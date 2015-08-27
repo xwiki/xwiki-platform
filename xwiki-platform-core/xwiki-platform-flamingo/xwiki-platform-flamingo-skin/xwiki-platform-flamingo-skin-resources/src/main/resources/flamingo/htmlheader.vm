@@ -11,13 +11,9 @@
   data-xwiki-${name}="$escapetool.xml($value)"
 #end
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language"
-  ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
-  ## http://platform.xwiki.org/xwiki/bin/view/DevGuide/JavaScriptAPI#HGetsomeinformationaboutthecurrentdocument
+## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
+## http://platform.xwiki.org/xwiki/bin/view/DevGuide/JavaScriptAPI#HGetsomeinformationaboutthecurrentdocument
   #xwikiDataAttribute('document-reference', $services.model.serialize($doc.documentReference, 'default'))
-  #xwikiDataAttribute('document', $doc.fullName)
-  #xwikiDataAttribute('wiki', $doc.wiki)
-  #xwikiDataAttribute('space', $doc.space)
-  #xwikiDataAttribute('page', $doc.name)
   #xwikiDataAttribute('version', $doc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>

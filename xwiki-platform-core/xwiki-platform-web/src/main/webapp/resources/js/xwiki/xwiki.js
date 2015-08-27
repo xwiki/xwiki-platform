@@ -1244,8 +1244,7 @@ XWiki.Document = Class.create({
    * e.g. new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'));
    */
   initialize : function(pageNameOrReference, space, wiki) {
-    if (typeof pageNameOrReference === 'string') {
-      // The first argument is the page name
+    if (typeof pageNameOrReference === 'string' || typeof space === 'string' || typeof wiki === 'space') {
       this.initializeFromStrings(pageNameOrReference, space, wiki);
     } else {
       // The first argument is a document reference (or it is null).
@@ -1259,21 +1258,15 @@ XWiki.Document = Class.create({
    */
   initializeFromReference : function(reference) {
     this.documentReference = reference || XWiki.Document.currentDocumentReference;
-    this.page = this.documentReference.extractReferenceValue(XWiki.EntityType.DOCUMENT);
-    var referenceArray = this.documentReference.extractReference(XWiki.EntityType.SPACE).getReversedReferenceChain();
-    this.spaces = [];
-    this.space = '';
-    // start at index 1 to skip the wiki reference part since we only want an array of spaces.
-    for (var i = 1; i < referenceArray.length; i++) {
-      this.spaces[i - 1] = referenceArray[i].getName();
-      // TODO: replace this part by a 'local' serializer for the space reference
-      if (i > 1) {
-        this.space += '.';
-      }
-      // Escape the dots
-      this.space += this.spaces[i - 1].replace(/\./g, '\\.');
-    }
-    this.wiki = this.documentReference.extractReferenceValue(XWiki.EntityType.WIKI);
+    var wikiReference       = this.documentReference.extractReference(XWiki.EntityType.WIKI);
+    var spaceReference      = this.documentReference.extractReference(XWiki.EntityType.SPACE);
+    var localSpaceReference = spaceReference.relativeTo(wikiReference);
+    this.page   = this.documentReference.extractReferenceValue(XWiki.EntityType.DOCUMENT);
+    this.space  = XWiki.Model.serialize(spaceReference.relativeTo(wikiReference));
+    this.spaces = localSpaceReference.getReversedReferenceChain().map(function(spaceRef) {
+      return spaceRef.getName();
+    });
+    this.wiki   = this.documentReference.extractReferenceValue(XWiki.EntityType.WIKI);
   },
   
   /**
@@ -1286,11 +1279,10 @@ XWiki.Document = Class.create({
     // It is recommended to use the new this.spaces variable which is an array of space Strings, representing the spaces
     // in which the document is located.
     this.space = space || XWiki.Document.currentSpace;
-    var referenceArray = XWiki.Model.resolve(this.space, XWiki.EntityType.SPACE).getReversedReferenceChain();
-    this.spaces = [];
-    for (var i = 0; i < referenceArray.length; i++) {
-      this.spaces[i] = referenceArray[i].getName();
-    }
+    var localSpaceReference = XWiki.Model.resolve(this.space, XWiki.EntityType.SPACE);
+    this.spaces = localSpaceReference.getReversedReferenceChain().map(function(spaceRef) {
+      return spaceRef.getName();
+    });
     this.wiki = wiki || XWiki.Document.currentWiki;
     this.documentReference = new XWiki.DocumentReference(this.wiki, this.spaces, this.page);
   },
@@ -1301,13 +1293,9 @@ XWiki.Document = Class.create({
   getURL : function(action, queryString, fragment) {
     action = action || 'view';
     var url = XWiki.Document.URLTemplate;
-    var spaceSegments = '';
-    for (var i = 0; i < this.spaces.length; ++i) {
-      if (i > 0) {
-        spaceSegments += '/';
-      }
-      spaceSegments += encodeURIComponent(this.spaces[i]);
-    }
+    var spaceSegments = this.spaces.map(function(spaceSegment) {
+      return encodeURIComponent(spaceSegment);
+    }).join('/');
     url = url.replace("__space__", spaceSegments);
     url = url.replace("__page__", (this.page == 'WebHome') ? '' : encodeURIComponent(this.page));
     url = url.replace("__action__/", encodeURIComponent(action) + "/");
@@ -1326,13 +1314,9 @@ XWiki.Document = Class.create({
     entity = entity || '';
     var url = XWiki.Document.RestURLTemplate;
     url = url.replace("__wiki__", this.wiki);
-    var spaceSegments = '';
-    for (var i = 0; i < this.spaces.length; ++i) {
-      if (i > 0) {
-        spaceSegments += '/spaces/';
-      }
-      spaceSegments += encodeURIComponent(this.spaces[i]);
-    }
+    var spaceSegments = this.spaces.map(function(spaceSegment) {
+      return encodeURIComponent(spaceSegment);
+    }).join('/spaces/');
     url = url.replace("__space__", spaceSegments);
     url = url.replace("__page__", this.page);
     if (entity) {

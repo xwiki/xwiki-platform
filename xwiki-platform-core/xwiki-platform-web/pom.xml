@@ -82,6 +82,7 @@
               <inputDir>${project.build.directory}/minimized</inputDir>
               <output>${project.build.directory}/minimized/resources/js/xwiki/xwiki-min.js</output>
               <includes>
+                <!-- entityReference.js is added first because it is used by xwiki.js -->
                 <include>**/entityReference.js</include>
                 <include>**/xwiki.js</include>
                 <include>**/modalPopup.js</include>

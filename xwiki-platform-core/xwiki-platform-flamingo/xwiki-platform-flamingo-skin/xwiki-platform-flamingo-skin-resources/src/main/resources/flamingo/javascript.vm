@@ -14,6 +14,7 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ## help debugging we provide/bundle the individual files also and you can load them instead of the aggregated files by
 ## passing 'minify=false' in the request query string or setting debug.minify property in xwiki.properties file.
 #if (!$services.debug.minify)
+  ## entityReferences.js should be loaded first because it is used by xwiki.js
   $xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
   $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##

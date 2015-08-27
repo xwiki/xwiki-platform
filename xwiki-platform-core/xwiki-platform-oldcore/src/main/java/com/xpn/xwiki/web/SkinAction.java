@@ -88,7 +88,22 @@ public class SkinAction extends XWikiAction
 
     public String render(String path, XWikiContext context) throws XWikiException, IOException
     {
+        // This Action expects an incoming Entity URL of the type:
+        //   http://localhost:8080/xwiki/bin/skin/<path to resource on the filesystem, relative to the xwiki webapp>
+        // Example 1 (fs skin file): .../bin/skin/skins/flamingo/style.css?...
+        // Example 2 (fs resource file): .../bin/skin/resources/uicomponents/search/searchSuggest.css
+        // Example 3 (wiki skin attachment or xproperty): .../bin/skin/XWiki/DefaultSkin/somefile.css
+        //
+        // TODO: The mapping to an Entity URL is hackish and needs to be fixed,
+        // see http://jira.xwiki.org/browse/XWIKI-12449
+
+        // Since we support Nested Spaces, these two examples will be mapped as the following Attachment References:
+        // Example 1: skins.flamingo@style\.css
+        // Example 2: resources.uicomponents.search@searchSuggest\.css
+        // Example 3: XWiki.DefaultSkin@somefile\.css
+
         XWiki xwiki = context.getWiki();
+
         // Since skin paths usually contain the name of skin document, it is likely that the context document belongs to
         // the current skin.
         XWikiDocument doc = context.getDoc();
@@ -96,6 +111,7 @@ public class SkinAction extends XWikiAction
         // The base skin could be either a filesystem directory, or an xdocument.
         String baseskin = xwiki.getBaseSkin(context, true);
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
+
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
@@ -169,6 +185,7 @@ public class SkinAction extends XWikiAction
     {
         String path =
             URI.create(DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename).normalize().toString();
+        // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
             LOGGER.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
@@ -185,6 +202,7 @@ public class SkinAction extends XWikiAction
     public String getResourceFilePath(String filename) throws IOException
     {
         String path = URI.create(DELIMITER + RESOURCES_DIRECTORY + DELIMITER + filename).normalize().toString();
+        // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
             LOGGER.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "'");

@@ -14,12 +14,10 @@
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
   ## http://platform.xwiki.org/xwiki/bin/view/DevGuide/JavaScriptAPI#HGetsomeinformationaboutthecurrentdocument
   #xwikiDataAttribute('document-reference', $services.model.serialize($doc.documentReference, 'default'))
-  ## START: Kept for backward compatibility reasons even though the recommended way is through the 'xwiki-meta' module
-  #xwikiDataAttribute('document', $doc.fullName)
-  #xwikiDataAttribute('wiki', $doc.wiki)
-  #xwikiDataAttribute('space', $doc.space)
-  #xwikiDataAttribute('page', $doc.name)
-  ## STOP: Kept for backward compatibility reasons even though the recommended way is through the 'xwiki-meta' module
+  #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'document-reference' instead
+  #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'document-reference' instead
+  #xwikiDataAttribute('space', $doc.space)##deprecated, use 'document-reference' instead
+  #xwikiDataAttribute('page', $doc.name)##deprecated, use 'document-reference' instead
   #xwikiDataAttribute('version', $doc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>

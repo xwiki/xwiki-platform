@@ -168,8 +168,8 @@ public class XWikiDocumentMockitoTest
 
         when(query.setLimit(7)).thenReturn(query);
 
-        List<Object[]> result = Arrays.asList(new Object[] { "X", "y" }, new Object[] { "A", "b" });
-        when(query.<Object[]>execute()).thenReturn(result);
+        List<String> result = Arrays.asList("X.y", "A.b");
+        when(query.<String>execute()).thenReturn(result);
 
         List<DocumentReference> childrenReferences =
             document.getChildrenReferences(7, 3, this.oldcore.getXWikiContext());

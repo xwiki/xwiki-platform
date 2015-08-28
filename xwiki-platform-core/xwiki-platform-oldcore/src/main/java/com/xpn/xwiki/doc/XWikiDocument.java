@@ -5211,7 +5211,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 getStore()
                     .getQueryManager()
                     .createQuery(
-                        "select distinct doc.space, doc.name from XWikiDocument doc where "
+                        "select distinct doc.fullName from XWikiDocument doc where "
                             + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
                         Query.XWQL);
             query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
@@ -5219,13 +5219,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 .bindValue("prefixedFullName", getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
-            query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
+            query.bindValue("space",
+                LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference()));
             query.setLimit(nb).setOffset(start);
-            List<Object[]> queryResults = query.execute();
 
-            for (Object[] queryResult : queryResults) {
-                children.add(new DocumentReference(this.getDocumentReference().getWikiReference().getName(),
-                    (String) queryResult[0], (String) queryResult[1]));
+            List<String> queryResults = query.execute();
+            WikiReference wikiReference = this.getDocumentReference().getWikiReference();
+            for (String fullName : queryResults) {
+                children.add(getCurrentDocumentReferenceResolver().resolve(fullName, wikiReference));
             }
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,

@@ -31,7 +31,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -90,8 +91,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private Logger logger;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    private SpaceReferenceResolver<String> spaceReferenceResolver;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -175,10 +175,13 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 // In the database the space and page names are always specified for a document. However the wiki
                 // part isn't, so we need to replace the wiki reference with the current wiki.
                 // Note that the space part can contain one or more spaces since XWiki 7.2 and the introduction of
-                // Nested Spaces and thus we have to resolve the full reference.
-                DocumentReference wikiMacroDocumentReference = this.currentDocumentReferenceResolver.resolve(
-                    (String) wikiMacroDocumentData[0], new WikiReference(wikiName));
-                registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[1], xcontext);
+                // Nested Spaces.
+                SpaceReference spaceReference =
+                    this.spaceReferenceResolver.resolve((String) wikiMacroDocumentData[0], new WikiReference(wikiName));
+                DocumentReference wikiMacroDocumentReference =
+                    new DocumentReference((String) wikiMacroDocumentData[1], spaceReference);
+
+                registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
         } catch (Exception ex) {
             this.logger.warn("Failed to register macros for wiki [{}]: {}", wikiName, ex.getMessage());

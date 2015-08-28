@@ -1244,7 +1244,7 @@ XWiki.Document = Class.create({
    * e.g. new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'));
    */
   initialize : function(pageNameOrReference, space, wiki) {
-    if (typeof pageNameOrReference === 'string' || typeof space === 'string' || typeof wiki === 'space') {
+    if (typeof pageNameOrReference === 'string' || typeof space === 'string' || typeof wiki === 'string') {
       this.initializeFromStrings(pageNameOrReference, space, wiki);
     } else {
       // The first argument is a document reference (or it is null).

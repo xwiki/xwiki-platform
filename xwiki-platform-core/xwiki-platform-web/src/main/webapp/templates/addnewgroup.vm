@@ -8,9 +8,9 @@
 <input type="text" name="newgroup" value="" id="newgroupi">
 </dd>
 </dl>
-<p>
+<div class="buttons">
 <span class="buttonwrapper"><input class="button" type="submit" value="Create group" onclick="new Ajax.Request(new XWiki.Document(this.form.newgroup.value, 'XWiki').getURL('save', 'form_token=$!services.csrf.token&template=XWiki.XWikiGroupTemplate'), { onFailure: function(transport) { alert('__name__ cannot be used for the group name, as another document with this name already exists.'.replace('__name__', $('newgroupi').value)); }, onSuccess: function(transport) { window.lb.lbSaveForm(); } });"></span>
 <span class="buttonwrapper"><input class="button secondary" type="submit" name="formactioncancel" value="Cancel" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"></span>
-</p>
+</div>
 </form>
 </div>

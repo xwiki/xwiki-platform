@@ -58,7 +58,7 @@
     where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'
   </query>
   <query name="getWikiMacroDocuments">
-    select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj
+    select doc.fullName, doc.author from XWikiDocument doc, BaseObject obj
     where doc.fullName=obj.name
       and obj.className='XWiki.WikiMacroClass'
   </query>

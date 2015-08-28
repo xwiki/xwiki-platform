@@ -392,7 +392,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return total;
     }
 
-    public int updateFeedsInSpace(String space, boolean fullContent, boolean oneDocPerEntry, boolean force,
+    public int updateFeedsInSpace(String spaceReference, boolean fullContent, boolean oneDocPerEntry, boolean force,
         XWikiContext context) throws XWikiException
     {
         // Make sure we have this class
@@ -400,14 +400,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         String sql =
             ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.space='"
-                + space + "'";
+                + spaceReference + "'";
         int total = 0;
         List<String> feedDocList = context.getWiki().getStore().searchDocumentsNames(sql, context);
         if (feedDocList != null) {
             for (int i = 0; i < feedDocList.size(); i++) {
                 String feedDocName = feedDocList.get(i);
                 try {
-                    total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, space, context);
+                    total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, spaceReference, context);
                 } catch (XWikiException e) {
                     // an exception occurred while updating feedDocName, don't fail completely, put the exception in the
                     // context and then pass to the next feed

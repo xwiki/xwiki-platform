@@ -146,10 +146,10 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         }
     }
 
-    public int updateFeedsInSpace(String space, boolean fullContent, boolean force) throws XWikiException
+    public int updateFeedsInSpace(String spaceReference, boolean fullContent, boolean force) throws XWikiException
     {
         if (hasProgrammingRights()) {
-            return getProtectedPlugin().updateFeedsInSpace(space, fullContent, true, force, getXWikiContext());
+            return getProtectedPlugin().updateFeedsInSpace(spaceReference, fullContent, true, force, getXWikiContext());
         } else {
             return -1;
         }

@@ -33,7 +33,7 @@ public class UpdateThread extends AbstractXWikiRunnable
 {
     protected boolean fullContent;
 
-    protected String space;
+    protected String spaceReference;
 
     protected FeedPlugin feedPlugin;
 
@@ -59,12 +59,12 @@ public class UpdateThread extends AbstractXWikiRunnable
 
     private XWikiContext xwikiContext;
 
-    public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
+    public UpdateThread(String spaceReference, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
         XWikiContext context)
     {
         this.xwikiContext = context.clone();
         this.fullContent = fullContent;
-        this.space = space;
+        this.spaceReference = spaceReference;
         this.feedPlugin = feedPlugin;
         this.scheduleTimer = scheduleTimer;
     }
@@ -93,7 +93,7 @@ public class UpdateThread extends AbstractXWikiRunnable
                     // Make sure store sessions are cleaned up
                     context.getWiki().getStore().cleanUp(context);
                     // update the feeds
-                    nbLoadedArticles = feedPlugin.updateFeedsInSpace(space, fullContent, true, false, context);
+                    nbLoadedArticles = feedPlugin.updateFeedsInSpace(spaceReference, fullContent, true, false, context);
                 } catch (XWikiException e) {
                     exception = e;
                     e.printStackTrace();
@@ -121,7 +121,7 @@ public class UpdateThread extends AbstractXWikiRunnable
     
     public String getSpace()
     {
-        return space;
+        return spaceReference;
     }
 
     public boolean isUpdateInProgress()
@@ -152,7 +152,7 @@ public class UpdateThread extends AbstractXWikiRunnable
     public void stopUpdate()
     {
         if (!updateInProgress) {
-            feedPlugin.removeUpdateThread(space, this, getXWikiContext());
+            feedPlugin.removeUpdateThread(spaceReference, this, getXWikiContext());
         }
         stopUpdate = true;
     }
@@ -183,7 +183,7 @@ public class UpdateThread extends AbstractXWikiRunnable
         while (true) {
             update();
             if (stopUpdate) {
-                feedPlugin.removeUpdateThread(space, this, getXWikiContext());
+                feedPlugin.removeUpdateThread(spaceReference, this, getXWikiContext());
                 break;
             }
             try {

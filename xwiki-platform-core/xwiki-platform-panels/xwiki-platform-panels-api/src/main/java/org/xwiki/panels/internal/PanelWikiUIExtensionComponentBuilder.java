@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -34,8 +35,8 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.block.XDOM;
@@ -54,12 +55,6 @@ import com.xpn.xwiki.XWikiContext;
 @Named("panels")
 public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilder
 {
-    /**
-     * The execution context.
-     */
-    @Inject
-    private Execution execution;
-
     /**
      * The query manager, used to search for documents defining panels.
      */
@@ -84,6 +79,13 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     @Inject
     private ContentParser parser;
 
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentResolver;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     public List<DocumentReference> getDocumentReferences()
     {
@@ -91,12 +93,11 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
 
         try {
             Query query =
-                queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object(Panels.PanelClass) "
+                queryManager.createQuery("select doc.fullName from Document doc, doc.object(Panels.PanelClass) "
                     + "as panel", Query.XWQL);
-            List<Object[]> results = query.execute();
-            for (Object[] result : results) {
-                references.add(
-                    new DocumentReference(getXWikiContext().getWikiId(), (String) result[0], (String) result[1]));
+            List<String> results = query.execute();
+            for (String fullName : results) {
+                references.add(this.currentResolver.resolve(fullName));
             }
         } catch (Exception e) {
             // Fail "silently"
@@ -109,39 +110,29 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     @Override
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         List<WikiComponent> components = new ArrayList<WikiComponent>();
-        DocumentReference panelXClass = new DocumentReference(getXWikiContext().getWikiId(), "Panels", "PanelClass");
+        DocumentReference panelXClass = new DocumentReference(xcontext.getWikiId(), "Panels", "PanelClass");
         String content = (String) documentAccessBridge.getProperty(reference, panelXClass, "content");
         Syntax syntax = null;
         DocumentReference authorReference;
 
         try {
             syntax = documentAccessBridge.getDocument(reference).getSyntax();
-            authorReference =
-                getXWikiContext().getWiki().getDocument(reference, getXWikiContext()).getAuthorReference();
+            authorReference = xcontext.getWiki().getDocument(reference, xcontext).getAuthorReference();
             XDOM xdom = parser.parse(content, syntax, reference);
 
             components.add(new PanelWikiUIExtension(reference, authorReference, xdom, syntax, componentManager));
         } catch (WikiComponentException e) {
             throw e;
         } catch (ComponentLookupException e) {
-            throw new WikiComponentException(
-                String.format("Failed to initialize Panel UI extension [%s]", reference), e);
+            throw new WikiComponentException(String.format("Failed to initialize Panel UI extension [%s]", reference),
+                e);
         } catch (Exception e) {
-            throw new WikiComponentException(
-                String.format("Failed to retrieve panel document [%s]", reference), e);
+            throw new WikiComponentException(String.format("Failed to retrieve panel document [%s]", reference), e);
         }
 
         return components;
-    }
-
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

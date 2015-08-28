@@ -185,17 +185,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         spaceReference = spaceReferenceInput.val();
       }
 
-      if (!spaceReference) {
-        // Special handling for top level documents because the hierarchy_reference.vm template is not useful here.
-        // We can not build an URL without the space, so we do the work directly on the DOM.
-        // Remove all breadcrumb items that don't represent wikis.
-        locationContainer.find('li').not('.wiki').remove();
-
-        // Update the document part of the new location.
-        updateLocationFromTitleOrNameInput();
-      } else {
-        updateLocation(wikiField.val(), spaceReference);
-      }
+      updateLocation(wikiField.val(), spaceReference);
     };
 
     var updateLocationFromWikiField = function(event) {
@@ -208,11 +198,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       wiki = wiki || wikiField.val();
       localSpaceReference = localSpaceReference || spaceReferenceInput.val();
 
-      var spaceReference = XWiki.Model.resolve(localSpaceReference, XWiki.EntityType.SPACE);
+      // We need to pass a document reference to the hierarchy_reference template and we cannot create a document
+      // reference without the space reference. If the space reference is empty we use the current space reference and
+      // we remove the extra path elements afterwards from the breadcrumb HTML.
+      var spaceReference = XWiki.Model.resolve(localSpaceReference || xm.space, XWiki.EntityType.SPACE);
       var documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, spaceReference);
-      if (wiki) {        
-        spaceReference.appendParent(new XWiki.WikiReference(wiki));
-      }
+      wiki && spaceReference.appendParent(new XWiki.WikiReference(wiki));
 
       $.post(getCurrentPageURL(), {
         'xpage': 'hierarchy_reference',
@@ -222,6 +213,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         var newLocationContainer = $(data);
         locationContainer.replaceWith(newLocationContainer);
         locationContainer = newLocationContainer;
+
+        // Remove all breadcrumb items that don't represent wikis if the space reference was empty.
+        localSpaceReference || locationContainer.find('li').not('.wiki').remove();
 
         // Update the document part of the new location.
         updateLocationFromTitleOrNameInput();

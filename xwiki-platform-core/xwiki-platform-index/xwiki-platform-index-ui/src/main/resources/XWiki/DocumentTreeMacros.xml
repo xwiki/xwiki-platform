@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1414167261000</creationDate>
+  <creationDate>1414163661000</creationDate>
   <parent>XWiki.DocumentTree</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1414440426000</date>
-  <contentUpdateDate>1414438718000</contentUpdateDate>
+  <date>1440768391000</date>
+  <contentUpdateDate>1440768251000</contentUpdateDate>
   <version>1.1</version>
   <title>Document Tree Macros</title>
   <comment/>
@@ -49,6 +49,7 @@
   'showSpaces': false,
   'showDocumentTitle': true,
   'showAddDocument': false,
+  'showTerminalDocuments': true,
   'showTranslations': true,
   'showAttachments': true,
   'showAddAttachment': false,
@@ -226,7 +227,7 @@
   #set ($selectClause = 'select space.name from XWikiSpace space')
   #set ($orderByClause = 'order by space.name')
   #if ($count)
-    #set ($selectClause = 'select count(space.name) from XWikiSpace space')
+    #set ($selectClause = 'select count(*) from XWikiSpace space')
     #set ($orderByClause = '')
   #end
   #set ($_query = $services.query.hql("$selectClause $whereClause $orderByClause"))
@@ -253,12 +254,20 @@
   #set ($spaceHomePageRef = $services.model.resolveDocument('', 'default', $spaceReference))
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
+  #if ($docTreeConfig.showTerminalDocuments)
+    ## Each space has at least one document or one sub-space. There's no such thing as "empty space" in the model.
+    #set ($hasChildren = true)
+  #else
+    ## We display only the nested spaces. This space might contain only documents.
+    #getChildSpacesQuery($spaceReference $countQuery true)
+    #set ($hasChildren = $countQuery.execute().get(0) &gt; 0)
+  #end
   #set ($discard = $siblings.add({
     'id': "space:$spaceId",
     'text': $spaceReference.name,
     'icon': 'fa fa-folder-o',
     'iconOpened': 'fa fa-folder-open-o',
-    'children': true,
+    'children': $hasChildren,
     'data': {
       'id': $spaceId,
       'type': 'space',
@@ -280,6 +289,14 @@
 
 #macro (addSpaceChildren $spaceId $offset $limit $children)
   #set ($spaceReference = $services.model.resolveSpace($spaceId))
+  #if ($docTreeConfig.showTerminalDocuments)
+    #addChildSpacesAndDocuments($spaceReference $offset $limit $children)
+  #else
+    #addChildSpaces($spaceReference $offset $limit $children)
+  #end
+#end
+
+#macro (addChildSpacesAndDocuments $spaceReference $offset $limit $children)
   #getSpaceChildrenQuery($spaceReference $selectQuery)
   #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
   #if ($results.size() &gt;= $limit)
@@ -361,20 +378,16 @@
   ## * if we use group-by then count returns the number of rows in each group not the number of groups
   ## So we're forced to do two queries.
   ## Count child spaces.
-  #set ($statement = 'select count(*) from XWikiSpace space where space.parent = :parentSpaceRef')
-  #set ($query = $services.query.hql($statement).addFilter('hidden/space'))
-  #set ($query = $query.setWiki($parentReference.extractReference('WIKI').name))
-  #set ($parentSpaceRef = $parentReference.extractReference('SPACE'))
-  #set ($parentLocalSpaceRef = $services.model.serialize($parentSpaceRef, 'local'))
-  #set ($query = $query.bindValue('parentSpaceRef', $parentLocalSpaceRef))
+  #getChildSpacesQuery($parentReference $query true)
   #set ($count = $query.execute().get(0))
   ## Count child documents.
   #set ($isChildDocument = [
     'doc.space = :parentSpaceRef',
     'doc.translation = 0'
   ])
+  #set ($parentSpaceRef = $parentReference.extractReference('SPACE'))
   #set ($parameters = {
-    'parentSpaceRef': $parentLocalSpaceRef
+    'parentSpaceRef': $services.model.serialize($parentSpaceRef, 'local')
   })
   #if ($docTreeConfig.hierarchyMode == 'parentchild')
     ## Include only the documents that either don't have a parent or that have a parent in a different space.
@@ -415,8 +428,8 @@
 #end
 
 #macro (addNestedChildDocuments $parentReference $offset $limit $siblings)
-  #set ($parentSpaceReference = $parentReference.extractReference('SPACE'))
-  #if ($parentSpaceReference)
+  #set ($macro.parentSpaceRef = $parentReference.extractReference('SPACE'))
+  #if ($macro.parentSpaceRef &amp;&amp; $docTreeConfig.showTerminalDocuments)
     #getSpaceChildrenQuery($parentReference $selectQuery)
     #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
     #if ($results.size() &gt;= $limit)
@@ -426,7 +439,7 @@
     #foreach ($result in $results)
       #set ($childName = $result.get(0))
       #set ($childType = $childTypes.get($result.get(1)))
-      #set ($childReference = $services.model.createEntityReference($childName, $childType, $parentSpaceReference))
+      #set ($childReference = $services.model.createEntityReference($childName, $childType, $macro.parentSpaceRef))
       #if ($childType == 'SPACE')
         #set ($childReference = $services.model.resolveDocument('', 'default', $childReference))
       #end
@@ -439,8 +452,12 @@
       #getChildSpacesQuery($parentReference $countQuery true)
       #set ($totalCount = $countQuery.execute().get(0))
     #end
+    #set ($spaceParentReference = $macro.parentSpaceRef)
+    #if (!$spaceParentReference)
+      #set ($spaceParentReference = $parentReference.extractReference('WIKI'))
+    #end
     #foreach ($spaceName in $results)
-      #set ($spaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $parentReference))
+      #set ($spaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $spaceParentReference))
       #set ($documentReference = $services.model.resolveDocument('', 'default', $spaceReference))
       #maybeAddDocumentNode($documentReference $siblings)
     #end
@@ -525,7 +542,12 @@
   #set ($count = 0)
   #if ($docTreeConfig.hierarchyMode == 'reference' &amp;&amp; !$docTreeConfig.showSpaces
       &amp;&amp; $parentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
-    #getSpaceChildrenCount($parentReference $count)
+    #if ($docTreeConfig.showTerminalDocuments)
+      #getSpaceChildrenCount($parentReference $count)
+    #else
+      #getChildSpacesQuery($parentReference $countQuery true)
+      #set ($count = $countQuery.execute().get(0))
+    #end
   #elseif ($docTreeConfig.hierarchyMode == 'parentchild')
     #getParentChildDocumentsQuery($parentReference $countQuery)
     #set ($wikiReference = $parentReference.extractReference('WIKI'))
@@ -1319,7 +1341,9 @@
   #set ($limit = 6)
   #set ($text = "$!request.query")
   #set ($lists = [])
-  #addDocumentSuggestions($text $limit $lists)
+  #if (!$docTreeConfig.showSpaces || $docTreeConfig.showTerminalDocuments)
+    #addDocumentSuggestions($text $limit $lists)
+  #end
   #if ($docTreeConfig.showAttachments)
     #addAttachmentSuggestions($text $limit $lists)
   #end
@@ -1381,12 +1405,17 @@
 #end
 
 #macro (searchDocumentsSolr $text $limit $return)
-  #set ($params = $stringtool.join([
+  #set ($params = [
     'fq=type:DOCUMENT',
     'fq=doclocale:""',
     'qf=title^6 name^4 doccontent^2 doccontentraw',
     'fl=wiki space name'
-  ], $util.newline))
+  ])
+  #if (!$docTreeConfig.showTerminalDocuments)
+    #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #set ($discard = $params.add("fq=name:$defaultDocumentName"))
+  #end
+  #set ($params = $stringtool.join($params, $util.newline))
   #createSearchSuggestQuery($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($documentReferences = [])
@@ -1401,8 +1430,25 @@
 #end
 
 #macro (searchDocumentsDatabase $text $limit $return)
-  #set ($matchDocNameOrTitle = '(upper(doc.name) like upper(:text) or upper(doc.title) like upper(:text))')
-  #set ($statement = 'where doc.translation = 0 and $matchDocNameOrTitle')
+  #set ($constraints = [
+    'doc.translation = 0',
+    'doc.space = space.reference'
+  ])
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($matchDocTitle = 'upper(doc.title) like upper(:text)')
+  #if ($docTreeConfig.showTerminalDocuments)
+    #set ($matchDocName = "(doc.name &lt;&gt; '$defaultDocumentName' and upper(doc.name) like upper(:text))")
+    #set ($matchSpaceName = "(doc.name = '$defaultDocumentName' and upper(space.name) like upper(:text))")
+    #set ($discard = $constraints.add("($matchDocTitle or $matchDocName or $matchSpaceName)"))
+  #else
+    #set ($matchSpaceName = 'upper(space.name) like upper(:text)')
+    #set ($discard = $constraints.addAll([
+      "doc.name = '$defaultDocumentName'",
+      "($matchDocTitle or $matchSpaceName)"
+    ]))
+  #end
+  #set ($constraints = $stringtool.join($constraints, ' and '))
+  #set ($statement = "select doc.fullName from XWikiDocument doc, XWikiSpace space where $constraints")
   #set ($query = $services.query.hql($statement).addFilter('hidden/document'))
   #set ($query = $query.setLimit($limit).bindValue('text', "%$text%"))
   #set ($documentReferences = [])

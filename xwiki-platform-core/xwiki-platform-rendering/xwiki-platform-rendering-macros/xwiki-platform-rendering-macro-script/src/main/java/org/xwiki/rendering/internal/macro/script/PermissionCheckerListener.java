@@ -40,7 +40,7 @@ import org.xwiki.security.authorization.Right;
 /**
  * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and aborts execution if the user is
  * not permitted to execute the script.
- * 
+ *
  * @version $Id$
  * @since 2.5M1
  */
@@ -78,8 +78,9 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
             MacroPermissionPolicy mpp =
                 this.componentManager.getInstance(MacroPermissionPolicy.class, currentMacroId.getId());
             if (!mpp.hasPermission(parameters, context)) {
-                event.cancel(
-                    String.format("You don't have the right to execute the script macro [%s]", currentMacroId));
+                event.cancel(String.format("The execution of the [%s] script macro is not allowed."
+                    + " Check the rights of its last author or the parameters if it's rendered from another script.",
+                    currentMacroId));
             }
         } catch (ComponentLookupException e) {
             // Policy not found for macro, check permission using backward compatibility check

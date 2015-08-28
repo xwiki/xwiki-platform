@@ -65,7 +65,7 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
 
 /**
  * Unit tests for {@link IncludeMacro}.
- * 
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -144,7 +144,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 + "endGroup [[class]=[xwikirenderingerror]]\n"
                 + "beginGroup [[class]=[xwikirenderingerrordescription hidden]]\n"
                 + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: "
-                    + "You don't have the right to execute the script macro [velocity]";
+                + "The execution of the [velocity] script macro is not allowed.";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
         List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);

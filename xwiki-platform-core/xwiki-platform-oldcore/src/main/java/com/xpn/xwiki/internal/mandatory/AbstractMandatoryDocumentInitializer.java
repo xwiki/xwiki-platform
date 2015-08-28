@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -92,13 +93,10 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
         if (this.reference != null && this.reference.extractReference(EntityType.WIKI) == null && isMainWikiOnly()) {
             synchronized (this) {
                 if (this.reference.extractReference(EntityType.WIKI) == null) {
-                    // Extract the information and use it to create a new main wiki document reference.
-                    String mainWikiId = this.wikiDescriptorManager.getMainWikiId();
-                    String spaceName = this.reference.extractReference(EntityType.SPACE).getName();
-                    String documentName = this.reference.extractReference(EntityType.DOCUMENT).getName();
-
+                    // Convert to main wiki reference
                     EntityReference mainWikiEntityReference =
-                        new DocumentReference(mainWikiId, spaceName, documentName);
+                        this.resolver.resolve(this.reference,
+                            new WikiReference(this.wikiDescriptorManager.getMainWikiId()));
 
                     this.reference = mainWikiEntityReference;
                 }

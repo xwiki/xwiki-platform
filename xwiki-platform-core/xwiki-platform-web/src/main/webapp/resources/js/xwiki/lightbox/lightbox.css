@@ -67,7 +67,7 @@
 #lb {
   left: 0;
   margin-left: 0;
-  width: auto;
+  width: 100%;
 }
 
 @media (min-width: 768px) { /* Should be: @screen-sm-min */

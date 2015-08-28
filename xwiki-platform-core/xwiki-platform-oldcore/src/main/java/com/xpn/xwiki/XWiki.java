@@ -2858,8 +2858,8 @@ public class XWiki implements EventListener
      */
     public BaseClass getEditModeClass(XWikiContext context) throws XWikiException
     {
-        return getMandatoryClass(context, new DocumentReference(context.getWikiId(), XWikiConstant.EDIT_MODE_CLASS
-            .getParent().getName(), XWikiConstant.EDIT_MODE_CLASS.getName()));
+        return getMandatoryClass(context, new DocumentReference(XWikiConstant.EDIT_MODE_CLASS, new WikiReference(
+            context.getWikiId())));
     }
 
     /**

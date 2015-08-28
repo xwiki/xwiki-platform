@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -34,10 +33,7 @@ import org.xwiki.ircbot.internal.BotData;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -68,19 +64,6 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
      */
     @Inject
     private Execution execution;
-
-    /**
-     * Used to format references in exception messages.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> defaultSerializer;
-
-    /**
-     * Used to compute a Wiki Bot Listener id from a relative Document reference without the wiki part.
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
 
     @Inject
     private WikiDescriptorManager wikis;
@@ -120,7 +103,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
             document = getDocument(new DocumentReference(this.wikis.getMainWikiId(), SPACE, CONFIGURATION_PAGE));
         }
 
-        return  document;
+        return document;
     }
 
     @Override
@@ -158,9 +141,9 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         List<Object[]> results;
         try {
             Query query = this.queryManager.createQuery(
-                String.format("select distinct doc.space, doc.name, listener.name, listener.description "
-                    + "from Document doc, doc.object(%s) as listener",
-                        this.defaultSerializer.serialize(WIKI_BOT_LISTENER_CLASS)), Query.XWQL);
+                String.format("select distinct doc.fullName, listener.name, listener.description "
+                    + "from Document doc, doc.object(%s) as listener", WIKI_BOT_LISTENER_CLASS_FULLNAME),
+                    Query.XWQL);
             results = query.execute();
         } catch (QueryException e) {
             throw new IRCBotException("Failed to locate IRC Bot listener objects in the wiki", e);
@@ -168,10 +151,8 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
 
         List<BotListenerData> data = new ArrayList<BotListenerData>();
         for (Object[] documentData : results) {
-            EntityReference relativeReference = new EntityReference((String) documentData[1], EntityType.DOCUMENT,
-                new EntityReference((String) documentData[0], EntityType.SPACE));
-            data.add(new BotListenerData(this.compactWikiSerializer.serialize(relativeReference),
-                (String) documentData[2], (String) documentData[3], true));
+            data.add(new BotListenerData((String) documentData[0], (String) documentData[1], (String) documentData[2],
+                true));
         }
 
         return data;

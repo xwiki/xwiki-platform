@@ -36,10 +36,20 @@ public interface WikiIRCBotConstants
     String SPACE = "IRC";
 
     /**
+     * The name of the IRC.IRCBotListenerClass xwiki class.
+     */
+    String WIKI_BOT_LISTENER_CLASS_NAME = "IRCBotListenerClass";
+
+    /**
      * IRC.IRCBotListenerClass xwiki class.
      */
-    EntityReference WIKI_BOT_LISTENER_CLASS = new EntityReference("IRCBotListenerClass", EntityType.DOCUMENT,
+    EntityReference WIKI_BOT_LISTENER_CLASS = new EntityReference(WIKI_BOT_LISTENER_CLASS_NAME, EntityType.DOCUMENT,
         new EntityReference(SPACE, EntityType.SPACE));
+
+    /**
+     * The full name of the IRC.IRCBotListenerClass xwiki class.
+     */
+    String WIKI_BOT_LISTENER_CLASS_FULLNAME = SPACE + '.' + WIKI_BOT_LISTENER_CLASS_NAME;
 
     /**
      * Listener name property.

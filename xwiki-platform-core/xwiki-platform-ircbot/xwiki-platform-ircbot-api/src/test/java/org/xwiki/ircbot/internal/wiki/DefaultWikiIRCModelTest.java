@@ -167,7 +167,7 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         Query query = mock(Query.class);
 
         List results = Collections.singletonList(new Object[]{
-            "space", "name", "listenername", "listenerdescription" });
+            "space.name", "listenername", "listenerdescription" });
 
         when(this.mockQueryManager.createQuery(anyString(), anyString())).thenReturn(query);
         when(query.execute()).thenReturn(results);

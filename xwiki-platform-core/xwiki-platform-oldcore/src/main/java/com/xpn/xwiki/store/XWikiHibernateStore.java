@@ -2527,15 +2527,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         // Search documents
-        List<Object[]> documentDatas = new ArrayList<Object[]>();
+        List documentDatas = new ArrayList();
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             String sql;
             if (distinctbylanguage) {
-                sql = createSQLQuery("select distinct doc.space, doc.name, doc.language", wheresql);
+                sql = createSQLQuery("select distinct doc.fullName, doc.language", wheresql);
             } else {
-                sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
+                sql = createSQLQuery("select distinct doc.fullName", wheresql);
             }
 
             // Start monitoring timer
@@ -2587,9 +2587,20 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // Resolve documents. We use two separated sessions because rights service could need to switch database to
         // check rights
         List<XWikiDocument> documents = new ArrayList<XWikiDocument>();
-        for (Object[] result : documentDatas) {
+        WikiReference currentWikiReference = new WikiReference(context.getWikiId());
+        for (Object result : documentDatas) {
+            String fullName;
+            String locale;
+            if (result instanceof String) {
+                fullName = (String) result;
+                locale = null;
+            } else {
+                fullName = (String) ((Object[])result)[0];
+                locale = (String) ((Object[])result)[1];
+            }
+
             XWikiDocument doc =
-                new XWikiDocument(new DocumentReference(context.getWikiId(), (String) result[0], (String) result[1]));
+                new XWikiDocument(this.defaultDocumentReferenceResolver.resolve(fullName, currentWikiReference));
             if (checkRight) {
                 if (!context.getWiki().getRightService()
                     .hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {
@@ -2599,12 +2610,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             DocumentReference documentReference = doc.getDocumentReference();
             if (distinctbylanguage) {
-                String language = (String) result[2];
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-                if ((language == null) || (language.equals(""))) {
+                if (StringUtils.isEmpty(locale)) {
                     documents.add(document);
                 } else {
-                    documents.add(document.getTranslatedDocument(language, context));
+                    documents.add(document.getTranslatedDocument(locale, context));
                 }
             } else {
                 documents.add(context.getWiki().getDocument(documentReference, context));

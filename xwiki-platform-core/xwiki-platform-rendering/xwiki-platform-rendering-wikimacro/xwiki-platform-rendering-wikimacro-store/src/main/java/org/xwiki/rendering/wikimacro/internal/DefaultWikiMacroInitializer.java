@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -88,6 +89,9 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
      */
     @Inject
     private Logger logger;
+
+    @Inject
+    private SpaceReferenceResolver<String> spaceReferenceResolver;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -170,9 +174,12 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                 // In the database the space and page names are always specified for a document. However the wiki
                 // part isn't, so we need to replace the wiki reference with the current wiki.
+                // Note that the space part can contain one or more spaces since XWiki 7.2 and the introduction of
+                // Nested Spaces.
+                SpaceReference spaceReference =
+                    this.spaceReferenceResolver.resolve((String) wikiMacroDocumentData[0], new WikiReference(wikiName));
                 DocumentReference wikiMacroDocumentReference =
-                    new DocumentReference((String) wikiMacroDocumentData[1], new SpaceReference(
-                        (String) wikiMacroDocumentData[0], new WikiReference(wikiName)));
+                    new DocumentReference((String) wikiMacroDocumentData[1], spaceReference);
 
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }

@@ -26,8 +26,8 @@ define(['jquery'], function($) {
   var html = $('html');
   // Case 1: meta information are stored in the data- attributes of the <html> tag
   // (since Flamingo)
-  if (html.data('xwiki-document-reference') !== undefined) {
-    var documentReference = XWiki.Model.resolve(html.data('xwiki-document-reference'), XWiki.EntityType.DOCUMENT);
+  if (html.data('xwiki-reference') !== undefined) {
+    var documentReference = XWiki.Model.resolve(html.data('xwiki-reference'), XWiki.EntityType.DOCUMENT);
     var wikiReference     = documentReference.extractReference(XWiki.EntityType.WIKI);
     var spaceReference    = documentReference.extractReference(XWiki.EntityType.SPACE);
     return {

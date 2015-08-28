@@ -13,11 +13,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language"
   ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
   ## http://platform.xwiki.org/xwiki/bin/view/DevGuide/JavaScriptAPI#HGetsomeinformationaboutthecurrentdocument
-  #xwikiDataAttribute('document-reference', $services.model.serialize($doc.documentReference, 'default'))
-  #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'document-reference' instead
-  #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'document-reference' instead
-  #xwikiDataAttribute('space', $doc.space)##deprecated, use 'document-reference' instead
-  #xwikiDataAttribute('page', $doc.name)##deprecated, use 'document-reference' instead
+  #xwikiDataAttribute('reference', $services.model.serialize($doc.documentReference, 'default'))
+  #xwikiDataAttribute('document', $doc.fullName)##deprecated, use 'reference' instead
+  #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'reference' instead
+  #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
+  #xwikiDataAttribute('page', $doc.name)##deprecated, use 'reference' instead
   #xwikiDataAttribute('version', $doc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>

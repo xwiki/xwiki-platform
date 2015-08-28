@@ -1335,11 +1335,11 @@ XWiki.Document = Class.create({
 TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225).
 Currently not done because the new API is asynchronous meanwhile this script must be loaded first/ */
 var htmlElement = $(document.documentElement);
-if (htmlElement.readAttribute('data-xwiki-document-reference') != null) {
+if (htmlElement.readAttribute('data-xwiki-reference') != null) {
   // Case 1: meta information are stored in the data- attributes of the <html> tag
   // (since Flamingo)
   var documentReference = XWiki.Model.resolve(
-    htmlElement.readAttribute('data-xwiki-document-reference'), XWiki.EntityType.DOCUMENT);
+    htmlElement.readAttribute('data-xwiki-reference'), XWiki.EntityType.DOCUMENT);
   var spaceReference    = documentReference.extractReference(XWiki.EntityType.SPACE);
   var wikiReference     = documentReference.extractReference(XWiki.EntityType.WIKI);
   XWiki.Document.currentDocumentReference = documentReference;

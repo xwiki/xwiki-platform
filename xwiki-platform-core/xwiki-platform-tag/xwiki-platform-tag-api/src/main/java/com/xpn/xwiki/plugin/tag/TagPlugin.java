@@ -180,7 +180,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     /**
      * Get cardinality map of tags for a specific wiki space.
      * 
-     * @param spaceReference the local reference of the space to get tags from. If blank, return tags for the whole wiki.
+     * @param spaceReference the local reference of the space to get tags from. If blank, return tags for the whole
+     *            wiki.
      * @param context XWiki context.
      * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
@@ -223,8 +224,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @since 1.18
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
      */
-    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
-            XWikiContext context) throws XWikiException
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+        XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, context);
     }

@@ -1,6 +1,7 @@
 #template('hierarchy_macros.vm')
 
 #set ($displayWikiFields = $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName && $xwiki.hasSubWikis())
+#set ($isDocumentTreeAvailable = $xwiki.exists('XWiki.DocumentTree'))
 
 #macro (locationPicker $options)
   #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js'))
@@ -39,8 +40,10 @@
       <span class="xHint">$services.localization.render($options.preview.hint)</span>
     </dt>
     <dd>
-      #documentPickerModal($options)
-      #locationPickerActions
+      #if ($isDocumentTreeAvailable)
+        #documentPickerModal($options)
+        #locationPickerActions
+      #end
       #if ("$!options.parent.reference" == '')
         #set ($hierarchyDoc = $tdoc)
       #else
@@ -73,7 +76,7 @@
 #end
 
 #macro (locationAdvancedEdit $options)
-  <div class="location-edit hidden">
+  <div class="location-edit#if ($isDocumentTreeAvailable) hidden#end">
     <dl>
       ## ---------------------------------------------------------------------------------------------------------
       ## Wiki field

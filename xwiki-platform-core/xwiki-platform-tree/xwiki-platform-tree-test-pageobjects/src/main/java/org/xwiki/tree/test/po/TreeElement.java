@@ -89,6 +89,21 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * Clear the selection in the tree.
+     * 
+     * @return this tree
+     * @since 7.2M3
+     */
+    public TreeElement clearSelection()
+    {
+        if (getDriver() instanceof JavascriptExecutor) {
+            ((JavascriptExecutor) getDriver()).executeScript(
+                "jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
+        }
+        return this;
+    }
+
+    /**
      * Wait as long as the tree in busy (loading).
      * 
      * @return this tree

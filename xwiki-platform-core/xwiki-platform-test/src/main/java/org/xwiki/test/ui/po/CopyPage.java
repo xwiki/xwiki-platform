@@ -35,29 +35,33 @@ public class CopyPage extends ViewPage
      */
     private static final String VALUE = "value";
 
+    @FindBy(css = "form#copy .breadcrumb")
+    private WebElement sourceBreadcrumbElement;
+
+    private BreadcrumbElement sourceBreadcrumb;
+
     /**
      * The hidden input containing the space name of the source page.
      */
-    @FindBy(id = "sourceSpaceName")
+    @FindBy(xpath = "//input[@type='hidden' and @name = 'sourceSpaceName']")
     private WebElement sourceSpaceName;
 
     /**
      * The hidden input containing the source page name.
      */
-    @FindBy(id = "sourcePageName")
+    @FindBy(xpath = "//input[@type='hidden' and @name = 'sourcePageName']")
     private WebElement sourcePageName;
 
     /**
-     * The select box containing the list of available spaces.
+     * The element that contains the document picker used to select the target document.
      */
-    @FindBy(id = "targetSpaceName")
-    private WebElement targetSpaceName;
+    @FindBy(className = "location-picker")
+    private WebElement documentPickerElement;
 
     /**
-     * The text input field to enter the name of the target page.
+     * The document picker used to select the target document.
      */
-    @FindBy(id = "targetPageName")
-    private WebElement targetPageName;
+    private DocumentPicker documentPicker;
 
     /**
      * The copy button.
@@ -66,24 +70,51 @@ public class CopyPage extends ViewPage
     private WebElement copyButton;
 
     /**
+     * @return the breadcrumb that specified the location of the source document
+     * @since 7.2M3
+     */
+    public BreadcrumbElement getSourceLocation()
+    {
+        if (this.sourceBreadcrumb == null) {
+            this.sourceBreadcrumb = new BreadcrumbElement(this.sourceBreadcrumbElement);
+        }
+        return this.sourceBreadcrumb;
+    }
+
+    /**
      * @return the name of the space where the source page should be.
      */
-    public String getSourceSpaceName() {
+    public String getSourceSpaceName()
+    {
         return this.sourceSpaceName.getAttribute(VALUE);
     }
 
     /**
      * @return the name of the source page.
      */
-    public String getSourcePageName() {
+    public String getSourcePageName()
+    {
         return this.sourcePageName.getAttribute(VALUE);
+    }
+
+    /**
+     * @return the document picker used to select the target document
+     * @since 7.2M3
+     */
+    public DocumentPicker getDocumentPicker()
+    {
+        if (this.documentPicker == null) {
+            this.documentPicker = new DocumentPicker(this.documentPickerElement);
+        }
+        return this.documentPicker;
     }
 
     /**
      * @return the current name of the space where the page should be copied.
      */
-    public String getTargetSpaceName() {
-        return this.targetSpaceName.getAttribute(VALUE);
+    public String getTargetSpaceName()
+    {
+        return this.getDocumentPicker().getParent();
     }
 
     /**
@@ -93,15 +124,15 @@ public class CopyPage extends ViewPage
      */
     public void setTargetSpaceName(String targetSpaceName)
     {
-        this.targetSpaceName.clear();
-        this.targetSpaceName.sendKeys(targetSpaceName);
+        this.documentPicker.setParent(targetSpaceName);
     }
 
     /**
      * @return the current name of the target page.
      */
-    public String getTargetPageName() {
-        return this.targetPageName.getAttribute(VALUE);
+    public String getTargetPageName()
+    {
+        return this.documentPicker.getName();
     }
 
     /**
@@ -111,8 +142,7 @@ public class CopyPage extends ViewPage
      */
     public void setTargetPageName(String targetPageName)
     {
-        this.targetPageName.clear();
-        this.targetPageName.sendKeys(targetPageName);
+        this.documentPicker.setName(targetPageName);
     }
 
     /**

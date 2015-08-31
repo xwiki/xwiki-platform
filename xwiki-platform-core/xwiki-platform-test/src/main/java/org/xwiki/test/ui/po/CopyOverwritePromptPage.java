@@ -45,7 +45,7 @@ public class CopyOverwritePromptPage extends ViewPage
     /**
      * The change target button.
      */
-    @FindBy(xpath = "//a[@class = 'secondary button' and text()='Change the target document']")
+    @FindBy(xpath = "//a[@class = 'secondary button' and normalize-space(.) = 'Change the target document']")
     private WebElement changeButton;
 
     /**

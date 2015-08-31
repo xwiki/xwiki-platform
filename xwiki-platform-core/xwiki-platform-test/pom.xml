@@ -43,6 +43,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- We need to extend the generic tree page objects. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>

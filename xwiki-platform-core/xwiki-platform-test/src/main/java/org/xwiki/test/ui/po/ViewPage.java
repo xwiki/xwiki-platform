@@ -43,7 +43,9 @@ public class ViewPage extends BasePage
     private WebElement content;
 
     @FindBy(id = "hierarchy")
-    private WebElement breadcrumb;
+    private WebElement breadcrumbElement;
+
+    private BreadcrumbElement breadcrumb;
 
     /**
      * Opens the comments tab.
@@ -131,9 +133,17 @@ public class ViewPage extends BasePage
         }
     }
 
+    public BreadcrumbElement getBreadcrumb()
+    {
+        if (this.breadcrumb == null) {
+            this.breadcrumb = new BreadcrumbElement(this.breadcrumbElement);
+        }
+        return this.breadcrumb;
+    }
+
     public String getBreadcrumbContent()
     {
-        return this.breadcrumb.getText();
+        return this.breadcrumb.getPathAsString();
     }
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
@@ -143,22 +153,7 @@ public class ViewPage extends BasePage
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent, boolean withLink)
     {
-        List<WebElement> result;
-        if (isCurrent) {
-            result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
-                By.xpath("li[@class = 'active' and text() ='" + breadcrumbItem + "']"));
-        } else {
-            if (withLink) {
-                result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
-                        By.xpath("//a[text() = '" + breadcrumbItem + "']"));
-            } else {
-                // if the user has not the right to see the parent, there is no link to the parent, only a <li> with the
-                // name of the document
-                result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
-                        By.xpath("//li[text() = '" + breadcrumbItem + "']"));
-            }
-        }
-        return result.size() > 0;
+        return this.breadcrumb.hasPathElement(breadcrumbItem, isCurrent, withLink);
     }
 
     /**
@@ -169,7 +164,7 @@ public class ViewPage extends BasePage
      */
     public ViewPage clickBreadcrumbLink(String linkText)
     {
-        this.breadcrumb.findElement(By.linkText(linkText)).click();
+        this.breadcrumb.clickPathElement(linkText);
         return new ViewPage();
     }
 

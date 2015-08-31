@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki;
 
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 public class XWikiConstant
 {
@@ -33,8 +34,8 @@ public class XWikiConstant
      *
      * @since 3.1M2
      */
-    public static final LocalDocumentReference EDIT_MODE_CLASS = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
-        "EditModeClass");
+    public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,
+        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /** The context key which is used to signify that permissions have been dropped. */
     public static final String DROPPED_PERMISSIONS = "hasDroppedPermissions";

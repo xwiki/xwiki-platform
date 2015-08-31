@@ -121,6 +121,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -2858,8 +2859,8 @@ public class XWiki implements EventListener
      */
     public BaseClass getEditModeClass(XWikiContext context) throws XWikiException
     {
-        return getMandatoryClass(context, new DocumentReference(XWikiConstant.EDIT_MODE_CLASS, new WikiReference(
-            context.getWikiId())));
+        return getMandatoryClass(context, new DocumentReference(new LocalDocumentReference(
+            XWikiConstant.EDIT_MODE_CLASS), new WikiReference(context.getWikiId())));
     }
 
     /**

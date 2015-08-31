@@ -427,7 +427,7 @@ public class PackageMojo extends AbstractMojo
             // ordered LinkedHashSet behind the scene)
             List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(xarArtifacts);
             Collections.reverse(dependenciesFirstArtifacts);
-            
+
             // Import the xars
             for (Artifact xarArtifact : dependenciesFirstArtifacts) {
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
@@ -618,7 +618,7 @@ public class PackageMojo extends AbstractMojo
         Set<Artifact> artifacts = getMandatoryJarArtifacts();
         // But also the skins artifacts, that may have JAR dependencies
         artifacts.addAll(getSkinArtifacts());
-        
+
         // Now resolve mandatory dependencies if they're not explicitly specified
         Set<Artifact> resolvedArtifacts = resolveTransitively(artifacts);
 
@@ -642,7 +642,7 @@ public class PackageMojo extends AbstractMojo
     {
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
 
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xxwiki-platform-wiki-default.platform",
             "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
@@ -687,6 +687,15 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-resource-servlet", getXWikiPlatformVersion(), null, "jar"));
+
+        // Velocity Scripting for Model Modules is also core (it's used a bit everywhere in VMs, pages, etc).
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-wiki-script", getXWikiPlatformVersion(), null, "jar"));
+
+        // Copy/Delete/Rename/Move actions are currently in the Refactoring module and for now we consider them as
+        // core actions.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-refactoring-default", getXWikiPlatformVersion(), null, "jar"));
 
         // Get the platform's pom.xml to get the versions of some needed externals dependencies, so that we do not
         // hardcode them.

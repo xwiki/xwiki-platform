@@ -271,10 +271,23 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- We need pick a Wiki implementation @ runtime -->
+    <!-- Wiki API + Wiki Script Services are core modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Delete/Copy/Rename/Move actions are now in the Refactoring module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -20,7 +20,6 @@
 package org.xwiki.messagestream.test.ui;
 
 import org.junit.*;
-import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractTest;
@@ -51,13 +50,7 @@ public class AdministrationTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("MessageStream"));
 
         // Select XWiki space administration.
-        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
-
-        // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
-        // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        getDriver().waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
-        // Also wait till the page is fully loaded to be extra sure...
-        spaceAdministrationPage.waitUntilPageIsLoaded();
+        AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("MessageStream"));

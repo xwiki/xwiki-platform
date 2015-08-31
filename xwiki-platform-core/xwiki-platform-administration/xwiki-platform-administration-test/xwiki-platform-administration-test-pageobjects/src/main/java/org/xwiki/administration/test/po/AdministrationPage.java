@@ -22,7 +22,8 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -70,6 +71,34 @@ public class AdministrationPage extends ViewPage
     {
         getUtil().gotoPage(getSpace(), getPage(), "admin");
         return new AdministrationPage();
+    }
+
+    /**
+     * Redirects to the administration page of a specified space.
+     *
+     * @param spaceReference the space reference
+     * @return the administration page of the specified space
+     * @since 7.2M3
+     */
+    public static AdministrationPage gotoSpaceAdministrationPage(SpaceReference spaceReference)
+    {
+        DocumentReference documentReference = new DocumentReference("WebPreferences", spaceReference);
+        getUtil().gotoPage(documentReference, "admin");
+
+        return new AdministrationPage();
+    }
+
+    /**
+     * Redirects to the administration page of a specified space.
+     *
+     * @param spaceReferenceString the string serialized space reference
+     * @return the administration page of the specified space
+     * @since 7.2M3
+     */
+    public static AdministrationPage gotoSpaceAdministrationPage(String spaceReferenceString)
+    {
+        SpaceReference spaceReference = new SpaceReference(getUtil().resolveSpaceReference(spaceReferenceString));
+        return gotoSpaceAdministrationPage(spaceReference);
     }
 
     public static String getURL()
@@ -204,8 +233,8 @@ public class AdministrationPage extends ViewPage
      */
     public AdministrationPage selectSpaceToAdminister(String spaceName)
     {
-        Select select = new Select(this.spaceAdminSelect);
-        select.selectByVisibleText(spaceName);
-        return new AdministrationPage();
+        // FIXME: actually implement this (and maybe change its signature accordingly) once the new page administration
+        // UI is implemented in http://jira.xwiki.org/browse/XWIKI-12219
+        return gotoSpaceAdministrationPage(spaceName);
     }
 }

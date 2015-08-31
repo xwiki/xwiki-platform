@@ -674,6 +674,14 @@ public class TestUtils
     }
 
     /**
+     * @since 7.2M3
+     */
+    public EntityReference resolveSpaceReference(String referenceAsString)
+    {
+        return referenceResolver.resolve(referenceAsString, EntityType.SPACE);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete

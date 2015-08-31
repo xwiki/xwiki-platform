@@ -42,12 +42,7 @@ public class PanelWizardTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("Panels.PanelWizard"));
 
         // Select space administration (XWiki space, since that space exists)
-        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
-
-        // Note: I'm not sure this is good enough since waitUntilPageIsLoaded() tests for the existence of the footer
-        // but if the page hasn't started reloading then the footer will be present... However I ran this test 300
-        // times in a row without any failure...
-        spaceAdministrationPage.waitUntilPageIsLoaded();
+        AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
         // The Panel Wizard should be available in the space administration.
         Assert.assertTrue(spaceAdministrationPage.hasSection("Panels.PanelWizard"));

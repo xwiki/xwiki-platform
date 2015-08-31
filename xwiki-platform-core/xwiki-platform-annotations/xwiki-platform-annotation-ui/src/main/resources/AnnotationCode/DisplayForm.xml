@@ -51,7 +51,7 @@
 
 {{velocity filter="none"}}
 {{html clean="false"}}
-#displayViewBoxFromReference($annotationReference)
+#displayViewBoxFromReference("$!{request.id}", $annotationReference)
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

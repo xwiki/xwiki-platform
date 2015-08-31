@@ -40,6 +40,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none" output="false"}}
+## Not used here but kept for retro-compatibility
 #set($restURL = "${request.contextPath}/rest")
 ## Retrieve the annotation class from the configuration
 #set($config = 'AnnotationCode.AnnotationConfig')

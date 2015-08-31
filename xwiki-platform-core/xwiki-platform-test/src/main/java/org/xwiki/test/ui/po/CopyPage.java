@@ -53,15 +53,16 @@ public class CopyPage extends ViewPage
     private WebElement sourcePageName;
 
     /**
-     * The element that contains the document picker used to select the target document.
+     * The text input field to enter the name of the target space.
      */
-    @FindBy(className = "location-picker")
-    private WebElement documentPickerElement;
+    @FindBy(xpath = "//input[@name = 'targetSpaceName']")
+    private WebElement targetSpaceName;
 
     /**
-     * The document picker used to select the target document.
+     * The text input field to enter the name of the target page.
      */
-    private DocumentPicker documentPicker;
+    @FindBy(xpath = "//input[@name = 'targetPageName']")
+    private WebElement targetPageName;
 
     /**
      * The copy button.
@@ -98,23 +99,11 @@ public class CopyPage extends ViewPage
     }
 
     /**
-     * @return the document picker used to select the target document
-     * @since 7.2M3
-     */
-    public DocumentPicker getDocumentPicker()
-    {
-        if (this.documentPicker == null) {
-            this.documentPicker = new DocumentPicker(this.documentPickerElement);
-        }
-        return this.documentPicker;
-    }
-
-    /**
      * @return the current name of the space where the page should be copied.
      */
     public String getTargetSpaceName()
     {
-        return this.getDocumentPicker().getParent();
+        return this.targetSpaceName.getAttribute(VALUE);
     }
 
     /**
@@ -124,7 +113,8 @@ public class CopyPage extends ViewPage
      */
     public void setTargetSpaceName(String targetSpaceName)
     {
-        this.documentPicker.setParent(targetSpaceName);
+        this.targetSpaceName.clear();
+        this.targetSpaceName.sendKeys(targetSpaceName);
     }
 
     /**
@@ -132,7 +122,7 @@ public class CopyPage extends ViewPage
      */
     public String getTargetPageName()
     {
-        return this.documentPicker.getName();
+        return this.targetPageName.getAttribute(VALUE);
     }
 
     /**
@@ -142,7 +132,8 @@ public class CopyPage extends ViewPage
      */
     public void setTargetPageName(String targetPageName)
     {
-        this.documentPicker.setName(targetPageName);
+        this.targetPageName.clear();
+        this.targetPageName.sendKeys(targetPageName);
     }
 
     /**

@@ -34,7 +34,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       #set($clsname = 'XWiki.XWikiRights')
     #end
   #elseif ($doc.name == 'WebPreferences')
-    #if ("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin')
+    #if (("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin') && "$!request.section" != 'PageRights')
       #set ($clsname = 'XWiki.XWikiGlobalRights')
       #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
     #else

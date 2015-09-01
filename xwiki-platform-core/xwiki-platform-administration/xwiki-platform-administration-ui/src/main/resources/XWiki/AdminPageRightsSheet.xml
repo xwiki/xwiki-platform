@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="XWiki.AdminPageRightsSheet" locale="">
   <web>XWiki</web>
-  <name>AdminRightsSheet</name>
+  <name>AdminPageRightsSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -31,21 +31,19 @@
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1213904460000</date>
-  <contentUpdateDate>1213904460000</contentUpdateDate>
+  <date>1441103207000</date>
+  <contentUpdateDate>1441103207000</contentUpdateDate>
   <version>1.1</version>
-  <title>AdminRightsSheet</title>
+  <title>AdminPageRightsSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($editor == 'spaceadmin')
-  {{info}}
-  #set($webHomeRef = $services.model.resolveDocument('WebHome'))
-  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
-  {{/info}}
-#end
+{{info}}
+#set($webHomeRef = $services.model.resolveDocument('WebHome'))
+$services.localization.render('admin.pagerights.info') **$services.localization.render('admin.pagerights.infoNonTerminalDoc', ['[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]"])**
+{{/info}}
 
 ### Administrate the rights in a wiki (globally or per space).
 {{html}}

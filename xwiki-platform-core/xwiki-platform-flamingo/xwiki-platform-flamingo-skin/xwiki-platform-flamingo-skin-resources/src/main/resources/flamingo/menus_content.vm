@@ -51,7 +51,13 @@
       #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
       #submenuseparator()
       ## Rights
-      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
+      ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in 
+      ## a terminal document or if the user has not the admin right on the space (because right now the page 
+      ## administration is still combined with the space administration).
+      ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
+      #if ($doc.name != 'WebHome' || !$hasSpaceAdmin || !$isAdminAppInstalled)
+        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
+      #end
       ## Objects
       #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
       ## Class
@@ -67,6 +73,7 @@
   <div class="dropdown" id="tmMoreActions">
     <a href="" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-option-vertical"></span></a>
     <ul class="dropdown-menu">
+      #set ($hasPreviousMenuSection = false)
       ## WATCH /UNWATCH PAGE
       #if (!$doc.isNew() && $hasWatch)
         #set ($watchClasses = '')
@@ -77,6 +84,7 @@
         #end
         #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses 'eye-open')
         #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses 'eye-close')
+        #set ($hasPreviousMenuSection = true)
       #end
       ## WATCH /UNWATCH SPACE
       #if ($hasWatch)
@@ -96,14 +104,36 @@
         #end
         #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.wiki') 'tmWatchWiki', $watchClasses 'eye-open')
         #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses 'eye-close')
-        #submenuseparator()
+        #set ($hasPreviousMenuSection = true)
+      #end
+      ## ADMINISTER
+      #if ($hasSpaceAdmin && $isAdminAppInstalled)
+        #if ($hasPreviousMenuSection)
+          #submenuseparator()
+        #end
+        #set ($adminspaceaction = $xwiki.getURL($spacePreferencesDocumentReference, 'admin'))
+        #if ($doc.name == 'WebHome')
+          #set ($title = $services.localization.render('core.menu.admin.page'))
+        #else
+          #set ($title = $services.localization.render('core.menu.admin.parent'))
+        #end
+        #submenuitem($adminspaceaction $title 'tmAdminSpace', '', 'wrench')
+        #set ($hasPreviousMenuSection = true)
       #end
       ## COPY
       #if ($canCopy)
+        #if ($hasPreviousMenuSection)
+          #submenuseparator()
+          #set($hasPreviousMenuSection = false)
+        #end
         #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')
       #end
       ## DELETE
       #if ($canDelete)
+        #if ($hasPreviousMenuSection)
+          #submenuseparator()
+          #set($hasPreviousMenuSection = false)
+        #end
         #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')
         #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')
       #end

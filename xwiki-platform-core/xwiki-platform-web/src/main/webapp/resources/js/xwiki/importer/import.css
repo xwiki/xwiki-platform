@@ -13,11 +13,6 @@
   overflow: hidden;
 }
 
-.clearfloats {
-  font-size: 0; /* toucan IE6 */
-  margin: -1px 50px 0;
-}
-
 #attachform .buttonwrapper {
   margin: 0;
 }

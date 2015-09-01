@@ -63,19 +63,11 @@
     <ul class="drawer-menu">
       #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', 'Home')
       ## ADMINISTER WIKI
-      #set ($hasHomeWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${mainWikiId}:XWiki.XWikiPreferences"))
-      #if ($hasHomeWikiAdmin)
-        #set ($adminRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'XWikiPreferences'))
-        #set ($adminwikiaction = $!xwiki.getURL($adminRef, 'admin'))
-        #set ($importaction = $!xwiki.getURL($adminRef, 'import'))
-        #set ($homeAdminSheetRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'AdminSheet'))
-        #set ($isHomeAdminAppInstalled = $xwiki.exists($homeAdminSheetRef))
-        #if ($isHomeAdminAppInstalled)
-          #if($xcontext.isMainWiki())
-            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'), 'tmAdminWiki')
-          #else
-            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin'), 'tmAdminWiki')
-          #end
+      #if ($hasGlobalAdmin)
+        #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
+        #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
+        #if ($isAdminAppInstalled)
+          #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'), 'tmAdminWiki')
         #else
           #drawerItem($importaction, 'wrench', $services.localization.render('core.menu.admin'), 'tmAdminWiki')
         #end
@@ -85,16 +77,18 @@
       #template('menus_language.vm')
       ## WIKI INDEX
       #drawerSeparator()
-      #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $services.localization.render('platform.wiki.menu.wikiindex'))
+      #if ($xwiki.exists($WikiManagerMainDocReference))
+        #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $services.localization.render('platform.wiki.menu.wikiindex'))
+      #end
       ## DOCUMENT INDEX
-      #set($homeDocumentIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'AllDocs'))
-      #if ($xwiki.exists($homeDocumentIndexRef))
-        #drawerItem($xwiki.getURL($homeDocumentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'), 'tmWikiDocumentIndex')
+      #set($documentIndexRef = $services.model.createDocumentReference('', 'Main', 'AllDocs'))
+      #if ($xwiki.exists($documentIndexRef))
+        #drawerItem($xwiki.getURL($documentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'), 'tmWikiDocumentIndex')
       #end
       ## USER INDEX
-      #set($homeUserIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'UserDirectory'))
-      #if ($xwiki.exists($homeUserIndexRef))
-        #drawerItem($xwiki.getURL($homeUserIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'), 'tmMainUserIndex')
+      #set($userIndexRef = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
+      #if ($xwiki.exists($userIndexRef))
+        #drawerItem($xwiki.getURL($userIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'), 'tmMainUserIndex')
       #end
       ## CREATE WIKI
       #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)

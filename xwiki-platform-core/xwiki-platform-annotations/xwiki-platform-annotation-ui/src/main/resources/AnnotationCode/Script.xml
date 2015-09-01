@@ -909,7 +909,7 @@ XWiki.Annotation = Class.create({
     require(['xwiki-meta'], function (xm) {
       var getAnnotationsURL = xm.restURL + '/annotations?media=json';
       new Ajax.Request(getAnnotationsURL, {method: 'GET',
-        parameters: this.prepareRequestParameters(new Hash()), 
+        parameters: this.prepareRequestParameters(new Hash()),
         onCreate: function() {
           // show nice loading message at page bottom
           this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loading')", 'inprogress');
@@ -954,7 +954,7 @@ XWiki.Annotation = Class.create({
           }
         }.bind(this)
       });
-    });
+    }.bind(this));
   },
 
   /**

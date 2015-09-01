@@ -189,6 +189,7 @@
   <div class="hidden">
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
     <input type="hidden" name="confirm" value="1"/>
+    <input type="hidden" name="async" value="true"/>
     #if("$!{request.xredirect}" != '')
       <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
     #end

@@ -19,13 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.job.Job;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
 
@@ -48,10 +47,28 @@ public class DeleteAction extends XWikiAction
     
     protected static final String ACTION_NAME = "delete";
     
+    protected static final String ASYNC_PARAM = "async";
+
+    protected static final String RECYCLED_DOCUMENT_ID_PARAM = "id";
+    
+    protected static final String JOB_ID_PARAM = "jobId";
+    
     protected boolean isJobLaunched(XWikiRequest request)
     {
         // If the jobId is given, then the deletion is already processing, and we let the UI display a progress bar
-        return StringUtils.isNotEmpty(request.getParameter("jobId"));
+        return StringUtils.isNotEmpty(request.getParameter(JOB_ID_PARAM));
+    }
+    
+    protected boolean isAsync(XWikiRequest request)
+    {
+        return "true".equals(request.get(ASYNC_PARAM));
+    }
+    
+    private boolean doesAffectChildren(XWikiRequest request, DocumentReference documentReference)
+    {
+        return StringUtils.isNotEmpty(request.getParameter("affectChildren")) &&
+                // Security check: we do not "affect children" of a terminal document
+                "WebHome".equals(documentReference.getName());
     }
 
     @Override
@@ -94,7 +111,7 @@ public class DeleteAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
-        String sindex = request.getParameter("id");
+        String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         boolean recycleIdIsValid = false;
         if (sindex != null) {
             long index = Long.parseLong(sindex);
@@ -127,40 +144,76 @@ public class DeleteAction extends XWikiAction
             return false;
         }
         
-        String sindex = request.getParameter("id");
+        String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         if (sindex != null && xwiki.hasRecycleBin(context)) {
-            long index = Long.parseLong(sindex);
-            XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
-            // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
-            // don't try to delete it and instead redirect to the view page.
-            if (dd != null) {
-                DeletedDocument ddapi = new DeletedDocument(dd, context);
-                if (!ddapi.canDelete()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "You are not allowed to delete a document from the trash "
-                            + "immediately after it has been deleted from the wiki");
-                }
-                if (!dd.getFullName().equals(doc.getFullName())) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                        "The specified trash entry does not match the current document");
-                }
-                xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
-            }
-            sendRedirect(response, Utils.getRedirect("view", context));
+            deleteFromRecycleBin(Long.parseLong(sindex), context);
+            return true;
         } else if (doc.isNew()) {
             // Redirect the user to the view template so that he gets the "document doesn't exist" dialog box.
             sendRedirect(response, Utils.getRedirect("view", context));
+            return true;
         } else {
             // Delete to recycle bin.
-            List<String> jobId = delete(doc.getTranslatedDocument(context).getDocumentReferenceWithLocale(),
-                    StringUtils.isNotEmpty(request.getParameter("affectChildren")));
-            sendRedirect(response, 
-                    Utils.getRedirect("delete", String.format("jobId=%s", serializeJobId(jobId)), context));
+            return deleteToRecycleBin(context);
+        }
+    }
+    
+    protected void deleteFromRecycleBin(long index, XWikiContext context) throws XWikiException
+    {
+        XWiki xwiki = context.getWiki();
+        XWikiResponse response = context.getResponse();
+        XWikiDocument doc = context.getDoc();
+        
+        XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
+        // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
+        // don't try to delete it and instead redirect to the view page.
+        if (dd != null) {
+            DeletedDocument ddapi = new DeletedDocument(dd, context);
+            if (!ddapi.canDelete()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "You are not allowed to delete a document from the trash "
+                                + "immediately after it has been deleted from the wiki");
+            }
+            if (!dd.getFullName().equals(doc.getFullName())) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
+                        "The specified trash entry does not match the current document");
+            }
+            xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+        }
+        sendRedirect(response, Utils.getRedirect("view", context));
+    }
+    
+    protected boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
+    {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
+        XWikiDocument doc = context.getDoc();
+
+        EntityReference documentReference = doesAffectChildren(request, doc.getDocumentReference()) ? 
+                doc.getDocumentReference().getLastSpaceReference() : 
+                doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
+        
+        Job deleteJob = startDeleteJob(documentReference);
+        
+        // If the user have asked for an asynchronous delete action
+        if (isAsync(request)) {
+            List<String> jobId = deleteJob.getRequest().getId();
+            sendRedirect(response,
+                    Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
+            return true;
+        }
+        
+        // Otherwise...
+        try {
+            deleteJob.join();
+        } catch (InterruptedException e) {
+            throw new XWikiException(String.format("Failed to delete [%s]", documentReference), e);
         }
 
-        return true;
+        // No redirect have been performed
+        return false;
     }
     
     protected String serializeJobId(List<String> jobId)
@@ -168,15 +221,13 @@ public class DeleteAction extends XWikiAction
         return StringUtils.join(jobId, "/");
     }
 
-    protected List<String> delete(EntityReference entityReference, boolean deep) throws XWikiException
+    protected Job startDeleteJob(EntityReference entityReference) throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        EntityRequest deleteRequest = refactoring.createDeleteRequest(Arrays.asList(entityReference));
-        deleteRequest.setDeep(deep);
-        Job deleteJob = refactoring.delete(deleteRequest);
+        Job deleteJob = refactoring.delete(entityReference);
         if (deleteJob != null) {
-            return deleteRequest.getId(); 
+            return deleteJob;
         } else {
             throw new XWikiException(String.format("Failed to schedule the delete job for [%s]", entityReference),
                 refactoring.getLastError());

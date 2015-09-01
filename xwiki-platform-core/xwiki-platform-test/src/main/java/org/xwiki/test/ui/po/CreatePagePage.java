@@ -45,7 +45,7 @@ public class CreatePagePage extends ViewPage
     @FindBy(name = "name")
     private WebElement pageTextField;
 
-    @FindBy(name = "terminal")
+    @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
     @FindBy(css = ".location-picker .breadcrumb")

@@ -400,7 +400,11 @@ require(['jquery'], function($) {
     addTerminalPageValidation(spaceValidator, form.find('#terminal'));
 
     var updateSpaceValidatorFromTemplateProviderInput = function(input) {
-      var allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+      var allowedSpacesData = input.attr('data-allowed-spaces');
+      var allowedSpaces = [];
+      if (allowedSpacesData) {
+        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+      }
       var message = input.attr('data-allowed-spaces-message');
       setAllowedValues(spaceValidator, allowedSpaces, message);
     };
@@ -414,6 +418,7 @@ require(['jquery'], function($) {
     var initiallyCheckedTemplateProviderInput = form.find('input[name="templateprovider"]:checked');
     // When a templateprovider is specified, we end up with 2 "checked" fields, so we choose the second one, which is
     // the actually selected one.
+    // Note that there could also be no template provider available, but we rely on jQuery's selectors here to avoid null values.
     updateSpaceValidatorFromTemplateProviderInput(initiallyCheckedTemplateProviderInput.last());
   });
 

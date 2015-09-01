@@ -27,16 +27,18 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.url.RestURLGenerator;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Generate REST URLs for different types of resources.
- *  
+ * 
  * @version $Id$
- * @since 7.2M1 
+ * @since 7.2M1
  */
 @Component
 @Named("rest")
@@ -47,21 +49,54 @@ public class RESTScriptService implements ScriptService
      * The key under which the last encountered error is stored in the current execution context.
      */
     private static final String ERROR_KEY = "scriptservice.rest.error";
-    
+
     @Inject
     private RestURLGenerator restURLGenerator;
 
     @Inject
     private Execution execution;
 
+    @Inject
+    private WikiDescriptorManager wikis;
+
     /**
+     * Create an REST URL representing the passed entity.
+     * <p>
+     * The URL path will be returned unless the reference wiki is different from the current wiki.
+     * 
      * @param reference an entity reference
      * @return the REST URL corresponding to the referenced entity, or null if an error occurs
+     * @since 7.2M3
      */
-    public URL url(EntityReference reference)
+    public String url(EntityReference reference)
     {
+        return url(reference, false);
+    }
+
+    /**
+     * Create an REST URL representing the passed entity.
+     * <p>
+     * If <code>external</code> is false the URL path will be returned unless the reference wiki is different from the
+     * current wiki.
+     * 
+     * @param reference an entity reference
+     * @param external indicate if the returned URL should be absolute (to be used by an external service usually)
+     * @return the REST URL corresponding to the referenced entity, or null if an error occurs
+     * @since 7.2M3
+     */
+    public String url(EntityReference reference, boolean external)
+    {
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+
         try {
-            return restURLGenerator.getURL(reference);
+            URL externalURL = this.restURLGenerator.getURL(reference);
+
+            // If forced or the reference wiki is different from the current wiki return external form URL
+            if (external || (wikiReference != null && !wikiReference.getName().equals(this.wikis.getCurrentWikiId()))) {
+                return externalURL.toExternalForm();
+            }
+
+            return externalURL.getPath();
         } catch (XWikiRestException e) {
             setLastError(e);
             return null;
@@ -70,6 +105,7 @@ public class RESTScriptService implements ScriptService
 
     /**
      * Get the error generated while performing the previously called action.
+     * 
      * @return an eventual exception or {@code null} if no exception was thrown
      */
     public XWikiRestException getLastError()

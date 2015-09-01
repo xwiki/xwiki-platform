@@ -19,7 +19,7 @@
   #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
   #xwikiDataAttribute('page', $doc.name)##deprecated, use 'reference' instead
   #xwikiDataAttribute('version', $doc.version)
-  #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
+  #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------

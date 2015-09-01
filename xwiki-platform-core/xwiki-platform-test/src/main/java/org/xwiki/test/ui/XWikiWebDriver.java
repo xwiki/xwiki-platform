@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.OutputType;
@@ -752,5 +753,26 @@ public class XWikiWebDriver extends RemoteWebDriver
     public String toString()
     {
         return this.wrappedDriver.toString();
+    }
+
+    /**
+     * Compared to using clear() + sendKeys(), this method ensures that an "input" event is triggered on the JavaScript
+     * side for an empty ("") value. Without this, the clear() method triggers just a "change" event.
+     *
+     * @param textInputElement an element accepting text input
+     * @param newTextValue the new text value to set
+     * @see https://code.google.com/p/selenium/issues/detail?id=214
+     * @since 7.2M3
+     */
+    public void setTextInputValue(WebElement textInputElement, String newTextValue)
+    {
+        if (newTextValue == "") {
+            // Workaround for the fact that clear() fires the "change" event but not the "input" event and javascript
+            // listening to the "input" event will not be executed otherwise.
+            textInputElement.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + newTextValue);
+        } else {
+            textInputElement.clear();
+            textInputElement.sendKeys(newTextValue);
+        }
     }
 }

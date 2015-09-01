@@ -143,7 +143,7 @@ public class ViewPage extends BasePage
 
     public String getBreadcrumbContent()
     {
-        return this.breadcrumb.getPathAsString();
+        return getBreadcrumb().getPathAsString();
     }
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
@@ -153,7 +153,7 @@ public class ViewPage extends BasePage
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent, boolean withLink)
     {
-        return this.breadcrumb.hasPathElement(breadcrumbItem, isCurrent, withLink);
+        return getBreadcrumb().hasPathElement(breadcrumbItem, isCurrent, withLink);
     }
 
     /**
@@ -164,7 +164,8 @@ public class ViewPage extends BasePage
      */
     public ViewPage clickBreadcrumbLink(String linkText)
     {
-        this.breadcrumb.clickPathElement(linkText);
+        getBreadcrumb().clickPathElement(linkText);
+
         return new ViewPage();
     }
 

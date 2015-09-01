@@ -36,19 +36,37 @@ import org.xwiki.test.ui.po.editor.EditPage;
  */
 public class CreatePagePage extends ViewPage
 {
-    @FindBy(id = "spaceReference")
+    @FindBy(name = "title")
+    private WebElement titleTextField;
+
+    @FindBy(name = "spaceReference")
     private WebElement spaceTextField;
 
-    @FindBy(id = "name")
+    @FindBy(name = "name")
     private WebElement pageTextField;
 
-    @FindBy(id = "terminal")
+    @FindBy(name = "terminal")
     private WebElement isTerminalCheckbox;
+
+    @FindBy(css = ".location-picker .breadcrumb")
+    private WebElement locationPreviewElement;
+
+    private BreadcrumbElement locationPreview;
 
     public static CreatePagePage gotoPage()
     {
         getUtil().gotoPage("Main", "WebHome", "create");
         return new CreatePagePage();
+    }
+
+    public String getTitle()
+    {
+        return titleTextField.getAttribute("value");
+    }
+
+    public void setTitle(String title)
+    {
+        getDriver().setTextInputValue(this.titleTextField, title);
     }
 
     public String getSpace()
@@ -58,8 +76,7 @@ public class CreatePagePage extends ViewPage
 
     public void setSpace(String space)
     {
-        this.spaceTextField.clear();
-        this.spaceTextField.sendKeys(space);
+        getDriver().setTextInputValue(this.spaceTextField, space);
     }
 
     public String getPage()
@@ -69,8 +86,7 @@ public class CreatePagePage extends ViewPage
 
     public void setPage(String page)
     {
-        this.pageTextField.clear();
-        this.pageTextField.sendKeys(page);
+        getDriver().setTextInputValue(this.pageTextField, page);
     }
 
     /**
@@ -123,14 +139,27 @@ public class CreatePagePage extends ViewPage
 
     public EditPage createPage(String spaceValue, String pageValue, boolean isTerminalPage)
     {
-        createPageInternal(spaceValue, pageValue, isTerminalPage);
+        return createPage(null, spaceValue, pageValue, isTerminalPage);
+    }
+
+    /**
+     * @since 7.2M3
+     */
+    public EditPage createPage(String title, String spaceValue, String pageValue, boolean isTerminalPage)
+    {
+        createPageInternal(title, spaceValue, pageValue, isTerminalPage);
         clickCreate();
         return new EditPage();
     }
 
     public EditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue)
     {
-        return createPageFromTemplate(spaceValue, pageValue, templateValue, false);
+        return createPageFromTemplate(null, spaceValue, pageValue, templateValue);
+    }
+
+    public EditPage createPageFromTemplate(String title, String spaceValue, String pageValue, String templateValue)
+    {
+        return createPageFromTemplate(title, spaceValue, pageValue, templateValue, false);
     }
 
     /**
@@ -139,16 +168,35 @@ public class CreatePagePage extends ViewPage
     public EditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue,
         boolean isTerminalPage)
     {
-        createPageInternal(spaceValue, pageValue, isTerminalPage);
+        return createPageFromTemplate(null, spaceValue, pageValue, templateValue, isTerminalPage);
+    }
+
+    /**
+     * @since 7.2M3
+     */
+    public EditPage createPageFromTemplate(String title, String spaceValue, String pageValue, String templateValue,
+        boolean isTerminalPage)
+    {
+        createPageInternal(title, spaceValue, pageValue, isTerminalPage);
         setTemplate(templateValue);
         clickCreate();
         return new EditPage();
     }
 
-    private void createPageInternal(String spaceValue, String pageValue, boolean isTerminalPage)
+    private void createPageInternal(String title, String spaceValue, String pageValue, boolean isTerminalPage)
     {
-        setSpace(spaceValue);
-        setPage(pageValue);
+        if (title != null) {
+            setTitle(title);
+        }
+
+        if (spaceValue != null) {
+            setSpace(spaceValue);
+        }
+
+        if (pageValue != null) {
+            setPage(pageValue);
+        }
+
         // Since the default is to not create terminal pages, only set this if the user is asking to create a terminal
         // page. This allows this API to work when using isTerminalPage = false even for simpler users which don't get
         // to see the Terminal option.
@@ -197,5 +245,27 @@ public class CreatePagePage extends ViewPage
         } else if (!isTerminalPage && this.isTerminalCheckbox.isSelected()) {
             this.isTerminalCheckbox.click();
         }
+    }
+
+    /**
+     * @return true if the choice between terminal or non-terminal document is displayed, false otherwise.
+     * @since 7.2M3
+     */
+    public boolean isTerminalOptionDisplayed()
+    {
+        return getDriver().hasElementWithoutWaiting(By.name("terminal"));
+    }
+
+    public String getLocationPreviewContent()
+    {
+        return getLocationPreview().getPathAsString();
+    }
+
+    public BreadcrumbElement getLocationPreview()
+    {
+        if (this.locationPreview == null) {
+            this.locationPreview = new BreadcrumbElement(this.locationPreviewElement);
+        }
+        return this.locationPreview;
     }
 }

@@ -20,8 +20,6 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -29,16 +27,14 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  *
  * @version $Id$
  * @since 3.2M3
+ * @deprecated since 7.2M3. Use {@link CreatePagePage} instead.
  */
-public class CreateSpacePage extends ViewPage
+@Deprecated
+public class CreateSpacePage extends CreatePagePage
 {
-    @FindBy(id = "name")
-    private WebElement spaceTextField;
-
     public WYSIWYGEditPage createSpace(String spaceValue)
     {
-        this.spaceTextField.sendKeys(spaceValue);
-        this.spaceTextField.submit();
+        this.createPage("", spaceValue);
         return new WYSIWYGEditPage();
     }
 

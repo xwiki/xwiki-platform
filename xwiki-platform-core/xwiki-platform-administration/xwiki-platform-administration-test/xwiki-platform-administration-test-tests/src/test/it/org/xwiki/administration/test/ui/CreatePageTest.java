@@ -19,7 +19,7 @@
  */
 package org.xwiki.administration.test.ui;
 
-import java.lang.String;import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +35,6 @@ import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.CreatePagePage;
-import org.xwiki.test.ui.po.CreateSpacePage;
 import org.xwiki.test.ui.po.DocumentDoesNotExistPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -72,6 +71,7 @@ public class CreatePageTest extends AbstractTest
         // Step 0: Setup the correct environment for the test
 
         // All these pages are created during this test
+        getUtil().deleteSpace(getTestClassName());
         getUtil().deletePage(getTestClassName(), getTestMethodName());
         EntityReference templateInstanceReference =
             getUtil().resolveDocumentReference(getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".WebHome");
@@ -96,12 +96,15 @@ public class CreatePageTest extends AbstractTest
         // Save the number of available templates so that we can make some checks later on.
         int availableTemplateSize = createPagePage.getAvailableTemplateSize();
         String templateInstanceName = TEMPLATE_NAME + "Instance";
-        EditPage templateInstanceEditWysiwyg = createPagePage.createPageFromTemplate(getTestClassName(),
-            templateInstanceName, templateProviderFullName);
+        EditPage templateInstanceEditWysiwyg =
+            createPagePage.createPageFromTemplate(templateInstanceName, getTestClassName(), null,
+                templateProviderFullName);
         WikiEditPage templateInstanceEdit = templateInstanceEditWysiwyg.clickSaveAndView().editWiki();
 
-        // Verify template instance content
+        // Verify template instance location and content
         assertEquals(templateInstanceName, templateInstanceEdit.getTitle());
+        assertEquals(getTestClassName() + "." + templateInstanceName, templateInstanceEdit.getMetaDataValue("space"));
+        assertEquals("WebHome", templateInstanceEdit.getMetaDataValue("page"));
         assertEquals(templateContent, templateInstanceEdit.getContent());
         // check the parent of the template instance
         assertEquals(templateProviderFullName, templateInstanceEdit.getParent());
@@ -132,10 +135,8 @@ public class CreatePageTest extends AbstractTest
         // Make sure we're in create mode.
         assertTrue(getUtil().isInCreateMode());
         // count the available templates, make sure they're as many as before and that our template is among them
-        templates = getDriver().findElements(By.name("templateprovider"));
-        // Note: We need to remove 1 to exclude the "Empty Page" template entry
-        assertEquals(availableTemplateSize, templates.size() - 1);
-        assertTrue(createPagePage.getAvailableTemplates().contains(templateProviderFullName));
+        assertEquals(availableTemplateSize, createUnexistingPage.getAvailableTemplateSize());
+        assertTrue(createUnexistingPage.getAvailableTemplates().contains(templateProviderFullName));
         // select it
         createUnexistingPage.setTemplate(templateProviderFullName);
         // and create
@@ -143,7 +144,9 @@ public class CreatePageTest extends AbstractTest
         EditPage ep = new EditPage();
         WikiEditPage unexistingPageEdit = ep.clickSaveAndView().editWiki();
 
-        // Verify template instance content
+        // Verify template instance location and content
+        assertEquals(getTestClassName(), templateInstanceEdit.getMetaDataValue("space"));
+        assertEquals(TEMPLATE_NAME + "UnexistingInstance", templateInstanceEdit.getMetaDataValue("page"));
         assertEquals(TEMPLATE_NAME + "UnexistingInstance", unexistingPageEdit.getTitle());
         assertEquals(templateContent, unexistingPageEdit.getContent());
         // test that this page has no parent
@@ -160,7 +163,7 @@ public class CreatePageTest extends AbstractTest
         // make sure it's empty
         assertEquals("", emptyPage.getContent());
         // make sure parent is the right one
-        assertEquals("Welcome to the templates test space EmptyPage", emptyPage.getBreadcrumbContent());
+        assertEquals("/" + getTestClassName() + "/EmptyPage", emptyPage.getBreadcrumbContent());
         // mare sure title is the right one
         assertEquals("EmptyPage", emptyPage.getDocumentTitle());
 
@@ -238,7 +241,7 @@ public class CreatePageTest extends AbstractTest
         assertEquals(currentURL, getDriver().getCurrentUrl());
         createPage.waitForErrorMessage();
 
-        // Step 2:  Create a page from Template for a page that already exists
+        // Step 2: Create a page from Template for a page that already exists
         // restart everything to make sure it's not the error before
         vp = getUtil().gotoPage(existingPageReference);
         createPage = vp.createPage();
@@ -255,14 +258,18 @@ public class CreatePageTest extends AbstractTest
         // Step 3: Create a space that already exists
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it.
-        getUtil().gotoPage(getUtil().getURL("create", 
-                new String[] {getTestClassName(), "ExistingPage", "WebHome"}, "tocreate=space"));
-        CreateSpacePage createSpace = new CreateSpacePage();
+        getUtil().gotoPage(
+            getUtil().getURL("create", new String[] {getTestClassName(), "ExistingPage", "WebHome"}, "tocreate=space"));
+        CreatePagePage createSpace = new CreatePagePage();
+        // Check that the terminal choice is not displayed in this mode.
+        assertFalse(createSpace.isTerminalOptionDisplayed());
+
         currentURL = getDriver().getCurrentUrl();
         // strip the parameters out of this URL
         currentURL =
             currentURL.substring(0, currentURL.indexOf('?') > 0 ? currentURL.indexOf('?') : currentURL.length());
-        createSpace.createSpace(existingSpaceName);
+        // Try to create the a space (non-terminal document) that already exist.
+        createSpace.createPage(existingSpaceName, "", null, false);
         String urlAfterSubmit = getDriver().getCurrentUrl();
         urlAfterSubmit =
             urlAfterSubmit.substring(0,
@@ -270,7 +277,7 @@ public class CreatePageTest extends AbstractTest
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
         // error
         assertEquals(currentURL, urlAfterSubmit);
-        assertTrue(createSpace.hasError());
+        createSpace.waitForErrorMessage();
     }
 
     /**
@@ -283,15 +290,16 @@ public class CreatePageTest extends AbstractTest
     })
     public void createPageWhenNoTemplateAvailable()
     {
+        // We'll create all these pages during this test
+        getUtil().deleteSpace(getTestClassName());
+        EntityReference newPageReference = getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.WebHome");
+        getUtil().deletePage(newPageReference);
+
         // prepare the test environment, create a test space and exclude all templates for this space
         // create the home page of this space to make sure the space exists
         getUtil().createPage(getTestClassName(), "WebHome", "You can have fun with templates here",
             "Welcome to the templates test space");
-        // we'll create all these pages during this test
-        getUtil().deletePage(getTestClassName(), "NewUnexistingPage");
-        EntityReference newPageReference = getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.WebHome");
-        getUtil().deletePage(newPageReference);
-        getUtil().deletePage(getTestClassName(), "NewLinkedPage");
+
         // go through all the templates and make sure they are disabled on this space
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
 
@@ -343,6 +351,7 @@ public class CreatePageTest extends AbstractTest
         // we expect no templates available
         assertEquals(0, createNewPage.getAvailableTemplateSize());
         // fill in data and create the page
+        createNewPage.setTitle("A New Page");
         createNewPage.setSpace(getTestClassName());
         createNewPage.setPage("NewPage");
         createNewPage.clickCreate();
@@ -351,9 +360,14 @@ public class CreatePageTest extends AbstractTest
         EditPage editNewPage = new EditPage();
         assertEquals(getTestClassName() + ".NewPage", editNewPage.getMetaDataValue("space"));
         assertEquals("WebHome", editNewPage.getMetaDataValue("page"));
+        ViewPage viewNewPage = editNewPage.clickSaveAndView();
+        // mare sure title is the right one
+        assertEquals("A New Page", viewNewPage.getDocumentTitle());
+        // Check that the breadcrumb uses titles for the parents and the current page.
+        assertEquals("/Welcome to the templates test space/A New Page", viewNewPage.getBreadcrumbContent());
 
         // 3/ create a page from a link in another page
-        WikiEditPage editNewPageWiki = editNewPage.clickSaveAndView().editWiki();
+        WikiEditPage editNewPageWiki = viewNewPage.editWiki();
         // put a link to the new page to create
         editNewPageWiki.setContent("[[NewLinkedPage]]");
         ViewPage newPage = editNewPageWiki.clickSaveAndView();
@@ -382,8 +396,8 @@ public class CreatePageTest extends AbstractTest
     })
     public void createPageWithSaveAndEditTemplate()
     {
-        EntityReference newPageReference = getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.WebHome");
-        getUtil().deletePage(newPageReference);
+        // Cleanup of the test space for any leftovers from previous tests.
+        getUtil().deleteSpace(getTestClassName());
 
         // Create a template
         String templateProviderName = TEMPLATE_NAME + "Provider";
@@ -410,7 +424,7 @@ public class CreatePageTest extends AbstractTest
         assertEquals("NewPage", newPage.getDocumentTitle());
         assertEquals(templateContent, newPage.getContent());
         // and the parent, it should be the template provider, since that's where we created it from
-        assertEquals("CreatePageTest NewPage", newPage.getBreadcrumbContent());
+        assertEquals("/CreatePageTest/NewPage", newPage.getBreadcrumbContent());
     }
 
     /**
@@ -419,8 +433,8 @@ public class CreatePageTest extends AbstractTest
     private ViewPage createTemplateAndTemplateProvider(String templateProviderName, String templateContent,
         String templateTitle, boolean saveAndEdit)
     {
-        getUtil().deletePage(getTestClassName(), TEMPLATE_NAME);
-        getUtil().deletePage(getTestClassName(), TEMPLATE_NAME + "Provider");
+        // Cleanup of the test space for any leftovers from previous tests.
+        getUtil().deleteSpace(getTestClassName());
 
         // Create a Template page
         getUtil().createPage(getTestClassName(), TEMPLATE_NAME, templateContent, templateTitle);
@@ -436,4 +450,61 @@ public class CreatePageTest extends AbstractTest
         }
         return templateProviderInline.clickSaveAndView();
     }
+
+    /**
+     * Test that the inputs in the create UI are updated, depending on the case.
+     */
+    @Test
+    public void testCreateUIInteraction()
+    {
+        // Cleanup of the test space for any leftovers from previous tests.
+        getUtil().deleteSpace(getTestClassName());
+
+        // Create an existent page that will also be the parent of our documents.
+        String existingPageTitle = "Test Area";
+        getUtil().createPage(getTestClassName(), "WebHome", "", existingPageTitle);
+
+        CreatePagePage createPage = new ViewPage().createPage();
+        // Check that by default we have an empty title and name and the parent is the current document's space.
+        assertEquals("", createPage.getTitle());
+        assertEquals("", createPage.getPage());
+        assertEquals(getTestClassName(), createPage.getSpace());
+        // Check the initial state of the breadcrumb.
+        assertEquals("/" + existingPageTitle + "/", createPage.getLocationPreviewContent());
+
+        // Set a new title and check that the page name and the breadcrumb are also updated.
+        String newTitle = "New Title";
+        createPage.setTitle(newTitle);
+        assertEquals(newTitle, createPage.getPage());
+        assertEquals("/" + existingPageTitle + "/" + newTitle, createPage.getLocationPreviewContent());
+
+        // Set a new page name and check that the breadcrumb is not updated, since we have a title specified.
+        String newName = "SomeNewName";
+        createPage.setPage(newName);
+        assertEquals("/" + existingPageTitle + "/" + newTitle, createPage.getLocationPreviewContent());
+
+        // Clear the title, set a page name and check that the breadcrumb now uses the page name as a fallback.
+        createPage.setTitle("");
+        assertEquals("", createPage.getPage());
+        createPage.setPage(newName);
+        assertEquals("/" + existingPageTitle + "/" + newName, createPage.getLocationPreviewContent());
+
+        // Set a new parent space and check that the breadcrumb is updated.
+        // Before that, reset the title, just for completeness.
+        createPage.setTitle(newTitle);
+        String newSpace = "SomeNewSpace";
+        createPage.setSpace(newSpace);
+        assertEquals("/" + newSpace + "/" + newTitle, createPage.getLocationPreviewContent());
+
+        // Set a new parent in nested spaces and check that the breadcrumb is updated.
+        String newSpaceLevel2 = "Level2";
+        createPage.setSpace(newSpace + "." + newSpaceLevel2);
+        assertEquals("/" + newSpace + "/" + newSpaceLevel2 + "/" + newTitle, createPage.getLocationPreviewContent());
+
+        // Clear the parent and check that the breadcrumb is updated, since we are creating a top level document.
+        createPage.setSpace("");
+        assertEquals("/" + newTitle, createPage.getLocationPreviewContent());
+    }
+
+    // TODO: Add a test for the input validation.
 }

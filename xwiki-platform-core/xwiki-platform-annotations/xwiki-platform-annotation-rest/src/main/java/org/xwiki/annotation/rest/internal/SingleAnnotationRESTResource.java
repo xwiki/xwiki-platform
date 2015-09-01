@@ -52,7 +52,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Component
 @Named("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
-@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotations/{id}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotation/{id}")
 @Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {

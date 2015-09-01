@@ -1,0 +1,7 @@
+###
+### Information page in the "view" mode
+###
+###
+#set($titleToDisplay = $services.localization.render('core.viewers.information.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
+#template('contentheader.vm')
+#template("informationinline.vm")

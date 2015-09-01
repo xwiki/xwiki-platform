@@ -1,0 +1,11 @@
+###
+### Comments page in the "view" mode
+###
+###
+#if("$!request.xpage" == 'comments')
+  $response.sendRedirect($doc.getURL('view', 'viewer=comments'))
+#else
+  #set($titleToDisplay = $services.localization.render('core.viewers.comments.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()]))
+  #template('contentheader.vm')
+  #template("commentsinline.vm")
+#end

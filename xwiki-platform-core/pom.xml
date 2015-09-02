@@ -437,15 +437,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-             <!-- Young API. Rename MimeMessageWrapper into ScriptMimeMessage (not a wrapper anymore). Velocity scripts
-                  are not affected by the change. -->
-             <exclude>**/org/xwiki/mail/script/**</exclude>
-             <!-- Young API. Change of API to fix bug in waitForProcessin(). Scripting API has not been broken, only the
-                  Java API has -->
-             <exclude>**/org/xwiki/mail/MailResult*</exclude>
-             <exclude>**/org/xwiki/mail/MailStatusResult*</exclude>
-             <!-- Young API. Class moved to the "script" package. Script service usage is unchanged. -->
-             <exclude>**/org/xwiki/mail/MailStorageScriptService*</exclude>
           </excludes>
         </configuration>
       </plugin>

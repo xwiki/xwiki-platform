@@ -795,7 +795,9 @@ public class TestUtils
         {
             path.add(singleReference.getName());
         }
-        path.add(reference.getName());
+        if (reference.getType() == EntityType.DOCUMENT) {
+            path.add(reference.getName());
+        }
         return path;
     }
 

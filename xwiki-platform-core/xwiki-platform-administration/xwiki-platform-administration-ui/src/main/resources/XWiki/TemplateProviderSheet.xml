@@ -42,56 +42,52 @@
   <content>{{velocity}}
 #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
 #set ($providerObj = $doc.getObject('XWiki.TemplateProviderClass'))
-#if ($editor == 'inline')
-  ; {{translation key="xe.templateprovider.name"/}}
-  : {{html}}&lt;input type="text" value="$!{doc.getTitle()}" name="title" /&gt;{{/html}}
-#end
-; {{translation key="xe.templateprovider.templatename"/}}
-#if ($editor == 'inline')
+{{html wiki="true"}}
+(% class="xform" %)
+(((
+  #if ($editor == 'inline')
+    ; &lt;label&gt;{{translation key="xe.templateprovider.name"/}}&lt;/label&gt;
+    : {{html}}&lt;input type="text" value="$!{doc.getTitle()}" name="title" /&gt;{{/html}}
+  #end
+  ; &lt;label&gt;{{translation key="xe.templateprovider.templatename"/}}&lt;/label&gt;
+  #if ($editor == 'inline')
+    (% class="xHint" %){{translation key="xe.templateprovider.templatename.info"/}}
+    : $doc.display('name')
+  #else
+    #set($providerName = $providerObj.getProperty('name').value)
+    : $services.localization.render($providerName)
+  #end
+  ; &lt;label&gt;{{translation key="xe.templateprovider.template"/}}&lt;/label&gt;
+  #if ($editor == 'inline')
+    : $doc.display('template')
+  #else
+    #set($templateDocName = $providerObj.getProperty('template').value)
+    : [[$templateDocName&gt;&gt;$templateDocName]]
+  #end
+  ; &lt;label&gt;{{translation key="xe.templateprovider.templatetype"/}}&lt;/label&gt;
+  #if ($editor == 'inline')
+    (% class="xHint" %){{translation key="xe.templateprovider.templatetype.info"/}}
+  #end
+  : $doc.display('type')
+  (% id="enabled-spaces" %)
+  (((
+    ; &lt;label&gt;{{translation key="xe.templateprovider.spaces"/}}&lt;/label&gt;
+    #if ($editor == 'inline')
+      (% class="xHint" %){{translation key="xe.templateprovider.spaces.info"/}}
+    #end
+    : $doc.display('spaces')
+  )))
+  ; &lt;label&gt;{{translation key="xe.templateprovider.action"/}}&lt;/label&gt;
+  #if ($editor == 'inline')
+    (% class="xHint" %){{translation key="xe.templateprovider.action.info"/}}
+  #end
+  : $doc.display('action')
 
-  {{translation key="xe.templateprovider.templatename.info"/}}
-  : $doc.display('name')
-#else
-  #set($providerName = $providerObj.getProperty('name').value)
-  : $services.localization.render($providerName)
-#end
-; {{translation key="xe.templateprovider.template"/}}
-#if ($editor == 'inline')
-  : $doc.display('template')
-#else
-  #set($templateDocName = $providerObj.getProperty('template').value)
-  : [[$templateDocName&gt;&gt;$templateDocName]]
-#end
-; {{translation key="xe.templateprovider.templatetype"/}}
-#if ($editor == 'inline')
-
-  {{translation key="xe.templateprovider.templatetype.info"/}}
-#end
-: $doc.display('type')
-(% id="enabled-spaces" %)(((
-; {{translation key="xe.templateprovider.spaces"/}}
-#if ($editor == 'inline')
-
-  {{translation key="xe.templateprovider.spaces.info"/}}
-#end
-: $doc.display('spaces')
+  #if ($xcontext.action == 'view')
+    (% class="buttonwrapper" %)[[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;$xwiki.getDocument('XWiki', 'XWikiPreferences').getExternalURL('admin', 'section=Templates')]]
+  #end
 )))
-; {{translation key="xe.templateprovider.action"/}}
-
-#if ($editor == 'inline')
-  {{translation key="xe.templateprovider.action.info"/}}
-#end
-: $doc.display('action')
-
-
-#if ($xcontext.action == 'view')
-
-  {{html wiki="true"}}
-    &lt;span class="buttonwrapper"&gt;
-      [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;$xwiki.getDocument('XWiki', 'XWikiPreferences').getExternalURL('admin', 'section=Templates')]]
-    &lt;/span&gt;
-  {{/html}}
-#end
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>XWiki.TemplateProviderSheet</name>

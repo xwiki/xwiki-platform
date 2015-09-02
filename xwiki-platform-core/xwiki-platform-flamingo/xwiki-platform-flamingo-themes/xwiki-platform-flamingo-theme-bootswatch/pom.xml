@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-themes</artifactId>
-    <version>7.2-SNAPSHOT</version>
+    <version>7.2-milestone-3</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-theme-bootswatch</artifactId>
   <packaging>xar</packaging>

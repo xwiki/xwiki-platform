@@ -123,7 +123,7 @@ public class BasePage extends BaseElement
 
     public String getMetaDataValue(String metaName)
     {
-        return getDriver().findElement(By.xpath("//meta[@name='" + metaName + "']")).getAttribute("content");
+        return getDriver().findElement(By.xpath("/html")).getAttribute("data-xwiki-" + metaName);
     }
 
     /**

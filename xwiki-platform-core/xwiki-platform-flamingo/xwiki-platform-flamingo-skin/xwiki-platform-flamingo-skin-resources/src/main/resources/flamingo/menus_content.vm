@@ -8,21 +8,25 @@
 ###########################################
 ##            MENU CONTENT
 ###########################################
+#if ($displayContentMenu)
 <div id="contentmenu" class="pull-right actionmenu">
-  #if ($hasEdit && !$isReadOnly)
+  #if ($displayEditMenu && $hasEdit && !$isReadOnly)
     #displayEditMenu()
   #end
-  #if ($hasCreatePage)
+  #if ($displayCreateMenu && $hasCreatePage)
     #displayCreateButton()
   #end
-  #diplayOptionsMenu()
-  #if ($canView)
-    #exportModal()
+  #if ($displayMoreActionsMenu)
+    #diplayOptionsMenu()
+    #if ($canView)
+      #exportModal()
+    #end
   #end
   #if($keyboardShortcutsEnabled)
     #keyboardShortcuts()
   #end
 </div>
+#end
 ###########################################
 ##        DISPLAY CREATE BUTTON
 ###########################################
@@ -70,6 +74,10 @@
 ##         DISPLAY ACTIONS MENU
 ###########################################
 #macro(diplayOptionsMenu)
+  ## Should we display this menu?
+  #set ($displayMoreActionsMenu = $displayMoreActionsMenu && ($hasWatch || ($hasSpaceAdmin && $isAdminAppInstalled) || $canCopy || $canDelete || $canView))
+  #if ($displayMoreActionsMenu)
+  
   <div class="dropdown" id="tmMoreActions">
     <a href="" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-option-vertical"></span></a>
     <ul class="dropdown-menu">
@@ -164,6 +172,8 @@
       #end
     </ul>
   </div>
+  
+  #end ## endif
 #end
 ###########################################
 ##          KEYBOARD SHORTCUTS

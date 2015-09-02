@@ -8,8 +8,13 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main">
-  <div id="contentmenu" class="actionmenu">
-    #template("menus_content.vm")
+  <div class="row">
+    <div id="contentmenu" class="actionmenu col-xs-12">
+      #template("menus_content.vm")
+    </div>
+    #if ($displayMoreActionsMenu)
+      <hr />
+    #end
   </div>
   <div id="mainContentArea">
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))

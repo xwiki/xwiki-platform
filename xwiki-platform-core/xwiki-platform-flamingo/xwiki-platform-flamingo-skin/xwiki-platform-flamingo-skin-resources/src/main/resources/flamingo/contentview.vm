@@ -67,7 +67,7 @@ $services.progress.endStep()
 #if ($doc.syntax.toIdString() == 'xwiki/1.0')
 $services.progress.startStep('Display the footnotes')
 #set($footnotes = "#putFootnotes()")
-$xwiki.renderText($footnotes, $doc)
+$doc.getRenderedContent($footnotes, 'xwiki/1.0')
 $services.progress.endStep()
 #end
 

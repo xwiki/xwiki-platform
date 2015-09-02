@@ -98,25 +98,6 @@
             <goals>
               <goal>package</goal>
             </goals>
-            <configuration>
-              <!-- Since the Syntax 1.0 parser uses some legacy methods, we also need to include the Legacy OldCore
-                   JAR -->
-              <legacy>true</legacy>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Skip Enforcer check on legacy dependencies since we want to include the OldCore Legacy module in the
-           functional test -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-no-legacy-dependencies</id>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
           </execution>
         </executions>
       </plugin>

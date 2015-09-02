@@ -209,14 +209,6 @@ public class PackageMojo extends AbstractMojo
      */
     private boolean test;
 
-    /**
-     * Indicate whether we should bundle the legacy JARs or not.
-     *
-     * @parameter default-value="false"
-     * @since 7.2M3
-     */
-    private boolean legacy;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -641,31 +633,15 @@ public class PackageMojo extends AbstractMojo
             }
         }
 
-        return filterResolvedJars(jarArtifacts);
-    }
-
-    private Set<Artifact> filterResolvedJars(Set<Artifact> resolvedArtifacts)
-    {
-        Set<Artifact> filteredArtifacts = new HashSet<>();
-        for (Artifact resolvedArtifact : resolvedArtifacts) {
-            if (!(this.legacy && resolvedArtifact.getArtifactId().equals("xwiki-platform-oldcore"))) {
-                filteredArtifacts.add(resolvedArtifact);
-            }
-        }
-        return filteredArtifacts;
+        return jarArtifacts;
     }
 
     private Set<Artifact> getMandatoryJarArtifacts() throws MojoExecutionException
     {
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<>();
 
-        if (this.legacy) {
-            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-                "xwiki-platform-legacy-oldcore", getXWikiPlatformVersion(), null, "jar"));
-        } else {
-            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-                "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
-        }
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

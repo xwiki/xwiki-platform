@@ -21,17 +21,16 @@ package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 
 /**
  * Page to handle the "Document does not exist" page.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
 public class DocumentDoesNotExistPage extends BasePage
 {
-    @FindBys({@FindBy(className = "xwikimessage"), @FindBy(tagName = "a")})
+    @FindBy(css = ".xwikimessage a")
     private WebElement editThisPageToCreate;
 
     /**

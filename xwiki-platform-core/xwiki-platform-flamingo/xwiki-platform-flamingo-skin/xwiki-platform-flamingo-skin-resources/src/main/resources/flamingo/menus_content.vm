@@ -187,7 +187,7 @@
         shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #if($hasAdmin)
           shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });

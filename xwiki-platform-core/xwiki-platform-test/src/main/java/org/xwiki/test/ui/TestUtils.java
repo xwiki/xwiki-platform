@@ -61,10 +61,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -112,6 +112,8 @@ public class TestUtils
     private static ComponentManager componentManager;
 
     private static EntityReferenceResolver<String> referenceResolver;
+
+    private static EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * Used to convert Java object into its REST XML representation.
@@ -165,8 +167,8 @@ public class TestUtils
     public static void initializeComponent(ComponentManager componentManager) throws Exception
     {
         TestUtils.componentManager = componentManager;
-        TestUtils.referenceResolver = TestUtils.componentManager.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class));
+        TestUtils.referenceResolver = TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING);
+        TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
 
     protected XWikiWebDriver getDriver()
@@ -679,6 +681,14 @@ public class TestUtils
     public EntityReference resolveSpaceReference(String referenceAsString)
     {
         return referenceResolver.resolve(referenceAsString, EntityType.SPACE);
+    }
+
+    /**
+     * @since 7.2RC1
+     */
+    public String serializeReference(EntityReference reference)
+    {
+        return referenceSerializer.serialize(reference);
     }
 
     /**

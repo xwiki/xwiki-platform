@@ -33,6 +33,7 @@ import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -83,6 +84,7 @@ public abstract class AbstractTest
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
         componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceResolver.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceSerializer.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);

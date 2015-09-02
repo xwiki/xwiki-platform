@@ -1035,6 +1035,8 @@ public class TestUtils
     {
         return getDriver().getCurrentUrl().contains("/create/");
     }
+    
+    public boolean isInAdminMode() { return getDriver().getCurrentUrl().contains("/admin/"); }
 
     /**
      * Forces the current user to be the Guest user by clearing all coookies.

@@ -220,13 +220,21 @@ public final class HqlQueryUtils
         } else if (expression instanceof Function) {
             Function function = (Function) expression;
 
-            for (Expression parameter : function.getParameters().getExpressions()) {
-                if (!isSelectExpressionAllowed(parameter, tables)) {
-                    return false;
+            if (function.isAllColumns()) {
+                // Validate that allowed table is passed to the method
+                // TODO: add support for more that "count" maybe
+                return function.getName().equals("count") && tables.size() == 1
+                    && isTableAllowed(tables.values().iterator().next());
+            } else {
+                // Validate that allowed columns are used as parameters
+                for (Expression parameter : function.getParameters().getExpressions()) {
+                    if (!isSelectExpressionAllowed(parameter, tables)) {
+                        return false;
+                    }
                 }
-            }
 
-            return true;
+                return true;
+            }
         }
 
         return false;
@@ -240,6 +248,15 @@ public final class HqlQueryUtils
     {
         Set<String> fields = ALLOWED_FIELDS.get(getTableName(column.getTable(), tables));
         return fields != null && fields.contains(column.getColumnName());
+    }
+
+    /**
+     * @param tableName the name of the table
+     * @return true if the table has at least one allowed field
+     */
+    private static boolean isTableAllowed(String tableName)
+    {
+        return ALLOWED_FIELDS.containsKey(tableName);
     }
 
     private static String getTableName(Table table, Map<String, String> tables)

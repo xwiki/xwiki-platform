@@ -42,14 +42,18 @@ public class HqlQueryUtilsTest
             .isSafe("select doc.name, space.name from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertTrue(HqlQueryUtils.isSafe("select count(name) from XWikiDocument"));
         assertTrue(HqlQueryUtils.isSafe("select count(doc.name) from XWikiDocument doc"));
+        assertTrue(HqlQueryUtils
+            .isSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str"));
 
-        assertTrue(HqlQueryUtils.isSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str"));
+        assertTrue(HqlQueryUtils.isSafe("select count(*) from XWikiSpace"));
 
         // not allowed
 
         assertFalse(HqlQueryUtils.isSafe("select name from OtherTable"));
         assertFalse(HqlQueryUtils.isSafe("select doc.* from XWikiDocument doc, XWikiSpace space"));
+        assertFalse(HqlQueryUtils.isSafe("select * from XWikiDocument doc"));
         assertFalse(HqlQueryUtils
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
+        assertTrue(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
     }
 }

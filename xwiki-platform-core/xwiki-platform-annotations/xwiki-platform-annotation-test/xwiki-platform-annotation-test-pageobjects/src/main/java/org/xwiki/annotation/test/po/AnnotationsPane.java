@@ -42,11 +42,10 @@ public class AnnotationsPane extends BaseElement
         // Open the page menu
         getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]")).click();
         // Wait for the drop down menu to be displayed
-        getDriver().waitUntilElementIsVisible(
-                By.xpath(dropDownMenuXPath));
+        getDriver().waitUntilElementIsVisible(By.xpath(dropDownMenuXPath));
         // Click on the annotations button
         WebElement annotationsPane = getDriver().findElement(
-                By.xpath(dropDownMenuXPath + "//a[contains(., 'Annotations')]"));
+            By.xpath(dropDownMenuXPath + "//a[contains(., 'Annotations')]"));
         annotationsPane.click();
     }
 

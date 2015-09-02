@@ -202,12 +202,20 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Indicate of the package mojo is used for tests. Among other things it means it's then possible to skip it using
-     * skipTetsts system property.
+     * skipTests system property.
      *
      * @parameter default-value="true"
      * @since 6.0M2
      */
     private boolean test;
+
+    /**
+     * Indicate whether we should bundle the legacy JARs or not.
+     *
+     * @parameter default-value="false"
+     * @since 7.2M3
+     */
+    private boolean legacy;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -616,8 +624,6 @@ public class PackageMojo extends AbstractMojo
     {
         // Get the mandatory jars
         Set<Artifact> artifacts = getMandatoryJarArtifacts();
-        // But also the skins artifacts, that may have JAR dependencies
-        artifacts.addAll(getSkinArtifacts());
 
         // Now resolve mandatory dependencies if they're not explicitly specified
         Set<Artifact> resolvedArtifacts = resolveTransitively(artifacts);
@@ -635,15 +641,31 @@ public class PackageMojo extends AbstractMojo
             }
         }
 
-        return jarArtifacts;
+        return filterResolvedJars(jarArtifacts);
+    }
+
+    private Set<Artifact> filterResolvedJars(Set<Artifact> resolvedArtifacts)
+    {
+        Set<Artifact> filteredArtifacts = new HashSet<>();
+        for (Artifact resolvedArtifact : resolvedArtifacts) {
+            if (!(this.legacy && resolvedArtifact.getArtifactId().equals("xwiki-platform-oldcore"))) {
+                filteredArtifacts.add(resolvedArtifact);
+            }
+        }
+        return filteredArtifacts;
     }
 
     private Set<Artifact> getMandatoryJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<Artifact>();
+        Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<>();
 
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xxwiki-platform-wiki-default.platform",
-            "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        if (this.legacy) {
+            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+                "xwiki-platform-legacy-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        } else {
+            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+                "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        }
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -719,6 +741,9 @@ public class PackageMojo extends AbstractMojo
         // developer's life easy, we also include the filter module (used for XAR exports).
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-filter-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
+
+        // Also add the skins artifacts, that may have JAR dependencies
+        mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());
 
         return mandatoryTopLevelArtifacts;
     }

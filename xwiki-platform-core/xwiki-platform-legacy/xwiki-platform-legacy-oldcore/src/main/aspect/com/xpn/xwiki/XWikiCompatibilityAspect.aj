@@ -1294,7 +1294,7 @@ public privileged aspect XWikiCompatibilityAspect
      *             instead
      */
     @Deprecated
-    public Object getRenderingEngine()
+    public Object XWiki.getRenderingEngine()
     {
         try {
             return Utils.getComponent(getClass().forName("com.xpn.xwiki.render.XWikiRenderingEngine"));

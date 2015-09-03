@@ -453,24 +453,6 @@
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
               <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/web/ExportURLFactory</className>
-              <method>com.xpn.xwiki.web.ExportURLFactoryContext getExportURLFactoryContext()</method>
-              <justification>getExportURLFactoryContext() was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/web/ExportURLFactoryContext</className>
-              <justification>ExportURLFactoryContext was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
-            </difference>
-            <difference>
-              <differenceType>7005</differenceType>
-              <className>com/xpn/xwiki/web/ExportURLFactoryActionHandler</className>
-              <method>java.net.URL createURL*</method>
-              <to>java.net.URL createURL*</to>
-              <justification>ExportURLFactoryActionHandler was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
               <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
               <method>java.lang.Object getRenderingEngine()</method>
               <justification>Not a breakage. The legacy method was not in the right place (which mean that it was not available so it actually fix a breakage)</justification>

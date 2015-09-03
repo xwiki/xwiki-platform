@@ -2624,3 +2624,72 @@ Recursive title display detected!##
   #set ($sentence3 = 'Click this box to get technical details.')
   #displayException("${sentence1} ${sentence2} ${sentence3}", $exception)
 #end
+
+###
+### Display a rich select input (with icon, description, etc...)
+###
+###
+### @param $fieldName name of the input field
+### @param $options an array of maps describing a category of options, which contains an array of options
+### @param $defaultValue the default value to use
+### @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first option
+### @param $cssClass class to add to the div (could be 'xwiki-select-small', 'xwiki-select-medium', 'xwiki-select-tall' or any other class)
+###
+### Example of use:
+###
+### #set($options = [
+###                   { 
+###                     'name': 'Category 1',
+###                     'options': [
+###                       { 'name': 'Option 1', 'value': 'option1', 'description': 'Description of the option 1', 'icon': 'wiki'},
+###                       { 'name': 'Option 2', 'value': 'option2', 'description': 'Description of the option 2', 'icon': 'page'}
+###                     ]
+###                   },
+###                   {
+###                     'name': 'Category 2',
+###                     'options': [
+###                       { 'name': 'Option 3', 'value': 'option3', 'description': 'Description of the option 3', 'icon': 'check'}
+###                     ]
+###                   }
+###                 ])
+### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small')
+#########################################################
+#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass)
+  ## TODO: put this in a webjar instead
+  #set ($discard = $xwiki.ssfx.use('uicomponents/select/select.css', {'forceSkinAction': true}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/select/select.js' , {'forceSkinAction': true}))
+  <div class="xwiki-select $!cssClass">
+    ## Here we let a place to add a filter in the future, that is why the options are inside the following div block.
+    <div class="xwiki-select-options">
+      <ul>
+        #set ($count = 0)
+        #foreach ($category in $options)
+          <li>$category.name ($category.options.size())
+            <ul>
+              #foreach ($option in $category.options)
+                #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+                  #set ($checked = 'checked="checked"')
+                  #set ($class = 'xwiki-select-option-selected')
+                #else
+                  #set ($checked = '')
+                  #set ($class = '')
+                #end
+                <li class="xwiki-select-option $class">
+                  <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked/>
+                  <span class="xwiki-select-option-icon">$services.icon.renderHTML($option.icon)</span>
+                  <div>
+                    <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
+                    #if ("$!option.description" != '')
+                      <p class="xHint">$option.description</p>
+                    #end
+                  </div>
+                </li>
+                #set ($count = $count + 1)
+              #end
+            </ul>
+          </li>
+        #end
+      </ul>
+    </div>
+  </div>
+#end

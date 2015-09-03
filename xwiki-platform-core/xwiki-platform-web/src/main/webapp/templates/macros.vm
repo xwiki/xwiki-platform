@@ -2656,8 +2656,8 @@ Recursive title display detected!##
 #########################################################
 #macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass)
   ## TODO: put this in a webjar instead
-  #set ($discard = $xwiki.ssfx.use('uicomponents/select/select.css', {'forceSkinAction': true}))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/select/select.js' , {'forceSkinAction': true}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/select/select.css', {'forceSkinAction': true}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/select/select.js' , {'forceSkinAction': true}))
   <div class="xwiki-select $!cssClass">
     ## Here we let a place to add a filter in the future, that is why the options are inside the following div block.
     <div class="xwiki-select-options">

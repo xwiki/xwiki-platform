@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-refactoring-api</artifactId>
   <name>XWiki Platform - Refactoring - API</name>
-  <description>XWiki Platform - Refactoring - API</description>
+  <description>Provides APIs to refactor XWiki entities</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->

@@ -1140,7 +1140,6 @@ public class XWiki implements EventListener
     /**
      * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
      *         list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
-     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAll()} instead
      */
     @Deprecated
     public List<String> getVirtualWikiList()
@@ -4360,28 +4359,10 @@ public class XWiki implements EventListener
 
     // Usefull date functions
 
-    /**
-     * @deprecated use {@link Date#Date()} instead...
-     */
-    @Deprecated
-    public Date getCurrentDate()
-    {
-        return new Date();
-    }
-
     public int getTimeDelta(long time)
     {
         Date ctime = new Date();
         return (int) (ctime.getTime() - time);
-    }
-
-    /**
-     * @deprecated use {@link Date#Date(long)} instead...
-     */
-    @Deprecated
-    public Date getDate(long time)
-    {
-        return new Date(time);
     }
 
     public boolean isMultiLingual(XWikiContext context)
@@ -4915,15 +4896,6 @@ public class XWiki implements EventListener
         }
 
         return this.fullNameSQL;
-    }
-
-    /**
-     * @deprecated use {@link EntityReferenceResolver} instead
-     */
-    @Deprecated
-    public String getDocName(String fullName)
-    {
-        return fullName.substring(fullName.indexOf('.') + 1);
     }
 
     public String getUserName(String user, XWikiContext context)

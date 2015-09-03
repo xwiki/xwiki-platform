@@ -183,7 +183,22 @@ public class DefaultWatchListStore implements WatchListStore
         // TODO: Can this be optimized by a direct "exists" query on the list item? Would it e better than what we
         // currently have with the document cache? If we try a query, it would also need to be performed on the user's
         // wiki/database, not the current one.
-        return getWatchedElements(user, type).contains(element);
+        Collection<String> watchedElements = getWatchedElements(user, type);
+        if (WatchedElementType.SPACE.equals(type)) {
+            // Special handling for Nested Spaces
+            for (String watchedSpace : watchedElements) {
+                // Check if there is an exact match on the watched space or if the current space is nested inside a
+                // watched space.
+                String watchedSpacePrefix = String.format("%s.", watchedSpace);
+                if (element.equals(watchedSpace) || element.startsWith(watchedSpacePrefix)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } else {
+            return watchedElements.contains(element);
+        }
     }
 
     @Override

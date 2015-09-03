@@ -54,6 +54,6 @@ public class HqlQueryUtilsTest
         assertFalse(HqlQueryUtils.isSafe("select * from XWikiDocument doc"));
         assertFalse(HqlQueryUtils
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
-        assertTrue(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
+        assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
     }
 }

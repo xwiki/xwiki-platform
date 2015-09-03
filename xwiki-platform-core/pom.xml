@@ -469,6 +469,12 @@
               <to>java.net.URL createURL*</to>
               <justification>ExportURLFactoryActionHandler was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
+              <method>java.lang.Object getRenderingEngine()</method>
+              <justification>Not a breakage. The legacy method was not in the right place (which mean that it was not available so it actually fix a breakage)</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

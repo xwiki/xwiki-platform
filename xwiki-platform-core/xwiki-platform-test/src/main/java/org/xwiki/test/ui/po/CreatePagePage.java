@@ -282,7 +282,6 @@ public class CreatePagePage extends ViewPage
                 {
                     try {
                         String value = getLocationPreview().getPathAsString();
-                        System.out.println("Expected: " + expectedContent + ", Value: " + value);
                         currentValue.setLength(0);
                         currentValue.append(currentValue);
                         return expectedContent.equals(value);

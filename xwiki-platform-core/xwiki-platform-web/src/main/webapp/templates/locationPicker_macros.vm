@@ -167,9 +167,13 @@
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
     'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($showWikis = $options.wiki && $displayWikiFields)
+  ## If we don't show the wikis then we need to show the root node (the current wiki) in order to be able to target top
+  ## level documents (e.g. create a top level document, move a document to the top level, etc.).
+  #set ($showRoot = !$showWikis)
   ## FIXME: The document picker must work on an empty wiki.
   #set ($url = $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
     'outputSyntax': 'plain',
+    'showRoot': $showRoot,
     'showWikis': $showWikis,
     'showTerminalDocuments': false,
     'showAttachments': false,

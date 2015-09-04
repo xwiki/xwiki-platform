@@ -64,8 +64,11 @@ import org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResol
 import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -108,6 +111,7 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -241,10 +245,6 @@ public class MockitoOldcoreRule implements MethodRule
         this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
-        this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
-        this.mockContextualAuthorizationManager =
-            getMocker().registerMockComponent(ContextualAuthorizationManager.class);
-
         this.mockXWiki = mock(XWiki.class);
         getXWikiContext().setWiki(this.mockXWiki);
 
@@ -259,6 +259,18 @@ public class MockitoOldcoreRule implements MethodRule
 
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), this.componentManager);
+
+        // Make sure an AuthorizationManager is available
+        if (!getMocker().hasComponent(AuthorizationManager.class)) {
+            this.mockAuthorizationManager =
+                getMocker().registerMockComponent(AuthorizationManager.class);
+        }
+
+        // Make sure a ContextualAuthorizationManager is available
+        if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
+            this.mockContextualAuthorizationManager =
+                getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+        }
 
         // Make sure a default ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class)) {
@@ -399,12 +411,21 @@ public class MockitoOldcoreRule implements MethodRule
                 @Override
                 public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
                 {
-                    XWikiDocument target = (XWikiDocument) invocation.getArguments()[0];
+                    XWikiDocument target = invocation.getArgumentAt(0, XWikiDocument.class);
 
                     return getMockXWiki().getDocument(target.getDocumentReferenceWithLocale(),
-                        (XWikiContext) invocation.getArguments()[1]);
+                        invocation.getArgumentAt(1, XWikiContext.class));
                 }
             });
+        when(getMockXWiki().getDocument(anyString(), any(XWikiContext.class))).then(new Answer<XWikiDocument>()
+        {
+            @Override
+            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getMockXWiki().getDocument(resolveDocument(invocation.getArgumentAt(0, String.class)),
+                    invocation.getArgumentAt(1, XWikiContext.class));
+            }
+        });
         when(getMockXWiki().exists(any(DocumentReference.class), any(XWikiContext.class))).then(new Answer<Boolean>()
         {
             @Override
@@ -419,14 +440,23 @@ public class MockitoOldcoreRule implements MethodRule
                 return documents.containsKey(target);
             }
         });
+        when(getMockXWiki().exists(anyString(), any(XWikiContext.class))).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getMockXWiki().exists(resolveDocument(invocation.getArgumentAt(0, String.class)),
+                    invocation.getArgumentAt(1, XWikiContext.class));
+            }
+        });
         doAnswer(new Answer<Void>()
         {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-                String comment = (String) invocation.getArguments()[1];
-                boolean minorEdit = (Boolean) invocation.getArguments()[2];
+                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
+                String comment = invocation.getArgumentAt(1, String.class);
+                boolean minorEdit = invocation.getArgumentAt(2, boolean.class);
 
                 boolean isNew = document.isNew();
 
@@ -492,8 +522,8 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                getMockXWiki().saveDocument((XWikiDocument) invocation.getArguments()[0],
-                    (String) invocation.getArguments()[1], false, (XWikiContext) invocation.getArguments()[2]);
+                getMockXWiki().saveDocument(invocation.getArgumentAt(0, XWikiDocument.class),
+                    invocation.getArgumentAt(1, String.class), false, invocation.getArgumentAt(2, XWikiContext.class));
 
                 return null;
             }
@@ -503,8 +533,8 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                getMockXWiki().saveDocument((XWikiDocument) invocation.getArguments()[0], "", false,
-                    (XWikiContext) invocation.getArguments()[1]);
+                getMockXWiki().saveDocument(invocation.getArgumentAt(0, XWikiDocument.class), "", false,
+                    invocation.getArgumentAt(1, XWikiContext.class));
 
                 return null;
             }
@@ -514,7 +544,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
                 documents.remove(document.getDocumentReferenceWithLocale());
 
@@ -531,7 +561,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
                 mockXWiki.deleteDocument(document, true, context);
 
@@ -543,7 +573,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
                 DocumentReference reference = document.getDocumentReference();
 
@@ -566,7 +596,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
                 mockXWiki.deleteAllDocuments(document, true, context);
 
@@ -580,7 +610,7 @@ public class MockitoOldcoreRule implements MethodRule
                 public BaseClass answer(InvocationOnMock invocation) throws Throwable
                 {
                     return getMockXWiki().getDocument((DocumentReference) invocation.getArguments()[0],
-                        (XWikiContext) invocation.getArguments()[1]).getXClass();
+                        invocation.getArgumentAt(1, XWikiContext.class)).getXClass();
                 }
             });
         when(getMockXWiki().getLanguagePreference(any(XWikiContext.class))).then(new Answer<String>()
@@ -599,6 +629,41 @@ public class MockitoOldcoreRule implements MethodRule
                 return new XWikiConfigDelegate(getMockXWikiCfg());
             }
         });
+        when(getMockXWiki().Param(anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getMockXWikiCfg().getProperty(invocation.getArgumentAt(0, String.class), String.class);
+            }
+        });
+        when(getMockXWiki().Param(anyString(), anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getMockXWikiCfg().getProperty(invocation.getArgumentAt(0, String.class),
+                    invocation.getArgumentAt(1, String.class));
+            }
+        });
+        when(getMockXWiki().getXWikiPreference(anyString(), any(XWikiContext.class))).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getConfigurationSource().getProperty(invocation.getArgumentAt(0, String.class), String.class);
+            }
+        });
+        when(getMockXWiki().getXWikiPreference(anyString(), anyString(), any(XWikiContext.class))).then(
+            new Answer<String>()
+            {
+                @Override
+                public String answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return getConfigurationSource().getProperty(invocation.getArgumentAt(0, String.class),
+                        invocation.getArgumentAt(1, String.class));
+                }
+            });
 
         // XWikiStoreInterface
 
@@ -608,7 +673,7 @@ public class MockitoOldcoreRule implements MethodRule
                 @Override
                 public List<String> answer(InvocationOnMock invocation) throws Throwable
                 {
-                    XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                    XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
                     List<String> translations = new ArrayList<String>();
 
@@ -629,8 +694,8 @@ public class MockitoOldcoreRule implements MethodRule
                 @Override
                 public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
                 {
-                    return getMockXWiki().getDocument((XWikiDocument) invocation.getArguments()[0],
-                        (XWikiContext) invocation.getArguments()[1]);
+                    return getMockXWiki().getDocument(invocation.getArgumentAt(0, XWikiDocument.class),
+                        invocation.getArgumentAt(1, XWikiContext.class));
                 }
             });
 
@@ -641,7 +706,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
+                XWikiContext xcontext = invocation.getArgumentAt(0, XWikiContext.class);
 
                 XWikiDocument userDocument =
                     getMockXWiki().getDocument(
@@ -671,7 +736,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
             {
-                XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
+                XWikiContext xcontext = invocation.getArgumentAt(0, XWikiContext.class);
 
                 XWikiDocument groupDocument =
                     getMockXWiki().getDocument(
@@ -727,6 +792,14 @@ public class MockitoOldcoreRule implements MethodRule
                 }
             });
         }
+    }
+
+    protected DocumentReference resolveDocument(String documentName) throws ComponentLookupException
+    {
+        DocumentReferenceResolver<String> resolver =
+            getMocker().getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+
+        return resolver.resolve(documentName);
     }
 
     protected void after() throws Exception
@@ -911,7 +984,9 @@ public class MockitoOldcoreRule implements MethodRule
         this.componentManager.registerComponentIfDontExist(ExplicitStringEntityReferenceResolver.class);
         this.componentManager.registerComponentIfDontExist(ExplicitStringEntityReferenceResolver.class);
         this.componentManager.registerComponentIfDontExist(LocalStringEntityReferenceSerializer.class);
+        this.componentManager.registerComponentIfDontExist(LocalUidStringEntityReferenceSerializer.class);
         this.componentManager.registerComponentIfDontExist(RelativeStringEntityReferenceResolver.class);
+        this.componentManager.registerComponentIfDontExist(UidStringEntityReferenceSerializer.class);
         this.componentManager.registerComponentIfDontExist(XClassRelativeStringEntityReferenceResolver.class);
 
         this.componentManager.registerComponentIfDontExist(DefaultModelConfiguration.class);

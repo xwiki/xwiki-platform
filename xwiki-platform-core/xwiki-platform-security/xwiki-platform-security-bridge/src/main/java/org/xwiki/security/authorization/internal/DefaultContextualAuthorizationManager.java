@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -31,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -62,6 +64,10 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
 
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    @Named("current")
+    private EntityReferenceResolver<EntityReference> resolver;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -97,7 +103,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             throw new AccessDeniedException(right, user, entity);
         }
 
-        this.authorizationManager.checkAccess(right, user, entity);
+        this.authorizationManager.checkAccess(right, user, getFullReference(entity));
     }
 
     @Override
@@ -127,7 +133,12 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
 
     private boolean hasAccess(Right right, DocumentReference user, EntityReference entity)
     {
-        return checkPreAccess(right) && this.authorizationManager.hasAccess(right, user, entity);
+        return checkPreAccess(right) && this.authorizationManager.hasAccess(right, user, getFullReference(entity));
+    }
+
+    private EntityReference getFullReference(EntityReference reference)
+    {
+        return reference != null ? this.resolver.resolve(reference, reference.getType()) : null;
     }
 
     /**

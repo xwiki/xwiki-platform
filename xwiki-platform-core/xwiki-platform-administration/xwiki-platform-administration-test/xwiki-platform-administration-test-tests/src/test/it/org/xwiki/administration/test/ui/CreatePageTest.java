@@ -470,40 +470,40 @@ public class CreatePageTest extends AbstractTest
         assertEquals("", createPage.getPage());
         assertEquals(getTestClassName(), createPage.getSpace());
         // Check the initial state of the breadcrumb.
-        assertEquals("/" + existingPageTitle + "/", createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
 
         // Set a new title and check that the page name and the breadcrumb are also updated.
         String newTitle = "New Title";
         createPage.setTitle(newTitle);
         assertEquals(newTitle, createPage.getPage());
-        assertEquals("/" + existingPageTitle + "/" + newTitle, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
 
         // Set a new page name and check that the breadcrumb is not updated, since we have a title specified.
         String newName = "SomeNewName";
         createPage.setPage(newName);
-        assertEquals("/" + existingPageTitle + "/" + newTitle, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
 
         // Clear the title, set a page name and check that the breadcrumb now uses the page name as a fallback.
         createPage.setTitle("");
         assertEquals("", createPage.getPage());
         createPage.setPage(newName);
-        assertEquals("/" + existingPageTitle + "/" + newName, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newName);
 
         // Set a new parent space and check that the breadcrumb is updated.
         // Before that, reset the title, just for completeness.
         createPage.setTitle(newTitle);
         String newSpace = "SomeNewSpace";
         createPage.setSpace(newSpace);
-        assertEquals("/" + newSpace + "/" + newTitle, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newTitle);
 
         // Set a new parent in nested spaces and check that the breadcrumb is updated.
         String newSpaceLevel2 = "Level2";
         createPage.setSpace(newSpace + "." + newSpaceLevel2);
-        assertEquals("/" + newSpace + "/" + newSpaceLevel2 + "/" + newTitle, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newSpaceLevel2 + "/" + newTitle);
 
         // Clear the parent and check that the breadcrumb is updated, since we are creating a top level document.
         createPage.setSpace("");
-        assertEquals("/" + newTitle, createPage.getLocationPreviewContent());
+        createPage.waitForLocationPreviewContent("/" + newTitle);
     }
 
     // TODO: Add a test for the input validation.

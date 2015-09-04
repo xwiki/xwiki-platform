@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Keys;
@@ -761,15 +762,20 @@ public class XWikiWebDriver extends RemoteWebDriver
      *
      * @param textInputElement an element accepting text input
      * @param newTextValue the new text value to set
-     * @see https://code.google.com/p/selenium/issues/detail?id=214
+     * @see <a href="https://code.google.com/p/selenium/issues/detail?id=214">Issue 214</a>
      * @since 7.2M3
      */
     public void setTextInputValue(WebElement textInputElement, String newTextValue)
     {
-        if (newTextValue == "") {
+        if (StringUtils.isEmpty(newTextValue)) {
             // Workaround for the fact that clear() fires the "change" event but not the "input" event and javascript
             // listening to the "input" event will not be executed otherwise.
-            textInputElement.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE + newTextValue);
+            // Note: We're not using CTRL+A and the Delete because the key combination to select the full input depends
+            // on the OS (on Mac it's META+A for example).
+            textInputElement.click();
+            textInputElement.sendKeys(Keys.END);
+            textInputElement.sendKeys(
+                StringUtils.repeat(Keys.BACK_SPACE.toString(), textInputElement.getAttribute("value").length()));
         } else {
             textInputElement.clear();
             textInputElement.sendKeys(newTextValue);

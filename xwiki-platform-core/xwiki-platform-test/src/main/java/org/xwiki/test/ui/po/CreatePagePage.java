@@ -23,9 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 /**
@@ -256,9 +261,44 @@ public class CreatePagePage extends ViewPage
         return getDriver().hasElementWithoutWaiting(By.id("terminal"));
     }
 
-    public String getLocationPreviewContent()
+    /**
+     * Wait for the Location Preview Breadcrumb to display the passed content and throws an exception if the timeout is
+     * reached. Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting
+     * would lead to false positives.
+     *
+     * @param expectedContent the content to wait for
+     * @since 7.2RC1
+     */
+    public void waitForLocationPreviewContent(final String expectedContent)
     {
-        return getLocationPreview().getPathAsString();
+        // TODO: Ugly hack. Would need to find a better solution
+        final StringBuilder currentValue = new StringBuilder();
+
+        try {
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    try {
+                        String value = getLocationPreview().getPathAsString();
+                        System.out.println("Expected: " + expectedContent + ", Value: " + value);
+                        currentValue.setLength(0);
+                        currentValue.append(currentValue);
+                        return expectedContent.equals(value);
+                    } catch (NotFoundException e) {
+                        return false;
+                    } catch (StaleElementReferenceException e) {
+                        // The element was removed from DOM in the meantime
+                        return false;
+                    }
+                }
+            });
+        } catch (WebDriverException e) {
+            // Display a nicer error message than would be displayed otherwise
+            throw new WebDriverException(
+                String.format("Found [%s], was expecting [%s]", currentValue.toString(), expectedContent), e);
+        }
     }
 
     public BreadcrumbElement getLocationPreview()

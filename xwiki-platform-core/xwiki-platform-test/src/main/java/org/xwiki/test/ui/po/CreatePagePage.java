@@ -283,7 +283,7 @@ public class CreatePagePage extends ViewPage
                     try {
                         String value = getLocationPreview().getPathAsString();
                         currentValue.setLength(0);
-                        currentValue.append(currentValue);
+                        currentValue.append(value);
                         return expectedContent.equals(value);
                     } catch (NotFoundException e) {
                         return false;

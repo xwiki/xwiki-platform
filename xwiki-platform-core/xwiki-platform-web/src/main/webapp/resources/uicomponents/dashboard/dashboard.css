@@ -102,3 +102,9 @@
   min-height: 16px;
   padding: 3px 6px 3px 22px;
 }
+
+/* Hide gadget title, when wider than gadget width */
+.gadget-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

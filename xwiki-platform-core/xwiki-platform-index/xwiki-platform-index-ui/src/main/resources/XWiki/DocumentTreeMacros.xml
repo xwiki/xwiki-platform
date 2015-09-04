@@ -58,7 +58,8 @@
   'hierarchyMode': 'reference',
   'showOnlyViewable': true,
   'filterByClass': '',
-  'root': ''
+  'root': '',
+  'showRoot': false
 })
 
 #macro (updateDocTreeConfigFromRequest)
@@ -109,38 +110,82 @@
 
 #macro (getChildren $nodeId $return)
   #set ($children = [])
-  #if ($nodeId == '#')
-    ## Select the root node.
+  #if ($nodeId == '#' &amp;&amp; $docTreeConfig.root == '')
+    ## Select the default root node.
     #if ($docTreeConfig.showWikis &amp;&amp; $xcontext.isMainWiki())
       #set ($nodeType = 'farm')
     #else
       #set ($nodeType = 'wiki')
-      #set ($nodeId = $xcontext.database)
+      #set ($nodeReference = $xcontext.database)
     #end
   #else
-    #set ($parts = $nodeId.split(':', 2))
+    #set ($actualNodeId = $nodeId)
+    #if ($actualNodeId == '#')
+      #set ($actualNodeId = $docTreeConfig.root)
+    #end
+    #set ($parts = $actualNodeId.split(':', 2))
     #set ($nodeType = $parts[0])
-    #set ($nodeId = $parts[1])
+    #set ($nodeReference = $parts[1])
   #end
   #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
   #if ("$!offset" == '')
     #set ($offset = 0)
   #end
-  #evaluate("${escapetool.h}add$stringtool.capitalize($nodeType)Children(${escapetool.d}nodeId
-    $offset 15 ${escapetool.d}children)")
+  #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
+    #maybeAddNode($nodeType $nodeReference $children)
+  #else
+    #evaluate("${escapetool.h}add$stringtool.capitalize($nodeType)Children(${escapetool.d}nodeReference
+      $offset 15 ${escapetool.d}children)")
+  #end
   #set ($return = $NULL)
   #setVariable("$return" $children)
 #end
 
+#macro (maybeAddNode $type $reference $siblings)
+  #if ($type == 'farm')
+    #addFarmNode($siblings)
+  #elseif ($type == 'wiki')
+    #set ($wiki = $services.wiki.getById($reference))
+    #maybeAddWikiNode($wiki $siblings)
+  #elseif ($type == 'space')
+    #set ($spaceReference = $services.model.resolveSpace($reference))
+    #maybeAddSpaceNode($spaceReference $siblings)
+  #elseif ($type == 'document')
+    #set ($documentReference = $services.model.resolveDocument($reference))
+    #maybeAddDocumentNode($documentReference $children)
+  #end
+#end
+
 ##
-## Wiki Nodes
+## Farm Node
 ##
+
+#macro (addFarmNode $siblings)
+  #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($discard = $siblings.add({
+    'id': 'farm:',
+    'text': 'Farm',
+    'icon': 'fa fa-home',
+    'children': true,
+    'data': {
+      'type': 'farm',
+      'validChildren': ['wiki', 'pagination']
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($farmHomeReference)
+    }
+  }))
+#end
 
 #macro (addFarmChildren $nodeId $offset $limit $children)
   #foreach ($wiki in $services.wiki.all)
     #maybeAddWikiNode($wiki $children)
   #end
 #end
+
+##
+## Wiki Nodes
+##
 
 #macro (maybeAddWikiNode $wiki $siblings $placeholder)
   #if ($wiki &amp;&amp; (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $wiki.reference)))
@@ -1052,6 +1097,12 @@
     #if ("$!docTreeConfig.root" != '')
       ## The path needs to be relative to the specified root because only a sub-tree is displayed.
       #getRelativePath($path $docTreeConfig.root)
+    #elseif ($docTreeConfig.showRoot)
+      ## We must prefix the path with the default root node.
+      #getChildren('#' $topLevelNodes)
+      #if ($topLevelNodes.size() &gt; 0)
+        #set ($discard = $path.add(0, $topLevelNodes.get(0)))
+      #end
     #end
   #end
   #set ($return = $NULL)
@@ -1068,7 +1119,12 @@
   #end
   #if ($index &gt;= 0)
     ## Return the path suffix that starts from the specified root.
-    #set ($path = $path.subList($mathtool.add($index, 1), $path.size()))
+    #set ($startIndex = $index)
+    #if (!$docTreeConfig.showRoot)
+      ## Exclude the root node from the path.
+      #set ($startIndex = $mathtool.add($index, 1))
+    #end
+    #set ($path = $path.subList($startIndex, $path.size()))
   #else
     ## The target node is not in the specified sub-tree. We return an empty path in this case, which prevents the node
     ## from being opened or added to the tree (in case the root node has pagination).

@@ -41,12 +41,9 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     parameters = parameters || {};
     if (!childrenURL) {
       childrenURL = this.element.attr('data-url');
-      // Use the specified id for the root node.
-      var root = this.element.attr('data-root');
-      var actualNodeId = (node.id === '#' && root) ? root : node.id;
       parameters = $.extend({
         data: 'children',
-        id: actualNodeId
+        id: node.id
       }, parameters);
     }
     if (childrenURL) {

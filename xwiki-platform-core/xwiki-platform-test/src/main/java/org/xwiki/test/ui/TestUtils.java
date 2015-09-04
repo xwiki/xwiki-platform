@@ -1051,6 +1051,14 @@ public class TestUtils
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
 
+    /**
+     * @since 7.2RC1
+     */
+    public void addObject(EntityReference reference, String className, Object... properties)
+    {
+        gotoPage(reference, "objectadd", toQueryParameters(className, null, properties));
+    }
+
     public void addObject(String space, String page, String className, Map<String, ?> properties)
     {
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));

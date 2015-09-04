@@ -19,42 +19,54 @@
  */
 package org.xwiki.faq.test.po;
 
+import java.util.Arrays;
+
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents actions that can be done on the FAQ.WebHome page.
+ * Represents actions that can be done on a FAQ home page.
  *
  * @version $Id$
  * @since 4.3M2
  */
 public class FAQHomePage extends ViewPage
 {
-    @FindBy(name = "question")
-    private WebElement faqNameField;
+    private EntityReference homeReference;
 
-    @FindBy(xpath = "//div[contains(@class, 'faq-link add-faq')]//input[contains(@class, 'btn btn-success')]")
-    private WebElement faqNameButton;
+    public static final FAQHomePage DEFAULT_FAQ_HOME_PAGE = new FAQHomePage(
+        new DocumentReference("xwiki", Arrays.asList("FAQ"), "WebHome"));
+
+    public FAQHomePage(EntityReference homeReference)
+    {
+        this.homeReference = homeReference;
+    }
 
     /**
      * Opens the home page.
      */
-    public static FAQHomePage gotoPage()
+    public void gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage());
-        return new FAQHomePage();
+        getUtil().gotoPage(this.homeReference);
     }
 
-    public static String getSpace()
+    /**
+     * @since 7.2RC1
+     */
+    public String getSpaces()
     {
-        return "FAQ";
+        return getUtil().serializeReference(
+            this.homeReference.extractReference(EntityType.SPACE).removeParent(new WikiReference("xwiki")));
     }
 
-    public static String getPage()
+    public String getPage()
     {
-        return "WebHome";
+        return this.homeReference.getName();
     }
 
     /**
@@ -63,9 +75,12 @@ public class FAQHomePage extends ViewPage
      */
     public FAQEntryEditPage addFAQEntry(String faqName)
     {
-        this.faqNameField.clear();
-        this.faqNameField.sendKeys(faqName);
-        this.faqNameButton.click();
+        WebElement faqNameField = getDriver().findElementByName("question");
+        WebElement faqNameButton = getDriver().findElementByXPath(
+            "//div[contains(@class, 'faq-link add-faq')]//input[contains(@class, 'btn btn-success')]");
+        faqNameField.clear();
+        faqNameField.sendKeys(faqName);
+        faqNameButton.click();
         return new FAQEntryEditPage();
     }
 

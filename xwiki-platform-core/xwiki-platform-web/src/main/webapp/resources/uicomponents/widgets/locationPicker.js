@@ -117,6 +117,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var spaceReferenceInput = picker.find('input.location-parent-field');
     var nameInput = picker.find('input.location-name-field');
     var locationContainer = picker.find('.breadcrumb');
+    // Input timeouts used to avoid handling too soon each individual letter, as the user types.
+    var inputDelay = 500;
+    var spaceReferenceInputTimeout;
 
     /**
      * Compute a page name from a given title.
@@ -185,7 +188,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         spaceReference = spaceReferenceInput.val();
       }
 
-      updateLocation(wikiField.val(), spaceReference);
+      // Delay the execution in case the user is still typing.
+      clearTimeout(spaceReferenceInputTimeout);
+      spaceReferenceInputTimeout = setTimeout(function() {
+        updateLocation(wikiField.val(), spaceReference);
+      }, inputDelay);
     };
 
     var updateLocationFromWikiField = function(event) {

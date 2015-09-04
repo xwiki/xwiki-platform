@@ -104,7 +104,7 @@
 }
 
 /* Hide gadget title, when wider than gadget width */
-.gadget-title.wikigeneratedheader {
-  overflow:hidden;
+.gadget-title {
+  overflow: hidden;
   text-overflow: ellipsis;
 }

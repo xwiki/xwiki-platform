@@ -24,26 +24,38 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Validate {@link XWikiServletURLFactory}.
+ * 
+ * @version $Id$
+ */
+public class XWikiServletURLFactoryTest
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
 
-    private XWikiServletURLFactory urlFactory;
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
-    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<>();
+    private XWikiServletURLFactory urlFactory;
 
     /**
      * Flag indicating if the request is secure. A request is secure if either its URL uses the HTTPS scheme or the
@@ -66,125 +78,70 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
      */
     private final Map<String, String> httpHeaders = new HashMap<>();
 
-    private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
+    @Before
+    public void before() throws Exception
     {
-        if (!this.databases.containsKey(database)) {
-            if (create) {
-                this.databases.put(database, new HashMap<String, XWikiDocument>());
-            } else {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Database " + database + " does not exists.");
-            }
-        }
+        this.oldcore.registerEntityReferenceComponents();
 
-        return this.databases.get(database);
-    }
-
-    private XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
-    {
-        XWikiDocument document = new XWikiDocument(documentReference);
-
-        Map<String, XWikiDocument> docs = getDocuments(document.getDatabase(), false);
-
-        if (docs.containsKey(document.getFullName())) {
-            return docs.get(document.getFullName());
-        } else {
-            return document;
-        }
-    }
-
-    private void saveDocument(XWikiDocument document) throws XWikiException
-    {
-        document.setNew(false);
-        Map<String, XWikiDocument> database = getDocuments(document.getDatabase(), true);
-        database.remove(document.getFullName());
-        database.put(document.getFullName(), document);
-    }
-
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        this.databases.put(MAIN_WIKI_NAME, new HashMap<String, XWikiDocument>());
-
-        XWiki xwiki = new XWiki()
+        when(this.oldcore.getMockXWiki().skipDefaultSpaceInURLs(any(XWikiContext.class))).then(new Answer<Boolean>()
         {
             @Override
-            public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
-            {
-                return XWikiServletURLFactoryTest.this.getDocument(Utils
-                    .<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING,
-                        "currentmixed").resolve(fullname));
-            }
-
-            @Override
-            public XWikiDocument getDocument(DocumentReference documentReference, XWikiContext context)
-                throws XWikiException
-            {
-                return XWikiServletURLFactoryTest.this.getDocument(documentReference);
-            }
-
-            @Override
-            public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context)
-                throws XWikiException
-            {
-                return XWikiServletURLFactoryTest.this.getDocument(doc.getDocumentReference());
-            }
-
-            @Override
-            public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
-            {
-                return defaultValue;
-            }
-
-            @Override
-            public boolean skipDefaultSpaceInURLs(XWikiContext context)
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
             {
                 return XWikiServletURLFactoryTest.this.skipDefaultSpaceInURLs;
             }
+        });
+        when(this.oldcore.getMockXWiki().getDefaultSpace(any(XWikiContext.class))).thenReturn("DefaultSpace");
 
-            @Override
-            public String getDefaultSpace(XWikiContext context)
-            {
-                return "DefaultSpace";
-            }
-        };
-        xwiki.setDatabase(getContext().getWikiId());
+        // XWiki methods that are also tested
+        when(this.oldcore.getMockXWiki().getServletPath(anyString(), any(XWikiContext.class))).thenCallRealMethod();
+        when(this.oldcore.getMockXWiki().getServerURL(anyString(), any(XWikiContext.class))).thenCallRealMethod();
+        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenCallRealMethod();
+        when(this.oldcore.getMockXWiki().showViewAction(any(XWikiContext.class))).thenCallRealMethod();
 
-        Mock mockXWikiRequest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
-        mockXWikiRequest.stubs().method("getScheme").will(returnValue("http"));
-        mockXWikiRequest.stubs().method("isSecure").will(new CustomStub("Implements ServletRequest.isSecure")
+        // Request
+        XWikiRequest mockXWikiRequest = mock(XWikiRequest.class);
+        when(mockXWikiRequest.getScheme()).thenReturn("http");
+        when(mockXWikiRequest.isSecure()).then(new Answer<Boolean>()
         {
             @Override
-            public Object invoke(Invocation invocation) throws Throwable
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
             {
                 return secure;
             }
         });
-        mockXWikiRequest.stubs().method("getServletPath").will(returnValue(""));
-        mockXWikiRequest.stubs().method("getContextPath").will(returnValue("/xwiki"));
-        mockXWikiRequest.stubs().method("getHeader").will(new CustomStub("Implements HttpServletRequest.getHeader")
+        when(mockXWikiRequest.getServletPath()).thenReturn("");
+        when(mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
+        when(mockXWikiRequest.getHeader(anyString())).then(new Answer<String>()
         {
             @Override
-            public Object invoke(Invocation invocation) throws Throwable
+            public String answer(InvocationOnMock invocation) throws Throwable
             {
-                String headerName = (String) invocation.parameterValues.get(0);
-                return httpHeaders.get(headerName);
+                return httpHeaders.get(invocation.getArgumentAt(0, String.class));
             }
         });
+        this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
 
-        getContext().setWiki(xwiki);
-        getContext().setRequest((XWikiRequest) mockXWikiRequest.proxy());
+        // Response
+        XWikiResponse xwikiResponse = mock(XWikiResponse.class);
+        when(xwikiResponse.encodeURL(anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArgumentAt(0, String.class);
+            }
+        });
+        this.oldcore.getXWikiContext().setResponse(xwikiResponse);
 
         // Create sub-wikis.
         createWiki("wiki1");
         createWiki("wiki2");
 
-        getContext().setURL(new URL("http://127.0.0.1/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getXWikiContext().setURL(new URL("http://127.0.0.1/xwiki/view/InitialSpace/InitialPage"));
 
         this.urlFactory = new XWikiServletURLFactory();
-        this.urlFactory.init(getContext());
+        this.urlFactory.init(this.oldcore.getXWikiContext());
     }
 
     /**
@@ -196,86 +153,119 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     private void createWiki(String wikiName) throws Exception
     {
         String wikiDocName = "XWikiServer" + wikiName.substring(0, 1).toUpperCase() + wikiName.substring(1);
-        XWikiDocument wikiDoc = getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", wikiDocName));
-        BaseObject wikiObj = wikiDoc.newObject("XWiki.XWikiServerClass", getContext());
+        XWikiDocument wikiDoc =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", wikiDocName),
+                this.oldcore.getXWikiContext());
+        BaseObject wikiObj =
+            wikiDoc.newXObject(new LocalDocumentReference("XWiki", "XWikiServerClass"), this.oldcore.getXWikiContext());
         wikiObj.setStringValue("server", wikiName + "server");
-        saveDocument(wikiDoc);
+        this.oldcore.getMockXWiki().saveDocument(wikiDoc, this.oldcore.getXWikiContext());
     }
 
+    // Tests
+
+    @Test
     public void testCreateURLOnMainWiki() throws MalformedURLException
     {
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWiki() throws MalformedURLException
     {
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWikiInVirtualMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnMainWikiInPathMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWikiInPathMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWikiInVirtualModeInPathMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
         secure = true;
         // Change the context URL to include a port number and to use HTTPS.
-        getContext().setURL(new URL("https://localhost:8080/xwiki/view/Main/"));
+        this.oldcore.getXWikiContext().setURL(new URL("https://localhost:8080/xwiki/view/Main/"));
         // Reinitialize the URL factory to take into account the new context URL.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("https://localhost:8080/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnMainWikiInDomainMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWikiInDomainMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
     }
 
+    @Test
     public void testCreateURLOnSubWikiInVirtualModeInDomainMode() throws MalformedURLException
     {
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+                this.oldcore.getXWikiContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
     }
 
@@ -284,120 +274,146 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
      * 
      * @throws MalformedURLException shouldn't happen
      */
+    @Test
     public void testCreateURLOnMainWikiInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", this.oldcore.getXWikiContext());
         assertEquals(new URL("https://www.xwiki.org/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnSubWikiInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         // The URL remains absolute in this case.
         assertEquals("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor",
-            urlFactory.getURL(url, getContext()));
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnSubWikiInVirtualModeInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", this.oldcore.getXWikiContext());
         assertEquals(new URL("https://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         // The URL remains absolute in this case.
         assertEquals("https://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor",
-            urlFactory.getURL(url, getContext()));
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnMainWikiInPathModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnSubWikiInPathModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", this.oldcore.getXWikiContext());
         assertEquals(new URL("https://www.xwiki.org/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLOnSubWikiInVirtualModeInPathModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org:8080");
         // Reinitialize the URL factory to take into account the new HTTP headers.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
-        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
+        URL url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://www.xwiki.org:8080/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
     /**
      * Tests how URLs are serialized when the request wiki (taken from the request URL) and the context wiki (explicitly
      * set from code on the XWiki context) are different.
      */
+    @Test
     public void testGetURLWhenRequestWikiAndContextWikiAreDifferent() throws MalformedURLException
     {
-        getContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getXWikiContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
         // Reinitialize the URL factory to take into account the new request URL.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
-        getContext().setWikiId("wiki2");
+        this.oldcore.getXWikiContext().setWikiId("wiki2");
 
-        String url = urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), getContext());
+        String url =
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
         assertEquals("/xwiki/bin/view/Space/Page", url);
 
-        url = urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), getContext());
+        url =
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
         assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
     }
 
     /** When the URL contains only the hostname, without a path, / is returned instead of the empty string. */
+    @Test
     public void testGetURLWithEmptyPathReturnsSlash() throws MalformedURLException
     {
-        getContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getXWikiContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
         // Reinitialize the URL factory to take into account the new request URL.
-        this.urlFactory.init(getContext());
+        this.urlFactory.init(this.oldcore.getXWikiContext());
 
-        String url = this.urlFactory.getURL(new URL("http://wiki1server/"), getContext());
+        String url = this.urlFactory.getURL(new URL("http://wiki1server/"), this.oldcore.getXWikiContext());
         assertEquals("/", url);
     }
 
@@ -405,123 +421,146 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
      * When getServerURL is called on a resource from the main wiki, the user is in a subwiki, and xwiki.home is set,
      * xwiki.home should be returned. see: XWIKI-5981
      */
+    @Test
     public void testGetServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
     {
-        getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setWikiId("subwiki");
+        this.oldcore.getXWikiContext()
+            .setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getXWikiContext().setWikiId("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalWikiId("subwiki");
+        this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
-        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
-        urlFactory.init(getContext());
-        assertEquals("http://mainwiki.mywiki.tld/", urlFactory.getServerURL("xwiki", getContext()).toString());
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
+        urlFactory.init(this.oldcore.getXWikiContext());
+        assertEquals("http://mainwiki.mywiki.tld/", urlFactory.getServerURL("xwiki", this.oldcore.getXWikiContext())
+            .toString());
     }
 
     /**
      * Proves that from a virtual wiki, URLs generated to point to the main wiki will use xwiki.home. see: XWIKI-5981
      */
+    @Test
     public void testXWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
     {
-        getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setWikiId("subwiki");
+        this.oldcore.getXWikiContext()
+            .setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getXWikiContext().setWikiId("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalWikiId("subwiki");
+        this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
-        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
 
         // Reinitialize the URL factory to take into account the new request URL.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
         // No wiki passed, assume same wiki. we should expect it to return http://virtual1.mywiki.tld/
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, getContext());
+        URL url =
+            urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, this.oldcore.getXWikiContext());
         assertEquals(new URL("http://virtual1.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         // We are already in virtual1 so it should be a relative reference.
-        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
 
         // Pass "xwiki" as the wiki, expect it to return the main wiki as set in the xwiki.home parameter.
-        url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         assertEquals("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor",
-            urlFactory.getURL(url, getContext()));
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
     /**
      * When getServerURL is called on a resource from the main wiki, the user is in the main wiki, and xwiki.home is
      * set, xwiki.home should be returned. see: XWIKI-5981
      */
+    @Test
     public void testGetServerURLNonVirtualModeWithXWikiDotHomeEnabled() throws MalformedURLException
     {
-        getContext().setURL(new URL("http://127.0.0.1:8080/xwiki/view/InitialSpace/InitialPage"));
-        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        urlFactory.init(getContext());
+        this.oldcore.getXWikiContext().setURL(new URL("http://127.0.0.1:8080/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        urlFactory.init(this.oldcore.getXWikiContext());
         // TODO: Fix getServerURL() so that is is consistent about returning a trailing / or not.
-        assertEquals("http://mainwiki.mywiki.tld", urlFactory.getServerURL("xwiki", getContext()).toString());
-        assertEquals("http://mainwiki.mywiki.tld", urlFactory.getServerURL(null, getContext()).toString());
+        assertEquals("http://mainwiki.mywiki.tld", urlFactory.getServerURL("xwiki", this.oldcore.getXWikiContext())
+            .toString());
+        assertEquals("http://mainwiki.mywiki.tld", urlFactory.getServerURL(null, this.oldcore.getXWikiContext())
+            .toString());
     }
 
     /**
      * Proves that in a single wiki instance, URLs are always generated using xwiki.home if present. see: XWIKI-5981
      */
+    @Test
     public void testXWikiDotHomeParameterNonVirtualMode() throws MalformedURLException
     {
         // Some proxies will modify the host field without adding a x-forwarded-host field,
         // Using xwiki.home we should be able to make it work anyway.
-        getContext().setURL(new URL("http://localhost:8080/xwiki/view/InitialSpace/InitialPage"));
-        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        this.oldcore.getXWikiContext().setURL(new URL("http://localhost:8080/xwiki/view/InitialSpace/InitialPage"));
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         // Reinitialize the URL factory to take into account the new request URL.
-        urlFactory.init(getContext());
+        urlFactory.init(this.oldcore.getXWikiContext());
 
         // No wiki passed, assume main wiki. we should expect it to return mainwiki.mywiki.tld and not
         // xwiki.mywiki.tld.
-        URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, getContext());
+        URL url =
+            urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", null, this.oldcore.getXWikiContext());
         assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
 
         // Pass "xwiki" as the wiki, expect same result.
-        url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
+        url =
+            urlFactory
+                .createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
-        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+        assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor",
+            urlFactory.getURL(url, this.oldcore.getXWikiContext()));
     }
 
     /**
      * Verify that jsessionid is removed from URL.
      */
+    @Test
     public void testNormalizeURL() throws Exception
     {
         assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en"),
-            urlFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
-                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", getContext()));
+            XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", this.oldcore.getXWikiContext()));
     }
 
+    @Test
     public void testCreateURLWithNestedSpaces() throws Exception
     {
-        URL url = this.urlFactory.createURL("Space1.Space2", "Page", getContext());
+        URL url = this.urlFactory.createURL("Space1.Space2", "Page", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page"), url);
     }
 
+    @Test
     public void testCreateURLWhenDefaultSpaceIsSkipped() throws Exception
     {
         this.skipDefaultSpaceInURLs = true;
-        URL url = this.urlFactory.createURL("DefaultSpace", "Page", getContext());
+        URL url = this.urlFactory.createURL("DefaultSpace", "Page", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Page"), url);
     }
 
+    @Test
     public void testCreateURLWhenDefaultSpaceIsSkippedButDefaultSpaveDoesntMatch() throws Exception
     {
         this.skipDefaultSpaceInURLs = true;
-        URL url = this.urlFactory.createURL("NonDefaultSpace", "Page", getContext());
+        URL url = this.urlFactory.createURL("NonDefaultSpace", "Page", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/NonDefaultSpace/Page"), url);
     }
 
+    @Test
     public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsNotContextDoc() throws Exception
     {
-        XWikiContext xwikiContext = getContext();
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.put("rev", "1.0");
         xwikiContext.setAction("viewrev");
         xwikiContext.setDoc(new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage")));
@@ -529,18 +568,22 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/viewrev/space/page/file"), url);
     }
 
+    @Test
     public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsContextDocAndAttachmentDoesntExist()
         throws Exception
     {
-        XWikiContext xwikiContext = getContext();
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.put("rev", "1.0");
         xwikiContext.setAction("viewrev");
+
         XWikiDocument document = new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage"));
-        saveDocument(document);
+        this.oldcore.getMockXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
         xwikiContext.setDoc(document);
         xwikiContext.setWikiId("currentwiki");
-        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "viewrev", null,
-            xwikiContext);
+
+        URL url =
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "viewrev", null, xwikiContext);
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/viewattachrev/currentspace/currentpage/file"), url);
     }
 }

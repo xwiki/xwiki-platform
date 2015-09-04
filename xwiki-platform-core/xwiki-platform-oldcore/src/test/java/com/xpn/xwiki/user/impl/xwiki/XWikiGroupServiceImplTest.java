@@ -22,90 +22,76 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTestCase
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+
+public class XWikiGroupServiceImplTest
 {
-    XWikiGroupServiceImpl groupService;
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
-    private Mock mockXWiki;
+    XWikiGroupServiceImpl groupService;
 
     private XWikiDocument user;
 
     private XWikiDocument userWithSpaces;
 
     private XWikiDocument group;
+
     private BaseObject groupObject;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void before() throws Exception
     {
-        super.setUp();
+        this.oldcore.registerEntityReferenceComponents();
 
         this.groupService = new XWikiGroupServiceImpl();
 
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("isReadOnly").will(returnValue(false));
-        this.mockXWiki.stubs().method("getWikiOwner").will(returnValue(null));
-        this.mockXWiki.stubs().method("getMaxRecursiveSpaceChecks").will(returnValue(0));
-        this.mockXWiki.stubs().method("getDocument").with(ANYTHING, eq("WebPreferences"), ANYTHING).will(
-            new CustomStub("Implements XWiki.getDocument")
-            {
-                @Override
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return new XWikiDocument(new DocumentReference(getContext().getWikiId(),
-                        (String) invocation.parameterValues.get(0), "WebPreferences"));
-                }
-            });
-
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        when(this.oldcore.getMockXWiki().getMaxRecursiveSpaceChecks(any(XWikiContext.class))).thenReturn(0);
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
-        getContext().setWikiId(this.user.getWikiName());
-        BaseObject userObject = new BaseObject();
-        userObject.setClassName("XWiki.XWikiUser");
-        this.user.addXObject(userObject);
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.user.getPrefixedFullName()), ANYTHING).will(
-            returnValue(this.user));
+        this.user.newXObject(new DocumentReference("wiki", "XWiki", "XWikiUser"), this.oldcore.getXWikiContext());
+        this.oldcore.getMockXWiki().saveDocument(this.user, this.oldcore.getXWikiContext());
 
         this.userWithSpaces = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user with spaces"));
-        getContext().setWikiId(this.userWithSpaces.getWikiName());
-        BaseObject userWithSpacesObject = new BaseObject();
-        userWithSpacesObject.setClassName("XWiki.XWikiUser");
-        this.userWithSpaces.addXObject(userWithSpacesObject);
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.userWithSpaces.getPrefixedFullName()), ANYTHING)
-            .will(returnValue(this.userWithSpaces));
-        
+        this.userWithSpaces.newXObject(new DocumentReference("wiki", "XWiki", "XWikiUser"),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getMockXWiki().saveDocument(this.userWithSpaces, this.oldcore.getXWikiContext());
+
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
-        getContext().setWikiId(this.group.getWikiName());
-        this.groupObject = new BaseObject();
-        this.groupObject.setClassName("XWiki.XWikiGroups");
+        this.groupObject =
+            this.group
+                .newXObject(new DocumentReference("wiki", "XWiki", "XWikiGroups"), this.oldcore.getXWikiContext());
         this.groupObject.setStringValue("member", this.user.getFullName());
-        this.group.addXObject(this.groupObject);
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.group.getPrefixedFullName()), ANYTHING).will(
-            returnValue(this.group));
-        this.mockXWiki.stubs().method("getDocument").with(eq(this.group.getFullName()), ANYTHING).will(
-            returnValue(this.group));
+        this.oldcore.getMockXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
+
+        this.oldcore.getXWikiContext().setWikiId("wiki");
     }
 
+    @Test
     public void testListMemberForGroup() throws XWikiException
-    {        
-        assertEquals(new HashSet<String>(Arrays.asList(this.user.getFullName())), new HashSet<String>(this.groupService
-            .listMemberForGroup(this.group.getFullName(), getContext())));
-        
+    {
+        assertEquals(
+            new HashSet<String>(Arrays.asList(this.user.getFullName())),
+            new HashSet<String>(this.groupService.listMemberForGroup(this.group.getFullName(),
+                this.oldcore.getXWikiContext())));
+
         this.groupObject.setStringValue("member", this.userWithSpaces.getFullName());
-        
-        assertEquals(new HashSet<String>(Arrays.asList(this.userWithSpaces.getFullName())), new HashSet<String>(this.groupService
-            .listMemberForGroup(this.group.getFullName(), getContext())));
+        this.oldcore.getMockXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
+
+        assertEquals(new HashSet<String>(Arrays.asList(this.userWithSpaces.getFullName())), new HashSet<String>(
+            this.groupService.listMemberForGroup(this.group.getFullName(), this.oldcore.getXWikiContext())));
     }
 }

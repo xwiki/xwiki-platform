@@ -20,27 +20,31 @@
 package com.xpn.xwiki.objects;
 
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Validate {@link BaseObjectReference}.
  * 
  * @version $Id$
  */
-public class BaseObjectReferenceTest extends AbstractBridgedComponentTestCase
+public class BaseObjectReferenceTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     private DocumentReference document;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void before() throws Exception
     {
-        super.setUp();
+        this.oldcore.registerEntityReferenceComponents();
 
         this.document = new DocumentReference("wiki", "space", "page");
     }

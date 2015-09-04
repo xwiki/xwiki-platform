@@ -105,6 +105,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
@@ -145,6 +146,8 @@ public class MockitoOldcoreRule implements MethodRule
     private XWikiVersioningStoreInterface mockVersioningStore;
 
     private XWikiRightService mockRightService;
+
+    private XWikiGroupService mockGroupService;
 
     private AuthorizationManager mockAuthorizationManager;
 
@@ -251,19 +254,20 @@ public class MockitoOldcoreRule implements MethodRule
         this.mockHibernateStore = mock(XWikiHibernateStore.class);
         this.mockVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockRightService = mock(XWikiRightService.class);
+        this.mockGroupService = mock(XWikiGroupService.class);
 
-        when(mockXWiki.getStore()).thenReturn(mockHibernateStore);
-        when(mockXWiki.getHibernateStore()).thenReturn(mockHibernateStore);
-        when(mockXWiki.getVersioningStore()).thenReturn(mockVersioningStore);
-        when(mockXWiki.getRightService()).thenReturn(mockRightService);
+        when(mockXWiki.getStore()).thenReturn(this.mockHibernateStore);
+        when(mockXWiki.getHibernateStore()).thenReturn(this.mockHibernateStore);
+        when(mockXWiki.getVersioningStore()).thenReturn(this.mockVersioningStore);
+        when(mockXWiki.getRightService()).thenReturn(this.mockRightService);
+        when(mockXWiki.getGroupService(getXWikiContext())).thenReturn(this.mockGroupService);
 
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), this.componentManager);
 
         // Make sure an AuthorizationManager is available
         if (!getMocker().hasComponent(AuthorizationManager.class)) {
-            this.mockAuthorizationManager =
-                getMocker().registerMockComponent(AuthorizationManager.class);
+            this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
         }
 
         // Make sure a ContextualAuthorizationManager is available
@@ -382,13 +386,30 @@ public class MockitoOldcoreRule implements MethodRule
         when(getMockXWiki().getSectionEditingDepth()).thenReturn(2L);
         when(getMockXWiki().getEncoding()).thenReturn("UTF-8");
 
+        when(getMockXWiki().getDocument(any(XWikiDocument.class), anyString(), any(XWikiContext.class))).then(
+            new Answer<XWikiDocument>()
+            {
+                @Override
+                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiDocument doc = invocation.getArgumentAt(0, XWikiDocument.class);
+                    String revision = invocation.getArgumentAt(1, String.class);
+
+                    if (StringUtils.equals(revision, doc.getVersion())) {
+                        return doc;
+                    }
+
+                    // TODO: implement version store mocking
+                    return new XWikiDocument(doc.getDocumentReference());
+                }
+            });
         when(getMockXWiki().getDocument(any(DocumentReference.class), any(XWikiContext.class))).then(
             new Answer<XWikiDocument>()
             {
                 @Override
                 public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
                 {
-                    DocumentReference target = (DocumentReference) invocation.getArguments()[0];
+                    DocumentReference target = invocation.getArgumentAt(0, DocumentReference.class);
 
                     if (target.getLocale() == null) {
                         target = new DocumentReference(target, Locale.ROOT);
@@ -833,6 +854,11 @@ public class MockitoOldcoreRule implements MethodRule
     public XWikiRightService getMockRightService()
     {
         return this.mockRightService;
+    }
+
+    public XWikiGroupService getMockGroupService()
+    {
+        return this.mockGroupService;
     }
 
     public AuthorizationManager getMockAuthorizationManager()

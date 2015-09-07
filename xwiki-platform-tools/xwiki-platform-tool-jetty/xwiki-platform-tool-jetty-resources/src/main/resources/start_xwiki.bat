@@ -69,6 +69,9 @@ REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
 set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir="%XWIKI_DATA_DIR%"
 
+# Catch any Out Of Memory to make easier to analyze it
+set XWIKI_OPTS=%XWIKI_OPTS% -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%XWIKI_DATA_DIR%"
+
 REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
 if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 

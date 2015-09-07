@@ -45,7 +45,7 @@
   ## Check if the document can have children.
   #if ($doc.name == $defaultDocumentName)
     #countDocumentChildren($doc.documentReference $childCount)
-    #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'xpage=children')))
+    #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children')))
     <dt>
       <label>
         <input type="checkbox" name="deep" value="true" />
@@ -58,7 +58,7 @@
 
 #macro (displayLinksCheckbox $options)
   #set ($backLinksCount = $doc.backlinks.size())
-  #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'xpage=backlinks')))
+  #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
   <dt>
     <label>
       <input type="checkbox" name="updateLinks" value="true" />

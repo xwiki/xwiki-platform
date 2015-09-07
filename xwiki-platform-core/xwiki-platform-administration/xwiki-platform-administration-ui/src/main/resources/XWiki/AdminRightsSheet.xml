@@ -43,7 +43,7 @@
 #if ($editor == 'spaceadmin')
   {{info}}
   #set($webHomeRef = $services.model.resolveDocument('WebHome'))
-  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
+  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'viewer=children')]]", '**'])
   {{/info}}
 #end
 

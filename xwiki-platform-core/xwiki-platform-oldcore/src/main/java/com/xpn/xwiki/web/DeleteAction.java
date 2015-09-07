@@ -186,20 +186,26 @@ public class DeleteAction extends XWikiAction
     protected boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
         EntityReference documentReference =
             doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference()
                 .getLastSpaceReference() : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
 
-        Job deleteJob = startDeleteJob(documentReference);
+        return deleteToRecycleBin(documentReference, context);
+    }
 
-        // If the user have asked for an asynchronous delete action
-        if (isAsync(request)) {
+    protected boolean deleteToRecycleBin(EntityReference entityReference, XWikiContext context) throws XWikiException
+    {
+        Job deleteJob = startDeleteJob(entityReference);
+
+        // If the user have asked for an asynchronous delete action...
+        if (isAsync(context.getRequest())) {
             List<String> jobId = deleteJob.getRequest().getId();
-            sendRedirect(response,
+            sendRedirect(context.getResponse(),
                 Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
+
+            // A redirect has been performed.
             return true;
         }
 
@@ -207,10 +213,10 @@ public class DeleteAction extends XWikiAction
         try {
             deleteJob.join();
         } catch (InterruptedException e) {
-            throw new XWikiException(String.format("Failed to delete [%s]", documentReference), e);
+            throw new XWikiException(String.format("Failed to delete [%s]", entityReference), e);
         }
 
-        // No redirect have been performed
+        // No redirect has been performed.
         return false;
     }
 

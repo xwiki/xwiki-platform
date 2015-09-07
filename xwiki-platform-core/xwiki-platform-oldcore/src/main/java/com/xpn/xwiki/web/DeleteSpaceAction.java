@@ -19,11 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.List;
-
-import org.xwiki.job.Job;
-import org.xwiki.model.reference.SpaceReference;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -38,30 +33,7 @@ public class DeleteSpaceAction extends DeleteAction
     @Override
     protected boolean delete(XWikiContext context) throws XWikiException
     {
-        XWikiResponse response = context.getResponse();
-
-        // Delete to recycle bin.
-        SpaceReference spaceReference = context.getDoc().getDocumentReference().getLastSpaceReference();
-        Job deleteJob = startDeleteJob(spaceReference);
-
-        // If the user have asked for an asynchronous delete action
-        if (isAsync(context.getRequest())) {
-            List<String> jobId = deleteJob.getRequest().getId();
-            sendRedirect(response,
-                Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
-
-            // A redirect has been performed.
-            return true;
-        }
-
-        // Otherwise...
-        try {
-            deleteJob.join();
-        } catch (InterruptedException e) {
-            throw new XWikiException(String.format("Failed to delete [%s]", spaceReference), e);
-        }
-
-        return false;
+        return deleteToRecycleBin(context.getDoc().getDocumentReference().getLastSpaceReference(), context);
     }
 
     @Override

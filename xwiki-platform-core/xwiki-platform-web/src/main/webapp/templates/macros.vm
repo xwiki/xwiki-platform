@@ -2641,7 +2641,7 @@ Recursive title display detected!##
 ###                   { 
 ###                     'name': 'Category 1',
 ###                     'options': [
-###                       { 'name': 'Option 1', 'value': 'option1', 'description': 'Description of the option 1', 'icon': 'wiki'},
+###                       { 'name': 'Option 1', 'value': 'option1', 'description': 'Description of the option 1', 'icon': 'wiki', 'data': {'some-data': 'some-value'}},
 ###                       { 'name': 'Option 2', 'value': 'option2', 'description': 'Description of the option 2', 'icon': 'page'}
 ###                     ]
 ###                   },
@@ -2674,13 +2674,17 @@ Recursive title display detected!##
                   #set ($checked = '')
                   #set ($class = '')
                 #end
+                #set ($otherData = '')
+                #foreach($data in $option.data.keySet())
+                  #set ($otherData = "$otherData data-${escapetool.xml($data)} = '$escapetool.xml($option.data.get($data))'")
+                #end
                 <li class="xwiki-select-option $class">
-                  <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked/>
+                  <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
                   <span class="xwiki-select-option-icon">$services.icon.renderHTML($option.icon)</span>
                   <div>
                     <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
                     #if ("$!option.description" != '')
-                      <p class="xHint">$option.description</p>
+                      <p class="xHint">$escapetool.xml($option.description)</p>
                     #end
                   </div>
                 </li>

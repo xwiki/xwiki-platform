@@ -30,7 +30,7 @@ require(['jquery'], function($) {
       selectWidget.find('.xwiki-select-option-selected').removeClass('xwiki-select-option-selected');
       option.find('input').prop('checked', true);
       option.addClass('xwiki-select-option-selected');
-      selectWidget.trigger('xwiki:select:updated', {'elements': select[0]});
+      selectWidget.trigger('xwiki:select:updated', {'elements': selectWidget[0]});
     });
   };
 

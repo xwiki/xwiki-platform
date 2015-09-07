@@ -411,7 +411,7 @@ position: relative;
 #set($excludedPages  = $stringtool.split($configObj.getProperty('excludedPages').value, ','))
 #set($excludedPages  = $stringtool.stripAll($excludedPages))
 ##
-#if($displayRatings &amp;&amp; !$listtool.contains($excludedPages, $doc.name))
+#if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
   #displayFullRating($doc.getDocumentReference() "")
 #end
 {{/velocity}}</content>

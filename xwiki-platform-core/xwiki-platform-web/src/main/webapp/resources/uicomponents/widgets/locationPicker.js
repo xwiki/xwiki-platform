@@ -417,6 +417,13 @@ require(['jquery'], function($) {
     };
 
     // Update the allowed spaces based on the selected template provider.
+    form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
+      var type = $('input[name="type"]:checked');
+      if (type.attr('data-type') == 'template') {
+        updateSpaceValidatorFromTemplateProviderInput(type);
+      }
+    });
+    
     form.find('input[name="templateprovider"]').change(function() {
       updateSpaceValidatorFromTemplateProviderInput($(this));
     });

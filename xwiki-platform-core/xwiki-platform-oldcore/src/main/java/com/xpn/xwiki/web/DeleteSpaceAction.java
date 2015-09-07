@@ -39,7 +39,7 @@ public class DeleteSpaceAction extends DeleteAction
     protected boolean delete(XWikiContext context) throws XWikiException
     {
         XWikiResponse response = context.getResponse();
-        
+
         // Delete to recycle bin.
         SpaceReference spaceReference = context.getDoc().getDocumentReference().getLastSpaceReference();
         Job deleteJob = startDeleteJob(spaceReference);
@@ -48,19 +48,19 @@ public class DeleteSpaceAction extends DeleteAction
         if (isAsync(context.getRequest())) {
             List<String> jobId = deleteJob.getRequest().getId();
             sendRedirect(response,
-                    Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
+                Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
 
             // A redirect has been performed.
             return true;
         }
-        
+
         // Otherwise...
         try {
             deleteJob.join();
         } catch (InterruptedException e) {
             throw new XWikiException(String.format("Failed to delete [%s]", spaceReference), e);
         }
-        
+
         return false;
     }
 

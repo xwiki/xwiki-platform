@@ -70,8 +70,10 @@ public class DefaultWikiCreator implements WikiCreator
         }
 
         // Create the descriptor
+        // Since XWiki#updateDatabase is generating documents it needs the wiki to actually exist
+        // from XWiki point of view as otherwise various codes are going to be lost
         WikiDescriptor descriptor = createDescriptor(wikiId, wikiAlias);
-        
+
         // Init database/schema
         try {
             xwiki.updateDatabase(wikiId, true, true, context);

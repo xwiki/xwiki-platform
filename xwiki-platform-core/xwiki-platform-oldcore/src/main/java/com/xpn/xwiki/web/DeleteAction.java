@@ -51,15 +51,7 @@ public class DeleteAction extends XWikiAction
 
     protected static final String RECYCLED_DOCUMENT_ID_PARAM = "id";
 
-    protected static final String JOB_ID_PARAM = "jobId";
-
-    protected boolean isJobLaunched(XWikiRequest request)
-    {
-        // If the jobId is given, then the deletion is already processing, and we let the UI display a progress bar
-        return StringUtils.isNotEmpty(request.getParameter(JOB_ID_PARAM));
-    }
-
-    protected boolean isAsync(XWikiRequest request)
+    private boolean isAsync(XWikiRequest request)
     {
         return "true".equals(request.get(ASYNC_PARAM));
     }
@@ -79,10 +71,6 @@ public class DeleteAction extends XWikiAction
         // If confirm=1 then delete the page. If not, the render action will go to the "delete" page so that the
         // user can confirm. That "delete" page will then call the delete action again with confirm=1.
         if (!"1".equals(request.getParameter(CONFIRM_PARAM))) {
-            return true;
-        }
-
-        if (isJobLaunched(request)) {
             return true;
         }
 
@@ -120,9 +108,6 @@ public class DeleteAction extends XWikiAction
             }
         }
 
-        if (isJobLaunched(request)) {
-            return ACTION_NAME;
-        }
         if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
             return "deleted";
         }
@@ -140,10 +125,6 @@ public class DeleteAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
-        if (isJobLaunched(request)) {
-            return false;
-        }
-
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         if (sindex != null && xwiki.hasRecycleBin(context)) {
             deleteFromRecycleBin(Long.parseLong(sindex), context);
@@ -158,7 +139,7 @@ public class DeleteAction extends XWikiAction
         }
     }
 
-    protected void deleteFromRecycleBin(long index, XWikiContext context) throws XWikiException
+    private void deleteFromRecycleBin(long index, XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
@@ -183,7 +164,7 @@ public class DeleteAction extends XWikiAction
         sendRedirect(response, Utils.getRedirect("view", context));
     }
 
-    protected boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
+    private boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
@@ -202,8 +183,11 @@ public class DeleteAction extends XWikiAction
         // If the user have asked for an asynchronous delete action...
         if (isAsync(context.getRequest())) {
             List<String> jobId = deleteJob.getRequest().getId();
+            // We don't redirect to the delete action because by the time the redirect request reaches the server the
+            // specified entity may be already deleted and the current user may not have the delete right anymore (e.g.
+            // the current user is no longer the creator).
             sendRedirect(context.getResponse(),
-                Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
+                Utils.getRedirect("view", "xpage=delete&jobId=" + serializeJobId(jobId), context));
 
             // A redirect has been performed.
             return true;
@@ -220,12 +204,12 @@ public class DeleteAction extends XWikiAction
         return false;
     }
 
-    protected String serializeJobId(List<String> jobId)
+    private String serializeJobId(List<String> jobId)
     {
         return StringUtils.join(jobId, "/");
     }
 
-    protected Job startDeleteJob(EntityReference entityReference) throws XWikiException
+    private Job startDeleteJob(EntityReference entityReference) throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");

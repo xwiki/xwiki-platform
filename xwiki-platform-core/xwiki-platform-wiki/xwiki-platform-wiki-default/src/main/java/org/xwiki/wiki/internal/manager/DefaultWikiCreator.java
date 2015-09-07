@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -52,9 +51,6 @@ public class DefaultWikiCreator implements WikiCreator
     private ContextualLocalizationManager localizationManager;
 
     @Inject
-    private Logger logger;
-
-    @Inject
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
     @Inject
@@ -73,6 +69,9 @@ public class DefaultWikiCreator implements WikiCreator
             throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation", wikiId), e);
         }
 
+        // Create the descriptor
+        WikiDescriptor descriptor = createDescriptor(wikiId, wikiAlias);
+        
         // Init database/schema
         try {
             xwiki.updateDatabase(wikiId, true, true, context);
@@ -80,7 +79,7 @@ public class DefaultWikiCreator implements WikiCreator
             throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate", wikiId), e);
         }
 
-        return createDescriptor(wikiId, wikiAlias);
+        return descriptor;
     }
 
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException

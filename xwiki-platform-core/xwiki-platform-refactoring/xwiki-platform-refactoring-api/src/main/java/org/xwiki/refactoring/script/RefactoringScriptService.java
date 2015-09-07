@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -58,20 +59,15 @@ import org.xwiki.stability.Unstable;
  * @since 7.2M1
  */
 @Component
-@Named(RefactoringScriptService.ROLE_HINT)
+@Named(RefactoringJobs.GROUP)
 @Singleton
 @Unstable
 public class RefactoringScriptService implements ScriptService
 {
     /**
-     * The role hint of this component.
-     */
-    public static final String ROLE_HINT = "refactoring";
-
-    /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    private static final String REFACTORING_ERROR_KEY = String.format("scriptservice.%s.error", ROLE_HINT);
+    private static final String REFACTORING_ERROR_KEY = String.format("scriptservice.%s.error", RefactoringJobs.GROUP);
 
     /**
      * Provides access to the current context.
@@ -254,7 +250,8 @@ public class RefactoringScriptService implements ScriptService
      */
     private List<String> getJobId(String type, String suffix)
     {
-        return Arrays.asList(ROLE_HINT, type, suffix);
+        return Arrays
+            .asList(RefactoringJobs.GROUP, StringUtils.removeStart(type, RefactoringJobs.GROUP_PREFIX), suffix);
     }
 
     /**

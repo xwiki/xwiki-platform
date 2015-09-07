@@ -34,6 +34,7 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceTreeNode;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -64,7 +65,7 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         void visit(T node);
     }
 
-    private static final JobGroupPath ROOT_GROUP = new JobGroupPath("refactoring", null);
+    private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
 
     private static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
 

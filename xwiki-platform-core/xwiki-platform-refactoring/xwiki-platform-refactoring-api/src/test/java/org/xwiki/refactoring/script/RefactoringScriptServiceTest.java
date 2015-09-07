@@ -108,8 +108,7 @@ public class RefactoringScriptServiceTest
 
         assertEquals(Arrays.asList(source), request.getValue().getEntityReferences());
         assertEquals(destination, request.getValue().getDestination());
-        assertEquals(Arrays.asList(RefactoringScriptService.ROLE_HINT, RefactoringJobs.MOVE), request.getValue()
-            .getId().subList(0, 2));
+        assertEquals(Arrays.asList(RefactoringJobs.GROUP, "move"), request.getValue().getId().subList(0, 2));
         assertEquals(RefactoringJobs.MOVE, request.getValue().getJobType());
         assertEquals(this.userReference, request.getValue().getUserReference());
         assertEquals(false, request.getValue().isDeep());

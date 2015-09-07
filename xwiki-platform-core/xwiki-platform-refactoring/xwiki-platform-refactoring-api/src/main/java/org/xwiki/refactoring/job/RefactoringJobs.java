@@ -31,27 +31,37 @@ import org.xwiki.stability.Unstable;
 public interface RefactoringJobs
 {
     /**
+     * The name used to group the refactoring jobs.
+     */
+    String GROUP = "refactoring";
+
+    /**
+     * The prefix used by all the refactoring job hits.
+     */
+    String GROUP_PREFIX = GROUP + '/';
+
+    /**
      * The role hint for the job that moves entities.
      */
-    String MOVE = "move";
+    String MOVE = GROUP_PREFIX + "move";
 
     /**
      * The role hint for the job that renames entities.
      */
-    String RENAME = "rename";
+    String RENAME = GROUP_PREFIX + "rename";
 
     /**
      * The role hint of the job that copies entities.
      */
-    String COPY = "copy";
+    String COPY = GROUP_PREFIX + "copy";
 
     /**
      * The role hint of the job that copies entities with a different name or reference.
      */
-    String COPY_AS = "copyAs";
+    String COPY_AS = GROUP_PREFIX + "copyAs";
 
     /**
      * The role hint of the job that deletes entities.
      */
-    String DELETE = "delete";
+    String DELETE = GROUP_PREFIX + "delete";
 }

@@ -130,6 +130,9 @@ echo Starting Jetty on port ${JETTY_PORT}, please wait...
 XWIKI_DATA_DIR=${xwikiDataDir}
 XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"
 
+# Catch any Out Of Memory to make easier to analyze it
+XWIKI_OPTS="$XWIKI_OPTS -XX:+HeapDumpOnOutOfMemoryError"
+
 # Ensure the data directory exists so that XWiki can use it for storing permanent data.
 mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 

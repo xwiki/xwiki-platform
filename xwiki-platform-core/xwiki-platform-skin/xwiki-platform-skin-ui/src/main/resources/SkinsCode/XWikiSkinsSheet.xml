@@ -307,7 +307,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // Perform asynchronously the deletion
       notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deleting'))', 'inprogress');
       $.ajax({
-        'url'      : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+        'url'      : XWiki.currentDocument.getURL('get'),
         'type'     : 'POST',
         'dataType' : 'json',
         'data' : {
@@ -368,7 +368,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
    */
   var displayObj = function(objNumber) {
     $.ajax({
-      'url'  : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+      'url'  : XWiki.currentDocument.getURL('get'),
       'type' : 'GET',
       'data' : {
         'action'    : 'displayObj',
@@ -400,7 +400,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
    */
   $('#newPathAdd').click(function() {
     $.ajax({
-      'url'      : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+      'url'      : XWiki.currentDocument.getURL('get'),
       'type'     : 'POST',
       'dataType' : 'json',
       'data' : {

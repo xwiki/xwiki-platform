@@ -272,18 +272,18 @@ public class SeparatePageRating implements Rating
     /**
      * Gets a unique page name.
      * 
-     * @param space the space in which the document should be
+     * @param spaceReference the reference of the space in which the document should be
      * @param name the name of the document
      * @param postfix post fix to add to the document name
      * @param forcepostfix force post fix or not
      * @return the unique document name
      */
-    private String getUniquePageName(String space, String name, String postfix, boolean forcepostfix)
+    private String getUniquePageName(String spaceReference, String name, String postfix, boolean forcepostfix)
     {
         String pageName = context.getWiki().clearName(name, context);
-        if (forcepostfix || context.getWiki().exists(space + '.' + pageName, context)) {
+        if (forcepostfix || context.getWiki().exists(spaceReference + '.' + pageName, context)) {
             int i = 1;
-            while (context.getWiki().exists(space + '.' + pageName + postfix + i, context)) {
+            while (context.getWiki().exists(spaceReference + '.' + pageName + postfix + i, context)) {
                 i++;
             }
             return pageName + postfix + i;

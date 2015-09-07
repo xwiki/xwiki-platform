@@ -44,31 +44,31 @@ public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */
     protected static final String CONFIRM_PARAM = "confirm";
-    
+
     protected static final String ACTION_NAME = "delete";
-    
+
     protected static final String ASYNC_PARAM = "async";
 
     protected static final String RECYCLED_DOCUMENT_ID_PARAM = "id";
-    
+
     protected static final String JOB_ID_PARAM = "jobId";
-    
+
     protected boolean isJobLaunched(XWikiRequest request)
     {
         // If the jobId is given, then the deletion is already processing, and we let the UI display a progress bar
         return StringUtils.isNotEmpty(request.getParameter(JOB_ID_PARAM));
     }
-    
+
     protected boolean isAsync(XWikiRequest request)
     {
         return "true".equals(request.get(ASYNC_PARAM));
     }
-    
+
     private boolean doesAffectChildren(XWikiRequest request, DocumentReference documentReference)
     {
-        return StringUtils.isNotEmpty(request.getParameter("affectChildren")) &&
-                // Security check: we do not "affect children" of a terminal document
-                "WebHome".equals(documentReference.getName());
+        // Security check: we do not "affect children" of a terminal document
+        return StringUtils.isNotEmpty(request.getParameter("affectChildren"))
+            && "WebHome".equals(documentReference.getName());
     }
 
     @Override
@@ -119,17 +119,17 @@ public class DeleteAction extends XWikiAction
                 recycleIdIsValid = true;
             }
         }
-        
+
         if (isJobLaunched(request)) {
             return ACTION_NAME;
-        }        
+        }
         if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
             return "deleted";
         }
         if (doc.isNew() && !recycleIdIsValid) {
             return Utils.getPage(request, "docdoesnotexist");
         }
-        
+
         return ACTION_NAME;
     }
 
@@ -139,11 +139,11 @@ public class DeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
- 
+
         if (isJobLaunched(request)) {
             return false;
         }
-        
+
         String sindex = request.getParameter(RECYCLED_DOCUMENT_ID_PARAM);
         if (sindex != null && xwiki.hasRecycleBin(context)) {
             deleteFromRecycleBin(Long.parseLong(sindex), context);
@@ -157,54 +157,52 @@ public class DeleteAction extends XWikiAction
             return deleteToRecycleBin(context);
         }
     }
-    
+
     protected void deleteFromRecycleBin(long index, XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        
+
         XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
         // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
         // don't try to delete it and instead redirect to the view page.
         if (dd != null) {
             DeletedDocument ddapi = new DeletedDocument(dd, context);
             if (!ddapi.canDelete()) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "You are not allowed to delete a document from the trash "
-                                + "immediately after it has been deleted from the wiki");
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "You are not allowed to delete a document from the trash "
+                        + "immediately after it has been deleted from the wiki");
             }
             if (!dd.getFullName().equals(doc.getFullName())) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                        "The specified trash entry does not match the current document");
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
+                    "The specified trash entry does not match the current document");
             }
             xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
         }
         sendRedirect(response, Utils.getRedirect("view", context));
     }
-    
+
     protected boolean deleteToRecycleBin(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
-        EntityReference documentReference = doesAffectChildren(request, doc.getDocumentReference()) ? 
-                doc.getDocumentReference().getLastSpaceReference() : 
-                doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
-        
+        EntityReference documentReference =
+            doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference()
+                .getLastSpaceReference() : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
+
         Job deleteJob = startDeleteJob(documentReference);
-        
+
         // If the user have asked for an asynchronous delete action
         if (isAsync(request)) {
             List<String> jobId = deleteJob.getRequest().getId();
             sendRedirect(response,
-                    Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
+                Utils.getRedirect("delete", String.format("%s=%s", JOB_ID_PARAM, serializeJobId(jobId)), context));
             return true;
         }
-        
+
         // Otherwise...
         try {
             deleteJob.join();
@@ -215,7 +213,7 @@ public class DeleteAction extends XWikiAction
         // No redirect have been performed
         return false;
     }
-    
+
     protected String serializeJobId(List<String> jobId)
     {
         return StringUtils.join(jobId, "/");

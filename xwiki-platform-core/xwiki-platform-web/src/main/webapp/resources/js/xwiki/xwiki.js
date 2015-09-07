@@ -490,7 +490,7 @@ Object.extend(XWiki, {
             var expires = "; expires="+date.toGMTString();
         }
         else var expires = "";
-        document.cookie = name+"="+value+expires+"; path=/";
+        document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/";
     },
 
     /**
@@ -508,7 +508,7 @@ Object.extend(XWiki, {
                 c = c.substring(1,c.length);
             }
             if (c.indexOf(nameEQ) == 0) {
-                return c.substring(nameEQ.length,c.length);
+                return decodeURIComponent(c.substring(nameEQ.length,c.length));
             }
         }
         return null;

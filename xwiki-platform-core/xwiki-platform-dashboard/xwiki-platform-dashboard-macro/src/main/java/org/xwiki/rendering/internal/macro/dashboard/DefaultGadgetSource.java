@@ -36,6 +36,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -94,6 +95,10 @@ public class DefaultGadgetSource implements GadgetSource
     @Inject
     @Named("current")
     protected DocumentReferenceResolver<EntityReference> currentReferenceEntityResolver;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localReferenceSerializer;
 
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the titles of the gadgets.
@@ -249,7 +254,9 @@ public class DefaultGadgetSource implements GadgetSource
         sourcePageBlock.setParameter(classParameterName, DashboardMacro.SOURCE_PAGE);
         metadataContainer.addChild(sourcePageBlock);
         GroupBlock sourceSpaceBlock = new GroupBlock();
-        sourceSpaceBlock.addChild(new WordBlock(sourceDoc.getSpaceReferences().get(0).getName()));
+        // Extract the full Space Reference (in order to support Nested Spaces) and set it in the XDOM
+        sourceSpaceBlock.addChild(new WordBlock(
+            this.localReferenceSerializer.serialize(sourceDoc.getLastSpaceReference())));
         sourceSpaceBlock.setParameter(classParameterName, DashboardMacro.SOURCE_SPACE);
         metadataContainer.addChild(sourceSpaceBlock);
         GroupBlock sourceWikiBlock = new GroupBlock();

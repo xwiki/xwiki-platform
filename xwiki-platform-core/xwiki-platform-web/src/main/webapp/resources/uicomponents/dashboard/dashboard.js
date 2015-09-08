@@ -36,6 +36,8 @@ XWiki.Dashboard = Class.create( {
     this.addURL = this.element.down('.metadata .addurl').readAttribute('href');
 
     this.sourcePage = this.element.down('.metadata .sourcepage').innerHTML;
+    // Note: Starting with XWiki 7.2RC1, "sourcespace" is the full space reference and can contain more than 1 space
+    // in the case of Nested Spaces (e.g. "space1.space2").
     this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
     this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
     this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');

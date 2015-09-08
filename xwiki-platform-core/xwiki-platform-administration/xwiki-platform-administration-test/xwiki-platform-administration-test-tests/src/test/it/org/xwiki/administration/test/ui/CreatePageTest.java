@@ -119,9 +119,11 @@ public class CreatePageTest extends AbstractTest
         EntityReference wantedLinkReference =
             getUtil().resolveDocumentReference(getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".NewPage");
         vp.clickWantedLink(wantedLinkReference, true);
-        List<WebElement> templates = getDriver().findElements(By.name("templateprovider"));
+        // TODO: a page object should be better here
+        List<WebElement> templates = 
+                getDriver().findElements(By.xpath("//input[@name='type' and @data-type='template']"));
         // Note: We need to remove 1 to exclude the "Empty Page" template entry
-        assertEquals(availableTemplateSize, templates.size() - 1);
+        assertEquals(availableTemplateSize, templates.size());
         assertTrue(createPagePage.getAvailableTemplates().contains(templateProviderFullName));
 
         // Step 3: Create a new page when located on a non-existing page

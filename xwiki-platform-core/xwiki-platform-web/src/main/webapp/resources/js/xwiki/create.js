@@ -35,17 +35,14 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       } else {
         var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
         if ($('#terminal').prop('checked')) {
-          documentReference.name = $('#Name').val();
-          documentReference.parent = spaceReference;
+          documentReference = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
         } else {
-          documentReference.parent = new XWiki.SpaceReference();
-          documentReference.parent.parent = spaceReference;
-          documentReference.parent.name = $('#Name').val();
-          documentReference.name = 'WebHome';
+          var parent = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.SPACE, spaceReference);
+          documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, parent);
         }
       }
       
-      return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki))).replace(/"/g, '&quot;');
+      return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki)));
     };
     
     /**
@@ -88,7 +85,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       if (type == 'office') {
         // The office importer is a wiki page which takes the 'page' parameter.
         // So we compute this parameter and we redirect the form to the Office Importer document.
-        window.location = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['XWiki'], 'OfficeImporter')).getURL('view', 'page=' + encodeURI(computeTargetPageName()));
+        window.location = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['XWiki'], 'OfficeImporter')).getURL('view', 'page=' + encodeURIComponent(computeTargetPageName()));
         return false;
       }
       

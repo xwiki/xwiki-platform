@@ -380,7 +380,24 @@ Object.extend(XWiki, {
                           if (redirect) {
                             window.location = redirect;
                           } else {
-                            new XWiki.widgets.CreatePagePopup({content: transport.responseText});
+                            // The create action actually loads some JS and CSS. This modal box needs them too, but we
+                            // load them on demand.
+                            // We display an notification while the browser fetch the resources/
+                            var notification = new XWiki.widgets.Notification("$services.localization.render('core.create.popup.loading')", 'inprogress');
+                            // Add the CSS
+                            var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css', 
+                              'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
+                            $(document.head).insert(newStyle);
+                            // Add the JS
+                            require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
+                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)",
+                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.css', true)"],
+                                    function($) {
+                                       // We are sure that the JS and the CSS have been loaded, so we finally display
+                                       // the create popup
+                                       new XWiki.widgets.CreatePagePopup({content: transport.responseText});
+                                       notification.hide();
+                                    });
                           }
                       },
                       onFailure: function() {

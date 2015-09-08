@@ -94,19 +94,23 @@ public class CreatePagePage extends ViewPage
         getDriver().setTextInputValue(this.pageTextField, page);
     }
 
+    private List<WebElement> getAvailableTemplateInputs()
+    {
+        return getDriver().findElements(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
+    }
+
     /**
      * @since 3.2M3
      */
     public int getAvailableTemplateSize()
     {
-        // When there's no template available a hidden input with a blank value remains.
-        return getDriver().findElements(By.name("templateprovider")).size() - 1;
+        return getAvailableTemplateInputs().size();
     }
 
     public List<String> getAvailableTemplates()
     {
         List<String> availableTemplates = new ArrayList<String>();
-        List<WebElement> templateInputs = getDriver().findElements(By.name("templateprovider"));
+        List<WebElement> templateInputs = getAvailableTemplateInputs();
         for (WebElement input : templateInputs) {
             if (input.getAttribute("value").length() > 0) {
                 availableTemplates.add(input.getAttribute("value"));
@@ -118,14 +122,13 @@ public class CreatePagePage extends ViewPage
 
     public void setTemplate(String template)
     {
-        // Select the correct radio element corresponding to the passed template name.
-        // TODO: For some reason the following isn't working. Find out why.
-        // List<WebElement> templates = getDriver().findElements(
-        // new ByChained(By.name("template"), By.tagName("input")));
-        List<WebElement> templates = getDriver().findElements(By.name("templateprovider"));
+        List<WebElement> templates = getAvailableTemplateInputs();
         for (WebElement templateInput : templates) {
             if (templateInput.getAttribute("value").equals(template)) {
-                templateInput.click();
+                // Get the label corresponding to the input so we can click on it
+                WebElement label = 
+                        getDriver().findElement(By.xpath("//label[@for = '"+templateInput.getAttribute("id")+"']"));
+                label.click();
                 return;
             }
         }

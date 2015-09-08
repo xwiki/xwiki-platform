@@ -159,13 +159,13 @@
       </title>
     </class>
     <property>
-      <content>{{spaces/}}</content>
+      <content>{{documentTree showTranslations="false" showAttachments="false" /}}</content>
     </property>
     <property>
       <position>1, 2</position>
     </property>
     <property>
-      <title>$services.localization.render('platform.dashboard.wiki.spaces')</title>
+      <title>$services.localization.render('platform.dashboard.wiki.pages')</title>
     </property>
   </object>
   <object>

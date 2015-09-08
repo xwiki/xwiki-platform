@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="WikiManager.Dashboard" locale="">
   <web>WikiManager</web>
   <name>Dashboard</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1252458000000</creationDate>
-  <date>1303429635000</date>
-  <contentUpdateDate>1303429635000</contentUpdateDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1441721384000</date>
+  <contentUpdateDate>1441721384000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.dashboard.wiki')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{dashboard/}}</content>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>22045e2a-e5ac-4b9e-9ff7-10ee2b62624c</guid>
     <class>
       <name>XWiki.EditModeClass</name>
       <customClass/>
@@ -63,15 +64,15 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultEditMode>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>22045e2a-e5ac-4b9e-9ff7-10ee2b62624c</guid>
     <property>
       <defaultEditMode>inline</defaultEditMode>
     </property>
   </object>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>0</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>6ad7ff1f-6971-4a95-a0e5-94c0d2adf3aa</guid>
     <class>
       <name>XWiki.GadgetClass</name>
       <customClass/>
@@ -120,10 +121,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>0</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>6ad7ff1f-6971-4a95-a0e5-94c0d2adf3aa</guid>
     <property>
       <content>{{spaces/}}</content>
     </property>
@@ -135,6 +132,10 @@
     </property>
   </object>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>1</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>35c8969a-8419-4a70-abda-9b6bb1c0d709</guid>
     <class>
       <name>XWiki.GadgetClass</name>
       <customClass/>
@@ -183,10 +184,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>1</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>35c8969a-8419-4a70-abda-9b6bb1c0d709</guid>
     <property>
       <content>{{tagcloud/}}</content>
     </property>
@@ -198,6 +195,10 @@
     </property>
   </object>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>2</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>092deb30-707f-43d3-b4e8-8b01b932c0eb</guid>
     <class>
       <name>XWiki.GadgetClass</name>
       <customClass/>
@@ -246,10 +247,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>2</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>092deb30-707f-43d3-b4e8-8b01b932c0eb</guid>
     <property>
       <content>{{activity/}}</content>
     </property>
@@ -261,6 +258,10 @@
     </property>
   </object>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>3</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>acb59a4e-cbfe-4a33-8a38-1bb6f65efa7b</guid>
     <class>
       <name>XWiki.GadgetClass</name>
       <customClass/>
@@ -309,10 +310,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>3</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>acb59a4e-cbfe-4a33-8a38-1bb6f65efa7b</guid>
     <property>
       <content>{{velocity}}
 #set ($currentWiki = $services.wiki.currentWikiId)
@@ -374,6 +371,10 @@
     </property>
   </object>
   <object>
+    <name>WikiManager.Dashboard</name>
+    <number>4</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>
     <class>
       <name>XWiki.GadgetClass</name>
       <customClass/>
@@ -422,10 +423,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>WikiManager.Dashboard</name>
-    <number>4</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>4505776f-6e41-4c59-a0b2-c2082743e60d</guid>
     <property>
       <content>{{velocity}}
 ## Max number of contributors to display.
@@ -466,5 +463,4 @@ $services.localization.render('platform.wiki.currentwiki.gadgetTopActiveUsersAll
       <title>$services.localization.render('platform.wiki.currentwiki.gadget.topActiveUsers.label')</title>
     </property>
   </object>
-  <content>{{dashboard/}}</content>
 </xwikidoc>

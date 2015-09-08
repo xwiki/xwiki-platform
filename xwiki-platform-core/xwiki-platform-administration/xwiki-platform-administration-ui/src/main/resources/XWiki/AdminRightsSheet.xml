@@ -43,7 +43,10 @@
 #if ($editor == 'spaceadmin')
   {{info}}
   #set($webHomeRef = $services.model.resolveDocument('WebHome'))
-  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'viewer=children')]]", '**'])
+  ## For the children link, we do not use 'viewer=children' because the WebHome might not exist and the viewer shows a 
+  ## 404 error in that case. Instead, we use 'xpage=children' because it always works, and because children document
+  ## could exist even if the parent document does not.
+  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
   {{/info}}
 #end
 

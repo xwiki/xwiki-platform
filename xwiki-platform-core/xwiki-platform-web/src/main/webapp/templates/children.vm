@@ -1,12 +1,25 @@
 #######################################################
 ###                CHILDREN PAGE
 ###              ------------------
-###
 #######################################################
-## TITLE
+##
+#######################################################
+##                   HEADER
+#######################################################
+#if($request.xpage == 'children')
+  #template("startpage.vm")
+    <div class="main layoutsubsection">
+      <div id="mainContentArea">
+        <div class="xcontent">
+#end
+#######################################################
+##                    TITLE
+#######################################################
 #set ($titleToDisplay = $services.localization.render('core.children.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
 #template('contentheader.vm')
-## CONTROLLER
+#######################################################
+##                  CONTROLLER
+#######################################################
 #if ($request.hierarchy == 'parentchild')
   #displayParentChildChildren()
 #else
@@ -61,4 +74,13 @@
   #else
     <p>$services.localization.render('core.children.parentChildNoChild')</p>
   #end
+#end
+#######################################################
+##                   FOOTER
+#######################################################
+#if($request.xpage == 'children')
+        </div> ## xcontent
+      </div> ## mainContentArea
+    </div> ## main
+  #template("endpage.vm")
 #end

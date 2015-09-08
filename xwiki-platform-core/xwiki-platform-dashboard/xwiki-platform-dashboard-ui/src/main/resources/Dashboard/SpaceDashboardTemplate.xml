@@ -127,19 +127,20 @@
     </class>
     <property>
       <content>{{velocity}}
-#if ($doc.space == "Main")
-  {{spaces /}}
-#else
-  {{spaceindex space="$doc.space" /}}
+#set ($extraParams = '')
+#if ($doc.space != 'Main')
+  #set ($escapedDocumentReference = $services.rendering.escape($services.model.serialize($doc.documentReference,
+    'default'), 'xwiki/2.1'))
+  #set ($extraParams = "root='document:$escapedDocumentReference'")
 #end
-{{/velocity}}
-</content>
+{{documentTree showTranslations="false" showAttachments="false" $extraParams /}}
+{{/velocity}}</content>
     </property>
     <property>
       <position>1,1</position>
     </property>
     <property>
-      <title>#if ($doc.space == 'Main')$services.localization.render('platform.dashboard.wiki.spaces')#{else}$services.localization.render('platform.dashboard.space.documents', [$doc.title])#end</title>
+      <title>#if ($doc.space == 'Main')$services.localization.render('platform.dashboard.wiki.pages')#{else}$services.localization.render('platform.dashboard.space.documents', [$doc.plainTitle])#end</title>
     </property>
   </object>
   <object>
@@ -199,12 +200,11 @@
       <content>{{velocity}}
 #set($tagSpace = $NULL)
 #if ($doc.space != "Main")
-  #set($tagSpace = $doc.space)
+  #set($tagSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
 #end
 
 {{tagcloud  space="$!tagSpace" /}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
     </property>
     <property>
       <position>1,2</position>
@@ -270,18 +270,17 @@
       <content>{{velocity}}
 #set($aSpace = $NULL)
 #if ($doc.space != "Main")
-  #set ($aSpace = $doc.space)
+  #set ($aSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
 #end
 
 {{activity spaces="$!aSpace" /}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
     </property>
     <property>
       <position>2,1</position>
     </property>
     <property>
-      <title>#if ($doc.space != 'Main')$services.localization.render('platform.dashboard.space.activity', [$doc.title])#{else}$services.localization.render('platform.dashboard.wiki.activity')#end</title>
+      <title>#if ($doc.space != 'Main')$services.localization.render('platform.dashboard.space.activity', [$doc.plainTitle])#{else}$services.localization.render('platform.dashboard.wiki.activity')#end</title>
     </property>
   </object>
 </xwikidoc>

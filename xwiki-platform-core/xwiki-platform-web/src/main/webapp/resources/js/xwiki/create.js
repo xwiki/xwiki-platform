@@ -91,6 +91,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // An office document: we redirect to the office importer
       // TODO: handle this use-case with an extension point
       if (type == 'office') {
+        // Verify that the target page name has been filled
+        if ($('#Name').val().trim().length == 0) {
+          return false;
+        }
         // The office importer is a wiki page which takes the 'page' parameter.
         // So we compute this parameter and we redirect the form to the Office Importer document.
         window.location = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['XWiki'], 'OfficeImporter')).getURL('view', 'page=' + encodeURIComponent(computeTargetPageName()));

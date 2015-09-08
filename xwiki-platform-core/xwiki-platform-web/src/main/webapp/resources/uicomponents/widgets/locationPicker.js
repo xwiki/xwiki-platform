@@ -324,15 +324,23 @@ require(['jquery'], function($) {
   };
 
   var setAllowedValues = function(validator, values, failureMessage) {
+    // Clean any previous existing inclusion validators, using the previous inclusion parameters (if available).
+    if (validator._inclusionParams) {
+      validator.remove(Validate.Inclusion, validator._inclusionParams);
+      delete validator._inclusionParams;
+    }
+
+    // If any values are specified, add an inclusion validator.
     if (values.length > 0) {
+      // Store the parameters so we can later be able to remove them in a future call.
       validator._inclusionParams = {
         within: values,
         failureMessage: failureMessage
       };
       validator.add(Validate.Inclusion, validator._inclusionParams);
-    } else {
-      validator.remove(Validate.Inclusion, validator._inclusionParams);
     }
+
+    // Validate using the new configuration.
     validator.validate();
   };
 
@@ -419,11 +427,12 @@ require(['jquery'], function($) {
     // Update the allowed spaces based on the selected template provider.
     form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
       var type = $('input[name="type"]:checked');
-      if (type.attr('data-type') == 'template') {
-        updateSpaceValidatorFromTemplateProviderInput(type);
-      }
+      // Note: Even though the page type selector can provide elements that are not template providers (i.e.
+      // data-type='template'), we still need to clear any previously set validations. The upside of this is that we
+      // are also allowing these page types to specify 'allowed spaces', should they need it at some point.
+      updateSpaceValidatorFromTemplateProviderInput(type);
     });
-    
+
     form.find('input[name="templateprovider"]').change(function() {
       updateSpaceValidatorFromTemplateProviderInput($(this));
     });

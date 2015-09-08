@@ -390,10 +390,9 @@ Object.extend(XWiki, {
                             $(document.head).insert(newStyle);
                             // Add the JS
                             require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
-                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)",
-                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.css', true)"],
+                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)"],
                                     function($) {
-                                       // We are sure that the JS and the CSS have been loaded, so we finally display
+                                       // We are sure that the JS have been loaded, so we finally display
                                        // the create popup
                                        new XWiki.widgets.CreatePagePopup({content: transport.responseText});
                                        notification.hide();

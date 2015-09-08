@@ -27,19 +27,27 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
      */
     var computeTargetPageName = function() {
       var documentReference = new XWiki.DocumentReference();
-      var parentReference = $('#ParentReference').val();
-      if (parentReference == '') {
-        // No need to check if the document is not terminal because of the document is terminal the parent reference
-        // cannot be null and the form is not submitted
-        documentReference = new XWiki.DocumentReference(xm.wiki, $('#Name').val(), 'WebHome');
-      } else {
-        var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
-        if ($('#terminal').prop('checked')) {
-          documentReference = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+      var parentReferenceField = $('#ParentReference');
+      // Test if the parent reference field exists
+      if (parentReferenceField.length > 0) {
+        var parentReference = parentReferenceField.val();
+        if (parentReference == '') {
+          // No need to check if the document is not terminal because of the document is terminal the parent reference
+          // cannot be null and the form is not submitted
+          documentReference = new XWiki.DocumentReference(xm.wiki, $('#Name').val(), 'WebHome');
         } else {
-          var parent = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.SPACE, spaceReference);
-          documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, parent);
+          var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
+          if ($('#terminal').prop('checked')) {
+            documentReference = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+          } else {
+            var parent = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.SPACE, spaceReference);
+            documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, parent);
+          }
         }
+      } else {
+        // No parent reference field: we are in the 'create page' popup
+        var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
+        documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
       }
       
       return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki)));

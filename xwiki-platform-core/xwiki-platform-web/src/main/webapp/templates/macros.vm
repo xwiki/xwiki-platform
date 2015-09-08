@@ -2680,7 +2680,7 @@ Recursive title display detected!##
                 #end
                 <li class="xwiki-select-option $class">
                   <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
-                  <span class="xwiki-select-option-icon">$services.icon.renderHTML($option.icon)</span>
+                  <span class="xwiki-select-option-icon">$!services.icon.renderHTML($option.icon)</span>
                   <div>
                     <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
                     #if ("$!option.description" != '')

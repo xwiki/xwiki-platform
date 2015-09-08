@@ -101,7 +101,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       wikiField.val(wikiReference ? wikiReference.name : '');
       var spaceReference = nodeReference.extractReference(XWiki.EntityType.SPACE);
       var localSpaceReference = spaceReference ? XWiki.Model.serialize(spaceReference.relativeTo(wikiReference)) : '';
+
+      // Set the selected value and trigger and update of the location preview.
       parentField.val(localSpaceReference);
+      // Notify interested listeners that we have new input. Note: PrototypeJS listeners will not be notified.
       parentField.triggerHandler('input');
     });
   });
@@ -314,7 +317,11 @@ require(['jquery'], function($) {
     var spaceReferenceInput = picker.find('input.location-parent-field');
     if (spaceReferenceInput.length > 0) {
       var spaceValidator = new LiveValidation(spaceReferenceInput[0], {
-        validMessage: "$services.localization.render('core.validation.valid.message')"
+        validMessage: "$services.localization.render('core.validation.valid.message')",
+        // Validating automatically only on submit to avoid double validation caused by jQuery-PrototypeJS event
+        // triggering incompatibilities when setting the space reference with the tree picker. We are calling validate
+        // manually in the 'input' handler to achieve the same behavior as if 'onlyOnBlur' was false.
+        onlyOnBlur: true
       });
       spaceValidator.displayMessageWhenEmpty = true;
       return spaceValidator;
@@ -400,6 +407,14 @@ require(['jquery'], function($) {
       if (!isValid && locationEdit.hasClass('hidden')) {
         locationEditToggle.click();
       }
+    });
+
+    // Call validate() manually on the spaceValidator when we get input on the space reference field, because
+    // LiveValidation (PrototypeJS) does not get notified about jQuery triggered events so we have to handle it
+    // ourselves.
+    var spaceReferenceInput = picker.find('input.location-parent-field');
+    spaceReferenceInput.on('input', function() {
+      spaceValidator.validate();
     });
   });
 

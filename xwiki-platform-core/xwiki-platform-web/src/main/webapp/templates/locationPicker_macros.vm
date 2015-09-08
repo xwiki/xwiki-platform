@@ -67,11 +67,9 @@
     <a href="#" class="location-action location-action-pick" title="Select a new location">
       $services.icon.renderHTML('chart-organisation')</a>
     ## Location advanced edit button.
-    #if ($isAdvancedUser)
-      <a href="#" class="location-action location-action-edit">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    #end
+    <a href="#" class="location-action location-action-edit">
+      <span class="glyphicon glyphicon-pencil"></span>
+    </a>
   </div>
 #end
 

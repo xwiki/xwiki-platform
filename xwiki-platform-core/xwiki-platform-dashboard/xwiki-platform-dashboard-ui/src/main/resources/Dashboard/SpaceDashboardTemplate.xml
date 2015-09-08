@@ -139,7 +139,7 @@
       <position>1,1</position>
     </property>
     <property>
-      <title>#if ($doc.space == 'Main')$services.localization.render('platform.dashboard.wiki.spaces')#{else}$services.localization.render('platform.dashboard.space.documents', [$doc.space])#end</title>
+      <title>#if ($doc.space == 'Main')$services.localization.render('platform.dashboard.wiki.spaces')#{else}$services.localization.render('platform.dashboard.space.documents', [$doc.title])#end</title>
     </property>
   </object>
   <object>
@@ -281,7 +281,7 @@
       <position>2,1</position>
     </property>
     <property>
-      <title>#if ($doc.space != 'Main')$services.localization.render('platform.dashboard.space.activity', [$doc.space])#{else}$services.localization.render('platform.dashboard.wiki.activity')#end</title>
+      <title>#if ($doc.space != 'Main')$services.localization.render('platform.dashboard.space.activity', [$doc.title])#{else}$services.localization.render('platform.dashboard.wiki.activity')#end</title>
     </property>
   </object>
 </xwikidoc>

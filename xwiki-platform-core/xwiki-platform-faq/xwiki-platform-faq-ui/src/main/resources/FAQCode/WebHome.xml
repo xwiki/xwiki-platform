@@ -47,7 +47,7 @@
 
 = {{translation key='platform.faq.list'/}} =
 
-{{spaceindex/}}
-
-</content>
+{{velocity}}
+{{documentTree showTranslations="false" showAttachments="false" root="document:$doc.documentReference" /}}
+{{/velocity}}</content>
 </xwikidoc>

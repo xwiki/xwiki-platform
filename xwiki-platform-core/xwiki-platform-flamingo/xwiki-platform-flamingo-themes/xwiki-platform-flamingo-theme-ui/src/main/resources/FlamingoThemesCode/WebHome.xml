@@ -39,5 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{spaceindex sort="docName"/}}</content>
+  <content>{{velocity}}
+{{documentTree showTranslations="false" showAttachments="false" root="document:$doc.documentReference" /}}
+{{/velocity}}</content>
 </xwikidoc>

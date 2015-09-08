@@ -34,10 +34,12 @@
   <date>1426000179000</date>
   <contentUpdateDate>1426000179000</contentUpdateDate>
   <version>1.1</version>
-  <title>WebHome</title>
+  <title>Skins Code</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{spaceindex sort="docName"/}}</content>
+  <content>{{velocity}}
+{{documentTree showTranslations="false" showAttachments="false" root="document:$doc.documentReference" /}}
+{{/velocity}}</content>
 </xwikidoc>

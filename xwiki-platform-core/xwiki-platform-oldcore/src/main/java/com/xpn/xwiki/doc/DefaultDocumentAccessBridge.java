@@ -469,12 +469,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getPropertyType(String className, String propertyName) throws Exception
     {
         XWikiContext xcontext = getContext();
-        PropertyClass pc = xcontext.getWiki().getPropertyClassFromName(className + "_" + propertyName, xcontext);
-        if (pc == null) {
-            return null;
-        } else {
-            return pc.newProperty().getClass().getName();
+        PropertyClass pc = null;
+        try {
+            pc = (PropertyClass) xcontext.getWiki().getDocument(className, xcontext).getXClass().get(propertyName);
+        } catch (XWikiException e) {
+            // Fail silently.
         }
+
+        return pc == null ? null : pc.newProperty().getClass().getName();
     }
 
     @Override

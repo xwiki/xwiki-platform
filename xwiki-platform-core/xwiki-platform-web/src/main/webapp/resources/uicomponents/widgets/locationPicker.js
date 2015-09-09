@@ -448,16 +448,16 @@ require(['jquery'], function($) {
       updateSpaceValidatorFromTemplateProviderInput(type);
     });
 
-    form.find('input[name="templateprovider"]').change(function() {
-      updateSpaceValidatorFromTemplateProviderInput($(this));
-    });
-
     // Make sure the spaceValidator is properly initialized when loading the page.
-    var initiallyCheckedTemplateProviderInput = form.find('input[name="templateprovider"]:checked');
-    // When a templateprovider is specified, we end up with 2 "checked" fields, so we choose the second one, which is
-    // the actually selected one.
+    var initiallyCheckedTemplateProviderInput = form.find('input[name="templateprovider"]');
+    if (initiallyCheckedTemplateProviderInput.length == 0) {
+        // If there is no (hidden) input called 'templateprovider', then we should look at the selected value
+        // in the xwiki selector widget
+        initiallyCheckedTemplateProviderInput = form.find('.xwiki-select input[name="type"]:checked');
+    }
+      
     // Note that there could also be no template provider available, but we rely on jQuery's selectors here to avoid null values.
-    updateSpaceValidatorFromTemplateProviderInput(initiallyCheckedTemplateProviderInput.last());
+    updateSpaceValidatorFromTemplateProviderInput(initiallyCheckedTemplateProviderInput);
   });
 
   //

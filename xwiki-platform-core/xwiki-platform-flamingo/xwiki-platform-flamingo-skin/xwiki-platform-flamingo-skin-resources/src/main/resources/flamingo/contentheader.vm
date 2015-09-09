@@ -7,9 +7,11 @@
       $services.rendering.render($uix.execute(), 'xhtml/1.0')
     #end
     <div id="document-title"><h1>$titleToDisplay</h1></div>
-    <div class="xdocLastModification">
-      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
-    </div>
+    #if (!$doc.isNew())
+      <div class="xdocLastModification">
+        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+      </div>
+    #end
   </div>
   #if($displayContentMenu)
     <div class="document-menu col-xs-12 col-md-5">

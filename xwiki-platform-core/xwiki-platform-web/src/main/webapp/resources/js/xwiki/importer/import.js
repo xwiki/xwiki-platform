@@ -496,7 +496,7 @@ var XWiki = (function(XWiki){
             Object.values(documentNode.locales).each(function(localeReference) {
               var displayName = localeReference.name;
               if (localeReference.locale != '') {
-                  displayName += "-" + localeReference.locale;
+                  displayName += " - " + localeReference.locale;
               }
 
               var pageItem = new Element("li", {

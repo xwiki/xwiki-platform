@@ -494,7 +494,12 @@ var XWiki = (function(XWiki){
         addDocumentToList: function(list, documentNode)
         {
             Object.values(documentNode.locales).each(function(localeReference) {
-            var pageItem = new Element("li", {
+              var displayName = localeReference.name;
+              if (localeReference.locale != '') {
+                  displayName += "-" + localeReference.locale;
+              }
+
+              var pageItem = new Element("li", {
                 'data-type' : 'document',
                 'data-reference' : localeReference,
                 'data-locale' : localeReference.locale,
@@ -502,9 +507,9 @@ var XWiki = (function(XWiki){
                   '{'+
                     '"icon":"fa fa-file-o"'
                   +'}'
-              }).update(documentNode.reference.name);
+              }).update(displayName);
 
-            list.insert(pageItem);
+              list.insert(pageItem);
           });
         },
     });

@@ -48,7 +48,7 @@
 ##  - entries (String set to a numerical value): number of entries to display the activity for.
 ##  - subentries (String set to a numerical value): number of activities to show for each entry.
 ##  - wikis (List of string[s]): comma separated list of wikis to display activity for.
-##  - spaces (List of string[s]): comma separated list of spaces to display the activity for.
+##  - spaces (List of string[s]): comma separated list of local serialized references of the spaces to display the activity for.
 ##  - authors (List of string[s]): comma separated list of authors whose modifications to show.
 ##  - tags (List of string[s]): comma separated list of tags to display activity for.
 ##  - minor (String set to "true" or "false"): whether to show modifications that create minor versions or not.
@@ -990,7 +990,7 @@ $xwiki.ssx.use('Main.Activity')##
 #updateFilterClause('space' $aSpaces false)
 ## BLACKLISTED SPACES - exclude them
 #if ($blacklistedSpaces &amp;&amp; $blacklistedSpaces.size() &gt; 0)
-  #set ($filterClause = $filterClause + ' and (act.application = ''MessageStream'' or 1=1 ')
+  #set ($filterClause = $filterClause + ' AND (act.application = ''MessageStream'' OR 1=1 ')
   #updateFilterClause('space' $blacklistedSpaces true)
   #set ($filterClause = $filterClause + ')')
 #end
@@ -1098,27 +1098,54 @@ $xwiki.ssx.use('Main.Activity')##
   *#
 #macro(updateFilterClause $colName $colValues $exclude)
   #if ($colValues.class == 'class java.lang.String')
-    #set ($filterClause = $filterClause + " and act.${colName}=?")
-    #set ($discard = $filterParameters.add(${colValues}))
-  #else
+    ## Transform the input to an array to handle it uniformly, below.
+    #set ($colValues = [$colValues])
+  #end
+
+  #if ($colValues.size() &gt; 0)
+    ## Filter out invalid values.
+    #set ($validColValues = [])
     #foreach ($colValue in $colValues)
-      #if ($velocityCount == 1)
-        #set ($filterCondition = 'in')
-        #if ($exclude)
-          #set ($filterCondition = 'not ' + $filterCondition)
-        #end
-        #set ($filterClause = $filterClause + " and act.${colName} ${filterCondition} (")
-      #end
       #if ("$!colValue" != '')
-        #if ($velocityCount &gt; 1)
-          #set ($filterClause = $filterClause + ',')
+        #set ($discard = $validColValues.add($colValue))
+      #end
+    #end
+
+    ## Work with the remaining valid values.
+    #if ($validColValues.size() &gt; 0)
+      ## Open wrapping subclause.
+      #set ($filterClause = $filterClause + ' AND (')
+
+      ## Determine the sign to use for the filterCondition.
+      #set ($maybeNegated = '')
+      #if ($exclude)
+        #set ($maybeNegated = 'NOT ')
+      #end
+
+      ## Exact match clause for the $validColValues.
+      #set ($filterCondition = "${maybeNegated}IN")
+      #set ($filterClause = $filterClause + "act.${colName} ${filterCondition} (${stringtool.repeat('?,', $mathtool.sub($validColValues.size(),1))}?)")
+      #set ($discard = $filterParameters.addAll($validColValues))
+
+      ## Extra clauses for the 'space' colName to match any nested spaces inside the specified spaces.
+      #if ($colName == 'space')
+        ## In an inclusion clause, we use OR to join the prefix queries, since we want at leas one match.
+        #set ($booleanOperation = 'OR')
+        #if ($exclude)
+          ## In an exclusion clause, we to use AND to join the prefix queries, since we don`t want any match.
+          #set ($booleanOperation = 'AND')
         #end
-        #set ($filterClause = $filterClause + '?')
-        #set ($discard = $filterParameters.add(${colValue}))
+
+        ## Prefix match clauses for the $validColValues.
+        #set ($filterCondition = "${maybeNegated}LIKE")
+        #foreach ($validColValue in $validColValues)
+          #set ($filterClause = $filterClause + " ${booleanOperation} act.${colName} ${filterCondition} ?")
+          #set ($discard = $filterParameters.add("${validColValue}.%"))
+        #end
       #end
-      #if ($velocityCount == $colValues.size())
-         #set ($filterClause = $filterClause + ')')
-      #end
+
+      ## Close wrapping subclause.
+      #set ($filterClause = $filterClause + ')')
     #end
   #end
 #end
@@ -2063,7 +2090,7 @@ $xwiki.ssx.use('Main.Activity')##
       <defaultValue/>
     </property>
     <property>
-      <description>Comma separated list of spaces to display the activity for.</description>
+      <description>Comma separated list of local serialized references of the spaces to display the activity for.</description>
     </property>
     <property>
       <mandatory>0</mandatory>

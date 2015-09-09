@@ -63,7 +63,7 @@ public class ActivityEventImpl implements ActivityEvent
     protected String application;
 
     /**
-     * Type of the event, see {@link ActivityEventType}.
+     * Type of the event, see {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEventType ActivityEventType}.
      */
     protected String type;
 
@@ -78,7 +78,7 @@ public class ActivityEventImpl implements ActivityEvent
     protected String wiki;
 
     /**
-     * Space in which the event occured, example: "Main".
+     * Space (local serialized reference) in which the event occurred, example: "Main", "A.B", "A.B.C", etc.
      */
     protected String space;
 

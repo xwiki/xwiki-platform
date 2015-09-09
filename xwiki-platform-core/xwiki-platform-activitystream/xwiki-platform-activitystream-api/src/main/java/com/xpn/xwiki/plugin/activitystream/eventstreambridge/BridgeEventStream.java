@@ -76,7 +76,7 @@ public class BridgeEventStream implements EventStream
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
-    /** Needed for serializing the wiki and space names. */
+    /** Needed for serializing the wiki and space references. */
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localSerializer;

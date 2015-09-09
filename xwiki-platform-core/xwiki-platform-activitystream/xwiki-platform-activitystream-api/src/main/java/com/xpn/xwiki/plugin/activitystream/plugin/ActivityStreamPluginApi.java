@@ -425,9 +425,9 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest recorded events for the given wiki space.
-     * 
+     *
      * @see #getEvents(boolean, int, int)
-     * @param space the space to retrieve latest events for
+     * @param space the local serialized reference of the space to retrieve latest events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
@@ -488,9 +488,9 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest events recorded for the given stream name in the given space.
-     * 
+     *
      * @param streamName the name of the stream to retrieve latest events for
-     * @param space space in which the events have been fired
+     * @param space local serialized reference of the space in which the events have been fired
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
@@ -708,18 +708,18 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * @param spaceName the space for which the stream name must be get
-     * @return The name of the event stream associated with the given space
+     * @param space the space local serialized reference to transform
+     * @return the name of the event stream associated with the given space
      */
-    public String getStreamName(String spaceName)
+    public String getStreamName(String space)
     {
-        return getActivityStream().getStreamName(spaceName, this.context);
+        return getActivityStream().getStreamName(space, this.context);
     }
 
     /**
      * Get events that have the same requestId as the event passed as parameter. The provided event is also included in
      * the returned list.
-     * 
+     *
      * @param event the event for which to look for related events
      * @return a list of events
      * @throws ActivityStreamException if the retrieval fails

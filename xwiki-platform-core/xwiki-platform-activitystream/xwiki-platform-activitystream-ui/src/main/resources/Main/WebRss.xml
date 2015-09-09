@@ -70,7 +70,7 @@
     ## RSS feed for spaces
     #set ($query = "$query (")
     #foreach ($space in $request.getParameterValues('space'))
-      #set ($query = "$query doc.space=:space${foreach.count}")
+      #set ($query = "$query doc.space=:space${foreach.count} OR doc.space LIKE :space_nested${foreach.count}")
       #if ($foreach.hasNext)
         #set ($query = "$query OR ")
       #end
@@ -91,6 +91,7 @@
   #if("$!{request.space}" != '')
     #foreach ($space in $request.getParameterValues('space'))
       #set ($queryObject = $queryObject.bindValue("space${foreach.count}", $space))
+      #set ($queryObject = $queryObject.bindValue("space_nested${foreach.count}", "${space}.%"))
     #end
   #end
   ## ================

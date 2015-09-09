@@ -155,27 +155,27 @@ public interface ActivityEvent
     /**
      * Document-related events target a certain document, and documents belong to a space; this is the space of the
      * target document.
-     * 
-     * @return the space name in which the event was created
+     *
+     * @return the local serialized reference of the space in which the event was created
      */
     String getSpace();
 
     /**
-     * @param space the space name in which the event was created
+     * @param space the local serialized reference of the space in which the event was created
      * @see #getSpace()
      */
     void setSpace(String space);
 
     /**
-     * Document-related events target a certain document, and documents have a name; this is the name of the target
+     * Document-related events target a certain document, and documents have a name; this is the full name of the target
      * document.
-     * 
+     *
      * @return the page of the event
      */
     String getPage();
 
     /**
-     * @param page the page of the event
+     * @param page the full name of the page of the event
      * @see #getPage()
      */
     void setPage(String page);

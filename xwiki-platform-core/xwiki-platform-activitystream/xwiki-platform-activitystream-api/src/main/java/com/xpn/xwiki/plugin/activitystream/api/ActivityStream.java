@@ -29,23 +29,23 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Manages the activity stream.
- * 
+ *
  * @version $Id$
  */
 public interface ActivityStream
 {
     /**
      * Init method, must be called on plugin init.
-     * 
+     *
      * @param context the XWiki context
      * @throws XWikiException if the init of the activity stream failed
      */
     void init(XWikiContext context) throws XWikiException;
 
     /**
-     * Tranforms space name into stream name.
-     * 
-     * @param space space to transform
+     * Transforms space reference into stream name.
+     *
+     * @param space the space local serialized reference to transform
      * @param context the XWiki context
      * @return the name of the stream for the given space
      */
@@ -274,8 +274,8 @@ public interface ActivityStream
 
     /**
      * Get events from the activity stream of a space.
-     * 
-     * @param space space to retrieve the events from
+     *
+     * @param space local serialized reference of the space to retrieve the events from
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
@@ -316,9 +316,9 @@ public interface ActivityStream
 
     /**
      * Get events from the given activity stream which happened in a particular space.
-     * 
+     *
      * @param streamName name of the activity stream to retrieve the events from
-     * @param space space to retrieve the events from
+     * @param space local serialized reference of the space to retrieve the events from
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset

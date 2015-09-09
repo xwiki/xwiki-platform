@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -97,6 +98,11 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      * The name of the listener.
      */
     private static final String LISTENER_NAME = "activitystream";
+
+    /**
+     * Used to query for nested spaces of the specified space.
+     */
+    private static final String NESTED_SPACE_FORMAT = "%s.%%";
 
     /**
      * The events to match.
@@ -699,35 +705,41 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        return searchEvents("act.space='" + space + "'", filter, nb, start, context);
+        List<Object> parameterValues = Arrays.<Object> asList(space, String.format(NESTED_SPACE_FORMAT, space));
+        return searchEvents("act.space=? OR act.space LIKE ?", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEventsForUser(String user, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        return searchEvents("act.user='" + user + "'", filter, nb, start, context);
+        List<Object> parameterValues = Arrays.<Object> asList(user);
+        return searchEvents("act.user=?", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEvents(String stream, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        return searchEvents("act.stream='" + stream + "'", filter, nb, start, context);
+        List<Object> parameterValues = Arrays.<Object> asList(stream);
+        return searchEvents("act.stream=?", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEventsForSpace(String stream, String space, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("act.space='" + space + "' and act.stream='" + stream + "'", filter, nb, start, context);
+        List<Object> parameterValues = Arrays.<Object> asList(stream, space, String.format(NESTED_SPACE_FORMAT, space));
+        return searchEvents("act.stream=? AND (act.space=? OR act.space LIKE ?)", filter, false, nb, start,
+            parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEventsForUser(String stream, String user, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("act.user='" + user + "' and act.stream='" + stream + "'", filter, nb, start, context);
+        List<Object> parameterValues = Arrays.<Object> asList(stream, user);
+        return searchEvents("act.stream=? AND act.user=?", filter, false, nb, start, parameterValues, context);
     }
 
     @Override

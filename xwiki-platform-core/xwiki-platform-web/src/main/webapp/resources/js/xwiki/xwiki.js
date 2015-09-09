@@ -325,7 +325,7 @@ Object.extend(XWiki, {
                       editlink = document.createElement("A");
                       editlink.href = window.docediturl + "?section=" + sectioncount;
                       editlink.style.textDecoration = "none";
-                      editlink.innerHTML = "$escapetool.javascript(services.localization.render('edit'))";
+                      editlink.innerHTML = "$escapetool.javascript($services.localization.render('edit'))";
                   }
 
                   editspan.appendChild(editlink);

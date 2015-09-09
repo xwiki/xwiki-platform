@@ -41,7 +41,7 @@
   <parent>IconThemes.WebHome</parent>
   <content>## General settings
 xwiki.iconset.type = image
-xwiki.iconset.render.wiki = image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")
+xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")]]
 xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" /&gt;
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).

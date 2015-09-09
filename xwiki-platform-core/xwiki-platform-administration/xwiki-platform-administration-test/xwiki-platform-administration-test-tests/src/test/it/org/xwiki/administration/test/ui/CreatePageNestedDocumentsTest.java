@@ -87,7 +87,7 @@ public class CreatePageNestedDocumentsTest extends AbstractTest
             ViewPage viewPage = getUtil().gotoPage(spaceReference);
 
             // It should not exist and we will create it.
-            assertFalse(String.format("Document [{}] already exists", pageReference), viewPage.exists());
+            assertFalse(String.format("Document [%s] already exists", pageReference), viewPage.exists());
             new DocumentDoesNotExistPage().clickEditThisPageToCreate();
             EditPage editPage = new EditPage();
             viewPage = editPage.clickSaveAndView();

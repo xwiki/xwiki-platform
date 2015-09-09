@@ -1403,10 +1403,10 @@ $xwiki.ssx.use('Main.Activity')##
   #set ($rssURL = '')
   #set ($parameters = 'xpage=plain&amp;outputSyntax=plain')
   #foreach ($tag in $aTags)
-    #set ($parameters = "${parameters}&amp;tag=$tag")
+    #set ($parameters = "${parameters}&amp;tag=$escapetool.url($tag)")
   #end
   #foreach ($space in $aSpaces)
-    #set ($parameters = "${parameters}&amp;space=$space")
+    #set ($parameters = "${parameters}&amp;space=$escapetool.url($space)")
   #end
   #set ($rssURL = $xwiki.getURL('Main.WebRss', 'view', $parameters))
   &lt;div class="rssURL"&gt;

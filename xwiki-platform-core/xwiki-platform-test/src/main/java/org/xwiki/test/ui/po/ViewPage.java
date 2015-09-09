@@ -78,8 +78,8 @@ public class ViewPage extends BasePage
     {
         List<WebElement> messages = getDriver().findElementsWithoutWaiting(By.className("xwikimessage"));
         for (WebElement message : messages) {
-            if (message.getText().contains("The requested document could not be found.")
-                || message.getText().contains("The document has been deleted.")) {
+            if (message.getText().contains("The requested page could not be found.")
+                || message.getText().contains("The page has been deleted.")) {
                 return false;
             }
         }

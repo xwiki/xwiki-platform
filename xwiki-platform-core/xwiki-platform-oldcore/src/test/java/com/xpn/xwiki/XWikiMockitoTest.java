@@ -34,7 +34,8 @@ import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -58,14 +59,9 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link XWiki}.
@@ -304,14 +300,45 @@ public class XWikiMockitoTest
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
         when(context.getURLFactory()).thenReturn(urlFactory);
 
-        EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        when(serializer.serialize(new EntityReference("space.withdot.and\\and:", EntityType.SPACE))).thenReturn(
-            "somescapedspace");
-
         DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
+
+        EntityReferenceSerializer<String> serializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("somescapedspace");
 
         this.xwiki.getURL(reference, "view", null, null, context);
 
         verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
+    }
+
+    @Test
+    public void getEntityURLWithDefaultAction() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("tennis", Arrays.asList("Path", "To"), "Success");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        when(context.getURLFactory()).thenReturn(urlFactory);
+
+        EntityReferenceSerializer<String> localSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localSerializer.serialize(documentReference.getLastSpaceReference())).thenReturn("Path.To");
+
+        // Document Entity
+        DocumentReferenceResolver<EntityReference> documentResolver =
+            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
+        when(documentResolver.resolve(documentReference)).thenReturn(documentReference);
+
+        this.xwiki.getURL(documentReference, this.context);
+        verify(urlFactory).createURL("Path.To", "Success", "view", null, null, "tennis", this.context);
+
+        // Attachment Entity
+        AttachmentReferenceResolver<EntityReference> attachmentResolver =
+            this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
+        when(attachmentResolver.resolve(attachmentReference)).thenReturn(attachmentReference);
+
+        this.xwiki.getURL(attachmentReference, this.context);
+        verify(urlFactory).createAttachmentURL("image.png", "Path.To", "Success", "download", null, "tennis",
+            this.context);
     }
 }

@@ -4219,16 +4219,25 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @since 7.2RC1
+     */
+    public String getURL(EntityReference reference, XWikiContext context)
+    {
+        String action = "view";
+        if (reference.getType() == EntityType.ATTACHMENT) {
+            action = "download";
+        }
+        return getURL(reference, action, context);
+    }
+
+    /**
      * @since 2.2.1
      */
     public String getURL(DocumentReference documentReference, String action, String queryString, String anchor,
         XWikiContext context)
     {
-        // Extract and escape the spaces portion of the passed reference to pass to the old createURL() API which
-        // unfortunately doesn't accept a DocumentReference...
-        EntityReference spaceReference =
-            documentReference.getLastSpaceReference().removeParent(documentReference.getWikiReference());
-        String spaces = this.defaultEntityReferenceSerializer.serialize(spaceReference);
+        // We need to serialize the space reference because the old createURL() API doesn't accept a DocumentReference.
+        String spaces = this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference());
 
         URL url =
             context.getURLFactory().createURL(spaces, documentReference.getName(), action, queryString, anchor,

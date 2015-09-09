@@ -24,11 +24,18 @@ require(['jquery'], function($) {
    */
   var init = function() {
     // Register a callback when an option is clicked
-    $('.xwiki-select').find('.xwiki-select-option').click(function (event) {
+    $('.xwiki-select').find('.xwiki-select-option').click(function () {
       var option = $(this);
+      var input = option.find('input');  
+      if (input.prop('checked')) {
+        // The input is already selected, so we have nothing to do, and we do not trigger any event.
+        // Note that if the user clicks on the <label> element of the widget, the "click" event is triggered twice:
+        // once because of this listener, and then because of the input's state change.
+        return;
+      }
+      input.prop('checked', true);
       var selectWidget = option.parents('.xwiki-select');
       selectWidget.find('.xwiki-select-option-selected').removeClass('xwiki-select-option-selected');
-      option.find('input').prop('checked', true);
       option.addClass('xwiki-select-option-selected');
       selectWidget.trigger('xwiki:select:updated', {'elements': selectWidget[0]});
     });

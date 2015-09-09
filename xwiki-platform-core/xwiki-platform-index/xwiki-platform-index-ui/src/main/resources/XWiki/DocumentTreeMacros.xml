@@ -73,6 +73,9 @@
       #end
     #end
   #end
+  ## Show the wikis only for global users.
+  #set ($docTreeConfig.showWikis = $docTreeConfig.showWikis &amp;&amp;
+    $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName)
 #end
 
 #macro (handleDocumentTreeRequest)
@@ -112,7 +115,7 @@
   #set ($children = [])
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.root == '')
     ## Select the default root node.
-    #if ($docTreeConfig.showWikis &amp;&amp; $xcontext.isMainWiki())
+    #if ($docTreeConfig.showWikis)
       #set ($nodeType = 'farm')
     #else
       #set ($nodeType = 'wiki')
@@ -1146,7 +1149,7 @@
   #if (!$spaceRef)
     #set ($spaceRef = $services.model.resolveSpace($spaceRefOrId))
   #end
-  #if ($docTreeConfig.showWikis &amp;&amp; $xcontext.isMainWiki())
+  #if ($docTreeConfig.showWikis)
     #getWikiPath($spaceRef $path)
   #end
   #set ($ancestorReferences = $spaceRef.reversedReferenceChain)
@@ -1176,7 +1179,7 @@
   #set ($rootDocRef = $docPath.first)
   #if ($docTreeConfig.showSpaces)
     #getSpacePath($rootDocRef $path)
-  #elseif ($docTreeConfig.showWikis &amp;&amp; $xcontext.isMainWiki())
+  #elseif ($docTreeConfig.showWikis)
     #getWikiPath($rootDocRef $path)
   #end
   #foreach ($docRef in $docPath)

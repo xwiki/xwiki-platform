@@ -240,7 +240,7 @@ Object.extend(XWiki, {
     $(content || 'body').select(".xwikirenderingerror").each(function(error) {
         if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
-            error.title = "$services.localization.render('platform.core.rendering.error.readTechnicalInformation')";
+            error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
             Event.observe(error, "click", function(event){
                    event.element().next().toggleClassName("hidden");
             });
@@ -320,12 +320,12 @@ Object.extend(XWiki, {
                   if (!XWiki.hasRenderer) {
                       editlink = document.createElement("SPAN");
                       editspan.className = editspan.className + " disabled";
-                      editlink.title = "$services.localization.render('platform.core.rendering.noRendererForSectionEdit')";
+                      editlink.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.noRendererForSectionEdit'))";
                   } else {
                       editlink = document.createElement("A");
                       editlink.href = window.docediturl + "?section=" + sectioncount;
                       editlink.style.textDecoration = "none";
-                      editlink.innerHTML = "$services.localization.render('edit')";
+                      editlink.innerHTML = "$escapetool.javascript(services.localization.render('edit'))";
                   }
 
                   editspan.appendChild(editlink);
@@ -383,7 +383,7 @@ Object.extend(XWiki, {
                             // The create action actually loads some JS and CSS. This modal box needs them too, but we
                             // load them on demand.
                             // We display an notification while the browser fetch the resources/
-                            var notification = new XWiki.widgets.Notification("$services.localization.render('core.create.popup.loading')", 'inprogress');
+                            var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
                             // Add the CSS
                             var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css', 
                               'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
@@ -400,7 +400,7 @@ Object.extend(XWiki, {
                           }
                       },
                       onFailure: function() {
-                        new XWiki.widgets.Notification("$services.localization.render('core.create.ajax.error')", 'error', {inactive: true}).show();
+                        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}).show();
                       }
                   });
                   event.stop();

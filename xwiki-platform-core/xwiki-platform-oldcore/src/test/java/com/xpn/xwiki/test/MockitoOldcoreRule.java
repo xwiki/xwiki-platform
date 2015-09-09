@@ -76,6 +76,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -223,7 +224,7 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public void evaluate() throws Throwable
             {
-                before();
+                before(target.getClass());
                 try {
                     base.evaluate();
                 } finally {
@@ -235,7 +236,7 @@ public class MockitoOldcoreRule implements MethodRule
         return this.parent != null ? this.parent.apply(statement, method, target) : statement;
     }
 
-    protected void before() throws Exception
+    protected void before(Class<?> testClass) throws Exception
     {
         final MockUtil mockUtil = new MockUtil();
 
@@ -265,15 +266,20 @@ public class MockitoOldcoreRule implements MethodRule
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), this.componentManager);
 
-        // Make sure an AuthorizationManager is available
-        if (!getMocker().hasComponent(AuthorizationManager.class)) {
-            this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
-        }
-
-        // Make sure a ContextualAuthorizationManager is available
-        if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
+        if (testClass.getAnnotation(AllComponents.class) != null) {
+            // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not already mocked
+            this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class, false);
             this.mockContextualAuthorizationManager =
-                getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+                getMocker().registerMockComponent(ContextualAuthorizationManager.class, false);
+        } else {
+            // Make sure an AuthorizationManager and a ContextualAuthorizationManager is available
+            if (!getMocker().hasComponent(AuthorizationManager.class)) {
+                this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+            }
+            if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
+                this.mockContextualAuthorizationManager =
+                    getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            }
         }
 
         // Make sure a default ConfigurationSource is available

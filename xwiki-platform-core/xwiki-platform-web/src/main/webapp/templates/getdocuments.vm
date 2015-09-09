@@ -18,6 +18,10 @@ $response.setContentType("application/json")
   #set ($discard = $queryParams.add("$!{request.childrenOf}.%"))
   #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
 #end
+#if ("$!request.get('doc.location')" != '')
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(doc.fullName) LIKE ?")
+  #set ($discard = $queryParams.add("%${request.get('doc.location').toLowerCase()}%"))
+#end
 ##
 ## ORDER
 ##
@@ -65,6 +69,11 @@ $response.setContentType("application/json")
 #set ($discard = $map.put('totalrows', $query.count()))
 #set ($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
 #set ($discard = $map.put('offset', $mathtool.add($offset, 1)))
+#if("$!request.sql" != '')
+  ## Add debug infos
+  #set($discard = $map.put('sql', $queryString))
+  #set($discard = $map.put('params', $queryParams))
+#end
 #set ($rows = [])
 #foreach ($item in $items)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
@@ -100,6 +109,7 @@ $response.setContentType("application/json")
       #set ($discard = $row.put('doc_name', $itemDoc.name))
     #end
     #set ($discard = $row.put('doc_fullName', $fullname))
+    #set ($discard = $row.put('doc_location', $itemDoc.fullName))
     #set ($discard = $row.put('doc_space', $itemDoc.space))
     #set ($discard = $row.put('doc_url', $xwiki.getURL($docName)))
     #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))

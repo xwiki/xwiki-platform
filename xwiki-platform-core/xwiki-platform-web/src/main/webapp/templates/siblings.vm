@@ -1,0 +1,49 @@
+#######################################################
+###                SIBLINGS PAGE
+###              ------------------
+#######################################################
+##
+#######################################################
+##                   HEADER
+#######################################################
+#if($request.xpage == 'siblings')
+  #template("startpage.vm")
+    <div class="main layoutsubsection">
+      <div id="mainContentArea">
+        <div class="xcontent">
+#end
+#######################################################
+##                    TITLE
+#######################################################
+#set ($titleToDisplay = $services.localization.render('core.siblings.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+#template('contentheader.vm')
+#######################################################
+##               DISPLAY SIBLINGS
+#######################################################
+##
+## List the sibling documents using a livetable
+##
+#set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+#set ($colprops = {
+  'doc.title'    : { 'link' : 'view' },
+  'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
+  'doc.location' : { 'link' : 'view', 'type': 'text', 'filterable': true},
+  '_actions'     : { 'actions': ['copy', 'delete', 'rename'] }
+})
+#set ($parent = $services.model.serialize($doc.documentReference.lastSpaceReference, 'local'))
+#set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($parent)&queryFilters=unique")
+#set ($options = { 
+  'url' : "$doc.getURL('get', $urlParameters)",
+  'translationPrefix' : 'platform.index.',
+  'outputOnlyHtml' : true
+})
+#livetable('siblingsIndex' $collist $colprops $options)
+#######################################################
+##                   FOOTER
+#######################################################
+#if($request.xpage == 'siblings')
+        </div> ## xcontent
+      </div> ## mainContentArea
+    </div> ## main
+  #template("endpage.vm")
+#end

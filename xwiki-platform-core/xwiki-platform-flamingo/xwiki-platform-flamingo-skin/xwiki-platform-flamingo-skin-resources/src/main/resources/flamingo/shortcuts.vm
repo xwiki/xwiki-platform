@@ -5,6 +5,13 @@
 ##
 #if (!$docextralinks && !$docextras)
   #set($docextralinks = [])
+  ## Children
+  #if ($doc.name == 'WebHome')
+    #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder-open']))
+  #else
+    ## Terminal document
+    #set ($discard = $docextralinks.add(['siblings', $services.localization.render('docextra.siblings'), -1, 'folder-open']))
+  #end
   #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1, 'file']))
   #end

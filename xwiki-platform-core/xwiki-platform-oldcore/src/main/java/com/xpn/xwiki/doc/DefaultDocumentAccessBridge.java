@@ -32,6 +32,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -472,7 +473,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             pc = (PropertyClass) xcontext.getWiki().getDocument(className, xcontext).getXClass().get(propertyName);
         } catch (XWikiException e) {
-            // Fail silently.
+            this.logger.warn("Failed to get document [{}]. Root cause: [{}]", className,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return pc == null ? null : pc.newProperty().getClass().getName();

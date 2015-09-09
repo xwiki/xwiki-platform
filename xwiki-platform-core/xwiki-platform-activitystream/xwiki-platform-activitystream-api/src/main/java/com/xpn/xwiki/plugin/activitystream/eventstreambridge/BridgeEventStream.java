@@ -53,7 +53,7 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 /**
  * Implementation for the {@link EventStream} which actually uses the old {@link ActivityStreamPlugin} for storing and
  * searching events.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -148,7 +148,7 @@ public class BridgeEventStream implements EventStream
 
     /**
      * Retrieve the old {@link XWikiContext} from the {@link org.xwiki.context.ExecutionContext execution context}.
-     * 
+     *
      * @return the current request context
      */
     private XWikiContext getXWikiContext()
@@ -158,7 +158,7 @@ public class BridgeEventStream implements EventStream
 
     /**
      * Retrieve the {@link ActivityStreamPlugin} instance.
-     * 
+     *
      * @param context the current request context
      * @return the plugin instance
      */
@@ -169,7 +169,7 @@ public class BridgeEventStream implements EventStream
 
     /**
      * Converts a new {@link Event} to the old {@link ActivityEvent}.
-     * 
+     *
      * @param e the event to transform
      * @return the equivalent activity event
      */
@@ -202,13 +202,13 @@ public class BridgeEventStream implements EventStream
         result.setWiki(this.serializer.serialize(e.getWiki()));
 
         result.setParameters(e.getParameters());
-        
+
         return result;
     }
 
     /**
      * Convert a list of old {@link ActivityEvent}s to a list of new {@link Event}s.
-     * 
+     *
      * @param events the activity events to convert
      * @return the equivalent events
      */
@@ -223,7 +223,7 @@ public class BridgeEventStream implements EventStream
 
     /**
      * Convert an old {@link ActivityEvent} to the new {@link Event}.
-     * 
+     *
      * @param e the activity event to transform
      * @return the equivalent event
      */

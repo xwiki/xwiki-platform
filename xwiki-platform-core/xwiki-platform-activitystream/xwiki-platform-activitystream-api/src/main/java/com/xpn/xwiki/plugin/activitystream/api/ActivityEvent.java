@@ -27,14 +27,14 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * An Activity Event represents an event done by a user in a certain context.
- * 
+ *
  * @version $Id$
  */
 public interface ActivityEvent
 {
     /**
      * Each event has a unique ID.
-     * 
+     *
      * @return the unique ID of the event
      */
     String getEventId();
@@ -47,7 +47,7 @@ public interface ActivityEvent
 
     /**
      * Multiple events can correspond to the same activity, so events can be grouped under the same request ID.
-     * 
+     *
      * @return the event group ID
      */
     String getRequestId();
@@ -63,7 +63,7 @@ public interface ActivityEvent
      * in the same request, or which events are important in the stream. For example, annotation automatic updates are
      * less important in a group of changes triggered by a document update, while a major version is more important than
      * a minor version.
-     * 
+     *
      * @return the priority of the event
      */
     int getPriority();
@@ -88,7 +88,7 @@ public interface ActivityEvent
     /**
      * Events can be triggered by different applications, not only the main wiki update events: user statuses, blog
      * pingbacks, new extension added...
-     * 
+     *
      * @return the application name
      */
     String getApplication();
@@ -102,7 +102,7 @@ public interface ActivityEvent
     /**
      * Events can happen in different contexts; for example, wiki activity events happen in different spaces, user
      * statuses are targeted to different groups.
-     * 
+     *
      * @return the stream name
      */
     String getStream();
@@ -115,7 +115,7 @@ public interface ActivityEvent
 
     /**
      * An event happens at a precise date.
-     * 
+     *
      * @return the event date
      */
     Date getDate();
@@ -128,7 +128,7 @@ public interface ActivityEvent
 
     /**
      * Event usually occur as the result of a registered user activity.
-     * 
+     *
      * @return the wiki name of the user creating the event
      */
     String getUser();
@@ -141,7 +141,7 @@ public interface ActivityEvent
 
     /**
      * In a wiki farm, each event happens in one of the wikis.
-     * 
+     *
      * @return the wiki name in which the event was created
      */
     String getWiki();
@@ -183,7 +183,7 @@ public interface ActivityEvent
     /**
      * If an event happens in an URL-accessible location (a document), or if the event itself can be seen at a given
      * URL, this field stores that URL.
-     * 
+     *
      * @return the URL related to the event
      */
     String getUrl();
@@ -196,7 +196,7 @@ public interface ActivityEvent
 
     /**
      * A name for the event.
-     * 
+     *
      * @return the title of the event
      */
     String getTitle();
@@ -209,7 +209,7 @@ public interface ActivityEvent
 
     /**
      * A larger section of text where the event can store some data.
-     * 
+     *
      * @return the body of the event
      */
     String getBody();
@@ -223,7 +223,7 @@ public interface ActivityEvent
     /**
      * For events related to documents, this field records the version of the document at the time when the event
      * occurred.
-     * 
+     *
      * @return the document version when the event occurred
      */
     String getVersion();
@@ -236,7 +236,7 @@ public interface ActivityEvent
 
     /**
      * Free form parameter to be used by the event consumer.
-     * 
+     *
      * @return the first parameter associated with the event
      */
     String getParam1();
@@ -249,7 +249,7 @@ public interface ActivityEvent
 
     /**
      * Free form parameter to be used by the event consumer.
-     * 
+     *
      * @return the second parameter associated with the event
      */
     String getParam2();
@@ -262,7 +262,7 @@ public interface ActivityEvent
 
     /**
      * Free form parameter to be used by the event consumer.
-     * 
+     *
      * @return the third parameter associated with the event
      */
     String getParam3();
@@ -275,7 +275,7 @@ public interface ActivityEvent
 
     /**
      * Free form parameter to be used by the event consumer.
-     * 
+     *
      * @return the fourth parameter associated with the event
      */
     String getParam4();
@@ -288,7 +288,7 @@ public interface ActivityEvent
 
     /**
      * Free form parameter to be used by the event consumer.
-     * 
+     *
      * @return the fifth parameter associated with the event
      */
     String getParam5();
@@ -301,7 +301,7 @@ public interface ActivityEvent
 
     /**
      * Get a more user-friendly, or a localized version of the {@link #getTitle() event title}.
-     * 
+     *
      * @param context the XWiki context
      * @return the event title in a human readable format
      * @see #getTitle()
@@ -310,7 +310,7 @@ public interface ActivityEvent
 
     /**
      * Get a more user-friendly, or a localized version of the {@link #getBody() event body}.
-     * 
+     *
      * @param context the XWiki context
      * @return the event body in a human readable format
      * @see #getBody()
@@ -319,7 +319,7 @@ public interface ActivityEvent
 
     /**
      * Get a formatted, localized version of the {@link #getDate() event date}.
-     * 
+     *
      * @param context the XWiki context
      * @return the event date in a human readable format
      * @see #getDate()
@@ -328,7 +328,7 @@ public interface ActivityEvent
 
     /**
      * Get the {@link #getUser() user name} as a HTML link.
-     * 
+     *
      * @param context the XWiki context
      * @return the event user in a human readable format (example: Administrator instead of XWiki.Admin), as a HTML
      *         fragment
@@ -337,14 +337,14 @@ public interface ActivityEvent
 
     /**
      * Set all parameters at once.
-     * 
+     *
      * @param params parameters to set, a list of at most 5 entries
      */
     void setParams(List<String> params);
 
     /**
      * Associates name-value pair parameters with this event.
-     * 
+     *
      * @param parameters the parameters to associate
      */
     void setParameters(Map<String, String> parameters);

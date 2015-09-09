@@ -37,7 +37,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 
 /**
  * API for {@link ActivityStreamPlugin}.
- * 
+ *
  * @version $Id$
  */
 public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
@@ -47,7 +47,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Constructor.
-     * 
+     *
      * @see PluginApi#PluginApi(XWikiPluginInterface, XWikiContext)
      * @param plugin plugin to wrap
      * @param context the XWiki context
@@ -67,7 +67,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Record in database the given {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent} event.
-     * 
+     *
      * @param event the event to record in databases
      * @throws ActivityStreamException if the event addition fails
      */
@@ -81,7 +81,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Records in database the a event built upon the passed parameters.
-     * 
+     *
      * @param streamName the name of the stream to record the event for
      * @param type the type of event. The type can be a value picked from the list of values defined in
      *            {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEventType} or any other String
@@ -98,7 +98,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Records in database an event built upon the passed document and other parameters. The passed document is used to
      * retrieve document-related data for the event : date, page name, database.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param type type of the event
      * @param title title of the event
@@ -116,7 +116,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Records in database an event built upon the passed document and other parameters. The passed document is used to
      * retrieve document-related data for the event : date, page name, database.
-     * 
+     *
      * @param streamName the name of the stream to add the event to
      * @param doc the document from which to retrieve document data for the event
      * @param type the type of event. (see {@link #addActivityEvent(String, String, String)}
@@ -134,7 +134,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Records in database an event built upon the passed document and other parameters. The passed document is used to
      * retrieve document-related data for the event : date, page name, database.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -153,7 +153,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Delete the passed events from the database.
-     * 
+     *
      * @param evs the events to be deleted
      * @throws ActivityStreamException if the event deletion fails
      */
@@ -169,7 +169,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Delete the passed event form the database.
-     * 
+     *
      * @param event the event to delete from database
      * @throws ActivityStreamException if the event deletion fails
      */
@@ -183,7 +183,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Records in database an event built upon the passed document and other parameters. The passed document is used to
      * retrieve document-related data for the event : date, page name, database.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -203,7 +203,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Records in database an event built upon the passed document and other parameters. The passed document is used to
      * retrieve document-related data for the event : date, page name, database.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -223,7 +223,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
@@ -244,7 +244,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param globalSearch true if the request must be performed on the main database
@@ -266,7 +266,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
@@ -289,7 +289,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param globalSearch true if the request must be performed on the main database
@@ -313,7 +313,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
@@ -335,7 +335,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
@@ -359,7 +359,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
@@ -382,7 +382,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
-     * 
+     *
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
@@ -407,7 +407,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest recorded events.
-     * 
+     *
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
@@ -446,7 +446,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest recorded events triggered by the given user.
-     * 
+     *
      * @see #getEvents(boolean, int, int)
      * @param user the user to retrieve latest events for
      * @param filter if true, group the matched events by priority
@@ -467,7 +467,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest events recorded for the given stream name.
-     * 
+     *
      * @see #getEvents(boolean, int, int)
      * @param streamName the name of the stream to retrieve latest events for
      * @param filter if true, group the matched events by priority
@@ -509,7 +509,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Return the latest events recorded for the given stream name and the given user.
-     * 
+     *
      * @param streamName the name of the stream to retrieve latest events for
      * @param user context user at the time the events were fired
      * @param filter if true, group the matched events by priority
@@ -530,7 +530,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Wrap a list of events.
-     * 
+     *
      * @param events events to wrap
      * @return list of wrapped events
      */
@@ -549,7 +549,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Unwrap a list of events.
-     * 
+     *
      * @param events events to unwrap
      * @return list of unwrapped events
      */
@@ -568,7 +568,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get the feed entry for the given event.
-     * 
+     *
      * @param event event to get the entry for
      * @return the feed entry corresponding to the event
      */
@@ -579,7 +579,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get the feed entry for the given event.
-     * 
+     *
      * @param event event to get the entry for
      * @param suffix suffix to add to entry title and body strings
      * @return the feed entry corresponding to the event
@@ -591,7 +591,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @return the feed entry corresponding to the given events
      */
@@ -602,7 +602,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param suffix suffix to add to entries title and body strings
      * @return the feed entry corresponding to the given events
@@ -614,7 +614,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -633,7 +633,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -653,7 +653,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get the string representation of a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -674,7 +674,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get the string representation of a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -696,7 +696,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 
     /**
      * Get the string representation of a feed from the given feed.
-     * 
+     *
      * @param feed the feed to get the string representation from
      * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some
      *            possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
@@ -733,7 +733,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
-     * 
+     *
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
      * @param start query offset
@@ -753,7 +753,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
-     * 
+     *
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
      * @param start query offset
@@ -775,7 +775,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
-     * 
+     *
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
      * @param start query offset
@@ -795,7 +795,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     /**
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
-     * 
+     *
      * @param hql HQL where query statement
      * @param nb number of events to retrieve
      * @param start query offset

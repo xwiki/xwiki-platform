@@ -53,7 +53,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param event event to add to the stream
      * @param context the XWiki context
      * @throws ActivityStreamException if the addition to the stream fails
@@ -62,7 +62,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param type type of the event
      * @param title title of the event
@@ -74,7 +74,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param type type of the event
      * @param title title of the event
@@ -87,7 +87,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -100,7 +100,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -114,7 +114,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -128,7 +128,7 @@ public interface ActivityStream
 
     /**
      * Adding an activity event. The Id does not need to be filled as it will be created. Date and Wiki are optional.
-     * 
+     *
      * @param streamName name of the stream to use for the addition
      * @param doc which fired the event
      * @param type type of the event
@@ -143,7 +143,7 @@ public interface ActivityStream
 
     /**
      * Delete the given event from the database.
-     * 
+     *
      * @param event the event to delete
      * @param context the XWiki context
      * @throws ActivityStreamException if the delete of the event fails
@@ -152,7 +152,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
@@ -166,7 +166,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
      * @param globalSearch true if the request must be performed on the main database
@@ -181,7 +181,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
      * @param globalSearch true if the request must be performed on the main database
@@ -197,7 +197,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param fromHql HQL from query statement
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
@@ -212,7 +212,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param fromHql HQL from query statement
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
@@ -228,7 +228,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param fromHql HQL from query statement
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
@@ -244,7 +244,7 @@ public interface ActivityStream
 
     /**
      * Search events.
-     * 
+     *
      * @param fromHql HQL from query statement
      * @param hql HQL where query statement
      * @param filter true if the events should be filtered by priority
@@ -261,7 +261,7 @@ public interface ActivityStream
 
     /**
      * Get events from the activity stream.
-     * 
+     *
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
      * @param start query offset
@@ -288,7 +288,7 @@ public interface ActivityStream
 
     /**
      * Get events from the activity stream of a user.
-     * 
+     *
      * @param user user to retrieve the events from
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
@@ -302,7 +302,7 @@ public interface ActivityStream
 
     /**
      * Get events from a particular activity stream.
-     * 
+     *
      * @param streamName name of the activity stream to retrieve the events from
      * @param filter true if the events should be filtered by priority
      * @param nb number of events to retrieve
@@ -331,7 +331,7 @@ public interface ActivityStream
 
     /**
      * Get events from the given activity stream which have been fired by a particular user.
-     * 
+     *
      * @param streamName name of the activity stream to retrieve the events from
      * @param user user to retrieve the events from
      * @param filter true if the events should be filtered by priority
@@ -346,7 +346,7 @@ public interface ActivityStream
 
     /**
      * Get the feed entry for the given event.
-     * 
+     *
      * @param event event to get the entry for
      * @param context the XWiki context
      * @return the feed entry corresponding to the event
@@ -355,7 +355,7 @@ public interface ActivityStream
 
     /**
      * Get the feed entry for the given event.
-     * 
+     *
      * @param event event to get the entry for
      * @param suffix suffix to add to entry title and body strings
      * @param context the XWiki context
@@ -365,7 +365,7 @@ public interface ActivityStream
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param context the XWiki context
      * @return the feed entry corresponding to the given events
@@ -374,7 +374,7 @@ public interface ActivityStream
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param suffix suffix to add to entries title and body strings
      * @param context the XWiki context
@@ -384,7 +384,7 @@ public interface ActivityStream
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -400,7 +400,7 @@ public interface ActivityStream
 
     /**
      * Get a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -417,7 +417,7 @@ public interface ActivityStream
 
     /**
      * Get the string representation of a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -435,7 +435,7 @@ public interface ActivityStream
 
     /**
      * Get the string representation of a feed from the given events.
-     * 
+     *
      * @param events events to create the feed from
      * @param author author to set in the feed metadata
      * @param title title to set in the feed metadata
@@ -463,7 +463,7 @@ public interface ActivityStream
     /**
      * Get events that have the same requestId as the event passed as parameter. The provided event is also included in
      * the returned list.
-     * 
+     *
      * @param event the event for which to look for related events
      * @param context the XWiki context
      * @return a list of events
@@ -474,7 +474,7 @@ public interface ActivityStream
     /**
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
-     * 
+     *
      * @param optionalWhereClause optional HQL where query statement
      * @param maxItems maximum number of documents to retrieve
      * @param startAt query offset
@@ -488,7 +488,7 @@ public interface ActivityStream
     /**
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
-     * 
+     *
      * @param optionalWhereClause optional HQL where query statement
      * @param parametersValues values for the query parameters
      * @param maxItems maximum number of documents to retrieve
@@ -503,7 +503,7 @@ public interface ActivityStream
     /**
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
-     * 
+     *
      * @param optionalWhereClause optional HQL where query statement
      * @param maxItems maximum number of documents to retrieve
      * @param startAt query offset
@@ -517,7 +517,7 @@ public interface ActivityStream
     /**
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
-     * 
+     *
      * @param optionalWhereClause optional HQL where query statement
      * @param parametersValues values for the query parameters
      * @param maxItems maximum number of documents to retrieve

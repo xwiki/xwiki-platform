@@ -141,7 +141,7 @@ public class ActivityEventImpl implements ActivityEvent
      * Named parameters.
      */
     protected Map<String, String> parameters;
-    
+
     @Override
     public String getDisplayTitle(XWikiContext context)
     {

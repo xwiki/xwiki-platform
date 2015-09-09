@@ -42,8 +42,8 @@
   <content>###############################################################################
 # WikiManager Manager translation page
 #
-# The translations contained in this document are used in the default UI (see xwiki-platform-web),
-# that can be displayed in subwikis too. That is why the scope of this document is GLOBAL.
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
 #
 # This contains the translations of the module in the default language
 # (generally English).
@@ -204,7 +204,7 @@ platform.wiki.prop.membershipType.hint=The way users can join this wiki.
 platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
 platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all documents will be cloned).
+platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
 platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
 platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independently of the rights configured in the Administration.
 platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
@@ -235,7 +235,7 @@ platform.wiki.create.wizard.step.create=Create
 platform.wiki.create.wizard.step.creation=Wiki creation
 platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
-platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some documents have not been installed. In consequence, the wiki might behave erroneously and you should probably delete it.
+platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some pages have not been installed. In consequence, the wiki might behave erroneously and you should probably delete it.
 platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
@@ -293,7 +293,7 @@ admin.wikis.template=Wiki Template
 platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
 platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
 platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
+platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
 platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 
 ## Used to indicate where deprecated keys end

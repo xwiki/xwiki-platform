@@ -45,7 +45,7 @@
   ## Check if the document can have children.
   #if ($doc.name == $defaultDocumentName)
     #countDocumentChildren($doc.documentReference $childCount)
-    #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children')))
+    #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
     <dt>
       <label>
         <input type="checkbox" name="deep" value="true" />

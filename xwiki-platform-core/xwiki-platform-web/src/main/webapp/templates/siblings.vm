@@ -31,7 +31,11 @@
   '_actions'     : { 'actions': ['copy', 'delete', 'rename'] }
 })
 #set ($parent = $services.model.serialize($doc.documentReference.lastSpaceReference, 'local'))
-#set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($parent)&queryFilters=unique")
+#set ($queryFilters = "unique")
+#if ("$!request.displayHidden" == '')
+  #set ($queryFilters = "${queryFilters},hidden")
+#end
+#set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($parent)&queryFilters=$queryFilters")
 #set ($options = { 
   'url' : "$doc.getURL('get', $urlParameters)",
   'translationPrefix' : 'platform.index.',

@@ -48,7 +48,11 @@
       'doc.location' : { 'link' : 'view', 'type': 'text', 'filterable': true},
       '_actions'     : { 'actions': ['copy', 'delete', 'rename'] }
     })
-    #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
+    #set ($queryFilters = "unique")
+    #if ("$!request.displayHidden" == '')
+      #set ($queryFilters = "${queryFilters},hidden")
+    #end
+    #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=$queryFilters")
     #set ($options = { 
       'url' : "$doc.getURL('get', $urlParameters)",
       'translationPrefix' : 'platform.index.',

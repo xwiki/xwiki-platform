@@ -2446,3 +2446,15 @@ input#tags {
   border: none !important;
   padding: 0 !important;
 }
+
+/* Import */
+#packagelist {
+  float: left;
+  width: 51%;
+}
+
+#packagecontainer {
+  float: left;
+  margin-left: 2%;
+  width: 46%;
+}

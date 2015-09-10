@@ -22,11 +22,6 @@ div.loading {
 }
 
 /* Package List  styles */
-#packagelist {
-  float: left;
-  width: 51%;
-}
-
 #packagelist fieldset {
   background-color: $theme.backgroundSecondaryColor;
   padding: 5px;
@@ -70,12 +65,6 @@ div.loading {
 }
 
 /* Package Content styles */
-#packagecontainer {
-  float: left;
-  margin-left: 2%;
-  width: 46%;
-}
-
 #packageDescription {
   background-color: #FCFCFC;
   border: 1px dotted $theme.borderColor;

@@ -35,8 +35,8 @@
   $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
   $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
-  <div id="import">
-    <div id="packagelist">
+  <div id="import" class="row">
+    <div id="packagelist" class="col-xs-12 col-sm-6 col-md-6">
       <div class="legend">$services.localization.render('core.importer.uploadPackage')</div>
       ## Let the user upload XAR files.
       <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
@@ -63,7 +63,7 @@
       #template('packagelist.vm')
     </div> ## packagelistcontainer
     </div> ## packagelist
-    <div id="packagecontainer">
+    <div id="packagecontainer" class="col-xs-12 col-sm-6 col-md-6">
       #if("$!request.file" != '')
         ##
         ## If we get here, it means javascript is not activated on the user's browser (otherwise the attachment link

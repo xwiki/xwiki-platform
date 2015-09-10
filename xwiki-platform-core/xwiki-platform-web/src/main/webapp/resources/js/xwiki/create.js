@@ -91,8 +91,8 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // An office document: we redirect to the office importer
       // TODO: handle this use-case with an extension point
       if (type == 'office') {
-        // Verify that the target page name has been filled
-        if ($('#Name').val().trim().length == 0) {
+        // Verify that the target page name has been filled (only if the location picker is displayed).
+        if ($('#Name').length > 0 && $('#Name').val().trim().length == 0) {
           return false;
         }
         // The office importer is a wiki page which takes the 'page' parameter.

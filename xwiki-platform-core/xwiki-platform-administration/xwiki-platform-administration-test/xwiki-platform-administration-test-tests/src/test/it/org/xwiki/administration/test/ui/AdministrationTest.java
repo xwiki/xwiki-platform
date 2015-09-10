@@ -49,10 +49,8 @@ public class AdministrationTest extends AbstractTest
     @Test
     public void verifyGlobalAndSpaceSections()
     {
-        // Because of http://jira.xwiki.org/browse/XWIKI-9763 we need to create a test page to ensure there's at least
-        // one non-hidden page in the XWiki space
-        // TODO: Remove this once http://jira.xwiki.org/browse/XWIKI-9763 is fixed.
-        getUtil().createPage("XWiki", getTestClassName() + "-" + getTestMethodName(), "", "");
+        // Navigate to a (non existent for test performance reasons) page in view mode.
+        getUtil().gotoPage("NonExistentSpace", "NonExistentPage");
 
         // Verify that pages have an Admin menu and navigate to the admin UI.
         AdministrablePage page = new AdministrablePage();

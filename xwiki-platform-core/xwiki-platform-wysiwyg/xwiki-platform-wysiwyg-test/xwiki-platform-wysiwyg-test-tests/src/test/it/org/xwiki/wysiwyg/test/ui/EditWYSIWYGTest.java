@@ -287,7 +287,7 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
 
         // Save & Continue should notify us about the conversion error.
         this.editPage.clickSaveAndContinue(false);
-        this.editPage.waitForNotificationErrorMessage("Failed to save the document. "
+        this.editPage.waitForNotificationErrorMessage("Failed to save the page. "
             + "Reason: content: Exception while parsing HTML");
 
         // Save & View should redirect us back to the edit mode, but the unsaved changes shouldn't be lost.

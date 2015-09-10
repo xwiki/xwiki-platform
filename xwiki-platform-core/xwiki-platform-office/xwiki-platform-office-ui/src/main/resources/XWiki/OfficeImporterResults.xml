@@ -46,7 +46,8 @@
 #########################
 ## Validate Input File ##
 #########################
-  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')&gt;&gt;XWiki.OfficeImporter]]")
+  #set ($mainDocRef = $services.wiki.currentWikiDescriptor.mainPageReference)
+  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')&gt;&gt;path:$xwiki.getURL($mainDocRef, 'create', 'type=office')]]")
   #set ($fileUpload = $xwiki.fileupload)
   #set ($fileName = $fileUpload.getFileName("filePath"))
   #if (!$fileName)
@@ -56,21 +57,12 @@
     #set ($officeFileStream = $fileUpload.fileItems.get(0).inputStream)
   #end
 ###########################
-## Validate Target Space ##
+## Validate Target       ##
 ###########################
-  #set ($parentReference = $services.model.resolveDocument("$!request.parent", 'default'))
-  #set ($targetSpace = $request.targetSpace)
-  #if ("$!targetSpace" == '')
+  #set ($target = $request.target)
+  #if ("$!target" != '')
     ## Use the parent space if the target space is not specified.
-    #set ($targetSpace = $parentReference.lastSpaceReference.name)
-  #end
-##########################
-## Validate Target Page ##
-##########################
-  #set ($targetPage = $request.targetPage)
-  #if ("$!targetPage" == '')
-    ## Use the file name if the target page name is not specified.
-    #set ($targetPage = $stringtool.substringBeforeLast($fileName, '.'))
+    #set ($targetDocumentReference = $services.model.resolveDocument($target))
   #end
 ##########################
 ## Append Configuration ##
@@ -101,7 +93,6 @@
 ## Import ##
 ############
   #if($fileName)
-    #set ($targetDocumentReference = $services.model.createDocumentReference($xcontext.database, $targetSpace, $targetPage))
     #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
     #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference, $filterStyles))
     #if ($xdomOfficeDoc)

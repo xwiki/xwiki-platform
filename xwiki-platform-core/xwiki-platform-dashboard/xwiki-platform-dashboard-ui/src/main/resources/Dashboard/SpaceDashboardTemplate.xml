@@ -210,7 +210,7 @@
       <position>1,2</position>
     </property>
     <property>
-      <title>$services.localization.render('platform.dashboard.wiki.tagsgadget', [$doc.title])</title>
+      <title>$services.localization.render('platform.dashboard.space.tagcloud', [$doc.plainTitle])</title>
     </property>
   </object>
   <object>

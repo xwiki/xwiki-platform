@@ -310,6 +310,11 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private boolean disposed;
 
+    /**
+     * The size of the not yet sent batch.
+     */
+    private volatile int batchSize;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -398,7 +403,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         SolrInstance solrInstance = this.solrInstanceProvider.get();
 
         int length = 0;
-        int size = 0;
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
             IndexOperation operation = batchEntry.operation;
@@ -412,7 +416,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                     if (solrDocument != null) {
                         solrInstance.add(solrDocument);
                         length += solrDocument.getLength();
-                        ++size;
+                        ++this.batchSize;
                     }
                 } else if (IndexOperation.DELETE.equals(operation)) {
                     if (batchEntry.reference == null) {
@@ -421,7 +425,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                         solrInstance.delete(this.solrRefereceResolver.getId(batchEntry.reference));
                     }
 
-                    ++size;
+                    ++this.batchSize;
                 }
             } catch (Throwable e) {
                 this.logger.error("Failed to process entry [{}]", batchEntry, e);
@@ -431,15 +435,14 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
             // the reason why we perform it at the end of the batch.
-            if (shouldCommit(length, size)) {
+            if (shouldCommit(length, this.batchSize)) {
                 commit();
                 length = 0;
-                size = 0;
             }
         }
 
         // Commit what's left
-        if (size > 0) {
+        if (this.batchSize > 0) {
             commit();
         }
     }
@@ -463,6 +466,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 this.logger.error("Failed to rollback index changes.", ex);
             }
         }
+
+        this.batchSize = 0;
     }
 
     /**
@@ -550,7 +555,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public int getQueueSize()
     {
-        return this.indexQueue.size() + this.resolveQueue.size();
+        return this.indexQueue.size() + this.resolveQueue.size() + this.batchSize;
     }
 
     @Override

@@ -105,8 +105,14 @@
   #set ($macro.document = $xwiki.getDocument($documentReference))
   #if ($macro.document)
     <li><a href="$macro.document.getURL()">$escapetool.xml($macro.document.translatedDocument.plainTitle)</a></li>
-  #else
+  #elseif ($services.parentchild.isParentChildMechanismEnabled())
+    ## In parent-child mode the parent can have a completely different reference than the child so we have to display
+    ## the full (local) reference in order for the users to identify the parents that are not accessible.
     <li>$escapetool.xml($services.model.serialize($documentReference, 'local'))</li>
+  #else
+    ## In reference mode all parents are WebHome documents. Moreover the parent reference/path is a prefix of the child
+    ## reference/path so it's enough to display the name of the last space (path element) in order to identify a parent.
+    <li>$escapetool.xml($documentReference.parent.name)</li>
   #end
 #end
 #*

@@ -37,7 +37,7 @@ public class AnnotatableViewPage extends BaseElement
     private static final String XWIKI_ANNOTATION_DELETE_SUCCESS = "Annotation deleted";
 
     private static final String XWIKI_SYNTAX_1_WARNING =
-        "Annotations are not available for documents in XWiki/1.0 syntax.";
+        "Annotations are not available for pages in XWiki/1.0 syntax.";
 
     private AnnotationsPane annotationsPane;
 

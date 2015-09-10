@@ -10,7 +10,7 @@
   <div class="main">
   <div id="mainContentArea">
   #template("hierarchy.vm")
-  #set($titleToDisplay = $doc.getPlainTitle())
+  #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
   #template('contentheader.vm')
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)

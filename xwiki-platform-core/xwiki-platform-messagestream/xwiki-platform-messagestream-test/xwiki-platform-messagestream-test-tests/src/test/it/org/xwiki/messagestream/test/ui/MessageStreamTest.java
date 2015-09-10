@@ -19,40 +19,39 @@
  */
 package org.xwiki.messagestream.test.ui;
 
-import org.junit.*;
-import org.xwiki.administration.test.po.AdministrablePage;
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
+import static org.junit.Assert.*;
+
 /**
- * Verify the overall Administration application features.
+ * Verify the Message Stream features.
  *
  * @version $Id$
  * @since 4.3M1
  */
-public class AdministrationTest extends AbstractTest
+public class MessageStreamTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
-    public void verifyGlobalAndSpaceSections()
+    public void verifyGlobalAndSpaceAdministrationSections()
     {
-        // Because of http://jira.xwiki.org/browse/XWIKI-9763 we need to create a test page to ensure there's at least
-        // one non-hidden page in the XWiki space
-        // TODO: Remove this once http://jira.xwiki.org/browse/XWIKI-9763 is fixed.
-        getUtil().createPage("XWiki", getTestClassName() + "-" + getTestMethodName(), "", "");
+        // Go to the wiki's administration page directly (the goal of this test is not to test the navigation
+        // from the Drawer menu to the Administration page).
+        AdministrationPage wikiAdministrationPage = AdministrationPage.gotoPage();
 
-        AdministrablePage page = new AdministrablePage();
-        AdministrationPage administrationPage = page.clickAdministerWiki();
+        // The MessageStream section should be present
+        assertTrue(wikiAdministrationPage.hasSection("MessageStream"));
 
-        Assert.assertTrue(administrationPage.hasSection("MessageStream"));
-
-        // Select XWiki space administration.
+        // Go to a space's administration page (we use the XWiki space).
         AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
 
-        // All those sections should not be present
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("MessageStream"));
+        // The MessageStream section should not be present since it's only a wiki level option
+        assertTrue(spaceAdministrationPage.hasNotSection("MessageStream"));
     }
 }

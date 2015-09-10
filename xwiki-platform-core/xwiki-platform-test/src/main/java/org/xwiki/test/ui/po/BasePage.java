@@ -121,9 +121,24 @@ public class BasePage extends BaseElement
         return getDriver().getCurrentUrl();
     }
 
+    /**
+     * @param metaName the name of the XWiki document metadata
+     * @return the value of the specified XWiki document metadata for the current XWiki document
+     * @see {@link #getHTMLMetaDataValue(String)} for HTML meta field values
+     */
     public String getMetaDataValue(String metaName)
     {
         return getDriver().findElement(By.xpath("/html")).getAttribute("data-xwiki-" + metaName);
+    }
+
+    /**
+     * @param metaName the name of the HTML meta field
+     * @return the value of the requested HTML meta field with from the current page
+     * @since 7.2RC1
+     */
+    public String getHTMLMetaDataValue(String metaName)
+    {
+        return getDriver().findElement(By.xpath("//meta[@name='" + metaName + "']")).getAttribute("content");
     }
 
     /**

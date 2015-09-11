@@ -124,8 +124,8 @@ public class CreatePagePage extends ViewPage
         for (WebElement templateInput : templates) {
             if (templateInput.getAttribute("value").equals(template)) {
                 // Get the label corresponding to the input so we can click on it
-                WebElement label = 
-                        getDriver().findElement(By.xpath("//label[@for = '"+templateInput.getAttribute("id")+"']"));
+                WebElement label =
+                    getDriver().findElement(By.xpath("//label[@for = '" + templateInput.getAttribute("id") + "']"));
                 label.click();
                 return;
             }

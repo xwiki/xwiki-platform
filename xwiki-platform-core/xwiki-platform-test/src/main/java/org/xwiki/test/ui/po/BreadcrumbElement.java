@@ -28,7 +28,7 @@ import org.openqa.selenium.WebElement;
 
 /**
  * Represents the page breadcrumb.
- * 
+ *
  * @version $Id$
  * @since 7.2M3
  */
@@ -65,8 +65,9 @@ public class BreadcrumbElement extends BaseElement
     {
         List<WebElement> result;
         if (isCurrent) {
-            result = getDriver().findElementsWithoutWaiting(this.container,
-                By.xpath("li[@class = 'active' and . = '" + text + "']"));
+            result =
+                getDriver().findElementsWithoutWaiting(this.container,
+                    By.xpath("li[@class = 'active' and . = '" + text + "']"));
         } else {
             if (withLink) {
                 result = getDriver().findElementsWithoutWaiting(this.container, By.xpath("//a[. = '" + text + "']"));

@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.CreatePagePage;
-import org.xwiki.test.ui.po.CreateSpacePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
@@ -60,8 +59,8 @@ public class CreatePageAndSpaceTest extends AbstractTest
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it.
         getUtil().gotoPage(getUtil().getURL("create", new String[] {spaceName, existingPageName}, "tocreate=space"));
-        CreateSpacePage csp = new CreateSpacePage();
-        EditPage editSpaceWebhomePage = csp.createSpace(spaceName);
+        CreatePagePage cpp = new CreatePagePage();
+        EditPage editSpaceWebhomePage = cpp.createPage("", spaceName);
 
         assertEquals(spaceName, editSpaceWebhomePage.getMetaDataValue("space"));
         assertEquals("WebHome", editSpaceWebhomePage.getMetaDataValue("page"));
@@ -94,7 +93,7 @@ public class CreatePageAndSpaceTest extends AbstractTest
 
         // Navigate to an existing page before clicking on the Add button
         ViewPage vp = getUtil().gotoPage(spaceName, existingPageName);
-        CreatePagePage cpp = vp.createPage();
+        cpp = vp.createPage();
         editPage = cpp.createPage(spaceName, newPageName, true);
 
         // Verify the title field

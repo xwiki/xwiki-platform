@@ -770,10 +770,12 @@ public class XWikiWebDriver extends RemoteWebDriver
         if (StringUtils.isEmpty(newTextValue)) {
             // Workaround for the fact that clear() fires the "change" event but not the "input" event and javascript
             // listening to the "input" event will not be executed otherwise.
-            // Note: We're not using CTRL+A and the Delete because the key combination to select the full input depends
-            // on the OS (on Mac it's META+A for example).
+            // Note 1: We're not using CTRL+A and the Delete because the key combination to select the full input
+            //         depends on the OS (on Mac it's META+A for example).
+            // Note 2: Sending the END key didn't always work when I tested it on Mac (for some unknown reason)
             textInputElement.click();
-            textInputElement.sendKeys(Keys.END);
+            textInputElement.sendKeys(
+                StringUtils.repeat(Keys.ARROW_RIGHT.toString(), textInputElement.getAttribute("value").length()));
             textInputElement.sendKeys(
                 StringUtils.repeat(Keys.BACK_SPACE.toString(), textInputElement.getAttribute("value").length()));
         } else {

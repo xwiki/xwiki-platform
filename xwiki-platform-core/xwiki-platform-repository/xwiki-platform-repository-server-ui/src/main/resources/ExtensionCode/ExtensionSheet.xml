@@ -131,7 +131,7 @@
           $doc.authors
         #end
       ##------- Rating --------
-      |(% class="label" %)Rating(%%)|#displayFullRating($doc "")
+      |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference "")
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')

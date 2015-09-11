@@ -19,19 +19,11 @@
  */
 package org.xwiki.search.solr.script;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 
 import javax.inject.Provider;
 
+import org.apache.solr.common.SolrDocument;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +31,11 @@ import org.slf4j.Logger;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -48,6 +43,10 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for the {@link org.xwiki.search.solr.script.SolrIndexScriptService}.
@@ -288,5 +287,25 @@ public class SolrIndexScriptServiceTest
         verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference1);
         verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference2);
         verify(this.mockAuthorization).hasAccess(Right.PROGRAM, this.contentAuthorReference, wikiReference3);
+    }
+
+    @Test
+    public void resolveWithImplicitType() throws Exception
+    {
+        SolrDocument document = new SolrDocument();
+        Object[] parameters = new Object[] {};
+
+        assertNull(this.service.resolve(document, parameters));
+
+        document.setField(FieldUtils.TYPE, "foo");
+        assertNull(this.service.resolve(document, parameters));
+
+        EntityReferenceResolver<SolrDocument> solrEntityReferenceResolver =
+            this.mocker.getInstance(SolrEntityReferenceResolver.TYPE);
+        EntityReference spaceReference = new EntityReference("bar", EntityType.SPACE);
+        when(solrEntityReferenceResolver.resolve(document, EntityType.SPACE, parameters)).thenReturn(spaceReference);
+
+        document.setField(FieldUtils.TYPE, "SPACE");
+        assertSame(spaceReference, this.service.resolve(document, parameters));
     }
 }

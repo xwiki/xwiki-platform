@@ -28,12 +28,16 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -80,6 +84,18 @@ public class SolrIndexScriptService implements ScriptService
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Used to extract a {@link DocumentReference} from a {@link SolrDocument}.
+     */
+    @Inject
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
+    /**
+     * Used to extract an {@link EntityReference} from a {@link SolrDocument}.
+     */
+    @Inject
+    private EntityReferenceResolver<SolrDocument> solrEntityReferenceResolver;
 
     /**
      * Index an entity and all it's contained entities recursively.
@@ -171,6 +187,59 @@ public class SolrIndexScriptService implements ScriptService
     public int getQueueSize()
     {
         return this.solrIndexer.getQueueSize();
+    }
+
+    /**
+     * Extract a {@link DocumentReference} from the given {@link SolrDocument} (e.g. search result).
+     * 
+     * @param document the {@link SolrDocument} to extract the {@link DocumentReference} from
+     * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
+     *            missing)
+     * @return the reference to the document associated with the given {@link SolrDocument}
+     */
+    public DocumentReference resolveDocument(SolrDocument document, Object... parameters)
+    {
+        return this.solrDocumentReferenceResolver.resolve(document, parameters);
+    }
+
+    /**
+     * Extract an {@link EntityReference} from the given {@link SolrDocument} (e.g. search result). The entity type is
+     * inferred from the "type" field which must be specified and must have a valid value (that corresponds to an
+     * existing {@link EntityType}).
+     * 
+     * @param document a {@link SolrDocument} to extract the {@link EntityReference} from (the "type" field must be
+     *            specified)
+     * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
+     *            missing)
+     * @return the reference to the entity associated with the given {@link SolrDocument}
+     */
+    public EntityReference resolve(SolrDocument document, Object... parameters)
+    {
+        EntityType type;
+        try {
+            type = EntityType.valueOf((String) document.get(FieldUtils.TYPE));
+        } catch (IllegalArgumentException e) {
+            return null;
+        } catch (NullPointerException e) {
+            return null;
+        }
+
+        return resolve(document, type, parameters);
+    }
+
+    /**
+     * Extract an {@link EntityReference} of the specified type from the given {@link SolrDocument} (e.g. search
+     * result).
+     * 
+     * @param document a {@link SolrDocument} to extract the {@link EntityReference} from
+     * @param type the entity type
+     * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
+     *            missing)
+     * @return the reference to the entity associated with the given {@link SolrDocument}
+     */
+    public EntityReference resolve(SolrDocument document, EntityType type, Object... parameters)
+    {
+        return this.solrEntityReferenceResolver.resolve(document, type, parameters);
     }
 
     /**

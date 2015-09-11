@@ -65,8 +65,12 @@ public class SolrEntityReferenceResolverTest
         solrDocument.setField(FieldUtils.SPACE, "Path.To.Success");
         solrDocument.setField(FieldUtils.NAME, "WebHome");
         solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, "fr");
-        solrDocument.setField(FieldUtils.FILENAME, "image.png");
-        solrDocument.setField(FieldUtils.CLASS, "App.Code.PlayerClass");
+        // The file name field can have multiple values.
+        solrDocument.addField(FieldUtils.FILENAME, "image.png");
+        solrDocument.addField(FieldUtils.FILENAME, "presentation.odp");
+        // The class name field can have multiple values too.
+        solrDocument.addField(FieldUtils.CLASS, "App.Code.PlayerClass");
+        solrDocument.addField(FieldUtils.CLASS, "App.Code.TrainerClass");
         solrDocument.setField(FieldUtils.NUMBER, 13);
         solrDocument.setField(FieldUtils.PROPERTY_NAME, "age");
 

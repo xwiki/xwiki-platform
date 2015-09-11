@@ -5,9 +5,8 @@
 ## Initially made to be used in an AJAX call when generating the location preview of a new page.
 ##
 #template('hierarchy_macros.vm')
-#set ($hierarchyDoc = $tdoc)
+#set ($documentReference = $NULL)
 #if ("$!request.reference" != '')
   #set ($documentReference = $services.model.resolveDocument($request.reference))
-  #set ($hierarchyDoc = $xwiki.getDocument($documentReference))
 #end
-#hierarchy($hierarchyDoc)
+#hierarchy($documentReference)

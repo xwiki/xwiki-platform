@@ -44,13 +44,13 @@
         #documentPickerModal($options)
         #locationPickerActions
       #end
-      #if ("$!options.parent.reference" == '')
-        #set ($hierarchyDoc = $tdoc)
-      #else
-        #set ($hierarchyDoc = $xwiki.getDocument($options.parent.reference))
+      #set ($parentReference = $options.parent.reference)
+      #if (!$parentReference)
+        #set ($parentReference = $doc.documentReference)
       #end
-      ## Note: we are only setting the parent reference here. The new document part will be added from JavaScript.
-      #hierarchy($hierarchyDoc {'showOnlySpaces': true})
+      ## Note: We display only the parent space reference here. The new document part will be added from JavaScript.
+      #set ($parentReference = $parentReference.extractReference('SPACE'))
+      #hierarchy($parentReference)
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Location advanced edit
@@ -159,7 +159,17 @@
   </div>
 #end
 
-#macro (documentTree)
+#macro (getWikiHomePageReference $wiki $return)
+  #set ($_wikiHomePageReference = $services.wiki.getById($wiki).mainPageReference)
+  #if (!$_wikiHomePageReference)
+    #set ($wikiReference = $services.model.createWikiReference($wiki))
+    #set ($_wikiHomePageReference = $services.model.resolveDocument('', 'default', $wikiReference))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $_wikiHomePageReference)
+#end
+
+#macro (documentTree $options)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
     'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',

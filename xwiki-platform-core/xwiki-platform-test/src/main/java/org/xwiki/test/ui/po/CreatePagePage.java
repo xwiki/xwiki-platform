@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NotFoundException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -265,14 +263,21 @@ public class CreatePagePage extends ViewPage
     }
 
     /**
-     * Wait for the Location Preview Breadcrumb to display the passed content and throws an exception if the timeout is
-     * reached. Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting
-     * would lead to false positives.
+     * Wait for the location preview to display the passed path string and throw an exception if the timeout is reached.
+     * Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would
+     * lead to false positives.
+     * <p/>
+     * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
+     * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
+     * iteration, we lookup the current breadcrumb element and not a cached one.
+     * <p/>
+     * TODO: Reuse {@link org.xwiki.index.test.po.DocumentPicker DocumentPicker} inside this PO instead of duplicating
+     * this method.
      *
-     * @param expectedContent the content to wait for
+     * @param expectedPathString the path string to wait for
      * @since 7.2RC1
      */
-    public void waitForLocationPreviewContent(final String expectedContent)
+    public void waitForLocationPreviewContent(final String expectedPathString)
     {
         // TODO: Ugly hack. Would need to find a better solution
         final StringBuilder currentValue = new StringBuilder();
@@ -285,21 +290,20 @@ public class CreatePagePage extends ViewPage
                 {
                     try {
                         String value = getLocationPreview().getPathAsString();
+
                         currentValue.setLength(0);
                         currentValue.append(value);
-                        return expectedContent.equals(value);
-                    } catch (NotFoundException e) {
-                        return false;
-                    } catch (StaleElementReferenceException e) {
-                        // The element was removed from DOM in the meantime
+
+                        return expectedPathString.equals(value);
+                    } catch (Exception e) {
                         return false;
                     }
                 }
             });
         } catch (WebDriverException e) {
             // Display a nicer error message than would be displayed otherwise
-            throw new WebDriverException(
-                String.format("Found [%s], was expecting [%s]", currentValue.toString(), expectedContent), e);
+            throw new WebDriverException(String.format("Found [%s], was expecting [%s]", currentValue.toString(),
+                expectedPathString), e);
         }
     }
 

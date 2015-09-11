@@ -19,14 +19,20 @@
  */
 package org.xwiki.index.test.po;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.BreadcrumbElement;
 
 /**
  * Represents the Document Picker.
- * 
+ *
  * @version $Id$
  * @since 7.2M3
  */
@@ -114,5 +120,88 @@ public class DocumentPicker extends BaseElement
     {
         this.container.findElement(By.className("location-action-pick")).click();
         return new DocumentPickerModal(this.container.findElement(By.cssSelector(".location-tree.modal"))).waitForIt();
+    }
+
+    /**
+     * Wait for the Breadcrumb to display the passed path string and throw an exception if the timeout is reached. Note
+     * that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to
+     * false positives.
+     * <p/>
+     * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
+     * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
+     * iteration, we lookup the current breadcrumb element and not a cached one.
+     *
+     * @param expectedPathString the path string to wait for
+     * @since 7.2RC1
+     */
+    public void waitForLocation(final String expectedPathString)
+    {
+        // TODO: Ugly hack. Would need to find a better solution
+        final StringBuilder currentValue = new StringBuilder();
+
+        try {
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    try {
+                        String value = getLocation().getPathAsString();
+
+                        currentValue.setLength(0);
+                        currentValue.append(value);
+
+                        return expectedPathString.equals(value);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+            });
+        } catch (WebDriverException e) {
+            // Display a nicer error message than would be displayed otherwise
+            throw new WebDriverException(String.format("Found [%s], was expecting [%s]", currentValue.toString(),
+                expectedPathString), e);
+        }
+    }
+
+    /**
+     * Wait for the Breadcrumb to display the passed path and throw an exception if the timeout is reached. Note that we
+     * need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to false
+     * positives.
+     * <p/>
+     * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
+     * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
+     * iteration, we lookup the current breadcrumb element and not a cached one.
+     *
+     * @param expectedPath the path to wait for
+     * @since 7.2RC1
+     */
+    public void waitForLocation(final List<String> expectedPath)
+    {
+        // TODO: Ugly hack. Would need to find a better solution
+        final List<String> currentPath = new ArrayList<String>();
+
+        try {
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    try {
+                        List<String> path = getLocation().getPath();
+
+                        currentPath.clear();
+                        currentPath.addAll(path);
+
+                        return expectedPath.equals(path);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+            });
+        } catch (WebDriverException e) {
+            // Display a nicer error message than would be displayed otherwise
+            throw new WebDriverException(String.format("Found %s, was expecting %s", currentPath, expectedPath), e);
+        }
     }
 }

@@ -30,7 +30,13 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DeletePageOutcomePage extends ViewPage
 {
-    @FindBy(xpath = "//table[@class='centered']//span[@class='wikilink']")
+    /**
+     * The Deleter is found in the first cell of the first column of the table listing past deletions.
+     * Note that when the user has no profile (as with superadmin for example or if a user's profile has been
+     * removed) then the deleted is not wrapped in an A tag and thus we shouldn't use that as a way to locate
+     * the deleter.
+     */
+    @FindBy(xpath = "//table[@class='centered']/tbody/tr/td")
     private WebElement deleter;
 
     @FindBy(xpath = "//p[@class='xwikimessage']")

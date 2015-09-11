@@ -80,8 +80,8 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//div[@id='xwikimainmenu']//li[contains(@class, 'navbar-avatar')]/a")
     private WebElement userLink;
 
-    @FindBy(xpath = "//div[@id='tmDrawer']//div[contains(@class, 'brand-links')]/a[contains(@class, 'brand-user')]")
-    private WebElement userLinkInDrawer;
+    @FindBy(xpath = "//li[contains(@class, 'navbar-avatar')]//img[contains(@class, 'avatar')]")
+    private WebElement userAvatarImage;
 
     @FindBy(id = "document-title")
     private WebElement documentTitle;
@@ -371,7 +371,9 @@ public class BasePage extends BaseElement
     public boolean canDelete()
     {
         toggleActionMenu();
-        boolean canDelete = getDriver().hasElement(By.id("tmActionDelete"));
+        // Don't wait here since test can use this method to verify that there's no Delete right on the current page
+        // and calling hasElement() would incurr the wait timeout.
+        boolean canDelete = getDriver().hasElementWithoutWaiting(By.id("tmActionDelete"));
         toggleActionMenu();
         return canDelete;
     }
@@ -414,10 +416,8 @@ public class BasePage extends BaseElement
      */
     public String getCurrentUser()
     {
-        toggleDrawer();
-        String userName = this.userLinkInDrawer.getText();
-        toggleDrawer();
-        return userName;
+        // Get the user from the title attribute of the image displaying the user's avatar in the nav bar
+        return this.userAvatarImage.getAttribute("title");
     }
 
     /**

@@ -19,7 +19,7 @@
  */
 package org.xwiki.flamingo.test.ui;
 
-import java.lang.Exception;import java.lang.String;import org.junit.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Tests the Delete Page feature.
  * 
- * @version $Id$
+ * @version $Id: 5f4959907fa00af4703bd2ebafcce1aa305c4c04 $
  * @since 3.0M3
  */
 public class DeletePageTest extends AbstractTest

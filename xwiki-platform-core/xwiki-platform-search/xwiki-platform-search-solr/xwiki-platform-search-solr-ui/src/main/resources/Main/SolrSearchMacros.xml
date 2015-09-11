@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output='false'}}
+  <content>{{template name="hierarchy_macros.vm" /}}
+
+{{velocity output='false'}}
 #set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 
@@ -322,31 +324,28 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
-  (% class="search-results-sort" %)(((
-    (% class="search-results-sort" %)
-    * {{translation key="solr.sortBy"/}}
-    #foreach ($entry in $defaultSortOrder.entrySet())
-      #set ($class = 'sort-item')
-      #set ($sortOrderIndicator = $NULL)
-      #set ($targetSortOrder = $entry.value)
-      #if ($sort == $entry.key)
-        #set ($class = "$class active")
-        #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-        #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-        #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
-      #end
-      #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-      * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+  (% class="search-results-sort" %)
+  * {{translation key="solr.sortBy"/}}
+  #foreach ($entry in $defaultSortOrder.entrySet())
+    #set ($class = 'sort-item')
+    #set ($sortOrderIndicator = $NULL)
+    #set ($targetSortOrder = $entry.value)
+    #if ($sort == $entry.key)
+      #set ($class = "$class active")
+      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
+      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
+      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
     #end
-  )))
-  (% class="search-options" %)(((
-    (% class="search-options" %)
-    * {{translation key="solr.options"/}}
-    #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-    * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
-    #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-    * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
-  )))
+    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
+    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+  #end
+
+  (% class="search-options" %)
+  * {{translation key="solr.options"/}}
+  #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
+  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+  #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
+  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
 #end
 
 #macro (extendQueryString $url $extraParameters)
@@ -398,9 +397,7 @@
 #end
 
 #macro (displaySearchResult $searchResult)
-  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki,
-    $searchResult.space, $searchResult.name))
-  #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
+  #set ($searchResultReference = $services.solr.resolve($searchResult))
   (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
     ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
     {{html}}
@@ -421,13 +418,12 @@
 #end
 
 #macro (displaySearchResult_document $searchResult)
-  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
   #displaySearchResultTitle()
   #displaySearchResultLocation()
   &lt;div class="search-result-author"&gt;
     $services.localization.render('core.footer.modification', [
-      $xwiki.getUserName($searchResultTranslatedDocument.author),
-      $xwiki.formatDate($searchResultTranslatedDocument.date)
+      "#displayUserProfileLink($searchResult.author $searchResult.author_display)",
+      $xwiki.formatDate($searchResult.date)
     ])
   &lt;/div&gt;
 #end
@@ -435,11 +431,12 @@
 #macro (displaySearchResult_attachment $searchResult)
   &lt;h2 class="search-result-title"&gt;
     $services.icon.renderHTML('attach')
-    #set ($fileName = $searchResult.filename.get(0))
-    #set ($attachmentURL = $searchResultDocument.getAttachmentURL($fileName))
+    #set ($attachmentURL = $xwiki.getURL($searchResultReference))
     #set ($downloadHint = $services.localization.render('core.viewers.attachments.download'))
-    &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;$escapetool.xml($fileName)&lt;/a&gt;
-    #set ($attachmentHistoryURL = $searchResultDocument.getAttachmentURL($fileName, 'viewattachrev'))
+    &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;
+      $escapetool.xml($searchResultReference.name)
+    &lt;/a&gt;
+    #set ($attachmentHistoryURL = $xwiki.getURL($searchResultReference, 'viewattachrev', $NULL))
     #set ($historyHint = $services.localization.render('core.viewers.attachments.showHistory'))
     &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version"&gt;
       $escapetool.xml($searchResult.attversion)
@@ -447,7 +444,7 @@
   &lt;/h2&gt;
   #displaySearchResultLocation($searchResult)
   &lt;div class="search-result-uploader"&gt;
-    #set ($uploader = $xwiki.getUserName($searchResult.attauthor.get(0)))
+    #set ($uploader = "#displayUserProfileLink($searchResult.attauthor.get(0) $searchResult.attauthor_display.get(0))")
     #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
     #set ($fileSize = "#dynamicsize($searchResult.attsize.get(0))")
     $services.localization.render('solr.result.uploadedBy', [$uploader, $uploadDate, $fileSize])
@@ -473,13 +470,13 @@
 
 #macro (displaySearchResultTitle)
   #set ($showLocale = $searchResult.locale != '' &amp;&amp; $searchResult.locale != $xcontext.language)
-  #set ($titleURL = $searchResultDocument.getURL())
+  #set ($titleURL = $xwiki.getURL($searchResultReference))
   #if ($showLocale)
-    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
+    #set ($titleURL = $xwiki.getURL($searchResultReference, 'view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
     $services.icon.renderHTML('file-white')
-    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResultTranslatedDocument.plainTitle)&lt;/a&gt;
+    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResult.title_)&lt;/a&gt;
     #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
@@ -488,25 +485,23 @@
 #end
 
 #macro (displaySearchResultLocation $searchResult)
-  #set ($wikiPrettyName = $services.wiki.getById($searchResult.wiki).prettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $searchResult.wiki)
-  #end
-  #set ($wikiReference = $services.model.createWikiReference($searchResult.wiki))
-  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
-  #set ($wikiLink = "&lt;a href=""$xwiki.getURL($wikiHomeDocRef)""&gt;$escapetool.xml($wikiPrettyName)&lt;/a&gt;")
-  ##
-  #set ($spaceReference = $services.model.createSpaceReference($searchResult.space, $wikiReference))
-  #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
-  #set ($spaceLink = "&lt;a href=""$xwiki.getURL($spaceHomeDocRef)""&gt;$escapetool.xml($searchResult.space)&lt;/a&gt;")
-  ##
-  #set ($documentLink = "&lt;a href=""$searchResultDocument.getURL()""&gt;$escapetool.xml($searchResult.name)&lt;/a&gt;")
   &lt;div class="search-result-location"&gt;
-    $services.localization.render('solr.result.location', [$wikiLink, $spaceLink, $documentLink])
-    #if ($searchResult.type == 'OBJECT_PROPERTY')
-      &amp;#187; $escapetool.xml("${searchResult.get('class').get(0)}[$searchResult.number]")
-    #end
+    $services.localization.render('solr.result.locatedIn')
+    #set ($locationOptions = {
+      'excludeSelf': true,
+      'limit': 6
+    })
+    #hierarchy($searchResultReference $locationOptions)
   &lt;/div&gt;
+#end
+
+#macro (displayUserProfileLink $userReference $userName)
+#if ($userReference)
+## We could test if the specified user exists but we want to speed up the search.
+&lt;a href="$xwiki.getURL($userReference)"&gt;$escapetool.xml($userName)&lt;/a&gt;##
+#else
+$services.localization.render('core.users.unknownUser')##
+#end
 #end
 
 #macro (displaySearchResultHighlighting $searchResult)
@@ -806,12 +801,13 @@ $value##
         #displaySearchDebugInfo()
       #end
       (% class="search-results-container row" %)(((
-        (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
-          #if ($facetEnabled)
+        #if ($facetEnabled)
+          (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
             #displaySearchFacets($searchResponse)
-          #end
-        )))
-        (% class="search-results-left col-xs-12 col-sm-8 col-sm-pull-4 col-md-9 col-md-pull-3" %)(((
+          )))
+        #end
+        (% class="search-results-left col-xs-12#if ($facetEnabled) col-sm-8 col-sm-pull-4 col-md-9 col-md-pull-3#end" %)
+        (((
           #displaySearchResultsSort()
 
           #displaySearchResults()
@@ -830,8 +826,7 @@ $value##
   #set ($list = [])
   #set ($results = $searchResponse.results)
   #foreach ($searchResult in $results)
-    #set ($searchResultDocumentReference = $services.model.createDocumentReference(
-      $searchResult.wiki, $searchResult.space, $searchResult.name))
+    #set ($searchResultDocumentReference = $services.solr.resolveDocument($searchResult))
     #set ($discard = $list.add("$searchResultDocumentReference"))
   #end
   ##

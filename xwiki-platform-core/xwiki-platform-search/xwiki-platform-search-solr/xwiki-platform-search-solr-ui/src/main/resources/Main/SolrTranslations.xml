@@ -79,7 +79,7 @@ solr.options.facet=Facets
 solr.options.facet.title=Allow extra filtering of the result
 
 solr.result.language=Language
-solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+solr.result.locatedIn=Located in
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
 solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
@@ -170,7 +170,16 @@ solr.field.mimetype=File Type
 solr.field.attauthor=Uploaded By
 solr.field.attauthor_display=Uploaded By
 solr.field.attdate=Upload Date
-solr.field.attsize=File Size</content>
+solr.field.attsize=File Size
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>Main.SolrTranslations</name>
     <number>0</number>

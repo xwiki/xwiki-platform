@@ -605,6 +605,13 @@ a.options-item.active, a.options-item.active:hover{
   line-height: 1.4em;
 }
 
+.search-result-location .breadcrumb {
+  background-color: transparent;
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
 dl.search-result-highlights {
   /* Overwrite the margin from the skin. */
   margin: 0;

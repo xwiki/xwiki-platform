@@ -199,8 +199,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     private SecurityAccess getAccess(UserSecurityReference user, SecurityReference entity)
         throws AuthorizationException
     {
-
         for (SecurityReference ref = entity; ref != null; ref = ref.getParentSecurityReference()) {
+            if (Right.getEnabledRights(ref.getSecurityType()).isEmpty()) {
+                // Skip search on entity types that will obviously have empty/useless list of rules.
+                continue;
+            }
             SecurityRuleEntry entry = securityCache.get(ref);
             if (entry == null) {
                 SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();

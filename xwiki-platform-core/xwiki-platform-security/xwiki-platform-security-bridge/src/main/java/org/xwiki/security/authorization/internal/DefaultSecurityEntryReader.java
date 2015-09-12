@@ -35,7 +35,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.SecurityReference;
@@ -115,7 +114,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         /**
-         * @return all rules available for this entity
+         * @return the reference of the related entity
          */
         @Override
         public SecurityReference getReference()
@@ -178,14 +177,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                     new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
                 break;
             default:
-                EntityReference relatedDocument = entity.extractReference(EntityType.DOCUMENT);
-                if (relatedDocument != null) {
-                    return new InternalSecurityRuleEntry(entity, Collections.<SecurityRule>emptyList());
-                } else {
-                    this.logger.debug("Rights on entities of type {} is not supported by this reader!",
-                                      entity.getType());
-                    throw new EntityTypeNotSupportedException(entity.getType(), this);
-                }
+                throw new EntityTypeNotSupportedException(entity.getType(), this);
         }
 
         return new InternalSecurityRuleEntry(entity,

@@ -21,9 +21,11 @@ package org.xwiki.security.authorization.cache.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,13 +39,16 @@ import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationSettler;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityEntryReader;
+import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
+import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.internal.UserBridge;
 
 /**
@@ -87,6 +92,47 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     /** Provide the configured authorization settler. */
     @Inject
     private Provider<AuthorizationSettler> authorizationSettlerProvider;
+
+    /**
+     * Implementation of the SecurityRuleEntry.
+     */
+    private final class EmptySecurityRuleEntry extends AbstractSecurityRuleEntry
+    {
+        /** Reference of the related entity. */
+        private final SecurityReference reference;
+
+        /**
+         * @param reference reference of the related entity
+         */
+        private EmptySecurityRuleEntry(SecurityReference reference)
+        {
+            this.reference = reference;
+        }
+
+        /**
+         * @return the reference of the related entity
+         */
+        @Override
+        public SecurityReference getReference()
+        {
+            return reference;
+        }
+
+        /**
+         * @return an empty list of rules
+         */
+        @Override
+        public Collection<SecurityRule> getRules()
+        {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return true;
+        }
+    }
 
     @Override
     public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity)
@@ -360,11 +406,25 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
     {
         Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
+        List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
         for (SecurityReference ref : entity.getReversedSecurityReferenceChain()) {
             SecurityRuleEntry entry = securityCache.get(ref);
             if (entry == null) {
-                entry = securityEntryReader.read(ref);
-                securityCache.add(entry);
+                if (Right.getEnabledRights(ref.getType()).isEmpty()) {
+                    // Do not call the reader on entity that will give useless rules
+                    entry = new EmptySecurityRuleEntry(ref);
+                    emptyRuleEntryTail.add(entry);
+                } else {
+                    entry = securityEntryReader.read(ref);
+                    if (!emptyRuleEntryTail.isEmpty()) {
+                        // Add intermediate empty rules sets to the cache to hold this significant one
+                        for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
+                            securityCache.add(emptyRuleEntry);
+                        }
+                        emptyRuleEntryTail.clear();
+                    }
+                    securityCache.add(entry);
+                }
             }
             rules.push(entry);
         }

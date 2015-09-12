@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -57,6 +58,8 @@ public abstract class AbstractSecurityTestCase
     protected SecurityReference anotherWikiDocRef;
     protected SecurityReference xwikiPreferencesDocRef;
     protected SecurityReference webPreferencesDocRef;
+
+    protected SecurityReference xattachmentRef;
 
     protected List<SecurityReference> entityRefs;
 
@@ -150,6 +153,8 @@ public abstract class AbstractSecurityTestCase
             anotherSpaceRef.getOriginalSpaceReference()));
         anotherWikiDocRef = newEntityReference(new DocumentReference("page",
             anotherWikiSpaceRef.getOriginalSpaceReference()));
+
+        xattachmentRef = newEntityReference(new AttachmentReference("file.ext", xdocRef.getOriginalDocumentReference()));
 
         xXWikiSpace = newEntityReference(new SpaceReference("XWiki", xwikiRef.getOriginalWikiReference()));
         xwikiSpace = newEntityReference(new SpaceReference("XWiki", wikiRef.getOriginalWikiReference()));

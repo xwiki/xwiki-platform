@@ -703,4 +703,18 @@ public class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTes
                         Arrays.asList(newRight),
                         RuleState.ALLOW))))));
     }
+
+    @Test
+    public void testSettleEntityTypeWithoutAnyEnabledRight() throws Exception
+    {
+        SecurityRule allowAllTestRightsRulesToXuser = getMockedSecurityRule("allowAllTestRightsRulesToXuser",
+            Collections.singletonList(xuserRef), Collections.<GroupSecurityReference>emptyList(), allTestRights, ALLOW);
+
+        assertAccess("Allow rights to entity without any acceptable right on itself but having some (XWIKI-12552)",
+            xuserRef, xattachmentRef, defaultAccess,
+            authorizationSettler.settle(xuserRef, Collections.<GroupSecurityReference>emptyList(),
+                getMockedSecurityRuleEntries("allrights",
+                    xattachmentRef,
+                    Collections.singletonList(Collections.singletonList(allowAllTestRightsRulesToXuser)))));
+    }
 }

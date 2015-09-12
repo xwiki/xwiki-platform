@@ -321,7 +321,11 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      */
     public static Set<Right> getEnabledRights(EntityType entityType)
     {
-        return UNMODIFIABLE_ENABLED_RIGHTS.get(entityType);
+        Set<Right> enabledRights = UNMODIFIABLE_ENABLED_RIGHTS.get(entityType);
+        if (enabledRights == null) {
+            enabledRights = Collections.<Right>emptySet();
+        }
+        return enabledRights;
     }
 
     /**

@@ -345,8 +345,7 @@
   #end
 
 {{html}}
-#template('hierarchy_macros.vm')
-#hierarchy($tdoc, true)
+#template('hierarchy.vm')
 {{/html}}
 
 (% id="document-title" %)(((

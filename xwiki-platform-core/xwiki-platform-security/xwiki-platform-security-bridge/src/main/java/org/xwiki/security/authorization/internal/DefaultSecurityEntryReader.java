@@ -171,13 +171,16 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 classReference = new DocumentReference(XWikiConstants.GLOBAL_CLASSNAME,
                     new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
                 break;
+            case DOCUMENT:
+                wikiReference = new WikiReference(entity.extractReference(EntityType.WIKI));
+                documentReference = new DocumentReference(entity);
+                classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
+                    new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
+                break;
             default:
                 EntityReference relatedDocument = entity.extractReference(EntityType.DOCUMENT);
                 if (relatedDocument != null) {
-                    wikiReference = new WikiReference(relatedDocument.extractReference(EntityType.WIKI));
-                    documentReference = new DocumentReference(relatedDocument);
-                    classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
-                        new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
+                    return new InternalSecurityRuleEntry(entity, Collections.<SecurityRule>emptyList());
                 } else {
                     this.logger.debug("Rights on entities of type {} is not supported by this reader!",
                                       entity.getType());

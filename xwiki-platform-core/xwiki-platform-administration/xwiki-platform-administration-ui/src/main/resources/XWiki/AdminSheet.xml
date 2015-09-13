@@ -272,7 +272,7 @@
   #set ($sortedSections = [])
   #sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)
   #foreach ($section in $sortedSections)
-    * {{html wiki="true"}}&lt;a href="$section.url"&gt;[[image:${section.iconReference}]] **${section.name}**&lt;/a&gt;{{/html}} (% class="description" %)$!{section.description}
+    * [[[[image:${section.iconReference}]] **${section.name}**&gt;&gt;path:${section.url}]] (% class="description" %)$!{section.description}
   #end
 #end
 

@@ -115,7 +115,10 @@ public class TreeElement extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return !Boolean.valueOf(element.getAttribute("aria-busy"));
+                // We are ready when the DOM element is marked as ready (not busy) and when the jQuery plugin is
+                // properly registered (otherwise we can not interact with it).
+                return !Boolean.valueOf(element.getAttribute("aria-busy"))
+                    && Boolean.TRUE.equals(getDriver().executeJavascript("return jQuery.jstree != null"));
             }
         });
         return this;

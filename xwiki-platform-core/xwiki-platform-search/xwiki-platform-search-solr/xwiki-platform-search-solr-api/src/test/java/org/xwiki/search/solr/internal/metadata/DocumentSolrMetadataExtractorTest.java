@@ -174,6 +174,12 @@ public class DocumentSolrMetadataExtractorTest
         when(localEntityReferenceSerializer.serialize(this.documentReference.getLastSpaceReference())).thenReturn(
             localSpaceReference);
 
+        // Hierarchy
+        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent())).thenReturn(
+            "Path.To");
+        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent().getParent()))
+            .thenReturn("Path");
+
         // Creator.
         DocumentReference creatorReference = new DocumentReference("wiki", "Space", "Creator");
         when(this.document.getCreatorReference()).thenReturn(creatorReference);
@@ -253,6 +259,11 @@ public class DocumentSolrMetadataExtractorTest
         assertEquals(this.documentReference.getWikiReference().getName(), solrDocument.getFieldValue(FieldUtils.WIKI));
         assertEquals(localSpaceReference, solrDocument.getFieldValue(FieldUtils.SPACE));
         assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
+
+        assertEquals(Arrays.asList("0/Path.", "1/Path.To.", "2/Path.To.Page."),
+            solrDocument.getFieldValues(FieldUtils.SPACE_FACET));
+        assertEquals(Arrays.asList("Path", "Path.To", "Path.To.Page"),
+            solrDocument.getFieldValues(FieldUtils.SPACE_PREFIX));
 
         assertEquals(Locale.US.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         assertEquals(Locale.US.getLanguage(), solrDocument.getFieldValue(FieldUtils.LANGUAGE));

@@ -129,10 +129,20 @@
    <field name="space" type="text_general" indexed="true" stored="true" />
    <!-- We also need to store the space name verbatim for faceting (exact matching). -->
    <field name="space_exact" type="string" indexed="true" stored="false" />
+   <!-- We also need a dedicated field for hierarchical faceting on nested spaces, as described on
+     https://wiki.apache.org/solr/HierarchicalFaceting ('facet.prefix'-based drill down).
+     E.g. for a document A.B.C.Page this field will hold ['0/A.', '1/A.B.', '2/A.B.C.'] -->
+   <field name="space_facet" type="string" indexed="true" stored="false" multiValued="true" />
+   <!-- This field is used to match descendant documents. A query such as space_prefix:A.B will match the documents from
+     space A.B and all its descendants (like A.B.C). This is possible because this field holds the local references of
+     all the ancestor spaces of a document (i.e. all the prefixes of the space reference). E.g. for a document
+     A.B.C.Page this field will hold ['A', 'A.B', 'A.B.C']. As a consequence, searching for space_prefix:A.B will match
+     A.B.C.Page. NOTE: We don't use the PathHierarchyTokenizer because it doesn't support specifying an escaping
+     character. We compute the values ourselves at index time as a workaround. -->
+   <field name="space_prefix" type="string" indexed="true" stored="false" multiValued="true" />
    <!-- The document name. This field is analyzed and thus mostly used for free text search. -->
    <field name="name" type="text_general" indexed="true" stored="true" />
-   <!-- We also need to store the document name verbatim for faceting (exact matching).
-        This facet is useful for attachments and objects for instance. -->
+   <!-- We also need to store the document name verbatim for exact matching. -->
    <field name="name_exact" type="string" indexed="true" stored="false" />
    <field name="locale" type="string" indexed="true" stored="true" />
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->

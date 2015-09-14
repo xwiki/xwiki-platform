@@ -86,6 +86,26 @@ public final class FieldUtils
     public static final String SPACE_EXACT = "space_exact";
 
     /**
+     * Unanalyzed and not stored version of the {@link #SPACE} field that is used for hierarchical faceting on nested
+     * spaces (using 'facet.prefix'-based drill down). E.g. for a document A.B.C.Page this field will hold ['0/A.',
+     * '1/A.B.', '2/A.B.C.']
+     * 
+     * @since 7.2RC1
+     */
+    public static final String SPACE_FACET = "space_facet";
+
+    /**
+     * This field is used to match descendant documents. A query such as {@code space_prefix:A.B} will match the
+     * documents from space A.B and all its descendants (like A.B.C). This is possible because this field holds the
+     * local references of all the ancestor spaces of a document (i.e. all the prefixes of the space reference). E.g.
+     * for a document A.B.C.Page this field will hold ['A', 'A.B', 'A.B.C']. As a consequence, searching for
+     * {@code space_prefix:A.B} will match A.B.C.Page
+     * 
+     * @since 7.2RC1
+     */
+    public static final String SPACE_PREFIX = "space_prefix";
+
+    /**
      * Name of the document.
      */
     public static final String NAME = "name";

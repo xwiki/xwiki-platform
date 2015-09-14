@@ -237,6 +237,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             this.localSerializer.serialize(documentReference.getLastSpaceReference()));
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());
 
+        // Set the fields that are used to query / filter the document hierarchy.
+        setHierarchyFields(solrDocument, documentReference.getParent());
+
         Locale locale = getLocale(documentReference);
         solrDocument.setField(FieldUtils.LOCALE, locale.toString());
         solrDocument.setField(FieldUtils.LANGUAGE, locale.getLanguage());
@@ -510,6 +513,20 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         } catch (Exception e) {
             this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
             return null;
+        }
+    }
+
+    private void setHierarchyFields(SolrInputDocument solrDocument, EntityReference path)
+    {
+        List<EntityReference> ancestors = path.getReversedReferenceChain();
+        // Skip the wiki reference because we want to index the local space references.
+        for (int i = 1; i < ancestors.size(); i++) {
+            String localAncestorReference = this.localSerializer.serialize(ancestors.get(i));
+            // We prefix the local ancestor reference with the depth in order to use 'facet.prefix'. We also add a
+            // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
+            // 0/GalleryCode/).
+            solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
+            solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
         }
     }
 }

@@ -126,7 +126,7 @@ public class ResetPasswordTest extends AbstractTest
         getUtil().loginAsSuperAdmin();
         getUtil().updateObject("XWiki", userName, "XWiki.XWikiUsers", 0, "email", "foo@bar.com", "form_token",
             getUtil().getSecretToken());
-        new ViewPage().logout();
+        getUtil().forceGuestUser();
 
         // Actually reset the user's password
         resetPasswordPage = ResetPasswordPage.gotoPage();

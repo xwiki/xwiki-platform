@@ -52,7 +52,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 {
     @Override
     public Objects getObjects(String wikiName, String spaceName, String pageName, Integer start, Integer number,
-            Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -63,16 +63,15 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             List<BaseObject> objectList = getBaseObjects(doc);
 
-            RangeIterable<BaseObject> ri =
-                    new RangeIterable<BaseObject>(objectList, start, number);
+            RangeIterable<BaseObject> ri = new RangeIterable<BaseObject>(objectList, start, number);
 
             for (BaseObject object : ri) {
                 /* By deleting objects, some of them might become null, so we must check for this */
                 if (object != null) {
-                    objects.getObjectSummaries().add(DomainObjectFactory
-                            .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                                    componentManager), doc, object, false, Utils.getXWikiApi(componentManager),
-                                    withPrettyNames));
+                    objects.getObjectSummaries().add(
+                        DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(),
+                            Utils.getXWikiContext(componentManager), doc, object, false,
+                            Utils.getXWikiApi(componentManager), withPrettyNames));
                 }
             }
 
@@ -84,7 +83,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
     @Override
     public Response addObject(String wikiName, String spaceName, String pageName, Object object)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         if (object.getClassName() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
@@ -100,21 +99,21 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
+            XWikiDocument xwikiDocument =
+                Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
+                    Utils.getXWikiContext(componentManager));
 
-            int objectNumber =
-                    xwikiDocument.createNewObject(object.getClassName(), Utils.getXWikiContext(componentManager));
-
-            BaseObject xwikiObject = xwikiDocument.getObject(object.getClassName(), objectNumber);
+            BaseObject xwikiObject =
+                xwikiDocument.newObject(object.getClassName(), Utils.getXWikiContext(componentManager));
 
             if (xwikiObject == null) {
                 throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
             }
 
             // We must initialize all the fields to an empty value in order to correctly create the object
-            BaseClass xwikiClass = Utils.getXWiki(componentManager)
-                    .getClass(xwikiObject.getClassName(), Utils.getXWikiContext(componentManager));
+            BaseClass xwikiClass =
+                Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
+                    Utils.getXWikiContext(componentManager));
             for (java.lang.Object propertyNameObject : xwikiClass.getPropertyNames()) {
                 String propertyName = (String) propertyNameObject;
                 xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
@@ -126,10 +125,14 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             doc.save();
 
-            return Response.created(Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces,
-                pageName, object.getClassName(), objectNumber)).entity(DomainObjectFactory.createObject(objectFactory,
-                    uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, xwikiObject, false,
-                    Utils.getXWikiApi(componentManager), false)).build();
+            return Response
+                .created(
+                    Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces, pageName,
+                        object.getClassName(), xwikiObject.getNumber()))
+                .entity(
+                    DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(),
+                        Utils.getXWikiContext(componentManager), doc, xwikiObject, false,
+                        Utils.getXWikiApi(componentManager), false)).build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

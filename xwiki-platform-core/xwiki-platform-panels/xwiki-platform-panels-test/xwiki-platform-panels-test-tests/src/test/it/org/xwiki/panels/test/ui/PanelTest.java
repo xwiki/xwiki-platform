@@ -32,6 +32,7 @@ import org.xwiki.test.ui.po.EditRightsPane.Right;
 import org.xwiki.test.ui.po.EditRightsPane.State;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
+import org.xwiki.text.StringUtils;
 
 /**
  * Various Panel tests.
@@ -58,7 +59,7 @@ public class PanelTest extends AbstractTest
         Assert.assertEquals(PanelsHomePage.getPage(), vp.getMetaDataValue("page"));
 
         // Now log out to verify that the Panels entry is not displayed for non admin users
-        vp.logout();
+        getUtil().forceGuestUser();
         // Navigate again to the Application Panels page to perform the verification
         applicationPanel = ApplicationsPanel.gotoPage();
         Assert.assertFalse(applicationPanel.containsApplication("Panels"));
@@ -111,18 +112,23 @@ public class PanelTest extends AbstractTest
         panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
         panelEditPage.clickSaveAndContinue();
 
-        // Add the panel to the right column from the administration.
+        // Add the panel to the right column from the administration. This also proves that the Panel Admin UI is
+        // displayed fine and can be modified.
         PageElementsAdministrationSectionPage pageElements =
             new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
         String rightPanels = pageElements.getRightPanels();
-        pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
+        String newPanelString = "Panels." + panelName;
+        if (!rightPanels.contains(newPanelString)) {
+            pageElements.setRightPanels(StringUtils.join(new Object[]{ rightPanels, newPanelString }, ','));
+        }
         pageElements.clickSave();
         try {
             // The panel should be visible for the administrator.
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
 
-            // Go to a page that doesn't exist and logout to see the panel as guest.
-            getUtil().gotoPage(getTestClassName(), getTestMethodName()).logout();
+            // Force the guest user to verify the Panel can also be viewed by Guests.
+            getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            getUtil().forceGuestUser();
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
 
             // Login and limit the view right on the panel document.
@@ -134,9 +140,8 @@ public class PanelTest extends AbstractTest
 
             // Check again the panel visibility for the test user and then for guest
             getUtil().loginAndGotoPage(userName, "password", getUtil().getURL(getTestClassName(), getTestMethodName()));
-            ViewPage page = new ViewPage();
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
-            page.logout();
+            getUtil().forceGuestUser();
             Assert.assertFalse(new PageWithPanels().hasPanel(panelName));
         } finally {
             // Restore the right panels.

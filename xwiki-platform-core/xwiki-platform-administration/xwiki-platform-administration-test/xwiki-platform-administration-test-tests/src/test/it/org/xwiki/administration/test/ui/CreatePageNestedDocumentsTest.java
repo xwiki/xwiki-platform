@@ -69,11 +69,11 @@ public class CreatePageNestedDocumentsTest extends AbstractTest
     // @formatter:on
 
     @Before
-    public void setup()
+    public void setup() throws Exception
     {
         // Cleanup to avoid problems from previous runs.
         for (DocumentReference pageReference : nestedDocuments) {
-            getUtil().deletePage(pageReference);
+            getUtil().rest().delete(pageReference);
         }
     }
 

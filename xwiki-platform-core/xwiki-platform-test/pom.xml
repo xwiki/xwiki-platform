@@ -108,8 +108,35 @@
       <version>1.0</version>
     </dependency>
     <dependency>
+      <groupId>org.restlet.jse</groupId>
+      <artifactId>org.restlet.ext.jaxrs</artifactId>
+      <version>${restlet.version}</version>
+      <exclusions>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-api</artifactId>
+          <groupId>javax.xml.bind</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
+        <!-- Exclude Servlet API 2.5 which is not declared as provided. And we use a newer version too. -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rest-model</artifactId>
+      <artifactId>xwiki-platform-rest-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

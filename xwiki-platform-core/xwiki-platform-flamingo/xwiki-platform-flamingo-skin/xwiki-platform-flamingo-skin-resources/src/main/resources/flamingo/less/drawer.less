@@ -1,74 +1,92 @@
 /* Drawer */
+
+// We introduce some variables with default values that a theme can override
+@xwiki-drawer-bg:                        @xwiki-page-content-bg;
+@xwiki-drawer-brand-bg:                  @navbar-default-bg;
+@xwiki-drawer-brand-border:              @navbar-default-border;
+@xwiki-drawer-brand-link-color:          @navbar-default-link-color;
+@xwiki-drawer-brand-link-hover-color:    @navbar-default-link-hover-color;
+@xwiki-drawer-brand-user-color:          @navbar-default-color;
+@xwiki-drawer-menu-item-padding:         @navbar-padding-vertical 0 @navbar-padding-vertical @navbar-padding-horizontal;
+@xwiki-drawer-menu-item-size:            @font-size-base;
+@xwiki-drawer-menu-item-color:           @text-color;
+@xwiki-drawer-menu-item-icon-padding:    @navbar-padding-horizontal;
+@xwiki-drawer-menu-item-hover-color:     @navbar-inverse-link-active-color;
+@xwiki-drawer-menu-item-hover-bg:        @navbar-inverse-link-active-bg;
+@xwiki-drawer-menu-subitem-indent:       @navbar-padding-horizontal * 2;
+@xwiki-drawer-menu-item-seperator-color: darken(@xwiki-page-content-bg, 10%);
+
+
 .drawer-default {
-  background-color: @xwiki-page-content-bg;
-}
-
-.drawer-default .drawer-brand a {
-  color: @navbar-default-link-color;
-}
-
-.drawer-default .drawer-brand a:hover, .drawer-default .drawer-brand a:focus {
-  color: @navbar-default-link-hover-color;
-  text-decoration: none;
-}
-
-.drawer-default .drawer-menu-item a,
-.drawer-default .drawer-menu-item a:hover, .drawer-default .drawer-menu-item a:focus {
-  color: @text-color;
-  text-decoration: none;
-}
-
-.drawer-menu-item:hover a:hover {
-  color: inherit;
-}
-
-.drawer-main {
-  box-shadow: -1px 0px 1px rgba(0,0,0,.05);
-}
-
-.drawer-brand {
-  background-color: @navbar-default-bg;
-  padding: 20px 16px;
-  border-bottom: 1px solid @navbar-default-border;
-}
-
-.drawer-brand img {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-}
-
-.drawer-default .drawer-brand a {
-  padding: 0;
-}
-
-.drawer-brand .brand-links, .drawer-brand img {
-  float: left;
-}
-
-.drawer-brand .brand-links {
-  margin-left: 16px;
-  margin-top: 8px;
-}
-
-.drawer-brand .brand-links a {
-  font-size: 14px;
-}
-
-.drawer-brand .brand-links .brand-user {
-  font-weight: 400;
-  color: @navbar-default-color;
-}
-
-.drawer-default .drawer-menu-item{
-  padding: 0;
-
-  a {
-    margin-top: 0;
-    padding: @navbar-padding-vertical 0 @navbar-padding-vertical @navbar-padding-horizontal;
-    font-size: @font-size-base;
-    font-weight: 400;
-    color: @text-color;
+  background-color: @xwiki-drawer-bg;
+  
+  // Brand =================================================================
+  .drawer-brand {
+    background-color: @xwiki-drawer-brand-bg;
+    border-bottom: 1px solid @xwiki-drawer-brand-border;
+    padding: 20px 16px;
+  
+    a {
+      color: @xwiki-drawer-brand-link-color;
+      padding: 0;
+      
+      &:hover, &:focus {
+        color: @xwiki-drawer-brand-link-hover-color;
+        text-decoration: none;
+      }
+    }
+    
+    img {
+      border-radius: 50%;
+      float: left;
+      height: 50px;
+      width: 50px;
+    }
+    
+    .brand-links {
+      float: left;
+      margin-left: 16px;
+      margin-top: 8px;
+      
+      a {
+        font-size: 14px;
+      }
+      
+      .brand-user {
+        color: @xwiki-drawer-brand-user-color;
+        font-weight: 400;
+      }
+    }
+  }
+  
+  
+  // Menu Item =============================================================
+  .drawer-menu-item {
+    padding: 0;
+     
+    a {
+      color: @xwiki-drawer-menu-item-color;
+      font-size: @xwiki-drawer-menu-item-size;
+      font-weight: 400;
+      margin-top: 0;
+      padding: @xwiki-drawer-menu-item-padding;
+    
+      &, &:hover, &:focus {
+        text-decoration: none;
+      }
+      
+      &:hover {
+        background-color: @xwiki-drawer-menu-item-hover-bg;
+        color: @xwiki-drawer-menu-item-hover-color;
+      }
+    }
+  }
+  
+  // Sub Item =============================================================
+  .drawer-menu-sub-item {
+    a {
+      padding-left: @xwiki-drawer-menu-subitem-indent;
+    }
   }
 }
 
@@ -84,24 +102,11 @@
   white-space: normal;
   
   .glyphicon {
-    padding-left: @navbar-padding-horizontal;
+    padding-left: @xwiki-drawer-menu-item-icon-padding;
   }
-}
-
-.drawer-default .drawer-menu-item a:hover {
-  background-color: @navbar-inverse-link-active-bg;
-  color: @navbar-inverse-link-active-color;
-  
-  a {
-    color: @navbar-inverse-link-active-color;
-  }
-}
-
-.drawer-default .drawer-menu-sub-item a {
-  padding-left: @navbar-padding-horizontal * 2;
 }
 
 .drawer-menuseparator {
-  border-top: 1px solid darken(@xwiki-page-content-bg, 10%);
+  border-top: 1px solid @xwiki-drawer-menu-item-seperator-color;
   margin: 12px 0;
 }

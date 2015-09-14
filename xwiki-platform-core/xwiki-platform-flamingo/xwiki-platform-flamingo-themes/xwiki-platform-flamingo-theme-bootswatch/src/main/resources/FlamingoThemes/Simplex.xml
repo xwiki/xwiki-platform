@@ -1923,7 +1923,13 @@ label {
 
 // Progress bars ==============================================================
 
-// Containers =================================================================</lessCode>
+// Containers =================================================================
+
+// XWiki customization
+// Customization for the drawer
+@xwiki-drawer-menu-item-hover-color: @dropdown-link-hover-color;
+@xwiki-drawer-menu-item-hover-bg:    @dropdown-link-hover-bg;
+</lessCode>
     </property>
     <property>
       <link-color>#d9230f</link-color>

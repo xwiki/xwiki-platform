@@ -1977,6 +1977,10 @@ legend {
 .navbar-nav &gt; .dropdown-split &gt; .dropdown-split-left:after {
   display: none;
 }
+
+// Customization for the drawer
+@xwiki-drawer-menu-item-hover-color: @dropdown-link-hover-color;
+@xwiki-drawer-menu-item-hover-bg:    @dropdown-link-hover-bg;
 </lessCode>
     </property>
     <property>

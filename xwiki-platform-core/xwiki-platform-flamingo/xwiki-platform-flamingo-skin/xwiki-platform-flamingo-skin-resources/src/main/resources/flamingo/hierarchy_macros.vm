@@ -20,7 +20,13 @@
     #set ($discard = $options.entities.put($entityReference, $tdoc))
   #end
   #getHierarchyPath($entityReference $path $options)
-  #displayHierarchyPath($path $options)
+  #if ($options.plain)
+    #getHierarchyPathLabels($path $labels $options)
+    $stringtool.join($labels, ' / ')
+  #else
+    #getHierarchyPathData($path $data $options)
+    #displayHierarchyPath($data $options)
+  #end
 #end
 
 #**
@@ -78,74 +84,116 @@
 #end
 
 #**
- * Displays a hierarchy path computed with #getHierarchyPath().
+ * Displays a hierarchy path computed with #getHierarchyPathData().
  *
- * @param $path the hierarchy path to display
+ * @param $pathData the data of the hierarchy path to display
  * @param $options various display options; default values are {
  *   id: null, // the value of the id attribute to set on the container element
- *   excludeSelf: false, // whether the target reference has been excluded from the path
- *   entities: {} // a map of (reference, entity) pairs holding unsaved entities that should be used for display
+ *   excludeSelf: false // whether the target reference has been excluded from the path
  * }
  *#
-#macro (displayHierarchyPath $path $options)
+#macro (displayHierarchyPath $pathData $options)
   #if (!$options)
     #set ($options = {})
   #end
   <ol id="$!options.id" class="breadcrumb"><li
-    #foreach ($reference in $path)
-      #set ($url = $xwiki.getURL($reference))
-      #set ($label = $escapetool.xml($reference.name))
-      #set ($active = false)
-      #if ($reference.type == 'SPACE' || $reference.type == 'DOCUMENT')
-        ## Check if there is an unsaved document with this reference.
-        #set ($document = $options.entities.get($reference))
-        #if (!$document)
-          ## Get the saved document.
-          #set ($document = $xwiki.getDocument($reference).translatedDocument)
-        #end
-        #if ($document)
-          #set ($label = $escapetool.xml($document.plainTitle))
-        #else
-          ## A document the current user doesn't have access to.
-          #set ($active = true)
-        #end
-      #elseif ($reference.type == 'WIKI')
-        #if ($foreach.index == 0)
-          #set ($label = '<span class="glyphicon glyphicon-home"></span>')
-        #else
-          #set ($wikiPrettyName = $services.wiki.getById($reference.name).prettyName)
-          #if ("$!wikiPrettyName" != '')
-            #set ($label = $escapetool.xml($wikiPrettyName))
-          #end
-        #end
-      #elseif ($reference.type == 'ellipsis')
-        #set ($url = '#')
-        #set ($label = '&hellip;')
-      #elseif ($reference.type == 'OBJECT')
-        #if ($reference.objectNumber)
-          #set ($objectNumber = $reference.objectNumber)
-          #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
-        #else
-          #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
-          #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
-        #end
-        #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
-          'editor': 'object',
-          'classname': $objectType,
-          'object': $objectNumber
-        })))
-        ## We don't have a link for the object in view mode so we make the edit link less visible.
-        #set ($active = true)
-      #end
+    #foreach ($item in $pathData)
       ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
+      #set ($active = $item.active)
       #set ($closingTag = '</li><li')
-      #if ($foreach.index == $mathtool.sub($path.size(), 1))
+      #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
         #set ($active = $active || !$options.excludeSelf)
         #set ($closingTag = '')
       #end
-      class="$reference.type.toString().toLowerCase()#if ($active) active#end"><a href="$url">$label</a>$closingTag##
+      class="$item.reference.type.toString().toLowerCase()#if ($active) active#end"
+        >#if ($item.url)<a href="$item.url">#end$item.label#if ($item.url)</a>#end$closingTag##
     #end##
   </li></ol>
+#end
+
+#macro (getHierarchyPathData $path $return $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #getHierarchyPathLabels($path $labels $options)
+  #set ($macro.data = [])
+  #foreach ($reference in $path)
+    #set ($url = $xwiki.getURL($reference))
+    #set ($active = !$services.security.authorization.hasAccess('view', $reference))
+    #if ($reference.type == 'ellipsis')
+      #set ($url = '#')
+    #elseif ($reference.type == 'OBJECT')
+      #if ($reference.objectNumber)
+        #set ($objectNumber = $reference.objectNumber)
+        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+      #else
+        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
+        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+      #end
+      #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
+        'editor': 'object',
+        'classname': $objectType,
+        'object': $objectNumber
+      })))
+      ## We don't have a link for the object in view mode so we make the edit link less visible.
+      #set ($active = true)
+    #end
+    #set ($discard = $macro.data.add({
+      'reference': $reference,
+      'label': $labels.get($foreach.index),
+      'url': $url,
+      'active': active
+    }))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.data)
+#end
+
+#**
+ * Collects the labels of the entities from the given path.
+ *
+ * @param $path a path in the hierarchy
+ * @param $options various display options; default values are {
+ *   entities: {}, // a map of (reference, entity) pairs holding unsaved entities that should be used for display
+ *   plain: false // whether to use plain text or HTML
+ *#
+#macro (getHierarchyPathLabels $path $return $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #set ($macro.labels = [])
+  #foreach ($reference in $path)
+    #set ($label = $escapetool.xml($reference.name))
+    #if ($reference.type == 'SPACE' || $reference.type == 'DOCUMENT')
+      ## Check if there is an unsaved document with this reference.
+      #set ($document = $options.entities.get($reference))
+      #if (!$document)
+        ## Get the saved document.
+        #set ($document = $xwiki.getDocument($reference).translatedDocument)
+      #end
+      #if ($document)
+        #set ($label = $escapetool.xml($document.plainTitle))
+      #end
+    #elseif ($reference.type == 'WIKI')
+      #if ($foreach.index == 0 && !$options.plain)
+        #set ($label = '<span class="glyphicon glyphicon-home"></span>')
+      #else
+        #set ($wikiPrettyName = $services.wiki.getById($reference.name).prettyName)
+        #if ("$!wikiPrettyName" != '')
+          #set ($label = $escapetool.xml($wikiPrettyName))
+        #end
+      #end
+    #elseif ($reference.type == 'ellipsis')
+      #if ($options.plain)
+        #set ($label = '...')
+      #else
+        #set ($label = '&hellip;')
+      #end
+    #end
+    #set ($discard = $macro.labels.add($label))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.labels)
 #end
 
 #*

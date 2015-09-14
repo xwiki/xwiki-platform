@@ -1,0 +1,19 @@
+//
+// Breadcrumbs
+// --------------------------------------------------
+
+.breadcrumb {
+  > li {
+    + li:before {
+      content: "@{breadcrumb-separator}"; /* No additional space needed */
+    }
+  }
+
+  > .active {
+    &:last-of-type {
+      a {
+        color: @breadcrumb-active-color;
+      }
+    }
+  }
+}

@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Tests the Delete Page feature.
  * 
- * @version $Id: 5f4959907fa00af4703bd2ebafcce1aa305c4c04 $
+ * @version $Id$
  * @since 3.0M3
  */
 public class DeletePageTest extends AbstractTest

@@ -46,6 +46,9 @@ public class DeletingPage extends ViewPage
     @FindBy(id = PROGRESS_BAR_CONTAINER_ID)
     private WebElement progressBarContainer;
     
+    @FindBy(xpath = "//div[@id = 'document-title']//a")
+    private WebElement titleLink;
+    
     /** 
      * @return true if the deletion process is terminated
      */
@@ -74,8 +77,9 @@ public class DeletingPage extends ViewPage
     
     public DeletePageOutcomePage getDeletePageOutcomePage()
     {
-        this.delete();
+        // Click on the title to get back to the "view" mode
+        titleLink.click();
+        // Since the page is deleted, we should have the "delete page outcome" UI...
         return new DeletePageOutcomePage();
     }
-    
 }

@@ -340,7 +340,8 @@
       '.controlPagination a',
       'a.search-facets-action-reset',
       '.search-facet a.itemName',
-      '.search-facet-body a.more'
+      '.search-facet-body a.more',
+      '.search-facet-body .selectedLocation a'
     ].join(',')).click(reloadSearchUI);
   };
 
@@ -605,11 +606,14 @@ a.options-item.active, a.options-item.active:hover{
   line-height: 1.4em;
 }
 
-.search-result-location .breadcrumb {
+.search-result-location .breadcrumb,
+.search-facet-body .breadcrumb {
   background-color: transparent;
-  display: inline;
   margin: 0;
   padding: 0;
+}
+.search-result-location .breadcrumb {
+  display: inline;
 }
 
 dl.search-result-highlights {
@@ -776,7 +780,8 @@ a.search-result-highlightAll:after {
   margin-top: .5em;
 }
 
-.search-facet-body ul {
+.search-facet-body ul,
+.search-facet-body ol {
   font-size: .9em;
 }
 

@@ -147,6 +147,7 @@ solr.field.locale.emptyValue.hint=Some documents don't have a language set becau
 solr.field.wiki=Wiki
 solr.field.space=Space
 solr.field.space_exact=Space
+solr.field.space_facet=Location
 solr.field.name=Page
 solr.field.name_exact=Page
 solr.field.title=Title

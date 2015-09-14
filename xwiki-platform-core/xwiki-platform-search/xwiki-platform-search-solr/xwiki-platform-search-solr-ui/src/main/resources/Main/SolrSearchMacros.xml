@@ -642,11 +642,13 @@ $services.localization.render('core.users.unknownUser')##
     ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
     ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
     #set ($facetFieldsWithFilterExcludes = [])
+    ## The type facet doesn't support multiple selection because we use different query fields for different result
+    ## types so the number of matches for the type facet changes when a result type is selected/unselected.
+    ## We don't allow multiple selection on the space facet because we perform a 'facet.prefix'-based drill down.
+    #set ($singleSelectionFacets = ['type', 'space_facet'])
     #foreach ($facet in $facetFields)
       #set ($excludeTaggedFilter = '')
-      ## The type facet doesn't support multiple selection because we use different query fields for different result
-      ## types so the number of matches for the type facet changes when a result type is selected/unselected.
-      #if ($facet != 'type')
+      #if (!$singleSelectionFacets.contains($facet))
         #set ($excludeTaggedFilter = "{!ex=$facet}")
       #end
       #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))
@@ -679,14 +681,27 @@ $services.localization.render('core.users.unknownUser')##
     #end
   #end
   ## Add the facets.
+  #set ($prefixFacets = ['space_facet'])
   #foreach ($parameter in $request.parameterMap.entrySet())
     #if ($parameter.key.startsWith('f_'))
+      #set ($fieldName = $parameter.key.substring(2))
       #set ($escapedValues = [])
       #foreach ($value in $parameter.value)
         #set ($discard = $escapedValues.add("#escapeFilterValue($value)"))
       #end
-      #set ($discard = $filters.put($parameter.key.substring(2), $escapedValues))
+      #set ($discard = $filters.put($fieldName, $escapedValues))
+      #if ($prefixFacets.contains($fieldName))
+        #set ($parts = $parameter.value.get(0).split('/', 2))
+        #set ($length = $mathtool.toInteger($parts.get(0)) + 1)
+        #set ($prefix = "$length/$parts.get(1)")
+        #set ($discard = $query.bindValue("f.${fieldName}.facet.prefix", $prefix))
+        #set ($discard = $prefixFacets.remove($fieldName))
+      #end
     #end
+  #end
+  ## Specify the initial prefix for the remaining prefix facets.
+  #foreach ($facet in $prefixFacets)
+    #set ($discard = $query.bindValue("f.${facet}.facet.prefix", '0/'))
   #end
   ##
   ## Build the filter query.

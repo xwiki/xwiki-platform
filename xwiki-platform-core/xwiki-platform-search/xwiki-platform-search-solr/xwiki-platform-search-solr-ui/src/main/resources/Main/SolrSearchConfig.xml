@@ -67,8 +67,8 @@
     }
   },
   'filterQuery': [],
-  'facetFields': ['type', 'wiki', 'space_exact', 'locale', 'author', 'creator', 'date',
-    'creationdate', 'class', 'name_exact', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+  'facetFields': ['type', 'wiki', 'space_facet', 'locale', 'author', 'creator', 'date',
+    'creationdate', 'class', 'mimetype', 'attauthor', 'attdate', 'attsize'],
   'facetQuery': {
     'type': 'DOCUMENT',
     'locale': [$xcontext.language, '']
@@ -77,6 +77,7 @@
   'facetDisplayers': {
     'type': 'Main.SolrTypeFacet',
     'wiki': 'Main.SolrWikiFacet',
+    'space_facet': 'Main.SolrSpaceFacet',
     'locale': 'Main.SolrLocaleFacet',
     'author': 'Main.SolrUserFacet',
     'creator': 'Main.SolrUserFacet',

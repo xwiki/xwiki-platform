@@ -65,9 +65,8 @@ public class BreadcrumbElement extends BaseElement
     {
         List<WebElement> result;
         if (isCurrent) {
-            result =
-                getDriver().findElementsWithoutWaiting(this.container,
-                    By.xpath("li[@class = 'active' and . = '" + text + "']"));
+            result = getDriver().findElementsWithoutWaiting(this.container,
+                By.xpath("li[contains(@class, 'active')]/a[. = '" + text + "']"));
         } else {
             if (withLink) {
                 result = getDriver().findElementsWithoutWaiting(this.container, By.xpath("//a[. = '" + text + "']"));

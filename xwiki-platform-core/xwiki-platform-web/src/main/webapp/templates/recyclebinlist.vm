@@ -1,6 +1,6 @@
 ### Show list of deleted documents
 #set($dds = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.language))
-#displayDeletedDocuments($dds)
+#displayDeletedDocuments($dds, 'docs')
 
 #if ($doc.name == 'WebHome')
   ## Also display the list of terminal documents sharing the same location.
@@ -8,22 +8,23 @@
   ## This is important because when the user delete a terminal document and go back to the location, she should see
   ## the page she have just deleted, and not an empty page because A.B.WebHome has never existed...
   #set($dds = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.language))
-  #displayDeletedDocuments($dds, 'core.recyclebin.showListTerminalPagesMsg')
+  #displayDeletedDocuments($dds, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
 #end
 
 #*
  * Display the given list of deleted documents
  * @param $list the list to display
+ * @param $className the name of the css class to apply to the list
  * @param $message (optional) the translation key for the message which introduce the list
  *#
-#macro (displayDeletedDocuments $list $message)
+#macro (displayDeletedDocuments $list $className $message)
   #if (!$message)
     #set ($message = 'core.recyclebin.showlistmsg')
   #end  
   #if($list && $list.size() > 0)
     <hr />
-    <div class="centered">
-      <p>$escapetool.xml($services.localization.render($message))</p>
+    <div class="centered $!className">
+      <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
       <table class="centered">
        <thead>
         <tr>
@@ -37,11 +38,11 @@
         <tr>
          <td>$xwiki.getUserName($dd.getDeleter())</td>
          <td><a href="$doc.getURL("view", "viewer=recyclebin&amp;id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
-         <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($dd.getFullName(), "undelete", "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")">$escapetool.xml($services.localization.render('core.recyclebin.restore'))</a> #end</td>
+         <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($dd.getFullName(), "undelete", "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")" class="action-restore">$escapetool.xml($services.localization.render('core.recyclebin.restore'))</a> #end</td>
          <td>
           #if($dd.canDelete())
            <a href="$xwiki.getURL($dd.getFullName(), 'delete', "form_token=$!{services.csrf.getToken()}&amp;id=$dd.getId()")"
-            onclick="if (confirm('$escapetool.javascript($services.localization.render('core.recyclebin.completelyDeleteConfirm'))')) {this.href += '&amp;confirm=1'; return true;} return false;">
+            onclick="if (confirm('$escapetool.javascript($services.localization.render('core.recyclebin.completelyDeleteConfirm'))')) {this.href += '&amp;confirm=1'; return true;} return false;" class="action-delete">
             $escapetool.xml($services.localization.render('core.recyclebin.delete'))
            </a>
           #end

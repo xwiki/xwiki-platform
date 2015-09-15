@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -72,4 +75,54 @@ public class DeletePageOutcomePage extends ViewPage
         this.restoreLink.click();
         return new ViewPage();
     }
+
+    /**  
+     * @return if there are terminal pages in the recycle bin
+     * 
+     * @since 7.2RC1 
+     */
+    public boolean hasTerminalPagesInRecycleBin()
+    {
+        List<WebElement> messages = getDriver().findElementsByClassName("recyclebin-message");
+        for (WebElement message : messages) {
+            if (StringUtils.equals(message.getText(),
+                    "The following versions of terminal pages are in the recycle bin:")) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Clicks on the link to restore the deleted page from the recycle bin.
+     *
+     * @return the restored view page
+     * @since 7.2RC1
+     */
+    public DeletePageOutcomePage clickDeletePage()
+    {
+        List<WebElement> elements = getDriver().findElementsByCssSelector(".docs .action-delete");
+        if (!elements.isEmpty()) {
+            getDriver().makeConfirmDialogSilent(true);
+            elements.get(0).click();
+        }
+        return new DeletePageOutcomePage();
+    }
+
+    /**
+     * Clicks on the link to restore the deleted terminal page from the recycle bin.
+     *
+     * @return the restored view page
+     * @since 7.2RC1
+     */
+    public DeletePageOutcomePage clickDeleteTerminalPage()
+    {
+        List<WebElement> elements = getDriver().findElementsByCssSelector(".terminal-docs .action-delete");
+        if (!elements.isEmpty()) {
+            getDriver().makeConfirmDialogSilent(true);
+            elements.get(0).click();
+        }
+        return new DeletePageOutcomePage();
+    }   
 }

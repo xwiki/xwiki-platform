@@ -19,12 +19,15 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
@@ -138,5 +141,52 @@ public class DeletePageTest extends AbstractTest
         // Logs out to be guest and not have the right to delete
         this.viewPage.logout();
         Assert.assertFalse(this.viewPage.canDelete());
+    }
+
+    /**
+     * Verify that when you delete a terminal and a non terminal page sharing the same location, both deleted versions
+     * are present in the recycle bin list when you hit the location afterwards.
+     * @see: "XWIKI-12563: Cannot restore a terminal page from its location"
+     * @since 7.2RC1
+     */
+    @Test
+    public void testDeleteTerminalAndNonTerminalPages()
+    {
+        DocumentReference terminalPageRef = new DocumentReference("xwiki",
+                Arrays.asList(getTestClassName()),
+                getTestMethodName());
+
+        DocumentReference nonTerminalPageRef = new DocumentReference("xwiki",
+                Arrays.asList(getTestClassName(), getTestMethodName()),
+                "WebHome");
+
+        // Clean up.
+        getUtil().deletePage(terminalPageRef);
+        getUtil().deletePage(nonTerminalPageRef);
+
+        // Create the non terminal page.
+        ViewPage nonTerminalPage = getUtil().createPage(nonTerminalPageRef, "Content", "Title");
+        // Delete it
+        nonTerminalPage.delete().clickYes();
+        DeletingPage deletingPage = new DeletingPage();
+        deletingPage.waitUntilIsTerminated();
+        
+        // Look at the recycle bin
+        DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
+        Assert.assertFalse(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+        
+        // Create the terminal page.
+        ViewPage terminalPage = getUtil().createPage(terminalPageRef, "Content", "Title");
+        // Delete it
+        terminalPage.delete().clickYes();
+        deletingPage.waitUntilIsTerminated();
+        
+        // Look at the recycle bin
+        deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
+        Assert.assertTrue(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+        
+        // Delete both version in the recycle bin
+        deletePageOutcomePage.clickDeletePage();
+        deletePageOutcomePage.clickDeleteTerminalPage();
     }
 }

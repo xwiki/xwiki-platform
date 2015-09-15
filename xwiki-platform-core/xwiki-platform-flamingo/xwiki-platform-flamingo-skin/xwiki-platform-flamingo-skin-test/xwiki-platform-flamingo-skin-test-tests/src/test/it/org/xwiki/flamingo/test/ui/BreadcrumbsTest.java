@@ -85,7 +85,8 @@ public class BreadcrumbsTest extends AbstractTest
         assertTrue(vp.hasBreadcrumbContent(CHILD_TITLE, true, true));
         assertTrue(vp.hasBreadcrumbContent(parentPageName, false, false));
 
-        // set back the default mode
+        // Set back the default hierarchy mode (but first we need to log back).
+        adminAuthenticationRule.authenticate();
         getUtil().setHierarchyMode("reference");
     }
 }

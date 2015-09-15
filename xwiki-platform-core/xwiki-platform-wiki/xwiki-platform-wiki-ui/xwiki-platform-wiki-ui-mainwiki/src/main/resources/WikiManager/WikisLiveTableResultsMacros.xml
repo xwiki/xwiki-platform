@@ -189,7 +189,7 @@
   #end
   ######## WIKI UI MAINWIKI CUSTOMIZATION #########
   ## The descriptors are always hidden, so we don't filter on the hidden column.
-  #set($query = $services.query.hql($sql).addFilter('currentlanguage').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #################################################
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))

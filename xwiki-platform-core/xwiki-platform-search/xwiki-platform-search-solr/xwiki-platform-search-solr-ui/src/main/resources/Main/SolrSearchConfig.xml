@@ -144,8 +144,9 @@
   'highlightEnabled' : true
 })
 
-#if (!$xcontext.isMainWiki())
+#if (!$xcontext.isMainWiki() || !$xwiki.hasSubWikis())
   ## Subwikis search by default in their content only so it doesn't make sense to display the wiki facet.
+  ## It also doesn't make sense to display the wiki facet if there is a single wiki.
   #set ($discard = $__defaultSolrConfig.facetFields.remove('wiki'))
 #end
 

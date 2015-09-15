@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>7.2-SNAPSHOT</version>
+    <version>7.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-war</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - WAR Distribution</name>

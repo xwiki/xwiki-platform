@@ -690,6 +690,14 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-wiki-script", getXWikiPlatformVersion(), null, "jar"));
 
+        // FIXME: $services.security is a replacement for $xwiki.hasAccessLevel() and we have started using it in the
+        // Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
+        // dependencies of platform-web (they are declared in enterprise-web) thus we need to bundle this script service
+        // here. In the future we may want to create a separate module to hold the Velocity templates from platform-web
+        // and this module should have a dependency on platform-security-script.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-script", getXWikiPlatformVersion(), null, "jar"));
+
         // Copy/Delete/Rename/Move actions are currently in the Refactoring module and for now we consider them as
         // core actions.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

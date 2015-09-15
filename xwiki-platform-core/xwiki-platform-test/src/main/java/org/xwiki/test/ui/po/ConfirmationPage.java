@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -39,6 +40,9 @@ public class ConfirmationPage extends ViewPage
             + "and (contains(@value, 'No') or contains(text(), 'No'))]")
     private WebElement noButton;
 
+    @FindBy(id = "affectChildren")
+    private WebElement affectChildren;
+
     /**
      * Clicks on the Yes button to confirm the current action.
      */
@@ -53,5 +57,36 @@ public class ConfirmationPage extends ViewPage
     public void clickNo()
     {
         this.noButton.click();
+    }
+
+    /**
+     * @return if the "affect children" option is present or not
+     * @since 7.2RC1 
+     */
+    public boolean hasAffectChildrenOption()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("affectChildren"));
+    }
+
+    /**
+     * Check or un-check the "affect children" option.
+     * @param value either or the option should be enabled 
+     * @since 7.2RC1
+     */
+    public void setAffectChildren(boolean value)
+    {
+        if (affectChildren.isSelected() != value) {
+            affectChildren.click();
+        }
+    }
+
+    /**
+     * Confirm the deletion of the page
+     * @return an object representing the UI displayed when a page is deleted
+     */
+    public DeletingPage confirmDeletePage()
+    {
+        clickYes();
+        return new DeletingPage();
     }
 }

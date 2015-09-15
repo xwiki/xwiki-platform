@@ -176,7 +176,7 @@
       #end
     #elseif ($reference.type == 'WIKI')
       #if ($foreach.index == 0 && !$options.plain)
-        #set ($label = '<span class="glyphicon glyphicon-home"></span>')
+        #set ($label = $services.icon.renderHTML('home'))
       #else
         #set ($wikiPrettyName = $services.wiki.getById($reference.name).prettyName)
         #if ("$!wikiPrettyName" != '')

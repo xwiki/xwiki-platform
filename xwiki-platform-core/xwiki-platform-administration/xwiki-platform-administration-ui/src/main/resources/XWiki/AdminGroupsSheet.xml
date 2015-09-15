@@ -40,6 +40,9 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+##
+## FIXME: Rewrite this entire code since it is very old and does everything by hand, making it hard to maintain.
+##
 {{html}}
 ### Globally administrate the groups in a wiki.
 #set($formname = "update")
@@ -53,13 +56,10 @@
 #set($ok = $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css", true))
 #set($ok = $xwiki.jsfx.use("js/xwiki/table/livetable.js", true))
 #set($ok = $xwiki.ssfx.use("js/xwiki/table/livetable.css", true))
+#set($ok = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
 ## The following are needed when editing a group (e.g. for adding new members).
 #userPicker_import()
 #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
-##
-## url to get the groups for displaying them in the ajax-based table
-##
-#set($url = $doc.getURL('get', 'xpage=getgroups'))
 #if($xcontext.database != "xwiki")
   #set($mainwk = false)
 #else
@@ -113,26 +113,127 @@
       &lt;/td&gt;
     &lt;/tr&gt;
   &lt;/table&gt;
-  #set($addnewurl = $xwiki.getURL("XWiki.XWikiGroups", "view", "xpage=addnewgroup"))
-  #set($saveurl = $xwiki.getURL("XWiki.XWikiGroups", "view"))
-  #set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=${editor}&amp;section=Groups")) 
-  &lt;script type="text/javascript"&gt;
-    //&lt;![CDATA[
-    (function() {
-      var startup = function() {
-        var callback = function(row, i, table) { return displayGroups(row, i, table, "$!{services.csrf.getToken()}"); };
-        var ta = new XWiki.widgets.LiveTable("$url", "groupstable", callback);
-        Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
-      }
-      if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
-        startup();
-      } else {
-        document.observe('xwiki:livetable:loading', startup);
-      }
-    })();
-    //]]&gt;
-  &lt;/script&gt;
 &lt;/div&gt; ## xwikieditcontent
 {{/html}}
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.AdminGroupsSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>41afe63a-d8ec-43ff-b1f3-1ab39f765330</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  /**
+   * Callback for the livetable.
+   */
+  var livetableCallback = function(row, i, table) {
+    return displayGroups(row, i, table, "$!{services.csrf.getToken()}");
+  };
+
+  var startup = function() {
+    // URL to get the groups for displaying them in the ajax-based table
+    var livetableDataURL = XWiki.currentDocument.getURL('get', 'xpage=getgroups');
+    // Initialize the livetable. FIXME: Just use the "modern" livetable macro.
+    var ta = new XWiki.widgets.LiveTable(livetableDataURL, 'groupstable', livetableCallback);
+
+    // Register the click listener for the Add New Group button.
+    var groupsDocument = new XWiki.Document('XWikiGroups', 'XWiki');
+    var addnewurl = groupsDocument.getURL('get', 'xpage=addnewgroup');
+    var saveurl = groupsDocument.getURL('view');
+    var redirecturl = new XWiki.Document('XWikiPreferences', 'XWiki').getURL('admin', 'editor=' + XWiki.editor + '&amp;section=Groups');
+    $('#addNewGroup').on('click', makeAddHandler(addnewurl, saveurl, redirecturl));
+  }
+
+  // Initialization
+  if ((typeof(XWiki) != 'undefined') &amp;&amp; (typeof(XWiki.widgets) != 'undefined') &amp;&amp; (typeof(XWiki.widgets.LiveTable) != 'undefined')) {
+    startup();
+  } else {
+    $(document).on('xwiki:livetable:loading', startup);
+  }
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
 </xwikidoc>

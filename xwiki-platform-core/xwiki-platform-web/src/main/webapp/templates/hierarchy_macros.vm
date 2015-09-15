@@ -98,15 +98,21 @@
   #end
   <ol id="$!options.id" class="breadcrumb"><li
     #foreach ($item in $pathData)
+      #set ($classNames = $collectionstool.set)
+      #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))
+      #if ($item.classNames)
+        #set ($discard = $classNames.addAll($item.classNames))
+      #end
       ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
-      #set ($active = $item.active)
       #set ($closingTag = '</li><li')
       #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
-        #set ($active = $active || !$options.excludeSelf)
+        #if (!$options.excludeSelf)
+          #set ($discard = $classNames.add('active'))
+        #end
         #set ($closingTag = '')
       #end
-      class="$item.reference.type.toString().toLowerCase()#if ($active) active#end"
-        >#if ($item.url)<a href="$item.url">#end$item.label#if ($item.url)</a>#end$closingTag##
+      class="$stringtool.join($classNames, ' ')">#if ($item.url)<a href="$item.url"
+        >#end$item.label#if ($item.url)</a>#end$closingTag##
     #end##
   </li></ol>
 #end
@@ -118,31 +124,29 @@
   #getHierarchyPathLabels($path $labels $options)
   #set ($macro.data = [])
   #foreach ($reference in $path)
-    #set ($url = $xwiki.getURL($reference))
-    #set ($active = !$services.security.authorization.hasAccess('view', $reference))
-    #if ($reference.type == 'ellipsis')
-      #set ($url = '#')
-    #elseif ($reference.type == 'OBJECT')
-      #if ($reference.objectNumber)
-        #set ($objectNumber = $reference.objectNumber)
-        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
-      #else
-        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
-        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+    #set ($url = $NULL)
+    #if ($reference.type == 'OBJECT')
+      #if ($services.security.authorization.hasAccess('edit', $reference))
+        #if ($reference.objectNumber)
+          #set ($objectNumber = $reference.objectNumber)
+          #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+        #else
+          #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
+          #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+        #end
+        #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
+          'editor': 'object',
+          'classname': $objectType,
+          'object': $objectNumber
+        })))
       #end
-      #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
-        'editor': 'object',
-        'classname': $objectType,
-        'object': $objectNumber
-      })))
-      ## We don't have a link for the object in view mode so we make the edit link less visible.
-      #set ($active = true)
+    #elseif ($reference.type != 'ellipsis' && $services.security.authorization.hasAccess('view', $reference))
+      #set ($url = $xwiki.getURL($reference))
     #end
     #set ($discard = $macro.data.add({
       'reference': $reference,
       'label': $labels.get($foreach.index),
-      'url': $url,
-      'active': active
+      'url': $url
     }))
   #end
   #set ($return = $NULL)

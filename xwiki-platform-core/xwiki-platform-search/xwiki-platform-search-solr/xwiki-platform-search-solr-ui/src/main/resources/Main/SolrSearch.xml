@@ -801,8 +801,8 @@ a.search-result-highlightAll:after {
   color: $theme.textSecondaryColor;
   list-style: none;
   display: block;
-  padding: 0.5em 0;
-  margin: 0;
+  padding: 0;
+  margin: .5em 0;
 }
 
 .search-facet-body li:hover {
@@ -859,6 +859,17 @@ a.search-result-highlightAll:after {
 
 .search-debug &gt; dl {
   margin: 0;
+}
+
+/**
+ * Fix the breadcrumb in Colibri skin.
+ */
+.skin-colibri .breadcrumb &gt; li {
+  display: inline;
+}
+.skin-colibri .breadcrumb &gt; li + li:before {
+  color: $theme.textSecondaryColor;
+  content: ' \00BB  ';
 }
 
 /**

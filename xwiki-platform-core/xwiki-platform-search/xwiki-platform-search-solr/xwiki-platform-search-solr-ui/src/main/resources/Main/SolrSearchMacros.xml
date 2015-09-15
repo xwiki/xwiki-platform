@@ -167,11 +167,12 @@
   #set ($facetValues = $facetField.values)
   ## Keep only the values that have at least one match.
   #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-  #if ($facetValues.size() &gt; 0)
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  ## Display the facets that either have matched values or that have values specified on the request.
+  #if ($facetValues.size() &gt; 0 || ($facetRequestValues &amp;&amp; $facetRequestValues.size() &gt; 0))
     ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
     ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
-    #set ($facetRequestParameter = "f_$facetField.name")
-    #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end"
         data-name="$facetField.name" %)(((
@@ -236,9 +237,11 @@
 #end
 
 #macro (displaySearchFacetValues $facetValues $customQueryStringParameters $customValueDisplayer)
-  &lt;ul&gt;
-    #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters $customValueDisplayer)
-  &lt;/ul&gt;
+  #if ($facetValues.size() &gt; 0)
+    &lt;ul&gt;
+      #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters $customValueDisplayer)
+    &lt;/ul&gt;
+  #end
 #end
 
 #macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters $customValueDisplayer)

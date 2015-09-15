@@ -210,6 +210,7 @@
         $doc.documentReference: $tdoc
       }
     })
-    #displayHierarchyPath($path $options)
+    #getHierarchyPathData($path $data $options)
+    #displayHierarchyPath($data $options)
   #end
 #end

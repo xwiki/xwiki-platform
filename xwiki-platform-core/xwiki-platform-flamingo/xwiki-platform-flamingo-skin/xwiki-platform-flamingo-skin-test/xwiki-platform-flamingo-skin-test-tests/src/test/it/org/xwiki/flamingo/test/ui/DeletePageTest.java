@@ -189,4 +189,68 @@ public class DeletePageTest extends AbstractTest
         deletePageOutcomePage.clickDeletePage();
         deletePageOutcomePage.clickDeleteTerminalPage();
     }
+
+    /**
+     * Test that when you delete a page and you select "affect children", it delete children properly. It also test
+     * the opposite.
+     * 
+     * @since 7.2RC1
+     */
+    @Test
+    public void testDeleteChildren()
+    {
+        // Initialize the parent
+        DocumentReference parentReference = new DocumentReference("xwiki",
+                Arrays.asList(getTestClassName(), getTestMethodName()),
+                "WebHome");
+        ViewPage parentPage = getUtil().createPage(parentReference, "Content", "Parent");
+        // Try to delete it to make sure we don't have the "affect children" option yet
+        ConfirmationPage confirmationPage = parentPage.delete();
+        Assert.assertFalse(confirmationPage.hasAffectChildrenOption());
+        
+        // Initialize the children pages
+        final int NB_CHILDREN = 3;
+        DocumentReference[] childrenReferences = new DocumentReference[NB_CHILDREN];
+        for (int i = 0; i < NB_CHILDREN; ++i) {
+            childrenReferences[i] = new DocumentReference("xwiki", 
+                    Arrays.asList(getTestClassName(), getTestMethodName(), "Child_" + (i + 1)),
+                    "WebHome");
+            getUtil().createPage(childrenReferences[i], "Content", "Child " + (i + 1));
+        }
+        
+        // Test 1: when you don't select "affect children", the children are not deleted
+        parentPage = getUtil().gotoPage(parentReference);
+        confirmationPage = parentPage.delete();
+        Assert.assertTrue(confirmationPage.hasAffectChildrenOption());
+        confirmationPage.setAffectChildren(false);
+        DeletingPage deletingPage = confirmationPage.confirmDeletePage();
+        deletingPage.waitUntilIsTerminated();
+        Assert.assertTrue(deletingPage.isSuccess());
+        // Check the page have been effectively removed
+        ViewPage page = getUtil().gotoPage(parentReference);
+        Assert.assertFalse(page.exists());
+        // But not the children 
+        for (int i = 0; i < NB_CHILDREN; ++i) {
+            page = getUtil().gotoPage(childrenReferences[i]);
+            Assert.assertTrue(page.exists());
+        }
+        
+        // Test 2: when you select "affect children", the children are deleted too
+        parentPage = getUtil().createPage(parentReference, "Content", "Parent");
+        confirmationPage = parentPage.delete();
+        Assert.assertTrue(confirmationPage.hasAffectChildrenOption());
+        confirmationPage.setAffectChildren(true);
+        deletingPage = confirmationPage.confirmDeletePage();
+        deletingPage.waitUntilIsTerminated();
+        Assert.assertTrue(deletingPage.isSuccess());
+        // Check the page have been effectively removed
+        page = getUtil().gotoPage(parentReference);
+        Assert.assertFalse(page.exists());
+        // And also the children
+        for (int i = 0; i < NB_CHILDREN; ++i) {
+            page = getUtil().gotoPage(childrenReferences[i]);
+            Assert.assertFalse(page.exists());
+        }
+        
+    }
 }

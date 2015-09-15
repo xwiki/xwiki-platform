@@ -80,6 +80,8 @@ rendering.macro.documentTree.parameter.finder.description=Show a text input that
 rendering.macro.documentTree.parameter.hierarchyMode.name=Document Hierarchy Mode
 rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between documents. Possible values are "reference" (default) and "parentchild". If "reference" is used then the document hierarchy is defined using only the document reference, especially the nested spaces component of the document reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" document field from the database.
 
+index.documentTree.empty=No pages found
+
 ## Deprecated translation keys
 
 ## Until 7.2M2

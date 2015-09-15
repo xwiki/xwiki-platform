@@ -140,6 +140,10 @@
     #evaluate("${escapetool.h}add$stringtool.capitalize($nodeType)Children(${escapetool.d}nodeReference
       $offset 15 ${escapetool.d}children)")
   #end
+  #if ($children.isEmpty() &amp;&amp; $nodeId == '#')
+    ## Inform the user that the tree is empty.
+    #addEmptyTreeNode($children)
+  #end
   #set ($return = $NULL)
   #setVariable("$return" $children)
 #end
@@ -776,6 +780,23 @@
       'validChildren': [],
       'canDelete': true,
       'offset': $offset
+    }
+  }))
+#end
+
+##
+## Empty Tree Node
+##
+
+#macro (addEmptyTreeNode $siblings)
+  #set ($discard = $siblings.add({
+    'id': "empty",
+    'text': $services.localization.render('index.documentTree.empty'),
+    'icon': 'fa fa-info-circle',
+    'children': false,
+    'data': {
+      'type': 'empty',
+      'validChildren': []
     }
   }))
 #end

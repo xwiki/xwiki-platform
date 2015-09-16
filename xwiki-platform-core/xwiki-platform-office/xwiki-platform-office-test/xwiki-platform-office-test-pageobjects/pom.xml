@@ -24,41 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-office-test</artifactId>
     <version>7.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-office</artifactId>
-  <name>XWiki Platform - Office - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Office - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-office-importer</module>
-    <module>xwiki-platform-office-viewer</module>
-    <module>xwiki-platform-office-macro</module>
-    <module>xwiki-platform-office-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-office-test-pageobjects</artifactId>
+  <name>XWiki Platform - Office - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Office - Test - Page Objects</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-office-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

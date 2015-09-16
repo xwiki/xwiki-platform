@@ -97,6 +97,11 @@ public class CreatePagePage extends ViewPage
         return getDriver().findElements(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
     }
 
+    private List<WebElement> getAvailableTypeInputs()
+    {
+        return getDriver().findElements(By.xpath("//input[@name = 'type']"));
+    }
+
     /**
      * @since 3.2M3
      */
@@ -131,6 +136,21 @@ public class CreatePagePage extends ViewPage
             }
         }
         throw new RuntimeException("Failed to find template [" + template + "]");
+    }
+    
+    public void setType(String type)
+    {
+        List<WebElement> types = getAvailableTypeInputs();
+        for (WebElement typeInput : types) {
+            if (typeInput.getAttribute("value").equals(type)) {
+                // Get the label corresponding to the input so we can click on it
+                WebElement label =
+                        getDriver().findElement(By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
+                label.click();
+                return;
+            }
+        }
+        throw new RuntimeException("Failed to find type [" + type + "]");
     }
 
     public void clickCreate()

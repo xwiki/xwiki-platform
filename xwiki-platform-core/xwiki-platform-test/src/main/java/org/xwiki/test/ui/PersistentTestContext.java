@@ -65,6 +65,8 @@ public class PersistentTestContext
     {
         this.executor = executor;
 
+        this.util.setExecutor(executor);
+
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
         // extensions such as Firebug), simply uncomment the following line:
         // System.setProperty("webdriver.firefox.profile", "default");

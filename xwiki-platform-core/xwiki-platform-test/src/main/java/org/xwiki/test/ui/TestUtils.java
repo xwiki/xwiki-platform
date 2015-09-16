@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +45,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -54,6 +58,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.NoSuchElementException;
@@ -62,11 +67,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.rest.resources.objects.ObjectPropertyResource;
+import org.xwiki.rest.resources.objects.ObjectResource;
+import org.xwiki.rest.resources.objects.ObjectsResource;
+import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -94,18 +106,41 @@ public class TestUtils
 
     /**
      * @since 5.0M2
+     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
      */
+    @Deprecated
     public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + "/xwiki/";
 
     /**
      * @since 5.0M2
+     * @deprecated since 7.3M1, use {@link #getBaseBinURL()} instead
      */
+    @Deprecated
     public static final String BASE_BIN_URL = BASE_URL + "bin/";
 
     /**
      * @since 5.0M2
+     * @deprecated since 7.3M1, use {@link #getBaseRestURL()} instead
      */
+    @Deprecated
     public static final String BASE_REST_URL = BASE_URL + "rest/";
+
+    /**
+     * @since 7.3M1
+     */
+    private static final EntityReferenceResolver<String> RELATIVE_RESOLVER =
+        new RelativeStringEntityReferenceResolver();
+
+    /**
+     * @since 7.3M1
+     */
+    private static final int[] STATUS_OKNOTFOUND = new int[] {Status.OK.getStatusCode(),
+        Status.NOT_FOUND.getStatusCode()};
+
+    /**
+     * @since 7.3M1
+     */
+    private static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
 
     private static PersistentTestContext context;
 
@@ -149,13 +184,41 @@ public class TestUtils
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
-    private HttpClient adminHTTPClient;
+    private HttpClient httpClient;
+
+    /**
+     * @since 7.3M1
+     */
+    private XWikiExecutor executor;
+
+    /**
+     * @since 7.3M1
+     */
+    private String currentWiki = "xwiki";
+
+    private RestTestUtils rest = new RestTestUtils();
 
     public TestUtils()
     {
-        this.adminHTTPClient = new HttpClient();
-        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
-        this.adminHTTPClient.getParams().setAuthenticationPreemptive(true);
+        this.httpClient = new HttpClient();
+        this.httpClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
+        this.httpClient.getParams().setAuthenticationPreemptive(true);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public XWikiExecutor getExecutor()
+    {
+        return this.executor;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public void setExecutor(XWikiExecutor executor)
+    {
+        this.executor = executor;
     }
 
     /** Used so that AllTests can set the persistent test context. */
@@ -202,8 +265,7 @@ public class TestUtils
      */
     public void setDefaultCredentials(String username, String password)
     {
-        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials(username, password));
+        this.httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
     }
 
     /**
@@ -211,12 +273,12 @@ public class TestUtils
      */
     public void setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
     {
-        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+        this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
     }
 
     public UsernamePasswordCredentials getDefaultCredentials()
     {
-        return (UsernamePasswordCredentials) this.adminHTTPClient.getState().getCredentials(AuthScope.ANY);
+        return (UsernamePasswordCredentials) this.httpClient.getState().getCredentials(AuthScope.ANY);
     }
 
     public void loginAsSuperAdmin()
@@ -359,11 +421,11 @@ public class TestUtils
             // Guest
             return null;
         }
-        
+
         WebElement element = getDriver().findElementWithoutWaiting(userAvatar);
         String href = element.getAttribute("href");
         String loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
-        
+
         // Return
         return loggedInUserName;
     }
@@ -474,6 +536,12 @@ public class TestUtils
     public void gotoPage(EntityReference reference, String action, String queryString)
     {
         gotoPage(getURL(reference, action, queryString));
+
+        // Update current wiki
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        if (wikiReference != null) {
+            this.currentWiki = wikiReference.getName();
+        }
     }
 
     public void gotoPage(String url)
@@ -756,7 +824,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(action, new String[]{ space, page }, queryString);
+        return getURL(action, new String[] {space, page}, queryString);
     }
 
     /**
@@ -774,7 +842,7 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString)
     {
-        return getURL(action, extractListFromReference(reference).toArray(new String[]{}), queryString);
+        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString);
     }
 
     /**
@@ -791,8 +859,7 @@ public class TestUtils
         // Add the spaces
         EntityReference spaceReference = reference.extractReference(EntityType.SPACE);
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-        for (EntityReference singleReference : spaceReference.removeParent(wikiReference).getReversedReferenceChain())
-        {
+        for (EntityReference singleReference : spaceReference.removeParent(wikiReference).getReversedReferenceChain()) {
             path.add(singleReference.getName());
         }
         if (reference.getType() == EntityType.DOCUMENT) {
@@ -802,11 +869,44 @@ public class TestUtils
     }
 
     /**
+     * @since 7.3M1
+     */
+    public String getCurrentWiki()
+    {
+        return this.currentWiki;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public String getBaseURL()
+    {
+        return XWikiExecutor.URL + ":" + (this.executor != null ? this.executor.getPort() : XWikiExecutor.DEFAULT_PORT)
+            + "/xwiki/";
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public String getBaseBinURL()
+    {
+        return getBaseURL() + "bin/";
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public String getBaseRestURL()
+    {
+        return getBaseURL() + "rest";
+    }
+
+    /**
      * @since 7.2M1
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
+        StringBuilder builder = new StringBuilder(getBaseBinURL());
 
         if (!StringUtils.isEmpty(action)) {
             builder.append(action).append('/');
@@ -896,7 +996,7 @@ public class TestUtils
         // which blocks the test.
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
-        gotoPage("XWiki", "Register", "register");
+        gotoPage(getCurrentWiki(), "Register", "register");
         recacheSecretTokenWhenOnRegisterPage();
         // Return to the previous page.
         getDriver().get(previousURL);
@@ -928,23 +1028,6 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
-    }
-
-    /**
-     * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
-     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
-     * to hexadecimal, and spaces are substituted by '+'.
-     *
-     * @param s
-     */
-    public String escapeURL(String s)
-    {
-        try {
-            return URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // should not happen
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -1035,8 +1118,11 @@ public class TestUtils
     {
         return getDriver().getCurrentUrl().contains("/create/");
     }
-    
-    public boolean isInAdminMode() { return getDriver().getCurrentUrl().contains("/admin/"); }
+
+    public boolean isInAdminMode()
+    {
+        return getDriver().getCurrentUrl().contains("/admin/");
+    }
 
     /**
      * Forces the current user to be the Guest user by clearing all coookies.
@@ -1226,7 +1312,7 @@ public class TestUtils
 
     public String getVersion() throws Exception
     {
-        Xwiki xwiki = getRESTResource("", null);
+        Xwiki xwiki = rest().getResource("", null);
 
         return xwiki.getVersion();
     }
@@ -1324,157 +1410,8 @@ public class TestUtils
 
         // import file
         executeGet(
-            BASE_BIN_URL + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
+            getBaseBinURL() + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
                 + escapeURL(file.getName()), Status.OK.getStatusCode());
-    }
-
-    public InputStream getRESTInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
-        throws Exception
-    {
-        return getInputStream(BASE_REST_URL, resourceUri, queryParams, elements);
-    }
-
-    public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
-    {
-        return getInputStream(BASE_URL, path, queryParams);
-    }
-
-    public String getString(String path, Map<String, ?> queryParams) throws Exception
-    {
-        try (InputStream inputStream = getInputStream(BASE_URL, path, queryParams)) {
-            return IOUtils.toString(inputStream);
-        }
-    }
-
-    public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
-        throws Exception
-    {
-        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
-        if (path.startsWith(cleanPrefix)) {
-            cleanPrefix = "";
-        }
-
-        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
-
-        if (queryParams != null) {
-            for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
-                if (entry.getValue() instanceof Object[]) {
-                    builder.queryParam(entry.getKey(), (Object[]) entry.getValue());
-                } else {
-                    builder.queryParam(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-
-        String url = builder.build(elements).toString();
-
-        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
-    }
-
-    public InputStream postRESTInputStream(String resourceUri, Object restObject, Map<String, Object[]> queryParams,
-        Object... elements) throws Exception
-    {
-        UriBuilder builder =
-            UriBuilder.fromUri(BASE_REST_URL.substring(0, BASE_REST_URL.length() - 1)).path(
-                !resourceUri.isEmpty() && resourceUri.charAt(0) == '/' ? resourceUri.substring(1) : resourceUri);
-
-        if (queryParams != null) {
-            for (Map.Entry<String, Object[]> entry : queryParams.entrySet()) {
-                builder.queryParam(entry.getKey(), entry.getValue());
-            }
-        }
-
-        String url = builder.build(elements).toString();
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        marshaller.marshal(restObject, stream);
-
-        return executePost(url, new ByteArrayInputStream(stream.toByteArray()), MediaType.APPLICATION_XML,
-            Status.OK.getStatusCode()).getResponseBodyAsStream();
-    }
-
-    public byte[] getRESTBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
-        throws Exception
-    {
-        InputStream is = getRESTInputStream(resourceUri, queryParams, elements);
-
-        byte[] buffer;
-        try {
-            buffer = IOUtils.toByteArray(is);
-        } finally {
-            is.close();
-        }
-
-        return buffer;
-    }
-
-    public <T> T getRESTResource(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
-        throws Exception
-    {
-        T resource;
-        try (InputStream is = getRESTInputStream(resourceUri, queryParams, elements)) {
-            resource = (T) unmarshaller.unmarshal(is);
-        }
-
-        return resource;
-    }
-
-    public <T> T postRESTResource(String resourceUri, Object entity, Object... elements) throws Exception
-    {
-        return postRESTResource(resourceUri, entity, Collections.<String, Object[]>emptyMap(), elements);
-    }
-
-    public <T> T postRESTResource(String resourceUri, Object entity, Map<String, Object[]> queryParams,
-        Object... elements) throws Exception
-    {
-        T resource;
-        try (InputStream is = postRESTInputStream(resourceUri, entity, queryParams, elements)) {
-            resource = (T) unmarshaller.unmarshal(is);
-        }
-
-        return resource;
-    }
-
-    protected GetMethod executeGet(String uri, int expectedCode) throws Exception
-    {
-        GetMethod getMethod = new GetMethod(uri);
-
-        int code = this.adminHTTPClient.executeMethod(getMethod);
-        if (code != expectedCode) {
-            throw new Exception("Failed to execute get [" + uri + "] with code [" + code + "]");
-        }
-
-        return getMethod;
-    }
-
-    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
-        throws Exception
-    {
-        PostMethod putMethod = new PostMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        putMethod.setRequestEntity(entity);
-
-        int code = this.adminHTTPClient.executeMethod(putMethod);
-        if (!ArrayUtils.contains(expectedCodes, code)) {
-            throw new Exception("Failed to execute post [" + uri + "] with code [" + code + "]");
-        }
-
-        return putMethod;
-    }
-
-    protected PutMethod executePut(String uri, InputStream content, String mediaType, int... expectedCodes)
-        throws Exception
-    {
-        PutMethod putMethod = new PutMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        putMethod.setRequestEntity(entity);
-
-        int code = this.adminHTTPClient.executeMethod(putMethod);
-        if (!ArrayUtils.contains(expectedCodes, code)) {
-            throw new Exception("Failed to execute put [" + uri + "] with code [" + code + "]");
-        }
-
-        return putMethod;
     }
 
     /**
@@ -1543,19 +1480,22 @@ public class TestUtils
 
     /**
      * Set the hierarchy mode used in the wiki
+     * 
      * @param mode the mode to use ("reference" or "parentchild")
      * @since 7.2M2
      */
-    public void setHierarchyMode(String mode) {
+    public void setHierarchyMode(String mode)
+    {
         setPropertyInXWikiPreferences("core.hierarchyMode", "String", mode);
     }
 
     /**
-     * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.  
+     * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
+     * 
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
      * @param value value to set to the property
-     * @since 7.2M2 
+     * @since 7.2M2
      */
     public void setPropertyInXWikiPreferences(String propertyName, String propertyType, Object value)
     {
@@ -1566,6 +1506,467 @@ public class TestUtils
             updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, propertyName, value);
         } else {
             addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
+        }
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static void assertStatuses(int actualCode, int... expectedCodes)
+    {
+        if (!ArrayUtils.contains(expectedCodes, actualCode)) {
+            Assert.fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.asList(expectedCodes)
+                + "]");
+        }
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static <M extends HttpMethod> M assertStatusCodes(M method, int... expectedCodes)
+    {
+        if (expectedCodes.length > 0) {
+            assertStatuses(method.getStatusCode(), expectedCodes);
+
+            method.releaseConnection();
+        }
+
+        return method;
+    }
+
+    // HTTP
+
+    /**
+     * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
+     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
+     * to hexadecimal, and spaces are substituted by '+'.
+     *
+     * @param s
+     */
+    public String escapeURL(String s)
+    {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // should not happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
+    {
+        return getInputStream(getBaseURL(), path, queryParams);
+    }
+
+    public String getString(String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(getBaseURL(), path, queryParams)) {
+            return IOUtils.toString(inputStream);
+        }
+    }
+
+    public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
+        throws Exception
+    {
+        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+        if (path.startsWith(cleanPrefix)) {
+            cleanPrefix = "";
+        }
+
+        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
+
+        if (queryParams != null) {
+            for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
+                if (entry.getValue() instanceof Object[]) {
+                    builder.queryParam(entry.getKey(), (Object[]) entry.getValue());
+                } else {
+                    builder.queryParam(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        String url = builder.build(elements).toString();
+
+        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
+    }
+
+    protected GetMethod executeGet(String uri) throws Exception
+    {
+        GetMethod getMethod = new GetMethod(uri);
+
+        this.httpClient.executeMethod(getMethod);
+
+        return getMethod;
+    }
+
+    protected GetMethod executeGet(String uri, int... expectedCodes) throws Exception
+    {
+        return assertStatusCodes(executeGet(uri), expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected PostMethod executePost(String uri, InputStream content, String mediaType) throws Exception
+    {
+        PostMethod postMethod = new PostMethod(uri);
+        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
+        postMethod.setRequestEntity(entity);
+
+        this.httpClient.executeMethod(postMethod);
+
+        return postMethod;
+    }
+
+    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
+        throws Exception
+    {
+        return assertStatusCodes(executePost(uri, content, mediaType), expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected DeleteMethod executeDelete(String uri) throws Exception
+    {
+        DeleteMethod postMethod = new DeleteMethod(uri);
+
+        this.httpClient.executeMethod(postMethod);
+
+        return postMethod;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected DeleteMethod executeDelete(String uri, int... expectedCodes) throws Exception
+    {
+        return assertStatusCodes(executeDelete(uri), expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected PutMethod executePut(String uri, InputStream content, String mediaType) throws Exception
+    {
+        PutMethod putMethod = new PutMethod(uri);
+        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
+        putMethod.setRequestEntity(entity);
+
+        this.httpClient.executeMethod(putMethod);
+
+        return putMethod;
+    }
+
+    protected PutMethod executePut(String uri, InputStream content, String mediaType, int... expectedCodes)
+        throws Exception
+    {
+        return assertStatusCodes(executePut(uri, content, mediaType), expectedCodes);
+    }
+
+    // REST
+
+    public RestTestUtils rest()
+    {
+        return this.rest;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public class RestTestUtils
+    {
+        public final Boolean ELEMENTS_ENCODED = new Boolean(true);
+
+        protected Object[] toElements(Page page)
+        {
+            List<Object> elements = new ArrayList<>();
+
+            // Add wiki
+            if (page.getWiki() != null) {
+                elements.add(page.getWiki());
+            } else {
+                elements.add(getCurrentWiki());
+            }
+
+            // Add spaces
+            for (EntityReference reference : RELATIVE_RESOLVER.resolve(page.getSpace(), EntityType.SPACE)
+                .getReversedReferenceChain()) {
+                elements.add(reference.getName());
+            }
+
+            // Add name
+            elements.add(page.getName());
+
+            return elements.toArray();
+        }
+
+        protected Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
+        {
+            List<Object> elements = new ArrayList<>();
+
+            // Add wiki
+            if (obj.getWiki() != null) {
+                elements.add(obj.getWiki());
+            } else {
+                elements.add(getCurrentWiki());
+            }
+
+            // Add spaces
+            for (EntityReference reference : RELATIVE_RESOLVER.resolve(obj.getSpace(), EntityType.SPACE)
+                .getReversedReferenceChain()) {
+                elements.add(reference.getName());
+            }
+
+            // Add name
+            elements.add(obj.getPageName());
+
+            if (!onlyDocument) {
+                // Add class
+                elements.add(obj.getClassName());
+
+                // Add number
+                elements.add(obj.getNumber());
+            }
+
+            return elements.toArray();
+        }
+
+        public Object[] toElements(EntityReference reference)
+        {
+            List<EntityReference> references = reference.getReversedReferenceChain();
+
+            List<Object> elements = new ArrayList<>(references.size() + 2);
+
+            // Indicate that elements are already encoded
+            elements.add(ELEMENTS_ENCODED);
+
+            // Add current wiki if the reference does not contains any
+            if (reference.extractReference(EntityType.WIKI) == null) {
+                elements.add(escapeURL(getCurrentWiki()));
+            }
+
+            // Add reference
+            for (EntityReference ref : references) {
+                if (ref.getType() == EntityType.SPACE) {
+                    // The URI builder does not support multiple elements like space reference so we hack it by doing
+                    // the opposite of what is done when reading the URL (generate a value looking like
+                    // "space1/spaces/space2")
+                    Object value = elements.get(elements.size() - 1);
+
+                    StringBuilder builder;
+                    if (value instanceof StringBuilder) {
+                        builder = (StringBuilder) value;
+                        builder.append("/spaces/");
+                    } else {
+                        builder = new StringBuilder();
+                        elements.add(builder);
+                    }
+
+                    builder.append(escapeURL(ref.getName()));
+                } else {
+                    elements.add(escapeURL(ref.getName()));
+                }
+            }
+
+            return elements.toArray();
+        }
+
+        /**
+         * Add or update.
+         */
+        public EntityEnclosingMethod save(Page page, int... expectedCodes) throws Exception
+        {
+            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)));
+        }
+
+        /**
+         * Add a new object.
+         */
+        public EntityEnclosingMethod add(org.xwiki.rest.model.jaxb.Object obj, int... expectedCodes) throws Exception
+        {
+            return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)));
+        }
+
+        /**
+         * Fail if the object does not exist.
+         */
+        public EntityEnclosingMethod update(org.xwiki.rest.model.jaxb.Object obj, int... expectedCodes)
+            throws Exception
+        {
+            return TestUtils.assertStatusCodes(executePut(ObjectResource.class, obj, toElements(obj, false)));
+        }
+
+        public DeleteMethod delete(EntityReference reference, int... expectedCodes) throws Exception
+        {
+            switch (reference.getType()) {
+                case DOCUMENT:
+                    return TestUtils.assertStatusCodes(executeDelete(PageResource.class, toElements(reference)),
+                        expectedCodes);
+                case ATTACHMENT:
+                    return TestUtils.assertStatusCodes(executeDelete(AttachmentResource.class, toElements(reference)),
+                        expectedCodes);
+                case OBJECT:
+                    return TestUtils.assertStatusCodes(executeDelete(ObjectResource.class, toElements(reference)),
+                        expectedCodes);
+                case OBJECT_PROPERTY:
+                    return TestUtils.assertStatusCodes(
+                        executeDelete(ObjectPropertyResource.class, toElements(reference)), expectedCodes);
+
+                default:
+                    throw new Exception("Unsuported type [" + reference.getType() + "]");
+            }
+        }
+
+        public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
+            throws Exception
+        {
+            return TestUtils.this.getInputStream(getBaseRestURL(), resourceUri, queryParams, elements);
+        }
+
+        public InputStream postRESTInputStream(Object resourceUri, Object restObject, Object... elements)
+            throws Exception
+        {
+            return postInputStream(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public InputStream postInputStream(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
+        {
+            return executePost(resourceUri, restObject, queryParams, elements).getResponseBodyAsStream();
+        }
+
+        protected InputStream toResourceInputStream(Object restObject) throws JAXBException
+        {
+            InputStream resourceStream;
+            if (restObject instanceof InputStream) {
+                resourceStream = (InputStream) restObject;
+            } else {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                marshaller.marshal(restObject, stream);
+                resourceStream = new ByteArrayInputStream(stream.toByteArray());
+            }
+
+            return resourceStream;
+        }
+
+        public PostMethod executePost(Object resourceUri, Object restObject, Object... elements) throws Exception
+        {
+            return executePost(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public PostMethod executePost(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
+        {
+            // Build URI
+            String uri = createUri(resourceUri, queryParams, elements).toString();
+
+            try (InputStream resourceStream = toResourceInputStream(restObject)) {
+                return TestUtils.this.executePost(uri, resourceStream, MediaType.APPLICATION_XML,
+                    Status.OK.getStatusCode());
+            }
+        }
+
+        public PutMethod executePut(Object resourceUri, Object restObject, Object... elements) throws Exception
+        {
+            return executePut(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public PutMethod executePut(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
+        {
+            // Build URI
+            String uri = createUri(resourceUri, queryParams, elements).toString();
+
+            try (InputStream resourceStream = toResourceInputStream(restObject)) {
+                return TestUtils.this.executePut(uri, resourceStream, MediaType.APPLICATION_XML,
+                    Status.OK.getStatusCode());
+            }
+        }
+
+        public DeleteMethod executeDelete(Object resourceUri, Object... elements) throws Exception
+        {
+            return executeDelete(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public DeleteMethod executeDelete(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            // Build URI
+            String uri = createUri(resourceUri, queryParams, elements).toString();
+
+            return TestUtils.this.executeDelete(uri);
+        }
+
+        public URI createUri(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
+        {
+            // Create URI builder
+            UriBuilder builder = getUriBuilder(resourceUri, queryParams);
+
+            // Build URI
+            URI uri;
+            if (elements.length > 0 && elements[0] == ELEMENTS_ENCODED) {
+                uri = builder.buildFromEncoded(Arrays.copyOfRange(elements, 1, elements.length));
+            } else {
+                uri = builder.build(elements);
+            }
+
+            return uri;
+        }
+
+        public UriBuilder getUriBuilder(Object resourceUri, Map<String, Object[]> queryParams)
+        {
+            // Create URI builder
+            UriBuilder builder;
+            if (resourceUri instanceof Class) {
+                builder = getUriBuilder((Class) resourceUri);
+            } else {
+                String stringResourceUri = (String) resourceUri;
+                builder =
+                    UriBuilder.fromUri(getBaseRestURL().substring(0, getBaseRestURL().length() - 1)).path(
+                        !stringResourceUri.isEmpty() && stringResourceUri.charAt(0) == '/' ? stringResourceUri
+                            .substring(1) : stringResourceUri);
+            }
+
+            // Add query parameters
+            if (queryParams != null) {
+                for (Map.Entry<String, Object[]> entry : queryParams.entrySet()) {
+                    builder.queryParam(entry.getKey(), entry.getValue());
+                }
+            }
+
+            return builder;
+        }
+
+        protected UriBuilder getUriBuilder(Class<?> resource)
+        {
+            return UriBuilder.fromUri(getBaseRestURL()).path(resource);
+        }
+
+        public byte[] getBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            InputStream is = getInputStream(resourceUri, queryParams, elements);
+
+            byte[] buffer;
+            try {
+                buffer = IOUtils.toByteArray(is);
+            } finally {
+                is.close();
+            }
+
+            return buffer;
+        }
+
+        public <T> T getResource(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            T resource;
+            try (InputStream is = getInputStream(resourceUri, queryParams, elements)) {
+                resource = (T) unmarshaller.unmarshal(is);
+            }
+
+            return resource;
         }
     }
 }

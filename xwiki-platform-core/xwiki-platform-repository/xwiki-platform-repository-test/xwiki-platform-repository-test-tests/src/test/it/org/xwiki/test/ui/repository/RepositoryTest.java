@@ -100,7 +100,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
     @Test
     public void testAddExtension() throws Exception
-    {   
+    {
         // Set id prefix
 
         RepositoryAdminPage repositoryAdminPage = RepositoryAdminPage.gotoPage();
@@ -179,7 +179,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Resolve
 
         ExtensionVersion extension =
-            getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "1.0");
+            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "1.0");
 
         Assert.assertEquals(this.baseExtension.getId().getId(), extension.getId());
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
@@ -194,11 +194,10 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // File
 
-        Assert
-            .assertEquals(
-                this.sizeOfFile,
-                getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
-                    "1.0").length);
+        Assert.assertEquals(
+            this.sizeOfFile,
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
+                "1.0").length);
 
         // //////////////////////////////////////////
         // 2.0
@@ -207,7 +206,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Resolve
 
         extension =
-            getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "2.0");
+            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "2.0");
 
         Assert.assertEquals(this.baseExtension.getId().getId(), extension.getId());
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
@@ -222,11 +221,10 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // File
 
-        Assert
-            .assertEquals(
-                this.sizeOfFile,
-                getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
-                    "2.0").length);
+        Assert.assertEquals(
+            this.sizeOfFile,
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
+                "2.0").length);
 
         // //////////////////////////////////////////
         // 10.0
@@ -235,7 +233,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // Resolve
 
         extension =
-            getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "10.0");
+            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, this.baseExtension.getId().getId(), "10.0");
 
         Assert.assertEquals(this.baseExtension.getId().getId(), extension.getId());
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
@@ -258,7 +256,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         Assert.assertEquals(
             this.sizeOfFile,
-            getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, this.baseExtension.getId().getId(),
                 this.baseExtension.getId().getVersion().getValue()).length);
 
         // //////////////////////////////////////////
@@ -287,7 +285,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"macro"});
 
-        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
         Assert.assertEquals(1, result.getTotalHits());
         Assert.assertEquals(0, result.getOffset());
@@ -306,7 +304,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         queryParams.clear();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"notexisting"});
 
-        result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
         Assert.assertEquals(0, result.getTotalHits());
         Assert.assertEquals(0, result.getOffset());
@@ -317,7 +315,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         queryParams.clear();
         queryParams.put(Resources.QPARAM_LIST_START, new Object[] {1});
 
-        result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
         Assert.assertEquals(1, result.getOffset());
         Assert.assertEquals(result.getTotalHits() - 1, result.getExtensions().size());
@@ -327,7 +325,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         queryParams.clear();
         queryParams.put(Resources.QPARAM_LIST_NUMBER, new Object[] {0});
 
-        result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
         Assert.assertTrue(result.getTotalHits() >= 1);
         Assert.assertEquals(0, result.getOffset());
@@ -337,7 +335,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
     private ExtensionVersion searchExtension(String id) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
-        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = getUtil().rest().getResource(Resources.SEARCH, queryParams);
 
         Assert.assertTrue(result.getTotalHits() >= 0);
         Assert.assertEquals(0, result.getOffset());
@@ -380,7 +378,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         long fileSize = FileUtils.sizeOf(emptyExtension.getFile().getFile());
 
         ExtensionVersion extension =
-            getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, "maven:extension", "2.0");
+            getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "2.0");
 
         Assert.assertEquals("maven:extension", extension.getId());
         Assert.assertEquals("jar", extension.getType());
@@ -394,11 +392,11 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,
-            getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "2.0").length);
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "2.0").length);
 
         // 1.0
 
-        extension = getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, "maven:extension", "1.0");
+        extension = getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "1.0");
 
         Assert.assertEquals("maven:extension", extension.getId());
         Assert.assertEquals("jar", extension.getType());
@@ -412,11 +410,11 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(FileUtils.sizeOf(emptyExtension.getFile().getFile()),
-            getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "1.0").length);
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "1.0").length);
 
         // 0.9
 
-        extension = getUtil().getRESTResource(Resources.EXTENSION_VERSION, null, "maven:extension", "0.9");
+        extension = getUtil().rest().getResource(Resources.EXTENSION_VERSION, null, "maven:extension", "0.9");
 
         Assert.assertEquals("maven:extension", extension.getId());
         Assert.assertEquals("jar", extension.getType());
@@ -430,7 +428,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,
-            getUtil().getRESTBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "0.9").length);
+            getUtil().rest().getBuffer(Resources.EXTENSION_VERSION_FILE, null, "maven:extension", "0.9").length);
 
         // Import again
 

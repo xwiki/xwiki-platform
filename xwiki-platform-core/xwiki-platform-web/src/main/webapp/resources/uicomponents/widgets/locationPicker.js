@@ -229,12 +229,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
         // Remove any redundant 'active' elements that we might inherit from the AJAX call, since the only active
         // element will be the page name preview that we create.
-        var activeElements = locationContainer.find('.active');
-        if (activeElements.length > 0) {
-          for (var i=0; i < activeElements.length; i++) {
-            $(activeElements[i]).removeClass('active');
-          }
-        }
+        locationContainer.find('.active').removeClass('active');
 
         // Update the document part of the new location.
         updateLocationFromTitleOrNameInput();

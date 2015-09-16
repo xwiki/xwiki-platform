@@ -32,8 +32,12 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       if (parentReferenceField.length > 0) {
         var parentReference = parentReferenceField.val();
         if (parentReference == '') {
-          // No need to check if the document is not terminal because of the document is terminal the parent reference
-          // cannot be null and the form is not submitted
+          // If there is no parent, then the document cannot be terminal.
+          // There is a live validation rule for that and it displays the proper error, but we need this check here too
+          // to avoid sending the form anyway.
+          if ($('#terminal').prop('checked')) {
+            return false;
+          }
           documentReference = new XWiki.DocumentReference(xm.wiki, $('#Name').val(), 'WebHome');
         } else {
           var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
@@ -45,9 +49,18 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }
         }
       } else {
-        // No parent reference field: we are in the 'create page' popup
-        var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
-        documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+        if ($('.modal-popup').length > 0) {
+          // We are in the 'create page' popup
+          var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
+          documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+        } else {
+          // We are in the create page action, but with a page name already filled
+          if ($('#terminal').prop('checked')) {
+            documentReference = xm.documentReference.parent;
+          } else {
+            documentReference = xm.documentReference;
+          }
+        }
       }
       
       return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki)));
@@ -97,7 +110,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         }
         // The office importer is a wiki page which takes the 'page' parameter.
         // So we compute this parameter and we redirect the form to the Office Importer document.
-        window.location = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['XWiki'], 'OfficeImporter')).getURL('view', 'page=' + encodeURIComponent(computeTargetPageName()));
+        var targetName = computeTargetPageName();
+        if (targetName != false) {
+          window.location = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['XWiki'], 'OfficeImporter')).getURL('view', 'page=' + encodeURIComponent(targetName));
+        }
         return false;
       }
       

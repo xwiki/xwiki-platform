@@ -140,6 +140,8 @@ public class CreateActionTest
 
         velocityContext = new VelocityContext();
         context.put("vcontext", velocityContext);
+        
+        when(mockRequest.get("type")).thenReturn("plain");
     }
 
     @Test
@@ -162,6 +164,29 @@ public class CreateActionTest
         assertNull(result);
 
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentFromURLWhenNoType() throws Exception
+    {
+        // No type has been set by the user
+        when(mockRequest.get("type")).thenReturn(null);
+
+        // new document = xwiki:X.Y
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertEquals("create", result);
     }
 
     @Test

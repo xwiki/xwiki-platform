@@ -92,6 +92,11 @@ public class CreateActionRequestHandler
     private static final String TOCREATE_SPACE = SPACE;
 
     /**
+     * The name of the "type" parameter.
+     */
+    private static final String TYPE = "type";
+
+    /**
      * The value of the tocreate parameter when a terminal/regular document is to be created.
      */
     private static final String TOCREATE_TERMINAL = "terminal";
@@ -158,6 +163,8 @@ public class CreateActionRequestHandler
     private BaseObject templateProvider;
 
     private List<Document> availableTemplateProviders;
+    
+    private String type;
 
     /**
      * @param context the XWikiContext for which to handle the request.
@@ -223,6 +230,9 @@ public class CreateActionRequestHandler
         availableTemplateProviders =
             loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
                 templateProviderClassReference, context);
+
+        // Get the type of document to create
+        type = request.get(TYPE);
     }
 
     /**
@@ -582,5 +592,14 @@ public class CreateActionRequestHandler
     public BaseObject getTemplateProvider()
     {
         return templateProvider;
+    }
+
+    /** 
+     * @return the type of document to create, read from the request, or {@code null} if none was set
+     * @since 7.2 
+     */
+    public String getType()
+    {
+        return type;
     }
 }

@@ -60,7 +60,9 @@
 #end
 #addAllDocsTab({'tabName' : 'index', 'idSuffix' : 'index', 'translationKey' : 'platform.index', 'document' : 'XWiki.Tableview'})
 #addAllDocsTab({'tabName' : 'tree', 'idSuffix' : 'treeview', 'translationKey' : 'platform.index.tree', 'document' : 'XWiki.Treeview'})
-#addAllDocsTab({'tabName' : 'orphans', 'idSuffix' : 'orphansview', 'translationKey' : 'platform.index.orphaned', 'document' : 'XWiki.OrphanedPages'})
+#if ($services.parentchild.isParentChildMechanismEnabled())
+  #addAllDocsTab({'tabName' : 'orphans', 'idSuffix' : 'orphansview', 'translationKey' : 'platform.index.orphaned', 'document' : 'XWiki.OrphanedPages'})
+#end
 #addAllDocsTab({'tabName' : 'attachments', 'idSuffix' : 'attachments', 'translationKey' : 'platform.index.attachments', 'document' : 'XWiki.AllAttachments'})
 #addAllDocsTab({'tabName' : 'deletedDocs', 'idSuffix' : 'deletedDocs', 'translationKey' : 'platform.index.documentsTrash', 'document' : 'XWiki.DeletedDocuments'})
 #addAllDocsTab({'tabName' : 'deletedAttachments', 'idSuffix' : 'deletedAttachments', 'translationKey' : 'platform.index.attachmentsTrash', 'document' : 'XWiki.DeletedAttachments'})

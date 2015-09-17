@@ -21,6 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Extends {@link DefaultStringEntityReferenceSerializer} to add the serialization of the Locale for Document
@@ -40,6 +41,11 @@ public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntit
         // Append parameters for DocumentReference (if any)
         if (currentReference instanceof DocumentReference) {
             DocumentReference documentReference = (DocumentReference) currentReference;
+            if (documentReference.getLocale() != null) {
+                representation.append('(').append(documentReference.getLocale()).append(')');
+            }
+        } else if (currentReference instanceof LocalDocumentReference) {
+            LocalDocumentReference documentReference = (LocalDocumentReference) currentReference;
             if (documentReference.getLocale() != null) {
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }

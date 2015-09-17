@@ -894,14 +894,6 @@ public class TestUtils
     }
 
     /**
-     * @since 7.3M1
-     */
-    public String getBaseRestURL()
-    {
-        return getBaseURL() + "rest";
-    }
-
-    /**
      * @since 7.2M1
      */
     public String getURL(String action, String[] path, String queryString)
@@ -1678,6 +1670,14 @@ public class TestUtils
     {
         public final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
+        /**
+         * @since 7.3M1
+         */
+        public String getBaseURL()
+        {
+            return TestUtils.this.getBaseURL() + "rest";
+        }
+
         private String toSpaceElement(String spaceReference)
         {
             StringBuilder builder = new StringBuilder();
@@ -1831,7 +1831,7 @@ public class TestUtils
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
             throws Exception
         {
-            return TestUtils.this.getInputStream(getBaseRestURL(), resourceUri, queryParams, elements);
+            return TestUtils.this.getInputStream(getBaseURL(), resourceUri, queryParams, elements);
         }
 
         public InputStream postRESTInputStream(Object resourceUri, Object restObject, Object... elements)
@@ -1933,7 +1933,7 @@ public class TestUtils
             } else {
                 String stringResourceUri = (String) resourceUri;
                 builder =
-                    UriBuilder.fromUri(getBaseRestURL().substring(0, getBaseRestURL().length() - 1)).path(
+                    UriBuilder.fromUri(getBaseURL().substring(0, getBaseURL().length() - 1)).path(
                         !stringResourceUri.isEmpty() && stringResourceUri.charAt(0) == '/' ? stringResourceUri
                             .substring(1) : stringResourceUri);
             }
@@ -1950,7 +1950,7 @@ public class TestUtils
 
         protected UriBuilder getUriBuilder(Class<?> resource)
         {
-            return UriBuilder.fromUri(getBaseRestURL()).path(resource);
+            return UriBuilder.fromUri(getBaseURL()).path(resource);
         }
 
         public byte[] getBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)

@@ -1,5 +1,16 @@
 #set ($formname = 'update')
 #set ($saveaction = 'save')
+##
+## Set on which document the rights should be saved
+##
+## Most of the time, it is the current document
+#set ($targetDocument = $doc)
+#if ($request.section == 'PageRights')
+  ## But when the current page is the "PageRights" section of the page administration, the target doc is actually the
+  ## "WebHome" page of the current space.
+  #set ($parentSpace = $doc.documentReference.lastSpaceReference)
+  #set ($targetDocument = $xwiki.getDocument($parentSpace))
+#end
 ########################
 ## display the interface
 ########################
@@ -22,7 +33,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #set ($maxlevel = $rightsLevels.get('createwiki'))
   #set ($clsname = 'XWiki.XWikiGlobalRights')
 #else
-  #if($doc.fullName == 'XWiki.XWikiPreferences')
+  #if($targetDocument.fullName == 'XWiki.XWikiPreferences')
     #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
       #set ($clsname = 'XWiki.XWikiGlobalRights')
       #if ($xcontext.database == 'xwiki')
@@ -33,8 +44,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #else
       #set($clsname = 'XWiki.XWikiRights')
     #end
-  #elseif ($doc.name == 'WebPreferences')
-    #if (("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin') && "$!request.section" != 'PageRights')
+  #elseif ($targetDocument.name == 'WebPreferences')
+    #if (("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin'))
       #set ($clsname = 'XWiki.XWikiGlobalRights')
       #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
     #else
@@ -46,8 +57,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #end
 
 ## url to take the users and groups to display in the ajax-based table
-#set ($url = $doc.getURL('get', 'xpage=getusersandgroups'))
-#set ($saveUrl = $doc.getURL('edit', "form_token=$!{services.csrf.getToken()}&xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
+#set ($url = $targetDocument.getURL('get', 'xpage=getusersandgroups'))
+#set ($saveUrl = $targetDocument.getURL('edit', "form_token=$!{services.csrf.getToken()}&xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
 
 ## get the rights for XWikiGuest
 #set($r = [])
@@ -55,7 +66,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #set ($discard = $r.add(0))
 #end
 #set ($guest = 'XWiki.XWikiGuest')
-#foreach ($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
+#foreach ($obj in $targetDocument.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set ($pers = "$!obj.getProperty('users').getValue()")
   #if ($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?$"))
     #if ($obj.getProperty('allow').getValue() == 1)
@@ -156,11 +167,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     </tr>
   </table>
   ## Global settings: mandatory authentication for view/edit, captcha
-  #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
+  #set ($guest_comment_captcha_prop = $targetDocument.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
   #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'wikis.rights')
     <dl class="rights-settings">
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
-        #set ($auth_view = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
+        #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
         #if ("$!auth_view" == '1')
           #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
           #set ($view_alt = 'yes')
@@ -174,7 +185,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             $services.localization.render('authenticate_view')
           </label>
         </dt>
-        #set ($auth_edit = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
+        #set ($auth_edit = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
         #if ("$!auth_edit" == '1')
           #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
           #set ($edit_alt = 'yes')
@@ -241,10 +252,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
       window.saveUrl = "$saveUrl";
       window.saveUrl.replace(/&amp;/g, "&");
+      
+      var targetDocument = new XWiki.Document(XWiki.Model.resolve("$services.model.serialize($targetDocument.documentReference, 'default')", XWiki.EntityType.DOCUMENT));
+      
       window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
       window.unregUser = "XWiki.XWikiGuest";
       // the callback function is called from LiveTable with 3 arguments
-      var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}") };
+      var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
     #foreach($i in [0..$maxlevel])
       var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
@@ -261,7 +275,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
     #if($guest_comment_captcha_prop)
-      Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$doc.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
     #end
       return true;
     }

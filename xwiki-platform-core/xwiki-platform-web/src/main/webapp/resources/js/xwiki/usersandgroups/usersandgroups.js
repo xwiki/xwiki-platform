@@ -394,14 +394,20 @@ function displayMembers(row, i, table, form_token)
   * Used in adminglobalrights.vm, adminspacerights.vm, editrights.vm.
   * @todo allows and denys should be arrays, not strings.
   */
-function displayUsersAndGroups(row, i, table, idx, form_token)
+function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 {
   var userurl = row.userurl;
   var uorg = table.json.uorg;
   var allows = row.allows;
   var denys = row.denys;
 
-  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + encodeURIComponent(row.fullname) + "&uorg=" + uorg;
+  // targetDocument is an optional parameter, which set on which document we save the rights
+  if (targetDocument === undefined) {
+    // by default, we set it to the current document
+    targetDocument = XWiki.currentDocument;
+  }
+  
+  var saveUrl = targetDocument.getURL('view', 'xpage=saverights&clsname=' + table.json.clsname + '&fullname=' + encodeURIComponent(row.fullname) + '&uorg=' + uorg);
   if (form_token != undefined) {
       saveUrl += "&form_token=" + form_token;
   }

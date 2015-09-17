@@ -214,9 +214,9 @@
           #set ($section.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.png')
         #end
       #end
-      #set ($query = "editor=$escapetool.url(${editor})&amp;amp;section=$escapetool.url(${section.id})")
+      #set ($query = "editor=$escapetool.url(${editor})&amp;section=$escapetool.url(${section.id})")
       #if ($editor != 'globaladmin')
-        #set ($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
+        #set ($query = $query + "&amp;space=$escapetool.url(${currentSpace})")
       #end
       #set ($action = "$!{section.action}")
       #if ($action == '')

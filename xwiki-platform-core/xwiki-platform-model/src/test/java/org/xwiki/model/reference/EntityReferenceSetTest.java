@@ -233,6 +233,25 @@ public class EntityReferenceSetTest
     }
 
     @Test
+    public void testIncludeLocalDocumentLocale()
+    {
+        includes(new LocalDocumentReference("space", "document", Locale.ROOT));
+
+        assertMatches(new LocalDocumentReference("space", "document"));
+        assertMatches(new LocalDocumentReference("space", "document", Locale.ROOT));
+
+        assertNotMatches(new LocalDocumentReference("space", "document", Locale.FRENCH));
+
+        includes(new LocalDocumentReference("space", "document", Locale.ENGLISH));
+
+        assertMatches(new LocalDocumentReference("space", "document"));
+        assertMatches(new LocalDocumentReference("space", "document", Locale.ROOT));
+        assertMatches(new LocalDocumentReference("space", "document", Locale.ENGLISH));
+
+        assertNotMatches(new LocalDocumentReference("space", "document", Locale.FRENCH));
+    }
+
+    @Test
     public void testIncludeDocumentInNestedSpace()
     {
         includesDocument("wiki:space.nestedspace.document");

@@ -12,7 +12,7 @@
       <div class="drawer-menu-item-icon">
         <span class="glyphicon glyphicon-${icon}"></span>
       </div>
-      <div class="drawer-menu-item-text">$escapetool.xml($text)</div>
+      <div class="drawer-menu-item-text">$text</div>
     </a>
   </li>
 #end
@@ -62,11 +62,11 @@
       <div class="brand-links">
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$services.localization.render('logout')</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$escapetool.xml($services.localization.render('logout'))</a>
         #else
-          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$services.localization.render('login')</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$escapetool.xml($services.localization.render('login'))</a>
           #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$services.localization.render('register')</a>
+            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$escapetool.xml($services.localization.render('register'))</a>
           #end
         #end
       </div>
@@ -90,9 +90,9 @@
         #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
         #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
         #if ($isAdminAppInstalled)
-          #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'), 'tmAdminWiki')
+          #drawerItem($adminwikiaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin.wiki')), 'tmAdminWiki')
         #else
-          #drawerItem($importaction, 'wrench', $services.localization.render('core.menu.admin'), 'tmAdminWiki')
+          #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
         #end
         #set ($hasPreviousMenuSection = true)
       #end
@@ -106,21 +106,21 @@
       #drawerSeparator()
       ## The wiki index is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
       #if ($isWikiAPIAvailable && $isWikiUIAvailable && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
-        #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $services.localization.render('platform.wiki.menu.wikiindex'))
+        #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $escapetool.xml($services.localization.render('platform.wiki.menu.wikiindex')))
       #end
       ##
       ## Document Index
       ##
       #set($documentIndexRef = $services.model.createDocumentReference('', 'Main', 'AllDocs'))
       #if ($xwiki.exists($documentIndexRef))
-        #drawerItem($xwiki.getURL($documentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'), 'tmWikiDocumentIndex')
+        #drawerItem($xwiki.getURL($documentIndexRef), 'book', $escapetool.xml($services.localization.render('core.menu.wiki.documentindex')), 'tmWikiDocumentIndex')
       #end
       ##
       ## User Index
       ##
       #set($userIndexRef = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
       #if ($xwiki.exists($userIndexRef))
-        #drawerItem($xwiki.getURL($userIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'), 'tmMainUserIndex')
+        #drawerItem($xwiki.getURL($userIndexRef), 'user', $escapetool.xml($services.localization.render('xe.panels.quicklinks.userdirectory')), 'tmMainUserIndex')
       #end
       ##
       ## Create Wiki
@@ -130,7 +130,7 @@
       #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
         #drawerSeparator()
         #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
-        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $services.localization.render('core.menu.create.wiki'), 'tmCreateWiki')
+        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $escapetool.xml($services.localization.render('core.menu.create.wiki')), 'tmCreateWiki')
       #end
       ##
       ## Delete Wiki
@@ -139,7 +139,7 @@
         #drawerSeparator()
         #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
         #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
-        #drawerItem($deleteUrl, 'remove', $services.localization.render('platform.wiki.menu.deletewiki'), 'tmDeleteWiki')
+        #drawerItem($deleteUrl, 'remove', $escapetool.xml($services.localization.render('platform.wiki.menu.deletewiki')), 'tmDeleteWiki')
       #end
     </ul>
   </nav>

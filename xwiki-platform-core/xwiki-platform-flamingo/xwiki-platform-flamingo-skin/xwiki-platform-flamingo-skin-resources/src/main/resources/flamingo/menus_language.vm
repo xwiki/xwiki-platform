@@ -32,4 +32,4 @@
 ##########################################
 ## Display the pretty name of a language
 ##########################################
-#macro(displayLanguagePrettyName $language)#set($languageLocale = $services.localization.toLocale($language))$stringtool.capitalize($languageLocale.getDisplayName($languageLocale))#end
+#macro(displayLanguagePrettyName $language)#set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))#end

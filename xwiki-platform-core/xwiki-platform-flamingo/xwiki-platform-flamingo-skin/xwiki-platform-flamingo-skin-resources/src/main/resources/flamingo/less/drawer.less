@@ -64,7 +64,10 @@
   .drawer-menu-item {
     padding: 0;
      
-    a {
+    a, a.collapsed, a[aria-expanded='true'] {
+      // the two last selectors above are used to fix a strange bug with the bootstrap collapse plugin
+      // see: "Language Menu disappears when you open it and move your mouse out" (http://jira.xwiki.org/browse/XWIKI-12572)
+      // TODO: remove them if we stop using this bootstrap plugin
       color: @xwiki-drawer-menu-item-color;
       font-size: @xwiki-drawer-menu-item-size;
       font-weight: 400;

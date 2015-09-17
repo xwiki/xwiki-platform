@@ -40,7 +40,9 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests page creation with and without a Template Provider/Template.
@@ -66,19 +68,19 @@ public class CreatePageTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
-    public void createPagesFromTemplate()
+    public void createPagesFromTemplate() throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
         // All these pages are created during this test
         getUtil().deleteSpace(getTestClassName());
-        getUtil().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
         EntityReference templateInstanceReference =
             getUtil().resolveDocumentReference(getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".WebHome");
-        getUtil().deletePage(templateInstanceReference);
-        getUtil().deletePage(getTestClassName(), "NewPage");
-        getUtil().deletePage(getTestClassName(), TEMPLATE_NAME + "UnexistingInstance");
-        getUtil().deletePage(getTestClassName(), "EmptyPage");
+        getUtil().rest().delete(templateInstanceReference);
+        getUtil().rest().deletePage(getTestClassName(), "NewPage");
+        getUtil().rest().deletePage(getTestClassName(), TEMPLATE_NAME + "UnexistingInstance");
+        getUtil().rest().deletePage(getTestClassName(), "EmptyPage");
 
         String templateContent = "Test Template Content";
         String templateTitle = "Test Template Title";
@@ -208,7 +210,7 @@ public class CreatePageTest extends AbstractTest
      */
     @Test
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See http://jira.xwiki.org/browse/XE-1146")
-    public void createExistingPageAndSpace()
+    public void createExistingPageAndSpace() throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
@@ -217,8 +219,8 @@ public class CreatePageTest extends AbstractTest
         String existingSpaceName = getTestClassName() + "Existing";
 
         // All these pages are created during this test
-        getUtil().deletePage(existingPageReference);
-        getUtil().deletePage(existingSpaceName, "WebHome");
+        getUtil().rest().delete(existingPageReference);
+        getUtil().rest().deletePage(existingSpaceName, "WebHome");
 
         // create a template to make sure that we have a template to create from
         String templateProviderName = TEMPLATE_NAME + "Provider";
@@ -290,12 +292,12 @@ public class CreatePageTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
-    public void createPageWhenNoTemplateAvailable()
+    public void createPageWhenNoTemplateAvailable() throws Exception
     {
         // We'll create all these pages during this test
         getUtil().deleteSpace(getTestClassName());
         EntityReference newPageReference = getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.WebHome");
-        getUtil().deletePage(newPageReference);
+        getUtil().rest().delete(newPageReference);
 
         // prepare the test environment, create a test space and exclude all templates for this space
         // create the home page of this space to make sure the space exists

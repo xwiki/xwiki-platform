@@ -85,9 +85,9 @@ public class RepositoryTestUtils
         return extension.getName() != null ? extension.getName() : extension.getId().getId();
     }
 
-    public void deleteExtension(Extension extension)
+    public void deleteExtension(Extension extension) throws Exception
     {
-        this.testUtils.deletePage("Extension", getPageName(extension));
+        this.testUtils.rest().deletePage("Extension", getPageName(extension));
     }
 
     public void addExtension(Extension extension) throws Exception
@@ -97,7 +97,7 @@ public class RepositoryTestUtils
 
     public void addExtension(Extension extension, UsernamePasswordCredentials credentials) throws Exception
     {
-        this.testUtils.deletePage("Extension", getPageName(extension));
+        this.testUtils.rest().deletePage("Extension", getPageName(extension));
 
         // Add the Extension object
         Map<String, Object> queryParameters = new HashMap<String, Object>();

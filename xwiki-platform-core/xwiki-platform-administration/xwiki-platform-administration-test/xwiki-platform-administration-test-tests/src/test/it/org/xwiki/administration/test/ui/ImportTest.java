@@ -55,10 +55,10 @@ public class ImportTest extends AbstractTest
     private ImportAdministrationSectionPage sectionPage;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         // Delete Test Page we import from XAR to ensure to start with a predefined state.
-        getUtil().deletePage("Main", "TestPage");
+        getUtil().rest().deletePage("Main", "TestPage");
 
         this.adminPage = AdministrationPage.gotoPage();
         this.sectionPage = this.adminPage.clickImportSection();

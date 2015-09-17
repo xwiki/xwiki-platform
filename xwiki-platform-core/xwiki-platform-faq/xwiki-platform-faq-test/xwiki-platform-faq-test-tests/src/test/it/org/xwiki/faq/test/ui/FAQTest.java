@@ -46,14 +46,14 @@ public class FAQTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
-    public void testFAQ()
+    public void testFAQ() throws Exception
     {
         // Note: we use a dot in the page name to verify it's supported by the FAQ application and we use an accent to
         // verify encoding.
         String faqTestPage = "Test.entrée de FAQ";
 
         // Delete pages that we create in the test
-        getUtil().deletePage(getTestClassName(), faqTestPage);
+        getUtil().rest().deletePage(getTestClassName(), faqTestPage);
 
         // Navigate to the FAQ app by clicking in the Application Panel.
         // This verifies that the FAQ application is registered in the Applications Panel.
@@ -85,16 +85,17 @@ public class FAQTest extends AbstractTest
     /**
      * Verify that it's possible to add a new FAQ altogether, in a different space. Also make sure it works
      * when creating that new FAQ in a Nested Space.
+     * @throws Exception 
      */
     @Test
-    public void testNewFAQAndInNestedSpace()
+    public void testNewFAQAndInNestedSpace() throws Exception
     {
         String faqTestPage = "NewFAQEntry";
         DocumentReference homeReference =
             new DocumentReference("xwiki", Arrays.asList(getTestClassName(), "Nested"), "WebHome");
 
         // Delete pages that we create in the test
-        getUtil().deletePage(homeReference);
+        getUtil().rest().delete(homeReference);
 
         // Create a new FAQ home page
         getUtil().addObject(homeReference, "FAQCode.FAQHomeClass", "description", "new FAQ");

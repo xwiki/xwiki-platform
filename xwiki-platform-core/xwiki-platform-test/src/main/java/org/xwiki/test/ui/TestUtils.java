@@ -71,6 +71,7 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -134,13 +135,29 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    private static final int[] STATUS_OKNOTFOUND = new int[] {Status.OK.getStatusCode(),
+    private static final int[] STATUS_OK_NOT_FOUND = new int[] {Status.OK.getStatusCode(),
         Status.NOT_FOUND.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
     private static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
+
+    /**
+     * @since 7.3M1
+     */
+    private static final int[] STATUS_NO_CONTENT = new int[] {Status.NO_CONTENT.getStatusCode()};
+
+    /**
+     * @since 7.3M1
+     */
+    private static final int[] STATUS_CREATED_ACCEPTED = new int[] {Status.CREATED.getStatusCode(),
+        Status.ACCEPTED.getStatusCode()};
+
+    /**
+     * @since 7.3M1
+     */
+    private static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
 
     private static PersistentTestContext context;
 
@@ -1517,10 +1534,20 @@ public class TestUtils
      */
     public static <M extends HttpMethod> M assertStatusCodes(M method, int... expectedCodes)
     {
+        return assertStatusCodes(method, true, expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
+    {
         if (expectedCodes.length > 0) {
             assertStatuses(method.getStatusCode(), expectedCodes);
 
-            method.releaseConnection();
+            if (release) {
+                method.releaseConnection();
+            }
         }
 
         return method;
@@ -1790,39 +1817,66 @@ public class TestUtils
         /**
          * Add a new object.
          */
-        public EntityEnclosingMethod add(org.xwiki.rest.model.jaxb.Object obj, int... expectedCodes) throws Exception
+        public void add(org.xwiki.rest.model.jaxb.Object obj) throws Exception
         {
-            return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)));
+            add(obj, true);
+        }
+
+        /**
+         * Add a new object.
+         */
+        public EntityEnclosingMethod add(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
+        {
+            return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)), release,
+                STATUS_CREATED);
         }
 
         /**
          * Fail if the object does not exist.
          */
-        public EntityEnclosingMethod update(org.xwiki.rest.model.jaxb.Object obj, int... expectedCodes)
-            throws Exception
+        public void update(org.xwiki.rest.model.jaxb.Object obj) throws Exception
         {
-            return TestUtils.assertStatusCodes(executePut(ObjectResource.class, obj, toElements(obj, false)));
+            update(obj, true);
         }
 
-        public DeleteMethod delete(EntityReference reference, int... expectedCodes) throws Exception
+        /**
+         * Fail if the object does not exist.
+         */
+        public EntityEnclosingMethod update(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
         {
+            return TestUtils.assertStatusCodes(executePut(ObjectResource.class, obj, toElements(obj, false)), release,
+                STATUS_CREATED_ACCEPTED);
+        }
+
+        public void delete(EntityReference reference) throws Exception
+        {
+            DeleteMethod deleteMethod;
+
             switch (reference.getType()) {
                 case DOCUMENT:
-                    return TestUtils.assertStatusCodes(executeDelete(PageResource.class, toElements(reference)),
-                        expectedCodes);
+                    deleteMethod = executeDelete(PageResource.class, toElements(reference));
+                    break;
                 case ATTACHMENT:
-                    return TestUtils.assertStatusCodes(executeDelete(AttachmentResource.class, toElements(reference)),
-                        expectedCodes);
+                    deleteMethod = executeDelete(AttachmentResource.class, toElements(reference));
+                    break;
                 case OBJECT:
-                    return TestUtils.assertStatusCodes(executeDelete(ObjectResource.class, toElements(reference)),
-                        expectedCodes);
+                    deleteMethod = executeDelete(ObjectResource.class, toElements(reference));
+                    break;
                 case OBJECT_PROPERTY:
-                    return TestUtils.assertStatusCodes(
-                        executeDelete(ObjectPropertyResource.class, toElements(reference)), expectedCodes);
+                    deleteMethod = executeDelete(ObjectPropertyResource.class, toElements(reference));
+                    break;
 
                 default:
                     throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
+
+            // Check if the deleted went as expected
+            TestUtils.assertStatusCodes(deleteMethod, STATUS_NO_CONTENT);
+        }
+
+        public void deletePage(String space, String page) throws Exception
+        {
+            delete(new LocalDocumentReference(space, page));
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)

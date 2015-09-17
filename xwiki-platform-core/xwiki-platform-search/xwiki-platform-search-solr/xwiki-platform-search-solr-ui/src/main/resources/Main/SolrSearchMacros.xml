@@ -164,13 +164,19 @@
 #end
 
 #macro (displaySearchFacet $facetField)
-  #set ($facetValues = $facetField.values)
-  ## Keep only the values that have at least one match.
-  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
   #set ($facetRequestParameter = "f_$facetField.name")
   #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-  ## Display the facets that either have matched values or that have values specified on the request.
-  #if ($facetValues.size() &gt; 0 || ($facetRequestValues &amp;&amp; $facetRequestValues.size() &gt; 0))
+  #set ($facetValues = [])
+  #foreach ($facetValue in $facetField.values)
+    ## Keep only the values that have at least one match or that are specified on the request.
+    #if ($facetValue.count &gt; 0 || ($facetRequestValues &amp;&amp; $facetRequestValues.contains($facetValue.name)))
+      #set ($discard = $facetValues.add($facetValue))
+    #end
+  #end
+  ## Facets that perform a 'facet.prefix'-based drill down (see https://wiki.apache.org/solr/HierarchicalFaceting) don't
+  ## have any values (not even with 0 count) when the prefix specified on the request doesn't have any "sub-values", but
+  ## we still want to display them to allow the user to reset the filter.
+  #if ($facetValues.size() &gt; 0 || $facetRequestValues)
     ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
     ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))

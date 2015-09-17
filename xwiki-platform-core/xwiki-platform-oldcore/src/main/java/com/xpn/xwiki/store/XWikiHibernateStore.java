@@ -2454,7 +2454,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
         // name is not stored in the database for document references.
         WikiReference wikiReference = new WikiReference(context.getWikiId());
-        for (String referenceString : this.<String>searchGenericInternal(sql, nb, start, parameterValues, context)) {
+        for (Object result : this.searchGenericInternal(sql, nb, start, parameterValues, context)) {
+            // The select always contains several elements in case of order by so we have to support both Object[] and
+            // String
+            String referenceString;
+            if (result instanceof String) {
+                referenceString = (String) result;
+            } else {
+                referenceString = (String) ((Object[]) result)[0];
+            }
+
             DocumentReference reference = this.defaultDocumentReferenceResolver.resolve(referenceString, wikiReference);
 
             documentReferences.add(reference);
@@ -2590,13 +2599,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         WikiReference currentWikiReference = new WikiReference(context.getWikiId());
         for (Object result : documentDatas) {
             String fullName;
-            String locale;
+            String locale = null;
             if (result instanceof String) {
                 fullName = (String) result;
-                locale = null;
             } else {
                 fullName = (String) ((Object[])result)[0];
-                locale = (String) ((Object[])result)[1];
+                if (distinctbylanguage) {
+                    locale = (String) ((Object[])result)[1];
+                }
             }
 
             XWikiDocument doc =

@@ -150,6 +150,8 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocument = false;
         this.sentBeginWikiDocumentLocale = false;
         this.sentBeginWikiDocumentRevision = false;
+
+        this.localeFromLegacy = true;
     }
 
     private void switchWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException

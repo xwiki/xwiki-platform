@@ -44,7 +44,8 @@
 #macro (displayChildrenCheckbox $options)
   ## Check if the document can have children.
   #if ($doc.name == $defaultDocumentName)
-    #countDocumentChildren($doc.documentReference $childCount)
+    #set ($spaceReference = $doc.documentReference.parent)
+    #countNestedDocuments($spaceReference $childCount)
     #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
     <dt>
       <label>
@@ -87,36 +88,18 @@
   #end
 #end
 
-#macro (countDocumentChildren $documentReference $return)
-  ## We cannot perform a single query because:
-  ## * select count(distinct case ...) doesn't work (https://hibernate.atlassian.net/browse/HHH-4150)
-  ## * select count(*) from (select distinct case ...) doesn't work (https://hibernate.atlassian.net/browse/HHH-3356)
-  ## * if we use group-by then count returns the number of rows in each group not the number of groups
-  ## So we're forced to do two queries.
-  ## NOTE: We include hidden children.
-  ## Count child spaces.
-  #set ($statement = 'select count(*) from XWikiSpace space where space.parent = :parentSpaceRef')
-  #set ($query = $services.query.hql($statement).setWiki($documentReference.wikiReference.name))
-  #set ($parentLocalSpaceRef = $services.model.serialize($documentReference.parent, 'local'))
-  #set ($count = $query.bindValue('parentSpaceRef', $parentLocalSpaceRef).execute().get(0))
-  ## Count child documents.
-  #set ($isChildDocument = [
-    'doc.space = :parentSpaceRef',
-    'doc.translation = 0',
-    'doc.name <> :spaceHomePageName'
-  ])
-  #set ($parameters = {
-    'parentSpaceRef': $parentLocalSpaceRef,
-    'spaceHomePageName': $services.model.getEntityReference('DOCUMENT', 'default').name
-  })
-  #set ($query = $services.query.hql("where $stringtool.join($isChildDocument, ' and ')"))
-  #set ($query = $query.setWiki($parentReference.extractReference('WIKI').name))
-  #foreach ($entry in $parameters.entrySet())
-    #set ($query = $query.bindValue($entry.key, $entry.value))
-  #end
-  #set ($count = $count + $query.count())
+#macro (countNestedDocuments $spaceReference $return)
+  #set ($isDirectChild = '(doc.space = :space and doc.name <> :defaultDocumentName)')
+  #set ($isIndirectChild = "doc.space like :spacePrefix escape '/'")
+  #set ($query = $services.query.hql("where $isDirectChild or $isIndirectChild"))
+  #set ($query = $query.setWiki($spaceReference.wikiReference.name))
+  #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+  #set ($query = $query.bindValue('space', $localSpaceReference))
+  #set ($query = $query.bindValue('defaultDocumentName', $defaultDocumentName))
+  #set ($spacePrefix = $localSpaceReference.replaceAll('([%_/])', '/$1'))
+  #set ($query = $query.bindValue('spacePrefix', "${spacePrefix}.%"))
   #set ($return = $NULL)
-  #setVariable("$return" $count)
+  #setVariable("$return" $query.count())
 #end
 
 #macro (getNestedDocumentReference $wiki $localSpaceReference $name $locale $terminal $return)

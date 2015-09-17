@@ -106,19 +106,13 @@
       ##
       #set ($parentField = $options.parent)
       #if ("$!parentField.reference" == '')
-        #getWikiHomePageReference($doc.wiki $homeReference)
-        #if ($doc.documentReference.equals($homeReference))
-          ## We want to discourage ending up with all the pages children of the homepage so we
-          ## default to top level documents, unless the user explicitly says otherwise.
-          #set ($defaultParentReference = $NULL)
-        #else
-          ## For all other documents, default to the current space, i.e. create the new page as a child of the current one.
-          #set ($defaultParentReference = $doc.documentReference.lastSpaceReference)
-        #end
+        ## Default to the current document's space.
+        #set ($defaultParentReference = $doc.documentReference.lastSpaceReference)
       #else
         #set ($defaultParentReference = $parentField.reference)
       #end
-      ## Make sure to use the local serialized string reference
+      ## Make sure to use the local serialized string reference.
+      ## Note: If the parent is a wiki reference, an empty value will be set in the input.
       #set ($defaultParentReferenceString = $services.model.serialize($defaultParentReference, 'local'))
       <dt>
         <label for="$!{id}ParentReference">$services.localization.render($parentField.label)</label>
@@ -152,16 +146,6 @@
         </dd>
       #end
   </div>
-#end
-
-#macro (getWikiHomePageReference $wiki $return)
-  #set ($_wikiHomePageReference = $services.wiki.getById($wiki).mainPageReference)
-  #if (!$_wikiHomePageReference)
-    #set ($wikiReference = $services.model.createWikiReference($wiki))
-    #set ($_wikiHomePageReference = $services.model.resolveDocument('', 'default', $wikiReference))
-  #end
-  #set ($return = $NULL)
-  #setVariable("$return" $_wikiHomePageReference)
 #end
 
 #macro (documentTree $options)

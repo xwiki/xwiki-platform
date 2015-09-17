@@ -44,13 +44,8 @@
         #documentPickerModal($options)
         #locationPickerActions
       #end
-      #set ($parentReference = $options.parent.reference)
-      #if (!$parentReference)
-        #set ($parentReference = $doc.documentReference)
-      #end
-      ## Note: We display only the parent space reference here. The new document part will be added from JavaScript.
-      #set ($parentReference = $parentReference.extractReference('SPACE'))
-      #hierarchy($parentReference)
+      ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
+      #hierarchy($options.parent.reference)
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Location advanced edit

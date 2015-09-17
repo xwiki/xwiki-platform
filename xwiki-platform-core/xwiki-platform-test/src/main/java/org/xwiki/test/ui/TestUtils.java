@@ -1678,6 +1678,22 @@ public class TestUtils
     {
         public final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
+        private String toSpaceElement(String spaceReference)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            for (EntityReference reference : RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE)
+                .getReversedReferenceChain()) {
+                if (builder.length() > 0) {
+                    builder.append("/spaces/");
+                }
+
+                builder.append(reference.getName());
+            }
+
+            return builder.toString();
+        }
+
         protected Object[] toElements(Page page)
         {
             List<Object> elements = new ArrayList<>();
@@ -1690,10 +1706,7 @@ public class TestUtils
             }
 
             // Add spaces
-            for (EntityReference reference : RELATIVE_RESOLVER.resolve(page.getSpace(), EntityType.SPACE)
-                .getReversedReferenceChain()) {
-                elements.add(reference.getName());
-            }
+            elements.add(toSpaceElement(page.getSpace()));
 
             // Add name
             elements.add(page.getName());
@@ -1713,10 +1726,7 @@ public class TestUtils
             }
 
             // Add spaces
-            for (EntityReference reference : RELATIVE_RESOLVER.resolve(obj.getSpace(), EntityType.SPACE)
-                .getReversedReferenceChain()) {
-                elements.add(reference.getName());
-            }
+            elements.add(toSpaceElement(obj.getSpace()));
 
             // Add name
             elements.add(obj.getPageName());

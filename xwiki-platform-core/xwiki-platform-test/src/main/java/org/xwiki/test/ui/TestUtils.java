@@ -1670,9 +1670,6 @@ public class TestUtils
     {
         public final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
-        /**
-         * @since 7.3M1
-         */
         public String getBaseURL()
         {
             return TestUtils.this.getBaseURL() + "rest";

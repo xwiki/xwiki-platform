@@ -132,6 +132,20 @@
   #end
 #end
 #set ($discard = $xwiki.jsfx.use('js/xwiki/create.js', {'forceSkinAction': true}))
+
+## ---------------------------------------------------------------------------------------------------------
+## Macro used to extrac a wiki's homepage reference.
+## ---------------------------------------------------------------------------------------------------------
+#macro (getWikiHomePageReference $wiki $return)
+  #set ($_wikiHomePageReference = $services.wiki.getById($wiki).mainPageReference)
+  #if (!$_wikiHomePageReference)
+    #set ($wikiReference = $services.model.createWikiReference($wiki))
+    #set ($_wikiHomePageReference = $services.model.resolveDocument('', 'default', $wikiReference))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $_wikiHomePageReference)
+#end
+
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
@@ -159,9 +173,23 @@
 
   ## Determine if we need to show the first column.
   #set ($showFirstColumn = $showSpaceReferenceInput || $showNameInput)
-
   <div class='row'>
     #if ($showFirstColumn)
+      ## Determine the parent reference for the new document.
+      #set ($parentReference = $spaceReference)
+      #if (!$parentReference)
+        ## No space reference specified.
+        ## Use the current document's space reference as parent for the new document.
+        #set ($parentReference = $doc.documentReference.lastSpaceReference)
+        #getWikiHomePageReference($doc.wiki $homeReference)
+        #if ($parentReference.equals($homeReference.lastSpaceReference))
+          ## We want to discourage ending up with all the pages children of the homepage so we
+          ## default to top level documents, unless the user explicitly says otherwise.
+          #set ($parentReference = $parentReference.wikiReference)
+        #end
+      #end
+
+      ## Display the location picker.
       <div class='col-xs-12 col-lg-6'>
         #template('locationPicker_macros.vm')
         #locationPicker({
@@ -181,7 +209,7 @@
             'label': 'core.create.spaceReference.label',
             'hint': 'core.create.spaceReference.hint',
             'name': 'spaceReference',
-            'reference': $spaceReference,
+            'reference': $parentReference,
             'placeholder': 'core.create.spaceReference.placeholder'
           },
           'name': {

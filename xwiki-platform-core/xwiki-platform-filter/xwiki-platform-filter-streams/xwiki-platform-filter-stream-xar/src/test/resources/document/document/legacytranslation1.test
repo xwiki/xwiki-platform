@@ -1,5 +1,6 @@
 .#------------------------------------------------------------------------------
 .inputexpect|xwiki+xar/1.1
+.# Make sure legacy XAR format is properly parsed
 .#------------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <xwikidoc version="1.2" reference="space.page" locale="fr">

@@ -327,6 +327,13 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
+  (% class="search-options" %)
+  * {{translation key="solr.options"/}}
+  #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
+  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+  #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
+  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+
   (% class="search-results-sort" %)
   * {{translation key="solr.sortBy"/}}
   #foreach ($entry in $defaultSortOrder.entrySet())
@@ -342,13 +349,6 @@
     #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
     * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
   #end
-
-  (% class="search-options" %)
-  * {{translation key="solr.options"/}}
-  #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
-  #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
 #end
 
 #macro (extendQueryString $url $extraParameters)

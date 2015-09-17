@@ -25,7 +25,7 @@
  *#
 #macro(drawerTopItemStart $icon $text $id)
   <li class="drawer-menu-item">
-    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu"">
+    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu">
       <div class="drawer-menu-item-icon">
         <span class="glyphicon glyphicon-${icon}"></span>
       </div>

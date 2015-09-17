@@ -1,25 +1,28 @@
-##########################################
-##              GLOBALS
-##########################################
-#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
-#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
-#set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
-##########################################
-##            DRAWER ITEM
-##########################################
+#**
+ * Display an element inside the drawer.
+ *
+ * @param $url the url of the link of the element
+ * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $text the text to display in the element
+ * @param $id (optional) the HTML id of the element
+ *#
 #macro(drawerItem $url $icon $text $id)
   <li class="drawer-menu-item">
     <a href="$url" #if($id)id="$id"#end>
       <div class="drawer-menu-item-icon">
         <span class="glyphicon glyphicon-${icon}"></span>
       </div>
-      <div class="drawer-menu-item-text">$text</div>
+      <div class="drawer-menu-item-text">$escapetool.xml($text)</div>
     </a>
   </li>
 #end
-##########################################
-##          DRAWER TOP ITEM
-##########################################
+#**
+ * Display the top element of a foldable drawer item.
+ *
+ * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $text the text to display in the element
+ * @param $id (optional) the HTML id of the element
+ *#
 #macro(drawerTopItemStart $icon $text $id)
   <li class="drawer-menu-item">
     <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu"">
@@ -30,21 +33,28 @@
     </a>
     <ul class="drawer-menu-sub-item collapse" id="${id}_menu">
 #end
+#**
+ * Close an foldable drawer item
+ *#
 #macro(drawerTopItemStop)
     </ul>
   </li>
 #end
-##########################################
-##            DRAWER SEPARATOR
-##########################################
+#**
+ * Display a separator between two elements in the drawer
+ *#
 #macro(drawerSeparator)
   <li class="drawer-menuseparator"></li>
 #end
-##########################################
-##               DRAWER
-##########################################
+##
+## Display the drawer
+##
 <div class="drawer-main drawer-default" id="tmDrawer">
   <nav class="drawer-nav" role="navigation">
+  
+    ##
+    ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)
+    ##
     <div class="drawer-brand clearfix">
       <a href="$xwiki.getURL($xcontext.user, 'view')">
       #largeUserAvatar($xcontext.user)
@@ -55,14 +65,27 @@
           <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$services.localization.render('logout')</a>
         #else
           <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$services.localization.render('login')</a>
-          <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$services.localization.render('register')</a>
+          #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
+            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$services.localization.render('register')</a>
+          #end
         #end
       </div>
     </div>
 
+    ##
+    ## Display the content of the drawer
+    ##
     <ul class="drawer-menu">
-      #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', 'Home')
-      ## ADMINISTER WIKI
+      ##
+      ## A link to the home wiki
+      ##
+      ## Only displayed on subwiki that have only global users.
+      #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" == 'GLOBAL_ONLY')
+        #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', 'Home')
+      #end
+      ##
+      ## Administer wiki
+      ##
       #if ($hasGlobalAdmin)
         #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
         #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
@@ -73,32 +96,46 @@
         #end
         #set ($hasPreviousMenuSection = true)
       #end
-      ## LANGUAGES
+      ##
+      ## Languages
+      ##
       #template('menus_language.vm')
-      ## WIKI INDEX
+      ##
+      ## Wiki Index
+      ##
       #drawerSeparator()
-      #if ($xwiki.exists($WikiManagerMainDocReference))
+      ## The wiki index is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
+      #if ($isWikiAPIAvailable && $isWikiUIAvailable && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
         #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $services.localization.render('platform.wiki.menu.wikiindex'))
       #end
-      ## DOCUMENT INDEX
+      ##
+      ## Document Index
+      ##
       #set($documentIndexRef = $services.model.createDocumentReference('', 'Main', 'AllDocs'))
       #if ($xwiki.exists($documentIndexRef))
         #drawerItem($xwiki.getURL($documentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'), 'tmWikiDocumentIndex')
       #end
-      ## USER INDEX
+      ##
+      ## User Index
+      ##
       #set($userIndexRef = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
       #if ($xwiki.exists($userIndexRef))
         #drawerItem($xwiki.getURL($userIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'), 'tmMainUserIndex')
       #end
-      ## CREATE WIKI
-      #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
+      ##
+      ## Create Wiki
+      ##
+      ## The "create wiki' option is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
+      ## Of course, there is also a check about the right.
+      #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
         #drawerSeparator()
         #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
         #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $services.localization.render('core.menu.create.wiki'), 'tmCreateWiki')
       #end
-      #set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
-      ## DELETE WIKI
-      #if ($canDeleteWiki)
+      ##
+      ## Delete Wiki
+      ## 
+      #if ($isWikiAPIAvailable && $isWikiUIAvailable && !$xcontext.isMainWiki() && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
         #drawerSeparator()
         #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
         #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))

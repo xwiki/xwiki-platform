@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,7 @@ import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectPropertyResource;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
@@ -787,25 +789,17 @@ public class TestUtils
         getDriver().get(getURLToDeleteSpace(space));
     }
 
-    public boolean pageExists(String space, String page)
+    public boolean pageExists(String space, String page) throws Exception
     {
-        return pageExists(Collections.singletonList(space), page);
+        return rest().exists(new LocalDocumentReference(space, page));
     }
 
     /**
      * @since 7.2M2
      */
-    public boolean pageExists(List<String> spaces, String page)
+    public boolean pageExists(List<String> spaces, String page) throws Exception
     {
-        boolean exists;
-        try {
-            executeGet(getURL(spaces, page, "view", null), Status.OK.getStatusCode());
-            exists = true;
-        } catch (Exception e) {
-            exists = false;
-        }
-
-        return exists;
+        return rest().exists(new LocalDocumentReference(spaces, page));
     }
 
     /**
@@ -1697,6 +1691,17 @@ public class TestUtils
     {
         public final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
+        public final Map<EntityType, Class<?>> RESOURCES_MAP = new IdentityHashMap<>();
+
+        public RestTestUtils()
+        {
+            RESOURCES_MAP.put(EntityType.DOCUMENT, PageResource.class);
+            RESOURCES_MAP.put(EntityType.ATTACHMENT, AttachmentResource.class);
+            RESOURCES_MAP.put(EntityType.OBJECT, ObjectResource.class);
+            RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, ObjectPropertyResource.class);
+            RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, ClassPropertyResource.class);
+        }
+
         public String getBaseURL()
         {
             return TestUtils.this.getBaseURL() + "rest";
@@ -1738,7 +1743,7 @@ public class TestUtils
             return elements.toArray();
         }
 
-        protected Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
+        public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
             List<Object> elements = new ArrayList<>();
 
@@ -1850,25 +1855,13 @@ public class TestUtils
 
         public void delete(EntityReference reference) throws Exception
         {
-            DeleteMethod deleteMethod;
+            Class<?> resource = RESOURCES_MAP.get(reference.getType());
 
-            switch (reference.getType()) {
-                case DOCUMENT:
-                    deleteMethod = executeDelete(PageResource.class, toElements(reference));
-                    break;
-                case ATTACHMENT:
-                    deleteMethod = executeDelete(AttachmentResource.class, toElements(reference));
-                    break;
-                case OBJECT:
-                    deleteMethod = executeDelete(ObjectResource.class, toElements(reference));
-                    break;
-                case OBJECT_PROPERTY:
-                    deleteMethod = executeDelete(ObjectPropertyResource.class, toElements(reference));
-                    break;
-
-                default:
-                    throw new Exception("Unsuported type [" + reference.getType() + "]");
+            if (resource == null) {
+                throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
+
+            DeleteMethod deleteMethod = executeDelete(resource, toElements(reference));
 
             // Check if the deleted went as expected
             TestUtils.assertStatusCodes(deleteMethod, STATUS_NO_CONTENT);
@@ -1877,6 +1870,21 @@ public class TestUtils
         public void deletePage(String space, String page) throws Exception
         {
             delete(new LocalDocumentReference(space, page));
+        }
+
+        public boolean exists(EntityReference reference) throws Exception
+        {
+            Class<?> resource = RESOURCES_MAP.get(reference.getType());
+
+            if (resource == null) {
+                throw new Exception("Unsuported type [" + reference.getType() + "]");
+            }
+
+            GetMethod getMethod = executeGet(resource, toElements(reference));
+
+            getMethod.releaseConnection();
+
+            return getMethod.getStatusCode() == Status.OK.getStatusCode();
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
@@ -1909,6 +1917,20 @@ public class TestUtils
             }
 
             return resourceStream;
+        }
+
+        public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception
+        {
+            return executeGet(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public GetMethod executeGet(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            // Build URI
+            String uri = createUri(resourceUri, queryParams, elements).toString();
+
+            return TestUtils.this.executeGet(uri);
         }
 
         public PostMethod executePost(Object resourceUri, Object restObject, Object... elements) throws Exception

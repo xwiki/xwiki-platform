@@ -309,7 +309,7 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * Create a space refererence from a wikiname and a list of space names.
+     * Create a space reference from a wikiname and a list of space names.
      *
      * @param wikiName the wikiname
      * @param spaceNames the list of space name from root to child

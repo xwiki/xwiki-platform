@@ -44,6 +44,19 @@ public class LocalDocumentReference extends EntityReference
 
     /**
      * Create a new Document reference in the current wiki.
+     *
+     * @param spaceNames an ordered list of the names of the spaces containing the document from root space to last one,
+     *            must not be null
+     * @param pageName the name of the document
+     * @since 7.3M1
+     */
+    public LocalDocumentReference(Iterable<String> spaceNames, String pageName)
+    {
+        super(pageName, EntityType.DOCUMENT, constructSpaceReference(spaceNames));
+    }
+
+    /**
+     * Create a new Document reference in the current wiki.
      * 
      * @param spaceName the name of the space containing the document, must not be null
      * @param pageName the name of the document, must not be null
@@ -97,6 +110,23 @@ public class LocalDocumentReference extends EntityReference
     public LocalDocumentReference(String pageName, EntityReference spaceReference)
     {
         super(pageName, EntityType.DOCUMENT, spaceReference);
+    }
+
+    /**
+     * Create a relative space reference in from a list of space names.
+     *
+     * @param spaceNames the list of space name from root to child
+     * @return the space reference
+     */
+    private static EntityReference constructSpaceReference(Iterable<String> spaceNames)
+    {
+        EntityReference spaceReference = null;
+
+        for (String spaceName : spaceNames) {
+            spaceReference = new EntityReference(spaceName, EntityType.SPACE, spaceReference);
+        }
+
+        return spaceReference;
     }
 
     /**

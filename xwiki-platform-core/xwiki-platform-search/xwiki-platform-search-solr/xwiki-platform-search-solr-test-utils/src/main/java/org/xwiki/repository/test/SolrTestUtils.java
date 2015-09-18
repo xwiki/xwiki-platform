@@ -38,14 +38,14 @@ public class SolrTestUtils
 
     private final TestUtils testUtils;
 
-    public SolrTestUtils(TestUtils testUtils)
+    public SolrTestUtils(TestUtils testUtils) throws Exception
     {
         this.testUtils = testUtils;
 
         initService();
     }
 
-    private void initService()
+    private void initService() throws Exception
     {
         if (!this.testUtils.pageExists(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE)) {
             // Make sure we create this page with SuperAdmin rights so that it has SR and PR when executed by tests.

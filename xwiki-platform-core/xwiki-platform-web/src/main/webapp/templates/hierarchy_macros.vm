@@ -50,8 +50,10 @@
     #if ($options.local)
       ## Remove the wiki reference.
       #set ($discard = $macro.path.remove(0))
-    #elseif ($wikiName != $xcontext.mainWikiName && $services.wiki.user.getUserScope($wikiName) != 'LOCAL_ONLY')
-      ## Add the main wiki reference.
+    #elseif ($wikiName != $xcontext.mainWikiName
+        && $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName
+        && $services.wiki.user.getUserScope($wikiName) != 'LOCAL_ONLY')
+      ## Global users should be able to navigate to the main wiki from a subwiki that accepts global users.
       #set ($discard = $macro.path.add(0, $services.model.createWikiReference($xcontext.mainWikiName)))
     #end
   #end

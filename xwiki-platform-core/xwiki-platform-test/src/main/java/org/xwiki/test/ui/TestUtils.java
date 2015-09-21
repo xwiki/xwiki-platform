@@ -1153,17 +1153,11 @@ public class TestUtils
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
 
-    public void deleteObject(String space, String page, String className, int objectNumber)
+    public void deleteObject(String space, String page, String className, int objectNumber) throws Exception
     {
-        StringBuilder queryString = new StringBuilder();
-
-        queryString.append("classname=");
-        queryString.append(escapeURL(className));
-        queryString.append('&');
-        queryString.append("classid=");
-        queryString.append(objectNumber);
-
-        gotoPage(space, page, "objectremove", queryString.toString());
+        TestUtils.assertStatusCodes(
+            rest().executeDelete(ObjectResource.class, getCurrentWiki(), space, page, className, objectNumber),
+            STATUS_NO_CONTENT);
     }
 
     public void updateObject(String space, String page, String className, int objectNumber, Map<String, ?> properties)

@@ -280,11 +280,22 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
-     * Waits until the given element is either hidden or deleted.
+     * Waits until the given locator corresponds to either a hidden or a deleted element.
      *
-     * @param locator
+     * @param locator the locator to wait for
      */
     public void waitUntilElementDisappears(final By locator)
+    {
+        waitUntilElementDisappears(null, locator);
+    }
+
+    /**
+     * Waits until the given locator corresponds to either a hidden or a deleted element.
+     *
+     * @param parentElement the element from which to start the search
+     * @param locator the locator to wait for
+     */
+    public void waitUntilElementDisappears(final WebElement parentElement, final By locator)
     {
         waitUntilCondition(new ExpectedCondition<Boolean>()
         {
@@ -292,7 +303,16 @@ public class XWikiWebDriver extends RemoteWebDriver
             public Boolean apply(WebDriver driver)
             {
                 try {
-                    WebElement element = driver.findElement(locator);
+                    WebElement element = null;
+                    // Note: Make sure to perform the find operation without waiting, since if the element is already
+                    // gone (what we really want here) there is no point to wait for it.
+                    if (parentElement != null) {
+                        // Use the locator from the passed parent element.
+                        element = findElementWithoutWaiting(parentElement, locator);
+                    } else {
+                        // Use the locator from the root.
+                        element = findElementWithoutWaiting(locator);
+                    }
                     return !element.isDisplayed();
                 } catch (NotFoundException e) {
                     return Boolean.TRUE;

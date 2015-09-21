@@ -170,11 +170,8 @@ public class DocumentSolrMetadataExtractorTest
             this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(this.documentReference)).thenReturn(fullName);
 
-        String localSpaceReference = "Path.To.Page";
-        when(localEntityReferenceSerializer.serialize(this.documentReference.getLastSpaceReference())).thenReturn(
-            localSpaceReference);
-
         // Hierarchy
+        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent())).thenReturn("Path.To.Page");
         when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent())).thenReturn(
             "Path.To");
         when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent().getParent()))
@@ -257,7 +254,7 @@ public class DocumentSolrMetadataExtractorTest
         assertEquals(id, solrDocument.getFieldValue(FieldUtils.ID));
 
         assertEquals(this.documentReference.getWikiReference().getName(), solrDocument.getFieldValue(FieldUtils.WIKI));
-        assertEquals(localSpaceReference, solrDocument.getFieldValue(FieldUtils.SPACE));
+        assertEquals(Arrays.asList("Path", "To", "Page"), solrDocument.getFieldValues(FieldUtils.SPACE));
         assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
 
         assertEquals(Arrays.asList("0/Path.", "1/Path.To.", "2/Path.To.Page."),

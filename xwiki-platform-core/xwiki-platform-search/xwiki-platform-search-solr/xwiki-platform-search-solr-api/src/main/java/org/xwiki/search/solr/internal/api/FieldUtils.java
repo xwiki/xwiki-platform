@@ -76,20 +76,21 @@ public final class FieldUtils
     public static final String WIKI = "wiki";
 
     /**
-     * Name of the space the document belongs to.
+     * The names of all the nested spaces the document belongs to. For a document {@code A.B.C.Page} the value of this
+     * field will be {@code ['A', 'B', 'C']}. This field is used for free text search.
      */
     public static final String SPACE = "space";
 
     /**
-     * Unanalyzed and not stored version of the document's space.
+     * The local space reference, unanalyzed and not stored, used for exact matching.
      */
     public static final String SPACE_EXACT = "space_exact";
 
     /**
-     * Unanalyzed and not stored version of the {@link #SPACE} field that is used for hierarchical faceting on nested
-     * spaces (using 'facet.prefix'-based drill down). E.g. for a document A.B.C.Page this field will hold ['0/A.',
-     * '1/A.B.', '2/A.B.C.']
+     * This field is used for hierarchical faceting on nested spaces (using 'facet.prefix'-based drill down). E.g. for a
+     * document A.B.C.Page this field will hold ['0/A.', '1/A.B.', '2/A.B.C.']
      * 
+     * @see <a href='https://wiki.apache.org/solr/HierarchicalFaceting'>Hierarchical Faceting</a>
      * @since 7.2RC1
      */
     public static final String SPACE_FACET = "space_facet";

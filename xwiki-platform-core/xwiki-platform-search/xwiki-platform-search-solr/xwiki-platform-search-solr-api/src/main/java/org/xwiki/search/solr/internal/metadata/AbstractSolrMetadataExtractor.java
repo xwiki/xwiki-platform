@@ -233,8 +233,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         solrDocument.setField(FieldUtils.HIDDEN, document.isHidden());
 
         solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
-        solrDocument.setField(FieldUtils.SPACE,
-            this.localSerializer.serialize(documentReference.getLastSpaceReference()));
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());
 
         // Set the fields that are used to query / filter the document hierarchy.
@@ -518,15 +516,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
     private void setHierarchyFields(SolrInputDocument solrDocument, EntityReference path)
     {
+        solrDocument.setField(FieldUtils.SPACE_EXACT, this.localSerializer.serialize(path));
         List<EntityReference> ancestors = path.getReversedReferenceChain();
         // Skip the wiki reference because we want to index the local space references.
         for (int i = 1; i < ancestors.size(); i++) {
+            solrDocument.addField(FieldUtils.SPACE, ancestors.get(i).getName());
             String localAncestorReference = this.localSerializer.serialize(ancestors.get(i));
+            solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
             // We prefix the local ancestor reference with the depth in order to use 'facet.prefix'. We also add a
             // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
             // 0/GalleryCode/).
             solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
-            solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
         }
     }
 }

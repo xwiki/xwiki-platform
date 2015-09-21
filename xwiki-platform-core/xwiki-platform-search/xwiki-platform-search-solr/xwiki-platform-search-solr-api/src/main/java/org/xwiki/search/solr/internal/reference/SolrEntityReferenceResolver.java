@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.reference;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,10 +56,6 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     @Inject
     @Named("explicit")
     private EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver;
-
-    @Inject
-    @Named("explicit")
-    private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
 
     @Override
     public EntityReference resolve(SolrDocument solrDocument, EntityType type, Object... parameters)
@@ -103,9 +100,13 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
     private EntityReference getSpaceReference(SolrDocument solrDocument, EntityReference parent, Object... parameters)
     {
-        String localSpaceReference = (String) solrDocument.get(FieldUtils.SPACE);
-        if (!StringUtils.isEmpty(localSpaceReference)) {
-            return this.explicitStringEntityReferenceResolver.resolve(localSpaceReference, EntityType.SPACE, parent);
+        Collection<Object> spaceNames = solrDocument.getFieldValues(FieldUtils.SPACE);
+        if (spaceNames != null && !spaceNames.isEmpty()) {
+            EntityReference spaceReference = parent;
+            for (Object spaceName : spaceNames) {
+                spaceReference = new EntityReference(String.valueOf(spaceName), EntityType.SPACE, spaceReference);
+            }
+            return spaceReference;
         } else {
             return resolveMissingReference(EntityType.SPACE, parent, parameters);
         }

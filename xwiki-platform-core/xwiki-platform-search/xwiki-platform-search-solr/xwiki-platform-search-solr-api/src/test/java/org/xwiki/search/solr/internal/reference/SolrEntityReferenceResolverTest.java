@@ -62,7 +62,7 @@ public class SolrEntityReferenceResolverTest
     {
         solrDocument = new SolrDocument();
         solrDocument.setField(FieldUtils.WIKI, "chess");
-        solrDocument.setField(FieldUtils.SPACE, "Path.To.Success");
+        solrDocument.setField(FieldUtils.SPACE, Arrays.asList("Path", "To", "Success"));
         solrDocument.setField(FieldUtils.NAME, "WebHome");
         solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, "fr");
         // The file name field can have multiple values.
@@ -73,14 +73,6 @@ public class SolrEntityReferenceResolverTest
         solrDocument.addField(FieldUtils.CLASS, "App.Code.TrainerClass");
         solrDocument.setField(FieldUtils.NUMBER, 13);
         solrDocument.setField(FieldUtils.PROPERTY_NAME, "age");
-
-        EntityReferenceResolver<String> explicitStringEntityReferenceResolver =
-            this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "explicit");
-        WikiReference wikiReference = new WikiReference("chess");
-        SpaceReference spaceReference =
-            new SpaceReference("Success", new SpaceReference("To", new SpaceReference("Path", wikiReference)));
-        when(explicitStringEntityReferenceResolver.resolve("Path.To.Success", EntityType.SPACE, wikiReference))
-            .thenReturn(spaceReference);
 
         EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver =
             this.mocker.getInstance(EntityReferenceResolver.TYPE_REFERENCE, "explicit");

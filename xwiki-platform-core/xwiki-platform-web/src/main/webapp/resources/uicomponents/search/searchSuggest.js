@@ -102,13 +102,13 @@ var XWiki = (function (XWiki) {
         if (event.memo.originalEvent) {
           Event.stop(event.memo.originalEvent);
         }
-        if (!event.memo.id) {
+        if (!event.memo.url) {
           // Submit form
           this.searchInput.up('form').submit();
         }
         else {
           // Go to page
-          window.location = event.memo.id;;
+          window.location = event.memo.url;
         }
       }
     },
@@ -162,6 +162,7 @@ var XWiki = (function (XWiki) {
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue: true,
         displayValueText: "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
+        resultInfoHTML: true,
         timeout: 0,
         width: 500,
         unifiedLoader: true,

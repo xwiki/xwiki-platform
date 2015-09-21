@@ -127,24 +127,7 @@
   #set ($macro.data = [])
   #foreach ($reference in $path)
     #set ($url = $NULL)
-    #if ($reference.type == 'OBJECT')
-      #if ($services.security.authorization.hasAccess('edit', $reference))
-        #if ($reference.objectNumber)
-          #set ($objectNumber = $reference.objectNumber)
-          #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
-        #else
-          #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
-          #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
-        #end
-        #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
-          'editor': 'object',
-          'classname': $objectType,
-          'object': $objectNumber
-        })))
-      #end
-    #elseif ($reference.type != 'ellipsis' && $services.security.authorization.hasAccess('view', $reference))
-      #set ($url = $xwiki.getURL($reference))
-    #end
+    #getHierarchyPathData_url($reference)
     #set ($discard = $macro.data.add({
       'reference': $reference,
       'label': $labels.get($foreach.index),
@@ -153,6 +136,27 @@
   #end
   #set ($return = $NULL)
   #setVariable("$return" $macro.data)
+#end
+
+#macro (getHierarchyPathData_url $reference)
+  #if ($reference.type == 'OBJECT')
+    #if ($services.security.authorization.hasAccess('edit', $reference))
+      #if ($reference.objectNumber)
+        #set ($objectNumber = $reference.objectNumber)
+        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+      #else
+        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
+        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+      #end
+      #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
+        'editor': 'object',
+        'classname': $objectType,
+        'object': $objectNumber
+      })))
+    #end
+  #elseif ($reference.type != 'ellipsis' && $services.security.authorization.hasAccess('view', $reference))
+    #set ($url = $xwiki.getURL($reference))
+  #end
 #end
 
 #**

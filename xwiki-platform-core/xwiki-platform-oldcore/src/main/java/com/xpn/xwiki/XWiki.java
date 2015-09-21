@@ -4239,8 +4239,22 @@ public class XWiki implements EventListener
         // We need to serialize the space reference because the old createURL() API doesn't accept a DocumentReference.
         String spaces = this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference());
 
+        // Take into account the specified document locale.
+        Locale documentLocale = documentReference.getLocale();
+        String actualQueryString = queryString;
+        if (documentLocale != null && documentLocale != Locale.ROOT) {
+            String localeQueryString = "language=" + documentLocale;
+            if (StringUtils.isEmpty(queryString)) {
+                actualQueryString = localeQueryString;
+            } else {
+                // Note: if the locale is already specified on the given query string then it won't be overwriten
+                // because the first parameter value is taken into account.
+                actualQueryString += '&' + localeQueryString;
+            }
+        }
+
         URL url =
-            context.getURLFactory().createURL(spaces, documentReference.getName(), action, queryString, anchor,
+            context.getURLFactory().createURL(spaces, documentReference.getName(), action, actualQueryString, anchor,
                 documentReference.getWikiReference().getName(), context);
 
         return context.getURLFactory().getURL(url, context);

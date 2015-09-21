@@ -22,6 +22,7 @@ package com.xpn.xwiki;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -309,6 +310,25 @@ public class XWikiMockitoTest
         this.xwiki.getURL(reference, "view", null, null, context);
 
         verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
+    }
+    
+    @Test
+    public void getURLWithLocale() throws Exception
+    {
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        when(context.getURLFactory()).thenReturn(urlFactory);
+
+        DocumentReference reference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+
+        EntityReferenceSerializer<String> serializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("Space");
+
+        this.xwiki.getURL(reference, "view", null, null, context);
+        verify(urlFactory).createURL("Space", "Page", "view", "language=fr", null, "wiki", context);
+
+        this.xwiki.getURL(reference, "view", "language=ro", null, context);
+        verify(urlFactory).createURL("Space", "Page", "view", "language=ro&language=fr", null, "wiki", context);
     }
 
     @Test

@@ -145,7 +145,7 @@ public class CreateAction extends XWikiAction
         // Note: we do not need the "type" if we have a template provider: the type of the new document will be the type
         // of the template.
         // TODO: handle this type in doCreate() that we call above (see: http://jira.xwiki.org/browse/XWIKI-12585).
-        if (StringUtils.isBlank(handler.getType()) && handler.getTemplateProvider() == null) {
+        if (StringUtils.isBlank(handler.getType()) && !handler.hasTemplate()) {
             return CREATE_TEMPLATE;
         }
 

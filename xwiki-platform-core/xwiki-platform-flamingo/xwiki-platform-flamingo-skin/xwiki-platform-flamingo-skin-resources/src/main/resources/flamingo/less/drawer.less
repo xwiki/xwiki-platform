@@ -10,6 +10,7 @@
 @xwiki-drawer-menu-item-padding:         @navbar-padding-vertical 0 @navbar-padding-vertical @navbar-padding-horizontal;
 @xwiki-drawer-menu-item-size:            @font-size-base;
 @xwiki-drawer-menu-item-color:           @text-color;
+@xwiki-drawer-menu-item-bg:              @xwiki-drawer-bg;
 @xwiki-drawer-menu-item-icon-padding:    @navbar-padding-horizontal;
 @xwiki-drawer-menu-item-hover-color:     @navbar-inverse-link-active-color;
 @xwiki-drawer-menu-item-hover-bg:        @navbar-inverse-link-active-bg;
@@ -64,17 +65,15 @@
   .drawer-menu-item {
     padding: 0;
      
-    a, a.collapsed, a[aria-expanded='true'] {
-      // the two last selectors above are used to fix a strange bug with the bootstrap collapse plugin
-      // see: "Language Menu disappears when you open it and move your mouse out" (http://jira.xwiki.org/browse/XWIKI-12572)
-      // TODO: remove them if we stop using this bootstrap plugin
-      color: @xwiki-drawer-menu-item-color;
+    a {
       font-size: @xwiki-drawer-menu-item-size;
       font-weight: 400;
       margin-top: 0;
       padding: @xwiki-drawer-menu-item-padding;
     
       &, &:hover, &:focus {
+        background-color: @xwiki-drawer-menu-item-bg;
+        color: @xwiki-drawer-menu-item-color;
         text-decoration: none;
       }
       

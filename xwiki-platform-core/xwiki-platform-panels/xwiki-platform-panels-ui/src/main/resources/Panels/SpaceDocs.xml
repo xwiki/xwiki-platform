@@ -124,10 +124,8 @@
     <property>
       <content>{{velocity}}
 #panelheader($doc.space)
-#set ($currentSpaceReference = $doc.documentReference.extractReference('SPACE'))
 #foreach ($docName in $xwiki.getSpaceDocsName($doc.space))
-  #set ($docReference = $services.model.createEntityReference($docName, 'DOCUMENT', $currentSpaceReference))
-  * [[$docReference.name>>$services.model.serialize($docReference)]]
+  * [[$docName]]
 #end
 #panelfooter()
 {{/velocity}}</content>

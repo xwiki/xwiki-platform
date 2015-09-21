@@ -48,17 +48,16 @@
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   &lt;results&gt;
     #foreach ($result in $results)
-      #set ($documentReference = $services.model.createDocumentReference($result.wiki, $result.space, $result.name))
-      #set ($wikiId = $result.name.replaceAll('XWikiServer', '').toLowerCase())
+      #set ($documentReference = $services.solr.resolveDocument($result))
+      #set ($wikiId = $stringtool.substringAfter($documentReference.name, 'XWikiServer').toLowerCase())
       #set ($wikiDescriptor = $services.wiki.getById($wikiId))
       #if ($wikiDescriptor)
         #set ($name = $wikiDescriptor.prettyName)
         #if ("$!name.trim()" == '')
           #set ($name = $wikiDescriptor.id)
         #end
-        #set ($wikiHomeDocRef = $wikiDescriptor.mainPageReference)
-        #set ($url = $xwiki.getURL($wikiHomeDocRef))
-        &lt;rs id="$escapetool.xml($url)" info="$escapetool.xml($wikiHomeDocRef)"&gt;$escapetool.xml($name)&lt;/rs&gt;
+        #set ($url = $xwiki.getURL($wikiDescriptor.mainPageReference))
+        &lt;rs id="$escapetool.xml($wikiId)" type="wiki" url="$escapetool.xml($url)"&gt;$escapetool.xml($name)&lt;/rs&gt;
       #end
     #end
   &lt;/results&gt;

@@ -64,6 +64,8 @@ var XWiki = (function(XWiki){
     // The name of the JSON parameter or XML attribute holding the result auxiliary information.
     // "info" for the old suggest, "pageFullName" for the REST search.
     resultInfo : "info",
+    // Indicates if the auxiliary information contains HTML code or node.
+    resultInfoHTML : false,
     // The name of the JSON parameter or XML attribute holding the result icon.
     resultIcon: "icon",
     // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
@@ -71,6 +73,8 @@ var XWiki = (function(XWiki){
     // The name of the JSON field or XML attribute holding the result type. The value of the specified field/attribute is
     // used as a CSS class name. This is useful if you need to style suggestions differently based on some property.
     resultType: "type",
+    // The name of the JSON field or XML attribute holding the result URL.
+    resultURL: 'url',
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -455,9 +459,10 @@ var XWiki = (function(XWiki){
           'id': this._getNestedProperty(result, source.resultId || this.options.resultId),
           'value': this._getNestedProperty(result, source.resultValue || this.options.resultValue),
           'info': this._getNestedProperty(result, source.resultInfo || this.options.resultInfo),
-          'icon' : this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
-          'hint' : this._getNestedProperty(result, source.resultHint || this.options.resultHint),
-          'type' : this._getNestedProperty(result, source.resultType || this.options.resultType)
+          'icon': this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
+          'hint': this._getNestedProperty(result, source.resultHint || this.options.resultHint),
+          'type': this._getNestedProperty(result, source.resultType || this.options.resultType),
+          'url': this._getNestedProperty(result, source.resultURL || this.options.resultURL)
         });
       }
     } else {
@@ -473,7 +478,8 @@ var XWiki = (function(XWiki){
             'info': results[i].getAttribute('info'),
             'icon': results[i].getAttribute('icon'),
             'hint': results[i].getAttribute('hint'),
-            'type': results[i].getAttribute('type')
+            'type': results[i].getAttribute('type'),
+            'url': results[i].getAttribute('url')
           });
         }
       }
@@ -713,9 +719,10 @@ var XWiki = (function(XWiki){
         return ((value || '') + '').escapeHTML();
       };
       var valueNode = new Element('div')
-            .insert(new Element('span', {'class':'suggestId'}).update(escapeHTML(arr[i].id)))
-            .insert(new Element('span', {'class':'suggestValue'}).update(escapeHTML(arr[i].value)))
-            .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)));
+        .insert(new Element('span', {'class':'suggestId'}).update(escapeHTML(arr[i].id)))
+        .insert(new Element('span', {'class':'suggestValue'}).update(escapeHTML(arr[i].value)))
+        .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)))
+        .insert(new Element('span', {'class':'suggestURL'}).update(escapeHTML(arr[i].url)));
 
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
@@ -762,10 +769,15 @@ var XWiki = (function(XWiki){
     if (!this.options.displayValue) {
       var displayNode = new Element("span", {'class':'info'}).update(output);
     } else {
-      var escapedInfo = ((data.info || '') + '').escapeHTML();
-      var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output))
-        .insert(new Element('div', {'class':'info'}).update("<span class='legend'>"
-        + this.options.displayValueText + "</span>" + escapedInfo));
+      var displayNode = new Element("div").insert(new Element('div', {'class':'value'}).update(output));
+      if (data.info) {
+        var escapedInfo = data.info + '';
+        if (source.resultInfoHTML  === undefined ? !this.options.resultInfoHTML : !source.resultInfoHTML) {
+          escapedInfo = escapedInfo.escapeHTML();
+        }
+        displayNode.insert(new Element('div', {'class':'info'}).update("<span class='legend'>"
+          + this.options.displayValueText + "</span>" + escapedInfo));
+      }
     }
     // If the search result contains an icon information, we insert this icon in the result entry.
     if (data.icon) {
@@ -958,6 +970,7 @@ var XWiki = (function(XWiki){
         'id': text(this.iHighlighted.down(".suggestId")),
         'value': text(this.iHighlighted.down(".suggestValue")),
         'info': text(this.iHighlighted.down(".suggestInfo")),
+        'url': text(this.iHighlighted.down(".suggestURL")),
         'icon' : icon ? icon.src : '',
         'originalEvent' : event
       }

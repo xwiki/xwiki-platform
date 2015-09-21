@@ -25,8 +25,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
  * Represents the actions that can be done on the Spaces Macro when executed.
@@ -52,15 +52,15 @@ public class SpacesMacroPane extends BaseElement
      * Shows the space creation form, fills the space name text field with the given space name and submits the form.
      *
      * @param spaceName the name of the space to create
-     * @return the WYSIWYG edit page for the space home page
+     * @return the create page form for the space home page
      */
-    public WYSIWYGEditPage createSpace(String spaceName)
+    public CreatePagePage createSpace(String spaceName)
     {
         this.spaceCreateFormToggleSwitch.click();
         this.spaceNameTextField.clear();
         this.spaceNameTextField.sendKeys(spaceName);
         this.spaceNameTextField.submit();
-        return new WYSIWYGEditPage();
+        return new CreatePagePage();
     }
 
     public SpaceIndexPage clickSpaceIndex(String spaceName)

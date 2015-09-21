@@ -20,7 +20,6 @@
 package org.xwiki.administration.test.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Rule;
@@ -282,112 +281,6 @@ public class CreatePageTest extends AbstractTest
         // error
         assertEquals(currentURL, urlAfterSubmit);
         createSpace.waitForErrorMessage();
-    }
-
-    /**
-     * Tests what happens when creating a page when no template is available in the specific space.
-     */
-    @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
-    })
-    public void createPageWhenNoTemplateAvailable() throws Exception
-    {
-        // We'll create all these pages during this test
-        getUtil().deleteSpace(getTestClassName());
-        EntityReference newPageReference = getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.WebHome");
-        getUtil().rest().delete(newPageReference);
-
-        // prepare the test environment, create a test space and exclude all templates for this space
-        // create the home page of this space to make sure the space exists
-        getUtil().createPage(getTestClassName(), "WebHome", "You can have fun with templates here",
-            "Welcome to the templates test space");
-
-        // go through all the templates and make sure they are disabled on this space
-        TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
-
-        // get the links to existing templates, navigate to each of them and disable the current space
-        List<String> spacesToExclude = Collections.singletonList(getTestClassName());
-        List<WebElement> existingTemplatesLinks = sectionPage.getExistingTemplatesLinks();
-        for (int i = 0; i < existingTemplatesLinks.size(); i++) {
-            WebElement link = existingTemplatesLinks.get(i);
-            link.click();
-            ViewPage templateViewPage = new ViewPage();
-            templateViewPage.editInline();
-            TemplateProviderInlinePage providerEditPage = new TemplateProviderInlinePage();
-
-            // FIXME: Temporary until we remove the template provider type altogether and make all providers page
-            // template providers.
-            if (!providerEditPage.isPageTemplate()) {
-                providerEditPage.setPageTemplate(true);
-            }
-
-            providerEditPage.excludeSpaces(spacesToExclude);
-            providerEditPage.clickSaveAndView();
-
-            // go back to the admin page, to leave this in a valid state
-            sectionPage = TemplatesAdministrationSectionPage.gotoPage();
-            existingTemplatesLinks = sectionPage.getExistingTemplatesLinks();
-        }
-
-        // TODO: should reset these template settings at the end of the test, to leave things in the same state as they
-        // were at the beginning of the test
-
-        // and now start testing!
-
-        // 1/ create a page from the link in the page displayed when navigating to a non-existing page
-        getUtil().gotoPage(getTestClassName(), "NewUnexistingPage", "view", "spaceRedirect=false");
-        ViewPage newUnexistentPage = new ViewPage();
-        assertFalse(newUnexistentPage.exists());
-        DocumentDoesNotExistPage nonExistingPage = new DocumentDoesNotExistPage();
-        nonExistingPage.clickEditThisPageToCreate();
-        // make sure we're not in create mode anymore
-        assertFalse(getUtil().isInCreateMode());
-        // TODO: check that we're indeed in the edit mode of space.NewUnexitingPage
-        EditPage editNewUnexistingPage = new EditPage();
-        assertEquals(getTestClassName(), editNewUnexistingPage.getMetaDataValue("space"));
-        assertEquals("NewUnexistingPage", editNewUnexistingPage.getMetaDataValue("page"));
-
-        // 2/ create a page from the create menu on an existing page, by filling in space and name
-        ViewPage spaceHomePage = getUtil().gotoPage(getTestClassName(), "WebHome");
-        CreatePagePage createNewPage = spaceHomePage.createPage();
-        // we expect no templates available
-        assertEquals(0, createNewPage.getAvailableTemplateSize());
-        // fill in data and create the page
-        createNewPage.setTitle("A New Page");
-        createNewPage.setSpace(getTestClassName());
-        createNewPage.setPage("NewPage");
-        createNewPage.clickCreate();
-        // we expect to go to the edit mode of the new page
-        assertFalse(getUtil().isInCreateMode());
-        EditPage editNewPage = new EditPage();
-        assertEquals(getTestClassName() + ".NewPage", editNewPage.getMetaDataValue("space"));
-        assertEquals("WebHome", editNewPage.getMetaDataValue("page"));
-        ViewPage viewNewPage = editNewPage.clickSaveAndView();
-        // mare sure title is the right one
-        assertEquals("A New Page", viewNewPage.getDocumentTitle());
-        // Check that the breadcrumb uses titles for the parents and the current page.
-        assertEquals("/Welcome to the templates test space/A New Page", viewNewPage.getBreadcrumbContent());
-
-        // 3/ create a page from a link in another page
-        WikiEditPage editNewPageWiki = viewNewPage.editWiki();
-        // put a link to the new page to create
-        editNewPageWiki.setContent("[[NewLinkedPage]]");
-        ViewPage newPage = editNewPageWiki.clickSaveAndView();
-        // no templates are available, so we don't expect a panel with a list of templates, we just expect it goes
-        // directly to edit mode of the new page
-        // it would be nice to be able to test here that the create page panel is not displayed, ever. However, we can't
-        // since we need to wait for that time, and we don't know how much is never.
-        EntityReference wantedLinkReference =
-            getUtil().resolveDocumentReference(getTestClassName() + ".NewPage.NewLinkedPage");
-        newPage.clickWantedLink(wantedLinkReference, false);
-        EditPage editNewLinkedPage = new EditPage();
-        // since the edit mode loads as a result of a redirect that comes from a async call made by the click, we need
-        // to wait for the page to load
-        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='mainEditArea']"));
-        assertEquals(getTestClassName() + ".NewPage", editNewLinkedPage.getMetaDataValue("space"));
-        assertEquals("NewLinkedPage", editNewLinkedPage.getMetaDataValue("page"));
     }
 
     /**

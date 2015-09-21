@@ -429,16 +429,21 @@ public class CreateActionRequestHandler
         // Check whether there is a template parameter set, be it an empty one. If a page should be created and there is
         // no template parameter, it means the create action is not supposed to be executed, but only display the
         // available templates and let the user choose
-        boolean hasTemplate =
-            context.getRequest().getParameter(TEMPLATE_PROVIDER) != null
-                || context.getRequest().getParameter(TEMPLATE) != null;
         // If there's no passed template, check if there are any available templates. If none available, then the fact
         // that there is no template is ok.
-        if (hasTemplate || availableTemplateProviders.isEmpty()) {
+        if (hasTemplate() || availableTemplateProviders.isEmpty()) {
             result = new DocumentReference(newName, newSpaceReference);
         }
 
         return result;
+    }
+
+    /**
+     * @return if a template or a template provider have been set (it can be empty however)
+     */
+    public boolean hasTemplate()
+    {
+        return request.getParameter(TEMPLATE_PROVIDER) != null || request.getParameter(TEMPLATE) != null;
     }
 
     /**

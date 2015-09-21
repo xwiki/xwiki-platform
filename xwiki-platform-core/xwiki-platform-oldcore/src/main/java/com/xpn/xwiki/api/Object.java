@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 public class Object extends Collection
 {
@@ -103,5 +104,11 @@ public class Object extends Collection
     public void set(String fieldname, java.lang.Object value)
     {
         getBaseObject().set(fieldname, value, getXWikiContext());
+    }
+
+    @Override
+    public BaseObjectReference getReference()
+    {
+        return getBaseObject().getReference();
     }
 }

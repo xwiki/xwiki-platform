@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.api;
 
+import org.xwiki.model.reference.EntityReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseElement;
 
@@ -64,5 +66,14 @@ public class Element extends Api
     public String getName()
     {
         return this.element.getName();
+    }
+
+    /**
+     * @return the reference of the element
+     * @since 7.3M1
+     */
+    public EntityReference getReference()
+    {
+        return this.element.getReference();
     }
 }

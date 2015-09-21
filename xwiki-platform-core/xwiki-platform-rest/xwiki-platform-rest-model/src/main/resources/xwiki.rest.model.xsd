@@ -134,6 +134,9 @@
           <element name="modifierName" type="string"></element>
           <element name="comment" type="string"></element>
           <element name="content" type="string"></element>
+          <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="1"></element>
+          <element name="objects" type="xwiki:Objects" minOccurs="0" maxOccurs="1"></element>
+          <element name="attachments" type="xwiki:Attachments" minOccurs="0" maxOccurs="1"></element>
         </sequence>
       </extension>
     </complexContent>
@@ -382,18 +385,18 @@
     </complexType>
   </element>
 
-  <element name="attachments">
-    <complexType>
-      <complexContent>
-        <extension base="xwiki:LinkCollection">
-          <sequence>
-            <element name="attachment" type="xwiki:Attachment"
-              minOccurs="0" maxOccurs="unbounded"></element>
-          </sequence>
-        </extension>
-      </complexContent>
-    </complexType>
-  </element>
+  <complexType name="Attachments">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="attachment" type="xwiki:Attachment"
+            minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="attachments" type="xwiki:Attachments"></element>
 
   <element name="comments">
     <complexType>
@@ -430,38 +433,37 @@
     </complexType>
   </element>
 
-  <element name="objects">
-    <complexType>
-      <complexContent>
-        <extension base="xwiki:LinkCollection">
-          <sequence>
-            <element name="objectSummary" type="xwiki:ObjectSummary"
-              minOccurs="0" maxOccurs="unbounded"></element>
-          </sequence>
-        </extension>
-      </complexContent>
-    </complexType>
-  </element>
+  <complexType name="Objects">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="objectSummary" type="xwiki:ObjectSummary"
+            minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="objects" type="xwiki:Objects"></element>
 
   <element name="object" type="xwiki:Object"></element>
 
 
   <element name="translations" type="xwiki:Translations"></element>
 
+  <complexType name="Properties">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="property" type="xwiki:Property"
+            minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
 
-  <element name="properties">
-    <complexType>
-      <complexContent>
-        <extension base="xwiki:LinkCollection">
-          <sequence>
-            <element name="property" type="xwiki:Property" minOccurs="0"
-              maxOccurs="unbounded"></element>
-          </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
-        </extension>
-      </complexContent>
-    </complexType>
-  </element>
+  <element name="properties" type="xwiki:Properties"></element>
 
   <element name="objectSummary" type="xwiki:ObjectSummary"></element>
 

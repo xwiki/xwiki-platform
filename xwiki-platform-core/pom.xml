@@ -520,6 +520,12 @@
               <method>java.lang.Object getRenderingEngine()</method>
               <justification>Not a breakage. The legacy method was not in the right place (which mean that it was not available so it actually fix a breakage)</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/rest/resources/pages/PageResource</className>
+              <method>org.xwiki.rest.model.jaxb.Page getPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean)</method>
+              <justification>New URL parameters</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

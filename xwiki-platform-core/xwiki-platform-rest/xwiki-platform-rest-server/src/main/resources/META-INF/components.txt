@@ -1,3 +1,4 @@
+org.xwiki.rest.internal.ModelFactory
 org.xwiki.rest.internal.resources.RootResourceImpl
 org.xwiki.rest.internal.resources.SyntaxesResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikisResourceImpl

@@ -19,13 +19,13 @@
  */
 package org.xwiki.rest.internal.resources.pages;
 
+import java.net.URI;
+
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageResource;
 
@@ -40,17 +40,21 @@ import com.xpn.xwiki.api.Document;
 public class PageResourceImpl extends ModifiablePageResource implements PageResource
 {
     @Override
-    public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames)
-            throws XWikiRestException
+    public Page getPage(String wikiName, String spaceName, String pageName, Boolean withPrettyNames,
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiRestException
     {
         try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null,
-                true, false);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
             Document doc = documentInfo.getDocument();
 
-            return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-                    false, Utils.getXWikiApi(componentManager), withPrettyNames);
+            URI baseUri = uriInfo.getBaseUri();
+
+            Page page =
+                this.factory.toRestPage(baseUri, uriInfo.getAbsolutePath(), doc, false, withPrettyNames, withObjects,
+                    withXClass, withAttachments);
+
+            return page;
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

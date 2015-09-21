@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
@@ -26,7 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.resources.classes.ClassResource;
@@ -40,6 +41,9 @@ import com.xpn.xwiki.XWikiException;
 @Named("org.xwiki.rest.internal.resources.classes.ClassResourceImpl")
 public class ClassResourceImpl extends XWikiResource implements ClassResource
 {
+    @Inject
+    private ModelFactory utils;
+
     @Override
     public Class getClass(String wikiName, String className) throws XWikiRestException
     {
@@ -53,7 +57,7 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass);
+            return this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {

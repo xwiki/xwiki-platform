@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,6 +44,12 @@ public class Class extends Collection
         return (BaseClass) getCollection();
     }
 
+    @Override
+    public DocumentReference getReference()
+    {
+        return getBaseClass().getReference();
+    }
+    
     /**
      * Returns a String table of the property names.
      *

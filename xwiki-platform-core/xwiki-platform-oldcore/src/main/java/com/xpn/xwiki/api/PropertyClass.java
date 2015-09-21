@@ -22,6 +22,8 @@ package com.xpn.xwiki.api;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.model.reference.ClassPropertyReference;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.ListItem;
@@ -63,6 +65,12 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass()
     {
         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
+    }
+
+    @Override
+    public ClassPropertyReference getReference()
+    {
+        return getBasePropertyClass().getReference();
     }
 
     /**

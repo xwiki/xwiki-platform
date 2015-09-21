@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -26,14 +27,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Object;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.resources.objects.ObjectResource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * @version $Id$
@@ -42,9 +43,12 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.objects.ObjectResourceImpl")
 public class ObjectResourceImpl extends BaseObjectsResource implements ObjectResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Object getObject(String wikiName, String spaceName, String pageName, String className, Integer objectNumber,
-            Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -56,9 +60,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
-                    .getXWikiContext(componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager),
-                    withPrettyNames);
+            return this.factory.toRestObject(this.uriInfo.getBaseUri(), doc, baseObject, false, withPrettyNames);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }
@@ -66,7 +68,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
     @Override
     public Response updateObject(String wikiName, String spaceName, String pageName, String className,
-            Integer objectNumber, Object object) throws XWikiRestException
+        Integer objectNumber, Object restObject) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -77,23 +79,19 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
-            if (baseObject == null) {
+            com.xpn.xwiki.api.Object xwikiObject = doc.getObject(className, objectNumber);
+            if (xwikiObject == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            for (Property property : object.getProperties()) {
-                baseObject.set(property.getName(), property.getValue(), Utils.getXWikiContext(componentManager));
-            }
+            this.factory.toObject(xwikiObject, restObject);
 
             doc.save();
 
-            baseObject = getBaseObject(doc, className, objectNumber);
+            BaseObject baseObject = getBaseObject(doc, className, objectNumber);
 
             return Response.status(Status.ACCEPTED)
-                    .entity(DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                            componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false))
-                    .build();
+                .entity(this.factory.toRestObject(this.uriInfo.getBaseUri(), doc, baseObject, false, false)).build();
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }
@@ -101,7 +99,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
     @Override
     public void deleteObject(String wikiName, String spaceName, String pageName, String className, Integer objectNumber)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);

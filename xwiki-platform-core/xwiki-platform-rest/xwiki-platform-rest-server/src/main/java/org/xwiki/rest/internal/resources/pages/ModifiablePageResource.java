@@ -19,12 +19,12 @@
  */
 package org.xwiki.rest.internal.resources.pages;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.internal.Utils;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Page;
 
 import com.xpn.xwiki.XWikiException;
@@ -35,40 +35,19 @@ import com.xpn.xwiki.api.Document;
  */
 public class ModifiablePageResource extends XWikiResource
 {
+    @Inject
+    protected ModelFactory factory;
+
     public Response putPage(DocumentInfo documentInfo, Page page) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
 
-        boolean save = false;
-
-        if (page.getContent() != null) {
-            doc.setContent(page.getContent());
-            save = true;
-        }
-
-        if (page.getTitle() != null) {
-            doc.setTitle(page.getTitle());
-            save = true;
-        }
-
-        if (page.getParent() != null) {
-            doc.setParent(page.getParent());
-            save = true;
-        }
-
-        if (page.getSyntax() != null) {
-            if (Utils.getXWiki(componentManager).getConfiguredSyntaxes().contains(page.getSyntax())) {
-                doc.setSyntaxId(page.getSyntax());
-                save = true;
-            }
-        }
-
-        if (save) {
+        if (this.factory.toDocument(doc, page)) {
             doc.save(page.getComment());
 
             page =
-                DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-                    false, Utils.getXWikiApi(componentManager), false);
+                this.factory.toRestPage(uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false, false, false, false,
+                    false);
 
             if (documentInfo.isCreated()) {
                 return Response.created(uriInfo.getAbsolutePath()).entity(page).build();

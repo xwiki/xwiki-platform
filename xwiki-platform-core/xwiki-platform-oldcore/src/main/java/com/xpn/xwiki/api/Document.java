@@ -481,6 +481,15 @@ public class Document extends Api
     }
 
     /**
+     * @return the parent reference or null if the parent is not set
+     * @since 7.3M1
+     */
+    public DocumentReference getParentReference()
+    {
+        return this.doc.getParentReference();
+    }
+
+    /**
      * Get fullName of the profile document of the document creator.
      *
      * @return The fullName of the profile document of the document creator.

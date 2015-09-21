@@ -160,6 +160,7 @@
             org/xwiki/rest/Constants.java,
             org/xwiki/rest/internal/Constants.java,
             org/xwiki/rest/internal/DomainObjectFactory.java,
+            org/xwiki/rest/internal/ModelFactory.java,
             org/xwiki/rest/internal/exceptions/QueryExceptionMapper.java,
             org/xwiki/rest/internal/exceptions/XWikiExceptionMapper.java,
             org/xwiki/rest/internal/RangeIterable.java,

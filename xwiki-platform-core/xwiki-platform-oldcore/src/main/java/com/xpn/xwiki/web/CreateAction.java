@@ -142,8 +142,10 @@ public class CreateAction extends XWikiAction
         // Verify if the "type" of document to create has been set, even if we currently do not use it in the action.
         // The goal is let the user be able to chose it, which have some consequences in the UI (thanks to javascript).
         // See: http://jira.xwiki.org/browse/XWIKI-12580
+        // Note: we do not need the "type" if we have a template provider: the type of the new document will be the type
+        // of the template.
         // TODO: handle this type in doCreate() that we call above (see: http://jira.xwiki.org/browse/XWIKI-12585).
-        if (StringUtils.isBlank(handler.getType())) {
+        if (StringUtils.isBlank(handler.getType()) && handler.getTemplateProvider() == null) {
             return CREATE_TEMPLATE;
         }
 

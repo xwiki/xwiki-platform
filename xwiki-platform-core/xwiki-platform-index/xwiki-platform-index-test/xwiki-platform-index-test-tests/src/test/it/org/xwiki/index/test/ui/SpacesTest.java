@@ -57,7 +57,8 @@ public class SpacesTest extends AbstractTest
 
         // Create the new space using the UI and verify it leads to the page being edited in WYSIWYG mode
         SpacesMacroPage macroPage = SpacesMacroPage.gotoPage();
-        WYSIWYGEditPage editPage = macroPage.getSpacesMacroPane().createSpace(spaceName);
+        macroPage.getSpacesMacroPane().createSpace(spaceName).clickCreate();
+        WYSIWYGEditPage editPage = new WYSIWYGEditPage();
 
         // Verify that space creation uses the space name as the space home page's title
         assertEquals(spaceName, editPage.getDocumentTitle());

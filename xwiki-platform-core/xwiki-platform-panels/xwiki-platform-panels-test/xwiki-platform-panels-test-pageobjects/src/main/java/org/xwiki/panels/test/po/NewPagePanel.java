@@ -21,8 +21,8 @@ package org.xwiki.panels.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
  * Represents the NewPage panel.
@@ -59,9 +59,9 @@ public class NewPagePanel extends ViewPage
      * 
      * @param spaceName the name of the space where to create the page
      * @param pageName the name of page to create
-     * @return the WYSIWYG edit page for the specified page
+     * @return the create page form for the specified page
      */
-    public WYSIWYGEditPage createPage(String spaceName, String pageName)
+    public CreatePagePage createPage(String spaceName, String pageName)
     {
         // Clean the default space name value.
         this.spaceNameTextField.clear();
@@ -69,6 +69,6 @@ public class NewPagePanel extends ViewPage
         this.pageNameTextField.clear();
         this.pageNameTextField.sendKeys(pageName);
         this.pageNameTextField.submit();
-        return new WYSIWYGEditPage();
+        return new CreatePagePage();
     }
 }

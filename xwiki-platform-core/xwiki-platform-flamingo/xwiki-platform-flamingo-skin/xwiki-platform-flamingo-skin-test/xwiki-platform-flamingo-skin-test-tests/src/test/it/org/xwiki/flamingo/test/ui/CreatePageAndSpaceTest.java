@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests basic page and space creation.
@@ -74,7 +74,8 @@ public class CreatePageAndSpaceTest extends AbstractTest
 
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it. This time on a non-exsiting page.
-        getUtil().gotoPage(getUtil().getURL("create", new String[]{ spaceName, "NonExistingPage" }, "tocreate=space"));
+        getUtil().gotoPage(getUtil().getURL("create", new String[]{ spaceName, "NonExistingPage" }, 
+                "tocreate=space&type=blank"));
         EditPage editPage = new EditPage();
 
         assertEquals(spaceName, editPage.getMetaDataValue("space"));

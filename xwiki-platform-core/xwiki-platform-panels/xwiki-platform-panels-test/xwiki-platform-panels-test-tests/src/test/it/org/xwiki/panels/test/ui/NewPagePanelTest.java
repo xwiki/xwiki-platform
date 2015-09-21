@@ -27,6 +27,7 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.AuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -52,7 +53,9 @@ public class NewPagePanelTest extends AbstractTest
     {
         NewPagePanel newPagePanel = NewPagePanel.gotoPage();
 
-        WYSIWYGEditPage editPage = newPagePanel.createPage(getTestClassName(), getTestMethodName());
+        CreatePagePage createPagePage = newPagePanel.createPage(getTestClassName(), getTestMethodName());
+        createPagePage.clickCreate();
+        WYSIWYGEditPage editPage = new WYSIWYGEditPage();
 
         Assert.assertEquals(getTestMethodName(), editPage.getDocumentTitle());
         Assert.assertEquals(getTestMethodName(), editPage.getMetaDataValue("page"));

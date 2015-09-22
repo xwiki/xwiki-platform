@@ -1489,21 +1489,15 @@
     'fq=type:DOCUMENT',
     'fq=doclocale:""',
     'qf=title^6 name^4 doccontent^2 doccontentraw',
-    'fl=wiki space name'
+    'fl=wiki spaces name'
   ])
-  #if (!$docTreeConfig.showTerminalDocuments)
-    #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
-    #set ($discard = $params.add("fq=name:$defaultDocumentName"))
-  #end
+  #addCommonDocTreeSolrParams($params)
   #set ($params = $stringtool.join($params, $util.newline))
   #createSearchSuggestQuery($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($documentReferences = [])
   #foreach ($result in $query.execute()[0].results)
-    #set ($wikiReference = $services.model.createWikiReference($result.wiki))
-    #set ($spaceReference = $services.model.resolveSpace($result.space, 'explicit', $wikiReference))
-    #set ($documentReference = $services.model.createEntityReference($result.name, 'DOCUMENT', $spaceReference))
-    #set ($discard = $documentReferences.add($documentReference))
+    #set ($discard = $documentReferences.add($services.solr.resolveDocument($result)))
   #end
   #set ($return = $NULL)
   #setVariable("$return" $documentReferences)
@@ -1558,20 +1552,18 @@
 #end
 
 #macro (searchAttachmentsSolr $text $limit $return)
-  #set ($params = $stringtool.join([
+  #set ($params = [
     'fq=type:ATTACHMENT',
     'qf=filename^4 attcontent',
-    'fl=wiki space name filename'
-  ], $util.newline))
+    'fl=type wiki spaces name filename'
+  ])
+  #addCommonDocTreeSolrParams($params)
+  #set ($params = $stringtool.join($params, $util.newline))
   #createSearchSuggestQuery($params $text $query)
   #set ($discard = $query.setLimit($limit))
   #set ($attachmentReferences = [])
   #foreach ($result in $query.execute()[0].results)
-    #set ($wikiReference = $services.model.createWikiReference($result.wiki))
-    #set ($spaceReference = $services.model.resolveSpace($result.space, 'explicit', $wikiReference))
-    #set ($documentReference = $services.model.createEntityReference($result.name, 'DOCUMENT', $spaceReference))
-    #set ($attachmentReference = $services.model.createAttachmentReference($documentReference, $result.filename))
-    #set ($discard = $attachmentReferences.add($attachmentReference))
+    #set ($discard = $attachmentReferences.add($services.solr.resolve($result)))
   #end
   #set ($return = $NULL)
   #setVariable("$return" $attachmentReferences)
@@ -1591,6 +1583,17 @@
   #end
   #set ($return = $NULL)
   #setVariable("$return" $attachmentReferences)
+#end
+
+#macro (addCommonDocTreeSolrParams $params)
+  #if (!$docTreeConfig.showWikis)
+    ## Limit the search to the current wiki
+    #set ($discard = $params.add("fq=wiki:$xcontext.database"))
+  #end
+  #if (!$docTreeConfig.showTerminalDocuments)
+    #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #set ($discard = $params.add("fq=name:$defaultDocumentName"))
+  #end
 #end
 
 #macro (displayPath $path)

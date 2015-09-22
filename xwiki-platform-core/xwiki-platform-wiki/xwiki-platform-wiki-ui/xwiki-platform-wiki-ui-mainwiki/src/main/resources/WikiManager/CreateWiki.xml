@@ -191,113 +191,115 @@
         &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
         &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
         #addMembersAsHiddenInput()
-        ### WIZARD FIRST HALF ###
-        &lt;div class="half"&gt;
-          ### PRETTY NAME ###
-          &lt;div&gt;
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label for="prettyname"&gt;$services.localization.render('platform.wiki.prop.wikiprettyname')#required()&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiprettyname')&lt;/span&gt;
-                &lt;span id="wikiprettynamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                &lt;input size="60" id="prettyname" name="wikiprettyname" type="text" value="$!escapetool.xml($request.getParameter('wikiprettyname'))"/&gt;
-              &lt;/dd&gt;
-            &lt;/dl&gt;
-          &lt;/div&gt;
-          ### WIKI NAME ###
-          &lt;div&gt;
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label for="wikiname"&gt;$services.localization.render('platform.wiki.prop.wikiname')#required()&lt;/label&gt;
-                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiname')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                &lt;input size="40" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
-                &lt;span id="wikinamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
-              &lt;/dd&gt;
-            &lt;/dl&gt;
-          &lt;/div&gt;
-          ### WIKI ALIAS ###
-          #if(!$services.wiki.isPathMode())
+        &lt;div class="row"&gt;
+          ### WIZARD FIRST HALF ###
+          &lt;div class = "col-xs-12 col-sm-6 col-md-6"&gt;
+            ### PRETTY NAME ###
             &lt;div&gt;
               &lt;dl&gt;
                 &lt;dt&gt;
-                  &lt;label for="wikialias"&gt;$services.localization.render('platform.wiki.prop.wikialias')#required()&lt;/label&gt;
-                  &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikialias')&lt;/span&gt;
+                  &lt;label for="prettyname"&gt;$services.localization.render('platform.wiki.prop.wikiprettyname')#required()&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiprettyname')&lt;/span&gt;
+                  &lt;span id="wikiprettynamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
-                  &lt;input size="40" id="wikialias" name="wikialias" type="text"  value="$!escapetool.xml($request.wikialias)"/&gt;
+                  &lt;input size="60" id="prettyname" name="wikiprettyname" type="text" value="$!escapetool.xml($request.getParameter('wikiprettyname'))"/&gt;
                 &lt;/dd&gt;
               &lt;/dl&gt;
             &lt;/div&gt;
-          #end
-          ### DESCRIPTION ###
-          &lt;div&gt;
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label for="description"&gt;$services.localization.render('platform.wiki.prop.description')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!escapetool.xml($request.getParameter('description'))&lt;/textarea&gt;
-              &lt;/dd&gt;
-            &lt;/dl&gt;
+            ### WIKI NAME ###
+            &lt;div&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="wikiname"&gt;$services.localization.render('platform.wiki.prop.wikiname')#required()&lt;/label&gt;
+                  &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiname')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;input size="40" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
+                  &lt;span id="wikinamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+            ### WIKI ALIAS ###
+            #if(!$services.wiki.isPathMode())
+              &lt;div&gt;
+                &lt;dl&gt;
+                  &lt;dt&gt;
+                    &lt;label for="wikialias"&gt;$services.localization.render('platform.wiki.prop.wikialias')#required()&lt;/label&gt;
+                    &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikialias')&lt;/span&gt;
+                  &lt;/dt&gt;
+                  &lt;dd&gt;
+                    &lt;input size="40" id="wikialias" name="wikialias" type="text"  value="$!escapetool.xml($request.wikialias)"/&gt;
+                  &lt;/dd&gt;
+                &lt;/dl&gt;
+              &lt;/div&gt;
+            #end
+            ### DESCRIPTION ###
+            &lt;div&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="description"&gt;$services.localization.render('platform.wiki.prop.description')&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!escapetool.xml($request.getParameter('description'))&lt;/textarea&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+          ### END OF WIZARD FIRST HALF
           &lt;/div&gt;
-        ### END OF WIZARD FIRST HALF
-        &lt;/div&gt;
-        ### WIZARD SECOND HALF
-        &lt;div class="half"&gt;
-          ### TEMPLATE / FLAVOR ###
-          #set ($templates = $services.wiki.template.getTemplates())
-          #if (!$services.distribution.hasWikiDefaultUIExtension())
-            #template('flavor/macros.vm')
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.label')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
-              &lt;/dt&gt;
-              #set ($currentTab = 'flavors')
-              #if ("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
-                #set ($currentTab = 'templates')
-              #end
-              &lt;dd class="flavor_template"&gt;
-                &lt;ul class="xwikitabbar"&gt;
-                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
-                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
-                &lt;/ul&gt;
-                &lt;div class="xwiki-createwiki-tabs-content"&gt;
-                  #set ($defaultFlavor = "$!request.flavor")
-                  #if ($defaultFlavor == '')
-                    #set ($defaultFlavor = 'noFlavor')
-                  #end
-                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='flavors')active#{else}hidden#end" id="flavors-tab"&gt;
-                    #displayFlavorPicker('flavor', $defaultFlavor, false, 'xwiki-createwiki-flavor-picker', true)
-                  &lt;/div&gt;
-                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='templates')active#{else}hidden#end" id="templates-tab"&gt;
-                    #displayTemplateFields($templates)
-                  &lt;/div&gt;
-                &lt;/div&gt;
-              &lt;/dd&gt;
-            &lt;/dl&gt;
-          #else
-            ## There is a default UI configured, so we do not display the flavor picker
-            &lt;dl&gt;
-              &lt;dt&gt;
-                #if ($templates.size() &gt; 0)
-                  &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
-                #else
-                  &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+          ### WIZARD SECOND HALF
+          &lt;div class="col-xs-12 col-sm-6 col-md-6"&gt;
+            ### TEMPLATE / FLAVOR ###
+            #set ($templates = $services.wiki.template.getTemplates())
+            #if (!$services.distribution.hasWikiDefaultUIExtension())
+              #template('flavor/macros.vm')
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.label')&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
+                &lt;/dt&gt;
+                #set ($currentTab = 'flavors')
+                #if ("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+                  #set ($currentTab = 'templates')
                 #end
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                #displayTemplateFields($templates)
-              &lt;/dd&gt;
-            &lt;/dl&gt;
-          #end
-        ### END OF WIZARD SECOND HALF
+                &lt;dd class="flavor_template"&gt;
+                  &lt;ul class="xwikitabbar"&gt;
+                    &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
+                    &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
+                  &lt;/ul&gt;
+                  &lt;div class="xwiki-createwiki-tabs-content"&gt;
+                    #set ($defaultFlavor = "$!request.flavor")
+                    #if ($defaultFlavor == '')
+                      #set ($defaultFlavor = 'noFlavor')
+                    #end
+                    &lt;div class="xwiki-createwiki-tab #if($currentTab=='flavors')active#{else}hidden#end" id="flavors-tab"&gt;
+                      #displayFlavorPicker('flavor', $defaultFlavor, false, 'xwiki-createwiki-flavor-picker', true)
+                    &lt;/div&gt;
+                    &lt;div class="xwiki-createwiki-tab #if($currentTab=='templates')active#{else}hidden#end" id="templates-tab"&gt;
+                      #displayTemplateFields($templates)
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            #else
+              ## There is a default UI configured, so we do not display the flavor picker
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  #if ($templates.size() &gt; 0)
+                    &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+                    &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
+                  #else
+                    &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+                  #end
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  #displayTemplateFields($templates)
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            #end
+          ### END OF WIZARD SECOND HALF
+          &lt;/div&gt;
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;
@@ -328,111 +330,113 @@
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
         &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
         #userPicker_import(true)
-        ### WIZARD FIRST HALF ###
-        &lt;div class="half"&gt;
-          ### OWNER ###
-          &lt;div&gt;
-            ## Make this section available only to admins, so that only admins can create wikis in the name of other users.
-            #if ($hasAdmin)
+        &lt;div class="row"&gt;
+          ### WIZARD FIRST HALF ###
+          &lt;div class="col-xs-12 col-sm-6 col-md-6"&gt;
+            ### OWNER ###
+            &lt;div&gt;
+              ## Make this section available only to admins, so that only admins can create wikis in the name of other users.
+              #if ($hasAdmin)
+                &lt;dl&gt;
+                  &lt;dt&gt;
+                    &lt;label for="owner"&gt;$services.localization.render('platform.wiki.prop.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;&lt;/label&gt;
+                    &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.owner')&lt;/span&gt;
+                  &lt;/dt&gt;
+                  &lt;dd&gt;
+                    #set($value = $escapetool.xml($request.getParameter('ownerId')))
+                    #if("$!value" == "")
+                      #set($value = $escapetool.xml($xcontext.user))
+                    #end
+                    &lt;input type="text" id="owner" name="ownerId" value="$!value" class="suggestUsers"/&gt;
+                  &lt;/dd&gt;
+                &lt;/dl&gt;
+              #else
+                &lt;input id="owner" name="ownerId" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
+              #end
+            &lt;/div&gt;
+            ### USERS SCOPE ###
+            &lt;div&gt;
               &lt;dl&gt;
                 &lt;dt&gt;
-                  &lt;label for="owner"&gt;$services.localization.render('platform.wiki.prop.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.owner')&lt;/span&gt;
+                  &lt;label for="userScope"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.label')&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.hint')&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
-                  #set($value = $escapetool.xml($request.getParameter('ownerId')))
-                  #if("$!value" == "")
-                    #set($value = $escapetool.xml($xcontext.user))
-                  #end
-                  &lt;input type="text" id="owner" name="ownerId" value="$!value" class="suggestUsers"/&gt;
-                &lt;/dd&gt;
-              &lt;/dl&gt;
-            #else
-              &lt;input id="owner" name="ownerId" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
-            #end
-          &lt;/div&gt;
-          ### USERS SCOPE ###
-          &lt;div&gt;
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label for="userScope"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.label')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.hint')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                #set($value = $escapetool.xml($request.getParameter('userScope')))
-                #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManager.WikiUserClass'))
-                #set ($wikiUserClass = $wikiUserClassDocument.getxWikiClass())
-                #set ($userScopeProperty = $wikiUserClass.get('userScope'))
-                #set ($userScopePropertyValues = '')
-                #set ($userScopePropertyValues = $userScopeProperty.getListValues())
-                #set ($userScopeDetailsMap = $userScopeProperty.getMapValues())
-                #foreach ($userScopeValue in $userScopePropertyValues)
-                  #set ($userScopeValueId = "userScope_${foreach.index}")
-                  &lt;div&gt;
-                  &lt;label for="$userScopeValueId"&gt;
-                  #set($checked = '')
-                  #if($request.getParameter('userScope') == $userScopeValue || ("$!request.getParameter('userScope')"=='' &amp;&amp; $foreach.index==0))
-                    #set($checked = 'checked="checked"')
-                  #end
-                  &lt;input type="radio" id="$userScopeValueId" name="userScope" value="$userScopeValue" $checked/&gt;
-                  $services.localization.render("${wikiUserClassDocument.fullName}_${userScopeProperty.name}_${userScopeDetailsMap.get($userScopeValue).getValue()}")
-                  &lt;/label&gt;
-                  &lt;/div&gt;
-                #end
-              &lt;/dd&gt;
-            &lt;/dl&gt;
-          &lt;/div&gt;
-        ### END OF WIZARD FIRST HALF
-        &lt;/div&gt;
-        ### WIZARD SECOND HALF
-        &lt;div class="half"&gt;
-          ### MEMBERSHIP TYPE
-          &lt;div&gt;
-            #set ($membershipTypeProperty = $wikiUserClass.get('membershipType'))
-            #set ($membershipTypeValues = '')
-            #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
-            #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label&gt;$services.localization.render('platform.wiki.prop.membershipType.label')&lt;/label&gt;
-                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.prop.membershipType.hint')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-              #foreach ($membershipTypeValue in $membershipTypeValues)
-                #set ($membershipTypeValueId = "membershipType_${foreach.index}")
-                &lt;div&gt;
-                  &lt;label for="$membershipTypeValueId"&gt;
+                  #set($value = $escapetool.xml($request.getParameter('userScope')))
+                  #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManager.WikiUserClass'))
+                  #set ($wikiUserClass = $wikiUserClassDocument.getxWikiClass())
+                  #set ($userScopeProperty = $wikiUserClass.get('userScope'))
+                  #set ($userScopePropertyValues = '')
+                  #set ($userScopePropertyValues = $userScopeProperty.getListValues())
+                  #set ($userScopeDetailsMap = $userScopeProperty.getMapValues())
+                  #foreach ($userScopeValue in $userScopePropertyValues)
+                    #set ($userScopeValueId = "userScope_${foreach.index}")
+                    &lt;div&gt;
+                    &lt;label for="$userScopeValueId"&gt;
                     #set($checked = '')
-                    #if($request.getParameter('membershipType') == $membershipTypeValue || ("$!request.getParameter('membershipType')"=='' &amp;&amp; $foreach.index==0))
+                    #if($request.getParameter('userScope') == $userScopeValue || ("$!request.getParameter('userScope')"=='' &amp;&amp; $foreach.index==0))
                       #set($checked = 'checked="checked"')
                     #end
-                    &lt;input type="radio" id="$membershipTypeValueId" name="membershipType" value="$membershipTypeValue" $checked/&gt;
-                    $services.localization.render("${wikiUserClassDocument.fullName}_${membershipTypeProperty.name}_${membershipTypeDetailsMap.get($membershipTypeValue).getValue()}")
-                  &lt;/label&gt;
-                &lt;/div&gt;
-              #end
-              &lt;/dd&gt;
-            &lt;/dl&gt;
+                    &lt;input type="radio" id="$userScopeValueId" name="userScope" value="$userScopeValue" $checked/&gt;
+                    $services.localization.render("${wikiUserClassDocument.fullName}_${userScopeProperty.name}_${userScopeDetailsMap.get($userScopeValue).getValue()}")
+                    &lt;/label&gt;
+                    &lt;/div&gt;
+                  #end
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+          ### END OF WIZARD FIRST HALF
           &lt;/div&gt;
-          ### MEMBERS
-          &lt;div&gt;
-            &lt;dl&gt;
-              &lt;dt&gt;
-                &lt;label for="members"&gt;$services.localization.render('platform.wiki.create.members')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                #set($listMembers = '')
-                #set($sep = '')
-                #foreach($m in $request.getParameterValues('members'))
-                  #set($listMembers = "${listMembers}${sep}$!escapetool.xml($m)")
-                  #set($sep = ',')
+          ### WIZARD SECOND HALF
+          &lt;div class="col-xs-12 col-sm-6 col-md-6"&gt;
+            ### MEMBERSHIP TYPE
+            &lt;div&gt;
+              #set ($membershipTypeProperty = $wikiUserClass.get('membershipType'))
+              #set ($membershipTypeValues = '')
+              #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
+              #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label&gt;$services.localization.render('platform.wiki.prop.membershipType.label')&lt;/label&gt;
+                  &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.prop.membershipType.hint')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                #foreach ($membershipTypeValue in $membershipTypeValues)
+                  #set ($membershipTypeValueId = "membershipType_${foreach.index}")
+                  &lt;div&gt;
+                    &lt;label for="$membershipTypeValueId"&gt;
+                      #set($checked = '')
+                      #if($request.getParameter('membershipType') == $membershipTypeValue || ("$!request.getParameter('membershipType')"=='' &amp;&amp; $foreach.index==0))
+                        #set($checked = 'checked="checked"')
+                      #end
+                      &lt;input type="radio" id="$membershipTypeValueId" name="membershipType" value="$membershipTypeValue" $checked/&gt;
+                      $services.localization.render("${wikiUserClassDocument.fullName}_${membershipTypeProperty.name}_${membershipTypeDetailsMap.get($membershipTypeValue).getValue()}")
+                    &lt;/label&gt;
+                  &lt;/div&gt;
                 #end
-                &lt;input type="text" id="members" name="members" value="$listMembers" class="suggestUsers multipleSelection"/&gt;
-              &lt;/dd&gt;
-            &lt;/dl&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+            ### MEMBERS
+            &lt;div&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="members"&gt;$services.localization.render('platform.wiki.create.members')&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  #set($listMembers = '')
+                  #set($sep = '')
+                  #foreach($m in $request.getParameterValues('members'))
+                    #set($listMembers = "${listMembers}${sep}$!escapetool.xml($m)")
+                    #set($sep = ',')
+                  #end
+                  &lt;input type="text" id="members" name="members" value="$listMembers" class="suggestUsers multipleSelection"/&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+          ### END OF WIZARD SECOND HALF
           &lt;/div&gt;
-        ### END OF WIZARD SECOND HALF
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;

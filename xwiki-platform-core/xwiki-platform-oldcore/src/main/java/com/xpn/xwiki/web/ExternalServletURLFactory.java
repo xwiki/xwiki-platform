@@ -41,6 +41,14 @@ public class ExternalServletURLFactory extends XWikiServletURLFactory
         super(context);
     }
 
+    /**
+     * Constructor used by {@link XWikiURLFactoryServiceImpl}.
+     */
+    public ExternalServletURLFactory()
+    {
+        super();
+    }
+
     @Override
     public String getURL(URL url, XWikiContext context)
     {

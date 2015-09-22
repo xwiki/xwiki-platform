@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.test.po;
 
 import java.io.File;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
@@ -76,5 +77,10 @@ public class OfficeImporterPage extends ViewPage
     {
         importButton.click();
         return new OfficeImporterResultPage();
+    }
+    
+    public boolean isChildPagesNamingMethodDisplayed()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("childPagesNamingMethodInputId"));
     }
 }

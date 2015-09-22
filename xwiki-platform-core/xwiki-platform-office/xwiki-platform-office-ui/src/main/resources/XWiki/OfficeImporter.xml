@@ -50,7 +50,9 @@
   #end
 #elseif("$!request.page" == '')
   ## This page does not propose to select the target page anymore. We redirect to the create action instead
-  {{error}}$services.localization.render('office.form.error.noDocument', ['[[', "&gt;&gt;path:$doc.getURL('create', 'type=office')]]"]){{/error}}
+  ## Note: we make the URL from the main page and not from the current one. Because the user have probably not the
+  ## create right on the "XWiki" space, and this space should be reserved for technical usage.
+  {{error}}$services.localization.render('office.form.error.noDocument', ['[[', "&gt;&gt;path:$xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference, 'create', 'type=office')]]"]){{/error}}
 #else
   #set ($targetReference = $services.model.resolveDocument($request.page))
   #set ($targetDoc = $xwiki.getDocument($targetReference))
@@ -137,16 +139,28 @@
       ##
       ## Child pages naming method:
       ##
-      &lt;dt&gt;
-        &lt;label for="childPagesNamingMethodInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;
-          &lt;option value="headingNames"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.headingnames'))&lt;/option&gt;
-          &lt;option value="mainPageNameAndHeading"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandheading'))&lt;/option&gt;
-          &lt;option value="mainPageNameAndNumbering"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandnumbering'))&lt;/option&gt;
-        &lt;/select&gt;
-      &lt;/dd&gt;
+      #if ($targetDoc.name == 'WebHome')
+        ## When the target page is not terminal, the only logical strategy to use is "headingNames". It creates pages
+        ## as children of the target, which seems to be the correct way in the nested pages paradigm.
+        ## The other choices have no sense:
+        ## - "mainPageNameAndHeading" will create pages called "WebHome-Title1" instead of "targetDoc/Title1".
+        ## - "mainPageNameAndNumbering" will create pages called "WebHome-1" instead of "targetDoc/1".
+        ## In both cases, the "WebHome" part of the names are meaningless.
+        ##
+        ## NOTE: The created children are terminal until http://jira.xwiki.org/browse/XWIKI-12569 is fixed.
+        &lt;input type="hidden" name="childPagesNamingMethod" value="headingNames" /&gt;
+      #else
+        &lt;dt&gt;
+          &lt;label for="childPagesNamingMethodInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming'))&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;
+            &lt;option value="headingNames"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.headingnames'))&lt;/option&gt;
+            &lt;option value="mainPageNameAndHeading"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandheading'))&lt;/option&gt;
+            &lt;option value="mainPageNameAndNumbering"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandnumbering'))&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      #end
     &lt;/div&gt;
   &lt;/dl&gt;
   &lt;div class="clearfloats"&gt;&lt;/div&gt;

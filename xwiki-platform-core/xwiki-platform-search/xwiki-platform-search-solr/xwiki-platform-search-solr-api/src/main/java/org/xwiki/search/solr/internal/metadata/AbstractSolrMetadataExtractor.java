@@ -520,7 +520,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         List<EntityReference> ancestors = path.getReversedReferenceChain();
         // Skip the wiki reference because we want to index the local space references.
         for (int i = 1; i < ancestors.size(); i++) {
-            solrDocument.addField(FieldUtils.SPACE, ancestors.get(i).getName());
+            solrDocument.addField(FieldUtils.SPACES, ancestors.get(i).getName());
             String localAncestorReference = this.localSerializer.serialize(ancestors.get(i));
             solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
             // We prefix the local ancestor reference with the depth in order to use 'facet.prefix'. We also add a

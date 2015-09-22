@@ -62,7 +62,7 @@ public class SolrEntityReferenceResolverTest
     {
         solrDocument = new SolrDocument();
         solrDocument.setField(FieldUtils.WIKI, "chess");
-        solrDocument.setField(FieldUtils.SPACE, Arrays.asList("Path", "To", "Success"));
+        solrDocument.setField(FieldUtils.SPACES, Arrays.asList("Path", "To", "Success"));
         solrDocument.setField(FieldUtils.NAME, "WebHome");
         solrDocument.setField(FieldUtils.DOCUMENT_LOCALE, "fr");
         // The file name field can have multiple values.

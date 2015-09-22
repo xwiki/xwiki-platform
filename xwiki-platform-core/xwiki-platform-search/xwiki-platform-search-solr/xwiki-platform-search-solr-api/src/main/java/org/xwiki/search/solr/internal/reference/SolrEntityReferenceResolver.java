@@ -100,7 +100,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
     private EntityReference getSpaceReference(SolrDocument solrDocument, EntityReference parent, Object... parameters)
     {
-        Collection<Object> spaceNames = solrDocument.getFieldValues(FieldUtils.SPACE);
+        Collection<Object> spaceNames = solrDocument.getFieldValues(FieldUtils.SPACES);
         if (spaceNames != null && !spaceNames.isEmpty()) {
             EntityReference spaceReference = parent;
             for (Object spaceName : spaceNames) {

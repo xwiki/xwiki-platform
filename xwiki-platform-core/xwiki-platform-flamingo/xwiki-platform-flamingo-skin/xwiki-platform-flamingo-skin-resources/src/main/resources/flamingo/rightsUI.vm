@@ -253,7 +253,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       window.saveUrl = "$saveUrl";
       window.saveUrl.replace(/&amp;/g, "&");
       
-      var targetDocument = new XWiki.Document(XWiki.Model.resolve("$services.model.serialize($targetDocument.documentReference, 'default')", XWiki.EntityType.DOCUMENT));
+      var targetDocument = new XWiki.Document(XWiki.Model.resolve("$escapetool.javascript($services.model.serialize($targetDocument.documentReference, 'default'))", XWiki.EntityType.DOCUMENT));
       
       window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
       window.unregUser = "XWiki.XWikiGuest";

@@ -152,7 +152,8 @@ public class OfficeImporterTest extends AbstractTest
         
         // Test excel file
         resultPage = importFile("/msoffice.97-2003/Test.xls");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Résumé"));
+        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
+        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
         deletePage();
 
         // Test ODT file
@@ -171,7 +172,8 @@ public class OfficeImporterTest extends AbstractTest
 
         // Test ODS file
         resultPage = importFile("/ooffice.3.0/Test.ods");
-        assertTrue(StringUtils.contains(resultPage.getContent(), "Résumé"));
+        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet1"));
+        assertTrue(StringUtils.contains(resultPage.getContent(), "Sheet2"));
         deletePage();
     }
 

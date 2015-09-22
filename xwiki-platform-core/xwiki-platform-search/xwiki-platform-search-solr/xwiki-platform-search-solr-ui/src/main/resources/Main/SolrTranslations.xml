@@ -145,7 +145,7 @@ solr.field.locale=Language
 solr.field.locale.emptyValue=No Language
 solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
 solr.field.wiki=Wiki
-solr.field.space=Location
+solr.field.spaces=Location
 solr.field.space_exact=Location
 solr.field.space_facet=Location
 solr.field.name=Page
@@ -178,6 +178,9 @@ solr.field.attsize=File Size
 
 ## until 7.2M3
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+
+## until 7.2RC1
+solr.field.space=Location
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

@@ -865,7 +865,7 @@
           title^5.0 name^5.0 filename^5.0
           doccontent doccontentraw objcontent attcontent propertyvalue
           author_display^0.2 creator_display^0.2 attauthor_display^0.2
-          comment^0.04 space^0.04
+          comment^0.04 spaces^0.04
        </str>
 
        <!-- Field aliasing. -->

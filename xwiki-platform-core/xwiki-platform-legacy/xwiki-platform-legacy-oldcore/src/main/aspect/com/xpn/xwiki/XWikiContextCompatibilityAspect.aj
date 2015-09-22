@@ -25,6 +25,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlrpc.server.XmlRpcServer;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWikiContext} class.
@@ -33,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public privileged aspect XWikiContextCompatibilityAspect
 {
+    private XmlRpcServer XWikiContext.xmlRpcServer;
+
     /**
      * @return true it's main wiki's context, false otherwise.
      * @deprecated replaced by {@link XWikiContext#isMainWiki()} since 1.4M1.
@@ -136,4 +139,25 @@ public privileged aspect XWikiContextCompatibilityAspect
     {
         // Cannot do anything
     }
+
+    /**
+     * @deprecated removed in 7.3M1 since XMLRPC feature has been removed by default and this method hasn't been used
+     * in very long time anyway
+     */
+    @Deprecated
+    public XmlRpcServer XWikiContext.getXMLRPCServer()
+    {
+        return this.xmlRpcServer;
+    }
+
+    /**
+     * @deprecated removed in 7.3M1 since XMLRPC feature has been removed by default and this method hasn't been used
+     * in very long time anyway
+     */
+    @Deprecated
+    public void XWikiContext.setXMLRPCServer(XmlRpcServer xmlRpcServer)
+    {
+        this.xmlRpcServer = xmlRpcServer;
+    }
+
 }

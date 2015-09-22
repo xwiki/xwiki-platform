@@ -36,7 +36,9 @@
     <swizzle.swizzle-confluence.version>1.2-20080419</swizzle.swizzle-confluence.version>
   </properties>
   <modules>
-    <module>xwiki-platform-xmlrpc-model</module>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-xmlrpc-client</module>
+    <module>xwiki-platform-xmlrpc-oldcore</module>
+    <module>xwiki-platform-xmlrpc-model</module>
   </modules>
 </project>

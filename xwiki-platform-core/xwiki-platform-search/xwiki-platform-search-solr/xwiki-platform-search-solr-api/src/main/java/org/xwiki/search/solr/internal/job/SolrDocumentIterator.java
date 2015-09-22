@@ -143,7 +143,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
     {
         if (query == null) {
             query = new SolrQuery(solrReferenceResolver.getQuery(rootReference));
-            query.setFields(FieldUtils.WIKI, FieldUtils.SPACE, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
+            query.setFields(FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
                 FieldUtils.VERSION);
             query.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
             // We sort by ID, which is normally the serialized document reference, in order to ensure this iterator has

@@ -254,7 +254,7 @@ public class DocumentSolrMetadataExtractorTest
         assertEquals(id, solrDocument.getFieldValue(FieldUtils.ID));
 
         assertEquals(this.documentReference.getWikiReference().getName(), solrDocument.getFieldValue(FieldUtils.WIKI));
-        assertEquals(Arrays.asList("Path", "To", "Page"), solrDocument.getFieldValues(FieldUtils.SPACE));
+        assertEquals(Arrays.asList("Path", "To", "Page"), solrDocument.getFieldValues(FieldUtils.SPACES));
         assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
 
         assertEquals(Arrays.asList("0/Path.", "1/Path.To.", "2/Path.To.Page."),

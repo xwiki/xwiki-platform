@@ -125,8 +125,12 @@
    <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->
    <field name="type" type="string" indexed="true" stored="true" />
    <field name="wiki" type="string" indexed="true" stored="true" />
-   <!-- The space names. This field is analyzed and thus mostly used for free text search.  -->
-   <field name="space" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <!-- The local space reference. For a document {@code A.B.C.Page} the value of this field is {@code A.B.C}.
+     This field is analyzed and thus used for free text search.
+     @deprecated since 7.2, use the "spaces" multiValued field instead -->
+   <field name="space" type="text_general" indexed="true" stored="true" />
+   <!-- The space names. This field is analyzed and thus mostly used for free text search. -->
+   <field name="spaces" type="text_general" indexed="true" stored="true" multiValued="true" />
    <!-- We index the local space reference (e.g. A.B\.1.C) verbatim for exact matching. -->
    <field name="space_exact" type="string" indexed="true" stored="false" />
    <!-- We also need a dedicated field for hierarchical faceting on nested spaces, as described on
@@ -347,7 +351,9 @@
   <copyField source="doccontentraw_*" dest="doccontentraw_"/>
   <copyField source="comment_*" dest="comment_"/>
 
-  <!-- Copy values for fields that are needed for specific tasks like exact matching or sorting and can not use their tokenized (analyzed) versions. -->
+  <!-- Copy values for fields that are needed for specific tasks like exact 
+    matching or sorting and can not use their tokenized (analyzed) versions. -->
+  <copyField source="space_exact" dest="space"/>
   <copyField source="name" dest="name_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>

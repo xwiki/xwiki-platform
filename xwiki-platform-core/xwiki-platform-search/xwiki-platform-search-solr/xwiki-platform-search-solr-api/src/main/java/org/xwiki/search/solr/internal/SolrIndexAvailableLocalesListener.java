@@ -157,7 +157,8 @@ public class SolrIndexAvailableLocalesListener implements EventListener
                     }
 
                     SolrQuery solrQuery = new SolrQuery(builder.toString());
-                    solrQuery.setFields(FieldUtils.NAME, FieldUtils.SPACE, FieldUtils.WIKI, FieldUtils.DOCUMENT_LOCALE);
+                    solrQuery
+                        .setFields(FieldUtils.WIKI, FieldUtils.SPACES, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE);
                     solrQuery.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
 
                     StreamingResponseCallback callback = new StreamingResponseCallback()

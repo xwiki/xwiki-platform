@@ -76,10 +76,23 @@ public final class FieldUtils
     public static final String WIKI = "wiki";
 
     /**
+     * The local reference of the space the document belongs to. For a document {@code A.B.C.Page} the value of this
+     * field is {@code A.B.C}. This field is analyzed and thus used for free text search.
+     * 
+     * @deprecated since 7.2, use {@link #SPACES} instead; the problem with this field is that the standard tokenizer
+     *             doesn't split around dots, and even if it did, it would also split around escaped dots (e.g.
+     *             {@code A.B\.1.C}) which is not what we want.
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-12594">XWIKI-12594: The path of a nested document is not
+     *      properly matched</a>
+     */
+    @Deprecated
+    public static final String SPACE = "space";
+
+    /**
      * The names of all the nested spaces the document belongs to. For a document {@code A.B.C.Page} the value of this
      * field will be {@code ['A', 'B', 'C']}. This field is used for free text search.
      */
-    public static final String SPACE = "space";
+    public static final String SPACES = "spaces";
 
     /**
      * The local space reference, unanalyzed and not stored, used for exact matching.

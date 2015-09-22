@@ -21,9 +21,13 @@ package org.xwiki.rest.internal;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -33,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
@@ -142,6 +147,9 @@ public class ModelFactory
 
         // Set objects
         if (restPage.getObjects() != null) {
+            Set<ObjectReference> newReferences = new HashSet<>();
+
+            // Add/update objects
             for (ObjectSummary restObjectSummary : restPage.getObjects().getObjectSummaries()) {
                 if (restObjectSummary != null) {
                     org.xwiki.rest.model.jaxb.Object restObject = (org.xwiki.rest.model.jaxb.Object) restObjectSummary;
@@ -152,7 +160,23 @@ public class ModelFactory
                     }
                     toObject(xwikiObject, restObject);
                     modified = true;
+
+                    newReferences.add(xwikiObject.getReference());
                 }
+            }
+
+            // Remove objects
+            List<com.xpn.xwiki.api.Object> toRemove = new ArrayList<>();
+            for (Vector<com.xpn.xwiki.api.Object> objects : doc.getxWikiObjects().values()) {
+                for (com.xpn.xwiki.api.Object object : objects) {
+                    if (!newReferences.contains(object.getReference())) {
+                        toRemove.add(object);
+                    }
+                }
+            }
+            for (com.xpn.xwiki.api.Object obj : toRemove) {
+                doc.removeObject(obj);
+                modified = true;
             }
         }
 

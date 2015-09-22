@@ -51,6 +51,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.License;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.ratings.AverageRatingApi;
@@ -130,7 +131,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Solr
 
         StringBuilder boostBuilder = new StringBuilder();
-        StringBuilder flBuilder = new StringBuilder("wiki,space,name");
+        StringBuilder flBuilder = new StringBuilder("wiki,spaces,name");
         for (SolrField field : XWikiRepositoryModel.SOLR_FIELDS.values()) {
             // Boost
             if (field.boostValue != null) {
@@ -163,6 +164,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     @Inject
     @Named("separate")
     protected RatingsManager ratingsManager;
+
+    /**
+     * Used to extract a document reference from a {@link SolrDocument}.
+     */
+    @Inject
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -570,9 +577,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     {
         XWikiContext xcontext = getXWikiContext();
 
-        String documentSpace = (String) document.getFieldValue("space");
-        String documentName = (String) document.getFieldValue("name");
-
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID, true));
@@ -601,8 +605,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Website
         extension.setWebsite(this.<String>getSolrValue(document, Extension.FIELD_WEBSITE, true));
         if (extension.getWebsite() == null) {
-            extension.setWebsite(xcontext.getWiki().getURL(
-                new DocumentReference(xcontext.getWikiId(), documentSpace, documentName), "view", xcontext));
+            DocumentReference extensionDocumentReference = this.solrDocumentReferenceResolver.resolve(document);
+            extension.setWebsite(xcontext.getWiki().getURL(extensionDocumentReference, xcontext));
         }
 
         // Authors

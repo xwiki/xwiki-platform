@@ -260,11 +260,7 @@ public class ExportAction extends XWikiAction
             return "exception";
         }
 
-        if (name == null) {
-            return "export";
-        }
-
-        if (StringUtils.isBlank(name)) {
+        if (StringUtils.isEmpty(name)) {
             if (all) {
                 name = "backup";
             } else {

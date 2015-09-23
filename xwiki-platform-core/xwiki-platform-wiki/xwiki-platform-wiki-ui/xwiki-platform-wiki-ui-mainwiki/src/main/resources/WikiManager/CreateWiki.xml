@@ -211,7 +211,7 @@
               &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiname')&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
-              &lt;input size="40" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
+              &lt;input size="60" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
               &lt;span id="wikinamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
             &lt;/dd&gt;
           &lt;/dl&gt;

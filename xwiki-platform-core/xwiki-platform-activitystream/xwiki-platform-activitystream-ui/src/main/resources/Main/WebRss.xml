@@ -82,7 +82,7 @@
   ## Bind Query parameters
   ## ==============
   ## Bind query parameters depending on the passed query string parameters
-  #set ($queryObject = $services.query.xwql($query).addFilter('currentlanguage').setLimit(20).setOffset(0))
+  #set ($queryObject = $services.query.xwql($query).addFilter('hidden/document').addFilter('currentlanguage').setLimit(20).setOffset(0))
   #if("$!{request.tag}" != '')
     #foreach ($tag in $request.getParameterValues('tag'))
       #set ($queryObject = $queryObject.bindValue("tag${foreach.count}", $tag))

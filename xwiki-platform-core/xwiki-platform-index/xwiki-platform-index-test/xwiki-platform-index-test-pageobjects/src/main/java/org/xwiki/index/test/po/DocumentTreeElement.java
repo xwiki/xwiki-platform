@@ -103,6 +103,18 @@ public class DocumentTreeElement extends TreeElement
     }
 
     /**
+     * Waits for the specified document to be selected.
+     * 
+     * @param path the path used to locate the document to wait for
+     * @return this tree
+     * @since 7.2
+     */
+    public DocumentTreeElement waitForDocumentSelected(String... path)
+    {
+        return (DocumentTreeElement) super.waitForNodeSelected(getDocumentNodeId(path));
+    }
+
+    /**
      * @param path the path used to locate the space
      * @return {@code true} if the specified space appears in the tree
      */

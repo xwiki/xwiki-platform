@@ -55,7 +55,7 @@
   </build>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>office-tests</id>
       <modules>
         <module>xwiki-platform-office-test</module>
       </modules>

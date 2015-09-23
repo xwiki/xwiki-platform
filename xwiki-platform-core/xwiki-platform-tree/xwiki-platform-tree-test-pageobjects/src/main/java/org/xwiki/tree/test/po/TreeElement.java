@@ -21,8 +21,6 @@ package org.xwiki.tree.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NotFoundException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -30,14 +28,12 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Page object used to interact with the generic tree widget available in XWiki.
- *
+ * 
  * @version $Id$
  * @since 6.3RC1
  */
 public class TreeElement extends BaseElement
 {
-    private static final String SELECTED_NODE_XPATH = "//*[@aria-selected='true']";
-
     /**
      * The element that represents the tree.
      */
@@ -45,7 +41,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Creates a new instance that can be used to interact with the tree represented by the given element.
-     *
+     * 
      * @param element the element that represents the tree
      */
     public TreeElement(WebElement element)
@@ -78,42 +74,23 @@ public class TreeElement extends BaseElement
 
     /**
      * Open the tree to the specified node.
-     *
+     * 
      * @param nodeId the node to open to
      * @return this tree
      */
-    public TreeElement openTo(final String nodeId)
+    public TreeElement openTo(String nodeId)
     {
         if (getDriver() instanceof JavascriptExecutor) {
             ((JavascriptExecutor) getDriver()).executeScript(
                 "jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element, nodeId);
         }
-
-        // Wait for the node to be selected.
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver input)
-            {
-                try {
-                    // Wait for only the node to be selected.
-                    return getNode(nodeId).isSelected()
-                        && getDriver().findElementsWithoutWaiting(element, By.xpath(SELECTED_NODE_XPATH))
-                            .size() == 1;
-                } catch (NotFoundException nfe) {
-                    return Boolean.FALSE;
-                } catch (StaleElementReferenceException sere) {
-                    return Boolean.FALSE;
-                }
-            }
-        });
-
+        getDriver().waitUntilElementIsVisible(By.id(nodeId));
         return this;
     }
 
     /**
      * Clear the selection in the tree.
-     *
+     * 
      * @return this tree
      * @since 7.2M3
      */
@@ -123,22 +100,12 @@ public class TreeElement extends BaseElement
             ((JavascriptExecutor) getDriver()).executeScript(
                 "jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
         }
-
-        // Wait for the deselection to actually happen:
-
-        // - wait for the DOM to be updated accordingly
-        getDriver().waitUntilElementDisappears(this.element, By.xpath(SELECTED_NODE_XPATH));
-
-        // - wait for the jstree code to be updated accordingly
-        getDriver().waitUntilJavascriptCondition(
-            "return jQuery.jstree.reference(jQuery(arguments[0])).get_selected().length === 0", this.element);
-
         return this;
     }
 
     /**
      * Wait as long as the tree in busy (loading).
-     *
+     * 
      * @return this tree
      */
     public TreeElement waitForIt()

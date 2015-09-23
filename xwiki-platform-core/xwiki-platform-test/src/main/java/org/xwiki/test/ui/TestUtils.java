@@ -1156,7 +1156,7 @@ public class TestUtils
     public void deleteObject(String space, String page, String className, int objectNumber) throws Exception
     {
         TestUtils.assertStatusCodes(
-            rest().executeDelete(ObjectResource.class, getCurrentWiki(), space, page, className, objectNumber),
+            rest().executeDelete(ObjectResource.class, getCurrentWiki(), space, page, className, objectNumber), true,
             STATUS_NO_CONTENT);
     }
 
@@ -1520,14 +1520,6 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public static <M extends HttpMethod> M assertStatusCodes(M method, int... expectedCodes)
-    {
-        return assertStatusCodes(method, true, expectedCodes);
-    }
-
-    /**
-     * @since 7.3M1
-     */
     public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
     {
         if (expectedCodes.length > 0) {
@@ -1608,7 +1600,15 @@ public class TestUtils
 
     protected GetMethod executeGet(String uri, int... expectedCodes) throws Exception
     {
-        return assertStatusCodes(executeGet(uri), expectedCodes);
+        return executeGet(uri, false, expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected GetMethod executeGet(String uri, boolean release, int... expectedCodes) throws Exception
+    {
+        return assertStatusCodes(executeGet(uri), release, expectedCodes);
     }
 
     /**
@@ -1628,7 +1628,16 @@ public class TestUtils
     protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
         throws Exception
     {
-        return assertStatusCodes(executePost(uri, content, mediaType), expectedCodes);
+        return executePost(uri, content, mediaType, true, expectedCodes);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    protected PostMethod executePost(String uri, InputStream content, String mediaType, boolean release,
+        int... expectedCodes) throws Exception
+    {
+        return assertStatusCodes(executePost(uri, content, mediaType), false, expectedCodes);
     }
 
     /**
@@ -1646,9 +1655,9 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected DeleteMethod executeDelete(String uri, int... expectedCodes) throws Exception
+    protected void executeDelete(String uri, int... expectedCodes) throws Exception
     {
-        return assertStatusCodes(executeDelete(uri), expectedCodes);
+        assertStatusCodes(executeDelete(uri), true, expectedCodes);
     }
 
     /**
@@ -1665,10 +1674,15 @@ public class TestUtils
         return putMethod;
     }
 
-    protected PutMethod executePut(String uri, InputStream content, String mediaType, int... expectedCodes)
-        throws Exception
+    protected void executePut(String uri, InputStream content, String mediaType, int... expectedCodes) throws Exception
     {
-        return assertStatusCodes(executePut(uri, content, mediaType), expectedCodes);
+        executePut(uri, content, mediaType, true, expectedCodes);
+    }
+
+    protected PutMethod executePut(String uri, InputStream content, String mediaType, boolean release,
+        int... expectedCodes) throws Exception
+    {
+        return assertStatusCodes(executePut(uri, content, mediaType), release, expectedCodes);
     }
 
     // REST
@@ -1808,9 +1822,20 @@ public class TestUtils
         /**
          * Add or update.
          */
-        public EntityEnclosingMethod save(Page page, int... expectedCodes) throws Exception
+        public void save(Page page, int... expectedCodes) throws Exception
         {
-            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)));
+            save(page, true, expectedCodes);
+        }
+
+        public EntityEnclosingMethod save(Page page, boolean release, int... expectedCodes) throws Exception
+        {
+            if (expectedCodes.length == 0) {
+                // Allow create or modify by default
+                expectedCodes = STATUS_CREATED_ACCEPTED;
+            }
+
+            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)), release,
+                expectedCodes);
         }
 
         /**
@@ -1855,10 +1880,7 @@ public class TestUtils
                 throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
 
-            DeleteMethod deleteMethod = executeDelete(resource, toElements(reference));
-
-            // Check if the deleted went as expected
-            TestUtils.assertStatusCodes(deleteMethod, STATUS_NO_CONTENT);
+            TestUtils.assertStatusCodes(executeDelete(resource, toElements(reference)), true, STATUS_NO_CONTENT);
         }
 
         public void deletePage(String space, String page) throws Exception
@@ -1939,8 +1961,7 @@ public class TestUtils
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
             try (InputStream resourceStream = toResourceInputStream(restObject)) {
-                return TestUtils.this.executePost(uri, resourceStream, MediaType.APPLICATION_XML,
-                    Status.OK.getStatusCode());
+                return TestUtils.this.executePost(uri, resourceStream, MediaType.APPLICATION_XML);
             }
         }
 
@@ -1956,8 +1977,7 @@ public class TestUtils
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
             try (InputStream resourceStream = toResourceInputStream(restObject)) {
-                return TestUtils.this.executePut(uri, resourceStream, MediaType.APPLICATION_XML,
-                    Status.OK.getStatusCode());
+                return TestUtils.this.executePut(uri, resourceStream, MediaType.APPLICATION_XML);
             }
         }
 

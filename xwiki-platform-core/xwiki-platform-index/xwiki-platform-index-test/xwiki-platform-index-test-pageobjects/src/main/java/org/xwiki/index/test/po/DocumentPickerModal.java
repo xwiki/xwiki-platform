@@ -89,4 +89,18 @@ public class DocumentPickerModal extends BaseElement
 
         return this;
     }
+
+    /**
+     * Helper method to wait for the specified document to be selected. This is useful when you open the modal and the
+     * tree is expanded to the current selection.
+     * 
+     * @param path the path used to locate the element to wait for
+     * @return this modal
+     * @since 7.2
+     */
+    public DocumentPickerModal waitForDocumentSelected(String... path)
+    {
+        getTree().waitForDocumentSelected(path);
+        return this;
+    }
 }

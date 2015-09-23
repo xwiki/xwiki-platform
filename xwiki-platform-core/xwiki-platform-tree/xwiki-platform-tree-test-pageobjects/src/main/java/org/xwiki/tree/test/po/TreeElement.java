@@ -124,6 +124,20 @@ public class TreeElement extends BaseElement
         return this;
     }
 
+    /**
+     * Waits for the specified node to be selected.
+     * 
+     * @param nodeId the id of the node to wait for
+     * @return this tree
+     * @since 7.2
+     */
+    protected TreeElement waitForNodeSelected(String nodeId)
+    {
+        String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
+        getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
+        return this;
+    }
+
     protected WebElement getElement()
     {
         return this.element;

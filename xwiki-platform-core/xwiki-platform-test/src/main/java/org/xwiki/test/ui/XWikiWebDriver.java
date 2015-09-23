@@ -209,7 +209,19 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsVisible(final By locator)
     {
-        waitUntilElementsAreVisible(new By[] {locator}, true);
+        waitUntilElementIsVisible(null, locator);
+    }
+
+    /**
+     * Wait until the element specified by the locator is displayed. Give up after timeout seconds.
+     *
+     * @param parentElement where to look for the specified element, {@code null} to look everywhere
+     * @param locator the locator for the element to look for
+     * @since 7.2
+     */
+    public void waitUntilElementIsVisible(WebElement parentElement, final By locator)
+    {
+        waitUntilElementsAreVisible(parentElement, new By[] {locator}, true);
     }
 
     /**
@@ -234,12 +246,25 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     /**
-     * Wait until one or all of a array of element locators are displayed.
+     * Wait until one or all of an array of element locators are displayed.
      *
-     * @param locators the array of element locators to look for.
-     * @param all if true then don't return until all elements are found. Otherwise return after finding one.
+     * @param locators the array of element locators to look for
+     * @param all if true then don't return until all elements are found. Otherwise return after finding one
      */
     public void waitUntilElementsAreVisible(final By[] locators, final boolean all)
+    {
+        waitUntilElementsAreVisible(null, locators, all);
+    }
+
+    /**
+     * Wait until one or all of an array of element locators are displayed.
+     *
+     * @param parentElement where to look for the specified elements, {@code null} to look everywhere
+     * @param locators the array of element locators to look for
+     * @param all if true then don't return until all elements are found. Otherwise return after finding one
+     * @since 7.2
+     */
+    public void waitUntilElementsAreVisible(final WebElement parentElement, final By[] locators, final boolean all)
     {
         waitUntilCondition(new ExpectedCondition<WebElement>()
         {
@@ -249,7 +274,13 @@ public class XWikiWebDriver extends RemoteWebDriver
                 WebElement element = null;
                 for (int i = 0; i < locators.length; i++) {
                     try {
-                        element = driver.findElement(locators[i]);
+                        if (parentElement != null) {
+                            // Use the locator from the passed parent element.
+                            element = parentElement.findElement(locators[i]);
+                        } else {
+                            // Use the locator from the root.
+                            element = driver.findElement(locators[i]);
+                        }
                     } catch (NotFoundException e) {
                         // This exception is caught by WebDriverWait
                         // but it returns null which is not necessarily what we want.

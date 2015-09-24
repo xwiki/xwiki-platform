@@ -63,7 +63,7 @@
     #set ($mailError = true)
     #displayError($exceptiontool.getStackTrace($services.mailstorage.lastError))
   #end
-  #set ($statuses = $mailResult.statusResult.getByState('FAILED'))
+  #set ($statuses = $mailResult.statusResult.getAllErrors())
   #if ($statuses.hasNext())
     #set ($mailError = true)
     #set ($status = $statuses.next())

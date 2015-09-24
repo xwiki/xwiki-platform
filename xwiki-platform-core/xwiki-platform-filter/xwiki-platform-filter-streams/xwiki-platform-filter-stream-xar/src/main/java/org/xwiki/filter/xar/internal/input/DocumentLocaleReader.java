@@ -156,7 +156,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void switchWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
-        if (canSendEdWikiSpace(force)) {
+        if (canSendEndWikiSpace(force)) {
             sendEndWikiSpace(proxyFilter, force);
         }
 
@@ -188,7 +188,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private boolean canSendEdWikiSpace(boolean force)
+    private boolean canSendEndWikiSpace(boolean force)
     {
         return this.sentSpaceReference != null && !this.sentSpaceReference.equals(this.currentSpaceReference)
             && (force || this.properties.getEntities() == null);

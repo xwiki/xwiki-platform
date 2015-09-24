@@ -159,11 +159,12 @@
     <guid>05dec3e3-4eaf-4432-aecf-f1d7b40879b9</guid>
     <property>
       <code>{{velocity}}
-#set($columns = ["doc.title", "doc.creationDate", "doc.date"])
+#set($columns = ["doc.title", "doc.creationDate", "doc.date", "_actions"])
 #set($columnsProperties = {
   "doc.title" : { "type" : "text", "link" : "view" },
   "doc.creationDate" : { "type" : "date" },
-  "doc.date" : { "type" : "date" }
+  "doc.date" : { "type" : "date" },
+  "_actions" : { "sortable" : false, "filterable" : false, "html" : true, "actions" : ["edit","delete"]}
 })
 #set($options = { 
    "tagCloud":true,

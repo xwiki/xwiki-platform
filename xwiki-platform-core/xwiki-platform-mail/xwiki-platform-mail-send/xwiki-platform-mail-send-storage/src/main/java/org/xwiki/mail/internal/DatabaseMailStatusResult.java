@@ -88,7 +88,7 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
     @Override
     public Iterator<MailStatus> getAllErrors()
     {
-        return getFilteredState("*_error");
+        return getFilteredState("%_error");
     }
 
     @Override

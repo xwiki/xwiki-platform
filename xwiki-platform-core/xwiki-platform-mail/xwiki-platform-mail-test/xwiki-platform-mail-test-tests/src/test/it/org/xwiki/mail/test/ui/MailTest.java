@@ -93,11 +93,25 @@ public class MailTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("Email", "General"));
         Assert.assertTrue(administrationPage.hasSection("Email", "Mail Sending"));
 
-        // Step 2: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
-
+        // Verify we can click on Email > General
         administrationPage.clickSection("Email", "General");
+
+        // Step 2: Before validating that we can send email, let's verify that we can report errors when the mail
+        // setup is not correct
+
+        // Make sure there's no mail server set for example.
         administrationPage.clickSection("Email", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
+        sendMailPage.setHost("");
+        sendMailPage.clickSave();
+
+        // Send the mail that's supposed to fail and validate that it fails
+        sendMailWithInvalidMailSetup();
+
+        // Step 3: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
+        administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Email", "Mail Sending");
+        sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("localhost");
         sendMailPage.setPort("3025");
         // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
@@ -173,6 +187,31 @@ public class MailTest extends AbstractTest
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);
         assertTrue(liveTableElement.hasRow("Error", ""));
+    }
+
+    private void sendMailWithInvalidMailSetup() throws Exception
+    {
+        // Remove existing pages (for pages that we create below)
+        getUtil().deletePage(getTestClassName(), "SendInvalidMail");
+
+        // Create a page with the Velocity script to send the template email.
+        // Note that we don't set the type and thus this message should not appear in the LiveTable filter at the end
+        // of the test.
+        String velocity = "{{velocity}}\n"
+            + "#set ($message = $services.mailsender.createMessage('from@doe.com', 'to@doe.com', 'Subject'))\n"
+            + "#set ($discard = $message.addPart('text/plain', 'text message'))\n"
+            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
+            + "#foreach ($status in $result.statusResult.getAllErrors())\n"
+            + "  MSGID $status.messageId SUMMARY $status.errorSummary DESCRIPTION $status.errorDescription\n"
+            + "#end\n"
+            + "{{/velocity}}";
+        // This will create the page and execute its content and thus send the mail
+        ViewPage vp = getUtil().createPage(getTestClassName(), "SendInvalidMail", velocity, "");
+
+        // Verify that the page is not empty (and thus an error message is displayed). Note that it's difficult to
+        // asssert what is displayed because it could vary from system to system. This is why we only assert that
+        // something is displayed and that it matches the defined pattern.
+        assertTrue(vp.getContent().matches("(?s)MSGID.*SUMMARY.*DESCRIPTION.*"));
     }
 
     private void sendTemplateMailToEmail() throws Exception

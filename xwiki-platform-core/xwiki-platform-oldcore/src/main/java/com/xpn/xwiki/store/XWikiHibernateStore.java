@@ -73,6 +73,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.store.UnexpectedException;
@@ -2960,14 +2961,26 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        try {
+            return getTranslationList(doc.getDocumentReference());
+        } catch (QueryException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                "Failed to retrieve the list of translations for [{0}]", e, new Object[] {doc.getDocumentReference()});
+        }
+    }
+
+    private List<String> getTranslationList(DocumentReference documentReference) throws QueryException
+    {
         // Note that the query is made to work with Oracle which treats empty strings as null.
-        String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
-            + "and (doc.language <> '' or (doc.language is not null and '' is null))";
-        ArrayList<String> params = new ArrayList<String>();
-        params.add(doc.getSpace());
-        params.add(doc.getName());
-        List<String> list = search(hql, 0, 0, params, context);
-        return (list == null) ? new ArrayList<String>() : list;
+        String hql =
+            "select doc.language from XWikiDocument as doc where doc.space = :space and doc.name = :name "
+                + "and (doc.language <> '' or (doc.language is not null and '' is null))";
+        org.xwiki.query.Query query = getQueryManager().createQuery(hql, org.xwiki.query.Query.HQL);
+        query.setWiki(documentReference.getWikiReference().getName());
+        query.bindValue("space", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
+        query.bindValue("name", documentReference.getName());
+        return query.execute();
     }
 
     @Override

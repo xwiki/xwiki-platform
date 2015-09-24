@@ -40,8 +40,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -467,5 +469,30 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         verify(stringListProperty, never()).setValue("");
         verify(stringListProperty, times(3)).setValue(Arrays.asList("one"));
         verify(session, times(3)).save(stringListProperty);
+    }
+
+    @Test
+    public void getTranslationList() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Success");
+        XWikiDocument doc = mock(XWikiDocument.class);
+        when(doc.getDocumentReference()).thenReturn(documentReference);
+
+        org.xwiki.query.Query query = mock(org.xwiki.query.Query.class);
+        List<Object> translationList = Arrays.<Object>asList("fr", "ro");
+        when(query.execute()).thenReturn(translationList);
+
+        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
+        when(queryManager.createQuery(any(String.class), eq(org.xwiki.query.Query.HQL))).thenReturn(query);
+
+        EntityReferenceSerializer<String> localEntityReferenceSerialzier =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localEntityReferenceSerialzier.serialize(documentReference.getParent())).thenReturn("Path.To");
+
+        assertEquals(translationList, store.getTranslationList(doc, context));
+
+        verify(query).setWiki(documentReference.getWikiReference().getName());
+        verify(query).bindValue("space", "Path.To");
+        verify(query).bindValue("name", documentReference.getName());
     }
 }

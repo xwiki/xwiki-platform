@@ -103,7 +103,7 @@
     <filter-class>org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
   </filter>
 
-  <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
+  <!-- This filter is used to initialize the XWiki context before processing a XML-RPC request. -->
   <filter>
     <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
     <filter-class>org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
@@ -192,6 +192,14 @@
   <filter-mapping>
     <filter-name>XWikiContextInitializationFilter</filter-name>
     <servlet-name>gwtrpc</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
+    <servlet-name>xmlrpc</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -291,6 +299,16 @@
     -->
   </servlet>
 
+  <servlet>
+    <servlet-name>xmlrpc</servlet-name>
+    <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
+    <init-param>
+      <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
+      <param-name>enabledForExtensions</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+
   <!-- This is the entry point for all component-based XWiki GWT services. XWikiService servlet should be dropped
     in favor of this servlet when we completely move to components. -->
   <servlet>
@@ -342,6 +360,11 @@
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/xwiki/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>xmlrpc</servlet-name>
+    <url-pattern>/xmlrpc/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -32,6 +32,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlrpc.server.XmlRpcServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -147,6 +148,8 @@ public class XWikiContext extends Hashtable<Object, Object>
     private URL url;
 
     private XWikiURLFactory URLFactory;
+
+    private XmlRpcServer xmlRpcServer;
 
     private int cacheDuration = 0;
 
@@ -689,6 +692,16 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setFinished(boolean finished)
     {
         this.finished = finished;
+    }
+
+    public XmlRpcServer getXMLRPCServer()
+    {
+        return this.xmlRpcServer;
+    }
+
+    public void setXMLRPCServer(XmlRpcServer xmlRpcServer)
+    {
+        this.xmlRpcServer = xmlRpcServer;
     }
 
     /**

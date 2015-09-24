@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
+import com.xpn.xwiki.xmlrpc.XWikiXmlRpcURLFactory;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {
@@ -43,8 +44,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
     private void init(XWiki xwiki)
     {
         this.factoryMap = new HashMap<>();
-        // TODO: This mode is still used by the REST module (in web.xml). We need to get rid of it.
-        register(xwiki, XWikiContext.MODE_XMLRPC, ExternalServletURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
+        register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXmlRpcURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");
         register(xwiki, XWikiContext.MODE_GWT, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");

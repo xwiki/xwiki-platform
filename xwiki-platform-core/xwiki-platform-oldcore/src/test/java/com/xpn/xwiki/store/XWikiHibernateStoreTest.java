@@ -21,7 +21,9 @@ package com.xpn.xwiki.store;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import org.hibernate.FlushMode;
@@ -38,8 +40,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,16 +54,9 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -335,5 +332,30 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         verify(query).setString("fullName", fullName);
         verify(query).setString("language", Locale.ENGLISH.toString());
+    }
+
+    @Test
+    public void getTranslationList() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Success");
+        XWikiDocument doc = mock(XWikiDocument.class);
+        when(doc.getDocumentReference()).thenReturn(documentReference);
+
+        org.xwiki.query.Query query = mock(org.xwiki.query.Query.class);
+        List<Object> translationList = Arrays.<Object>asList("fr", "ro");
+        when(query.execute()).thenReturn(translationList);
+
+        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
+        when(queryManager.createQuery(any(String.class), eq(org.xwiki.query.Query.HQL))).thenReturn(query);
+
+        EntityReferenceSerializer<String> localEntityReferenceSerialzier =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localEntityReferenceSerialzier.serialize(documentReference.getParent())).thenReturn("Path.To");
+
+        assertEquals(translationList, store.getTranslationList(doc, context));
+
+        verify(query).setWiki(documentReference.getWikiReference().getName());
+        verify(query).bindValue("space", "Path.To");
+        verify(query).bindValue("name", documentReference.getName());
     }
 }

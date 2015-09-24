@@ -44,9 +44,38 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+AnnotationCode.AnnotationConfig_activated=Anotácie sú aktivované
+AnnotationCode.AnnotationConfig_annotationClass=XWiki trieda definujúca štruktúru anotácií
+AnnotationCode.AnnotationConfig_displayed=Zobraziť anotácie implicitne
+AnnotationCode.AnnotationConfig_exceptionSpaces=Okrem priestorov
 admin.annotations=Anotácie
+annotations.action.create.cancel.text=Zrušiť
+annotations.action.create.error.wrongsyntax=Anotácie nie sú dostupné pre stránky v XWiki/1.0 syntaxe.
+annotations.action.create.form.loaderror=Nepodarilo sa\:
+annotations.action.create.helpmessage=Ak chcete komentovať kus textu, označte to a stlačte {0}.
+annotations.action.create.loaderror=Nepodarilo sa\:
+annotations.action.create.submit.text=Pridať anotáciu
+annotations.action.delete.confirm=Chcete zmazať anotáciu?
+annotations.action.delete.done=Odstrániť anotáciu
 annotations.action.delete.text=[Odstrániť]
 annotations.action.delete.tooltip=Odstrániť anotáciu
+annotations.action.edit.cancel.text=Zrušiť
+annotations.action.edit.loaderror=Nepodarilo sa\:
+annotations.action.edit.submit.text=Aktualizovať
+annotations.action.edit.text=[Editovať]
+annotations.action.edit.tooltip=Editovať anotáciu
+annotations.action.validate.loaderror=Nepodarilo sa\:
+annotations.action.validate.text=[Validovať]
+annotations.action.view.form.loaderror=Nepodarilo sa\:
+annotations.action.view.hide.text=skryť
+annotations.action.view.thread=Ukázať vlákno
+annotations.annotated.loaderror=Nepodarilo sa\:
+annotations.config.activate.explanation=Nasledujúce nastavenia umožnujú nastaviť, kde budú anotácie aktívne. 1. nastavenie určuje všeobecné pravidlo, 2. špecifikuje priestory (výnimky).
+annotations.config.activate.title=Nastavenia
+annotations.config.type.explanation=Pridať ďalšie vlastnosti anotácie.
+annotations.config.type.title=Nastavenia anotácie
+annotations.filters.anyvalue=akákoľvek hodnota
+annotations.filters.clearvalue=vymazať
 annotations.settings.display=Zobraziť anotácie
 annotations.title=Anotácie
 </content>

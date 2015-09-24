@@ -43,6 +43,7 @@
 faq.doc.creationDate=Created On
 faq.doc.date=Last Modified
 faq.applicationsPanelEntryLabel=FAQ
+faq._actions=Actions
 
 platform.faq.about=Frequently Asked Questions (FAQ) are an easy way to find answers to most of your questions.
 platform.faq.search.title=Search FAQ...

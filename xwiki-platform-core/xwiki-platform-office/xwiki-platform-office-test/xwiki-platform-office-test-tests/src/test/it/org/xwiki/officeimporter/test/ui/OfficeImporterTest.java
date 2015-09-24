@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
  * Functional tests for the office importer
  *  
  * @version $Id$
- * @since 7.2
+ * @since 7.3M1
  */
 public class OfficeImporterTest extends AbstractTest
 {

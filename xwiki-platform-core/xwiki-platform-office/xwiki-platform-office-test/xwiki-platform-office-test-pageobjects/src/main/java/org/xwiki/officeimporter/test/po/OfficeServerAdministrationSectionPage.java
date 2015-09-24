@@ -24,6 +24,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
 
 /**
+ * @since 7.3M1
  * @version $Id$
  */
 public class OfficeServerAdministrationSectionPage extends AdministrationSectionPage

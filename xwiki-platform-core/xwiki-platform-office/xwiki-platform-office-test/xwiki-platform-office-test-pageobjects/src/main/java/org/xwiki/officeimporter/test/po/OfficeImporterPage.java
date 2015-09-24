@@ -27,6 +27,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
+ * @since 7.3M1
  * @version $Id$
  */
 public class OfficeImporterPage extends ViewPage

@@ -39,24 +39,9 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-repository-model</artifactId>
-      <version>${commons.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <!-- Server side test dependencies -->

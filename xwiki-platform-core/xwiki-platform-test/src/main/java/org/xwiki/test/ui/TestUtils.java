@@ -69,6 +69,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -1375,27 +1377,28 @@ public class TestUtils
     public void attachFile(List<String> spaces, String page, String name, InputStream is, boolean failIfExists)
         throws Exception
     {
-        // make sure xwiki.Import exists
-        if (!pageExists(spaces, page)) {
-            createPage(spaces, page, null, null);
-        }
+        AttachmentReference reference =
+            new AttachmentReference(name, new DocumentReference(getCurrentWiki(), spaces, page));
 
-        StringBuilder url = new StringBuilder(BASE_REST_URL);
+        attachFile(reference, is, failIfExists);
+    }
 
-        url.append("wikis/xwiki");
-        for (String space : spaces) {
-            url.append("/spaces/").append(escapeURL(space));
+    /**
+     * @since 7.3M1
+     */
+    public void attachFile(AttachmentReference reference, InputStream is, boolean failIfExists) throws Exception
+    {
+        // make sure the page exist
+        if (!rest().exists(reference.getDocumentReference())) {
+            createPage(reference, null, null);
         }
-        url.append("/pages/");
-        url.append(escapeURL(page));
-        url.append("/attachments/");
-        url.append(escapeURL(name));
 
         if (failIfExists) {
-            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode());
+            assertStatusCodes(rest().executePut(AttachmentResource.class, is, rest().toElements(reference)), true,
+                STATUS_CREATED);
         } else {
-            executePut(url.toString(), is, MediaType.APPLICATION_OCTET_STREAM, Status.CREATED.getStatusCode(),
-                Status.ACCEPTED.getStatusCode());
+            assertStatusCodes(rest().executePut(AttachmentResource.class, is, rest().toElements(reference)), true,
+                STATUS_CREATED_ACCEPTED);
         }
     }
 
@@ -1512,7 +1515,7 @@ public class TestUtils
     public static void assertStatuses(int actualCode, int... expectedCodes)
     {
         if (!ArrayUtils.contains(expectedCodes, actualCode)) {
-            Assert.fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.asList(expectedCodes)
+            Assert.fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes)
                 + "]");
         }
     }
@@ -1524,10 +1527,10 @@ public class TestUtils
     {
         if (expectedCodes.length > 0) {
             assertStatuses(method.getStatusCode(), expectedCodes);
+        }
 
-            if (release) {
-                method.releaseConnection();
-            }
+        if (release) {
+            method.releaseConnection();
         }
 
         return method;
@@ -1715,20 +1718,29 @@ public class TestUtils
             return TestUtils.this.getBaseURL() + "rest";
         }
 
-        private String toSpaceElement(String spaceReference)
+        private String toSpaceElement(Iterable<?> spaces)
         {
             StringBuilder builder = new StringBuilder();
 
-            for (EntityReference reference : RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE)
-                .getReversedReferenceChain()) {
+            for (Object space : spaces) {
                 if (builder.length() > 0) {
                     builder.append("/spaces/");
                 }
 
-                builder.append(reference.getName());
+                if (space instanceof EntityReference) {
+                    builder.append(((EntityReference) space).getName());
+                } else {
+                    builder.append(space.toString());
+                }
             }
 
             return builder.toString();
+        }
+
+        private String toSpaceElement(String spaceReference)
+        {
+            return toSpaceElement(RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE)
+                .getReversedReferenceChain());
         }
 
         protected Object[] toElements(Page page)

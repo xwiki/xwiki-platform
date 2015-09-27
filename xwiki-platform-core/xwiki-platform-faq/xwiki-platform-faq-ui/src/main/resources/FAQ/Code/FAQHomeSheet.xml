@@ -20,15 +20,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>FAQCode</web>
-  <name>FAQHomeSheet</name>
+<xwikidoc version="1.1" reference="FAQ.Code.FAQHomeSheet">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1384415291000</creationDate>
-  <parent>FAQCode.WebHome</parent>
+  <parent>FAQ.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1384417967000</date>
@@ -41,13 +39,13 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
-#set($faqHome = $doc.getObject("FAQCode.FAQHomeClass"))
+#set($faqHome = $doc.getObject("FAQ.Code.FAQHomeClass"))
 #if($faqHome)
   ## Don't display doc extra tabs for FAQ home pages
   #set($docextras=[])
-  $doc.use("FAQCode.FAQHomeClass")
-  $xwiki.jsx.use('FAQCode.SkinExtension')
-  $xwiki.ssx.use('FAQCode.SkinExtension')
+  $doc.use("FAQ.Code.FAQHomeClass")
+  $xwiki.jsx.use('FAQ.Code.SkinExtension')
+  $xwiki.ssx.use('FAQ.Code.SkinExtension')
   ## The space where to add and search for FAQ Entries
   #set ($faqSpace = $doc.space)
   ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
@@ -98,7 +96,7 @@
       &lt;form action="$doc.getURL()" id="newfaq" class="xformInline"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
-          &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
+          &lt;input type="hidden" name="template" value="FAQ.Code.FAQTemplate" /&gt;
           &lt;input type="hidden" name="createFAQ" value="true" /&gt;
           &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="16"/&gt;
           &lt;span class="buttonwrapper"&gt;
@@ -115,7 +113,7 @@
 
   {{faq filter="space=${faqSpace}"/}}
 #else
-  This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
+  This class sheet must be applied on a document containing an FAQ.Code.FAQHomeClass object
 #end
 {{/velocity}}</content>
 </xwikidoc>

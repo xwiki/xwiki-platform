@@ -20,62 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>FAQTemplate</name>
+<xwikidoc version="1.1" reference="FAQ.Code.FAQSearch">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FAQ.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1393259863000</creationDate>
+  <parent>FAQ.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1360434145000</creationDate>
-  <date>1360434235000</date>
-  <contentUpdateDate>1360434235000</contentUpdateDate>
+  <date>1393322274000</date>
+  <contentUpdateDate>1393322227000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
+  <title>Search FAQs</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>FAQCode.FAQClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <answer>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <editor>---</editor>
-        <name>answer</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>answer</prettyName>
-        <rows>50</rows>
-        <size>75</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </answer>
-    </class>
-    <name>FAQCode.FAQTemplate</name>
-    <number>0</number>
-    <className>FAQCode.FAQClass</className>
-    <guid>f2b881f1-8360-4c88-adab-53af00013b20</guid>
-    <property>
-      <answer/>
-    </property>
-  </object>
-  <content/>
+  <content>{{include reference="XWiki.SearchCode"/}}
+
+{{velocity output="false"}}
+#if ($searchEngine == 'solr')
+  ## Customize the Solr Search UI for the FAQ application.
+  #set ($solrConfig = {
+    'queryFields': 'title^3 property.FAQ.Code.FAQClass.answer',
+    'facetFields': ['creator', 'creationdate', 'author', 'date', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+    'filterQuery': [
+      'type:DOCUMENT',
+      "wiki:$xcontext.database",
+      "space_exact:$doc.space",
+      'class:FAQ.Code.FAQClass'
+    ]
+  })
+#end
+{{/velocity}}
+
+{{velocity}}
+{{include reference="$searchPage"/}}
+{{/velocity}}</content>
 </xwikidoc>

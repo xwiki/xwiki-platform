@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQ</web>
-  <name>WebHome</name>
+<xwikidoc reference="FAQ.WebHome">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -45,7 +43,7 @@
   <hidden>false</hidden>
   <object>
     <class>
-      <name>FAQCode.FAQHomeClass</name>
+      <name>FAQ.Code.FAQHomeClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -71,7 +69,7 @@
     </class>
     <name>FAQ.WebHome</name>
     <number>0</number>
-    <className>FAQCode.FAQHomeClass</className>
+    <className>FAQ.Code.FAQHomeClass</className>
     <guid>49e446f2-6582-4dba-8769-2ce3930d7cd2</guid>
     <property>
       <description>**{{translation key='platform.faq.about'/}}**</description>

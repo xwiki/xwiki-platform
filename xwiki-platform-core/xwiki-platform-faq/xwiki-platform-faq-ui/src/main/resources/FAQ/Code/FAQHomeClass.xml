@@ -20,13 +20,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>FAQHomeClass</name>
+<xwikidoc reference="FAQ.Code.FAQHomeClass">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FAQCode.WebHome</parent>
+  <parent>FAQ.Code.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -44,7 +42,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <class>
-    <name>FAQCode.FAQHomeClass</name>
+    <name>FAQ.Code.FAQHomeClass</name>
     <customClass/>
     <customMapping/>
     <defaultViewSheet/>
@@ -92,12 +90,12 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>FAQCode.FAQHomeClass</name>
+    <name>FAQ.Code.FAQHomeClass</name>
     <number>0</number>
     <className>XWiki.ClassSheetBinding</className>
     <guid>621424a6-86c6-4779-a1f2-e3631455be61</guid>
     <property>
-      <sheet>FAQCode.FAQHomeSheet</sheet>
+      <sheet>FAQ.Code.FAQHomeSheet</sheet>
     </property>
   </object>
   <content/>

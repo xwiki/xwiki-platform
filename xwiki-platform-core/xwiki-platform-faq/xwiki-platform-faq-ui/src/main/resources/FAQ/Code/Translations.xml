@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>FAQCode</web>
-  <name>Translations</name>
+<xwikidoc version="1.1" reference="FAQ.Code.Translations">
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
@@ -57,13 +55,13 @@ platform.faq.create.submit=Add
 platform.faq.need=You need first to {0} log in {1} or {2} register {3}
 
 platform.faq.noAnswer= No answer has been provided yet for this FAQ entry. Be the first to provide one! Register on this wiki and edit this page to add an answer to this FAQ entry.
-platform.faq.sheet=This class sheet must be applied on a page containing an FAQCode.FAQClass object
+platform.faq.sheet=This class sheet must be applied on a page containing an FAQ.Code.FAQClass object
 
 platform.faq.technical=Contains technical pages for the FAQ application.
 platform.faq.list=Pages
 </content>
   <object>
-    <name>FAQCode.Translations</name>
+    <name>FAQ.Code.Translations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>32d8ed0e-8cc4-4b0e-936b-5cf1c265a1af</guid>

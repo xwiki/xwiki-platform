@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>FAQCode</web>
-  <name>SkinExtension</name>
+<xwikidoc version="1.1" reference="FAQ.Code.SkinExtension">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -41,7 +39,7 @@
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>FAQCode.SkinExtension</name>
+    <name>FAQ.Code.SkinExtension</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>4c2c7c63-2bd7-4163-b674-002fb761626f</guid>
@@ -140,7 +138,7 @@
     </property>
   </object>
   <object>
-    <name>FAQCode.SkinExtension</name>
+    <name>FAQ.Code.SkinExtension</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>2c68e573-947a-4fdb-935d-25daf0986190</guid>

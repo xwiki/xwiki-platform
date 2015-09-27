@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>FAQMacro</name>
+<xwikidoc reference="FAQ.Code.FAQMacro">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -153,7 +151,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>FAQCode.FAQMacro</name>
+    <name>FAQ.Code.FAQMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>05dec3e3-4eaf-4432-aecf-f1d7b40879b9</guid>
@@ -168,8 +166,8 @@
 })
 #set($options = { 
    "tagCloud":true,
-   "resultPage":"FAQCode.FAQJSON",
-   "className":"FAQCode.FAQClass",
+   "resultPage":"FAQ.Code.FAQJSON",
+   "className":"FAQ.Code.FAQClass",
    "selectedColumn":"doc.creationDate",
    "defaultOrder":"desc",
    "translationPrefix" : "faq.",
@@ -253,7 +251,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>FAQCode.FAQMacro</name>
+    <name>FAQ.Code.FAQMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroParameterClass</className>
     <guid>e7e63161-df41-4aa0-8ee6-7212633b9843</guid>

@@ -98,7 +98,7 @@ public class FAQTest extends AbstractTest
         getUtil().rest().delete(homeReference);
 
         // Create a new FAQ home page
-        getUtil().addObject(homeReference, "FAQCode.FAQHomeClass", "description", "new FAQ");
+        getUtil().addObject(homeReference, "FAQ.Code.FAQHomeClass", "description", "new FAQ");
         // Note: AddObject stays in edit mode so we need to navigate again
         FAQHomePage homePage = new FAQHomePage(homeReference);
         homePage.gotoPage();

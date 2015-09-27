@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.InlinePage;
  */
 public class FAQEntryEditPage extends InlinePage
 {
-    @FindBy(id = "FAQCode.FAQClass_0_answer")
+    @FindBy(id = "FAQ.Code.FAQClass_0_answer")
     private WebElement answerElement;
 
     /**

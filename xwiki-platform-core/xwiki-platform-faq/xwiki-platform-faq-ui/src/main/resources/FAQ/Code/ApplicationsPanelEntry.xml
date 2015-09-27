@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>ApplicationsPanelEntry</name>
+<xwikidoc reference="FAQ.Code.ApplicationsPanelEntry">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -92,7 +90,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </parameters>
     </class>
-    <name>FAQCode.ApplicationsPanelEntry</name>
+    <name>FAQ.Code.ApplicationsPanelEntry</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>8d0ca379-e52f-422e-b6ad-3d5c27fa91a4</guid>

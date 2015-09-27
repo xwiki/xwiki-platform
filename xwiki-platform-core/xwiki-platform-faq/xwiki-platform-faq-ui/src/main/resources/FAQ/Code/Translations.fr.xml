@@ -20,14 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>FAQCode</web>
-  <name>Translations</name>
+<xwikidoc version="1.1" reference="FAQ.Code.Translations">
   <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>FAQCode.WebHome</parent>
+  <parent>FAQ.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1353578574000</creationDate>
@@ -56,7 +54,7 @@ platform.faq.create.submit=Ajouter
 platform.faq.need=Vous devez vous {0} identifier {1} ou vous {2} enregister {3}
 
 platform.faq.noAnswer=Aucune réponse n'a encore été donnée à cette question. Soyez le premier à en donner une! Inscrivez vous sur ce wiki et éditez cette page pour ajouter une réponse.
-platform.faq.sheet=Cette feuille de classe doit être appliquée à un document contenant un FAQCode.FAQClass object
+platform.faq.sheet=Cette feuille de classe doit être appliquée à un document contenant un FAQ.Code.FAQClass object
 
 platform.faq.technical=Contient les pages techniques de l'application FAQ.
 platform.faq.list=Documents dans cet espace</content>

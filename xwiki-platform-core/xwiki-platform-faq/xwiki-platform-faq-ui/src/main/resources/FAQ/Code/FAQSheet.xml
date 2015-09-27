@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>FAQSheet</name>
+<xwikidoc reference="FAQ.Code.FAQSheet">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -44,9 +42,9 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($faq = $doc.getObject('FAQCode.FAQClass'))
+#set($faq = $doc.getObject('FAQ.Code.FAQClass'))
 #if($faq)
-  $doc.use('FAQCode.FAQClass')
+  $doc.use('FAQ.Code.FAQClass')
     #if ($xcontext.action == 'view')
       #set ($answer = $doc.getValue('answer'))
       #if ("$!answer" != "")

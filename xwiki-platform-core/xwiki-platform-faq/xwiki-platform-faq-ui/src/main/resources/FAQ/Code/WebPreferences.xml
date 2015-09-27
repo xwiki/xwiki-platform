@@ -20,9 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
-  <web>FAQCode</web>
-  <name>WebPreferences</name>
+<xwikidoc reference="FAQ.Code.WebPreferences">
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -130,7 +128,7 @@
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
-    <name>FAQCode.WebPreferences</name>
+    <name>FAQ.Code.WebPreferences</name>
     <number>0</number>
     <className>XWiki.XWikiGlobalRights</className>
     <guid>41653e1c-80ed-45a7-ac5a-afe3fc9b5bdb</guid>
@@ -1217,7 +1215,7 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </xwiki.title.mandatory>
     </class>
-    <name>FAQCode.WebPreferences</name>
+    <name>FAQ.Code.WebPreferences</name>
     <number>0</number>
     <className>XWiki.XWikiPreferences</className>
     <guid>91bd9bfd-8bfc-421d-8905-ec36242c0c49</guid>

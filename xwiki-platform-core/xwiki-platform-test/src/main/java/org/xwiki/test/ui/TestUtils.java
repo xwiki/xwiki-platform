@@ -68,6 +68,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -75,8 +76,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
@@ -133,35 +134,34 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    private static final EntityReferenceResolver<String> RELATIVE_RESOLVER =
-        new RelativeStringEntityReferenceResolver();
-
-    /**
-     * @since 7.3M1
-     */
-    private static final int[] STATUS_OK_NOT_FOUND = new int[] {Status.OK.getStatusCode(),
+    public static final int[] STATUS_OK_NOT_FOUND = new int[] {Status.OK.getStatusCode(),
         Status.NOT_FOUND.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    private static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
+    public static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    private static final int[] STATUS_NO_CONTENT = new int[] {Status.NO_CONTENT.getStatusCode()};
+    public static final int[] STATUS_NO_CONTENT = new int[] {Status.NO_CONTENT.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    private static final int[] STATUS_CREATED_ACCEPTED = new int[] {Status.CREATED.getStatusCode(),
+    public static final int[] STATUS_CREATED_ACCEPTED = new int[] {Status.CREATED.getStatusCode(),
         Status.ACCEPTED.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    private static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
+    public static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
+
+    private static final RelativeStringEntityReferenceResolver RELATIVE_RESOLVER =
+        new RelativeStringEntityReferenceResolver();
+
+    private static DefaultStringEntityReferenceSerializer SERIALIZER = new DefaultStringEntityReferenceSerializer();
 
     private static PersistentTestContext context;
 
@@ -181,27 +181,6 @@ public class TestUtils
      */
     private static Unmarshaller unmarshaller;
 
-    /**
-     * Used to create REST Java resources.
-     */
-    private static ObjectFactory objectFactory;
-
-    {
-        {
-            try {
-                // Initialize REST related tools
-                JAXBContext context =
-                    JAXBContext.newInstance("org.xwiki.rest.model.jaxb"
-                        + ":org.xwiki.extension.repository.xwiki.model.jaxb");
-                marshaller = context.createMarshaller();
-                unmarshaller = context.createUnmarshaller();
-                objectFactory = new ObjectFactory();
-            } catch (JAXBException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -217,13 +196,15 @@ public class TestUtils
      */
     private String currentWiki = "xwiki";
 
-    private RestTestUtils rest = new RestTestUtils();
+    private RestTestUtils rest;
 
     public TestUtils()
     {
         this.httpClient = new HttpClient();
         this.httpClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
         this.httpClient.getParams().setAuthenticationPreemptive(true);
+
+        this.rest = new RestTestUtils(this);
     }
 
     /**
@@ -1390,7 +1371,7 @@ public class TestUtils
     {
         // make sure the page exist
         if (!rest().exists(reference.getDocumentReference())) {
-            createPage(reference, null, null);
+            rest().savePage(reference);
         }
 
         if (failIfExists) {
@@ -1698,14 +1679,24 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public class RestTestUtils
+    public static class RestTestUtils
     {
-        public final Boolean ELEMENTS_ENCODED = new Boolean(true);
+        public static final Boolean ELEMENTS_ENCODED = new Boolean(true);
 
-        public final Map<EntityType, Class<?>> RESOURCES_MAP = new IdentityHashMap<>();
+        public static final Map<EntityType, Class<?>> RESOURCES_MAP = new IdentityHashMap<>();
 
-        public RestTestUtils()
-        {
+        static {
+            try {
+                // Initialize REST related tools
+                JAXBContext jaxbContext =
+                    JAXBContext.newInstance("org.xwiki.rest.model.jaxb"
+                        + ":org.xwiki.extension.repository.xwiki.model.jaxb");
+                marshaller = jaxbContext.createMarshaller();
+                unmarshaller = jaxbContext.createUnmarshaller();
+            } catch (JAXBException e) {
+                throw new RuntimeException(e);
+            }
+
             RESOURCES_MAP.put(EntityType.DOCUMENT, PageResource.class);
             RESOURCES_MAP.put(EntityType.ATTACHMENT, AttachmentResource.class);
             RESOURCES_MAP.put(EntityType.OBJECT, ObjectResource.class);
@@ -1713,9 +1704,68 @@ public class TestUtils
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, ClassPropertyResource.class);
         }
 
+        /**
+         * @since 7.3M1
+         */
+        public static org.xwiki.rest.model.jaxb.Object object(String className)
+        {
+            org.xwiki.rest.model.jaxb.Object obj = new org.xwiki.rest.model.jaxb.Object();
+
+            obj.setClassName(className);
+
+            return obj;
+        }
+
+        /**
+         * @since 7.3M1
+         */
+        public static String toPropertyString(Object value)
+        {
+            String stringValue;
+
+            if (value instanceof Iterable) {
+                StringBuilder builder = new StringBuilder();
+                for (Object item : (Iterable) value) {
+                    if (builder.length() > 0) {
+                        builder.append('|');
+                    }
+
+                    builder.append(item);
+                }
+
+                stringValue = builder.toString();
+            } else if (value != null) {
+                stringValue = value.toString();
+            } else {
+                stringValue = null;
+            }
+
+            return stringValue;
+        }
+
+        /**
+         * @since 7.3M1
+         */
+        public static Property property(String name, Object value)
+        {
+            Property property = new Property();
+
+            property.setName(name);
+            property.setValue(toPropertyString(value));
+
+            return property;
+        }
+
+        private TestUtils testUtils;
+
+        public RestTestUtils(TestUtils testUtils)
+        {
+            this.testUtils = testUtils;
+        }
+
         public String getBaseURL()
         {
-            return TestUtils.this.getBaseURL() + "rest";
+            return this.testUtils.getBaseURL() + "rest";
         }
 
         private String toSpaceElement(Iterable<?> spaces)
@@ -1751,7 +1801,7 @@ public class TestUtils
             if (page.getWiki() != null) {
                 elements.add(page.getWiki());
             } else {
-                elements.add(getCurrentWiki());
+                elements.add(this.testUtils.getCurrentWiki());
             }
 
             // Add spaces
@@ -1771,7 +1821,7 @@ public class TestUtils
             if (obj.getWiki() != null) {
                 elements.add(obj.getWiki());
             } else {
-                elements.add(getCurrentWiki());
+                elements.add(this.testUtils.getCurrentWiki());
             }
 
             // Add spaces
@@ -1802,7 +1852,7 @@ public class TestUtils
 
             // Add current wiki if the reference does not contains any
             if (reference.extractReference(EntityType.WIKI) == null) {
-                elements.add(escapeURL(getCurrentWiki()));
+                elements.add(this.testUtils.escapeURL(this.testUtils.getCurrentWiki()));
             }
 
             // Add reference
@@ -1822,9 +1872,9 @@ public class TestUtils
                         elements.add(builder);
                     }
 
-                    builder.append(escapeURL(ref.getName()));
+                    builder.append(this.testUtils.escapeURL(ref.getName()));
                 } else {
-                    elements.add(escapeURL(ref.getName()));
+                    elements.add(this.testUtils.escapeURL(ref.getName()));
                 }
             }
 
@@ -1848,6 +1898,61 @@ public class TestUtils
 
             return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)), release,
                 expectedCodes);
+        }
+
+        /**
+         * @since 7.3M1
+         */
+        public void savePage(EntityReference reference) throws Exception
+        {
+            savePage(reference, null, null, null, null);
+        }
+
+        /**
+         * @since 7.3M1
+         */
+        public void savePage(EntityReference reference, String content, String title) throws Exception
+        {
+            savePage(reference, content, null, title, null);
+        }
+
+        /**
+         * @since 7.3M1
+         */
+        public void savePage(EntityReference reference, String content, String syntaxId, String title,
+            String parentFullPageName) throws Exception
+        {
+            Page page = new Page();
+
+            // Add current wiki if the reference does not contains any
+            EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+            if (wikiReference == null) {
+                page.setWiki(this.testUtils.getCurrentWiki());
+            } else {
+                page.setWiki(wikiReference.getName());
+            }
+
+            // Add spaces
+            EntityReference spaceReference = reference.extractReference(EntityType.SPACE).removeParent(wikiReference);
+            page.setSpace(SERIALIZER.serialize(spaceReference));
+
+            // Add page
+            page.setName(reference.getName());
+
+            if (content != null) {
+                page.setContent(content);
+            }
+            if (title != null) {
+                page.setTitle(title);
+            }
+            if (syntaxId != null) {
+                page.setSyntax(syntaxId);
+            }
+            if (parentFullPageName != null) {
+                page.setParent(parentFullPageName);
+            }
+
+            save(page, true);
         }
 
         /**
@@ -1918,7 +2023,7 @@ public class TestUtils
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
             throws Exception
         {
-            return TestUtils.this.getInputStream(getBaseURL(), resourceUri, queryParams, elements);
+            return this.testUtils.getInputStream(getBaseURL(), resourceUri, queryParams, elements);
         }
 
         public InputStream postRESTInputStream(Object resourceUri, Object restObject, Object... elements)
@@ -1958,7 +2063,7 @@ public class TestUtils
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
-            return TestUtils.this.executeGet(uri);
+            return this.testUtils.executeGet(uri);
         }
 
         public PostMethod executePost(Object resourceUri, Object restObject, Object... elements) throws Exception
@@ -1973,7 +2078,7 @@ public class TestUtils
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
             try (InputStream resourceStream = toResourceInputStream(restObject)) {
-                return TestUtils.this.executePost(uri, resourceStream, MediaType.APPLICATION_XML);
+                return this.testUtils.executePost(uri, resourceStream, MediaType.APPLICATION_XML);
             }
         }
 
@@ -1989,7 +2094,7 @@ public class TestUtils
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
             try (InputStream resourceStream = toResourceInputStream(restObject)) {
-                return TestUtils.this.executePut(uri, resourceStream, MediaType.APPLICATION_XML);
+                return this.testUtils.executePut(uri, resourceStream, MediaType.APPLICATION_XML);
             }
         }
 
@@ -2004,7 +2109,7 @@ public class TestUtils
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
 
-            return TestUtils.this.executeDelete(uri);
+            return this.testUtils.executeDelete(uri);
         }
 
         public URI createUri(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)

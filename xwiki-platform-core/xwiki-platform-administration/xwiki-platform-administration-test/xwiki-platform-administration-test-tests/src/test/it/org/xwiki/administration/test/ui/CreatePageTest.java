@@ -29,6 +29,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
@@ -228,8 +229,9 @@ public class CreatePageTest extends AbstractTest
         createTemplateAndTemplateProvider(templateProviderName, templateContent, templateTitle, false);
 
         // create a page and a space webhome
-        getUtil().createPage(existingPageReference, "Page that already exists", "Existing page");
-        getUtil().createPage(existingSpaceName, "WebHome", "Some content", "Existing space");
+        getUtil().rest().savePage(existingPageReference, "Page that already exists", "Existing page");
+        getUtil().rest().savePage(new LocalDocumentReference(existingSpaceName, "WebHome"), "Some content",
+            "Existing space");
 
         // Step 1: Create an empty page for a page that already exists
         // First we must click on create from a page that already exists as otherwise we won't get the create UI
@@ -291,7 +293,7 @@ public class CreatePageTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
-    public void createPageWithSaveAndEditTemplate()
+    public void createPageWithSaveAndEditTemplate() throws Exception
     {
         // Cleanup of the test space for any leftovers from previous tests.
         getUtil().deleteSpace(getTestClassName());
@@ -328,13 +330,14 @@ public class CreatePageTest extends AbstractTest
      * Helper function to Create both a Template and a Template Provider for the tests in this class.
      */
     private ViewPage createTemplateAndTemplateProvider(String templateProviderName, String templateContent,
-        String templateTitle, boolean saveAndEdit)
+        String templateTitle, boolean saveAndEdit) throws Exception
     {
         // Cleanup of the test space for any leftovers from previous tests.
         getUtil().deleteSpace(getTestClassName());
 
         // Create a Template page
-        getUtil().createPage(getTestClassName(), TEMPLATE_NAME, templateContent, templateTitle);
+        getUtil().rest().savePage(new LocalDocumentReference(getTestClassName(), TEMPLATE_NAME), templateContent,
+            templateTitle);
 
         // Create a Template Provider
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();

@@ -22,6 +22,7 @@ package org.xwiki.repository.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -35,6 +36,9 @@ public class SolrTestUtils
     private final static String SOLRSERVICE_SPACE = "TestService";
 
     private final static String SOLRSERVICE_PAGE = "Solr";
+
+    private final static LocalDocumentReference SOLRSERVICE_REFERENCE = new LocalDocumentReference(SOLRSERVICE_SPACE,
+        SOLRSERVICE_PAGE);
 
     private final TestUtils testUtils;
 
@@ -52,8 +56,8 @@ public class SolrTestUtils
             testUtils.loginAsSuperAdmin();
 
             // Create the utility page.
-            this.testUtils.createPage(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE,
-                "{{velocity}}$services.solr.queueSize{{/velocity}}", null);
+            this.testUtils.rest().savePage(SOLRSERVICE_REFERENCE, "{{velocity}}$services.solr.queueSize{{/velocity}}",
+                null, null, null);
         }
     }
 

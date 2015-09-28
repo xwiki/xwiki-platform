@@ -99,9 +99,9 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
 
     private String createSpaceQuery(boolean hidden)
     {
-        StringBuilder query = new StringBuilder("select DISTINCT doc.space from xwikidoc as doc where");
+        StringBuilder query = new StringBuilder("select DISTINCT doc.space from XWikiDocument as doc where");
         if (hidden) {
-            query.append(" XWikiSpace not in (" + createSpaceQuery(false) + ")");
+            query.append(" doc.space not in (" + createSpaceQuery(false) + ")");
         } else {
             query.append(" doc.hidden <> true OR doc.hidden IS NULL");
         }

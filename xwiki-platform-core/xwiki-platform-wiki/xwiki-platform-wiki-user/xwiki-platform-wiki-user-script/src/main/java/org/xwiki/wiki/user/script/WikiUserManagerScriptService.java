@@ -30,7 +30,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -72,9 +72,9 @@ public class WikiUserManagerScriptService implements ScriptService
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
+    
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * Provides access to the current context.
@@ -126,33 +126,78 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
+     * Check that all required permissions are respected by both the script and the user.
+     *
+     * @param wikiId the id of the wiki concerned by the operation
+     *
+     * @throws AccessDeniedException if the permissions are not respected
+     */
+    private void checkRights(String wikiId) throws AccessDeniedException
+    {
+        checkRights(wikiId, null);
+    }
+
+    /**
+     * Check that all required permissions are respected by both the script and the user.
+     *
+     * @param wikiId the id of the wiki concerned by the operation
+     * @param user the user concerned by the operation
+     *
+     * @throws AccessDeniedException if the permissions are not respected
+     */
+    private void checkRights(String wikiId, DocumentReference user) throws AccessDeniedException
+    {
+        XWikiContext context = xcontextProvider.get();
+
+        // Does the script author have the admin right?
+        //
+        // The goal is to avoid that a non-granted user writes a script, which could be executed by an administrator,
+        // which uses this script service to perform "nasty" operations, like being invited to a sub-wiki.
+        //
+        // By the past, we checked for the programing right, but it was too restrictive, as it make impossible to
+        // a user without programing rights to create a wiki and then invite some peoples in it.
+        authorizationManager.checkAccess(Right.ADMIN, context.getDoc().getAuthorReference(),
+                context.getDoc().getDocumentReference());
+
+        // Is the user concerned by the operation?
+        if (user != null && user.equals(context.getUserReference())) {
+            // If the user is concerned, then she has the right to perform this operation.
+            return;
+        }
+
+        // Does the current user have the admin right?
+        authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), new WikiReference(wikiId));
+    }
+
+    /**
+     * Check that all required permissions are respected by both the script and the user concerned by a candidacy.
+     *
+     * @param candidacy the candidacy concerned by the operation
+     *
+     * @throws AccessDeniedException if the permissions are not respected
+     */
+    private void checkRights(MemberCandidacy candidacy) throws AccessDeniedException
+    {
+        checkRights(candidacy.getWikiId(), documentReferenceResolver.resolve(candidacy.getUserId()));
+    }
+            
+
+    /**
      * @param wikiId Id of the wiki to change
      * @param scope scope to set
      * @return true if it succeed
      */
     public boolean setUserScope(String wikiId, String scope)
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        boolean success = true;
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                   xcontext.getDoc().getDocumentReference());
-            // Check the right
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Do the job
+            checkRights(wikiId);
             wikiUserManager.setUserScope(wikiId, UserScope.valueOf(scope.toUpperCase()));
-        } catch (WikiUserManagerException e) {
+        } catch (WikiUserManagerException | AccessDeniedException | IllegalArgumentException e) {
             setLastError(e);
-            success = false;
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-            success = false;
-        } catch (IllegalArgumentException e) {
-            setLastError(e);
-            success = false;
+            return false;
         }
-        return success;
+        
+        return true;
     }
 
     /**
@@ -184,27 +229,15 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean setMembershipType(String wikiId, String type)
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        boolean success = true;
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            // Check the right
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Do the job
+            checkRights(wikiId);
             wikiUserManager.setMembershipType(wikiId, MembershipType.valueOf(type.toUpperCase()));
-        } catch (WikiUserManagerException e) {
+        } catch (WikiUserManagerException | AccessDeniedException | IllegalArgumentException e) {
             setLastError(e);
-            success = false;
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-            success = false;
-        } catch (IllegalArgumentException e) {
-            setLastError(e);
-            success = false;
+            return false;
         }
-        return success;
+        
+        return true;
     }
 
     /**
@@ -247,19 +280,10 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean addMember(String userId, String wikiId)
     {
-        XWikiContext xcontext = xcontextProvider.get();
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            // Check the right
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Add the member
+            checkRights(wikiId);
             wikiUserManager.addMember(userId, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-            return false;
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
             return false;
         }
@@ -276,14 +300,8 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean addMembers(Collection<String> userIds, String wikiId)
     {
-        XWikiContext xcontext = xcontextProvider.get();
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            // Check the right
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Add the member
+            checkRights(wikiId);
             wikiUserManager.addMembers(userIds, wikiId);
         } catch (AccessDeniedException e) {
             setLastError(e);
@@ -305,19 +323,10 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean removeMember(String userId, String wikiId)
     {
-        XWikiContext xcontext = xcontextProvider.get();
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            // Check the right
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Add the member
+            checkRights(wikiId);
             wikiUserManager.removeMember(userId, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-            return false;
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
             return false;
         }
@@ -327,18 +336,18 @@ public class WikiUserManagerScriptService implements ScriptService
 
     private boolean canSeeCandidacy(MemberCandidacy candidacy)
     {
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext context = xcontextProvider.get();
 
         // If the user is concerned by the candidacy
-        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
-        if (candidacy.getUserId().equals(currentUser)) {
+        DocumentReference candidacyUser = documentReferenceResolver.resolve(candidacy.getUserId());
+        if (context.getUserReference().equals(candidacyUser)) {
             // Hide the admin private comment
             candidacy.setAdminPrivateComment(null);
             return true;
         }
 
         // Check if the user is an admin
-        return authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
+        return authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
                 new WikiReference(candidacy.getWikiId()));
     }
 
@@ -415,21 +424,9 @@ public class WikiUserManagerScriptService implements ScriptService
         }
 
         try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-
-            // If the current user is not concerned by the invitation, he must be admin of the subwiki
-            if (!xcontext.getUserReference().equals(user)) {
-                authorizationManager.checkAccess(Right.ADMIN,
-                        xcontext.getUserReference(), new WikiReference(wikiId));
-            }
-            // Do the job
+            checkRights(wikiId, user);
             return wikiUserManager.hasPendingInvitation(user, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
 
@@ -449,22 +446,9 @@ public class WikiUserManagerScriptService implements ScriptService
         }
 
         try {
-            // Check if the passed user is the current user and if the current document has the programming rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-
-            // If the current user is not concerned by the invitation, he must be admin of the subwiki to have pending
-            // requests.
-            if (!xcontext.getUserReference().equals(user)) {
-                authorizationManager.checkAccess(Right.ADMIN,
-                        xcontext.getUserReference(), new WikiReference(wikiId));
-            }
-            // Do the job
+            checkRights(wikiId, user);
             return wikiUserManager.hasPendingRequest(user, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
 
@@ -498,11 +482,11 @@ public class WikiUserManagerScriptService implements ScriptService
     public boolean join(String userId, String wikiId)
     {
         // Check if the current user is userId
-        XWikiContext xcontext = xcontextProvider.get();
-        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
-        if (!userId.equals(currentUser)) {
+        XWikiContext context = xcontextProvider.get();
+        DocumentReference candidacyUser = documentReferenceResolver.resolve(userId);
+        if (!context.getUserReference().equals(candidacyUser)) {
             setLastError(new WikiUserManagerException(String.format("User [%s] cannot call "
-                    + "$services.wiki.user.join() with an other userId.", currentUser)));
+                    + "$services.wiki.user.join() with an other userId.", context.getUserReference())));
             return false;
         }
 
@@ -525,11 +509,11 @@ public class WikiUserManagerScriptService implements ScriptService
     public boolean leave(String userId, String wikiId)
     {
         // Check if the current user is userId
-        XWikiContext xcontext = xcontextProvider.get();
-        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
-        if (!userId.equals(currentUser)) {
+        XWikiContext context = xcontextProvider.get();
+        DocumentReference candidacyUser = documentReferenceResolver.resolve(userId);
+        if (!context.getUserReference().equals(candidacyUser)) {
             setLastError(new WikiUserManagerException(String.format("User [%s] cannot call $services.wiki.user.leave()"
-                    + " with an other userId.", currentUser)));
+                    + " with an other userId.", context.getUserReference())));
             return false;
         }
 
@@ -573,18 +557,10 @@ public class WikiUserManagerScriptService implements ScriptService
     public boolean acceptRequest(MemberCandidacy request, String message, String privateComment)
     {
         try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            authorizationManager.checkAccess(Right.ADMIN,
-                    xcontext.getUserReference(), new WikiReference(request.getWikiId()));
-            // Do the job
+            checkRights(request);
             wikiUserManager.acceptRequest(request, message, privateComment);
             return true;
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        } catch (AccessDeniedException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
 
@@ -602,18 +578,10 @@ public class WikiUserManagerScriptService implements ScriptService
     public boolean refuseRequest(MemberCandidacy request, String message, String privateComment)
     {
         try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            authorizationManager.checkAccess(Right.ADMIN,
-                    xcontext.getUserReference(), new WikiReference(request.getWikiId()));
-            // Do the job
+            checkRights(request);
             wikiUserManager.refuseRequest(request, message, privateComment);
             return true;
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        } catch (AccessDeniedException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
 
@@ -629,22 +597,10 @@ public class WikiUserManagerScriptService implements ScriptService
     public boolean cancelCandidacy(MemberCandidacy candidacy)
     {
         try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-
-            String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
-            if (!candidacy.getUserId().equals(currentUser)) {
-                authorizationManager.checkAccess(Right.ADMIN,
-                    xcontext.getUserReference(), new WikiReference(candidacy.getWikiId()));
-            }
-            // Do the job
+            checkRights(candidacy);
             wikiUserManager.cancelCandidacy(candidacy);
             return true;
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        } catch (AccessDeniedException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
 
@@ -663,18 +619,12 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         // Invite
         try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
-            // Do the job
+            checkRights(wikiId);
             return wikiUserManager.invite(userId, wikiId, message);
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        } catch (AccessDeniedException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
         }
+        
         return null;
     }
 
@@ -687,28 +637,15 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean acceptInvitation(MemberCandidacy invitation, String message)
     {
-        // Check if the current script has the programing rights
-        XWikiContext xcontext = xcontextProvider.get();
-        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-            xcontext.getDoc().getDocumentReference())) {
-            return false;
-        }
-
-        // Check right
-        if (!canSeeCandidacy(invitation)) {
-            // TODO
-            return false;
-        }
-
-        // Accept invitation
         try {
+            checkRights(invitation);
             wikiUserManager.acceptInvitation(invitation, message);
-        } catch (WikiUserManagerException e) {
+            return true;
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
-            return false;
         }
-
-        return true;
+        
+        return false;
     }
 
     /**
@@ -720,27 +657,14 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean refuseInvitation(MemberCandidacy invitation, String message)
     {
-        // Check if the current script has the programing rights
-        XWikiContext xcontext = xcontextProvider.get();
-        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-            xcontext.getDoc().getDocumentReference())) {
-            return false;
-        }
-
-        // Check right
-        if (!canSeeCandidacy(invitation)) {
-            // TODO
-            return false;
-        }
-
-        // Accept invitation
         try {
+            checkRights(invitation);
             wikiUserManager.refuseInvitation(invitation, message);
-        } catch (WikiUserManagerException e) {
+            return true;
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
-            return false;
         }
 
-        return true;
+        return false;
     }
 }

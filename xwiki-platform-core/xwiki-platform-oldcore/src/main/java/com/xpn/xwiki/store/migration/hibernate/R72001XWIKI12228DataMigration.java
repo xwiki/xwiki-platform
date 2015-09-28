@@ -183,6 +183,5 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
 
             session.save(space);
         }
-
     }
 }

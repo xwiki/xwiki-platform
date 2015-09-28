@@ -20,14 +20,10 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -35,8 +31,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -90,148 +86,103 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                session.doWork(new R72001Work());
+                // Copy visible spaces
+                Collection<SpaceReference> visibleSpaces = createVisibleSpaces(session);
+
+                // Copy hidden spaces
+                createHiddenSpaces(visibleSpaces, session);
 
                 return Boolean.TRUE;
             }
         });
     }
 
-    private class R72001Work implements Work
+    private String createSpaceQuery(boolean hidden)
     {
-        @Override
-        public void execute(Connection connection) throws SQLException
-        {
-            // Copy visible spaces
-            Collection<SpaceReference> visibleSpaces = createVisibleSpaces(connection);
-
-            // Copy hidden spaces
-            createHiddenSpaces(visibleSpaces, connection);
+        StringBuilder query = new StringBuilder("select DISTINCT doc.space from xwikidoc as doc where");
+        if (hidden) {
+            query.append(" XWikiSpace not in (" + createSpaceQuery(false) + ")");
+        } else {
+            query.append(" doc.hidden <> true OR doc.hidden IS NULL");
         }
 
-        private String createSpaceQuery(boolean hidden)
-        {
-            StringBuilder query = new StringBuilder("select DISTINCT XWD_WEB from xwikidoc where");
-            if (hidden) {
-                query.append(" XWD_WEB not in (" + createSpaceQuery(false) + ")");
-            } else {
-                query.append(" XWD_HIDDEN <> true OR XWD_HIDDEN IS NULL");
-            }
+        return query.toString();
+    }
 
-            return query.toString();
+    private Collection<SpaceReference> getVisibleSpaces(Session session)
+    {
+        Query query = session.createQuery(createSpaceQuery(false));
+
+        Collection<SpaceReference> databaseSpaces = new ArrayList<>();
+        for (String space : (List<String>) query.list()) {
+            databaseSpaces.add(this.spaceResolver.resolve(space, WIKI));
         }
 
-        private Collection<SpaceReference> getVisibleSpaces(Connection connection) throws SQLException
-        {
-            Collection<SpaceReference> databaseSpaces;
-
-            try (Statement selectStatement = connection.createStatement()) {
-                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(false))) {
-                    databaseSpaces = new ArrayList<>();
-
-                    while (result.next()) {
-                        databaseSpaces.add(spaceResolver.resolve(result.getString(1), WIKI));
-                    }
-                }
+        // Resolve nested spaces
+        Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
+        for (SpaceReference space : databaseSpaces) {
+            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+                parent.getParent()) {
+                spaces.add((SpaceReference) parent);
             }
+        }
 
-            // Resolve nested spaces
-            Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
-            for (SpaceReference space : databaseSpaces) {
-                for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
-                    parent.getParent()) {
+        return spaces;
+    }
+
+    private Collection<SpaceReference> getHiddenSpaces(Collection<SpaceReference> visibleSpaces, Session session)
+    {
+        Query query = session.createQuery(createSpaceQuery(true));
+
+        Collection<SpaceReference> databaseSpaces = new ArrayList<>();
+        for (String space : (List<String>) query.list()) {
+            databaseSpaces.add(this.spaceResolver.resolve(space, WIKI));
+        }
+
+        // Resolve nested spaces
+        Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
+        for (SpaceReference space : databaseSpaces) {
+            for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+                parent.getParent()) {
+                if (!visibleSpaces.contains(parent)) {
                     spaces.add((SpaceReference) parent);
                 }
             }
-
-            return spaces;
         }
 
-        private Collection<SpaceReference> getHiddenSpaces(Collection<SpaceReference> visibleSpaces,
-            Connection connection) throws SQLException
-        {
-            Collection<SpaceReference> databaseSpaces;
-
-            try (Statement selectStatement = connection.createStatement()) {
-                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(true))) {
-                    databaseSpaces = new ArrayList<>();
-
-                    while (result.next()) {
-                        databaseSpaces.add(spaceResolver.resolve(result.getString(1), WIKI));
-                    }
-                }
-            }
-
-            // Resolve nested spaces
-            Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
-            for (SpaceReference space : databaseSpaces) {
-                for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
-                    parent.getParent()) {
-                    if (!visibleSpaces.contains(parent)) {
-                        spaces.add((SpaceReference) parent);
-                    }
-                }
-            }
-
-            return spaces;
-        }
-
-        private Collection<SpaceReference> createVisibleSpaces(Connection connection) throws SQLException
-        {
-            // Get spaces
-            Collection<SpaceReference> spaces = getVisibleSpaces(connection);
-
-            // Create spaces
-            createSpaces(spaces, false, connection);
-
-            return spaces;
-        }
-
-        private void createHiddenSpaces(Collection<SpaceReference> visibleSpaces, Connection connection)
-            throws SQLException
-        {
-            // Get spaces
-            Collection<SpaceReference> spaces = getHiddenSpaces(visibleSpaces, connection);
-
-            // Create spaces
-            createSpaces(spaces, true, connection);
-        }
-
-        private void createSpaces(Collection<SpaceReference> spaces, boolean hidden, Connection connection)
-            throws SQLException
-        {
-            // Create spaces in the xwikispace table
-            try (PreparedStatement statement =
-                connection.prepareStatement("INSERT INTO xwikispace"
-                    + " (XWS_ID, XWS_HIDDEN, XWS_REFERENCE, XWS_NAME, XWS_PARENT) VALUES (?, ?, ?, ?, ?)")) {
-                for (SpaceReference space : spaces) {
-                    addBatch(statement, new XWikiSpace(space, hidden));
-                }
-
-                // Do all the changes
-                statement.executeBatch();
-            }
-        }
+        return spaces;
     }
 
-    private void addBatch(PreparedStatement statement, XWikiSpace space) throws SQLException
+    private Collection<SpaceReference> createVisibleSpaces(Session session)
     {
-        // id
-        statement.setLong(1, space.getId());
+        // Get spaces
+        Collection<SpaceReference> spaces = getVisibleSpaces(session);
 
-        // hidden
-        statement.setBoolean(2, space.isHidden());
+        // Create spaces
+        createSpaces(spaces, false, session);
 
-        // reference
-        statement.setString(3, space.getReference());
+        return spaces;
+    }
 
-        // name
-        statement.setString(4, space.getName());
+    private void createHiddenSpaces(Collection<SpaceReference> visibleSpaces, Session session)
+    {
+        // Get spaces
+        Collection<SpaceReference> spaces = getHiddenSpaces(visibleSpaces, session);
 
-        // parent
-        statement.setString(5, space.getParent());
+        // Create spaces
+        createSpaces(spaces, true, session);
+    }
 
-        // Add a space to the list
-        statement.addBatch();
+    private void createSpaces(Collection<SpaceReference> spaces, boolean hidden, Session session)
+    {
+        // Create spaces in the xwikispace table
+        for (SpaceReference spaceReference : spaces) {
+            XWikiSpace space = new XWikiSpace(spaceReference);
+
+            space.setHidden(hidden);
+
+            session.save(space);
+        }
+
     }
 }

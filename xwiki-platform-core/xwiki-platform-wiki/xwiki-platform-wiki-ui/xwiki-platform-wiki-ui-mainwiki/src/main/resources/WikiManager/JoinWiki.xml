@@ -75,7 +75,7 @@
     #if ("$!wikiName" == '')
       #set ($wikiName = $wikiId)
     #end
-    #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
+    #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if ($members &amp;&amp; $members.contains($currentUser))

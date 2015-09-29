@@ -22,6 +22,7 @@ package org.xwiki.lesscss.internal.cache;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
@@ -62,6 +63,9 @@ public abstract class AbstractCachedCompiler<T>
 
     @Inject
     protected LESSContext lessContext;
+    
+    @Inject
+    protected Logger logger;
 
     /**
      * Get the result of the compilation.
@@ -132,6 +136,7 @@ public abstract class AbstractCachedCompiler<T>
             try {
                 result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, true, skin);
             } catch (LESSCompilerException e) {
+                logger.error("Error during the compilation of the resource [{}].", lessResourceReference, e);
                 // We must cache the result, even if the compilation have failed, to prevent re-compiling again and
                 // again (the compilation will still fail until the LESS resource is updated so it useless to retry).
                 result = exceptionAsResult(e);

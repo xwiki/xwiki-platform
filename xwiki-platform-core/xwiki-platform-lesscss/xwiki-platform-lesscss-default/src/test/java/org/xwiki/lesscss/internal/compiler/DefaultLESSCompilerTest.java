@@ -214,6 +214,8 @@ public class DefaultLESSCompilerTest
         assertTrue(StringUtils.startsWith(result, "/* org.xwiki.lesscss.compiler.LESSCompilerException: an exception"));
         assertTrue(StringUtils.endsWith(result, "*/"));
         verify(cache).set(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference), eq(result));
+        verify(mocker.getMockedLogger()).error(eq("Error during the compilation of the resource [{}]."),
+                eq(lessResourceReference), eq(expectedException));
     }
 
 }

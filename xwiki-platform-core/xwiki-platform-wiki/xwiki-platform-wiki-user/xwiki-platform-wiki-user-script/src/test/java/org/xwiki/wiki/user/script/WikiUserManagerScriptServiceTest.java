@@ -57,7 +57,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -98,13 +97,13 @@ public class WikiUserManagerScriptServiceTest
     public void setUp() throws Exception
     {
         // Components mocks
-        wikiUserManager = mocker.getInstance(WikiUserManager.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        wikiUserManager           = mocker.getInstance(WikiUserManager.class);
+        wikiDescriptorManager     = mocker.getInstance(WikiDescriptorManager.class);
+        authorizationManager      = mocker.getInstance(AuthorizationManager.class);
+        xcontextProvider          = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null,
                 DocumentReferenceResolver.class, String.class));
-        execution = mocker.getInstance(Execution.class);
+        execution                 = mocker.getInstance(Execution.class);
 
         // Frequent uses
         xcontext = mock(XWikiContext.class);
@@ -123,16 +122,21 @@ public class WikiUserManagerScriptServiceTest
         
         DocumentReference userReference = new DocumentReference("mainWiki", "XWiki", "User");
         when(documentReferenceResolver.resolve("mainWiki:XWiki.User")).thenReturn(userReference);
+        DocumentReference otherUser = new DocumentReference("mainWiki", "XWiki", "OtherUser");
+        when(documentReferenceResolver.resolve("mainWiki:XWiki.OtherUser")).thenReturn(otherUser);
     }
 
     /**
+     * Mocks the components to simulate that a non admin user have saved the current script. 
+     *
      * @return the exception expected when the current script has the not the admin right
      */
     private Exception currentScriptHasNotAdminRight() throws AccessDeniedException
     {
-        DocumentReference authorDocRef = new DocumentReference("mainWiki", "XWiki", "Admin");
+        DocumentReference authorDocRef = new DocumentReference("mainWiki", "XWiki", "NonAdmin");
         when(currentDoc.getAuthorReference()).thenReturn(authorDocRef);
-        DocumentReference currentDocRef = new DocumentReference("subwiki", "Test", "test");
+        
+        DocumentReference currentDocRef = new DocumentReference("subwiki", "Space", "PageToTest");
         when(currentDoc.getDocumentReference()).thenReturn(currentDocRef);
 
         Exception exception = new AccessDeniedException(Right.ADMIN, authorDocRef, currentDocRef);
@@ -142,12 +146,15 @@ public class WikiUserManagerScriptServiceTest
     }
 
     /**
+     * Mocks the components to simulate that the current user is not an admin.
+     *  
      * @return the exception expected when the current user has the not the admin right
      */
     private Exception currentUserHasNotAdminRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("subwiki");
         Exception exception = new AccessDeniedException(Right.ADMIN, userDocRef, wiki);
+        
         doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef), eq(wiki));
 
         return exception;
@@ -164,297 +171,416 @@ public class WikiUserManagerScriptServiceTest
     @Test
     public void getUserScopeWithError() throws Exception
     {
-        Exception exception = new WikiUserManagerException("Error in getUserScope");
-        when(wikiUserManager.getUserScope("test")).thenThrow(exception);
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("Error in getUserScope");
+        when(wikiUserManager.getUserScope("test")).thenThrow(expectedException);
+        
+        // Test
         UserScope result = mocker.getComponentUnderTest().getUserScope("test");
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void setUserScope() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
+        
+        // Asserts
         assertEquals(true, result);
+        verify(wikiUserManager).setUserScope(eq("subwiki"), eq(UserScope.LOCAL_ONLY));
     }
 
     @Test
-    public void setUserScopeWithoutPR() throws Exception
+    public void setUserScopeWhenScriptHasNoRight() throws Exception
     {
-        // Current script has not the programming right
-        Exception exception = currentScriptHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void setUserScopeWithoutAdminRight() throws Exception
+    public void setUserScopeWhenUserHasNoRight() throws Exception
     {
-        // Current script has not the admin right
-        Exception exception = currentUserHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void setUserScopeWrongValue() throws Exception
+    public void setUserScopeWhenWrongValue() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "wrong value");
-        assertEquals(false, result);
+        
+        // Asserts
+        assertFalse(result);
         assertTrue(mocker.getComponentUnderTest().getLastError() instanceof IllegalArgumentException);
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void setUserScopeError() throws Exception
     {
-        WikiUserManagerException exception = new WikiUserManagerException("error in setUserScope");
-        doThrow(exception).when(wikiUserManager).setUserScope(anyString(), any(UserScope.class));
+        // Mocks
+        WikiUserManagerException expectedException = new WikiUserManagerException("error in setUserScope");
+        doThrow(expectedException).when(wikiUserManager).setUserScope(anyString(), any(UserScope.class));
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void getMembershipType() throws Exception
     {
+        // Mocks
         when(wikiUserManager.getMembershipType("subwiki")).thenReturn(MembershipType.INVITE);
+        
+        // Test
         MembershipType result = mocker.getComponentUnderTest().getMembershipType();
+        
+        // Asserts
         assertEquals(MembershipType.INVITE, result);
     }
 
     @Test
     public void getMembershipTypeWithError() throws Exception
     {
-        Exception exception = new WikiUserManagerException("Error in getMembershipType");
-        when(wikiUserManager.getMembershipType("test")).thenThrow(exception);
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("Error in getMembershipType");
+        when(wikiUserManager.getMembershipType("test")).thenThrow(expectedException);
+        
+        // Test
         MembershipType result = mocker.getComponentUnderTest().getMembershipType("test");
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void setMembershipType() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
-        assertEquals(true, result);
+        
+        // Asserts
+        assertTrue(result);
     }
 
     @Test
-    public void setMembershipTypeWithoutPR() throws Exception
+    public void setMembershipTypeWhenScriptHasNoRight() throws Exception
     {
-        // Current script has not the programming right
-        Exception exception = currentScriptHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "INVITE");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void setMembershipTypeWithoutAdminRight() throws Exception
+    public void setMembershipTypeWhenUserHasNoRight() throws Exception
     {
-        // Current script has not the admin right
-        Exception exception = currentUserHasNotAdminRight();
+        // Mocks
+        Exception expectedExtension = currentUserHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "INVITE");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedExtension, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);    
     }
 
     @Test
     public void setMembershipTypeWrongValue() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "wrong value");
+        
+        // Asserts
         assertEquals(false, result);
         assertTrue(mocker.getComponentUnderTest().getLastError() instanceof IllegalArgumentException);
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void setMembershipTypeError() throws Exception
     {
-        WikiUserManagerException exception = new WikiUserManagerException("error in setMembershipType");
-        doThrow(exception).when(wikiUserManager).setMembershipType(anyString(), any(MembershipType.class));
+        // Mocks
+        WikiUserManagerException expectedException = new WikiUserManagerException("error in setMembershipType");
+        doThrow(expectedException).when(wikiUserManager).setMembershipType(anyString(), any(MembershipType.class));
 
+        // Test
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "INVITE");
+        
+        // Asserts
         assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void getMembers() throws Exception
     {
+        // Mocks
         Collection<String> members = new ArrayList<String>();
         when(wikiUserManager.getMembers("subwiki")).thenReturn(members);
+        
+        // Test
         Collection<String> result = mocker.getComponentUnderTest().getMembers("subwiki");
+        
+        // Asserts
         assertEquals(members, result);
     }
 
     @Test
     public void getMembersError() throws Exception
     {
-        Exception exception = new WikiUserManagerException("error in getMembers");
-        when(wikiUserManager.getMembers("subwiki")).thenThrow(exception);
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("error in getMembers");
+        when(wikiUserManager.getMembers("subwiki")).thenThrow(expectedException);
+        
+        // Test
         Collection<String> result = mocker.getComponentUnderTest().getMembers("subwiki");
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void isMember() throws Exception
     {
+        // Mocks
         when(wikiUserManager.isMember("mainWiki:XWiki.User", "subwiki")).thenReturn(true);
-        boolean result = mocker.getComponentUnderTest().isMember("mainWiki:XWiki.User", "subwiki");
-        assertTrue(result);
-
         when(wikiUserManager.isMember("mainWiki:XWiki.User", "subwiki2")).thenReturn(false);
-        result = mocker.getComponentUnderTest().isMember("mainWiki:XWiki.User", "subwiki2");
-        assertFalse(result);
+        
+        // Test
+        boolean result1 = mocker.getComponentUnderTest().isMember("mainWiki:XWiki.User", "subwiki");
+        boolean result2 = mocker.getComponentUnderTest().isMember("mainWiki:XWiki.User", "subwiki2");
+        
+        // Asserts
+        assertTrue(result1);
+        assertFalse(result2);
     }
 
     @Test
     public void isMemberError() throws Exception
     {
-        Exception exception = new WikiUserManagerException("error in isMember");
-        when(wikiUserManager.isMember("mainWiki:XWiki.User", "subwiki")).thenThrow(exception);
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("error in isMember");
+        when(wikiUserManager.isMember("mainWiki:XWiki.User", "subwiki")).thenThrow(expectedException);
+        
+        // Test
         Boolean result = mocker.getComponentUnderTest().isMember("mainWiki:XWiki.User", "subwiki");
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void addMember() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().addMember("xwiki:XWiki.UserA", "subwiki");
+        
+        // Asserts
         assertTrue(result);
-
         verify(wikiUserManager).addMember("xwiki:XWiki.UserA", "subwiki");
     }
 
     @Test
-    public void addMemberWithoutPR() throws Exception
+    public void addMemberWhenScriptHasNoRight() throws Exception
     {
-        // Current script has not the programming right
-        Exception exception = currentScriptHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().addMember("xwiki:XWiki.UserA", "subwiki");
+        
+        // Asserts
         assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void addMemberWithoutAdminRight() throws Exception
+    public void addMemberWhenUserHasNoRight() throws Exception
     {
-        // Current script has not the admin right
-        Exception exception = currentUserHasNotAdminRight();
-
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
+        
+        // Test
         boolean result = mocker.getComponentUnderTest().addMember("xwiki:XWiki.UserA", "subwiki");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void addMembers() throws Exception
     {
+        // Test
         Collection<String> userIds = new ArrayList<String>();
         boolean result = mocker.getComponentUnderTest().addMembers(userIds, "subwiki");
+        
+        // Asserts
         assertTrue(result);
-
         verify(wikiUserManager).addMembers(userIds, "subwiki");
     }
 
     @Test
-    public void addMembersWithoutPR() throws Exception
+    public void addMembersWhenScriptHasNoRight() throws Exception
     {
-        // Current script has not the programming right
-        Exception exception = currentScriptHasNotAdminRight();
+        // Mock
+        Exception expectedExtension = currentScriptHasNotAdminRight();
 
+        // Test
         Collection<String> userIds = new ArrayList<String>();
         boolean result = mocker.getComponentUnderTest().addMembers(userIds, "subwiki");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedExtension, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void addMembersWithoutAdminRight() throws Exception
+    public void addMembersWhenUserHasNoRight() throws Exception
     {
-        // Current script has not the admin right
-        Exception exception = currentUserHasNotAdminRight();
+        // Mock
+        Exception expectedException = currentUserHasNotAdminRight();
 
+        // Test
         Collection<String> userIds = new ArrayList<String>();
         boolean result = mocker.getComponentUnderTest().addMembers(userIds, "subwiki");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void removeMember() throws Exception
     {
+        // Test
         boolean result = mocker.getComponentUnderTest().removeMember("xwiki:XWiki.UserA", "subwiki");
+        
+        // Asserts
         assertTrue(result);
-
         verify(wikiUserManager).removeMember("xwiki:XWiki.UserA", "subwiki");
     }
 
     @Test
-    public void removeMemberWithoutPR() throws Exception
+    public void removeMemberWhenScriptHasNoRight() throws Exception
     {
-        // Current script has not the programming right
-        Exception exception = currentScriptHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
+        // Test
         boolean result = mocker.getComponentUnderTest().removeMember("xwiki:XWiki.UserA", "subwiki");
-        assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        
+        // Asserts
+        assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void removeMemberWithoutAdminRight() throws Exception
+    public void removeMemberWhenUserHasNoRight() throws Exception
     {
-        // Current script has not the admin right
-        Exception exception = currentUserHasNotAdminRight();
-
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
+        
+        // Test
         boolean result = mocker.getComponentUnderTest().removeMember("xwiki:XWiki.UserA", "subwiki");
+        
+        // Asserts
         assertEquals(false, result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void getCandidacyAsAdmin() throws Exception
     {
-        MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.UserA",
+        // Mocks
+        MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.REQUEST);
         candidacy.setId(12);
+        candidacy.setAdminPrivateComment("private message");
         when(wikiUserManager.getCandidacy("subwiki", candidacy.getId())).thenReturn(candidacy);
         when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(userDocRef),
                 eq(new WikiReference("subwiki")))).thenReturn(true);
 
+        // Test
         MemberCandidacy result = mocker.getComponentUnderTest().getCandidacy("subwiki", 12);
+        
+        // Asserts
         assertEquals(candidacy, result);
+        assertEquals("private message", result.getAdminPrivateComment());
     }
 
     @Test
     public void getCandidacyAsUserConcerned() throws Exception
     {
+        // Mocks
+        
         // Here, the candidate is the current user
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.REQUEST);
         candidacy.setId(12);
+        candidacy.setAdminPrivateComment("some private message that I should not be able to see");
 
         when(wikiUserManager.getCandidacy("subwiki", candidacy.getId())).thenReturn(candidacy);
 
+        // Test
         MemberCandidacy result = mocker.getComponentUnderTest().getCandidacy("subwiki", 12);
+        
+        // Asserts
         assertEquals(candidacy, result);
+        // Verify that the private message has been removed from the candidacy
+        assertNull(candidacy.getAdminPrivateComment());
     }
 
     @Test
     public void getCandidacyWhenNoRight() throws Exception
     {
+        // Mocks
+        
         // The current user is not the candidate
-        MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.UserA",
+        MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.REQUEST);
         candidacy.setId(12);
         when(wikiUserManager.getCandidacy("subwiki", candidacy.getId())).thenReturn(candidacy);
@@ -463,9 +589,11 @@ public class WikiUserManagerScriptServiceTest
         when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(userDocRef),
                 eq(new WikiReference("subwiki")))).thenReturn(false);
 
+        // Test
         MemberCandidacy result = mocker.getComponentUnderTest().getCandidacy("subwiki", 12);
+        
+        // Asserts
         assertNull(result);
-
         Exception exception = mocker.getComponentUnderTest().getLastError();
         assertTrue(exception instanceof WikiUserManagerScriptServiceException);
         assertEquals("You are not allowed to see this candidacy.", exception.getMessage());
@@ -474,10 +602,14 @@ public class WikiUserManagerScriptServiceTest
     @Test
     public void getCandidacyWhenError() throws Exception
     {
+        // Mocks
         Exception exception = new WikiUserManagerException("error in getCandidacy");
         when(wikiUserManager.getCandidacy("subwiki", 42)).thenThrow(exception);
 
+        // Test
         MemberCandidacy result = mocker.getComponentUnderTest().getCandidacy("subwiki", 42);
+        
+        // Asserts
         assertNull(result);
         assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
@@ -490,8 +622,9 @@ public class WikiUserManagerScriptServiceTest
         candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION));
         // not the second
-        candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.UserB",
+        candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION));
+        candidacies.get(0).setAdminPrivateComment("private message");
 
         // We do not have admin rights
         when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(userDocRef),
@@ -506,6 +639,23 @@ public class WikiUserManagerScriptServiceTest
         assertEquals(1, result.size());
         assertTrue(result.contains(candidacies.get(0)));
         assertFalse(result.contains(candidacies.get(1)));
+        // The private message from the candidacy must be removed
+        assertNull(((MemberCandidacy)result.toArray()[0]).getAdminPrivateComment());
+    }
+
+    @Test
+    public void getAllInvitationsError() throws Exception
+    {
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("error in getAllInvitations()");
+        when(wikiUserManager.getAllInvitations("subwiki")).thenThrow(expectedException);
+
+        // Test
+        Collection<MemberCandidacy> result = mocker.getComponentUnderTest().getAllInvitations("subwiki");
+        
+        // Asserts
+        assertNull(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
@@ -516,8 +666,9 @@ public class WikiUserManagerScriptServiceTest
         candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.REQUEST));
         // not the second
-        candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.UserB",
+        candidacies.add(new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.REQUEST));
+        candidacies.get(0).setAdminPrivateComment("private message");
 
         // We do not have admin rights
         when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(userDocRef),
@@ -532,30 +683,51 @@ public class WikiUserManagerScriptServiceTest
         assertEquals(1, result.size());
         assertTrue(result.contains(candidacies.get(0)));
         assertFalse(result.contains(candidacies.get(1)));
+        // The private message from the candidacy must be removed
+        assertNull(((MemberCandidacy)result.toArray()[0]).getAdminPrivateComment());
+    }
+
+    @Test
+    public void getAllRequestError() throws Exception
+    {
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("error in getAllRequests()");
+        when(wikiUserManager.getAllRequests("subwiki")).thenThrow(expectedException);
+
+        // Test
+        Collection<MemberCandidacy> result = mocker.getComponentUnderTest().getAllRequests("subwiki");
+
+        // Asserts
+        assertNull(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
     public void join() throws Exception
     {
+        // Test
         String userId = "mainWiki:XWiki.User";
         String wikiId = "wikiId";
         boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        
+        // Asserts
         assertTrue(result);
-
         verify(wikiUserManager).join(userId, wikiId);
     }
 
     @Test
     public void joinWhenUserIsNotCurrentUser() throws Exception
     {
-        String userId = "mainWiki:XWiki.User2";
+        // Test
+        String userId = "mainWiki:XWiki.OtherUser";
         String wikiId = "wikiId";
         boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        
+        // Asserts
         assertFalse(result);
         assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.join() with an other userId.",
                 this.mocker.getComponentUnderTest().getLastError().getMessage());
-
-        verify(wikiUserManager, never()).join(userId, wikiId);
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
@@ -564,13 +736,16 @@ public class WikiUserManagerScriptServiceTest
         String userId = "mainWiki:XWiki.User";
         String wikiId = "wikiId";
 
-        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#join()");
-        doThrow(exception).when(wikiUserManager).join(userId, wikiId);
+        // Mocks
+        WikiUserManagerException expectedException = new WikiUserManagerException("error in wikiUserManager#join()");
+        doThrow(expectedException).when(wikiUserManager).join(userId, wikiId);
 
+        // Test
         boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        
+        // Asserts
         assertFalse(result);
-
-        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, this.mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
@@ -578,23 +753,29 @@ public class WikiUserManagerScriptServiceTest
     {
         String userId = "mainWiki:XWiki.User";
         String wikiId = "wikiId";
+        
+        // Test
         boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        
+        // Asserts
         assertTrue(result);
-
         verify(wikiUserManager).leave(userId, wikiId);
     }
 
     @Test
     public void leaveWhenUserIsNotCurrentUser() throws Exception
     {
-        String userId = "mainWiki:XWiki.User2";
+        String userId = "mainWiki:XWiki.OtherUser";
         String wikiId = "wikiId";
+        
+        // Test
         boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        
+        // Asserts
         assertFalse(result);
         assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.leave() with an other userId.",
                 this.mocker.getComponentUnderTest().getLastError().getMessage());
-
-        verify(wikiUserManager, never()).leave(userId, wikiId);
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
@@ -603,13 +784,16 @@ public class WikiUserManagerScriptServiceTest
         String userId = "mainWiki:XWiki.User";
         String wikiId = "wikiId";
 
-        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#leave()");
-        doThrow(exception).when(wikiUserManager).leave(userId, wikiId);
+        // Mocks
+        WikiUserManagerException expectedException = new WikiUserManagerException("error in wikiUserManager#leave()");
+        doThrow(expectedException).when(wikiUserManager).leave(userId, wikiId);
 
+        // Test
         boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        
+        // Asserts
         assertFalse(result);
-
-        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, this.mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
@@ -617,14 +801,11 @@ public class WikiUserManagerScriptServiceTest
     {
         String wikiId = "subwiki";
 
-        // Mocks
+        // First test
         when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(true);
+        assertTrue(mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId));
 
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId);
-        assertTrue(result);
-
-        // Second run
+        // Second test
         when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(false);
         assertFalse(mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId));
     }
@@ -634,44 +815,47 @@ public class WikiUserManagerScriptServiceTest
     {
         String wikiId = "subwiki";
 
+        // Mocks
         DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "User");
-        Exception exception = new WikiUserManagerException("exception");
-        
-        doThrow(exception).when(wikiUserManager).hasPendingInvitation(userToTest, wikiId);
+        Exception expectedException = new WikiUserManagerException("exception");
+        doThrow(expectedException).when(wikiUserManager).hasPendingInvitation(userToTest, wikiId);
 
         // Test
         Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
-    public void hasPendingInvitationWhenNoPR() throws Exception
+    public void hasPendingInvitationWhenPageHasNoRight() throws Exception
     {
         String wikiId = "subwiki";
-        Exception exception = currentScriptHasNotAdminRight();
         DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "User");
+        
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
     public void hasPendingRequest() throws Exception
     {
         String wikiId = "subwiki";
-
-        // Mocks
+        
+        // First test
         when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(true);
+        assertTrue(mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId));
 
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId);
-        assertTrue(result);
-
-        // Second run
+        // Second test
         when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(false);
         assertFalse(mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId));
     }
@@ -680,30 +864,37 @@ public class WikiUserManagerScriptServiceTest
     public void hasPendingRequestWhenError() throws Exception
     {
         String wikiId = "subwiki";
-
         DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "User");
         
-        Exception exception = new WikiUserManagerException("exception");
-        doThrow(exception).when(wikiUserManager).hasPendingRequest(userToTest, wikiId);
+        // Mocks
+        Exception expectedException = new WikiUserManagerException("exception");
+        doThrow(expectedException).when(wikiUserManager).hasPendingRequest(userToTest, wikiId);
 
         // Test
         Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
 
     }
 
     @Test
-    public void hasPendingRequestWhenNoPR() throws Exception
+    public void hasPendingRequestWhenScriptHasNoRight() throws Exception
     {
         String wikiId = "subwiki";
-        Exception exception = currentScriptHasNotAdminRight();
         DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "User");
+        
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
+        
+        // Asserts
         assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
     
     @Test
@@ -717,24 +908,26 @@ public class WikiUserManagerScriptServiceTest
         
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).acceptRequest(candidacy, "message", "comment");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).acceptRequest(candidacy, "message", "comment");
     }
 
     @Test
-    public void acceptRequestWhenNoAdminRight() throws Exception
+    public void acceptRequestWhenUserHasNoAdminRight() throws Exception
     {        
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION);
-        Exception exception = currentUserHasNotAdminRight();
+        
+        // Mocks
+        Exception expecyedException = currentUserHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().acceptRequest(candidacy, "message", "comment");
 
         // Asserts
         assertFalse(result);
+        assertEquals(expecyedException, mocker.getComponentUnderTest().getLastError());
         verifyZeroInteractions(wikiUserManager);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
@@ -742,6 +935,8 @@ public class WikiUserManagerScriptServiceTest
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         currentUserHasNotAdminRight();
 
         // Test
@@ -749,16 +944,71 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).acceptRequest(candidacy, "message", "comment");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).acceptRequest(candidacy, "message", "comment");
     }
     
     @Test
     public void askToJoin() throws Exception
     {
-        mocker.getComponentUnderTest().askToJoin("mainWiki:XWiki.User", "subwiki", "please!");
-        verify(wikiUserManager).askToJoin("mainWiki:XWiki.User", "subwiki", "please!");
+        // Mocks
+        MemberCandidacy candidacy = new MemberCandidacy();
+        when(wikiUserManager.askToJoin("mainWiki:XWiki.User", "subwiki", "please!")).thenReturn(candidacy);
         
+        // Test
+        MemberCandidacy result = mocker.getComponentUnderTest().askToJoin("mainWiki:XWiki.User", "subwiki", "please!");
+        
+        // Asserts
+        assertEquals(candidacy, result);
+        assertNull(mocker.getComponentUnderTest().getLastError());
+    }
+
+    @Test
+    public void askToJoinWhenScriptHasNoRight() throws Exception
+    {
+        // Mocks
+        Exception expectedException = currentScriptHasNotAdminRight();
+        
+        // Test
+        MemberCandidacy result = mocker.getComponentUnderTest().askToJoin("mainWiki:XWiki.User", "subwiki", "please!");
+        
+        // Asserts
+        assertNull(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
+    }
+
+    @Test
+    public void askToJoinWhenUsertHasNoRight() throws Exception
+    {
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
+
+        // Test
+        MemberCandidacy result = mocker.getComponentUnderTest().askToJoin("mainWiki:XWiki.OtherUser",
+                "subwiki", "please!");
+
+        // Asserts
+        assertNull(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
+    }
+
+    @Test
+    public void askToJoinWhenUserHasNoRightButConcerned() throws Exception
+    {
+        // Mocks
+        currentUserHasNotAdminRight();
+        MemberCandidacy candidacy = new MemberCandidacy();
+        when(wikiUserManager.askToJoin("mainWiki:XWiki.User", "subwiki", "please!")).thenReturn(candidacy);
+
+        // Test
+        MemberCandidacy result = mocker.getComponentUnderTest().askToJoin("mainWiki:XWiki.User",
+                "subwiki", "please!");
+
+        // Asserts
+        assertEquals(candidacy, result);
+        assertNull(mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
@@ -772,32 +1022,35 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).refuseRequest(candidacy, "message", "comment");
         assertNull(mocker.getComponentUnderTest().getLastError());
-
+        verify(wikiUserManager).refuseRequest(candidacy, "message", "comment");
     }
 
     @Test
-    public void refuseRequestWhenNoAdminRight() throws Exception
+    public void refuseRequestWhenUserHasNoAdminRight() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION);
-        Exception exception = currentUserHasNotAdminRight();
+        
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().refuseRequest(candidacy, "message", "comment");
 
         // Asserts
         assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
         verifyZeroInteractions(wikiUserManager);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
-    public void refuseRequestWhenNoAdminRightButConcerned() throws Exception
+    public void refuseRequestWhenUserHasNoAdminRightButConcerned() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         currentUserHasNotAdminRight();
 
         // Test
@@ -805,8 +1058,8 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).refuseRequest(candidacy, "message", "comment");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).refuseRequest(candidacy, "message", "comment");
     }
 
     @Test
@@ -820,32 +1073,36 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).cancelCandidacy(candidacy);
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).cancelCandidacy(candidacy);
 
     }
 
     @Test
-    public void cancelCandidacyWhenNoAdminRight() throws Exception
+    public void cancelCandidacyWhenUserHasNoAdminRight() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION);
-        Exception exception = currentUserHasNotAdminRight();
+        
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().cancelCandidacy(candidacy);
 
         // Asserts
         assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
         verifyZeroInteractions(wikiUserManager);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
-    public void cancelCandidacyWhenNoAdminRightButConcerned() throws Exception
+    public void cancelCandidacyWhenUserHasNoAdminRightButConcerned() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         currentUserHasNotAdminRight();
 
         // Test
@@ -853,8 +1110,8 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).cancelCandidacy(candidacy);
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).cancelCandidacy(candidacy);
     }
 
     @Test
@@ -868,19 +1125,20 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertNotNull(result);
-
     }
 
     @Test
-    public void inviteWhenNoAdminRight() throws Exception
+    public void inviteWhenUserHasNoAdminRight() throws Exception
     {
-        currentUserHasNotAdminRight();
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
 
         // Test
         MemberCandidacy result = mocker.getComponentUnderTest().invite("someUser", "subwiki", "someMessage");
 
         // Asserts
         assertNull(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
         verifyZeroInteractions(wikiUserManager);
     }
 
@@ -895,16 +1153,17 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).acceptInvitation(candidacy, "thanks");
         assertNull(mocker.getComponentUnderTest().getLastError());
-
+        verify(wikiUserManager).acceptInvitation(candidacy, "thanks");
     }
 
     @Test
-    public void acceptInvitationWhenNoAdminRight() throws Exception
+    public void acceptInvitationWhenUserHasNoAdminRight() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         Exception exception = currentUserHasNotAdminRight();
 
         // Test
@@ -912,15 +1171,17 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertFalse(result);
-        verifyZeroInteractions(wikiUserManager);
         assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+        verifyZeroInteractions(wikiUserManager);
     }
 
     @Test
-    public void acceptInvitationWhenNoAdminRightButConcerned() throws Exception
+    public void acceptInvitationWhenUserHasNoAdminRightButConcerned() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         currentUserHasNotAdminRight();
 
         // Test
@@ -928,8 +1189,8 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).acceptInvitation(candidacy, "thanks");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).acceptInvitation(candidacy, "thanks");
     }
 
     @Test
@@ -943,32 +1204,36 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).refuseInvitation(candidacy, "no thanks");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).refuseInvitation(candidacy, "no thanks");
 
     }
 
     @Test
-    public void refuseInvitationWhenNoAdminRight() throws Exception
+    public void refuseInvitationWhenUserHasNoAdminRight() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
                 MemberCandidacy.CandidateType.INVITATION);
-        Exception exception = currentUserHasNotAdminRight();
+        
+        // Mocks
+        Exception expectedException = currentUserHasNotAdminRight();
 
         // Test
         Boolean result = mocker.getComponentUnderTest().refuseInvitation(candidacy, "no thanks");
 
         // Asserts
         assertFalse(result);
+        assertEquals(expectedException, mocker.getComponentUnderTest().getLastError());
         verifyZeroInteractions(wikiUserManager);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
 
     @Test
-    public void refuseInvitationWhenNoAdminRightButConcerned() throws Exception
+    public void refuseInvitationWhenUserHasNoAdminRightButConcerned() throws Exception
     {
         MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.User",
                 MemberCandidacy.CandidateType.INVITATION);
+        
+        // Mocks
         currentUserHasNotAdminRight();
 
         // Test
@@ -976,7 +1241,7 @@ public class WikiUserManagerScriptServiceTest
 
         // Asserts
         assertTrue(result);
-        verify(wikiUserManager).refuseInvitation(candidacy, "no thanks");
         assertNull(mocker.getComponentUnderTest().getLastError());
+        verify(wikiUserManager).refuseInvitation(candidacy, "no thanks");
     }
 }

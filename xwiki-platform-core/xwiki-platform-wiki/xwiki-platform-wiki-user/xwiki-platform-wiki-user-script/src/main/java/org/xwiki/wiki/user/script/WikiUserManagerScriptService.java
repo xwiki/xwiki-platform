@@ -305,10 +305,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             checkRights(wikiId);
             wikiUserManager.addMembers(userIds, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-            return false;
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
             return false;
         }
@@ -340,7 +337,7 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         XWikiContext context = xcontextProvider.get();
 
-        // If the user is concerned by the candidacy
+        // Test if the user is concerned by the candidacy...
         DocumentReference candidacyUser = documentReferenceResolver.resolve(candidacy.getUserId());
         if (context.getUserReference().equals(candidacyUser)) {
             // Hide the admin private comment
@@ -348,7 +345,7 @@ public class WikiUserManagerScriptService implements ScriptService
             return true;
         }
 
-        // Check if the user is an admin
+        // Otherwise the user must be an admin.
         return authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
                 new WikiReference(candidacy.getWikiId()));
     }
@@ -380,6 +377,7 @@ public class WikiUserManagerScriptService implements ScriptService
 
     /**
      * Filter from a list of candidacies those that the current user has the right to see.
+     *  
      * @param candidacies list to filter
      * @return the filtered list
      */
@@ -541,8 +539,9 @@ public class WikiUserManagerScriptService implements ScriptService
     public MemberCandidacy askToJoin(String userId, String wikiId, String message)
     {
         try {
+            checkRights(wikiId, documentReferenceResolver.resolve(userId));
             return wikiUserManager.askToJoin(userId, wikiId, message);
-        } catch (WikiUserManagerException e) {
+        } catch (AccessDeniedException | WikiUserManagerException e) {
             setLastError(e);
             return null;
         }
@@ -619,7 +618,6 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public MemberCandidacy invite(String userId, String wikiId, String message)
     {
-        // Invite
         try {
             checkRights(wikiId);
             return wikiUserManager.invite(userId, wikiId, message);

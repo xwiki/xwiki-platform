@@ -30,9 +30,9 @@
   <artifactId>xwiki-platform-lesscss-default</artifactId>
   <name>XWiki Platform - LESS CSS - Default</name>
   <packaging>jar</packaging>
-  <description>Default implementation for XWiki Platform - LESS CSS - API</description>
+  <description>Default implementation for XWiki Platform - LESS CSS - Default Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
      <xwiki.extension.features>
      <!-- only used in 6.2M1 -->

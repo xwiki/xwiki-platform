@@ -19,6 +19,9 @@
  */
 package org.xwiki.lesscss.internal.compiler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -74,5 +77,13 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
     protected String cloneResult(String toClone)
     {
         return new String(toClone);
+    }
+
+    @Override
+    protected String exceptionAsResult(LESSCompilerException exception)
+    {
+        StringWriter serializedException = new StringWriter();
+        exception.printStackTrace(new PrintWriter(serializedException));
+        return String.format("/* %s */", serializedException.toString());
     }
 }

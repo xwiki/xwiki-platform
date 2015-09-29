@@ -22,15 +22,15 @@ package org.xwiki.lesscss.internal.cache;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler;
-import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -131,11 +131,12 @@ public abstract class AbstractCachedCompiler<T>
             // Either the result was in the cache or the force flag is set to true, we need to compile
             try {
                 result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, true, skin);
-            } finally {
+            } catch (LESSCompilerException e) {
                 // We must cache the result, even if the compilation have failed, to prevent re-compiling again and
                 // again (the compilation will still fail until the LESS resource is updated so it useless to retry).
-                // FixMe: it actually does not work, since setting null in the cache will not prevent an other
-                // computation.
+                result = exceptionAsResult(e);
+            } finally {
+                // Put the result in the cache
                 cache.set(lessResourceReference, skinReference, colorThemeReference, result);
             }
         }
@@ -152,4 +153,17 @@ public abstract class AbstractCachedCompiler<T>
      * @since 6.4M3
      */
     protected abstract T cloneResult(T toClone);
+
+    /**
+     * Convert an exception to a result object that we can store in the cache. Thanks to this, the compilation will not
+     * be restarted until the cache is cleared. It is needed because the cache cannot store null values.
+     * 
+     * This method must be overrided. For example, it could return the serialized exception or an empty object. 
+     *  
+     * @param exception exception to store in the cache
+     * @return an object that can be stored in the cache and returned to the user next time
+     *  
+     * @since 7.3M1, 6.4.6, 7.1.2, 7.2.1
+     */
+    protected abstract T exceptionAsResult(LESSCompilerException exception);
 }

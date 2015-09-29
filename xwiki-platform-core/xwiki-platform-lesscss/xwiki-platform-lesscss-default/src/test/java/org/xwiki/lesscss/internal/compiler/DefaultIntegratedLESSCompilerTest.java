@@ -212,6 +212,8 @@ public class DefaultIntegratedLESSCompilerTest
         assertTrue(StringUtils.endsWith(result, "*/"));
         verify(cache).set(eq(lessResourceReference), eq(new FSSkinReference("skin")),
                 eq(new NamedColorThemeReference("colorTheme")), eq(result));
+        verify(mocker.getMockedLogger()).error(eq("Error during the compilation of the resource [{}]."),
+                eq(lessResourceReference), eq(expectedException));
     }
 
 }

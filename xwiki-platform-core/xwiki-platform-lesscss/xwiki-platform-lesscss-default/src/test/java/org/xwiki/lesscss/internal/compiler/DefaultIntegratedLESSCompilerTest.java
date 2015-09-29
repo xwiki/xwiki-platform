@@ -21,6 +21,7 @@ package org.xwiki.lesscss.internal.compiler;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.resources.LESSResourceReference;
@@ -42,7 +44,9 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -78,6 +82,12 @@ public class DefaultIntegratedLESSCompilerTest
     private XWikiContext xcontext;
 
     private XWiki xwiki;
+    
+    private SkinReference skinReference = new FSSkinReference("skin");
+    
+    private ColorThemeReference colorThemeReference = new NamedColorThemeReference("colorTheme");
+    
+    private LESSResourceReference lessResourceReference = new LESSSkinFileResourceReference("file");
 
     @Before
     public void setUp() throws Exception
@@ -95,9 +105,8 @@ public class DefaultIntegratedLESSCompilerTest
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
         when(currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("colorTheme");
-        when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
-        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
-                new NamedColorThemeReference("colorTheme"));
+        when(skinReferenceFactory.createReference("skin")).thenReturn(skinReference);
+        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(colorThemeReference);
         when(cache.getMutex(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
                 eq(new NamedColorThemeReference("colorTheme")))).thenReturn("mutex");
     }
@@ -106,8 +115,8 @@ public class DefaultIntegratedLESSCompilerTest
     public void compileWhenInCache() throws Exception
     {
         // Mocks
-        when(cache.get(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cached output");
+        when(cache.get(eq(lessResourceReference), eq(skinReference), 
+                eq(colorThemeReference))).thenReturn("cached output");
 
         // Test
         assertEquals("cached output",
@@ -121,52 +130,46 @@ public class DefaultIntegratedLESSCompilerTest
     @Test
     public void compileWhenNotInCache() throws Exception
     {
-        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
-
         // Mocks
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq(true), eq("skin"))).
-                thenReturn("compiled output");
+        when(cachedIntegratedLESSCompiler.compute(eq(lessResourceReference), eq(false), eq(false), eq(true),
+                eq("skin"))).thenReturn("compiled output");
 
         // Test
         assertEquals("compiled output",
                 mocker.getComponentUnderTest().compile(new LESSSkinFileResourceReference("file"), false, false, false));
 
         // Verify
-        verify(cache).set(eq(resource), eq(new FSSkinReference("skin")), eq(new NamedColorThemeReference("colorTheme")),
-                eq("compiled output"));
+        verify(cache).set(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference), eq("compiled output"));
     }
 
     @Test
     public void compileWhenInCacheButForced() throws Exception
     {
-        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
-
         // Mocks
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq(true), eq("skin"))).
-                thenReturn("compiled output");
+        when(cachedIntegratedLESSCompiler.compute(eq(lessResourceReference),
+                eq(false), eq(false), eq(true), eq("skin"))).thenReturn("compiled output");
 
         // Test
         assertEquals("compiled output", mocker.getComponentUnderTest().compile(
                 new LESSSkinFileResourceReference("file"), false, false, "skin", true));
 
         // Verify
-        verify(cache, times(1)).set(any(LESSResourceReference.class), any(SkinReference.class),
-                any(ColorThemeReference.class), anyString());
-        verify(cache, never()).get(eq(resource), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")));
+        verify(cache, times(1)).set(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference),
+                eq("compiled output"));
+        verify(cache, never()).get(eq(lessResourceReference), eq(skinReference), eq(colorThemeReference));
     }
 
     @Test
     public void compileSkinFileWhenInCacheButCacheDisabled() throws Exception
     {
         // Mock
-        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
         when(lessContext.isCacheDisabled()).thenReturn(true);
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false),eq(true), eq("skin"))).
-                thenReturn("compiled output");
+        when(cachedIntegratedLESSCompiler.compute(eq(lessResourceReference), eq(false), eq(false),eq(true),
+                eq("skin"))).thenReturn("compiled output");
 
         // Test
-        assertEquals("compiled output", mocker.getComponentUnderTest().compile(resource, false, false, "skin", true));
+        assertEquals("compiled output", mocker.getComponentUnderTest().compile(lessResourceReference, false, false,
+                "skin", true));
 
         // Verify that the cache is disabled
         verifyZeroInteractions(cache);
@@ -176,21 +179,39 @@ public class DefaultIntegratedLESSCompilerTest
     public void compileWhenInCacheAndHTMLExport() throws Exception
     {
         // Mocks
-        when(cache.get(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cached output");
+        when(cache.get(eq(lessResourceReference), eq(skinReference),
+                eq(colorThemeReference))).thenReturn("cached output");
         
         when(lessContext.isHtmlExport()).thenReturn(true);
 
         // Test
         assertEquals("cached output",
-                mocker.getComponentUnderTest().compile(new LESSSkinFileResourceReference("file"), false, true, false));
+                mocker.getComponentUnderTest().compile(lessResourceReference, false, true, false));
         
         // Verify that the velocity is executed
-        verify(cachedIntegratedLESSCompiler).compute(eq(new LESSSkinFileResourceReference("file")), eq(false), eq(true),
+        verify(cachedIntegratedLESSCompiler).compute(eq(lessResourceReference), eq(false), eq(true),
                 eq(false), eq("skin"));
         // Verify we don't put anything in the cache
         verify(cache, never()).set(any(LESSResourceReference.class), any(SkinReference.class),
                 any(ColorThemeReference.class), anyString());
+    }
+
+    @Test
+    public void compileWhenError() throws Exception
+    {
+        // Mocks
+        LESSCompilerException expectedException = new LESSCompilerException("an exception");
+        when(cachedIntegratedLESSCompiler.compute(any(LESSResourceReference.class), anyBoolean(), anyBoolean(), 
+                anyBoolean(), anyString())).thenThrow(expectedException);
+
+        // Test
+        String result = mocker.getComponentUnderTest().compile(lessResourceReference, false, false, false);
+
+        // Asserts
+        assertTrue(StringUtils.startsWith(result, "/* org.xwiki.lesscss.compiler.LESSCompilerException: an exception"));
+        assertTrue(StringUtils.endsWith(result, "*/"));
+        verify(cache).set(eq(lessResourceReference), eq(new FSSkinReference("skin")),
+                eq(new NamedColorThemeReference("colorTheme")), eq(result));
     }
 
 }

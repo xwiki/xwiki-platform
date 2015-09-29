@@ -43,6 +43,8 @@ import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
 public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
         implements LESSColorThemeConverter, Initializable
 {
+    private static final ColorTheme EMPTY_COLOR_THEME = new ColorTheme();
+    
     @Inject
     private ColorThemeCache cache;
 
@@ -73,5 +75,11 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
     protected ColorTheme cloneResult(ColorTheme toClone)
     {
         return new ColorTheme(toClone);
+    }
+
+    @Override
+    protected ColorTheme exceptionAsResult(LESSCompilerException exception)
+    {
+        return EMPTY_COLOR_THEME;
     }
 }

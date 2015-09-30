@@ -1,51 +1,4 @@
-#**
- * Display an element inside the drawer.
- *
- * @param $url the url of the link of the element
- * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
- * @param $text the text to display in the element
- * @param $id (optional) the HTML id of the element
- *#
-#macro(drawerItem $url $icon $text $id)
-  <li class="drawer-menu-item">
-    <a href="$url" #if($id)id="$id"#end>
-      <div class="drawer-menu-item-icon">
-        <span class="glyphicon glyphicon-${icon}"></span>
-      </div>
-      <div class="drawer-menu-item-text">$text</div>
-    </a>
-  </li>
-#end
-#**
- * Display the top element of a foldable drawer item.
- *
- * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
- * @param $text the text to display in the element
- * @param $id (optional) the HTML id of the element
- *#
-#macro(drawerTopItemStart $icon $text $id)
-  <li class="drawer-menu-item">
-    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu">
-      <div class="drawer-menu-item-icon">
-        <span class="glyphicon glyphicon-${icon}"></span>
-      </div>
-      <div class="drawer-menu-item-text">$text</div>
-    </a>
-    <ul class="drawer-menu-sub-item collapse" id="${id}_menu">
-#end
-#**
- * Close an foldable drawer item
- *#
-#macro(drawerTopItemStop)
-    </ul>
-  </li>
-#end
-#**
- * Display a separator between two elements in the drawer
- *#
-#macro(drawerSeparator)
-  <li class="drawer-menuseparator"></li>
-#end
+#template('drawer_macros.vm')
 ##
 ## Display the drawer
 ##
@@ -69,6 +22,10 @@
             <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$escapetool.xml($services.localization.render('register'))</a>
           #end
         #end
+         ##
+         ## UIX
+         ##
+         #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
       </div>
     </div>
 
@@ -77,70 +34,37 @@
     ##
     <ul class="drawer-menu">
       ##
-      ## A link to the home wiki
-      ##
-      ## Only displayed on subwiki that have only global users.
-      #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" == 'GLOBAL_ONLY')
-        #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', 'Home')
-      #end
-      ##
-      ## Administer wiki
+      ## Administer wiki (import actually)
       ##
       #if ($hasGlobalAdmin)
-        #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
         #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
-        #if ($isAdminAppInstalled)
-          #drawerItem($adminwikiaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin.wiki')), 'tmAdminWiki')
-        #else
+        #if (!$isAdminAppInstalled)
+          ## If the admin application is not installed, we add a link to import it.
+          ## Otherwise, we let the admin application adds the correct UIX to administrate the wiki.
+          #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
           #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
         #end
-        #set ($hasPreviousMenuSection = true)
       #end
       ##
       ## Languages
       ##
       #template('menus_language.vm')
       ##
-      ## Wiki Index
+      ## UIX
       ##
-      #drawerSeparator()
-      ## The wiki index is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
-      #if ($isWikiAPIAvailable && $isWikiUIAvailable && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
-        #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $escapetool.xml($services.localization.render('platform.wiki.menu.wikiindex')))
-      #end
-      ##
-      ## Document Index
-      ##
-      #set($documentIndexRef = $services.model.createDocumentReference('', 'Main', 'AllDocs'))
-      #if ($xwiki.exists($documentIndexRef))
-        #drawerItem($xwiki.getURL($documentIndexRef), 'book', $escapetool.xml($services.localization.render('core.menu.wiki.documentindex')), 'tmWikiDocumentIndex')
-      #end
-      ##
-      ## User Index
-      ##
-      #set($userIndexRef = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
-      #if ($xwiki.exists($userIndexRef))
-        #drawerItem($xwiki.getURL($userIndexRef), 'user', $escapetool.xml($services.localization.render('xe.panels.quicklinks.userdirectory')), 'tmMainUserIndex')
-      #end
-      ##
-      ## Create Wiki
-      ##
-      ## The "create wiki' option is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
-      ## Of course, there is also a check about the right.
-      #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki && ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
-        #drawerSeparator()
-        #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
-        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $escapetool.xml($services.localization.render('core.menu.create.wiki')), 'tmCreateWiki')
-      #end
-      ##
-      ## Delete Wiki
-      ## 
-      #if ($isWikiAPIAvailable && $isWikiUIAvailable && !$xcontext.isMainWiki() && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
-        #drawerSeparator()
-        #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
-        #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
-        #drawerItem($deleteUrl, 'remove', $escapetool.xml($services.localization.render('platform.wiki.menu.deletewiki')), 'tmDeleteWiki')
-      #end
+      #displayDrawerUIX('org.xwiki.plaftorm.drawer')
     </ul>
   </nav>
 </div>
+#**
+ * Display the UI extensions.
+ *
+ * @param $name the name of the UI extension to display
+ *#
+#macro(displayDrawerUIX $name)
+  #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
+    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      $services.rendering.render($uix.execute(), 'html/5.0')
+    #end
+  #end
+#end

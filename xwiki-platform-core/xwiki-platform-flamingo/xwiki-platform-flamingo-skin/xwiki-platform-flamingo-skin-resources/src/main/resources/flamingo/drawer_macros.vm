@@ -1,0 +1,48 @@
+#**
+ * Display an element inside the drawer.
+ *
+ * @param $url the url of the link of the element
+ * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $text the text to display in the element
+ * @param $id (optional) the HTML id of the element
+ *#
+#macro(drawerItem $url $icon $text $id)
+  <li class="drawer-menu-item">
+    <a href="$url" #if($id)id="$id"#end>
+      <div class="drawer-menu-item-icon">
+        <span class="glyphicon glyphicon-${icon}"></span>
+      </div>
+      <div class="drawer-menu-item-text">$text</div>
+    </a>
+  </li>
+#end
+#**
+ * Display the top element of a foldable drawer item.
+ *
+ * @param $icon the name of the icon of the element (must be an icon of the glyphicon set, without the "glyphicon-" prefix)
+ * @param $text the text to display in the element
+ * @param $id (optional) the HTML id of the element
+ *#
+#macro(drawerTopItemStart $icon $text $id)
+  <li class="drawer-menu-item">
+    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu">
+      <div class="drawer-menu-item-icon">
+        <span class="glyphicon glyphicon-${icon}"></span>
+      </div>
+      <div class="drawer-menu-item-text">$text</div>
+    </a>
+    <ul class="drawer-menu-sub-item collapse" id="${id}_menu">
+#end
+#**
+ * Close an foldable drawer item
+ *#
+#macro(drawerTopItemStop)
+    </ul>
+  </li>
+#end
+#**
+ * Display a separator between two elements in the drawer
+ *#
+#macro(drawerSeparator)
+  <li class="drawer-menuseparator"></li>
+#end

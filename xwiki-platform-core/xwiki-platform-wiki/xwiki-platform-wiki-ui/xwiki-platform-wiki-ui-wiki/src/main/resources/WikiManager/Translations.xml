@@ -171,5 +171,8 @@ admin.xwiki.manageworkspace.description=Manage settings such as wiki name, descr
 admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
 admin.xwiki.usersconfiguration.title=Configuration
 admin.xwiki.members.title=Current Members
+    
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=Home
 </content>
 </xwikidoc>

@@ -129,8 +129,10 @@
   #panelheader($services.localization.render('xe.panels.modifications.my'))
   #foreach ($docName in $recentDocs)
     #set ($recentDoc = $xwiki.getDocument($docName).getTranslatedDocument())
-    ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
-    * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}
+    #if ($recentDoc)
+      ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
+      * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}
+    #end
   #end
   #panelfooter()
 #end

@@ -115,7 +115,8 @@
   ## A link to the home wiki
   ##
   ## Only displayed on subwiki that have only global users.
-  #if ("$!services.wiki.user.userScope" == 'GLOBAL_ONLY')
+  #set ($mainWikiHomeDocumentReference = $services.wiki.mainWikiDescriptor.mainPageReference)
+  #if ("$!services.wiki.user.userScope" == 'GLOBAL_ONLY' &amp;&amp; $xwiki.exists($mainWikiHomeDocumentReference) &amp;&amp; $services.security.authorization.hasAccess('view', $mainWikiHomeDocumentReference))
     #template('drawer_macros.vm')
     #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', $escapetool.xml($services.localization.render('platform.wiki.drawer.homeWiki')))
   #end

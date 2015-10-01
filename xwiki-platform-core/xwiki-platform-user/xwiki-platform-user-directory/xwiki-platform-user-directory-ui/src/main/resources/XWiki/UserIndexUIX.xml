@@ -115,7 +115,7 @@
   ## User Index
   ##
   #set($userIndexRef = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))
-  #if ($xwiki.exists($userIndexRef))
+  #if ($xwiki.exists($userIndexRef) &amp;&amp; $services.security.authorization.hasAccess('view', $userIndexRef))
     #template('drawer_macros.vm')
     #drawerItem($xwiki.getURL($userIndexRef), 'user', $escapetool.xml($services.localization.render('xe.panels.quicklinks.userdirectory')), 'tmMainUserIndex')
   #end

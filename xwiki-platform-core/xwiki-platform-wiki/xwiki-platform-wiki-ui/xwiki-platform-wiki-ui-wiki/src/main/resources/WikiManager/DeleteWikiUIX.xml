@@ -114,11 +114,11 @@
   ##
   ## Delete Wiki
   ## 
-  #if ($services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
+  #set ($deleteWikiPageReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'DeleteWiki'))
+  #if ($services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId) &amp;&amp; $xwiki.exists($deleteWikiPageReference) &amp;&amp; $services.security.authorization.hasAccess('view', $deleteWikiPageReference))
     #template('drawer_macros.vm')
     #drawerSeparator()
-    #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
-    #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
+    #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${escapetool.url($services.wiki.currentWikiId)}"))
     #drawerItem($deleteUrl, 'remove', $escapetool.xml($services.localization.render('platform.wiki.menu.deletewiki')), 'tmDeleteWiki')
   #end
 {{/html}}{{/velocity}}

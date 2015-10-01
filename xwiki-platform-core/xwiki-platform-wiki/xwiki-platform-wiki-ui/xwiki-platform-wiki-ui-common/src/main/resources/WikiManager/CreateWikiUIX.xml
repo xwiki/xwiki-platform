@@ -117,10 +117,10 @@
   ## The "create wiki" option is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
   ## Of course, there is also a check about the right.
   ##
-  #if ($hasCreateWiki &amp;&amp; ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
+  #set ($createWikiDocReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'CreateWiki'))
+  #if ($hasCreateWiki &amp;&amp; $xwiki.exists($createWikiDocReference) &amp;&amp; $services.security.authorization.hasAccess('view', $createWikiDocReference) &amp;&amp; ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
     #template('drawer_macros.vm')
     #drawerSeparator()
-    #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
     #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $escapetool.xml($services.localization.render('core.menu.create.wiki')), 'tmCreateWiki')
   #end
 {{/html}}{{/velocity}}</content>

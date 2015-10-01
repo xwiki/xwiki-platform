@@ -115,7 +115,7 @@
   ## Document Index
   ##
   #set($documentIndexRef = $services.model.createDocumentReference('', 'Main', 'AllDocs'))
-  #if ($xwiki.exists($documentIndexRef))
+  #if ($xwiki.exists($documentIndexRef) &amp;&amp; $services.security.authorization.hasAccess('view', $documentIndexRef))
     #template('drawer_macros.vm')
     #drawerItem($xwiki.getURL($documentIndexRef), 'book', $escapetool.xml($services.localization.render('core.menu.wiki.documentindex')), 'tmWikiDocumentIndex')
   #end

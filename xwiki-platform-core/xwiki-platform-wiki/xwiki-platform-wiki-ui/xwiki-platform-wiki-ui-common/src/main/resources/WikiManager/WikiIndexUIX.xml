@@ -112,13 +112,14 @@
     <property>
       <content>{{velocity}}{{html clean="false"}}
   #template('drawer_macros.vm')
+  #drawerSeparator()
   ##
   ## Wiki Index
   ##
-  #drawerSeparator()
   ## The wiki index is only displayed on the main wiki OR on subwikis which support only global users (so the farm use-case is still possible)
-  #if ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY')
-    #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $escapetool.xml($services.localization.render('platform.wiki.menu.wikiindex')))
+  #set ($wikiIndexRef = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
+  #if (($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY') &amp;&amp; $xwiki.exists($wikiIndexRef) &amp;&amp; $services.security.authorization.hasAccess('view', $wikiIndexRef))
+    #drawerItem($xwiki.getURL($wikiIndexRef), 'list', $escapetool.xml($services.localization.render('platform.wiki.menu.wikiindex')))
   #end
 {{/html}}{{/velocity}}
 </content>

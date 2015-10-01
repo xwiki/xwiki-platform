@@ -1077,6 +1077,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         BaseClass bclass = context.getWiki().getXClass(classReference, context);
         BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        object.setXClassReference(classReference);
 
         return object;
     }

@@ -907,10 +907,14 @@ public class RepositoryManager implements Initializable, Disposable
     {
         boolean needSave = false;
 
-        Set<ExtensionDependency> dependenciesToAdd = new HashSet<ExtensionDependency>(extension.getDependencies());
+        List<ExtensionDependency> dependencies = new ArrayList<>(extension.getDependencies());
+        int dependencyIndex = 0;
 
+        // Clean misplaced or bad existing dependencies associated to this extension version
         List<BaseObject> xobjects = document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
         if (xobjects != null) {
+            boolean deleteExistingObjects = false;
+
             for (int i = 0; i < xobjects.size(); ++i) {
                 BaseObject dependencyObject = xobjects.get(i);
 
@@ -920,17 +924,27 @@ public class RepositoryManager implements Initializable, Disposable
 
                     if (StringUtils.isNotEmpty(extensionVersion)
                         && extension.getId().getVersion().equals(new DefaultVersion(extensionVersion))) {
-                        String id = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID);
-                        String constraint = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
-
-                        ExtensionDependency dependency =
-                            new DefaultExtensionDependency(id, new DefaultVersionConstraint(constraint));
-
-                        if (!dependenciesToAdd.remove(dependency)) {
+                        if (deleteExistingObjects) {
                             document.removeXObject(dependencyObject);
                             needSave = true;
+                        } else {
+                            String id = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID);
+                            String constraint =
+                                getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
 
-                            --i;
+                            ExtensionDependency xobjectDependency =
+                                new DefaultExtensionDependency(id, new DefaultVersionConstraint(constraint));
+
+                            ExtensionDependency dependency = dependencies.get(dependencyIndex);
+
+                            if (!dependency.equals(xobjectDependency)) {
+                                deleteExistingObjects = true;
+
+                                document.removeXObject(dependencyObject);
+                                needSave = true;
+                            } else {
+                                ++dependencyIndex;
+                            }
                         }
                     }
                 }
@@ -938,18 +952,22 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         // Add missing dependencies
-        XWikiContext xcontext = this.xcontextProvider.get();
-        for (ExtensionDependency dependency : dependenciesToAdd) {
-            BaseObject dependencyObject =
-                document.newXObject(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE, xcontext);
+        if (dependencyIndex < dependencies.size()) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            for (; dependencyIndex < dependencies.size(); ++dependencyIndex) {
+                ExtensionDependency dependency = dependencies.get(dependencyIndex);
 
-            dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, extension.getId().getVersion()
-                .getValue(), xcontext);
-            dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
-            dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT, dependency.getVersionConstraint()
-                .getValue(), xcontext);
+                BaseObject dependencyObject =
+                    document.newXObject(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE, xcontext);
 
-            needSave = true;
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, extension.getId()
+                    .getVersion().getValue(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT, dependency.getVersionConstraint()
+                    .getValue(), xcontext);
+
+                needSave = true;
+            }
         }
 
         return needSave;

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -169,7 +170,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
-                    nameSpace, e.getMessage());
+                    nameSpace, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -327,7 +328,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      * Parses a string content.
      * 
      * @param content the content to parse
-     * @param syntaxId the syntax of the given content, used as a hint then looking up the parser component
+     * @param syntax the syntax of the given content
      * @return the result of parsing the given content
      */
     private XDOM parseContent(String content, Syntax syntax, DocumentReference source)

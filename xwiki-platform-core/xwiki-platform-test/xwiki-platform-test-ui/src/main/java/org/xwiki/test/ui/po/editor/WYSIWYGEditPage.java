@@ -20,7 +20,6 @@
 package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
@@ -43,7 +42,7 @@ public class WYSIWYGEditPage extends PreviewableEditPage
      */
     public static WYSIWYGEditPage gotoPage(String space, String page)
     {
-        BaseElement.getUtil().gotoPage(space, page, "edit", "editor=wysiwyg");
+        getUtil().gotoPage(space, page, "edit", "editor=wysiwyg");
         return new WYSIWYGEditPage();
     }
 

@@ -38,7 +38,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test</artifactId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

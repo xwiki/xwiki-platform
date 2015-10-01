@@ -41,7 +41,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -285,44 +284,6 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
-     * Set the meta-information fields of the given extension class document.
-     * 
-     * @param doc the document representing the extension class.
-     * @return true if the document has been modified, false otherwise.
-     */
-    private boolean setExtensionClassDocumentFields(XWikiDocument doc)
-    {
-        boolean needsUpdate = false;
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator("superadmin");
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        return needsUpdate;
-    }
-
-    /**
      * Creates or updates the XClass used for this type of extension. Usually called on {@link #init(XWikiContext)} and
      * {@link #virtualInit(XWikiContext)}.
      * 
@@ -333,30 +294,12 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
-            boolean needsUpdate = false;
 
-            BaseClass bclass = doc.getXClass();
-            if (context.get("initdone") != null) {
-                return bclass;
-            }
-
-            bclass.setName(getExtensionClassName());
-
-            needsUpdate |= bclass.addTextField("name", "Name", 30);
-            needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension",
-                "currentPage|onDemand|always");
-            needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
-            needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
-            needsUpdate |= setExtensionClassDocumentFields(doc);
-
-            if (needsUpdate) {
-                context.getWiki().saveDocument(doc, context);
-            }
-            return bclass;
+            return doc.getXClass();
         } catch (Exception ex) {
-            LOGGER.error("Cannot initialize skin extension class [{}]", getExtensionClassName(), ex);
+            LOGGER.error("Cannot get skin extension class [{}]", getExtensionClassName(), ex);
         }
+
         return null;
     }
 

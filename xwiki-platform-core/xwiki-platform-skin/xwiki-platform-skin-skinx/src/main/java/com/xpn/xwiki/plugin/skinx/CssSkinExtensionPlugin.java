@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import org.xwiki.model.reference.LocalDocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Skin Extension plugin that allows pulling CSS code stored inside wiki documents as
@@ -33,6 +33,10 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 {
     /** The name of the XClass storing the code for this type of extensions. */
     public static final String SSX_CLASS_NAME = "XWiki.StyleSheetExtension";
+
+    /** The local reference of the XClass storing the code for this type of extensions. */
+    public static final LocalDocumentReference SSX_CLASS_REFERENCE = new LocalDocumentReference("XWiki",
+        "StyleSheetExtension");
 
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
@@ -108,31 +112,5 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     public String endParsing(String content, XWikiContext context)
     {
         return super.endParsing(content, context);
-    }
-
-    @Override
-    public BaseClass getExtensionClass(XWikiContext context)
-    {
-        // First, let the parent do its job
-        super.getExtensionClass(context);
-        // Now adding the content type field
-        try {
-            XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
-            boolean needsUpdate = false;
-
-            BaseClass bclass = doc.getXClass();
-            if (context.get("initdone") != null) {
-                return bclass;
-            }
-            needsUpdate |= bclass.addStaticListField("contentType", "Content Type", "CSS|LESS");
-
-            if (needsUpdate) {
-                context.getWiki().saveDocument(doc, context);
-            }
-            return bclass;
-        } catch (Exception ex) {
-            LOGGER.error("Cannot initialize skin extension class [{}]", getExtensionClassName(), ex);
-        }
-        return null;
     }
 }

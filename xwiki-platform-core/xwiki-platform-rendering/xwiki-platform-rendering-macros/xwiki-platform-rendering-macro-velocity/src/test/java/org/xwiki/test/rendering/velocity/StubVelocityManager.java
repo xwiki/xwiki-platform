@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro;
+package org.xwiki.test.rendering.velocity;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.phase.Initializable;
@@ -45,7 +45,7 @@ import javax.script.ScriptContext;
  */
 @Component
 @Singleton
-public class MockVelocityManager implements VelocityManager, Initializable
+public class StubVelocityManager implements VelocityManager, Initializable
 {
     @Inject
     private ComponentManager componentManager;

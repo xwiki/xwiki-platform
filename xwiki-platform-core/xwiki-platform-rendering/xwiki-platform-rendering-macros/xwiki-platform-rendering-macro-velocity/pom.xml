@@ -51,7 +51,6 @@
       <artifactId>xwiki-platform-rendering-xwiki</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -92,7 +91,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/MockVelocityManager.class</include>
+                <include>**/StubVelocityManager.class</include>
                 <include>**/component*.txt</include>
               </includes>
             </configuration>

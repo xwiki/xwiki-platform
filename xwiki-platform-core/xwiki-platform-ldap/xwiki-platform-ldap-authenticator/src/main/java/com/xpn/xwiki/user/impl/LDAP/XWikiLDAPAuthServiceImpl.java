@@ -263,7 +263,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param validXWikiUserName the name of the XWiki user to log in.
      * @param password the password of the user to log in.
      * @param context the XWiki context.
-     * @param local indicate if it's a local authentication. Supposed to return a local user {@link Principal} (whithout
+     * @param local indicate if it's a local authentication. Supposed to return a local user {@link Principal} (without
      *            the wiki name).
      * @return the {@link Principal}.
      * @throws XWikiException error when login.
@@ -420,7 +420,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (local) {
             principal = new SimplePrincipal(userProfile.getFullName());
         } else {
-            principal = new SimplePrincipal(context.getWikiId() + ":" + userProfile.getFullName());
+            principal = new SimplePrincipal(userProfile.getPrefixedFullName());
         }
 
         // ////////////////////////////////////////////////////////////////////

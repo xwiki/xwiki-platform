@@ -2322,6 +2322,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     */
+    public int getXObjectSize(EntityReference classReference)
+    {
+        return getXObjectSize(resolveClassReference(classReference));
+    }
+
+    /**
      * @deprecated since 2.2M1 use {@link #getXObjectSize(DocumentReference)} instead
      */
     @Deprecated
@@ -2494,6 +2502,35 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Get an xobject with the passed xclass at the passed location.
+     * <p>
+     * If <code>create</code> is true and the is no xobject at the passed located, it's created.
+     * 
+     * @param classReference the xlcass of the object to retrieve
+     * @param number the location of the xobject
+     * @param create if true the xobject is created when it does not exist
+     * @param xcontext the XWiki context
+     * @return a {@link BaseObject} stored at passed location
+     * @throws XWikiException when failing to create new xobject instance
+     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     */
+    public BaseObject getXObject(EntityReference classReference, int number, boolean create, XWikiContext xcontext)
+        throws XWikiException
+    {
+        DocumentReference absoluteClassReference = resolveClassReference(classReference);
+
+        BaseObject xobject = getXObject(absoluteClassReference);
+
+        if (xobject == null && create) {
+            xobject = BaseClass.newCustomClassInstance(absoluteClassReference, xcontext);
+
+            setXObject(number, xobject);
+        }
+
+        return xobject;
     }
 
     /**

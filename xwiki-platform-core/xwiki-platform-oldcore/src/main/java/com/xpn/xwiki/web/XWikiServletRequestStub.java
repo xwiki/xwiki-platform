@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -67,6 +68,11 @@ public class XWikiServletRequestStub implements XWikiRequest
     private String requestURI;
 
     private String serverName;
+
+    /**
+     * @since 7.3M1
+     */
+    private Map<String, String> parameters;
 
     public XWikiServletRequestStub()
     {
@@ -121,10 +127,26 @@ public class XWikiServletRequestStub implements XWikiRequest
         return "";
     }
 
+    /**
+     * @since 7.3M1
+     */
+    public void put(String name, String value)
+    {
+        if (this.parameters == null) {
+            this.parameters = new HashMap<>();
+        }
+        this.parameters.put(name, value);
+    }
+
     @Override
     public String get(String name)
     {
-        return "";
+        String result = null;
+        if (this.parameters != null) {
+            result = this.parameters.get(name);
+        }
+
+        return result;
     }
 
     @Override

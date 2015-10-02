@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,31 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.test.page;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.3-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-test</artifactId>
-  <name>XWiki Platform - Test - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Test - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-test-integration</module>
-    <module>xwiki-platform-test-page</module>
-    <module>xwiki-platform-test-ui</module>
-  </modules>
-</project>
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration;
+
+/**
+ * Stubbed {@link org.xwiki.rendering.configuration.RenderingConfiguration} to control the list of Transformations
+ * to execute in Page tests (specifically to not execute the Icon transformation, for performance optimizations).
+ *
+ * @version $Id$
+ * @since 7.3M1
+ */
+@Component
+@Singleton
+public class StubRenderingConfiguration extends DefaultXWikiRenderingConfiguration
+{
+    @Override
+    public List<String> getTransformationNames()
+    {
+        return Arrays.asList("macro");
+    }
+}

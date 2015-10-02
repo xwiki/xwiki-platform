@@ -61,7 +61,7 @@
     #end
     #set ($query = "$query) AND ")
   #else
-    #set ($query = 'where ')
+    #set ($query = 'where')
   #end
   #if("$!{request.space}" == '')
     ## RSS feed for the whole wiki
@@ -119,7 +119,7 @@
   #set ($discard = $feed.setLink($feedURI))
   #set ($discard = $feed.setUri($feedURI))
   #set ($discard = $feed.setAuthor('XWiki'))
-  #set ($discard = $feed.setTitle($services.localization.render('activity.rss.feed.description', [$text])))
+  #set ($discard = $feed.setTitle($services.localization.render('activity.rss.feed.description')))
   #set ($discard = $feed.setDescription($description))
   #set ($discard = $feed.setLanguage($xcontext.language))
   #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))

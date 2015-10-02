@@ -24,62 +24,69 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-activitystream</artifactId>
+    <artifactId>xwiki-platform-test</artifactId>
     <version>7.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-activitystream-ui</artifactId>
-  <name>XWiki Platform - Activity Stream - UI</name>
-  <packaging>xar</packaging>
-  <description>Display all activity in the wiki or farm</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Activity Stream Application</xwiki.extension.name>
-  </properties>
+  <artifactId>xwiki-platform-test-page</artifactId>
+  <name>XWiki Platform - Test - Page Tests Framework</name>
+  <packaging>jar</packaging>
+  <description>Allow writing unit tests for wiki pages</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-activitystream-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-observation-local</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-plain</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-feed-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-script</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
-    <!-- Needed since we have a wiki macro and we need the XWiki.WikiMacroClass xclass -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
-    <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-page</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 </project>

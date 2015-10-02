@@ -53,6 +53,8 @@ import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultDocumentReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -91,6 +93,7 @@ import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver;
@@ -168,7 +171,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     private MemoryConfigurationSource configurationSource;
 
-    private MemoryConfigurationSource xwikicfg;
+    private MemoryConfigurationSource xwikicfgConfigurationSource;
 
     public MockitoOldcoreRule()
     {
@@ -213,7 +216,7 @@ public class MockitoOldcoreRule implements MethodRule
      */
     public void notifyComponentDescriptorEvent() throws ComponentLookupException
     {
-        this.componentManager.notifyComponentDescriptorEvent();
+        getMocker().notifyComponentDescriptorEvent();
     }
 
     @Override
@@ -242,7 +245,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Statically store the component manager in {@link Utils} to be able to access it without
         // the context.
-        Utils.setComponentManager(this.componentManager);
+        Utils.setComponentManager(getMocker());
 
         this.context = new XWikiContext();
 
@@ -264,7 +267,7 @@ public class MockitoOldcoreRule implements MethodRule
         when(mockXWiki.getGroupService(getXWikiContext())).thenReturn(this.mockGroupService);
 
         // We need to initialize the Component Manager so that the components can be looked up
-        getXWikiContext().put(ComponentManager.class.getName(), this.componentManager);
+        getXWikiContext().put(ComponentManager.class.getName(), getMocker());
 
         if (testClass.getAnnotation(AllComponents.class) != null) {
             // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not already mocked
@@ -287,16 +290,19 @@ public class MockitoOldcoreRule implements MethodRule
             this.configurationSource = getMocker().registerMemoryConfigurationSource();
         }
 
-        // Make sure a xwikicfg ConfigurationSource is available
+        // Make sure a "xwikicfg" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, "xwikicfg")) {
-            this.xwikicfg = new MockConfigurationSource();
-            this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), this.xwikicfg);
+            this.xwikicfgConfigurationSource = new MockConfigurationSource();
+            getMocker().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"),
+                this.xwikicfgConfigurationSource);
         }
 
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
-        if (this.componentManager.hasComponent(Environment.class)) {
-            ServletEnvironment environment = this.componentManager.getInstance(Environment.class);
+        if (getMocker().hasComponent(Environment.class)
+            && getMocker().getInstance(Environment.class) instanceof  ServletEnvironment)
+        {
+            ServletEnvironment environment = getMocker().getInstance(Environment.class);
 
             ServletContext servletContextMock = mock(ServletContext.class);
             environment.setServletContext(servletContextMock);
@@ -966,7 +972,7 @@ public class MockitoOldcoreRule implements MethodRule
      */
     public MemoryConfigurationSource getMockXWikiCfg()
     {
-        return this.xwikicfg;
+        return this.xwikicfgConfigurationSource;
     }
 
     /**
@@ -1020,6 +1026,9 @@ public class MockitoOldcoreRule implements MethodRule
         this.componentManager.registerComponentIfDontExist(RelativeStringEntityReferenceResolver.class);
         this.componentManager.registerComponentIfDontExist(UidStringEntityReferenceSerializer.class);
         this.componentManager.registerComponentIfDontExist(XClassRelativeStringEntityReferenceResolver.class);
+        this.componentManager.registerComponentIfDontExist(CurrentGetDocumentReferenceDocumentReferenceResolver.class);
+        this.componentManager.registerComponentIfDontExist(DefaultReferenceDocumentReferenceResolver.class);
+        this.componentManager.registerComponentIfDontExist(DefaultReferenceEntityReferenceResolver.class);
 
         this.componentManager.registerComponentIfDontExist(DefaultModelConfiguration.class);
     }

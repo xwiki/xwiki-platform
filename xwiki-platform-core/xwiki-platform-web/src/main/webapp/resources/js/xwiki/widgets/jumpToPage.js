@@ -127,7 +127,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       Event.stop(event);
       var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT);
       if (reference.parent) {
-        window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
+        window.self.location = this.urlTemplate.replace("__space__", encodeURIComponent(reference.parent.name)).replace("__document__", encodeURIComponent(reference.name)).replace("__action__", encodeURIComponent(mode));
       } else {
         if (typeof(XWiki.widgets.Suggest) != "undefined") {
           new XWiki.widgets.Notification("$services.localization.render('core.viewers.jump.dialog.invalidNameError')", 'error');

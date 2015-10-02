@@ -31,6 +31,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verify;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class DefaultContextualAuthorizationManagerTest
 {
     public MockitoComponentMockingRule<ContextualAuthorizationManager> mocker =
@@ -57,8 +59,6 @@ public class DefaultContextualAuthorizationManagerTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         this.authorizationManager = this.mocker.getInstance(AuthorizationManager.class);
 
         this.currentWikiReference = new WikiReference("wiki");

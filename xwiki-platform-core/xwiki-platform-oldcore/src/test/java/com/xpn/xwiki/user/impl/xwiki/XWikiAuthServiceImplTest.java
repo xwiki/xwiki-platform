@@ -34,6 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiResponse;
 
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class XWikiAuthServiceImplTest
 {
     @Rule
@@ -60,8 +62,6 @@ public class XWikiAuthServiceImplTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         this.authService = new XWikiAuthServiceImpl();
 
         // Dummy response

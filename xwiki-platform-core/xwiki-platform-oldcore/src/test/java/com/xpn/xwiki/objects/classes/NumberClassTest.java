@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,16 +35,11 @@ import static org.junit.Assert.assertNull;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class NumberClassTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    @Before
-    public void before() throws Exception
-    {
-        this.oldcore.registerEntityReferenceComponents();
-    }
 
     /** Test the fromString method. */
     @Test

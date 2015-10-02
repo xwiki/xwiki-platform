@@ -20,28 +20,23 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 /**
  * Unit tests for the {@link BaseClass} class.
  *
  * @version $Id$
  */
+@ReferenceComponentList
 public class BaseClassTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    @Before
-    public void before() throws Exception
-    {
-        this.oldcore.registerEntityReferenceComponents();
-    }
 
     @Test
     public void testSetDocumentReference() throws Exception

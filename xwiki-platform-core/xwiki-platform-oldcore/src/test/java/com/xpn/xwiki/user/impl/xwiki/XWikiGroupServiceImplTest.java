@@ -32,11 +32,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+@ReferenceComponentList
 public class XWikiGroupServiceImplTest
 {
     @Rule
@@ -55,8 +57,6 @@ public class XWikiGroupServiceImplTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         this.groupService = new XWikiGroupServiceImpl();
 
         when(this.oldcore.getMockXWiki().getMaxRecursiveSpaceChecks(any(XWikiContext.class))).thenReturn(0);

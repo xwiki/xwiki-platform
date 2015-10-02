@@ -22,7 +22,6 @@ package com.xpn.xwiki.objects;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.logging.LogLevel;
@@ -34,22 +33,18 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 /**
  * Unit tests for the {@link BaseObject} class.
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class BaseObjectTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    @Before
-    public void before() throws Exception
-    {
-        this.oldcore.registerEntityReferenceComponents();
-    }
 
     @Test
     public void testSetDocumentReference() throws Exception

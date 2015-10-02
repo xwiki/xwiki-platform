@@ -30,6 +30,7 @@ import org.mockito.stubbing.Answer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class DBListClassTest
 {
     @Rule
@@ -49,8 +51,6 @@ public class DBListClassTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         when(this.oldcore.getMockXWiki().parseContent(anyString(), any(XWikiContext.class))).then(new Answer<String>()
         {
             @Override

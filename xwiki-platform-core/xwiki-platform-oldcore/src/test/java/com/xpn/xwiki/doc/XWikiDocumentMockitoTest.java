@@ -64,6 +64,7 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
 
@@ -87,6 +88,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 @ComponentList(DefaultSyntaxFactory.class)
 public class XWikiDocumentMockitoTest
 {
@@ -119,7 +121,6 @@ public class XWikiDocumentMockitoTest
     @Before
     public void setUp() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
         this.oldcore.registerMockEnvironment();
 
         // Activate programming rights in order to be able to call com.xpn.xwiki.api.Document#getDocument().

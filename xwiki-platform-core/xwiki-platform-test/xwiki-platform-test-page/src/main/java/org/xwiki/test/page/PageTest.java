@@ -52,6 +52,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -70,6 +71,7 @@ import static org.mockito.Mockito.when;
  * @since 7.3M1
  */
 @PageComponentList
+@ReferenceComponentList
 public class PageTest
 {
     private static final String XWIKI = "xwiki";
@@ -119,8 +121,6 @@ public class PageTest
     @BeforeComponent
     public void setUpComponentsForPageTest() throws Exception
     {
-        oldcore.registerEntityReferenceComponents();
-
         mocker.registerMockComponent(JMXBeanRegistration.class);
         mocker.registerMockComponent(Environment.class);
         mocker.registerMockComponent(JobProgressManager.class);

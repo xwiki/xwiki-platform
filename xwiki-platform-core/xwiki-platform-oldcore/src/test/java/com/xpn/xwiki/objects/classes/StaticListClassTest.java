@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class StaticListClassTest
 {
     /**
@@ -216,8 +218,6 @@ public class StaticListClassTest
     @Test
     public void testDisplayEditWithSuggest() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
 

@@ -50,25 +50,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultDocumentReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultWikiReferenceProvider;
-import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
-import org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver;
-import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -90,21 +71,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiConfigDelegate;
-import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentGetDocumentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -270,7 +236,8 @@ public class MockitoOldcoreRule implements MethodRule
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());
 
         if (testClass.getAnnotation(AllComponents.class) != null) {
-            // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not already mocked
+            // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not
+            // already mocked
             this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class, false);
             this.mockContextualAuthorizationManager =
                 getMocker().registerMockComponent(ContextualAuthorizationManager.class, false);
@@ -300,8 +267,7 @@ public class MockitoOldcoreRule implements MethodRule
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)
-            && getMocker().getInstance(Environment.class) instanceof  ServletEnvironment)
-        {
+            && getMocker().getInstance(Environment.class) instanceof ServletEnvironment) {
             ServletEnvironment environment = getMocker().getInstance(Environment.class);
 
             ServletContext servletContextMock = mock(ServletContext.class);
@@ -986,50 +952,5 @@ public class MockitoOldcoreRule implements MethodRule
 
         when(environment.getTemporaryDirectory()).thenReturn(new File(temp, "temporary"));
         when(environment.getPermanentDirectory()).thenReturn(new File(temp, "permanent"));
-    }
-
-    /**
-     * Register all the reference resolver/serializer/provides/etc.
-     * 
-     * @since 7.2M2
-     */
-    public void registerEntityReferenceComponents() throws Exception
-    {
-        this.componentManager.registerComponentIfDontExist(CompactStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(CompactWikiStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(CurrentEntityReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(CurrentMixedEntityReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(CurrentMixedReferenceDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentMixedReferenceEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentMixedStringDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentReferenceDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentReferenceEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentStringAttachmentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentStringDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentStringSpaceReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(DefaultDocumentReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(DefaultSpaceReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(DefaultStringDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(DefaultStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(DefaultStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(DefaultWikiReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(DefaultEntityReferenceProvider.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitReferenceDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitReferenceEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitStringAttachmentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitStringDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(ExplicitStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(LocalStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(LocalUidStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(RelativeStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(UidStringEntityReferenceSerializer.class);
-        this.componentManager.registerComponentIfDontExist(XClassRelativeStringEntityReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(CurrentGetDocumentReferenceDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(DefaultReferenceDocumentReferenceResolver.class);
-        this.componentManager.registerComponentIfDontExist(DefaultReferenceEntityReferenceResolver.class);
-
-        this.componentManager.registerComponentIfDontExist(DefaultModelConfiguration.class);
     }
 }

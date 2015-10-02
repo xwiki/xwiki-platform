@@ -28,12 +28,14 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 /**
  * Validate {@link BaseObjectReference}.
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public class BaseObjectReferenceTest
 {
     @Rule
@@ -44,8 +46,6 @@ public class BaseObjectReferenceTest
     @Before
     public void before() throws Exception
     {
-        this.oldcore.registerEntityReferenceComponents();
-
         this.document = new DocumentReference("wiki", "space", "page");
     }
 

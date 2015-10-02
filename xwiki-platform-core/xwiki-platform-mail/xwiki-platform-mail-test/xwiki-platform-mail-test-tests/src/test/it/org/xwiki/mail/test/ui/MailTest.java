@@ -91,10 +91,10 @@ public class MailTest extends AbstractTest
         // Step 2: Before validating that we can send email, let's verify that we can report errors when the mail
         // setup is not correct
 
-        // Make sure there's no mail server set for example.
+        // Make sure there's an invalid mail server set.
         wikiAdministrationPage.clickSection("Email", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
-        sendMailPage.setHost("");
+        sendMailPage.setHost("invalidmailserver");
         sendMailPage.clickSave();
 
         // Send the mail that's supposed to fail and validate that it fails

@@ -1550,7 +1550,38 @@ $xwiki.ssx.use('Main.Activity')##
           #if ($pageTitle == '')
             #set ($pageTitle = $pageName)
           #end
-          &lt;a href="$xwiki.getURL(${pageFullName})" class="typePage type" title="$!{escapetool.xml($services.localization.render('activity.link.title', [$services.wiki.getById("$!event.wiki").defaultAlias, $document.space, $document.name]))}"&gt;$!{escapetool.xml($pageTitle)}&lt;/a&gt;
+
+          ##
+          ## Build the page's location
+          ##
+          #set ($documentReference = $document.documentReference)
+          #set ($pageLocationSeparator = '/')
+          ## Main wiki, if current wiki is not a farm wiki.
+          #if ($services.wiki.user.getUserScope($services.wiki.currentWikiId) != "LOCAL_ONLY")
+            #set ($pageLocation = "$services.wiki.mainWikiDescriptor.prettyName $pageLocationSeparator")
+          #else
+            #set ($pageLocation = '')
+          #end
+          ## Subwiki, if any.
+          #if ($event.wiki != $services.wiki.currentWikiId)
+            #set ($pageLocation = "$pageLocation $services.wiki.getById($event.wiki).prettyName $pageLocationSeparator")
+          #end
+          ## Spaces.
+          ## Note: Not displaying pretty names since that might be too costrly.
+          #foreach ($spaceReference in $documentReference.spaceReferences)
+            #set ($pageLocation = "$pageLocation $spaceReference.name")
+            #if ($foreach.hasNext())
+              #set ($pageLocation = "$pageLocation $pageLocationSeparator")
+            #end
+          #end
+          ## Terminal document, if any.
+          ## Note: Not displaying pretty name to be consistent with spaces.
+          #set ($documentName = $documentReference.name)
+          #if ($documentName != 'WebHome')
+            #set ($pageLocation = "$pageLocation $pageLocationSeparator $documentName")
+          #end
+
+          &lt;a href="$xwiki.getURL(${pageFullName})" class="typePage type" title="$!{escapetool.xml($services.localization.render('activity.page.link.title', [$pageLocation]))}"&gt;$!{escapetool.xml($pageTitle)}&lt;/a&gt;
           #if ($event.wiki != $services.wiki.currentWikiId)
             #set($wikiPrettyName = $services.wiki.getById($event.wiki).prettyName)
             &lt;span class="activityWiki"&gt;($!{escapetool.xml($wikiPrettyName)})&lt;/span&gt;

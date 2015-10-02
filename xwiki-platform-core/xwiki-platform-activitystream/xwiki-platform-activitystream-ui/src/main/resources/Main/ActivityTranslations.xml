@@ -37,14 +37,23 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>activity.link.title=Located in {0} » {1} » {2}
+  <content>activity.page.link.title=Located in {0}
 activity.rss.pages.modified=Modified Pages RSS Feed
 activity.rss.feed.description=RSS feed for document changes
 activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
 activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"</content>
+activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.3M1
+activity.link.title=Located in {0} » {1} » {2}
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>Main.ActivityTranslations</name>
     <number>0</number>

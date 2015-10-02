@@ -549,6 +549,15 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             .append(this.parameters).toHashCode();
     }
 
+    /**
+     * Note: The default implementation relies on comparing the string serialization of the 2 entities. It is the
+     * caller's responsibility to make sure that the entities are either first resolved or at least of the same type, in
+     * order for the comparison to actually make sense.
+     * <p/>
+     * {@inheritDoc}
+     *
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(EntityReference reference)
     {
@@ -560,38 +569,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             return 0;
         }
 
-        int cmp = compareParent(reference);
-        if (cmp != 0) {
-            return cmp;
+        // Generically compare the string serializations of the 2 references.
+        int stringCompareResult = toString().compareTo(reference.toString());
+        if (stringCompareResult != 0) {
+            return stringCompareResult;
         }
 
-        if (!type.equals(reference.type)) {
-            return type.compareTo(reference.type);
-        }
-
-        if (!name.equals(reference.name)) {
-            return name.compareTo(reference.name);
-        }
-
+        // If the string serializations are the same, compare the parameters.
         return compareParameters(reference);
-    }
-
-    /**
-     * Compare parent references of this reference and another reference.
-     *
-     * @param reference the other reference to be compare with
-     * @return 0 if parents are equals, -1 if this reference has a lower parent, +1 otherwise
-     */
-    private int compareParent(EntityReference reference)
-    {
-        if (parent != null) {
-            if (reference.parent == null) {
-                return 1;
-            }
-
-            return parent.compareTo(reference.parent);
-        }
-        return (reference.parent == null) ? 0 : -1;
     }
 
     /**

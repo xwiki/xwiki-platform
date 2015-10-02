@@ -293,6 +293,10 @@ public class EntityReferenceTest
             new EntityReference("a", EntityType.SPACE,
                 new EntityReference("a", EntityType.WIKI)));
 
+        EntityReference reference31 =
+            new EntityReference("c", EntityType.DOCUMENT, new EntityReference("x", EntityType.SPACE,
+                new EntityReference("a", EntityType.SPACE, new EntityReference("a", EntityType.WIKI))));
+
         Map map1 = new HashMap(3);
         map1.put("param1","a");
         map1.put("param2","b");
@@ -316,24 +320,32 @@ public class EntityReferenceTest
             new EntityReference("a", EntityType.SPACE,
                 new EntityReference("a", EntityType.WIKI)),map3);
 
+        EntityReference reference61 =
+            new EntityReference("c", EntityType.DOCUMENT, new EntityReference("x", EntityType.SPACE,
+                new EntityReference("a", EntityType.SPACE, new EntityReference("a", EntityType.WIKI)), map3));
+
         Assert.assertEquals(0, reference.compareTo(reference));
 
         List<EntityReference> list = new ArrayList<EntityReference>();
         list.add(reference);
         list.add(reference2);
         list.add(reference3);
+        list.add(reference31);
         list.add(reference4);
         list.add(reference5);
         list.add(reference6);
+        list.add(reference61);
         Collections.sort(list);
 
-        // Reference3 is first since it serializes as a:a:c which comes before a:b:c and d:e:f
-        Assert.assertSame(reference, list.get(5));
-        Assert.assertSame(reference2, list.get(4));
+        // Reference3 is first since it serializes as a:a.c which comes before a:a.x.c, a:b.c and d:e.f
         Assert.assertSame(reference3, list.get(0));
         Assert.assertSame(reference4, list.get(1));
         Assert.assertSame(reference5, list.get(2));
         Assert.assertSame(reference6, list.get(3));
+        Assert.assertSame(reference31, list.get(4));
+        Assert.assertSame(reference61, list.get(5));
+        Assert.assertSame(reference2, list.get(6));
+        Assert.assertSame(reference, list.get(7));
     }
 
     @Test

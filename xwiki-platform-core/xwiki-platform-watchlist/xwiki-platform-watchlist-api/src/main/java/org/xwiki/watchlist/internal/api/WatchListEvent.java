@@ -414,11 +414,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     @Override
     public int compareTo(WatchListEvent event)
     {
-        // FIXME: Workaround for http://jira.xwiki.org/browse/XWIKI-12432
-        // Compare the references when it gets fixed like the commented code below.
-        // return getDocumentReference().compareTo(event.getDocumentReference());
-
-        return getPrefixedFullName().compareTo(event.getPrefixedFullName());
+        return getDocumentReference().compareTo(event.getDocumentReference());
     }
 
     /**

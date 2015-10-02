@@ -605,7 +605,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/test/*.class</include>
+                <include>**/test/**/*.class</include>
               </includes>
             </configuration>
           </execution>

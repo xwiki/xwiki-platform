@@ -708,6 +708,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return false;
     }
 
+    public boolean addTimezoneField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
+            TimezoneClass timezoneClass = new TimezoneClass();
+            timezoneClass.setName(fieldName);
+            timezoneClass.setPrettyName(fieldPrettyName);
+            timezoneClass.setSize(size);
+            timezoneClass.setObject(this);
+            put(fieldName, timezoneClass);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean addBooleanField(String fieldName, String fieldPrettyName, String displayType)
     {
         if (get(fieldName) == null) {

@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.TimezoneClass;
 
 /**
  * Update XWiki.XWikiPreferences document with all required informations.
@@ -47,6 +47,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Singleton
 public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the field containing the time zone.
+     */
+    private static final String TIMEZONE_FIELD = "timezone";
+
     /**
      * Used to bind a class to a document sheet.
      */
@@ -167,31 +172,12 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
             "---|Small|Medium|Large");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
-        needsUpdate |= bclass.addTextField("timezone", "Timezone", 30);
-        PropertyClass timezoneProperty = (PropertyClass) bclass.get("timezone");
-        if (!timezoneProperty.isCustomDisplayed(xcontext)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'inline' || $xcontext.action == 'edit')\n");
-            builder.append("  {{html}}\n");
-            builder.append("    #if($xwiki.jodatime)\n");
-            builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
-            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>\n");
-            builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
-            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$tz</option>\n");
-            builder.append("        #end\n");
-            builder.append("      </select>\n");
-            builder.append("    #else\n");
-            builder.append("      <input id='$prefix$name' name='$prefix$name' type=\"text\" value=\"$!value\"/>\n");
-            builder.append("    #end\n");
-            builder.append("  {{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  $!value\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}\n");
-            timezoneProperty.setCustomDisplay(builder.toString());
+
+        // Timezone. Handle upgrade since in the past we were using a standard text field with a custom displayer and
+        // we're now using a Timezone Class. Thus we need to remove any existing field to upgrade it.
+        if (!(bclass.getField(TIMEZONE_FIELD) instanceof TimezoneClass)) {
+            bclass.removeField(TIMEZONE_FIELD);
+            bclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
             needsUpdate = true;
         }
 

@@ -123,7 +123,11 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
     public void dispose() throws ComponentLifecycleException
     {
         if (this.server != null) {
-            this.server.shutdown();
+            try {
+                this.server.close();
+            } catch (IOException e) {
+                this.logger.error("Failed to close server", e);
+            }
         }
 
         if (this.container != null) {

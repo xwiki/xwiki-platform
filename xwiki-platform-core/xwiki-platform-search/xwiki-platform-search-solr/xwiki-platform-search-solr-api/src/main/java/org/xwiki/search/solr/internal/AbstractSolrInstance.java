@@ -24,7 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -45,7 +45,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     /**
      * Solr server instance corresponding, depending on the subclass.
      */
-    protected SolrServer server;
+    protected SolrClient server;
 
     /**
      * Logging framework.
@@ -110,7 +110,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     }
 
     @Override
-    public QueryResponse query(SolrParams solrParams) throws SolrServerException
+    public QueryResponse query(SolrParams solrParams) throws SolrServerException, IOException
     {
         this.logger.debug("Execute Solr query [{}]", solrParams);
 
@@ -132,7 +132,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
      * 
      * @return the server
      */
-    protected SolrServer getServer()
+    protected SolrClient getServer()
     {
         return this.server;
     }

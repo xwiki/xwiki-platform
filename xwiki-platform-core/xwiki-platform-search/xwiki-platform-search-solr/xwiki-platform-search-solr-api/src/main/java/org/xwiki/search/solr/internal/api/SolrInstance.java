@@ -120,8 +120,9 @@ public interface SolrInstance extends Initializable
      * @param solrParams Solr Query API.
      * @return the query result.
      * @throws SolrServerException if problems occur.
+     * @throws IOException if there is an error on the server
      */
-    QueryResponse query(SolrParams solrParams) throws SolrServerException;
+    QueryResponse query(SolrParams solrParams) throws SolrServerException, IOException;
 
     /**
      * Query solr, and stream the results. Unlike the standard query, this will send events for each Document rather

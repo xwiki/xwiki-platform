@@ -26,7 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
@@ -88,7 +88,7 @@ public class RemoteSolrInstance extends AbstractSolrInstance
         // }
 
         // Initialize the remote Solr server.
-        this.server = new HttpSolrServer(remoteURL);
+        this.server = new HttpSolrClient(remoteURL);
     }
 
     /**

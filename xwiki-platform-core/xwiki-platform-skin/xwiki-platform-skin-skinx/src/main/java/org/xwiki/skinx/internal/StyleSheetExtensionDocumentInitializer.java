@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin;
-import com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin;
 
 /**
  * Initialize style sheet extension class.
@@ -36,7 +35,7 @@ import com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin;
  * @since 7.3M1
  */
 @Component
-@Named(JsSkinExtensionPlugin.JSX_CLASS_NAME)
+@Named(CssSkinExtensionPlugin.SSX_CLASS_NAME)
 @Singleton
 public class StyleSheetExtensionDocumentInitializer extends AbstractSkinExtensionDocumentInitializer
 {

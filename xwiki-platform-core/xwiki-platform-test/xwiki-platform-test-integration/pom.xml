@@ -75,16 +75,9 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- REST. TODO: Find way to not have any dependency on platform modules since this prevents using this test
-         framework in those modules! -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>

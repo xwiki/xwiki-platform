@@ -25,9 +25,10 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Form;
-import org.restlet.engine.http.header.HeaderConstants;
+import org.restlet.data.Header;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.util.Series;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
@@ -80,18 +81,19 @@ public class XWikiAuthentication extends ChallengeAuthenticator
         XWiki xwiki = Utils.getXWiki(componentManager);
 
         /* By default set XWiki.Guest as the user that is sending the request. */
-        xwikiContext.setUser("XWiki.XWikiGuest");
+        xwikiContext.setUserReference(null);
 
         /*
          * After performing the authentication we should add headers to the response
          * to allow applications to verify if the authentication is still valid
          * We are also adding the XWiki version at the same moment.
          */
-        Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
-        Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
+        Series<Header> headers = (Series<Header>) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Series<Header> responseHeaders =
+            (Series<Header>) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (responseHeaders == null) {
-            responseHeaders = new Form();
-            response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+            responseHeaders = new Series<Header>(Header.class);
+            response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
         }
         responseHeaders.add("XWiki-User", xwikiContext.getUser());
         responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());

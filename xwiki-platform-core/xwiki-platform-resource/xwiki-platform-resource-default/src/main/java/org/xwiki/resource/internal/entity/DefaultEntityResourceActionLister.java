@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -100,7 +101,10 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
             }
             Element mappingElement = document.getRootElement().getChild("action-mappings");
             for (Element element : mappingElement.getChildren("action")) {
-                actionNames.add(element.getAttributeValue("name"));
+                // We extract the action name from the path mapping. Note that we cannot use the "name" attribute since
+                // it's not reliable (it's not unique) and for example the sanveandcontinue action uses "save" as its
+                // "name" element value.
+                actionNames.add(StringUtils.strip(element.getAttributeValue("path"), "/"));
             }
         }
 

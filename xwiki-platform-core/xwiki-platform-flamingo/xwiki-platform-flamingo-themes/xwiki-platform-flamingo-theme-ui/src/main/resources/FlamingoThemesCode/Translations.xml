@@ -93,7 +93,7 @@ platform.flamingo.themes.title.variables=Variables
 platform.flamingo.themes.title.preview=Preview
 platform.flamingo.themes.autorefresh=Auto refresh
 platform.flamingo.themes.refresh=Refresh
-platform.flamingo.themes.refreshwarning=The refresh can take several seconds and the preview might not be 100% accurate.
+platform.flamingo.themes.refreshwarning=The refresh can take several seconds.
 platform.flamingo.themes.loading=Loading...
 platform.flamingo.themes.category.logos=Logos
 platform.flamingo.themes.category.base-colors=Base colors
@@ -107,6 +107,20 @@ platform.flamingo.themes.category.breadcrumb=Breadcrumb
 platform.flamingo.themes.category.advanced=Advanced
 platform.flamingo.themes.defaultvalue=Default
 platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code that will be added into the skin.
+platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a more recent browser.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
 platform.flamingo.themes.lessCode.warning=Unfortunatly, this field is not taken into account in the live preview.
-platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a more recent browser.</content>
+
+#@deprecatedend</content>
 </xwikidoc>

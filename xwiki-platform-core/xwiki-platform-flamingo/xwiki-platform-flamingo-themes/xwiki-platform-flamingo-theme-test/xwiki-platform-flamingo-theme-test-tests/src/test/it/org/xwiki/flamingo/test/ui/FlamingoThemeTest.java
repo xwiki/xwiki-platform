@@ -122,6 +122,9 @@ public class FlamingoThemeTest extends AbstractTest
         // Again...
         editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");
+        // Test that the @lessCode variable is handled too!
+        editThemePage.selectVariableCategory("Advanced");
+        editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         // Refresh
         editThemePage.refreshPreview();
         // Verify that there is still no errors
@@ -129,6 +132,8 @@ public class FlamingoThemeTest extends AbstractTest
         // Verify that the modification have been made in the preview
         assertEquals("rgba(255, 0, 0, 1)", previewBox.getPageBackgroundColor());
         assertEquals("monospace", previewBox.getFontFamily());
+        // Test 'lessCode' is correctly handled (since 7.3M1)
+        assertEquals("rgba(0, 0, 255, 1)", previewBox.getTextColor());
     }
 
     /**
@@ -193,7 +198,7 @@ public class FlamingoThemeTest extends AbstractTest
         ViewThemePage themePage = themeApplicationWebHomePage.seeTheme("Test");
         themePage.waitUntilPreviewIsLoaded();
         ConfirmationPage confirmationPage = themePage.delete();
-        confirmationPage.clickYes();
+        confirmationPage.confirmDeletePage().waitUntilIsTerminated();
     }
 
 }

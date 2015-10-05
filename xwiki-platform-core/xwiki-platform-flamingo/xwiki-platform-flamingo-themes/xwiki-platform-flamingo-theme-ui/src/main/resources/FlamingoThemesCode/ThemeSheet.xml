@@ -410,12 +410,12 @@ require(['jquery'], function($) {
     
     // Function that waits the iframe has loaded LESS
     var waitUntilLessIsLoadedInIFrame = function(callback) {
-      if (iframe[0].contentWindow.less !== undefined) {
+      if (iframe[0].contentWindow.lessJs !== undefined) {
         callback();
       } else {
         setTimeout(function(){ waitUntilLessIsLoadedInIFrame(callback); }, 100 );
       }
-    }    
+    }
     
     // Refresh the preview
     var refreshPreview = function () {
@@ -441,7 +441,7 @@ require(['jquery'], function($) {
       // We run LESS in a callback in order to have the time to add the preview curtain in the dom
       setTimeout(function(){
         // Run LESS
-        iframe[0].contentWindow.less.modifyVars(varMap);
+        iframe[0].contentWindow.lessJs.modifyVars(varMap);
         removeCurtain();
       }, 10);
     };
@@ -479,8 +479,11 @@ require(['jquery'], function($) {
       link.rel = "stylesheet/less";
       link.type = "text/css";
       link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
+      // Add the LESS processor via a requireJs call.
       var script = document.createElement("script");
-      script.src = "$services.webjars.url('less', 'less.min.js')";
+      script.innerHTML  = "require.config({paths: { 'lessJs': '$services.webjars.url('less', 'less.min.js')' }});\n";
+      // Put it as a global variable of the iFrame so we can re-use it
+      script.innerHTML += "require(['lessJs'], function(lessJs) {window.lessJs=lessJs;});";
       iframeHead.appendChild(link);
       iframeHead.appendChild(script);
       waitUntilLessIsLoadedInIFrame(function(){

@@ -10,8 +10,8 @@
     ## Right menu
     #xwikitopmenurightstart()
       #displayDrawerActivator()
-      #displaySearch()
       #displayUserAvatar()
+      #displaySearch()
     #xwikitopmenurightend()
     
   ## End of Top Menu

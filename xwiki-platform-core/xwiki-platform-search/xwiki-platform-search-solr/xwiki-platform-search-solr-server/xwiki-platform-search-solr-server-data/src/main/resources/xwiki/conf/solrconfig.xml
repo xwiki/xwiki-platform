@@ -331,13 +331,6 @@
          this is enabled here, and controlled through log4j.properties.
       -->
      <infoStream>true</infoStream>
-    
-    <!--
-        Use true to enable this safety check, which can help
-        reduce the risk of propagating index corruption from older segments 
-        into new ones, at the expense of slower merging.
-    -->
-     <checkIntegrityAtMerge>false</checkIntegrityAtMerge>
   </indexConfig>
 
 
@@ -1258,13 +1251,6 @@
                   class="solr.DocumentAnalysisRequestHandler" 
                   startup="lazy" />
 
-  <!-- Admin Handlers
-
-       Admin Handlers - This will register all the standard admin
-       RequestHandlers.  
-    -->
-  <requestHandler name="/admin/" 
-                  class="solr.admin.AdminHandlers" />
   <!-- This single handler is equivalent to the following... -->
   <!--
      <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />

@@ -89,6 +89,11 @@
           <artifactId>jaxb-impl</artifactId>
           <groupId>com.sun.xml.bind</groupId>
         </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>stax</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

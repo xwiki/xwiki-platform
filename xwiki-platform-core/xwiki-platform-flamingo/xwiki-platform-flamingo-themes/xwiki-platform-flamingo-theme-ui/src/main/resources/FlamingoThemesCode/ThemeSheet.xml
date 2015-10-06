@@ -233,7 +233,13 @@
     #foreach($var in $catVar.keySet())
       #set($varName = $var)
       #set($varType = $catVar.get($varName))
-      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($doc.getValue($varName, $obj))" class="type-${varType}"/&gt;
+      #if ($varType == 'textarea')
+        &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="type-${varType}"&gt;
+          $!escapetool.xml($doc.getValue($varName, $obj))
+        &lt;/textarea&gt;
+      #else
+        &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($doc.getValue($varName, $obj))" class="type-${varType}"/&gt;
+      #end
     #end
   #end
   &lt;/div&gt;

@@ -447,11 +447,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // It is handled by our LessCodePlugin.
       iframe[0].contentWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
       
-      // We run LESS in a callback in order to have the time to add the preview curtain in the dom
+      // We run LESS in a thread in order to not block the main thread
       setTimeout(function(){
-        // Run LESS
-        iframe[0].contentWindow.lessJs.modifyVars(varMap);
-        removeCurtain();
+        // Run LESS (which use promises)
+        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain).catch(removeCurtain);
       }, 10);
     };
     
@@ -528,7 +527,8 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         removeCurtain();
         // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
         // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
-        refreshPreview();
+        // We refresh it in a thread to avoid blocking the browser.
+        setTimeout(refreshPreview, 1);
       });
     };
     
@@ -538,7 +538,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     // we re-init the iframe to use LESS
     iframe.load(initIframe);
     // Initialize the event handlers
-    $("#refresh").click(refreshPreview);
+    $("#refresh").click( function() { 
+      // We refresh it in a thread to avoid blocking the browser.
+      setTimeout(refreshPreview, 1);
+    });
     for (var i=0; i&lt;variableInputs.length; ++i) {
       var variableInput = variableInputs[i];
       $(variableInput).on("change", function(){onChange(variableInput);});

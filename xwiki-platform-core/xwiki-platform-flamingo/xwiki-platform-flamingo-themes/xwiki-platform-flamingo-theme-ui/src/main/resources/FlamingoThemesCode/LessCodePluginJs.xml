@@ -139,8 +139,14 @@ define(function() {
   // The 'process' function is required for every LESS Plugin.
   // It is called at each LESS computation.
   LessCodePlugin.process = function (str, options) {
-    // We append the content to add to the 'str' variable holding the LESS code to render.
-    return str + '\n' + this.contentToAdd;
+    // If the current processed file is the main one
+    if (options.fileInfo.filename == options.fileInfo.rootFilename) {
+      // We append the content to add to the 'str' variable holding the LESS code to render.
+      return str + '\n' + this.contentToAdd;
+    }
+    // Otherwise, we just return the less file as it is
+    // (the code to add is not supposed to be appended to imported files).
+    return str;
   };
   
   return LessCodePlugin;

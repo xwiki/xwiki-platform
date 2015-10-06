@@ -533,7 +533,8 @@ diff$id.hashCode()##
 #macro (diffVersion $version)
 #if ($version.id && $version.version)
 ## Seems to be an extension id.
-$services.extension.local.repository.resolve($version).name ${version.version}##
+#set ($extension = $services.extension.local.repository.resolve($version))
+#if ($extension)$extension.name#else$version.id#end ${version.version}##
 #else
 $!version##
 #end

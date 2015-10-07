@@ -21,23 +21,31 @@ require(['jquery', 'bootstrap'], function($) {
       });
     });
     
-    // Show/hide the global search
+    // Some variables used in the next 2 functions
     var globalSearch = $('#globalsearch');
-    globalSearch.hide();
-    globalSearch.removeClass('hidden');
-    $('#globalsearch-trigger').click(function(event) {
-      var icon = $(this).find('span');
-      if (icon.hasClass('glyphicon-search')) {
-        icon.removeClass('glyphicon-search');
-        icon.addClass('glyphicon-remove');
-        globalSearch.fadeIn();
-      } else {
-        icon.removeClass('glyphicon-remove');
-        icon.addClass('glyphicon-search');
-        globalSearch.fadeOut();
+    var globalSearchInput = globalSearch.find('input');
+    var globalSearchButton = globalSearch.find('button');
+    
+    // Open the global search when the user click on the global search button
+    globalSearchButton.click(function(event) {
+      if (!globalSearch.hasClass('globalsearch-close') && globalSearchInput.val().length > 0) {
+        return true;
       }
-      
+      globalSearch.removeClass('globalsearch-close');
+      globalSearchInput.focus();
       return false;
+    });
+    
+    // Close the global search when the focus is lost
+    globalSearchInput.focusout(function() {
+      // In order to let the main thread setting the focus to the new element, we execute the following code
+      // in a callback.
+      setTimeout( function () {
+        // We close the global search only if the focus is on the search inpur or the search button
+        if (document.activeElement !== globalSearchButton[0] && document.activeElement !== globalSearchInput[0]) {
+          globalSearch.addClass('globalsearch-close');
+        }
+      }, 1);
     });
     
     // When the drawer is close, collapse sub items

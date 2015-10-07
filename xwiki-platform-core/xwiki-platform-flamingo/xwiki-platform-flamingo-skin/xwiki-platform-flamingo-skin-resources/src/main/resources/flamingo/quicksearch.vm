@@ -2,13 +2,10 @@
 ##       QUICK SEARCH
 ################################
 #if ($displayQuickSearch && ($xwiki.exists('Main.Search') || $xwiki.exists('Main.WebSearch')))
-  <li class="icon-navbar">
-    <a href="#globalsearch" id="globalsearch-trigger"><span class="glyphicon glyphicon-search"></span><span class="sr-only">$services.localization.render('core.menu.toggleSearch')</span></a>
-  </li>
   <li>
-    <form class="navbar-form globalsearch form-inline hidden" id="globalsearch" role="search" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end">
+    <form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" role="search" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end">
       <input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" />
-      <button type="submit" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-search"></span></button>
+      <button type="submit" class="btn"><span class="glyphicon glyphicon-search"></span></button>
     </form>
   </li>
 #end

@@ -40,27 +40,53 @@
   }
 }
 
-.globalsearch {
-  @media (min-width: @screen-sm-min) {
-    .input-group {
-      width: 15em;
-    }
-    
-    .btn {
-      margin-bottom: 0;
-    }
-  }
+#globalsearch {
 
+  // Remove the bootstrap border on the form when the screen is small
+  @media (max-width: @screen-sm-max) {
+    border: none;
+  }
+ 
   .btn {
-    border: 1px solid lighten(@btn-primary-bg, 10%);
+    // When the global search is active, the button has an "hover"-kind color
+    background-color: @navbar-default-link-hover-bg;
+    border: 1px solid @navbar-default-link-hover-bg;
     box-shadow: none;
-    height: @input-height-base;
-    margin-left: -@navbar-padding-horizontal;
-    margin-top: 0;
+    color: @navbar-default-link-color;
     &:hover,
     &:focus {
-      border: 1px solid lighten(@btn-primary-bg, 10%);
+      background-color: @navbar-default-link-hover-bg;
       box-shadow: none;
+    }
+  }
+  
+  // The global search input
+  #headerglobalsearchinput { // we need to be that specific to be applied
+    border-radius: 0;
+    min-width: 0;
+    border: 0;
+    transition: width 0.3s, padding 0.3s;
+    width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
+  }
+  
+  // When the global search is close
+  &.globalsearch-close {
+    // The button is transparent
+    .btn {
+      background-color: transparent;
+      border: 1px solid transparent;
+      // Except when it is hovering!
+      &:hover,
+      &:focus {
+        background-color: @navbar-default-link-hover-bg;
+        box-shadow: none;
+      }
+    }
+    
+    // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
+    #headerglobalsearchinput { // we need to be that specific to be applied
+      padding: 0;
+      width: 0;
     }
   }
 }

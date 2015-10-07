@@ -41,6 +41,7 @@ import org.xwiki.extension.internal.maven.MavenUtils;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionIssueManagement;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionRating;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionScm;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionScmConnection;
@@ -82,11 +83,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
     XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
 
-    public static final String[] EPROPERTIES_EXTRA = new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
-    XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
-    XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
-    XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, XWikiRepositoryModel.PROP_EXTENSION_SCMURL,
-    XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION };
+    public static final String[] EPROPERTIES_EXTRA =
+        new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION,
+        XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS,
+        XWikiRepositoryModel.PROP_EXTENSION_FEATURES, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME,
+        XWikiRepositoryModel.PROP_EXTENSION_SCMURL, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION,
+        XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION,
+        XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
+        XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL };
 
     protected static final String DEFAULT_BOOST;
 
@@ -374,6 +378,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION)));
         extension.setScm(scm);
 
+        // Issue Management
+        ExtensionIssueManagement issueManagement = new ExtensionIssueManagement();
+        issueManagement.setSystem((String) getValue(extensionObject,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM));
+        issueManagement.setUrl((String) getValue(extensionObject,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL));
+        if (StringUtils.isNotEmpty(issueManagement.getSystem()) || StringUtils.isNotEmpty(issueManagement.getUrl())) {
+            extension.setIssueManagement(issueManagement);
+        }
+
         // Authors
         List<String> authors = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS);
         if (authors != null) {
@@ -532,6 +546,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION)));
         extension.setScm(scm);
 
+        // Issue Management
+        ExtensionIssueManagement issueManagement = new ExtensionIssueManagement();
+        issueManagement.setSystem(this.<String>getQueryValue(entry,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM));
+        issueManagement.setUrl(this.<String>getQueryValue(entry,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL));
+        if (StringUtils.isNotEmpty(issueManagement.getSystem()) || StringUtils.isNotEmpty(issueManagement.getUrl())) {
+            extension.setIssueManagement(issueManagement);
+        }
+
         // Rating
         DocumentReference extensionDocumentReference =
             new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
@@ -593,6 +617,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION, true)));
         if (scm.getUrl() != null || scm.getConnection() != null || scm.getDeveloperConnection() != null) {
             extension.setScm(scm);
+        }
+
+        // Issue Management
+        ExtensionIssueManagement issueManagement = new ExtensionIssueManagement();
+        issueManagement.setSystem(this.<String>getSolrValue(document,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, true));
+        issueManagement.setUrl(this.<String>getSolrValue(document,
+            XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL, true));
+        if (issueManagement.getSystem() != null || issueManagement.getUrl() != null) {
+            extension.setIssueManagement(issueManagement);
         }
 
         // Rating

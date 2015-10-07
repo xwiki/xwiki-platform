@@ -53,6 +53,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionIssueManagement;
 import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
@@ -779,6 +780,21 @@ public class RepositoryManager implements Initializable, Disposable
                 needSave |=
                     update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION, scm
                         .getDeveloperConnection().toString());
+            }
+        }
+
+        // Issue Management
+        ExtensionIssueManagement issueManagement = extension.getIssueManagement();
+        if (issueManagement != null) {
+            if (issueManagement.getSystem() != null) {
+                needSave |=
+                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
+                        issueManagement.getSystem());
+            }
+            if (issueManagement.getURL() != null) {
+                needSave |=
+                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_URL,
+                        issueManagement.getURL());
             }
         }
 

@@ -41,7 +41,9 @@ require(['jquery', 'bootstrap'], function($) {
       // In order to let the main thread setting the focus to the new element, we execute the following code
       // in a callback.
       setTimeout( function () {
-        // We close the global search only if the focus is on the search inpur or the search button
+        // We close the global search only if the focus is not on the search input or the search button.
+        // Without this, the global search would be close each time the user click on the button (even when it's for
+        // actually performing the search).
         if (document.activeElement !== globalSearchButton[0] && document.activeElement !== globalSearchInput[0]) {
           globalSearch.addClass('globalsearch-close');
         }

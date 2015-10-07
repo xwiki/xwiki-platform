@@ -944,12 +944,18 @@ public class RepositoryManager implements Initializable, Disposable
                             document.removeXObject(dependencyObject);
                             needSave = true;
                         } else {
-                            String id = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID);
-                            String constraint =
+                            String xobjectId = getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_ID);
+                            String xobjectConstraint =
                                 getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT);
+                            List<String> xobjectRepositories =
+                                (List<String>) getValue(dependencyObject,
+                                    XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
 
-                            ExtensionDependency xobjectDependency =
-                                new DefaultExtensionDependency(id, new DefaultVersionConstraint(constraint));
+                            DefaultExtensionDependency xobjectDependency =
+                                new DefaultExtensionDependency(xobjectId, new DefaultVersionConstraint(
+                                    xobjectConstraint));
+                            xobjectDependency.setRepositories(XWikiRepositoryModel
+                                .toRepositoryDescriptors(xobjectRepositories));
 
                             ExtensionDependency dependency = dependencies.get(dependencyIndex);
 
@@ -981,6 +987,8 @@ public class RepositoryManager implements Initializable, Disposable
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(), xcontext);
                 dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT, dependency.getVersionConstraint()
                     .getValue(), xcontext);
+                dependencyObject.set(XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES,
+                    XWikiRepositoryModel.toStringList(dependency.getRepositories()), xcontext);
 
                 needSave = true;
             }
@@ -1010,6 +1018,10 @@ public class RepositoryManager implements Initializable, Disposable
 
         // Id
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_ID, extension.getId().getId());
+
+        // Repositories
+        List<String> repositories = XWikiRepositoryModel.toStringList(extension.getRepositories());
+        needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_REPOSITORIES, repositories);
 
         // Update dependencies
         needSave |= updateExtensionVersionDependencies(document, extension);

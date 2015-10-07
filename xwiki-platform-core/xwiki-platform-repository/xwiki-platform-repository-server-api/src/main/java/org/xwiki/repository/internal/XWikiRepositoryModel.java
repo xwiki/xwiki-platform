@@ -19,11 +19,23 @@
  */
 package org.xwiki.repository.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.rating.RatingExtension;
+import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
+import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
@@ -92,8 +104,14 @@ public class XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_SCMDEVCONNECTION = "scmdevconnection";
 
+    /**
+     * @since 7.3M1
+     */
     public static final String PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM = "issueManagementSystem";
 
+    /**
+     * @since 7.3M1
+     */
     public static final String PROP_EXTENSION_ISSUEMANAGEMENT_URL = "issueManagementURL";
 
     public static final String PROP_EXTENSION_PROPERTIES = "properties";
@@ -104,11 +122,21 @@ public class XWikiRepositoryModel
 
     public static final String PROP_VERSION_DOWNLOAD = "download";
 
+    /**
+     * @since 7.3M1
+     */
+    public static final String PROP_VERSION_REPOSITORIES = "repositories";
+
     public static final String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
 
     public static final String PROP_DEPENDENCY_ID = "id";
 
     public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+
+    /**
+     * @since 7.3M1
+     */
+    public static final String PROP_DEPENDENCY_REPOSITORIES = PROP_VERSION_REPOSITORIES;
 
     public static final String PROP_PROXY_REPOSITORYID = "repositoryId";
 
@@ -208,19 +236,25 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL, new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, new ExtensionSolrField(
+            PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL, new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
+            null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
+        SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
 
         // Rating
         SOLR_FIELDS.put(RatingExtension.FIELD_TOTAL_VOTES, new RatingSolrField(PROP_RATING_TOTALVOTES, "int", null));
         SOLR_FIELDS.put("votes", SOLR_FIELDS.get(PROP_RATING_TOTALVOTES));
-        SOLR_FIELDS.put(RatingExtension.FIELD_AVERAGE_VOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
+        SOLR_FIELDS
+            .put(RatingExtension.FIELD_AVERAGE_VOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
 
         // Fields not stored
         // Extension.FIELD_REPOSITORY
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRepositoryModel.class);
 
     public static String toExtensionClassSolrPropertyName(String propertyName)
     {
@@ -251,5 +285,70 @@ public class XWikiRepositoryModel
         }
 
         return field.name;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static List<ExtensionRepositoryDescriptor> toRepositoryDescriptors(Collection<String> stringRepositories)
+    {
+        if (stringRepositories == null) {
+            return Collections.emptyList();
+        }
+
+        List<ExtensionRepositoryDescriptor> reposiories = new ArrayList<>(stringRepositories.size());
+
+        for (String stringRepository : stringRepositories) {
+            try {
+                reposiories.add(toRepositoryDescriptor(stringRepository));
+            } catch (URISyntaxException e) {
+                LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return reposiories;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository) throws URISyntaxException
+    {
+        int index;
+
+        // Id
+        String id = repository.substring(0, index = repository.indexOf(':'));
+
+        // Type
+        String type = repository.substring(index + 1, index = repository.indexOf(':', index + 1));
+
+        // URI
+        URI uri = new URI(repository.substring(index + 1, repository.length()));
+
+        return new DefaultExtensionRepositoryDescriptor(id, type, uri);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static List<String> toStringList(Collection<ExtensionRepositoryDescriptor> repositories)
+    {
+        List<String> stringRepositories = new ArrayList<>(repositories.size());
+
+        for (ExtensionRepositoryDescriptor repository : repositories) {
+            stringRepositories.add(toString(repository));
+        }
+
+        return stringRepositories;
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public static String toString(ExtensionRepositoryDescriptor repository)
+    {
+        return repository != null ? StringUtils.defaultString(repository.getId()) + ':' + repository.getType() + ':'
+            + repository.getURI().toString() : null;
     }
 }

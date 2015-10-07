@@ -71,8 +71,17 @@ public class XWikiResource implements XWikiRestComponent, Initializable
 
     /**
      * The logger to be used to output log messages.
+     * @deprecated since 7.3M1, use {@link #slf4Jlogger} instead
      */
+    @Deprecated
     protected Logger logger;
+
+    /**
+     * The logger to be used to output log messages.
+     * 
+     * @since 7.3M1
+     */
+    protected org.slf4j.Logger slf4Jlogger;
 
     /**
      * The object factory for model objects to be used when creating representations.

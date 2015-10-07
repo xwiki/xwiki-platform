@@ -80,7 +80,6 @@ public class RepositoryTestUtils
             extensionObject.getProperties().add(
                 property(XWikiRepositoryModel.PROP_EXTENSION_SCMURL, extension.getScm().getUrl()));
         }
-
         return extensionObject;
     }
 
@@ -89,14 +88,15 @@ public class RepositoryTestUtils
      */
     public static org.xwiki.rest.model.jaxb.Object extensionVersionObject(Extension extension)
     {
-        return extensionVersionObject(extension, extension.getId().getVersion(), null);
+        return extensionVersionObject(extension.getId().getVersion(), null,
+            XWikiRepositoryModel.toStringList(extension.getRepositories()));
     }
 
     /**
      * @since 7.3M1
      */
-    public static org.xwiki.rest.model.jaxb.Object extensionVersionObject(Extension extension, Object version,
-        Object download)
+    public static org.xwiki.rest.model.jaxb.Object extensionVersionObject(Object version, Object download,
+        Object repositories)
     {
         org.xwiki.rest.model.jaxb.Object versionObject = object(XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
 
@@ -105,6 +105,9 @@ public class RepositoryTestUtils
         }
         if (download != null) {
             versionObject.getProperties().add(property(XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download));
+        }
+        if (repositories != null) {
+            versionObject.getProperties().add(property(XWikiRepositoryModel.PROP_VERSION_REPOSITORIES, repositories));
         }
 
         return versionObject;
@@ -119,7 +122,8 @@ public class RepositoryTestUtils
 
         int number = 0;
         for (ExtensionDependency dependency : extension.getDependencies()) {
-            org.xwiki.rest.model.jaxb.Object dependencyObject = extensionDependencyObject(extension.getId().getVersion(), dependency);
+            org.xwiki.rest.model.jaxb.Object dependencyObject =
+                extensionDependencyObject(extension.getId().getVersion(), dependency);
             dependencyObject.setNumber(number++);
 
             dependencies.add(dependencyObject);

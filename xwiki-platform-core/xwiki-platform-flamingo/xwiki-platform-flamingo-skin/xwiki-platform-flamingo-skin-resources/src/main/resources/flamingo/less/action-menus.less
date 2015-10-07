@@ -43,6 +43,7 @@
 #globalsearch {
 
   margin: 0;
+  padding: 0;
 
   // Remove the bootstrap border on the form when the screen is small
   @media (max-width: @screen-sm-max) {
@@ -55,9 +56,11 @@
     border: 1px solid @navbar-default-link-hover-bg;
     box-shadow: none;
     color: @navbar-default-link-color;
-    height: @navbar-height;
     margin: 0;
     padding: 10px @navbar-padding-horizontal;
+    @media (min-width: @grid-float-breakpoint) {
+      padding: @navbar-padding-vertical @navbar-padding-horizontal;
+    }
     &:hover,
     &:focus {
       background-color: @navbar-default-link-hover-bg;

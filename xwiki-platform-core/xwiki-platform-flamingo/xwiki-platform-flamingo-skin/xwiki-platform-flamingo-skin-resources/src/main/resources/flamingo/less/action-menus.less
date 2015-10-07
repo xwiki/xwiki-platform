@@ -42,6 +42,8 @@
 
 #globalsearch {
 
+  margin: 0;
+
   // Remove the bootstrap border on the form when the screen is small
   @media (max-width: @screen-sm-max) {
     border: none;
@@ -53,6 +55,9 @@
     border: 1px solid @navbar-default-link-hover-bg;
     box-shadow: none;
     color: @navbar-default-link-color;
+    height: @navbar-height;
+    margin: 0;
+    padding: 10px @navbar-padding-horizontal;
     &:hover,
     &:focus {
       background-color: @navbar-default-link-hover-bg;
@@ -63,8 +68,8 @@
   // The global search input
   #headerglobalsearchinput { // we need to be that specific to be applied
     border-radius: 0;
-    min-width: 0;
     border: 0;
+    min-width: 0;
     transition: width 0.3s, padding 0.3s;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }

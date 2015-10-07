@@ -389,7 +389,7 @@ Object.extend(XWiki.constants, {
   addMetaTag('space',      'space');
   addMetaTag('page',       'page');
   addMetaTag('version',    'version');
-  addMetaTag('restURL',    'resturl');
+  addMetaTag('restURL',    'rest-url');
   addMetaTag('form_token', 'form-token');
 
   // Add the language

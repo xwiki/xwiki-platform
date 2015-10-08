@@ -1556,7 +1556,8 @@ public class TestUtils
             cleanPrefix = "";
         }
 
-        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
+        UriBuilder builder =
+            UriBuilder.fromUri(URI.create(cleanPrefix)).path(path.startsWith("/") ? path.substring(1) : path);
 
         if (queryParams != null) {
             for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
@@ -2137,7 +2138,7 @@ public class TestUtils
             } else {
                 String stringResourceUri = (String) resourceUri;
                 builder =
-                    UriBuilder.fromUri(getBaseURL().substring(0, getBaseURL().length() - 1)).path(
+                    UriBuilder.fromUri(URI.create(getBaseURL().substring(0, getBaseURL().length() - 1))).path(
                         !stringResourceUri.isEmpty() && stringResourceUri.charAt(0) == '/' ? stringResourceUri
                             .substring(1) : stringResourceUri);
             }
@@ -2154,7 +2155,9 @@ public class TestUtils
 
         protected UriBuilder getUriBuilder(Class<?> resource)
         {
-            return UriBuilder.fromUri(getBaseURL()).path(resource);
+            // FIXME: Can't use UriBuilder#fromUri(String)
+            // because of https://github.com/restlet/restlet-framework-java/issues/1158
+            return UriBuilder.fromUri(URI.create(getBaseURL())).path(resource);
         }
 
         public byte[] getBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)

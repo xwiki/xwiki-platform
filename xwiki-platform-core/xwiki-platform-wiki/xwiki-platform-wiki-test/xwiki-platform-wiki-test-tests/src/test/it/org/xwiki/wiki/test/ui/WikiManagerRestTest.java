@@ -20,6 +20,7 @@
 package org.xwiki.wiki.test.ui;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
@@ -227,7 +228,7 @@ public class WikiManagerRestTest
 
     protected UriBuilder getUriBuilder(Class<?> resource)
     {
-        return UriBuilder.fromUri(getBaseURL()).path(resource);
+        return UriBuilder.fromUri(URI.create(getBaseURL())).path(resource);
     }
 
     protected String getFullUri(Class<?> resourceClass)

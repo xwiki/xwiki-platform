@@ -29,6 +29,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
@@ -57,10 +59,30 @@ public class CurrentGetDocumentReferenceDocumentReferenceResolver implements Doc
     @Inject
     private DocumentReferenceResolver<EntityReference> defaultResolver;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public DocumentReference resolve(EntityReference initialReference, Object... parameters)
     {
         if (initialReference.getType().ordinal() < EntityType.DOCUMENT.ordinal()) {
+            if (EntityType.WIKI.equals(initialReference.getType())) {
+                // Use whatever document reference that is configured as wiki homepage.
+                String wikiId = initialReference.getName();
+                try {
+                    WikiDescriptor wikiDescriptor = wikiDescriptorManager.getById(wikiId);
+                    if (wikiDescriptor != null) {
+                        DocumentReference wikiHomepageReference = wikiDescriptor.getMainPageReference();
+                        return wikiHomepageReference;
+                    }
+                } catch (Exception e) {
+                    // It would not be safe to do any assumptions a this level since we risk affecting the wrong
+                    // document.
+                    throw new RuntimeException(String.format(
+                        "Failed to get wiki descriptor while resolving reference [%s]", initialReference), e);
+                }
+            }
+
             // Get the complete initial reference
             EntityReference currentParentReference =
                 this.currentResolver.resolve(initialReference, initialReference.getType(), parameters);

@@ -79,7 +79,6 @@ import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
-import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -722,14 +721,9 @@ public class InternalTemplateManager
             }
         }
 
-        VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-
-        velocityEngine.startedUsingMacroNamespace(namespace);
         try {
-            velocityEngine.evaluate(velocityContext, writer, namespace, content.content);
+            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, namespace, content.content);
         } finally {
-            velocityEngine.stoppedUsingMacroNamespace(namespace);
-
             // Get rid of temporary rendering context
             if (renderingContextPushed) {
                 ((MutableRenderingContext) this.renderingContext).pop();

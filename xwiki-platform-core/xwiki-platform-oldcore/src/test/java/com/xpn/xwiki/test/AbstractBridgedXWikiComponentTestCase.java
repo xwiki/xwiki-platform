@@ -32,6 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
@@ -57,6 +58,8 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
     protected File temporaryDirectory;
 
+    protected Mock mockWikiDescriptorManager;
+
     @Override
     protected void setUp() throws Exception
     {
@@ -65,7 +68,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Statically store the component manager in {@link Utils} to be able to access it without
         // the context.
         Utils.setComponentManager(getComponentManager());
-        
+
         this.context = new XWikiContext();
 
         this.context.setWikiId("xwiki");
@@ -113,6 +116,26 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockWikiDescriptorManager.stubs().method("getCurrentWikiId")
+            .will(new CustomStub("Implements WikiDescriptorManager.getCurrentWikiId")
+            {
+                @Override
+                public String invoke(Invocation invocation) throws Throwable
+                {
+                    return getContext().getWikiId();
+                }
+            });
+        this.mockWikiDescriptorManager.stubs().method("getMainWikiId")
+            .will(new CustomStub("Implements WikiDescriptorManager.getMainWikiId")
+            {
+                @Override
+                public String invoke(Invocation invocation) throws Throwable
+                {
+                    return getContext().getMainXWiki();
+                }
+            });
     }
 
     @Override

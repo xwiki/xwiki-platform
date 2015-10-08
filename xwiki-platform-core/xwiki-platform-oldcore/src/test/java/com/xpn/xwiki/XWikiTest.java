@@ -48,6 +48,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -187,9 +188,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setAuthor("Albatross");
 
         this.xwiki.saveDocument(this.document, getContext());
-
-        Mock mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
-        mockWikiDescriptorManager.stubs().method("getMainWikiId").will(returnValue("xwiki"));
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
@@ -532,11 +530,17 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    return (XWikiDocument) invocation.parameterValues.get(0);
+                    return invocation.parameterValues.get(0);
                 }
             });
 
         DocumentReference documentReference = new DocumentReference("wiki", "Main", "WebHome");
+
+        WikiDescriptor mockWikiDescriptor = new WikiDescriptor("wiki", "wiki");
+        mockWikiDescriptor.setMainPageReference(documentReference);
+
+        this.mockWikiDescriptorManager.stubs().method("getById").with(same("wiki"))
+            .will(returnValue(mockWikiDescriptor));
 
         assertEquals(documentReference, this.xwiki.getDocument(new WikiReference("wiki"), getContext())
             .getDocumentReference());

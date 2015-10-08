@@ -111,10 +111,10 @@ public class DownloadAction extends XWikiAction
             // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
             // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
             //
-            // Thus in order to preseve backward compatibility for existing plugins that have custom URL formats
-            // extending the Download URL format, we reparse the URL by considering that it doesn't contain any Nested
-            // Space. This also means that those plugins will need to completely reparse the URL if they wish to support
-            // Nested Spaces.
+            // Thus in order to preserve backward compatibility for existing plugins that have custom URL formats
+            // extending the Download URL format, we parse again the URL by considering that it doesn't contain any
+            // Nested Space. This also means that those plugins will need to completely reparse the URL if they wish to
+            // support Nested Spaces.
             //
             // Also note that this code below is not compatible with the notion of having several URL schemes. The real
             // fix will be to not allow plugins to support custom URL formats and instead to have them register new

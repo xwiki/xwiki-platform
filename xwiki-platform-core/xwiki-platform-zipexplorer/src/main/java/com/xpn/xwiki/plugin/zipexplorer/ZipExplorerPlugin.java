@@ -108,9 +108,14 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     {
         String url = context.getRequest().getRequestURI();
 
-        // Verify if we should return the original attachment. This will happen if the requested
-        // download URL doesn't point to a zip or if the URL doesn't point to a file inside the ZIP.
-        if (!isValidZipURL(url, context.getAction().trim())) {
+        // Verify if we should return the original attachment. We do so when:
+        // * the requested URL doesn't point to a zip file
+        // * or the request URL doesn't point to a file inside a zip file
+        // * or if the passed attachment points to a Nested Space. This is because currently the Zip Explorer plugin
+        //   doesn't support Nested Spaces (See http://jira.xwiki.org/browse/XWIKI-12448).
+        if (attachment.getReference().getDocumentReference().getSpaceReferences().size() > 1
+            || !isValidZipURL(url, context.getAction().trim()))
+        {
             return attachment;
         }
 
@@ -260,7 +265,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      * @return the relative file location of a file in the ZIP file pointed to by the passed URL. The ZIP URL must be of
      *         the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example above this
      *         method would return <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL
-     *         passed.
+     *         passed doesn't point inside a zip file.
      * @todo There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL manipulation. Once
      *       this exists remove this code. See http://jira.xwiki.org/jira/browse/XWIKI-437
      */

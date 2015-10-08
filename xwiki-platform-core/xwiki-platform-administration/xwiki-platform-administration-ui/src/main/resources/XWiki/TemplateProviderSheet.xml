@@ -37,90 +37,123 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
+##
+## Variables
+##
+#set ($discard     = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
 #set ($providerObj = $doc.getObject('XWiki.TemplateProviderClass'))
-#if ($editor == 'inline')
-  ; {{translation key="xe.templateprovider.name"/}}
-  : {{html}}&lt;input type="text" value="$!{doc.getTitle()}" name="title" /&gt;{{/html}}
-#end
-; {{translation key="xe.templateprovider.templatename"/}}
-#if ($editor == 'inline')
+#set ($isEditing   = $xcontext.action == 'edit')
 
-  {{translation key="xe.templateprovider.templatename.info"/}}
-  : $doc.display('name')
-#else
-  #set($providerName = $providerObj.getProperty('name').value)
-  : $services.localization.render($providerName)
-#end
-; {{translation key="xe.templateprovider.template"/}}
-#if ($editor == 'inline')
-  : $doc.display('template')
-#else
-  #set($templateDocName = $providerObj.getProperty('template').value)
-  : [[$templateDocName&gt;&gt;$templateDocName]]
-#end
-; {{translation key="xe.templateprovider.templatetype"/}}
-#if ($editor == 'inline')
+##
+## Display the sheet.
+##
+## We set wiki="true" because we use $providerObj.get() which returns some text in the wiki syntax.
+##
+{{html wiki="true"}}
+&lt;div class="xform row"&gt;
+  ##
+  ## Left side
+  ##
+  &lt;div class="col-xs-12 col-md-6"&gt;
+    &lt;dl&gt;
+      ##
+      ## Title
+      ##
+      #if ($isEditing)
+        &lt;dt&gt;
+          &lt;label for="title"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.name'))&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;input type="text" value="$!{escapetool.xml($doc.title)}" name="title" id="title" /&gt;
+        &lt;/dd&gt;
+      #end
+      ##
+      ## Name
+      ##
+      &lt;dt&gt;
+        &lt;label for="XWiki.TemplateProviderClass_0_name"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename'))&lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename.info'))&lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if ($isEditing)
+          $providerObj.get('name')
+        #else
+          &lt;p&gt;$escapetool.xml($services.localization.render($doc.getValue('name', $providerObj)))&lt;/p&gt;
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Template
+      ##
+      &lt;dt&gt;
+        &lt;label for="XWiki.TemplateProviderClass_0_template"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.template'))&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if ($isEditing)
+          $providerObj.get('template')
+        #else
+          #set($templateDocName = $doc.getValue('template', $providerObj))
+          &lt;p&gt;&lt;a href="$xwiki.getURL($templateDocName)"&gt;$escapetool.xml($templateDocName)&lt;/a&gt;&lt;/p&gt;
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Type
+      ##
+      &lt;dt&gt;
+        &lt;label for="XWiki.TemplateProviderClass_0_type"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatetype'))&lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatetype.info'))&lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        $doc.display('type')
+      &lt;/dd&gt;
+      ##
+      ## Action
+      ##
+      &lt;dt&gt;
+        &lt;label for="XWiki.TemplateProviderClass_0_action"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action'))&lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action.info'))&lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        $doc.display('action')
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+  ##
+  ## Right side: enabled spaces
+  ##
+  &lt;div class="col-xs-12 col-md-6" id="enabled-spaces"&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label&gt;$escapetool.xml($services.localization.render('xe.templateprovider.spaces'))&lt;/label&gt;
+        #if ($isEditing)
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.spaces.info'))&lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        $doc.display('spaces')
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
 
-  {{translation key="xe.templateprovider.templatetype.info"/}}
+##
+## Go back to the administration
+##
+#if (!$isEditing)
+  (% class="buttonwrapper" %)
+  [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getDocument($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences')).getURL('admin', 'section=Templates')]]
 #end
-: $doc.display('type')
-(% id="enabled-spaces" %)(((
-; {{translation key="xe.templateprovider.spaces"/}}
-#if ($editor == 'inline')
-
-  {{translation key="xe.templateprovider.spaces.info"/}}
-#end
-: $doc.display('spaces')
-)))
-; {{translation key="xe.templateprovider.action"/}}
-
-#if ($editor == 'inline')
-  {{translation key="xe.templateprovider.action.info"/}}
-#end
-: $doc.display('action')
-
-
-#if ($xcontext.action == 'view')
-
-  {{html wiki="true"}}
-    &lt;span class="buttonwrapper"&gt;
-      [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;$xwiki.getDocument('XWiki', 'XWikiPreferences').getExternalURL('admin', 'section=Templates')]]
-    &lt;/span&gt;
-  {{/html}}
-#end
-{{/velocity}}</content>
-  <object>
-    <name>XWiki.TemplateProviderSheet</name>
-    <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>365d54ff-373c-48ca-bafb-9c82109f31ed</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
+{{/velocity}}
+</content>
   <object>
     <name>XWiki.TemplateProviderSheet</name>
     <number>0</number>

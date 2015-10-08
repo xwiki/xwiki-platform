@@ -113,10 +113,17 @@ dl.diff-group > dd > dl {
   color: #D0B44C;
 }
 
-.diff-item-hint {
+.diff-item-locale, .diff-item-hint {
   color: $theme.textSecondaryColor;
-  display: block;
   font-size: 65%;
+}
+
+.diff-item-locale {
+  vertical-align: middle;
+}
+
+.diff-item-hint {
+  display: block;
   margin-top: .3em;
 }
 

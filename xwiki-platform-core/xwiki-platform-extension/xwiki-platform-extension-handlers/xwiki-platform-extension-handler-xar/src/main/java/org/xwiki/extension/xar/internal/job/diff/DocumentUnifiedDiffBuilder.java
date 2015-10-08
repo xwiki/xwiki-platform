@@ -93,10 +93,13 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
     {
         if (document == null) {
             return null;
-        } else if (document.getDocumentReference() instanceof DocumentVersionReference) {
-            return (DocumentVersionReference) document.getDocumentReference();
         } else {
-            return new DocumentVersionReference(document.getDocumentReference(), document.getVersion());
+            DocumentVersionReference documentVersionReference =
+                new DocumentVersionReference(document.getDocumentReferenceWithLocale());
+            if (documentVersionReference.getVersion() == null) {
+                return new DocumentVersionReference(documentVersionReference, document.getVersion());
+            }
+            return documentVersionReference;
         }
     }
 

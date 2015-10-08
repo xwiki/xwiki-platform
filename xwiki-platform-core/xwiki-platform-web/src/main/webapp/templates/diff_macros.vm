@@ -527,6 +527,10 @@ $escapedChunk##
 
 #macro (diffAnchor $entityReference)
 #set ($id = "$!entityReference.type:$!services.model.serialize($entityReference, 'default')")
+#if ($entityReference.type == 'DOCUMENT')
+## We need different anchors for different document translations.
+#set ($id = "${id}_$!entityReference.locale")
+#end
 diff$id.hashCode()##
 #end
 
@@ -586,9 +590,13 @@ $!version##
 
 #macro (displayDocumentUnifiedDiffSummary $documentDiff)
   <div class="diff-summary-item">
-    #diffIcon('page' $documentDiff.type)
-    <a href="#details">$escapetool.xml($services.model.serialize($documentDiff.reference, 'local'))</a>
+    #diffIcon('file-white' $documentDiff.type)
+    #set ($documentReference = $documentDiff.reference)
+    <a href="#details">$escapetool.xml($services.model.serialize($documentReference, 'local'))</a>
     <span class="diff-summary-item-hint">
+      #if ("$!documentReference.locale" != '')
+        ($documentReference.locale)
+      #end
       (#diffVersion($documentDiff.previousReference.version)
       $services.icon.renderHTML('right')
       #diffVersion($documentDiff.nextReference.version))
@@ -661,8 +669,12 @@ $!version##
   #foreach ($documentDiff in $documentDiffs)
     #set ($documentReference = $documentDiff.reference)
     <h$mathtool.add($headingLevel, 1) id="#diffAnchor($documentReference)">
-      #diffIcon('page' $documentDiff.type)
-      $escapetool.xml($services.model.serialize($documentReference, 'local'))
+      #diffIcon('file-white' $documentDiff.type)
+      <a href="$xwiki.getURL($documentReference)"
+        >$escapetool.xml($services.model.serialize($documentReference, 'local'))</a>
+      #if ("$!documentReference.locale" != '')
+        <span class="diff-item-locale">($documentReference.locale)</span>
+      #end
       <span class="diff-item-hint">
         #diffVersion($documentDiff.previousReference.version)
         $services.icon.renderHTML('right')

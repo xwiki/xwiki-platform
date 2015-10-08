@@ -56,6 +56,16 @@ public class DocumentVersionReference extends DocumentReference
     }
 
     /**
+     * Cast a {@link DocumentReference} to a {@link DocumentVersionReference}.
+     * 
+     * @param documentReference the document reference to cast
+     */
+    public DocumentVersionReference(DocumentReference documentReference)
+    {
+        super(documentReference);
+    }
+
+    /**
      * @return the document version
      */
     public Serializable getVersion()

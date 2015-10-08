@@ -39,7 +39,7 @@
   - for best index size and searching performance, set "index" to false
     for all general text fields, use copyField to copy them to the
     catchall "text" field, and use that for searching.
-  - For maximum indexing performance, use the StreamingUpdateSolrServer
+  - For maximum indexing performance, use the ConcurrentUpdateSolrServer
     java client.
   - Remember to run the JVM in server mode, and use a higher logging level
     that avoids logging every request
@@ -447,7 +447,7 @@
                   ... 6 months and 3 days in the future from the start of
                       the current day
                       
-         Consult the DateField javadocs for more information.
+         Consult the TrieDateField javadocs for more information.
 
          Note: For faster range queries, consider the tdate type
       -->
@@ -458,7 +458,7 @@
 
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
-    <fieldtype name="binary" class="solr.BinaryField"/>
+    <fieldType name="binary" class="solr.BinaryField"/>
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema
@@ -499,17 +499,6 @@
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
       </analyzer>
     </fieldType>
-
-    <!-- A text type for English text where stopwords and synonyms are managed using the REST API -->
-    <!--
-    <fieldType name="managed_en" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.ManagedStopFilterFactory" managed="english" />
-        <filter class="solr.ManagedSynonymFilterFactory" managed="english" />
-      </analyzer>
-    </fieldType>
-    -->
 
     <!-- A general text field that has reasonable, generic
          cross-language defaults: it tokenizes with StandardTokenizer,
@@ -693,14 +682,14 @@
       </analyzer>
     </fieldType>
     
-    <fieldtype name="phonetic" stored="false" indexed="true" class="solr.TextField" >
+    <fieldType name="phonetic" stored="false" indexed="true" class="solr.TextField" >
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.DoubleMetaphoneFilterFactory" inject="false"/>
       </analyzer>
-    </fieldtype>
+    </fieldType>
 
-    <fieldtype name="payloads" stored="false" indexed="true" class="solr.TextField" >
+    <fieldType name="payloads" stored="false" indexed="true" class="solr.TextField" >
       <analyzer>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <!--
@@ -716,7 +705,7 @@
          -->
         <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float"/>
       </analyzer>
-    </fieldtype>
+    </fieldType>
 
     <!-- lowercases the entire field value, keeping it as a single token.  -->
     <fieldType name="lowercase" class="solr.TextField" positionIncrementGap="100">
@@ -755,7 +744,7 @@
 
     <!-- since fields of this type are by default not stored or indexed,
          any data added to them will be ignored outright.  --> 
-    <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
+    <fieldType name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
 
     <!-- This point type indexes the coordinates as separate fields (subFields)
       If subFieldType is defined, it references a type, and a dynamic field
@@ -778,7 +767,7 @@
       http://wiki.apache.org/solr/SolrAdaptersForLuceneSpatial4
     -->
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
-        geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
+        geo="true" distErrPct="0.025" maxDistErr="0.001" distanceUnits="kilometers" />
 
    <!-- Money/currency field type. See http://wiki.apache.org/solr/MoneyFieldType
         Parameters:
@@ -1185,12 +1174,13 @@
     <!-- Thai -->
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
-        <tokenizer class="solr.ThaiTokenizerFactory"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ThaiWordFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_th.txt" />
       </analyzer>
     </fieldType>
-
+    
     <!-- Turkish -->
     <fieldType name="text_tr" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 

@@ -83,7 +83,7 @@
         #if ($isEditing)
           $providerObj.get('name')
         #else
-          &lt;p&gt;$escapetool.xml($services.localization.render($doc.getValue('name', $providerObj)))&lt;/p&gt;
+          &lt;p&gt;$!escapetool.xml($services.localization.render($doc.getValue('name', $providerObj)))&lt;/p&gt;
         #end
       &lt;/dd&gt;
       ##
@@ -97,7 +97,9 @@
           $providerObj.get('template')
         #else
           #set($templateDocName = $doc.getValue('template', $providerObj))
-          &lt;p&gt;&lt;a href="$xwiki.getURL($templateDocName)"&gt;$escapetool.xml($templateDocName)&lt;/a&gt;&lt;/p&gt;
+          #if ("$!templateDocName" != '')
+            &lt;p&gt;&lt;a href="$xwiki.getURL($templateDocName)"&gt;$escapetool.xml($templateDocName)&lt;/a&gt;&lt;/p&gt;
+          #end
         #end
       &lt;/dd&gt;
       ##
@@ -150,7 +152,7 @@
 ##
 #if (!$isEditing)
   (% class="buttonwrapper" %)
-  [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getDocument($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences')).getURL('admin', 'section=Templates')]]
+  [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=Templates')]]
 #end
 {{/velocity}}
 </content>

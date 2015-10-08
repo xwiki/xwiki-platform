@@ -14,6 +14,12 @@
   #if (!$entityReference)
     ## Default on the current (translated) document.
     #set ($entityReference = $tdoc.documentReference)
+    #if ($entityReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+      ## The current document is a space home page. Use the space reference instead. This is important for preview mode
+      ## and when editing a document section because $tdoc needs to be mapped to the right entity reference in the
+      ## 'entities' configuration option.
+      #set ($entityReference = $entityReference.parent)
+    #end
     #if (!$options.entities)
       #set ($discard = $options.put('entities', {}))
     #end

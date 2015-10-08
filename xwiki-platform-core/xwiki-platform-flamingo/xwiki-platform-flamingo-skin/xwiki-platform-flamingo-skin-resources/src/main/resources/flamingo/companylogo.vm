@@ -27,7 +27,7 @@
   #end
 #end
 <div id="companylogo">
-  <a href="$!xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))" title="Home" rel="home" #if(!$displayPageHeader)class="navbar-brand"#end>
+  <a href="$!xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)" title="Home" rel="home" #if(!$displayPageHeader)class="navbar-brand"#end>
     <img src="$!logourl" alt="Wiki Logo"/>
   </a>
 </div>

@@ -785,12 +785,6 @@
 
     -->
 
-  <requestHandler name="/dataimport" class="solr.DataImportHandler">
-    <lst name="defaults">
-      <str name="config">solr-data-config.xml</str>
-    </lst>
-  </requestHandler>
-
   <!-- SearchHandler
 
        http://wiki.apache.org/solr/SearchHandler

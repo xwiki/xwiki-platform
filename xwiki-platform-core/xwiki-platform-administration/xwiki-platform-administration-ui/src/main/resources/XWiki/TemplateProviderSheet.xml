@@ -255,34 +255,6 @@
         resultInfo       : "pageFullName"
       });
     }
-
-    if (typeof(XWiki.Document) != 'undefined') {
-      var enableTemplateEditLink = function() {
-        if (templateElement.value == '') {
-          if (templateElement.__x_editLink) {
-            templateElement.__x_editLink.hide();
-          }
-        } else {
-          var resource = XWiki.resource.get(templateElement.value);
-          var url = new XWiki.Document(resource.name, resource.space, resource.wiki).getURL('edit');
-          if (templateElement.__x_editLink) {
-            templateElement.__x_editLink.down('a').setAttribute('href', url);
-            templateElement.__x_editLink.show();
-          } else {
-            templateElement.__x_editLink = new Element('a', {
-              'href'   : url,
-              'title'  : "$services.localization.render('xe.templateprovider.template.edit')" ,
-              'target' : "__blank" ,
-              'class'  : 'button'
-            }).update("$services.localization.render('xe.templateprovider.template.edit')").wrap('span', {'class' : 'buttonwrapper'});
-            templateElement.insert({'after' : templateElement.__x_editLink});
-            templateElement.insert({'after' : ' '});
-          }
-        }
-      };
-      enableTemplateEditLink();
-      templateElement.observe('blur', enableTemplateEditLink);
-    }
   }
   // ----------------------------------------------------------------------------------------------------
   // Add live validations

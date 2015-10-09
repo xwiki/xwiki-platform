@@ -513,7 +513,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 }
             });
         mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
-        mockStore.expects(once()).method("exists").will(returnValue(false));
 
         this.xwiki.getPrefsClass(getContext());
         this.xwiki.getPrefsClass(getContext());

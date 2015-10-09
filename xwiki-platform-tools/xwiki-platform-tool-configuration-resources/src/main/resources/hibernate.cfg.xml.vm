@@ -102,6 +102,11 @@
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
 ## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDb == 'mysql' || $xwikiDb == 'oracle')
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
+#end
+## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)
     <property name="xwiki.virtual_mode">$xwikiDbVirtualMode</property>
 #end

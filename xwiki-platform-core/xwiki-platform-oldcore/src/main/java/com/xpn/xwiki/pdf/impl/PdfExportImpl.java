@@ -65,7 +65,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xml.EntityResolver;
@@ -541,15 +540,9 @@ public class PdfExportImpl implements PdfExport
         String templateName = referenceSerializer.serialize(templateReference);
         try {
             StringWriter writer = new StringWriter();
-            VelocityEngine engine = velocityManager.getVelocityEngine();
-            try {
-                VelocityContext vcontext = velocityManager.getVelocityContext();
-                engine.startedUsingMacroNamespace(templateName);
-                velocityManager.getVelocityEngine().evaluate(vcontext, writer, templateName, result);
-                result = writer.toString();
-            } finally {
-                engine.stoppedUsingMacroNamespace(templateName);
-            }
+            VelocityContext vcontext = velocityManager.getVelocityContext();
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, templateName, result);
+            result = writer.toString();
         } catch (XWikiVelocityException ex) {
             LOGGER
                 .warn("Velocity errors while parsing pdf export extension [" + templateName + "]: " + ex.getMessage());

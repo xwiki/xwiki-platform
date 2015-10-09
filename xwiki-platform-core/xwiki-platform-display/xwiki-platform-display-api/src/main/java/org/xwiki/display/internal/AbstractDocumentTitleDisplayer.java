@@ -228,9 +228,6 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         Map<String, Object> backupObjects = null;
         boolean canPop = false;
         try {
-            // Prepare namespace cleanup
-            velocityEngine.startedUsingMacroNamespace(namespace);
-
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
                 // The following method call also clones the execution context.
@@ -243,9 +240,6 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            // Clean namespace unless this execution is part of a wider range
-            velocityEngine.stoppedUsingMacroNamespace(namespace);
-
             if (canPop) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
             }

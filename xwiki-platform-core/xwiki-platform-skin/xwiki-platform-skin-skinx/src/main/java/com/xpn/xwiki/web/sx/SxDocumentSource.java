@@ -32,7 +32,6 @@ import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
@@ -152,16 +151,10 @@ public class SxDocumentSource implements SxSource
                     try {
                         StringWriter writer = new StringWriter();
                         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                        VelocityEngine engine = velocityManager.getVelocityEngine();
-                        try {
-                            VelocityContext vcontext = velocityManager.getVelocityContext();
-                            engine.startedUsingMacroNamespace(this.document.getPrefixedFullName());
-                            velocityManager.getVelocityEngine().evaluate(vcontext, writer,
-                                this.document.getPrefixedFullName(), sxContent);
-                            sxContent = writer.toString();
-                        } finally {
-                            engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
-                        }
+                        VelocityContext vcontext = velocityManager.getVelocityContext();
+                        velocityManager.getVelocityEngine().evaluate(vcontext, writer,
+                            this.document.getPrefixedFullName(), sxContent);
+                        sxContent = writer.toString();
                     } catch (XWikiVelocityException ex) {
                         LOGGER.warn("Velocity errors while parsing skin extension [{}] with content [{}]: ",
                             this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(ex));

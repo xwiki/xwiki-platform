@@ -19,54 +19,65 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
+import java.util.List;
+import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.configuration.ConfigurationSource;
 
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.url.ExtendedURL;
+
 
 /**
  * @version $Id$
  */
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor
 {
+    private static final String VIEW_ACTION = "view";
+
+    private final EntityResourceActionLister entityResourceActionLister = Utils.getComponent(EntityResourceActionLister.class);
+
+    private StandardURLConfiguration configuration = Utils.getComponent(StandardURLConfiguration.class);
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
 
     @Override
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-        throws IOException
     {
-        String result = super.processPath(httpServletRequest, httpServletResponse);
+        try {
+            /**
+             * Extract the action using the same method as in {@link
+             * org.xwiki.url.internal.standard.entity.AbstractEntityResourceReferenceResolver}
+             *
+             * We cannot use the EntityResourceReferenceResolver because the execution context have not been
+             * initialized here.
+             */
+            final String url = httpServletRequest.getRequestURL().toString();
 
-        ConfigurationSource configuration =
-            Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
-            // Remove /wikiname part if the struts action is /wiki
-            if (httpServletRequest.getServletPath().equals(
-                "/" + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                int wikiNameIndex = result.indexOf("/", 1);
-                if (wikiNameIndex == -1) {
-                    result = "";
-                } else {
-                    result = result.substring(wikiNameIndex);
+            final ExtendedURL extendedURL = new ExtendedURL(new URL(url), httpServletRequest.getContextPath());
+
+            final List<String> pathSegments = extendedURL.getSegments();
+
+            String action = VIEW_ACTION;
+
+            if (pathSegments.size() > 0) {
+                action = pathSegments.get(0);
+                if (this.configuration.isViewActionHidden()
+                    && !VIEW_ACTION.equals(action)
+                    && !this.entityResourceActionLister.listActions().contains(action)) {
+                    action = VIEW_ACTION;
                 }
             }
-        }
 
-        if (StringUtils.countMatches(result, "/") <= 2) {
-            if (result.startsWith("/xmlrpc/")) {
-                return "/xmlrpc/";
-            } else {
-                return "/view/";
-            }
-        } else {
-            return result.substring(0, result.indexOf("/", 1) + 1);
+            return "/" + action + "/";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
+
 }

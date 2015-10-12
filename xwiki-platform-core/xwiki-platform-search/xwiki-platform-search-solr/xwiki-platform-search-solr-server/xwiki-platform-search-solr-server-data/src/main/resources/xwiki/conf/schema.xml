@@ -268,6 +268,7 @@
    <dynamicField name="*_nl"  type="text_nl"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_no"  type="text_no"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_pt"  type="text_pt"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_pt_BR" type="text_pt_BR" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="*_ro"  type="text_ro"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ru"  type="text_ru"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_sk"  type="text_sk"    indexed="true"  stored="true" multiValued="true" />
@@ -1133,6 +1134,16 @@
         <!-- less aggressive: <filter class="solr.PortugueseMinimalStemFilterFactory"/> -->
         <!-- more aggressive: <filter class="solr.SnowballPorterFilterFactory" language="Portuguese"/> -->
         <!-- most aggressive: <filter class="solr.PortugueseStemFilterFactory"/> -->
+      </analyzer>
+    </fieldType>
+
+    <!-- Brazilian Portuguese -->
+    <fieldType name="text_pt_BR" class="solr.TextField" positionIncrementGap="100">
+      <analyzer> 
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_pt_BR.txt" format="snowball" />
+        <filter class="solr.BrazilianStemFilterFactory"/>
       </analyzer>
     </fieldType>
     

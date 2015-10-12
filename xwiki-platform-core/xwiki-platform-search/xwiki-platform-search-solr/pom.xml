@@ -50,12 +50,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
           </exclusion>
-          <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
-               module -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>wstx-asl</artifactId>
-          </exclusion>
           <!-- We use a different version of Restlet. -->
           <exclusion>
             <groupId>org.restlet.jee</groupId>

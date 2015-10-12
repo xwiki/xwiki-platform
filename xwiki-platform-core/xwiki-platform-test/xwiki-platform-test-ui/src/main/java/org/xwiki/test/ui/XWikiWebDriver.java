@@ -145,6 +145,16 @@ public class XWikiWebDriver extends RemoteWebDriver
         }
     }
 
+    public boolean hasElementWithoutWaiting(WebElement element, By by)
+    {
+        try {
+            findElementWithoutWaiting(element, by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
     /**
      * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
      */

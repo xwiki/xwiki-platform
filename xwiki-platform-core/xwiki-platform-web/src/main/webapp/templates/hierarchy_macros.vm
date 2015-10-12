@@ -31,7 +31,12 @@
     $stringtool.join($labels, ' / ')
   #else
     #getHierarchyPathData($path $data $options)
-    #displayHierarchyPath($data $options)
+    ## At this point, we need to know the *document* actually pointed by the breadcrumb to give the correct reference
+    ## to #displayHierarchyPath(), which displays this reference as hidden data.
+    #if ($entityReference.type == 'SPACE')
+       #set ($entityReference = $services.model.createEntityReference('WebHome', 'DOCUMENT', $entityReference))
+    #end
+    #displayHierarchyPath($data $options $entityReference)
   #end
 #end
 
@@ -97,14 +102,25 @@
  * @param $pathData the data of the hierarchy path to display
  * @param $options various display options; default values are {
  *   id: null, // the value of the id attribute to set on the container element
- *   excludeSelf: false // whether the target reference has been excluded from the path
+ *   excludeSelf: false, // whether the target reference has been excluded from the path
+ *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
  * }
+ * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
  *#
-#macro (displayHierarchyPath $pathData $options)
+#macro (displayHierarchyPath $pathData $options $entityReference)
   #if (!$options)
     #set ($options = {})
   #end
-  <ol id="$!options.id" class="breadcrumb"><li
+  #set ($breadCrumbClassNames = 'breadcrumb')
+  #set ($breadCrumbParameters = '')
+  #if ($options.limit)
+    #set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+    ## Tag the breadcrumb as expandable, so the JS can enable the 'expand' feature
+    #set ($breadCrumbClassNames = "${breadCrumbClassNames} breadcrumb-expandable")
+    ## Store the entity reference into the breadcrumb, so the JS can retreive the full hierarchy
+    #set ($breadCrumbParameters = "data-entity='$escapetool.xml($services.model.serialize($entityReference, 'local'))'")
+  #end
+  <ol id="$!options.id" class="$breadCrumbClassNames" $breadCrumbParameters><li
     #foreach ($item in $pathData)
       #set ($classNames = $collectionstool.set)
       #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))

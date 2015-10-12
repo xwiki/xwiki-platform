@@ -10,6 +10,22 @@
   #if($services.parentchild.isParentChildMechanismEnabled())
     #hierarchy_parentChild()
   #else
-    #hierarchy($NULL {'id': 'hierarchy'})
+    ##
+    ## 'Xpage' mode: used to display the hierarchy of the current document.
+    ## It is used by 'uicomponents/hierarchy/hierarchy.js' to expand the breadcrumb when the user clicks on the ellipsis
+    ## of a limited breamcrumb.
+    ##
+    #if ($request.xpage == 'hierarchy')
+      #set ($options = {})
+      #if ("$!request.id" != '')
+        #set($discard = $options.put('id', $escapetool.xml($request.id)))
+      #end
+      #hierarchy($NULL $options)
+    #else
+      ##
+      ## Default mode: display the hierarchy for the current page
+      ##
+      #hierarchy($NULL {'id': 'hierarchy', 'limit': 5})
+    #end
   #end
 #end

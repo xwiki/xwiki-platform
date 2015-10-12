@@ -19,15 +19,21 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.util.Arrays;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.ui.po.BreadcrumbElement;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test Breadcrumbs.
@@ -88,5 +94,22 @@ public class BreadcrumbsTest extends AbstractTest
         // Set back the default hierarchy mode (but first we need to log back).
         adminAuthenticationRule.authenticate();
         getUtil().setHierarchyMode("reference");
+    }
+    
+    @Test
+    public void verifyBreadcrumbInLongHierarchy() throws Exception
+    {
+        DocumentReference documentReference = 
+                new DocumentReference("xwiki", Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H"), "WebHome");
+        ViewPage page = getUtil().createPage(documentReference, "Content", getTestMethodName());
+
+        BreadcrumbElement breadcrumb = page.getBreadcrumb();
+        // Verify that the breadcrumb is limited
+        assertEquals("/A/…/F/G/" + getTestMethodName(), breadcrumb.getPathAsString());
+        // Verify we can expand it
+        breadcrumb.expand();
+        assertEquals("/A/B/C/D/E/F/G/" + getTestMethodName(), breadcrumb.getPathAsString());
+        // Clean
+        getUtil().deletePage(documentReference);
     }
 }

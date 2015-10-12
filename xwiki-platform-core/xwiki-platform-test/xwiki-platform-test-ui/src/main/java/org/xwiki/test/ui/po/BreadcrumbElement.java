@@ -78,4 +78,12 @@ public class BreadcrumbElement extends BaseElement
         }
         return result.size() > 0;
     }
+    
+    public void expand()
+    {
+        clickPathElement("…");
+        if (getDriver().hasElementWithoutWaiting(this.container, By.className("ellipsis"))) {
+            getDriver().waitUntilElementDisappears(this.container, By.className("ellipsis"));
+        }
+    }
 }

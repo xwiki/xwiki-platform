@@ -80,6 +80,11 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
       <version>${restlet.version}</version>
@@ -104,12 +109,14 @@
           <artifactId>jaxb-impl</artifactId>
           <groupId>com.sun.xml.bind</groupId>
         </exclusion>
+        <!-- Restlet triggers the wrong version of JAX-RS.
+             See https://github.com/restlet/restlet-framework-java/issues/1158
+        -->
+        <exclusion>
+          <artifactId>javax.ws.rs-api</artifactId>
+          <groupId>javax.ws.rs</groupId>
+        </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rest-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

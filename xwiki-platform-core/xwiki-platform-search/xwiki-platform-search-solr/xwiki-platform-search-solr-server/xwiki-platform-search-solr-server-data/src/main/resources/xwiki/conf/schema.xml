@@ -270,6 +270,7 @@
    <dynamicField name="*_pt"  type="text_pt"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ro"  type="text_ro"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ru"  type="text_ru"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_sk"  type="text_sk"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_sv"  type="text_sv"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_th"  type="text_th"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_tr"  type="text_tr"    indexed="true"  stored="true" multiValued="true" />
@@ -1156,6 +1157,18 @@
       </analyzer>
     </fieldType>
     
+    <!-- Slovak -->
+    <fieldType name="text_sk" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_sk.txt" />
+        <filter class="solr.CzechStemFilterFactory"/>
+        <!-- Remove accents -->
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
     <!-- Swedish -->
     <fieldType name="text_sv" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -146,7 +145,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
                         absoluteUrl, Utils.getXWikiContext(componentManager)));
 
-                URI baseUri = uriInfo.getBaseUri();
+                String baseUri = uriInfo.getBaseUri().toString();
 
                 String pageUri =
                         UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(),

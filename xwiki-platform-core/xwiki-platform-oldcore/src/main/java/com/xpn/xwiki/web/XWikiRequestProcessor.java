@@ -20,16 +20,20 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.configuration.ConfigurationSource;
-
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.ResourceTypeResolver;
+import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.url.ExtendedURL;
 
 /**
  * @version $Id$
@@ -38,35 +42,29 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiRequestProcessor.class);
 
+    private ResourceTypeResolver<ExtendedURL> typeResolver =
+        Utils.getComponent(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
+
+    private ResourceReferenceResolver<ExtendedURL> resolver =
+        Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
+
     @Override
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException
     {
-        String result = super.processPath(httpServletRequest, httpServletResponse);
+        String url = httpServletRequest.getRequestURL().toString();
 
-        ConfigurationSource configuration =
-            Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
-            // Remove /wikiname part if the struts action is /wiki
-            if (httpServletRequest.getServletPath().equals(
-                "/" + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                int wikiNameIndex = result.indexOf("/", 1);
-                if (wikiNameIndex == -1) {
-                    result = "";
-                } else {
-                    result = result.substring(wikiNameIndex);
-                }
-            }
-        }
+        try {
+            ExtendedURL extendedURL = new ExtendedURL(new URL(url), httpServletRequest.getContextPath());
 
-        if (StringUtils.countMatches(result, "/") <= 2) {
-            if (result.startsWith("/xmlrpc/")) {
-                return "/xmlrpc/";
-            } else {
-                return "/view/";
-            }
-        } else {
-            return result.substring(0, result.indexOf("/", 1) + 1);
+            ResourceType type = this.typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
+
+            EntityResourceReference entityResourceReference = (EntityResourceReference) this.resolver.resolve(
+                extendedURL, type, Collections.<String, Object>emptyMap());
+
+            return "/" + entityResourceReference.getAction().getActionName() + "/";
+        } catch (Exception e) {
+            throw new IOException(String.format("Failed to extract the Entity Action from URL [%s]", url), e);
         }
     }
 }

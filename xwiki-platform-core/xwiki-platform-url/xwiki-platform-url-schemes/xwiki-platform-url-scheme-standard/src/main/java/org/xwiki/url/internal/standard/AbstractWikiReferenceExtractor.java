@@ -21,6 +21,7 @@ package org.xwiki.url.internal.standard;
 
 import javax.inject.Inject;
 
+import org.xwiki.context.Execution;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -42,13 +43,16 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private Execution execution;
+
     /**
      * Check if there's a descriptor for the passed wiki and if not and the configuration option to redirect to
      * the main wiki is enabled then return the main wiki.
      */
-    protected String normalizeWikiIdForNonExistentWikiDescriptor(String wikiId)
+    protected String normalizeWikiIdForNonExistentWikiDescriptor(String alias)
     {
-        String normalizedWikiId = wikiId;
+        String normalizedWikiId = alias;
         String mainWiki = getMainWikiId();
         if (!mainWiki.equals(normalizedWikiId)
             && this.configuration.getWikiNotFoundBehavior() == WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI)
@@ -63,19 +67,33 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
 
     protected WikiDescriptor getWikiDescriptorByAlias(String alias)
     {
+        // Note: We also support not having an Execution Context available. This allows this code to work at request
+        // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
+        // as the first thing along with Database initialization.
+        if (this.execution.getContext() == null) {
+            return null;
+        }
+
         try {
             return this.wikiDescriptorManager.getByAlias(alias);
         } catch (WikiManagerException e) {
-            throw new RuntimeException(String.format("Failed to located wiki descriptor for alias [%s]", alias), e);
+            throw new RuntimeException(String.format("Failed to locate wiki descriptor for alias [%s]", alias), e);
         }
     }
 
     protected WikiDescriptor getWikiDescriptorById(String wikiId)
     {
+        // Note: We also support not having an Execution Context available. This allows this code to work at request
+        // initialization time, when no Context has been set up yet. In the future, we need to move the Context init
+        // as the first thing along with Database initialization.
+        if (this.execution.getContext() == null) {
+            return null;
+        }
+
         try {
             return this.wikiDescriptorManager.getById(wikiId);
         } catch (WikiManagerException e) {
-            throw new RuntimeException(String.format("Failed to located wiki descriptor for wiki [%s]", wikiId), e);
+            throw new RuntimeException(String.format("Failed to locate wiki descriptor for wiki [%s]", wikiId), e);
         }
     }
 

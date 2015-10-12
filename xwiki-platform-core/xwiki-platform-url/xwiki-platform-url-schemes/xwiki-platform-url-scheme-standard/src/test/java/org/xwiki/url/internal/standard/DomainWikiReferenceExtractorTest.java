@@ -24,6 +24,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
@@ -31,7 +33,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link PathWikiReferenceExtractor}.
@@ -45,10 +47,12 @@ public class DomainWikiReferenceExtractorTest
     public MockitoComponentMockingRule<DomainWikiReferenceExtractor> mocker =
         new MockitoComponentMockingRule<>(DomainWikiReferenceExtractor.class);
 
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Before
     public void setUp() throws Exception
     {
-        WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        this.wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
@@ -111,9 +115,22 @@ public class DomainWikiReferenceExtractorTest
     }
 
     @Test
-    public void extractWhenUnderscoreInDomainName() throws Exception
+    public void extractWhenNoAliasAndUnderscoreInDomainName() throws Exception
     {
+        // Simulate a configured Execution Context
+        Execution execution = mocker.getInstance(Execution.class);
+        when(execution.getContext()).thenReturn(new ExecutionContext());
+
         testAndAssert("http://some_domain.server.com/xwiki/bin/view/Main/WebHome", "some_domain");
+    }
+
+    @Test
+    public void extractWhenNoExecutionContext() throws Exception
+    {
+        testAndAssert("http://domain.server.com/xwiki/bin/view/Main/WebHome", "domain");
+
+        verify(this.wikiDescriptorManager, never()).getByAlias(anyString());
+        verify(this.wikiDescriptorManager, never()).getById(anyString());
     }
 
     private void testAndAssert(String urlToTest, String expectedWikiId) throws Exception
@@ -127,6 +144,10 @@ public class DomainWikiReferenceExtractorTest
 
     private void setUpConfiguration(WikiNotFoundBehavior wikiNotFoundBehavior) throws Exception
     {
+        // Simulate a configured Execution Context
+        Execution execution = mocker.getInstance(Execution.class);
+        when(execution.getContext()).thenReturn(new ExecutionContext());
+
         StandardURLConfiguration urlConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         when(urlConfiguration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);
     }

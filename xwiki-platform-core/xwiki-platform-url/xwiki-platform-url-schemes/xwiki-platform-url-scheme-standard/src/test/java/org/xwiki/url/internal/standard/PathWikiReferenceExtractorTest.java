@@ -24,6 +24,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
@@ -31,7 +33,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link PathWikiReferenceExtractor}.
@@ -45,10 +47,12 @@ public class PathWikiReferenceExtractorTest
     public MockitoComponentMockingRule<PathWikiReferenceExtractor> mocker =
         new MockitoComponentMockingRule<>(PathWikiReferenceExtractor.class);
 
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Before
     public void setUp() throws Exception
     {
-        WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        this.wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
@@ -107,6 +111,15 @@ public class PathWikiReferenceExtractorTest
         testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "somewiki");
     }
 
+    @Test
+    public void extractWhenNoExecutionContext() throws Exception
+    {
+        testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "somewiki");
+
+        verify(this.wikiDescriptorManager, never()).getByAlias(anyString());
+        verify(this.wikiDescriptorManager, never()).getById(anyString());
+    }
+
     private void testAndAssert(String urlToTest, String expectedWikiId) throws Exception
     {
         ExtendedURL url = new ExtendedURL(new URL(urlToTest), "xwiki");
@@ -118,6 +131,10 @@ public class PathWikiReferenceExtractorTest
 
     private void setUpConfiguration(WikiNotFoundBehavior wikiNotFoundBehavior) throws Exception
     {
+        // Simulate a configured Execution Context
+        Execution execution = mocker.getInstance(Execution.class);
+        when(execution.getContext()).thenReturn(new ExecutionContext());
+
         StandardURLConfiguration urlConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         when(urlConfiguration.getWikiNotFoundBehavior()).thenReturn(wikiNotFoundBehavior);
     }

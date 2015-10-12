@@ -28,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
@@ -115,6 +117,10 @@ public class IntegrationTest
 
         // Isolate from Environment
         this.componentManager.registerMockComponent(EntityResourceActionLister.class);
+
+        // Simulate a configured Execution Context
+        Execution execution = this.componentManager.registerMockComponent(Execution.class);
+        when(execution.getContext()).thenReturn(new ExecutionContext());
 
         // For test simplicity consider that Context CM == CM
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);

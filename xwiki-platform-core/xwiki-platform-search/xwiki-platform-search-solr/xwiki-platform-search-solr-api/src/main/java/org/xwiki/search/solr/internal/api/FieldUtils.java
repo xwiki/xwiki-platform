@@ -43,8 +43,8 @@ public final class FieldUtils
     public static final String SORT_SUFFIX = "_sort";
 
     /**
-     * Keyword field, holds a string uniquely identifying a document across the index. this is used for finding old
-     * versions of a document to be indexed.
+     * Keyword field, holds a string uniquely identifying a document across the index. This is used for finding old
+     * versions of a document to be indexed. The value format is wiki:Space.Page_locale .
      */
     public static final String ID = "id";
 

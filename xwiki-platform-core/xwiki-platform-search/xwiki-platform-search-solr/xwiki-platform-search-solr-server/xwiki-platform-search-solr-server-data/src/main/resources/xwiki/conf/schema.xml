@@ -120,6 +120,7 @@
    <!-- Only remove the "id" field if you have a very good reason to. While not strictly
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
+     The id has the following format: wiki:Space.Page_locale
    -->
    <field name="id" type="string" indexed="true" stored="true" required="true" />
    <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->

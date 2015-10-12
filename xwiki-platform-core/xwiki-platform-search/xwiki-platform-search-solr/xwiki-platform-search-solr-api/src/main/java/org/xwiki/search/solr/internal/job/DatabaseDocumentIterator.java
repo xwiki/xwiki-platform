@@ -214,6 +214,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     private Query getQuery() throws QueryException
     {
         if (query == null) {
+            // This iterator must have the same order as the SolrDocumentIterator, otherwise the synchronization fails.
             String select = "select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc";
             String orderBy = " order by doc.space, doc.name, doc.language";
 

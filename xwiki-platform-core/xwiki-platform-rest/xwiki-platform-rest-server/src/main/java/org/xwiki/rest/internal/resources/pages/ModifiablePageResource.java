@@ -42,7 +42,8 @@ public class ModifiablePageResource extends XWikiResource
     {
         Document doc = documentInfo.getDocument();
 
-        if (this.factory.toDocument(doc, page)) {
+        // Save the document only if there is actually something to do if if the document does not exist
+        if (this.factory.toDocument(doc, page) || doc.isNew()) {
             doc.save(page.getComment());
 
             page =

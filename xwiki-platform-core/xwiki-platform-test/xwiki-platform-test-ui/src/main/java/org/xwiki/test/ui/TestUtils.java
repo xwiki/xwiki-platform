@@ -1371,7 +1371,7 @@ public class TestUtils
     {
         // make sure the page exist
         if (!rest().exists(reference.getDocumentReference())) {
-            rest().savePage(reference);
+            rest().savePage(reference.getDocumentReference());
         }
 
         if (failIfExists) {
@@ -1937,7 +1937,8 @@ public class TestUtils
             page.setSpace(SERIALIZER.serialize(spaceReference));
 
             // Add page
-            page.setName(reference.getName());
+            EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
+            page.setName(documentReference.getName());
 
             if (content != null) {
                 page.setContent(content);

@@ -487,6 +487,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
+
+            return restRepositories;
         }
 
         return null;

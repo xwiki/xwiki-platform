@@ -62,7 +62,7 @@ public class XWikiSecretVerifier extends SecretVerifier
     }
 
     @Override
-    public int verify(String identifier, char[] secret) throws IllegalArgumentException
+    public boolean verify(String identifier, char[] secret) throws IllegalArgumentException
     {
         XWikiContext xwikiContext = Utils.getXWikiContext(this.componentManager);
         XWiki xwiki = Utils.getXWiki(this.componentManager);
@@ -77,7 +77,7 @@ public class XWikiSecretVerifier extends SecretVerifier
 
                 this.context.getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
 
-                return RESULT_VALID;
+                return true;
             }
         } catch (XWikiException e) {
             this.context.getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
@@ -85,7 +85,7 @@ public class XWikiSecretVerifier extends SecretVerifier
 
         this.context.getLogger().log(Level.WARNING, String.format("Cannot authenticate '%s'.", identifier));
 
-        return RESULT_INVALID;
+        return false;
     }
 
 }

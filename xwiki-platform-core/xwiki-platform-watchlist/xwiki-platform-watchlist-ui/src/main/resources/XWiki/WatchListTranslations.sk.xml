@@ -21,34 +21,34 @@
 -->
 
 <xwikidoc>
-  <web>Main</web>
-  <name>ActivityTranslations</name>
-  <language>de</language>
+  <web>XWiki</web>
+  <name>WatchListTranslations</name>
+  <language>sk</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.Activity</parent>
+  <parent>XWiki.WatchListClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1390416042000</creationDate>
-  <date>1390416053000</date>
-  <contentUpdateDate>1390416047000</contentUpdateDate>
+  <creationDate>1397735293000</creationDate>
+  <date>1397735757000</date>
+  <contentUpdateDate>1397735757000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>WatchListTranslations</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
-activity.link.title=Befindlich in {0} » {1} » {2} 
-activity.rss.feed.description=RSS-Feed für Dokumentenänderungen
-activity.rss.feed.spaces.description=RSS Feed der Dokumente in Bereich(en) "{0}"
-activity.rss.feed.tags.description=RSS Feed der Dokumente, die getaggt sind mit\: "{0}"
-activity.rss.feed.tagsAndSpaces.description=RSS Feed der Dokumente in Bereich(en) "{1}", welche getaggt sind mit\: "{0}" 
-activity.rss.pages.modified=Geänderte Seiten RSS-Feed
+  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Denne
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Každú hodinu
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Týždenne
+XWiki.WatchListClass_interval_realtime=V reálnom čase
+rendering.macro.watchlist.description=Ukázať obsah zoznamu sledovaných stránok.
+rendering.macro.watchlist.name=Zoznam sledovania
 </content>
 </xwikidoc>

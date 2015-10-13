@@ -44,7 +44,14 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+admin.repository=Uložisko rozšírení
+extension.repository.authors=Autor
+extension.repository.category=Kategórie
+extension.repository.doc.creationDate=Vytvorené
+extension.repository.doc.date=Posledná modifikácia
+extension.repository.emptyvalue=\ 
 extension.repository.name=Názov
+extension.repository.summary=Súhrn
 extension.repository.type=Typ
 </content>
 </xwikidoc>

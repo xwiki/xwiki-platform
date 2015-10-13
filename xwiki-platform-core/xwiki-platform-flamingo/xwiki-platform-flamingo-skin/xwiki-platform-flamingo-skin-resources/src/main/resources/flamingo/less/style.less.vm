@@ -42,6 +42,12 @@
   $themeObj.getValue('lessCode')
 #end
 
+// We re-inject the variables from the flamingo theme so they can interract with the content of @lessCode.
+// This way, it's also consistent with the Flamingo Theme preview (See: http://jira.xwiki.org/browse/XWIKI-12672)
+#if ("$!themeObj" != '')
+  #initFromFlamingoTheme()
+#end
+
 // ==============================================================================
 // NOT SENT TO THE BROWSER FROM THIS POINT
 // ==============================================================================

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>7.3-SNAPSHOT</version>
+    <version>7.3-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -129,7 +129,7 @@
           <!-- The EditTranslations page is not a Translation page and thus not a content page!
                Note that we need to override the contentPages definition too as otherwise EditTranslations would be
                considered as a content page and thus would require a language of "en" -->
-          <contentPages combine.self="override"/>
+          <contentPages combine.self="override" />
           <technicalPages>
             <technicalPage>EditTranslations\.xml</technicalPage>
           </technicalPages>

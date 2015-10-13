@@ -126,7 +126,10 @@
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
-          <!-- The EditTranslations page is not a Translation page and thus not a content page! -->
+          <!-- The EditTranslations page is not a Translation page and thus not a content page!
+               Note that we need to override the contentPages definition too as otherwise EditTranslations would be
+               considered as a content page and thus would require a language of "en" -->
+          <contentPages combine.self="override"/>
           <technicalPages>
             <technicalPage>EditTranslations\.xml</technicalPage>
           </technicalPages>

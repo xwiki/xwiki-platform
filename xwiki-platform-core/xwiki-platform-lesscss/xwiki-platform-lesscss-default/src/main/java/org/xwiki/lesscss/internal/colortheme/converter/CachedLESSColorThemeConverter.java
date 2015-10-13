@@ -45,7 +45,7 @@ public class CachedLESSColorThemeConverter implements CachedCompilerInterface<Co
     @Inject
     private LESSCompiler lessCompiler;
 
-    private final Pattern pattern = Pattern.compile("\\.colortheme-(\\w+)[\\s$]*\\{(\\w+):(#*\\w+)\\}");
+    private final Pattern pattern = Pattern.compile("\\.colortheme-(\\w+)[\\s$]*\\{(\\w+):(#*\\w+)(;)*\\}");
 
     @Override
     public ColorTheme compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle,

@@ -31,6 +31,9 @@ import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -59,13 +62,21 @@ public class CachedLESSColorThemeConverterTest
     @Test
     public void compute() throws Exception
     {
-        StringWriter string = new StringWriter();
-        IOUtils.copy(getClass().getResourceAsStream("/bigStyle.css"), string);
+        StringWriter lessSource = new StringWriter();
+        IOUtils.copy(getClass().getResourceAsStream("/styleWithColorTheme.less"), lessSource);
+        
+        // To have a better test, we use Less4j to generate the CSS that contains the color theme mapping
+        LessCompiler less4jCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
+        LessCompiler.CompilationResult lessResult = less4jCompiler.compile(lessSource.toString(), options);        
         when(lessCompiler.compile(any(LESSResourceReference.class), eq(false), eq(false), eq("skin"), eq(false))).
-            thenReturn(string.toString());
+            thenReturn(lessResult.getCss());
 
+        // So now we can test the converter on the less4j output
         Map<String, String> results = mocker.getComponentUnderTest().compute(
             new LESSSkinFileResourceReference("file", null, null), false, false, true, "skin");
-        assertEquals("#e8e8e8", results.get("borderColor"));
+        assertEquals("#E8E8E8", results.get("borderColor"));
+        assertEquals("#3e444c", results.get("highlightColor"));
     }
 }

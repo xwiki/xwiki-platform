@@ -43,6 +43,7 @@
           ## Otherwise, we let the admin application adds the correct UIX to administrate the wiki.
           #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
           #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
+          #drawerSeparator()
         #end
       #end
       ##
@@ -62,9 +63,18 @@
  * @param $name the name of the UI extension to display
  *#
 #macro(displayDrawerUIX $name)
+  #set ($canHaveMenuSeparator = false)
   #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
-      $services.rendering.render($uix.execute(), 'html/5.0')
+      #if ("$!uix.getParameters().separator" == 'true' && $canHaveMenuSeparator)
+        #drawerSeparator()
+        #set ($canHaveMenuSeparator = false)
+      #end
+      #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
+      $content
+      #if ($stringtool.isNotBlank($content))
+        #set ($canHaveMenuSeparator = true)
+      #end
     #end
   #end
 #end

@@ -19,15 +19,15 @@
     #set($queryStringMap = {})
     #set($discard = $queryStringMap.putAll($request.parameterMap))
     #set($discard = $queryStringMap.put('language', $currentLanguage))
-    #drawerSeparator()
     #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
     #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
     #foreach($lang in $additionallangs)
       #set($discard = $queryStringMap.put('language', $lang))
       #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
     #end
+    #drawerTopItemStop()
+    #drawerSeparator()
   #end
-  #drawerTopItemStop()
 #end
 ##########################################
 ## Display the pretty name of a language

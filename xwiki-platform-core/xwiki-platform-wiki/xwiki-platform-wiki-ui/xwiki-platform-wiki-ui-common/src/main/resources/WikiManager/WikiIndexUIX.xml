@@ -112,7 +112,6 @@
     <property>
       <content>{{velocity}}{{html clean="false"}}
   #template('drawer_macros.vm')
-  #drawerSeparator()
   ##
   ## Wiki Index
   ##
@@ -131,7 +130,8 @@
       <name>org.xwiki.plaftorm.wiki.ui.wikindex</name>
     </property>
     <property>
-      <parameters>order=30000</parameters>
+      <parameters>order=30000
+separator=true</parameters>
     </property>
     <property>
       <scope>wiki</scope>

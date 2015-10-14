@@ -120,7 +120,6 @@
   #set ($createWikiDocReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'CreateWiki'))
   #if ($hasCreateWiki &amp;&amp; $xwiki.exists($createWikiDocReference) &amp;&amp; $services.security.authorization.hasAccess('view', $createWikiDocReference) &amp;&amp; ($xcontext.isMainWiki() || "$!services.wiki.user.userScope" == 'GLOBAL_ONLY'))
     #template('drawer_macros.vm')
-    #drawerSeparator()
     #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $escapetool.xml($services.localization.render('core.menu.create.wiki')), 'tmCreateWiki')
   #end
 {{/html}}{{/velocity}}</content>
@@ -132,7 +131,8 @@
       <name>org.xwiki.plaftorm.wiki.ui.createwiki</name>
     </property>
     <property>
-      <parameters>order=60000</parameters>
+      <parameters>order=60000
+separator=true</parameters>
     </property>
     <property>
       <scope>wiki</scope>

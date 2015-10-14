@@ -162,7 +162,7 @@
     ##
     ## CLASS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')", 'order': 60000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')", 'order': 70000}))
   #end
   ##
   ## Display all the extensions points, including the static ones

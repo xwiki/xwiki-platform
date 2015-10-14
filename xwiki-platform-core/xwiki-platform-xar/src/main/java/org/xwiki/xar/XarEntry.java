@@ -22,7 +22,6 @@ package org.xwiki.xar;
 import java.beans.Transient;
 
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.model.XarModel;
 
@@ -37,9 +36,6 @@ import org.xwiki.xar.internal.model.XarModel;
  */
 public class XarEntry extends LocalDocumentReference
 {
-    private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalStringEntityReferenceSerializer();
-
     /**
      * @see #getEntryName()
      */

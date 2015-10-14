@@ -85,16 +85,26 @@ public class DBListClass extends ListClass
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
-                        result.add(new ListItem(res[0].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0])));
                     } else if (res.length == 2) {
-                        result.add(new ListItem(res[0].toString(), res[1].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0]), toStringButEmptyIfNull(res[1])));
                     } else {
-                        result.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0]), toStringButEmptyIfNull(res[1]),
+                            toStringButEmptyIfNull(res[2])));
                     }
                 }
             }
         }
         return result;
+    }
+
+    private String toStringButEmptyIfNull(Object object)
+    {
+        if (object == null) {
+            return "";
+        } else {
+            return object.toString();
+        }
     }
 
     public List<ListItem> getDBList(XWikiContext context)
@@ -438,7 +448,7 @@ public class DBListClass extends ListClass
     public String getValue(String val, String sql, XWikiContext context)
     {
         String lowerCaseSQL = sql.toLowerCase();
-        
+
         // Make sure the query does not contain ORDER BY, as it will fail in certain databases.
         // TODO: dangerous: "order by" could be inside a string in the query
         int orderByPos = lowerCaseSQL.lastIndexOf("order by ");

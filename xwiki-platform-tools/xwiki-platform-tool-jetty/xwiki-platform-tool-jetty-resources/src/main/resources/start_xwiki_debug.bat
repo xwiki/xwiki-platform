@@ -86,6 +86,13 @@ if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
+REM Create directories that Jetty would otherwise create. We create them to avoid the confusing messages such as:
+REM "MKDIR: ${jetty.base}/lib"
+if not exist "%JETTY_BASE%\lib" mkdir "%JETTY_BASE%\lib"
+if not exist "%JETTY_BASE%\lib\ext" mkdir "%JETTY_BASE%\lib\ext"
+if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
+if not exist "%JETTY_BASE%\resources" mkdir "%JETTY_BASE%\resources"
+
 REM Specify Jetty's home and base directories
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BASE%"
 

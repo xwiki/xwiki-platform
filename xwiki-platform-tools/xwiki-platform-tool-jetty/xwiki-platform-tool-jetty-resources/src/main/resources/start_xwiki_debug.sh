@@ -156,6 +156,12 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
+# Create directories that Jetty would otherwise create. We create them to avoid the confusing messages such as:
+# "MKDIR: ${jetty.base}/lib"
+mkdir -p $JETTY_BASE/lib/ext 2>/dev/null
+mkdir -p $JETTY_BASE/logs 2>/dev/null
+mkdir -p $JETTY_BASE/resources 2>/dev/null
+
 # Specify Jetty's home and base directories
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 

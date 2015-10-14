@@ -31,6 +31,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.po.BreadcrumbElement;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentDoesNotExistPage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -133,7 +134,11 @@ public class CreatePageNestedDocumentsTest extends AbstractTest
     {
         SpaceReference spaceReference = pageReference.getLastSpaceReference();
 
-        assertEquals("/" + getUtil().getURLFragment(spaceReference), viewPage.getBreadcrumbContent());
+        BreadcrumbElement breadcrumb = viewPage.getBreadcrumb();
+        if (breadcrumb.canBeExpanded()) {
+            breadcrumb.expand();
+        }
+        assertEquals("/" + getUtil().getURLFragment(spaceReference), breadcrumb.getPathAsString());
         assertEquals(spaceReference.getName(), viewPage.getDocumentTitle());
         assertEquals(getUtil().serializeReference(pageReference), viewPage.getMetaDataValue("reference"));
     }

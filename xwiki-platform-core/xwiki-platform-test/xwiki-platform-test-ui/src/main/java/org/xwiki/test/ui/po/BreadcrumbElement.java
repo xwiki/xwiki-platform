@@ -86,4 +86,9 @@ public class BreadcrumbElement extends BaseElement
             getDriver().waitUntilElementDisappears(this.container, By.className("ellipsis"));
         }
     }
+    
+    public boolean canBeExpanded()
+    {
+        return hasPathElement("…", false, true);
+    }
 }

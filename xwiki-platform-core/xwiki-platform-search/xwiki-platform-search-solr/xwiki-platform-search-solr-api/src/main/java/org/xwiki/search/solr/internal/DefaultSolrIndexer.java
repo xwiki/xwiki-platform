@@ -33,6 +33,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -70,6 +71,10 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  */
 @Component
 @Singleton
+// We start the disposal a bit earlier because we want the resolver & indexer threads to finish before the Solr client
+// is shutdown. We can't stop the threads immediately because the resolve & index queues may have entries that are being
+// processed.
+@DisposePriority(500)
 public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposable, Runnable
 {
     /**
@@ -376,12 +381,11 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 queueEntry = INDEX_QUEUE_ENTRY_STOP;
             }
 
-            if (queueEntry == INDEX_QUEUE_ENTRY_STOP) {
+            // Add to the batch until either the batch size is achieved, the queue gets emptied or the
+            // INDEX_QUEUE_ENTRY_STOP is retrieved from the queue.
+            if (!processBatch(queueEntry)) {
                 break;
             }
-
-            // Add to the batch until either the batch size is achieved or the queue gets emptied
-            processBatch(queueEntry);
         }
 
         this.logger.debug("Stop SOLR indexer thread");
@@ -392,8 +396,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * batch when it finishes to process it.
      * 
      * @param queueEntry the batch to process
+     * @return {@code true} to wait for another batch, {@code false} to stop the indexing thread
      */
-    private void processBatch(IndexQueueEntry queueEntry)
+    private boolean processBatch(IndexQueueEntry queueEntry)
     {
         SolrInstance solrInstance = this.solrInstanceProvider.get();
 
@@ -401,6 +406,11 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         int size = 0;
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
+            if (batchEntry == INDEX_QUEUE_ENTRY_STOP) {
+                // Discard the current batch and stop the indexing thread.
+                return false;
+            }
+
             IndexOperation operation = batchEntry.operation;
 
             // For the current contiguous operations queue, group the changes
@@ -442,6 +452,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         if (size > 0) {
             commit();
         }
+
+        return true;
     }
 
     /**

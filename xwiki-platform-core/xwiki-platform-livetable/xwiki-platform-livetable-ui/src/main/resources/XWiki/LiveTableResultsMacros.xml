@@ -333,7 +333,17 @@
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
     #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
-    #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
+    ## Compute the 'edit rights' URL
+    #if($itemDoc.name == 'WebHome')
+      ## For nested pages, use the page administration
+      #set($webPreferencesReference = $services.model.createEntityReference('WebPreferences', 'DOCUMENT', $itemDoc.documentReference.lastSpaceReference))
+      #set($editRightsURL = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&amp;section=PageRights'))
+    #else
+      ## For terminal pages, use the old rights editor
+      ## TODO: we should create a page administration for terminal pages too
+      #set($editRightsURL = $itemDoc.getURL('edit', 'editor=rights'))
+    #end
+    #set($discard = $row.put('doc_rights_url', $editRightsURL))
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))

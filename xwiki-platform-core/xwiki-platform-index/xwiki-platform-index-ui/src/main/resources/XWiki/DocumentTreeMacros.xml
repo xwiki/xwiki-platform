@@ -249,8 +249,8 @@
     #set ($totalCount = $countQuery.execute().get(0))
   #end
   #foreach ($spaceName in $spaceNames)
-    #set ($spaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $parentReference))
-    #maybeAddSpaceNode($spaceReference $children)
+    #set ($childSpaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $parentReference))
+    #maybeAddSpaceNode($childSpaceReference $children)
   #end
   #if ($spaceNames.size() &gt;= $limit)
     #set ($newOffset = $mathtool.add($offset, $spaceNames.size()))

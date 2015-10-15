@@ -190,6 +190,7 @@
   'showWikiPrettyName': true,
   'showSpaces': false,
   'showDocumentTitle': true,
+  'showTerminalDocuments': true,
   'showTranslations': true,
   'showAttachments': true,
   'showObjects': false,

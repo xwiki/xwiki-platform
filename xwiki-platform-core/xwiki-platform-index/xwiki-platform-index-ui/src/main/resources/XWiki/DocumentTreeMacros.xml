@@ -303,7 +303,6 @@
 
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
-  #set ($spaceHomePageRef = $services.model.resolveDocument('', 'default', $spaceReference))
   #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
   #if ($docTreeConfig.showTerminalDocuments)
@@ -330,11 +329,11 @@
       'canCopy': $canViewSpace,
       'canRename': $hasSpaceAdmin,
       'canDelete': $hasSpaceAdmin,
-      'createDocumentURL': $xwiki.getURL($spaceHomePageRef, 'create', $NULL),
-      'deleteURL': $xwiki.getURL($spaceHomePageRef, 'deletespace')
+      'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
+      'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
     },
     'a_attr': {
-      'href': $xwiki.getURL($spaceHomePageRef)
+      'href': $xwiki.getURL($spaceReference)
     }
   }))
 #end

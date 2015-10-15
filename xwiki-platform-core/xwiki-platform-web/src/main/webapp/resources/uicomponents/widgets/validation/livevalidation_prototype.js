@@ -1,5 +1,5 @@
-// LiveValidation 1.3 (prototype.js version)
-// Copyright (c) 2007-2008 Alec Hill (www.livevalidation.com)
+// LiveValidation 1.4 (prototype.js version)
+// Copyright (c) 2007-2010 Alec Hill (www.livevalidation.com)
 // LiveValidation is licensed under the terms of the MIT License
 
 var LiveValidation = Class.create();
@@ -10,29 +10,29 @@ var LiveValidation = Class.create();
 
 Object.extend(LiveValidation, {
   
-  VERSION: '1.3 prototype',
+  VERSION: '1.4 prototype',
   
   /*** element types constants ***/
   TEXTAREA:  1,
-  TEXT:         2,
-  PASSWORD: 3,
+  TEXT:      2,
+  PASSWORD:  3,
   CHECKBOX:  4,
-  SELECT:      5,
-  FILE:          6,
+  SELECT:    5,
+  FILE:      6,
 
   /**
    *	pass an array of LiveValidation objects and it will validate all of them
    *	
-   *	@var validations {Array} - an array of LiveValidation objects
+   *	@param validations {Array} - an array of LiveValidation objects
    *	@return {Bool} - true if all passed validation, false if any fail						
    */
   massValidate: function(validations){
-    var returnValue = true;
+    var ret = true;
     for(var i = 0, len = validations.length; i < len; ++i ){
       var valid = validations[i].validate();
-      if(returnValue) returnValue = valid;
+      if(ret) ret = valid;
     }
-    return returnValue;
+    return ret;
   }
 
 });
@@ -50,16 +50,28 @@ LiveValidation.prototype = {
   /**
    *	constructor for LiveValidation - validates a form field in real-time based on validations you assign to it
    *	
-   *	@var element {mixed} - either a dom element reference or the string id of the element to validate
-   *	@var optionsObj {Object} - general options, see below for details
+   *	@param element {mixed} - either a dom element reference or the string id of the element to validate
+   *	@param optionsObj {Object} - general options, see below for details
    *
    *	optionsObj properties:
-   *							validMessage {String} 	- the message to show when the field passes validation
+   *							validMessage {String} 	- the message to show when the field passes validation (set to '' or false to not insert any message)
    *													  (DEFAULT: "Thankyou!")
+   *                            beforeValidation {Function} - function to execute directly before validation is performed
+   *													  (DEFAULT: function(){})
+   *                            beforeValid {Function}  - function to execute directly before the onValid function is executed
+   *													  (DEFAULT: function(){})
    *							onValid {Function} 		- function to execute when field passes validation
-   *													  (DEFAULT: function(){ this.insertMessage(this.createMessageSpan()s); this.addFieldClass(); } )	
+   *													  (DEFAULT: function(){ this.insertMessage(this.createMessageSpan()s); this.addFieldClass(); } )
+   *                            afterValid {Function}   - function to execute directly after the onValid function is executed
+   *													  (DEFAULT: function(){})
+   *                            beforeInvalid {Function} - function to execute directly before the onInvalid function is executed
+   *													  (DEFAULT: function(){})	
    *							onInvalid {Function} 	- function to execute when field fails validation
    *													  (DEFAULT: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); })
+   *                            aterInvalid {Function}  - function to execute directly after the onInvalid function is executed
+   *													  (DEFAULT: function(){})
+   *                            afterValidation {Function} - function to execute directly after validation is performed
+   *													  (DEFAULT: function(){})
    *							insertAfterWhatNode {mixed} 	- reference or id of node to have the message inserted after 
    *													  (DEFAULT: the field that is being validated
    *              onlyOnBlur {Boolean} - whether you want it to validate as you type or only on blur
@@ -81,12 +93,19 @@ LiveValidation.prototype = {
     // overwrite the options defaults with passed in ones
     this.options = Object.extend({
       validMessage: 'Thankyou!',
-      onValid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
-      onInvalid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
       insertAfterWhatNode: this.element,
       onlyOnBlur: false,
       wait: 0,
-      onlyOnSubmit: false
+      onlyOnSubmit: false,
+	  // hooks
+	  beforeValidation: function(){},
+	  beforeValid: function(){},
+	  onValid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  afterValid: function(){},
+	  beforeInvalid: function(){},
+	  onInvalid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  afterInvalid: function(){},
+	  afterValidation: function(){},
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
@@ -98,26 +117,26 @@ LiveValidation.prototype = {
     }
     // events
 	// event callbacks are cached so they can be stopped being observed
-	this.boundFocus = this.doOnFocus.bindAsEventListener(this);
-    Event.observe(this.element, 'focus', this.boundFocus);
+	this.cFocus = this.doOnFocus.bindAsEventListener(this);
+    Event.observe(this.element, 'focus', this.cFocus);
     if(!this.onlyOnSubmit){
       switch(this.elementType){
         case LiveValidation.CHECKBOX:
-		  this.boundClick = this.validate.bindAsEventListener(this);
-          Event.observe(this.element, 'click', this.boundClick);
+		  this.cClick = this.validate.bindAsEventListener(this);
+          Event.observe(this.element, 'click', this.cClick);
           // let it run into the next to add a change event too
         case LiveValidation.SELECT:
         case LiveValidation.FILE:
-		  this.boundChange = this.validate.bindAsEventListener(this);
-          Event.observe(this.element, 'change', this.boundChange);
+		  this.cChange = this.validate.bindAsEventListener(this);
+          Event.observe(this.element, 'change', this.cChange);
           break;
         default:
           if(!this.onlyOnBlur){
-		  	this.boundKeyup = this.deferValidation.bindAsEventListener(this);
-		  	Event.observe(this.element, 'keyup', this.boundKeyup);
+		  	this.cKeyup = this.deferValidation.bindAsEventListener(this);
+		  	Event.observe(this.element, 'keyup', this.cKeyup);
 		  }
-          this.boundBlur = this.validate.bindAsEventListener(this);
-		  Event.observe(this.element, 'blur', this.boundBlur);
+          this.cBlur = this.validate.bindAsEventListener(this);
+		  Event.observe(this.element, 'blur', this.cBlur);
       }
     }
   },
@@ -133,19 +152,20 @@ LiveValidation.prototype = {
 		this.formObj.destroy();
 	}
     // remove events
-    Event.stopObserving(this.element, 'focus', this.boundFocus);
+	var el = this.element;
+    Event.stopObserving(el, 'focus', this.cFocus);
     if(!this.onlyOnSubmit){
       switch(this.elementType){
         case LiveValidation.CHECKBOX:
-          Event.stopObserving(this.element, 'click', this.boundClick);
+          Event.stopObserving(el, 'click', this.cClick);
           // let it run into the next to add a change event too
         case LiveValidation.SELECT:
         case LiveValidation.FILE:
-          Event.stopObserving(this.element, 'change', this.boundChange);
+          Event.stopObserving(el, 'change', this.cChange);
           break;
         default:
-          if(!this.onlyOnBlur) Event.stopObserving(this.element, 'keyup', this.boundKeyup);
-          Event.stopObserving(this.element, 'blur', this.boundBlur);
+          if(!this.onlyOnBlur) Event.stopObserving(el, 'keyup', this.cKeyup);
+          Event.stopObserving(el, 'blur', this.cBlur);
       }
     }
     this.validations = [];
@@ -155,9 +175,9 @@ LiveValidation.prototype = {
   /**
    *	adds a validation to perform to a LiveValidation object
    *
-   *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-   *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
-   * @return {Object} - the LiveValidation object itself so that calls can be chained
+   *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+   *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+   *    @return {Object} - the LiveValidation object itself so that calls can be chained
    */
   add: function(validationFunction, validationParamsObj){
     this.validations.push( { type: validationFunction, params: validationParamsObj || {} } );
@@ -167,16 +187,16 @@ LiveValidation.prototype = {
   /**
      *	removes a validation from a LiveValidation object - must have exactly the same arguments as used to add it 
      *
-     *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-     *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
-     * @return {Object} - the LiveValidation object itself so that calls can be chained
+     *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+     *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+     *  @return {Object} - the LiveValidation object itself so that calls can be chained
      */
-    remove: function(validationFunction, validationParamsObj){
-	  this.validations = this.validations.reject(function(v){
-	  	return (v.type == validationFunction && v.params == validationParamsObj);
-	  });
-	  return this;
-    },
+  remove: function(validationFunction, validationParamsObj){
+	this.validations = this.validations.reject(function(v){
+	  return (v.type == validationFunction && v.params == validationParamsObj);
+	});
+	return this;
+  },
     
   /**
    * makes the validation wait the alotted time from the last keystroke 
@@ -206,52 +226,43 @@ LiveValidation.prototype = {
   /**
    *	gets the type of element, to check whether it is compatible
    *
-   *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-   *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+   *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+   *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
    */
   getElementType: function(){
+	var nn = this.element.nodeName.toUpperCase();
+	var nt = this.element.type.toUpperCase();
     switch(true){
-      case (this.element.nodeName.toUpperCase() == 'TEXTAREA'):
+      case (nn == 'TEXTAREA'):
         return LiveValidation.TEXTAREA;
-      case (this.element.nodeName.toUpperCase() == 'INPUT' && this.element.type.toUpperCase() == 'TEXT'):
+      case (nn == 'INPUT' && nt == 'TEXT'):
         return LiveValidation.TEXT;
-      case (this.element.nodeName.toUpperCase() == 'INPUT' && this.element.type.toUpperCase() == 'PASSWORD'):
+      case (nn == 'INPUT' && nt == 'PASSWORD'):
         return LiveValidation.PASSWORD;
-      case (this.element.nodeName.toUpperCase() == 'INPUT' && this.element.type.toUpperCase() == 'CHECKBOX'):
+      case (nn == 'INPUT' && nt == 'CHECKBOX'):
         return LiveValidation.CHECKBOX;
-      case (this.element.nodeName.toUpperCase() == 'INPUT' && this.element.type.toUpperCase() == 'FILE'):
+      case (nn == 'INPUT' && nt == 'FILE'):
         return LiveValidation.FILE;
-      case (this.element.nodeName.toUpperCase() == 'SELECT'):
+      case (nn == 'SELECT'):
         return LiveValidation.SELECT;
-      case (this.element.nodeName.toUpperCase() == 'INPUT'):
-        throw new Error('LiveValidation::getElementType - Cannot use LiveValidation on an ' + this.element.type + ' input!');
+      case (nn == 'INPUT'):
+        throw new Error('LiveValidation::getElementType - Cannot use LiveValidation on an ' + nt.toLowerCase() + ' input!');
       default:
-        throw new Error('LiveValidation::getElementType - Element must be an input, select, or textarea!');
+        throw new Error('LiveValidation::getElementType - Element must be an input, select, or textarea - ' + nn.toLowerCase() + ' was given!');
     }
   },
     
   /**
    *	loops through all the validations added to the LiveValidation object and checks them one by one
    *
-   *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-   *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
-   * @return {Boolean} - whether the all the validations passed or if one failed
+   *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+   *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+   *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   doValidations: function(){
     this.validationFailed = false;
     for(var i = 0, len = this.validations.length; i < len; ++i){
-      var validation = this.validations[i];
-      switch(validation.type){
-        case Validate.Presence:
-        case Validate.Confirmation:
-        case Validate.Acceptance:
-          this.displayMessageWhenEmpty = true;
-          this.validationFailed = !this.validateElement(validation.type, validation.params); 
-          break;
-        default:
-          this.validationFailed = !this.validateElement(validation.type, validation.params);
-          break;
-      }
+	  this.validationFailed = !this.validateElement(this.validations[i].type, this.validations[i].params);
       if(this.validationFailed) return false;	
     }
     this.message = this.validMessage;
@@ -261,24 +272,38 @@ LiveValidation.prototype = {
   /**
    *	performs validation on the element and handles any error (validation or otherwise) it throws up
    *
-   *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-   *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
-   * @return {Boolean} - whether the validation has passed or failed
+   *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+   *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+   *    @return {Boolean} - whether the validation has passed or failed
    */
   validateElement: function(validationFunction, validationParamsObj){
+  	// check whether we should display the message when empty
+	switch(validationFunction){
+    	case Validate.Presence:
+        case Validate.Confirmation:
+        case Validate.Acceptance:
+    		this.displayMessageWhenEmpty = true;
+    		break;
+		case Validate.Custom:
+			if(validationParamsObj.displayMessageWhenEmpty) this.displayMessageWhenEmpty = true;
+			break;
+    }
+	// select and checkbox elements values are handled differently
     var value = (this.elementType == LiveValidation.SELECT) ? this.element.options[this.element.selectedIndex].value : this.element.value;     
     if(validationFunction == Validate.Acceptance){
       if(this.elementType != LiveValidation.CHECKBOX) throw new Error('LiveValidation::validateElement - Element to validate acceptance must be a checkbox!');
       value = this.element.checked;
     }
+	// now validate
     var isValid = true;
     try{    
       validationFunction(value, validationParamsObj);
     } catch(error) {
       if(error instanceof Validate.Error){
         if( value !== '' || (value === '' && this.displayMessageWhenEmpty) ){
-          this.validationFailed = true;
-          this.message = error.message;
+          this.validationFailed = true;	
+		  // Opera 10 adds stacktrace after newline
+          this.message = error.message.split('\n')[0];
           isValid = false;
         }
       }else{
@@ -290,23 +315,29 @@ LiveValidation.prototype = {
   },
     
   /**
-   *	makes it do the all the validations and fires off the onValid or onInvalid callbacks
+   *	makes it do the all the validations and fires off the various callbacks
    *
-   * @return {Boolean} - whether the all the validations passed or if one failed
+   *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   validate: function(){
   	if(!this.element.disabled){
+		this.beforeValidation();
 		var isValid = this.doValidations();
 		if(isValid){
+			this.beforeValid();
 			this.onValid();
+			this.afterValid();
 			return true;
 		}else {
+			this.beforeInvalid();
 			this.onInvalid();
+			this.afterInvalid();
 			return false;
 		}
+		this.afterValidation();
 	}else{
-    return true;
-  }
+      return true;
+    }
   },
   
   /**
@@ -340,7 +371,7 @@ LiveValidation.prototype = {
   /**
    *	makes a span containg the passed or failed message
    *
-   * @return {HTMLSpanObject} - a span element with the message in it
+   *    @return {HTMLSpanObject} - a span element with the message in it
    */
   createMessageSpan: function(){
     var span = document.createElement('span');
@@ -350,25 +381,27 @@ LiveValidation.prototype = {
   },
     
   /**
-   *	inserts the element containing the message in place of the element that already exists (if it does)
+   *  inserts the element containing the message in place of the element that already exists (if it does)
    *
-   * @var elementToIsert {HTMLElementObject} - an element node to insert
+   *  @param elementToInsert {HTMLElementObject} - an element node to insert
    */
   insertMessage: function(elementToInsert){
     this.removeMessage();
-    var className = this.validationFailed ? this.invalidClass : this.validClass;
+    if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
-      $(elementToInsert).addClassName( this.messageClass + (' ' + className) );
-      if( nxtSibling = this.insertAfterWhatNode.nextSibling){
-        this.insertAfterWhatNode.parentNode.insertBefore(elementToInsert, nxtSibling);
+      var className = this.validationFailed ? this.invalidClass : this.validClass;
+	  $(elementToInsert).addClassName( this.messageClass + ' ' + className );
+	  var parent = this.insertAfterWhatNode.up();
+      if( nxtSibling = this.insertAfterWhatNode.next()){
+        parent.insertBefore(elementToInsert, nxtSibling);
       }else{
-        this.insertAfterWhatNode.parentNode.appendChild(elementToInsert);
+        parent.appendChild(elementToInsert);
       }
     }
   },
     
   /**
-   *	changes the class of the field based on whether it is valid or not
+   *  changes the class of the field based on whether it is valid or not
    */
   addFieldClass: function(){ 
     this.removeFieldClass();
@@ -385,11 +418,12 @@ LiveValidation.prototype = {
    *	removes the message element if it exists
    */
   removeMessage: function(){
-    if( nxtEl = this.insertAfterWhatNode.next('.' + this.messageClass) ) nxtEl.remove();
+	var nxtEl = this.insertAfterWhatNode.next('.' + this.messageClass);
+    if(nxtEl) nxtEl.remove();
   },
     
   /**
-   *	removes the class that has been applied to the field to indicte if valid or not
+   *  removes the class that has been applied to the field to indicte if valid or not
    */
   removeFieldClass: function(){
     this.element.removeClassName(this.invalidFieldClass);
@@ -397,16 +431,22 @@ LiveValidation.prototype = {
   },
     
   /**
-   *	removes the message and the field class
+   *  removes the message and the field class
    */
   removeMessageAndFieldClass: function(){
     this.removeMessage();
     this.removeFieldClass();
   }
    
-} // end of LiveValidation.prototype object
+}
 
 /*************************************** LiveValidationForm class ****************************************/
+/**
+ * This class is used internally by LiveValidation class to associate a LiveValidation field with a form it is icontained in one
+ * 
+ * It will therefore not really ever be needed to be used directly by the developer, unless they want to associate a LiveValidation 
+ * field with a form that it is not a child of, or add some extra functionality via the hooks (access through a LiveValidation object's formObj property)
+ */
 
 var LiveValidationForm = Class.create();
 
@@ -415,20 +455,22 @@ var LiveValidationForm = Class.create();
 Object.extend(LiveValidationForm, {
 
 	/**
-	 * namespace to hold instances
+	 *  namespace to hold instances
 	 */
 	instances: {},
 	
 	/**
 	   *	gets the instance of the LiveValidationForm if it has already been made or creates it if it doesnt exist
 	   *	
-	   *	@var element {HTMLFormElement} - a dom element reference to a form
+	   *	@param element {mixed} - a dom element reference to or id of a form
 	   */
 	getInstance: function(element){
+	  if(!element) throw new Error("LiveValidationForm::getInstance - No element reference or element id has been provided!");
+	  var el = $(element);
 	  var rand = Math.random() * Math.random();
-	  if(!element.id) element.id = 'formId_' + rand.toString().replace(/\./, '') + new Date().valueOf();
-	  if(!LiveValidationForm.instances[element.id]) LiveValidationForm.instances[element.id] = new LiveValidationForm(element);
-	  return LiveValidationForm.instances[element.id];
+	  if(!el.id) el.id = 'formId_' + rand.toString().replace(/\./, '') + new Date().valueOf();
+	  if(!LiveValidationForm.instances[el.id]) LiveValidationForm.instances[el.id] = new LiveValidationForm(el);
+	  return LiveValidationForm.instances[el.id];
 	}
 
 });
@@ -437,10 +479,16 @@ Object.extend(LiveValidationForm, {
 
 LiveValidationForm.prototype = {
   
+  // hooks
+  beforeValidation: function(){},
+  onValid: function(){},
+  onInvalid: function(){},
+  afterValidation: function(){},
+
   /**
    *	constructor for LiveValidationForm - handles validation of LiveValidation fields belonging to this form on its submittal
    *	
-   *	@var element {HTMLFormElement} - a dom element reference to the form to turn into a LiveValidationForm
+   *	@param element {HTMLFormElement} - a dom element reference to the form to turn into a LiveValidationForm
    */
   initialize: function(element){
     this.element = $(element);
@@ -450,15 +498,20 @@ LiveValidationForm.prototype = {
 	//(hence not using Event.observe, as inline events appear to be captured before prototype events)
 	this.oldOnSubmit = this.element.onsubmit || function(){};
 	this.element.onsubmit = function(e){
-	  var ret = (LiveValidation.massValidate(this.fields)) ? this.oldOnSubmit.call(this.element, e) !== false : false;
-	  if (!ret) Event.stop(e)
+	  var ret = false;
+	  this.beforeValidation(),
+      this.valid = LiveValidation.massValidate(this.fields);
+      this.valid ? this.onValid() : this.onInvalid();
+      this.afterValidation();
+	  if(this.valid) ret = this.oldOnSubmit.call(this.element, e) !== false;
+	  if(!ret) Event.stop(e);
     }.bindAsEventListener(this);
   },
   
   /**
    *	adds a LiveValidation field to the forms fields array
    *	
-   *	@var lvObj {LiveValidation} - a LiveValidation object
+   *	@param lvObj {LiveValidation} - a LiveValidation object
    */
   addField: function(lvObj){
     this.fields.push(lvObj);
@@ -467,16 +520,16 @@ LiveValidationForm.prototype = {
   /**
    *	removes a LiveValidation field from the forms fields array
    *	
-   *	@var victim {LiveValidation} - a LiveValidation object
+   *	@param victim {LiveValidation} - a LiveValidation object
    */
   removeField: function(victim){
 	this.fields = this.fields.without(victim);
   },
   
   /**
-   *	destroy this instance and its events
+   *    destroy this instance and its events
    *
-   * @var force {Boolean} - whether to force the detruction even if there are fields still associated
+   *    @param force {Boolean} - whether to force the detruction even if there are fields still associated
    */
   destroy: function(force){
   	// only destroy if has no fields and not being forced
@@ -488,7 +541,7 @@ LiveValidationForm.prototype = {
 	return true;
   }
    
-}// end of LiveValidationForm prototype
+}
 
 /*************************************** Validate class ****************************************/
 /**
@@ -510,8 +563,8 @@ var Validate = {
   /**
    *	validates that the field has been filled in
    *
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation 
@@ -528,8 +581,8 @@ var Validate = {
   /**
    *	validates that the value is numeric, does not fall within a given range of numbers
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							notANumberMessage {String} - the message to show when the validation fails when value is not a number
@@ -589,8 +642,8 @@ var Validate = {
   /**
    *	validates against a RegExp pattern
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation
@@ -608,8 +661,8 @@ var Validate = {
     var value = String(value);
     var params = Object.extend({ 
       failureMessage: "Not valid!",
-      pattern:           /./ ,
-      negate:            false
+      pattern:        /./,
+      negate:   	  false
     }, paramsObj || {});
     if(!params.negate && !params.pattern.test(value)) Validate.fail(params.failureMessage); // normal
     if(params.negate && params.pattern.test(value)) Validate.fail(params.failureMessage); // negated
@@ -619,8 +672,8 @@ var Validate = {
   /**
    *	validates that the field contains a valid email address
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation
@@ -637,8 +690,8 @@ var Validate = {
   /**
    *	validates the length of the value
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							 wrongLengthMessage {String} - the message to show when the fails when is param is used
@@ -687,8 +740,8 @@ var Validate = {
   /**
    *	validates that the value falls within a given set of values
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation
@@ -739,8 +792,8 @@ var Validate = {
   /**
    *	validates that the value does not fall within a given set of values (shortcut for using Validate.Inclusion with exclusion: true)
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation
@@ -770,8 +823,8 @@ var Validate = {
   /**
    *	validates that the value matches that in another field
    *	
-   *	@var value {mixed} - value to be checked
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation
@@ -793,8 +846,8 @@ var Validate = {
   /**
    *	validates that the value is true (for use primarily in detemining if a checkbox has been checked)
    *	
-   *	@var value {mixed} - value to be checked if true or not (usually a boolean from the checked value of a checkbox)
-   *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+   *	@param value {mixed} - value to be checked if true or not (usually a boolean from the checked value of a checkbox)
+   *	@param paramsObj {Object} - parameters for this particular validation, see below for details
    *
    *	paramsObj properties:
    *							failureMessage {String} - the message to show when the field fails validation 
@@ -811,14 +864,14 @@ var Validate = {
    /**
      *	validates against a custom function that returns true or false (or throws a Validate.Error) when passed the value
      *	
-     *	@var value {mixed} - value to be checked
-     *	@var paramsObj {Object} - parameters for this particular validation, see below for details
+     *	@param value {mixed} - value to be checked
+     *	@param paramsObj {Object} - parameters for this particular validation, see below for details
      *
      *	paramsObj properties:
      *							failureMessage {String} - the message to show when the field fails validation
      *													  (DEFAULT: "Not valid!")
      *							against {Function} 			- a function that will take the value and object of arguments and return true or false 
-     *													  (DEFAULT: function(){ return true; })
+     *													  (DEFAULT: function(value, argsObj){ return true; })
      *							args {Object} 		- an object of named arguments that will be passed to the custom function so are accessible through this object within it 
      *													  (DEFAULT: {})
      */
@@ -835,18 +888,18 @@ var Validate = {
   /**
    *	validates whatever it is you pass in, and handles the validation error for you so it gives a nice true or false reply
    *
-   *	@var validationFunction {Function} - validation function to be used (ie Validate.Presence )
-   *	@var value {mixed} - value to be checked 
-   *	@var validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
+   *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
+   *	@param value {mixed} - value to be checked 
+   *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
    */
   now: function(validationFunction, value, validationParamsObj){
     if(!validationFunction) throw new Error("Validate::now - Validation function must be provided!");
     var isValid = true;
     try{    
       validationFunction(value, validationParamsObj || {});
-    } catch(error) {
+    }catch(error){
       if(error instanceof Validate.Error){
-        isValid =  false;
+        isValid = false;
       }else{
         throw error;
       }
@@ -865,4 +918,4 @@ var Validate = {
     throw new Validate.Error(errorMessage);
   }
 
-} // end of Validate object
+}

@@ -120,7 +120,9 @@
     </property>
     <property>
       <parameters>label=$services.localization.render('platform.appwithinminutes.appPanelCreateEntry')
-target=AppWithinMinutes.WebHome
+## Only users with the right to create spaces should see the Create Applications since currently AWM creates a new space
+## to hold the application.
+target=#if ($hasCreateSpace)AppWithinMinutes.WebHome#end
 icon=icon:bullet_go</parameters>
     </property>
     <property>

@@ -107,8 +107,8 @@
     #set ($filterQuery = [])
   #end
   ## Add the default filters only if they aren't already set.
-  #if (!$filterNames.contains('locales'))
-    #set ($discard = $filterQuery.add("locales:$xcontext.language"))
+  #if (!$filterNames.contains('locale'))
+    #set ($discard = $filterQuery.add("locale:(""$xcontext.language"" OR """")"))
   #end
   #if (!$xcontext.isMainWiki() &amp;&amp; !$filterNames.contains('wiki'))
     ## Subwikis search by default in their content only.
@@ -118,24 +118,6 @@
     #set ($discard = $filterQuery.add("hidden:false"))
   #end
   #set ($params.fq = $filterQuery)
-  ##
-  ## Disable faceting and highlighting because we don't need them.
-  #if (!$params.facet)
-    #set ($params.facet = false)
-  #end
-  #if (!$params.hl)
-    #set ($params.hl = false)
-  #end
-  ##
-  ## We have to set the list of supported locales so the names of the fields that are indexed in multiple languages are
-  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
-  ## title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
-  #if (!$params.get('xwiki.supportedLocales'))
-    #set ($supportedLocales = $xwiki.getXWikiPreference('languages'))
-    ## Fix the locale list separator.
-    #set ($supportedLocales = $supportedLocales.replaceAll('\s*[, |]\s*', ','))
-    #set ($discard = $params.put('xwiki.supportedLocales', $supportedLocales))
-  #end
 #end
 
 #macro (prepareSearchSuggestStatement $params $input)

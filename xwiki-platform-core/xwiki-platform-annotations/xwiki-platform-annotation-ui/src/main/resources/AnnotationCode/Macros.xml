@@ -159,8 +159,8 @@
  *#
 #macro(displayAnnotationBoxButtons $mode)
   &lt;div class="buttons"&gt;
-    &lt;span class='buttonwrapper'&gt;&lt;input type="submit" class='button' value='$services.localization.render("annotations.action.${mode}.submit.text")'/&gt;&lt;/span&gt;
-    &lt;span class='buttonwrapper'&gt;&lt;input type="reset" class='button secondary' value='$services.localization.render("annotations.action.${mode}.cancel.text")'/&gt;&lt;/span&gt;
+    &lt;span class='buttonwrapper'&gt;&lt;input type="submit" class='button' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.submit.text"))}'/&gt;&lt;/span&gt;
+    &lt;span class='buttonwrapper'&gt;&lt;input type="reset" class='button secondary' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.cancel.text"))}'/&gt;&lt;/span&gt;
   &lt;/div&gt;
 #end
 ##

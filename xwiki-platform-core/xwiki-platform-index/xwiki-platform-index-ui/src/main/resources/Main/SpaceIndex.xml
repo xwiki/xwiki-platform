@@ -42,8 +42,10 @@
   <content>{{velocity}}
 #if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end
 $services.localization.render('platform.index.spaceIndexDescription', [$space])
+## Since we display the space index, we do not display page titles and locations, but the old columns name and space 
+## (old behavior consistent with this old macro)...
 
-{{documents space="$space.replaceAll('["~]', '~$0')" id="spaceindex"/}}
+{{documents space="$space.replaceAll('["~]', '~$0')" id="spaceindex" columns="doc.name, doc.space, doc.date, doc.author"/}}
 #set($docextras=[])
 {{/velocity}}
 </content>

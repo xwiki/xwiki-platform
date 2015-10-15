@@ -107,8 +107,8 @@
     #set ($filterQuery = [])
   #end
   ## Add the default filters only if they aren't already set.
-  #if (!$filterNames.contains('locales'))
-    #set ($discard = $filterQuery.add("locales:$xcontext.language"))
+  #if (!$filterNames.contains('locale'))
+    #set ($discard = $filterQuery.add("locale:(""$xcontext.language"" OR """")"))
   #end
   #if (!$xcontext.isMainWiki() &amp;&amp; !$filterNames.contains('wiki'))
     ## Subwikis search by default in their content only.

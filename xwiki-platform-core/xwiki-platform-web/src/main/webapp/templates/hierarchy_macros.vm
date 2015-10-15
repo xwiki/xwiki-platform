@@ -119,6 +119,10 @@
     #set ($breadCrumbClassNames = "${breadCrumbClassNames} breadcrumb-expandable")
     ## Store the entity reference into the breadcrumb, so the JS can retreive the full hierarchy
     #set ($breadCrumbParameters = "data-entity='$escapetool.xml($services.model.serialize($entityReference, 'local'))'")
+    ## Store the options into the breadcrumb, so the JS can have all informations
+    #foreach ($option in $options.keySet())
+      #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
+    #end
   #end
   <ol id="$!options.id" class="$breadCrumbClassNames" $breadCrumbParameters><li
     #foreach ($item in $pathData)

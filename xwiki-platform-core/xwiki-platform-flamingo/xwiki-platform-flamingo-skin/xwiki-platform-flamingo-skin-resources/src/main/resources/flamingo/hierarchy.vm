@@ -17,8 +17,24 @@
     ##
     #if ($request.xpage == 'hierarchy')
       #set ($options = {})
+      #if ("$!request.displayTitle" != '')
+        #set ($displayTitle = ($request.displayTitle == 'true'))
+        #set ($discard = $options.put('displayTitle', $displayTitle))
+      #end
+      #if ("$!request.excludeSelf" != '')
+        #set ($excludeSelf = ($request.excludeSelf == 'true'))
+        #set ($discard = $options.put('excludeSelf', $excludeSelf))
+      #end
       #if ("$!request.id" != '')
         #set($discard = $options.put('id', $escapetool.xml($request.id)))
+      #end
+      #if ("$!request.limit" != '')
+        #set ($limit = $mathtool.toInteger($request.limit))
+        #set ($discard = $options.put('limit', $limit))
+      #end
+      #if ("$!request.local" != '')
+        #set ($local = ($request.local == 'true'))
+        #set ($discard = $options.put('local', $local))
       #end
       #hierarchy($NULL $options)
     #else

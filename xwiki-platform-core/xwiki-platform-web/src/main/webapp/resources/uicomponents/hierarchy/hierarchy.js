@@ -35,8 +35,12 @@ require(['jquery'], function($) {
       // Get the full breadcumb with an AJAX call
       var breadcrumb  = $(this).parents('.breadcrumb-expandable');
       var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT)).getURL('get', 'xpage=hierarchy');
-      $.ajax(ajaxURL, { 'data': { 'id': breadcrumb[0].id } })
-        .done(function (newBreadcrumb) {
+      $.ajax(ajaxURL, { 'data': {
+          'id'           : breadcrumb[0].id,
+          'displayTitle' : breadcrumb.data('displaytitle'),
+          'local'        : breadcrumb.data('local'),
+          'excludeSelf'  : breadcrumb.data('excludeself')
+      }}).done(function (newBreadcrumb) {
           breadcrumb.replaceWith(newBreadcrumb);
         })
         .fail(function (){

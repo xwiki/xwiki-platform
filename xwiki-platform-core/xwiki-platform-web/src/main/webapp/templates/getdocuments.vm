@@ -19,8 +19,13 @@ $response.setContentType("application/json")
   #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
 #end
 #if ("$!request.get('doc.location')" != '')
+  ## Location is a special case, that we need to handle separatly.
+  ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
   #set ($whereQueryPart = "${whereQueryPart} AND LOWER(doc.fullName) LIKE ?")
-  #set ($discard = $queryParams.add("%${request.get('doc.location').toLowerCase()}%"))
+  ## Because the user might filter with "/" as separator we replace that by "%", because
+  ## it could be "." (the space separator) or "/" (as it is in the document name).
+  #set ($location = $request.get('doc.location').replaceAll('/', '%').toLowerCase())
+  #set ($discard = $queryParams.add("%${location}%"))
 #end
 ##
 ## ORDER
@@ -74,6 +79,7 @@ $response.setContentType("application/json")
   #set($discard = $map.put('sql', $queryString))
   #set($discard = $map.put('params', $queryParams))
 #end
+#template('hierarchy_macros.vm')
 #set ($rows = [])
 #foreach ($item in $items)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
@@ -109,7 +115,8 @@ $response.setContentType("application/json")
       #set ($discard = $row.put('doc_name', $itemDoc.name))
     #end
     #set ($discard = $row.put('doc_fullName', $fullname))
-    #set ($discard = $row.put('doc_location', $itemDoc.fullName))
+    #set ($location = "#hierarchy($itemDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
+    #set ($discard = $row.put('doc_location', $location))
     #set ($discard = $row.put('doc_space', $itemDoc.space))
     #set ($discard = $row.put('doc_url', $xwiki.getURL($docName)))
     #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
@@ -124,7 +131,17 @@ $response.setContentType("application/json")
     #set ($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set ($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
     #set ($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&step=1')))
-    #set ($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
+    ## Compute the 'edit rights' URL
+    #if($itemDoc.name == 'WebHome')
+      ## For nested pages, use the page administration
+      #set($webPreferencesReference = $services.model.createEntityReference('WebPreferences', 'DOCUMENT', $itemDoc.documentReference.lastSpaceReference))
+      #set($editRightsURL = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&section=PageRights'))
+    #else
+      ## For terminal pages, use the old rights editor
+      ## TODO: we should create a page administration for terminal pages too
+      #set($editRightsURL = $itemDoc.getURL('edit', 'editor=rights'))
+    #end
+    #set ($discard = $row.put('doc_rights_url', $editRightsURL))
     #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))

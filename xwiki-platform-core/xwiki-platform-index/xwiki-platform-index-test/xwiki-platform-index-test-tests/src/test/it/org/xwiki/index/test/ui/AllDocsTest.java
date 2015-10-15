@@ -65,7 +65,7 @@ public class AllDocsTest extends AbstractTest
 
         // Test 2: Verify filtering works by filtering on the document name
         livetable = page.clickIndexTab();
-        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", getTestMethodName());
+        livetable.filterColumn("xwiki-livetable-alldocs-filter-2", getTestMethodName());
         // We get one result for the user we've created
         assertEquals(1, livetable.getRowCount());
         assertTrue(livetable.hasRow("Page", getTestClassName() + "_" + getTestMethodName()));

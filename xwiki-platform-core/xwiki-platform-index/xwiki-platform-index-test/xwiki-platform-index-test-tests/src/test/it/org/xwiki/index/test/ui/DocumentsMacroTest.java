@@ -55,7 +55,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
          Assert.assertTrue(livetable.getRowCount() > 0);
 
          // Verify that page titles are displayed by filtering on one page for which we know the title
-         livetable.filterColumn("xwiki-livetable-example-filter-1", "Test Title");
+         livetable.filterColumn("xwiki-livetable-example-filter-2", getTestMethodName());
          Assert.assertTrue(livetable.hasRow("Page", "Test Title"));
      }
  }

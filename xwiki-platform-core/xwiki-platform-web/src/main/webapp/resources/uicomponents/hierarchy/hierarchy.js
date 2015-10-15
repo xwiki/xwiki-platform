@@ -20,7 +20,7 @@
 /**
  * Expand hierarchy breadcrumbs on clicks.
  */
-require(['jquery'], function($) {
+require(['jquery', 'xwiki-events-bridge'], function($) {
   'use strict';
   
   $(document).ready(function() {
@@ -52,10 +52,17 @@ require(['jquery'], function($) {
    /**
     * Add a link to expand breadcrumbs.
     */
-    $('.breadcrumb-expandable .ellipsis').wrapInner(function () {
-      // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
-      return $('<a href="#"></a>').click(expandBreadCrumb);
-    });
+    var addExpandLinkToBreadcrumbs = function () {
+      $('.breadcrumb-expandable .ellipsis').removeClass('ellipsis').wrapInner(function () {
+        // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
+        return $('<a href="#"></a>').click(expandBreadCrumb);
+      });
+    };
+    
+    addExpandLinkToBreadcrumbs();
+    
+    // Initialize breadcrumbs on livetable refresh (because now livetables could have breadcrumbs to display locations)
+    $(document).on('xwiki:livetable:displayComplete', addExpandLinkToBreadcrumbs);
     
   });
   

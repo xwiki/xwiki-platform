@@ -27,8 +27,8 @@
 #set ($colprops = {
   'doc.title'    : { 'link' : 'view' },
   'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
-  'doc.location' : { 'link' : 'view', 'type': 'text', 'filterable': true},
-  '_actions'     : { 'actions': ['copy', 'delete', 'rename'] }
+  'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
+  '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
 })
 #set ($parent = $services.model.serialize($doc.documentReference.lastSpaceReference, 'local'))
 #set ($queryFilters = "unique")
@@ -42,6 +42,8 @@
   'outputOnlyHtml' : true
 })
 #livetable('siblingsIndex' $collist $colprops $options)
+## Load the hierarchy JS file because the locations of documents in the livetable results are displayed as hierarchy
+#set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
 #######################################################
 ##                   FOOTER
 #######################################################

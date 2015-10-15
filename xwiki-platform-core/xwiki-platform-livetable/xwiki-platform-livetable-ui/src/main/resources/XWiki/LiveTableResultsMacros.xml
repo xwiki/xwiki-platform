@@ -40,6 +40,8 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#template('hierarchy_macros.vm')
+
 #**
  * Macro to get the results of a livetable data call.
  * This page is called from live grids via Ajax with the argument xpage=plain. It returns a
@@ -320,6 +322,7 @@
     #end
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))
+    #set($discard = $row.put('doc_location', "#hierarchy($itemDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})"))
     #set($discard = $row.put('doc_url', $xwiki.getURL($itemDoc.documentReference)))
     #set($discard = $row.put('doc_space_url', $xwiki.getURL($itemDoc.documentReference.extractReference('SPACE'))))
     #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
@@ -590,9 +593,20 @@
     #if ("$!filterValue" != '')
       #set ($discard = $tablelist.add($colName))
       #if ($colName.startsWith('doc.'))
-        #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
-        #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
-        #set ($discard = $whereParams.add("%$filterValue%"))
+        #if ($colName == 'doc.location')
+          ## Location is a special case, that we need to handle separatly.
+          ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+          #set ($safeColName = 'doc.fullName')
+          #set ($whereSql = "${whereSql} and upper(doc.fullName) like upper(?)")
+          ## Because the user might filter with "/" as separator we replace that by "%", because
+          ## it could be "." (the space separator) or "/" (as it is in the document name).
+          #set ($locationFilterValue = $filterValue.replaceAll('/', '%'))
+          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+        #else
+          #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
+          #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
+          #set ($discard = $whereParams.add("%$filterValue%"))
+        #end
       #else
         #livetable_filterProperty($colName $filterValue)
       #end

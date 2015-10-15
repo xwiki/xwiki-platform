@@ -41,11 +41,11 @@
   <hidden>true</hidden>
   <content>Example:
 
-##{{{{{documents id="example" count="5" actions="false" columns="doc.title"/}}}}}##
+##{{{{{documents id="example" count="5" actions="false" columns="doc.title, doc.location"/}}}}}##
 
 Generates:
 
-{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}</content>
+{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title, doc.location"/}}</content>
   <object>
     <name>XWiki.DocumentsMacro</name>
     <number>0</number>
@@ -168,10 +168,11 @@ Generates:
     #set ($discard = $collist.add($colname.trim()))
   #end
 #else
-  #set($collist = ['doc.name', 'doc.space', 'doc.date', 'doc.author'])
+  #set($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
 #set($colprops = {
-  'doc.title' : { 'type' : 'text' , 'size' : 30, 'link' : 'view' },
+  'doc.title' : { 'type' : 'text' , 'size' : 30, 'link' : 'view', 'filterable': false },
+  'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
   'doc.fullName' : { 'type' : 'text' , 'size' : 30, 'link' : 'view' },
   'doc.name' : { 'type' : 'text' , 'size' : 30, 'link' : 'view' },
   'doc.space' : { 'type' : 'text', 'link' : 'space' },

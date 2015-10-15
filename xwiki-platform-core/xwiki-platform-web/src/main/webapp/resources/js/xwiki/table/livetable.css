@@ -447,3 +447,13 @@ table.livetable {
   left: 0px;
 }
 /* </Compatibility> */
+
+.xwiki-livetable .breadcrumb {
+  margin: 0;
+  background-color: transparent;
+  padding: 0;
+}
+
+.xwiki-livetable .breadcrumb .active a{
+  color: $theme.linkColor;
+}

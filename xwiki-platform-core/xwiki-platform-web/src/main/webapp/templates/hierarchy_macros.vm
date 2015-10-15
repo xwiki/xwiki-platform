@@ -187,7 +187,8 @@
  * @param $path a path in the hierarchy
  * @param $options various display options; default values are {
  *   entities: {}, // a map of (reference, entity) pairs holding unsaved entities that should be used for display
- *   plain: false // whether to use plain text or HTML
+ *   plain: false, // whether to use plain text or HTML
+ *   displayTitle: true // whether to display the title of the documents or the reference name
  *#
 #macro (getHierarchyPathLabels $path $return $options)
   #if (!$options)
@@ -196,7 +197,7 @@
   #set ($macro.labels = [])
   #foreach ($reference in $path)
     #set ($label = $escapetool.xml($reference.name))
-    #if ($reference.type == 'SPACE' || $reference.type == 'DOCUMENT')
+    #if (($reference.type == 'SPACE' || $reference.type == 'DOCUMENT') && "$!options.displayTitle" != 'false')
       ## Check if there is an unsaved document with this reference.
       #set ($document = $options.entities.get($reference))
       #if (!$document)

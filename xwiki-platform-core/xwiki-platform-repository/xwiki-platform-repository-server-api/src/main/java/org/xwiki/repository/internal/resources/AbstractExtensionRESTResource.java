@@ -88,13 +88,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
     XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
 
-    public static final String[] EPROPERTIES_EXTRA = new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
-    XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
-    XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
-    XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, XWikiRepositoryModel.PROP_EXTENSION_SCMURL,
-    XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION,
-    XWikiRepositoryModel.PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM };
-
     protected static final String DEFAULT_BOOST;
 
     protected static final String DEFAULT_FL;
@@ -102,8 +95,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected static Map<String, Integer> EPROPERTIES_INDEX = new HashMap<String, Integer>();
 
     protected static String SELECT_EXTENSIONSUMMARY;
-
-    protected static String SELECT_EXTENSION;
 
     static {
         StringBuilder pattern = new StringBuilder();
@@ -125,15 +116,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         SELECT_EXTENSIONSUMMARY = pattern.toString();
-
-        // Extension extra
-        for (int i = 0; i < EPROPERTIES_EXTRA.length; ++i, ++j) {
-            pattern.append(", extension.");
-            pattern.append(EPROPERTIES_EXTRA[i]);
-            EPROPERTIES_INDEX.put(EPROPERTIES_EXTRA[i], j);
-        }
-
-        SELECT_EXTENSION = pattern.toString();
 
         // Solr
 
@@ -214,29 +196,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected long getExtensionsCountResult(Query query) throws QueryException
     {
         return ((Number) query.execute().get(0)).intValue();
-    }
-
-    protected Query createExtensionsQuery(String from, String where, int offset, int number) throws QueryException
-    {
-        // select
-
-        String select = SELECT_EXTENSION;
-
-        // TODO: add support for real lists: need a HQL or JPQL equivalent to MySQL GROUP_CONCAT
-        // * dependencies
-
-        // Link to last version object
-
-        if (where != null) {
-            where = "(" + where + ") and ";
-        } else {
-            where = "";
-        }
-        where +=
-            "extensionVersion." + XWikiRepositoryModel.PROP_VERSION_VERSION + " = extension."
-                + XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION;
-
-        return createExtensionsQuery(select, from, where, offset, number, true);
     }
 
     protected Query createExtensionsSummariesQuery(String from, String where, int offset, int number, boolean versions)

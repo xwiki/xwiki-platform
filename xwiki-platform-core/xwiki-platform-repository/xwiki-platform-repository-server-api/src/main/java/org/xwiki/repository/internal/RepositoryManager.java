@@ -83,7 +83,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 import org.xwiki.repository.internal.reference.ExtensionResourceReference;
-import org.xwiki.repository.internal.resources.AbstractExtensionRESTResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -112,6 +111,9 @@ public class RepositoryManager implements Initializable, Disposable
         new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
 
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
+
+    private static final String[] COLUMNS = new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
+    XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS };
 
     /**
      * Get the reference of the class in the current wiki.
@@ -324,20 +326,6 @@ public class RepositoryManager implements Initializable, Disposable
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? "1" : "0", xcontext);
 
             needSave = true;
-        }
-
-        // Make sure all searched fields are set in valid extensions (otherwise they won't appear in the search result).
-        // Would probably be cleaner and safer to do a left join instead but can't find a standard way to do it trough
-        // XWQL or HSQL.
-
-        if (valid) {
-            for (String fieldName : AbstractExtensionRESTResource.EPROPERTIES_EXTRA) {
-                if (extensionObject.safeget(fieldName) == null) {
-                    extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                    extensionObjectToSave.set(fieldName, "", xcontext);
-                    needSave = true;
-                }
-            }
         }
 
         // Save document
@@ -584,13 +572,14 @@ public class RepositoryManager implements Initializable, Disposable
             // Create document
             document =
                 xcontext.getWiki().getDocument(
-                    new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName()), xcontext);
+                    new DocumentReference(xcontext.getWikiId(), Arrays.asList("Extension", extension.getName()),
+                        "WebHome"), xcontext);
 
             for (int i = 1; !document.isNew(); ++i) {
                 document =
                     xcontext.getWiki().getDocument(
-                        new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName() + ' ' + i),
-                        xcontext);
+                        new DocumentReference(xcontext.getWikiId(), Arrays.asList("Extension", extension.getName()
+                            + ' ' + i), "WebHome"), xcontext);
             }
 
             document.readFromTemplate(this.currentResolver.resolve(XWikiRepositoryModel.EXTENSION_TEMPLATEREFERENCE),

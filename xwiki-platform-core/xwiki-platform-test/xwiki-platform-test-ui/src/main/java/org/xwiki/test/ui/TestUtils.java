@@ -1367,11 +1367,22 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public void attachFile(AttachmentReference reference, InputStream is, boolean failIfExists) throws Exception
+    public void attachFile(EntityReference pageReference, String name, InputStream is, boolean failIfExists)
+        throws Exception
+    {
+        EntityReference reference = new EntityReference(name, EntityType.ATTACHMENT, pageReference);
+
+        attachFile(reference, is, failIfExists);
+    }
+
+    /**
+     * @since 7.3M1
+     */
+    public void attachFile(EntityReference reference, InputStream is, boolean failIfExists) throws Exception
     {
         // make sure the page exist
-        if (!rest().exists(reference.getDocumentReference())) {
-            rest().savePage(reference.getDocumentReference());
+        if (!rest().exists(reference.getParent())) {
+            rest().savePage(reference.getParent());
         }
 
         if (failIfExists) {
@@ -1900,6 +1911,29 @@ public class TestUtils
                 expectedCodes);
         }
 
+        public Page page(EntityReference reference)
+        {
+            Page page = new Page();
+
+            // Add current wiki if the reference does not contains any
+            EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+            if (wikiReference == null) {
+                page.setWiki(this.testUtils.getCurrentWiki());
+            } else {
+                page.setWiki(wikiReference.getName());
+            }
+
+            // Add spaces
+            EntityReference spaceReference = reference.extractReference(EntityType.SPACE).removeParent(wikiReference);
+            page.setSpace(SERIALIZER.serialize(spaceReference));
+
+            // Add page
+            EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
+            page.setName(documentReference.getName());
+
+            return page;
+        }
+
         /**
          * @since 7.3M1
          */
@@ -1922,23 +1956,7 @@ public class TestUtils
         public void savePage(EntityReference reference, String content, String syntaxId, String title,
             String parentFullPageName) throws Exception
         {
-            Page page = new Page();
-
-            // Add current wiki if the reference does not contains any
-            EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-            if (wikiReference == null) {
-                page.setWiki(this.testUtils.getCurrentWiki());
-            } else {
-                page.setWiki(wikiReference.getName());
-            }
-
-            // Add spaces
-            EntityReference spaceReference = reference.extractReference(EntityType.SPACE).removeParent(wikiReference);
-            page.setSpace(SERIALIZER.serialize(spaceReference));
-
-            // Add page
-            EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
-            page.setName(documentReference.getName());
+            Page page = page(reference);
 
             if (content != null) {
                 page.setContent(content);

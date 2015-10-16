@@ -22,6 +22,7 @@ package org.xwiki.repository.test;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.test.RepositoryUtils;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
@@ -185,26 +187,25 @@ public class RepositoryTestUtils
         return extensionFile != null ? new TestExtension(id, type, extensionFile) : null;
     }
 
-    private String getPageName(Extension extension)
+    private LocalDocumentReference getExtensionPageReference(Extension extension)
     {
-        return extension.getName() != null ? extension.getName() : extension.getId().getId();
+        String spaceName = extension.getName() != null ? extension.getName() : extension.getId().getId();
+
+        return new LocalDocumentReference(Arrays.asList(SPACENAME_EXTENSION, spaceName), "WebHome");
     }
 
     public void deleteExtension(Extension extension) throws Exception
     {
-        this.testUtils.rest().deletePage("Extension", getPageName(extension));
+        this.testUtils.rest().delete(getExtensionPageReference(extension));
     }
 
     public void addExtension(Extension extension) throws Exception
     {
         // Delete any pre existing extension
-        this.testUtils.rest().deletePage(SPACENAME_EXTENSION, getPageName(extension));
+        this.testUtils.rest().delete(getExtensionPageReference(extension));
 
         // Create Page
-        Page extensionPage = new Page();
-
-        extensionPage.setSpace(SPACENAME_EXTENSION);
-        extensionPage.setName(getPageName(extension));
+        Page extensionPage = this.testUtils.rest().page(getExtensionPageReference(extension));
 
         extensionPage.setObjects(new Objects());
 
@@ -240,8 +241,8 @@ public class RepositoryTestUtils
             queryParameters.put(XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
         }
 
-        this.testUtils.addObject(SPACENAME_EXTENSION, getPageName(extension),
-            XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME, queryParameters);
+        this.testUtils.addObject(getExtensionPageReference(extension), XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME,
+            queryParameters);
     }
 
     public void addDependencies(Extension extension)
@@ -263,7 +264,7 @@ public class RepositoryTestUtils
 
     public void addDependency(Extension extension, Object version, ExtensionDependency dependency)
     {
-        this.testUtils.addObject(SPACENAME_EXTENSION, getPageName(extension),
+        this.testUtils.addObject(getExtensionPageReference(extension),
             XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
             dependency.getVersionConstraint(), XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(),
             XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version);
@@ -273,7 +274,7 @@ public class RepositoryTestUtils
     {
         InputStream is = extension.getFile().openStream();
         try {
-            this.testUtils.attachFile(SPACENAME_EXTENSION, getPageName(extension), extension.getId().getId() + "-"
+            this.testUtils.attachFile(getExtensionPageReference(extension), extension.getId().getId() + "-"
                 + extension.getId().getVersion() + "." + extension.getType(), is, true);
         } finally {
             is.close();

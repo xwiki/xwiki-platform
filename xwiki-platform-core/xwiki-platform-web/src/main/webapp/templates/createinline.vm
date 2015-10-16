@@ -126,13 +126,12 @@
     #end
     <dt><label>$services.localization.render('core.create.type')</label></dt>
     #set ($defaultValue = $request.type)
-    #if ("$!defaultValue" == '')  
+    #if ("$!defaultValue" == '')
       #set ($defaultValue = 'blank')
     #end
     <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-small')</dd>
   #else
-    ## TODO: add the data-allowed-spaces for this template
-    <input type="hidden" name="templateprovider" value="$template" />
+    <input type="hidden" name="template" value="$escapetool.xml($template)" />
   #end
 #end
 #set ($discard = $xwiki.jsfx.use('js/xwiki/create.js', {'forceSkinAction': true}))

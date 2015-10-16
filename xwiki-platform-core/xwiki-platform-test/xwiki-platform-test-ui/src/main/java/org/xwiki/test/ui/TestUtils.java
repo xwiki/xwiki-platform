@@ -822,6 +822,14 @@ public class TestUtils
     }
 
     /**
+     * @since 7.3M1
+     */
+    public String getURL(List<String> spaces, String page)
+    {
+        return getURL(spaces, page, "view", "");
+    }
+
+    /**
      * @since 7.2M2
      */
     public String getURL(List<String> spaces, String page, String action, String queryString)
@@ -1911,6 +1919,9 @@ public class TestUtils
                 expectedCodes);
         }
 
+        /**
+         * @since 7.3M1
+         */
         public Page page(EntityReference reference)
         {
             Page page = new Page();

@@ -87,8 +87,8 @@ public class DatePingDataProviderTest
             "      \"firstPingDate\": {\n" +
             "         \"value\": 1392854400000\n" +
             "      },\n" +
-            "      \"sinceDays\": {\n" +
-            "         \"value\": 3073880860\n" +
+            "      \"serverTime\": {\n" +
+            "         \"value\": 1393200000000\n" +
             "      }\n" +
             "   }\n" +
             "}";
@@ -100,7 +100,7 @@ public class DatePingDataProviderTest
         JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        assertEquals("{\"sinceDays\":36,\"firstPingDate\":1392854400000}",
+        assertEquals("{\"sinceDays\":4,\"firstPingDate\":1392854400000}",
             JSONObject.fromObject(this.mocker.getComponentUnderTest().provideData()).toString());
     }
 }

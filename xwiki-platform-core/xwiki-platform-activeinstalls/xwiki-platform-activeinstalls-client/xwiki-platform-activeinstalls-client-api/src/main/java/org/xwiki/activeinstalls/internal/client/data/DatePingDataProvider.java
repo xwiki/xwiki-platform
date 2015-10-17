@@ -56,6 +56,8 @@ public class DatePingDataProvider implements PingDataProvider
 
     private static final String PROPERTY_SINCE_DAYS = "sinceDays";
 
+    private static final String PROPERTY_SERVER_TIME = "serverTime";
+
     private static final String PROPERTY_VALUE = "value";
 
     private static final String PROPERTY_TYPE = "type";
@@ -103,23 +105,25 @@ public class DatePingDataProvider implements PingDataProvider
 
             @SuppressWarnings("unchecked")
             Map<String, Object> aggregationsMap = (Map<String, Object>) result.getValue("aggregations");
+
+            // Get the current server time and the first timestamp of the ping for this instance id and compute the
+            // since days from them.
             @SuppressWarnings("unchecked")
-            Map<String, Object> sinceDaysMap = (Map<String, Object>) aggregationsMap.get(PROPERTY_SINCE_DAYS);
-
-            // It's possible that this is the first ping and thus that sinceDays will be null.
-            Object sinceDaysObject = sinceDaysMap.get(PROPERTY_VALUE);
-            if (sinceDaysObject != null) {
-                long sinceDays = Math.round((double) sinceDaysObject / 86400000D);
-                jsonMap.put(PROPERTY_SINCE_DAYS, sinceDays);
-            }
-
-            // It's possible that this is the first ping and thus that firstPingDate will be null too.
+            Map<String, Object> serverTimeMap = (Map<String, Object>) aggregationsMap.get(PROPERTY_SERVER_TIME);
+            Object serverTimeObject = serverTimeMap.get(PROPERTY_VALUE);
             @SuppressWarnings("unchecked")
             Map<String, Object> firstPingDateMap = (Map<String, Object>) aggregationsMap.get(PROPERTY_FIRST_PING_DATE);
             Object firstPingDateObject = firstPingDateMap.get(PROPERTY_VALUE);
-            if (firstPingDateObject != null) {
+
+            if (serverTimeObject != null && firstPingDateObject != null) {
+                long sinceDays = Math.round(((double) serverTimeObject - (double) firstPingDateObject) / 86400000D);
+                jsonMap.put(PROPERTY_SINCE_DAYS, sinceDays);
                 long firstPingDate = Math.round((double) firstPingDateObject);
                 jsonMap.put(PROPERTY_FIRST_PING_DATE, firstPingDate);
+            } else {
+                // This means it's the first ping and thus there was no previous _timestamp. Thus we set the since Days
+                // to 0.
+                jsonMap.put(PROPERTY_SINCE_DAYS, 0);
             }
         } catch (Exception e) {
             // If this fails we just don't send this information but we still send the other piece of information.
@@ -136,8 +140,8 @@ public class DatePingDataProvider implements PingDataProvider
         jsonMap.put("query", Collections.singletonMap("term", Collections.singletonMap("instanceId", instanceId)));
 
         Map<String, Object> aggsMap = new HashMap<>();
-        aggsMap.put(PROPERTY_SINCE_DAYS, Collections.singletonMap(PROPERTY_MIN,
-            Collections.singletonMap("script", "time() - doc['_timestamp'].value")));
+        aggsMap.put(PROPERTY_SERVER_TIME, Collections.singletonMap(PROPERTY_MIN,
+            Collections.singletonMap("script", "time()")));
         aggsMap.put(PROPERTY_FIRST_PING_DATE, Collections.singletonMap(PROPERTY_MIN,
             Collections.singletonMap("field", "_timestamp")));
 

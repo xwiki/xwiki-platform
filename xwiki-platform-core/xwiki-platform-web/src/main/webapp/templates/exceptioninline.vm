@@ -1,3 +1,4 @@
+$response.setStatus(500)
 #set($message = $xcontext.message)
 #if($message)
   #xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message))

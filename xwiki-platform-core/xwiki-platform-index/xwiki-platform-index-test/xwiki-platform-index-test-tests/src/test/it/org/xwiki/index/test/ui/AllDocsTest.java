@@ -68,7 +68,7 @@ public class AllDocsTest extends AbstractTest
         livetable.filterColumn("xwiki-livetable-alldocs-filter-2", getTestMethodName());
         // We get one result for the user we've created
         assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Page", getTestClassName() + "_" + getTestMethodName()));
+        assertTrue(livetable.hasRow("Title", getTestClassName() + "_" + getTestMethodName()));
     }
 
     @Test

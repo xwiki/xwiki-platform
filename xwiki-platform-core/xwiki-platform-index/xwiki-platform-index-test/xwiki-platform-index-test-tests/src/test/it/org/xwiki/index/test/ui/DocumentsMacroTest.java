@@ -49,13 +49,13 @@ import org.xwiki.test.ui.po.LiveTableElement;
          LiveTableElement livetable = dmp.getDocumentsExampleLiveTable();
 
          // Verify that we have a Page column
-         Assert.assertTrue("No Page column found", livetable.hasColumn("Page"));
+         Assert.assertTrue("No Title column found", livetable.hasColumn("Title"));
 
          // Verify there are several rows displayed
          Assert.assertTrue(livetable.getRowCount() > 0);
 
          // Verify that page titles are displayed by filtering on one page for which we know the title
          livetable.filterColumn("xwiki-livetable-example-filter-2", getTestMethodName());
-         Assert.assertTrue(livetable.hasRow("Page", "Test Title"));
+         Assert.assertTrue(livetable.hasRow("Title", "Test Title"));
      }
  }

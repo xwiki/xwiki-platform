@@ -5,11 +5,39 @@
 ##                 if not provided use xhtml/1.0
 ## * outputVersion: the syntax version to use to render the XDOM
 ##                  if not provided use the last version of the outputSyntax
+## * outputTitle: if true then also output the title
 ## 
 ############################################################################
-#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-#if ($outputSyntax)
-$cdoc.getRenderedContent($outputSyntax)##
+#if ("$!request.outputTitle" == 'true')
+  #set ($displayTitle = true)
+  $services.progress.pushLevel(3)
 #else
-$cdoc.getRenderedContent()##
+  #set ($displayTitle = false)
+  $services.progress.pushLevel(1)
 #end
+$services.progress.startStep('Compute the content to display')
+#template("contentvars.vm")
+$services.progress.endStep()
+#if ($displayTitle)
+  $services.progress.startStep('Compute title to display and modify rendered content accordingly')
+  #template("titlevars.vm")
+  $services.progress.endStep()
+  <div class="xcontent">
+    $xcontext.dropPermissions()
+    #if ($displayTitle)
+      <div class="document-info">
+        <div id="document-title"><h1>$titleToDisplay</h1></div>
+      </div>
+    #end
+    <div id="xwikicontent">
+#end
+#if ("$!exception" != '')
+  $exceptiontool.getStackTrace($exception)
+#else
+  $renderedContent
+#end
+#if ($displayTitle)
+    </div>
+  </div>
+#end
+$services.progress.popLevel()

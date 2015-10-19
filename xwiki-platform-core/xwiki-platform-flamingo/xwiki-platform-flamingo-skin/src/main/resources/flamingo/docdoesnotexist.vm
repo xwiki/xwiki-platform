@@ -8,9 +8,11 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main">
-  <div id="contentmenu" class="actionmenu">
-    #template("menus_content.vm")
-  </div>
+  #if($displayContentMenu)
+    <div id="contentmenu" class="actionmenu">
+      #template("menus_content.vm")
+    </div>
+  #end
   <div id="mainContentArea">
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)

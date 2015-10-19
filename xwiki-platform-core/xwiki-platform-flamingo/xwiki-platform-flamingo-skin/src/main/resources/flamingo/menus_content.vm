@@ -1,3 +1,4 @@
+#template("menus_macros.vm")
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 <div id="contentmenu" class="pull-right actionmenu">
 #if($hasEdit && !$isReadOnly)

@@ -10,6 +10,7 @@
 ## Display the 4 menus
 ##
 #if ($displayContentMenu)
+#template("menus_macros.vm")
 <div id="contentmenu" class="pull-right actionmenu">
   #if ($displayEditMenu && $hasEdit && !$isReadOnly)
     #displayEditMenu()

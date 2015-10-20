@@ -231,6 +231,8 @@ public class LiveTableElement extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
+                // Refresh the current page since we need the livetable to fetch the JSON again
+                driver.navigate().refresh();
                 return driver.findElements(by).size() >= minimalExpectedRowCount;
             }
         });

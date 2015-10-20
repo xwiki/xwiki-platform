@@ -1,3 +1,9 @@
+### Ensure this template is only called once (for performance reasons), since it's called from several places
+#if ($hasMenuMacrosBeenCalled)
+  #break
+#else
+  #set ($hasMenuMacrosBeenCalled = true)
+#end
 ###
 ###    GLOBALS
 ###

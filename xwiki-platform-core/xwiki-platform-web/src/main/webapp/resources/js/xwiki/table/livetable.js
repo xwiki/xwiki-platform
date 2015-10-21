@@ -171,10 +171,10 @@ XWiki.widgets.LiveTable = Class.create({
 
       // Let code know the table is about to load new entries.
       // 1. Named event (for code interested by that table only)
-      document.fire("xwiki:livetable:" + this.domNodeName + ":loadingEntries");
+      document.fire("xwiki:livetable:" + self.domNodeName + ":loadingEntries");
       // 2. Generic event (for code potentially interested in any livetable)
       document.fire("xwiki:livetable:loadingEntries", {
-        "tableId" : this.domNodeName
+        "tableId" : self.domNodeName
       });
 
       var ajx = new Ajax.Request(url,

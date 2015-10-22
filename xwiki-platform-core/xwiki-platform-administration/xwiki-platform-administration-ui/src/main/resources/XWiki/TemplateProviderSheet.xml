@@ -93,7 +93,7 @@
       &lt;dd&gt;
         #if ($isEditing)
           &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template" class="suggestDocuments"
-            size="30" autocomplete="off" value="$!{$providerObj.getValue('template')}" /&gt;
+            size="30" autocomplete="off" value="$!{providerObj.getValue('template')}" /&gt;
         #else
           #set ($templateDocName = $providerObj.getValue('template'))
           #if ("$!templateDocName" != '')

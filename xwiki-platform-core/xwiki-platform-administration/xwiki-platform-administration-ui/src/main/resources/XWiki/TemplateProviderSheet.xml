@@ -384,6 +384,8 @@
 
         // Complete the tree node ID by adding the reference type prefix.
         return 'document:' + serializedSpaceRef;
+      }).filter(function(id) {
+        return id;
       });
     }
 

@@ -40,25 +40,69 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-(% class="xform half" %)(((
+## Create form, left column.
+(% class="col-xs-12 col-md-6" %)(((
 == {{translation key="admin.templates.createprovider"/}} ==
 
 {{html}}
-  &lt;form action="$doc.getURL('create')" method="post"&gt;
+  &lt;form class="xform" action="$doc.getURL('create')" method="post"&gt;
+
+    #template('locationPicker_macros.vm')
+    #locationPicker({
+      'id': 'target',
+      'title': {
+        'label': 'core.create.title',
+        'hint': 'core.create.title.hint',
+        'name': 'title',
+        'placeholder': 'admin.templates.createprovider.defaultdocname'
+      },
+      'preview': {
+        'label': 'core.create.locationPreview.label',
+        'hint': 'core.create.locationPreview.hint'
+      },
+      'parent': {
+        'label': 'core.create.spaceReference.label',
+        'hint': 'core.create.spaceReference.hint',
+        'name': 'spaceReference',
+        'reference': $doc.documentReference.lastSpaceReference,
+        'placeholder': 'core.create.spaceReference.placeholder'
+      },
+      'name': {
+        'label': 'core.create.name.label',
+        'hint': 'core.create.name.hint',
+        'name': 'name',
+        'value': '',
+        'placeholder': 'admin.templates.createprovider.defaultdocname'
+      }
+    })
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="space"&gt;$services.localization.render('admin.templates.createprovider.space')&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;&lt;input type="text" id="space" name="space" value="XWiki" size="8"/&gt;&lt;/dd&gt;
-      &lt;dt&gt;&lt;label for="page"&gt;$services.localization.render('admin.templates.createprovider.page')&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;&lt;input type="text" id="page" name="page" value="$services.localization.render('admin.templates.createprovider.defaultdocname')" class="withTip"'/&gt;&lt;/dd&gt;
+
+      &lt;dt&gt;
+      #if ($isAdvancedUser || $isSuperAdmin)
+        &lt;label for="terminal"&gt;
+          &lt;input type="checkbox" id="terminal" name="tocreate" value="terminal" checked="checked" /&gt;
+          $services.localization.render('core.create.terminal.label')
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('core.create.terminal.hint')&lt;/span&gt;
+      #else
+        &lt;input type="hidden" id="terminal" name="tocreate" value="terminal" /&gt;
+      #end
+      &lt;/dt&gt;
+
+      &lt;dt&gt;
+        &lt;div class="buttons"&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
+          &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/dt&gt;
+
     &lt;/dl&gt;
-    &lt;div class="buttons"&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-      &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
-      &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
-    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
+)))
+
 #set($availableProviders = $services.query.hql("
   , BaseObject obj
   WHERE
@@ -67,12 +111,16 @@
     doc.fullName").execute())
 #if($availableProviders.size() &gt; 0)
 
+## Available providers list, right column.
+(% class="col-xs-12 col-md-6" %)(((
 == {{translation key="admin.templates.providerslist"/}} ==
 
   #foreach($providerFullname in $availableProviders)
     * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
   #end
-#end
 )))
+
+#end
+
 {{/velocity}}</content>
 </xwikidoc>

@@ -40,19 +40,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-##
-## Variables
-##
+## Javascript and CSS
 #set ($discard     = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
+#set ($discard     = $xwiki.ssx.use('XWiki.TemplateProviderSheet'))
+## Variables
 #set ($providerObj = $doc.getObject('XWiki.TemplateProviderClass'))
 #set ($isEditing   = $xcontext.action == 'edit')
 
 ##
 ## Display the sheet.
 ##
-## We set wiki="true" because we use $providerObj.get() which returns some text in the wiki syntax.
-##
-{{html wiki="true"}}
+{{html clean='false'}}
 &lt;div class="xform row"&gt;
   ##
   ## Left side
@@ -81,9 +79,9 @@
       &lt;/dt&gt;
       &lt;dd&gt;
         #if ($isEditing)
-          $providerObj.get('name')
+          {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('name'){{/html}}{{html clean='false'}}
         #else
-          &lt;p&gt;$!escapetool.xml($services.localization.render($doc.getValue('name', $providerObj)))&lt;/p&gt;
+          &lt;p&gt;$!escapetool.xml($services.localization.render($providerObj.getValue('name')))&lt;/p&gt;
         #end
       &lt;/dd&gt;
       ##
@@ -94,11 +92,12 @@
       &lt;/dt&gt;
       &lt;dd&gt;
         #if ($isEditing)
-          $providerObj.get('template')
+          &lt;input type="text" id="XWiki.TemplateProviderClass_0_template" name="XWiki.TemplateProviderClass_0_template" class="suggestDocuments"
+            size="30" autocomplete="off" value="$!{$providerObj.getValue('template')}" /&gt;
         #else
-          #set($templateDocName = $doc.getValue('template', $providerObj))
+          #set ($templateDocName = $providerObj.getValue('template'))
           #if ("$!templateDocName" != '')
-            &lt;p&gt;&lt;a href="$xwiki.getURL($templateDocName)"&gt;$escapetool.xml($templateDocName)&lt;/a&gt;&lt;/p&gt;
+            {{/html}}{{html wiki='true' clean='false'}}[[$templateDocName&gt;&gt;$templateDocName]]{{/html}}{{html clean='false'}}
           #end
         #end
       &lt;/dd&gt;
@@ -112,7 +111,7 @@
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        $doc.display('type')
+        {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('type'){{/html}}{{html clean='false'}}
       &lt;/dd&gt;
       ##
       ## Action
@@ -124,7 +123,7 @@
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        $doc.display('action')
+        {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('action'){{/html}}{{html clean='false'}}
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -140,7 +139,31 @@
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        $doc.display('spaces')
+        #if ($isEditing)
+          ## We can`t just join the list values in the hidden DOM element without escaping the separator from each value first.
+          #set ($spacesEscapedValues = [])
+          #foreach ($spacesValue in $providerObj.getValue('spaces'))
+            #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
+          #end
+          &lt;input id="XWiki.TemplateProviderClass_0_spaces" name="XWiki.TemplateProviderClass_0_spaces"
+            value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
+
+          {{/html}}{{html wiki='true' clean='false'}}
+            {{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
+          {{/html}}{{html clean='false'}}
+        #else
+          #set ($spacesValues = $providerObj.getValue('spaces'))
+          #if ($spacesValues &amp;&amp; !$spacesValues.isEmpty())
+            #template("hierarchy_macros.vm")
+            &lt;ul&gt;
+              ## Note: Sorting the list, in case they are not already sorted.
+              #foreach ($spacesValue in $sorttool.sort($spacesValues))
+                #set ($spaceReference = $services.model.resolveSpace($spacesValue))
+                &lt;li&gt;#hierarchy($spaceReference, { 'local' : true })&lt;/li&gt;
+              #end
+            &lt;/ul&gt;
+          #end
+        #end
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -154,8 +177,7 @@
   (% class="buttonwrapper" %)
   [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=Templates')]]
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
   <object>
     <name>XWiki.TemplateProviderSheet</name>
     <number>0</number>
@@ -236,63 +258,283 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>document.observe('xwiki:dom:loaded', function() {
-  // ----------------------------------------------------------------------------------------------------
-  // Suggest document names in the name field of the template provider
-  // ----------------------------------------------------------------------------------------------------
-  var templateElement = document.documentElement.down('input[name$=_template]');
-  if (templateElement) {
-    if (typeof(XWiki.widgets.Suggest) != 'undefined') {
-      new XWiki.widgets.Suggest(templateElement, {
-        script           : XWiki.Document.getRestSearchURL("scope=name&amp;number=10&amp;media=json&amp;"),
-        varname          : "q",
-        icon             : "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
-        noresults        : "Document not found",
-        json             : true,
-        resultsParameter : "searchResults",
-        resultId         : "id",
-        resultValue      : "pageFullName",
-        resultInfo       : "pageFullName"
+      <code>require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+
+  // Reminder: 'tree' is a jQuery plugin and returns the jQuery instance itself when required.
+  require(['tree', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+    /**
+     * Initialization method.
+     */
+    function initialize() {
+      addLiveValidations();
+      addTypeFieldHandler();
+      addEnabledSpacesTreeExtraConfiguration();
+    }
+
+    /**
+     * Add live validations
+     */
+    function addLiveValidations() {
+      if (typeof LiveValidation != 'undefined') {
+        var templateNameValidator = new LiveValidation($('#XWiki\\.TemplateProviderClass_0_name')[0], {
+          validMessage: "$escapetool.javascript($services.localization.render('core.validation.valid.message'))"
+        });
+        templateNameValidator.add(Validate.Presence, {
+          failureMessage: "$escapetool.javascript($services.localization.render('core.validation.required.message'))"
+        });
+      }
+    }
+
+    /*
+     * TODO: Remove this code when XWiki starts supporting nested spaces:
+     *   If the template type is set to 'Space', hide from the user the
+     *   list of spaces where the template should be active
+     */
+    function addTypeFieldHandler() {
+      var typeElement = $(document.documentElement).find('select[name$=_type]');
+      var enabledSpacesFields = $('#enabled-spaces');
+      var toggleSpaces = function() {
+        var templateType = typeElement.val();
+        if (templateType == 'space') {
+           enabledSpacesFields.addClass('hidden');
+        } else {
+           enabledSpacesFields.removeClass('hidden');
+        }
+      }
+      if (typeElement.length &gt; 0 &amp;&amp; enabledSpacesFields.length &gt; 0) {
+        toggleSpaces();
+        typeElement.on('change', toggleSpaces);
+      }
+    }
+
+    function addEnabledSpacesTreeExtraConfiguration() {
+      var treeElement = $('.xtree');
+      var dataElement = $('#XWiki\\.TemplateProviderClass_0_spaces');
+
+      // Extract the list of initially checked elements.
+      var savedIds = readSavedValues(dataElement.val());
+
+      // Wait for the tree to be ready (root children loaded).
+      treeElement.on('ready.jstree', function(event, data) {
+        var tree = $.jstree.reference(treeElement);
+
+        // Configure the tree to not cascade the check status when checking nodes.
+        // tree.settings.checkbox.three_state = false;
+        tree.settings.checkbox.cascade = '';
+
+        // Expand into view and check all tree nodes that are initially supposed to be checked.
+        for (var i=0; i&lt;savedIds.length; i++) {
+          var savedId = savedIds[i];
+          // Load and expand to the node.
+          tree.openTo(savedId, function(idToCheck) {
+            // Once the node is loaded, check it, if possible.
+            // If the node did not load (lack of permissions, hidden document, etc.), nothing happens.
+            tree.check_node(idToCheck);
+          }.bind(this, savedId));
+        }
+      });
+
+      // Listen to tree nodes being checked/unchecked and save the changes in the DOM to be saved on submit.
+      treeElement.on('changed.jstree', function(event, data) {
+        var node = data.node;
+        var initialNrOfNodes = savedIds.length;
+
+        // Update the savedIds list.
+        var savedIdIndex = savedIds.indexOf(node.id);
+        if (data.action == 'select_node') {
+          // If it's not in the list, add it.
+          if (savedIdIndex == -1) {
+            savedIds.push(node.id);
+          }
+        } else if (data.action == 'deselect_node') {
+          // If it's in the list, remove it.
+          if (savedIdIndex &gt; -1) {
+            savedIds.splice(savedIdIndex, 1);
+          }
+        }
+
+        // Save the list in the DOM, if nodes were added/removed.
+        if (initialNrOfNodes != savedIds.length) {
+          var serializedValues = serializeValues(savedIds);
+          dataElement.val(serializedValues);
+        }
       });
     }
-  }
-  // ----------------------------------------------------------------------------------------------------
-  // Add live validations
-  // ----------------------------------------------------------------------------------------------------
-  if (typeof LiveValidation != 'undefined') {
-    var templateNameValidator = new LiveValidation($('XWiki.TemplateProviderClass_0_name'), {
-      validMessage: "$escapetool.javascript($services.localization.render('core.validation.valid.message'))"
-    });
-    templateNameValidator.add(Validate.Presence, {
-      failureMessage: "$escapetool.javascript($services.localization.render('core.validation.required.message'))"
-    });
-  }
-  // ----------------------------------------------------------------------------------------------------
-  // TODO: Remove this code when XWiki starts supporting nested spaces:
-  //   If the template type is set to 'Space', hide from the user the
-  //   list of spaces where the template should be active
-  // ----------------------------------------------------------------------------------------------------
-  var typeElement = document.documentElement.down('select[name$=_type]');
-  var enabledSpacesFields = $('enabled-spaces');
-  var toggleSpaces = function() {
-    var templateType = typeElement.options[typeElement.selectedIndex].value;
-    if (templateType == 'space') {
-       enabledSpacesFields.addClassName('hidden');
-    } else {
-       enabledSpacesFields.removeClassName('hidden');
+
+    function readSavedValues(savedValuesString) {
+      // Extract the list and transform local space references to space webhome references as IDs in the tree.
+      //
+      // When splitting by the separator char ('), we want to avoid values that contain the spliting char inside them, escaped.
+      // Trick: Since JavaScript does not support negative lookbehind regex "(?&lt;!\\)," we apply a negative lookahead ",(?!\\)" on the reversed string to properly split.
+      return reverseString(savedValuesString).split(/\s*,(?!\\)\s*/).map(function(refString) {
+        if (!refString) {
+          return refString;
+        }
+
+        // Unescape any input separator that might be part of the value and that was previously escaped when serialized in the hidden input element.
+        // Trick: Remember that we previously reverset the savedValuesString, so individual values need to be reversed back to make sense before unescaping.
+        refString = reverseString(refString).replace('\\,', ',');
+
+        // Transform the local space reference to an absolute document reference, for the Nested Pages tree to use as node ID.
+        refString = refString + '.WebHome';
+        var defaultValues = {};
+        defaultValues[XWiki.EntityType.WIKI] = xm.wiki;
+        var resolvedSpaceRef = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT, defaultValues);
+        var serializedSpaceRef = XWiki.Model.serialize(resolvedSpaceRef);
+
+        // Complete the tree node ID by adding the reference type prefix.
+        return 'document:' + serializedSpaceRef;
+      });
     }
-  }
-  if (typeElement &amp;&amp; enabledSpacesFields) {
-    toggleSpaces();
-    typeElement.observe('change', toggleSpaces);
-  }
+
+    function reverseString (initialString) {
+      return initialString.split('').reverse().join('');
+    }
+
+    function serializeValues(savedIds) {
+      return savedIds.map(function (id) {
+        // Transform the ID back to a local space reference string.
+        var refString = id.substring('document:'.length);
+        var reference = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT);
+        var wikiReference = reference.extractReference(XWiki.EntityType.WIKI);
+        var spaceReference = reference.extractReference(XWiki.EntityType.SPACE);
+        var localSpaceReference = spaceReference.relativeTo(wikiReference);
+
+        // Remember to escape the separator char "," from the serialized individual value.
+        return XWiki.Model.serialize(localSpaceReference).replace(',', '\\,');
+      }).sort().join(',');
+    }
+
+    (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
+  });
+
 });</code>
     </property>
     <property>
-      <name/>
+      <name>Javascript</name>
     </property>
     <property>
       <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.TemplateProviderSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>46d40ee0-3464-4ac0-9295-b0f9c391cc91</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.breadcrumb &gt; .active:last-of-type a {
+  color: @link-color;
+}
+
+#enabled-spaces .breadcrumb {
+  margin-bottom: 0;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

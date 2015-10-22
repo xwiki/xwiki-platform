@@ -17,12 +17,12 @@
     #set ($titleField = $options.title)
     #if ($titleField.label)
       <dt>
-        <label for="$!{id}Title">$services.localization.render($titleField.label)</label>
+        <label for="$!{options.id}Title">$services.localization.render($titleField.label)</label>
         <span class="xHint">$services.localization.render($titleField.hint)</span>
       </dt>
       <dd>
-        <input type="text" id="$!{id}Title" name="$titleField.name" value="$!escapetool.xml($titleField.value)"
-          class="location-title-field" placeholder="$services.localization.render($titleField.placeholder)" />
+        <input type="text" id="$!{options.id}Title" name="$titleField.name" value="$!escapetool.xml($titleField.value)"
+          class="location-title-field" placeholder="$!services.localization.render($titleField.placeholder)" />
       </dd>
     #elseif ($titleField)
       <dd class="hidden">
@@ -77,11 +77,11 @@
       #set ($wikiField = $options.wiki)
       #if ($wikiField.label && $displayWikiFields)
         <dt>
-          <label for="$!{id}Wiki">$services.localization.render($wikiField.label)</label>
+          <label for="$!{options.id}Wiki">$services.localization.render($wikiField.label)</label>
           <span class="xHint">$services.localization.render($wikiField.hint)</span>
         </dt>
         <dd>
-          <select id="$!{id}Wiki" name="$wikiField.name" class="location-wiki-field">
+          <select id="$!{options.id}Wiki" name="$wikiField.name" class="location-wiki-field">
             #set ($wikis = $xwiki.wikiNames)
             #foreach ($wiki in $wikis)
               #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
@@ -115,11 +115,11 @@
       ## Note: If the parent is a wiki reference, an empty value will be set in the input.
       #set ($defaultParentReferenceString = $services.model.serialize($defaultParentReference, 'local'))
       <dt>
-        <label for="$!{id}ParentReference">$services.localization.render($parentField.label)</label>
+        <label for="$!{options.id}ParentReference">$services.localization.render($parentField.label)</label>
         <span class="xHint">$services.localization.render($parentField.hint)</span>
       </dt>
       <dd>
-        <input type="text" id="$!{id}ParentReference" class="location-parent-field suggestSpaces"
+        <input type="text" id="$!{options.id}ParentReference" class="location-parent-field suggestSpaces"
           name="$parentField.name" value="$!escapetool.xml($defaultParentReferenceString)"
           placeholder="$!services.localization.render($parentField.placeholder)" />
       </dd>
@@ -131,11 +131,11 @@
       #set ($nameField = $options.name)
       #if ($nameField.label)
         <dt>
-          <label for="$!{id}Name">$services.localization.render($nameField.label)</label>
+          <label for="$!{options.id}Name">$services.localization.render($nameField.label)</label>
           <span class="xHint">$services.localization.render($nameField.hint)</span>
         </dt>
         <dd>
-          <input type="text" id="$!{id}Name" name="$nameField.name" class="location-name-field"
+          <input type="text" id="$!{options.id}Name" name="$nameField.name" class="location-name-field"
             value="$!escapetool.xml($nameField.value)"
             placeholder="$!services.localization.render($nameField.placeholder)" />
         </dd>

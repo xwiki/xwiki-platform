@@ -222,7 +222,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   {{/html}}
 
   #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-  #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+  #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
+    $doc.documentReference.parent))
   #set($templateDoc = $xwiki.getDocument($templateRef))
   ## Simulate the editing of the class instance from the template document.
   ## Note that we can't simply call display on the template document because $field could be a new field that hasn't
@@ -487,7 +488,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     ##
     #set($instancesStatement = "from doc.object('$doc.fullName') as obj where doc.fullName not in (:className,:templateName)")
     #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+    #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
+      $doc.documentReference.parent))
     #set($templateFullName = $services.model.serialize($templateRef, 'local'))
     #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName).bindValue('templateName', $templateFullName))
     #foreach($instanceDocName in $instancesQuery.execute())
@@ -505,12 +507,14 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
- * Handle Date fields that have the "Empty is today" option checked in the class edit form. See http://jira.xwiki.org/browse/XWIKI-10296
+ * Handle Date fields that have the "Empty is today" option checked in the class edit form.
+ * See http://jira.xwiki.org/browse/XWIKI-10296
  **#
 #macro(handleEmptyIsTodayDateFields $templateDoc)
   #foreach($property in $doc.xWikiClass.properties)
-    ## We check directly on the request if the user provided an empty date. We can not check from the template document's object that we've just
-    ## parsed from the request using the updateObjectFromRequest method because it already applies the emtpyIsToday mechanism and that would not be good for us.
+    ## We check directly on the request if the user provided an empty date. We can not check from the template
+    ## document's object that we've just parsed from the request using the updateObjectFromRequest method because it
+    ## already applies the emtpyIsToday mechanism and that would not be good for us.
     #set($newValueRequestParameterName = "${doc.fullName}_0_${property.name}")
     #set($newDateStringValue = "$!{request.getParameter($newValueRequestParameterName)}")
     #if($property.classType == 'Date' &amp;&amp; $property.getValue('emptyIsToday') == 1 &amp;&amp; $newDateStringValue == '')
@@ -525,7 +529,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #macro(updateAndSaveTemplate)
   #if(!$errorMessage &amp;&amp; $request.updateClassTemplate)
     #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+    #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
+      $doc.documentReference.parent))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
     #if ($request.templateTitle)
@@ -541,7 +546,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     ## 
     #handleEmptyIsTodayDateFields($templateDoc)
     #set($discard = $templateDoc.setHidden(true))
-    #set($discard = $templateDoc.save($services.localization.render('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
+    #set($discard = $templateDoc.save(
+      $services.localization.render('platform.appwithinminutes.classEditorTemplateSaveComment'),
+      $minorEdit))
   #end
 #end
 
@@ -553,9 +560,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($classSheets = $services.sheet.getClassSheets($doc))
     #if($classSheets.isEmpty())
       #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-      #set($sheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
+      #set($sheetReference = $services.model.createEntityReference("${className}Sheet", 'DOCUMENT',
+        $doc.documentReference.parent))
       #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
-      #set($discard = $doc.save($services.localization.render('platform.appwithinminutes.classEditorBindSheetSaveComment'), $minorEdit))
+      #set($discard = $doc.save($services.localization.render('platform.appwithinminutes.classEditorBindSheetSaveComment'),
+        $minorEdit))
     #elseif($classSheets.size() == 1)
       #set($sheetReference = $classSheets.get(0))
     #end
@@ -563,9 +572,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($sheetDoc = $xwiki.getDocument($sheetReference))
       #set($sheetGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassSheetGenerator'))
       #set($discard = $sheetDoc.setParent($doc.name))
-      #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content, $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+      #set($discard = $sheetDoc.setContent($doc.getRenderedContent($sheetGeneratorDoc.content,
+        $sheetGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
       #set($discard = $sheetDoc.setHidden(true))
-      #set($discard = $sheetDoc.save($services.localization.render('platform.appwithinminutes.classEditorSheetSaveComment'), $minorEdit))
+      #set($discard = $sheetDoc.save($services.localization.render('platform.appwithinminutes.classEditorSheetSaveComment'),
+        $minorEdit))
     #end
   #end
 #end
@@ -576,7 +587,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #macro(updateAndSaveTranslations)
   #if(!$errorMessage &amp;&amp; $request.updateClassTranslations)
     #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($translationsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Translations"))
+    #set($translationsRef = $services.model.createEntityReference("${className}Translations", 'DOCUMENT',
+      $doc.documentReference.parent))
     #set($translationsDoc = $xwiki.getDocument($translationsRef))
     #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
     ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
@@ -585,9 +597,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($discard = $translationsObj.set('scope', 'ON_DEMAND'))
     #set($discard = $translationsDoc.setParent($doc.name))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
-    #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content, $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content,
+      $translationsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
     #set($discard = $translationsDoc.setHidden(true))
-    #set($discard = $translationsDoc.save($services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'), $minorEdit))
+    #set($discard = $translationsDoc.save(
+      $services.localization.render('platform.appwithinminutes.classEditorTranslationsSaveComment'),
+      $minorEdit))
   #end
 #end
 
@@ -605,12 +620,16 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set($appName = $doc.getValue('dataSpaceName'))
-      #if("$!appName" == '')
-        ## Backwards compatibility for apps created before 6.3M2 when the code space was not properly cleaned and the data space name was restricted as a consequence.
-        #set($appName = $stringtool.removeEnd($doc.title, ' Class'))
+      #set($appLocalRef = $doc.getValue('dataSpaceName'))
+      #if("$!appLocalRef" != '')
+        #set($appReference = $services.model.resolveSpace($appLocalRef))
+      #else
+        ## Backwards compatibility for apps created before 6.3M2 when the code space was not properly cleaned and the
+        ## data space name was restricted as a consequence.
+        #set($appReference = $services.model.createSpaceReference($stringtool.removeEnd($doc.title, ' Class'),
+          $doc.documentReference.wikiReference))
       #end
-      #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
+      #set($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
       #set($queryString = {"wizard" : true})
       #if(!$xwiki.exists($homePageRef))
         #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))

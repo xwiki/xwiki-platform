@@ -103,6 +103,7 @@
 {{/html}}
 )))
 
+## Available providers list, right column.
 #set($availableProviders = $services.query.hql("
   , BaseObject obj
   WHERE
@@ -110,16 +111,13 @@
   ORDER BY
     doc.fullName").execute())
 #if($availableProviders.size() &gt; 0)
+  (% class="col-xs-12 col-md-6" %)(((
+  == {{translation key="admin.templates.providerslist"/}} ==
 
-## Available providers list, right column.
-(% class="col-xs-12 col-md-6" %)(((
-== {{translation key="admin.templates.providerslist"/}} ==
-
-  #foreach($providerFullname in $availableProviders)
-    * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
-  #end
-)))
-
+    #foreach($providerFullname in $availableProviders)
+      * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
+    #end
+  )))
 #end
 
 {{/velocity}}</content>

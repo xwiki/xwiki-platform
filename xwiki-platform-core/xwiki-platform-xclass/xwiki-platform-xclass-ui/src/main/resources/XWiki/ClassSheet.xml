@@ -151,48 +151,50 @@
 
     {{html}}
     &lt;form action="$doc.getURL()" id="newdoc" method="post" class="xform half"&gt;
-      &lt;div&gt;
+      &lt;div class="hidden"&gt;
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         &lt;input type="hidden" name="parent" value="${defaultParent}"/&gt;
         &lt;input type="hidden" name="template" value="${classTemplateDoc}"/&gt;
         &lt;input type="hidden" name="sheet" value="1"/&gt;
-        #locationPicker({
-          'id': 'target',
-          'title': {
-            'label': 'core.create.title',
-            'hint': 'core.create.title.hint',
-            'name': 'docTitle',
-            'placeholder': 'core.create.name.placeholder'
-          },
-          'preview': {
-            'label': 'core.create.locationPreview.label',
-            'hint': 'core.create.locationPreview.hint'
-          },
-          'parent': {
-            'label': 'core.create.spaceReference.label',
-            'hint': 'core.create.spaceReference.hint',
-            'name': 'spaceName',
-            'reference': $services.model.resolveSpace($defaultSpace),
-            'placeholder': 'core.create.spaceReference.placeholder'
-          },
-          'name': {
-            'label': 'core.create.name.label',
-            'hint': 'core.create.name.hint',
-            'name': 'docName',
-            'placeholder': 'core.create.name.placeholder'
-          }
-        })
-        &lt;p&gt;
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" value="Create this page" class="button"/&gt;
-          &lt;/span&gt;
-        &lt;/p&gt;
       &lt;/div&gt;
+      #locationPicker({
+        'id': 'target',
+        'title': {
+          'label': 'core.create.title',
+          'hint': 'core.create.title.hint',
+          'name': 'docTitle',
+          'placeholder': 'core.create.name.placeholder'
+        },
+        'preview': {
+          'label': 'core.create.locationPreview.label',
+          'hint': 'core.create.locationPreview.hint'
+        },
+        'parent': {
+          'label': 'core.create.spaceReference.label',
+          'hint': 'core.create.spaceReference.hint',
+          'name': 'spaceName',
+          'reference': $services.model.resolveSpace($defaultSpace),
+          'placeholder': 'core.create.spaceReference.placeholder'
+        },
+        'name': {
+          'label': 'core.create.name.label',
+          'hint': 'core.create.name.hint',
+          'name': 'docName',
+          'placeholder': 'core.create.name.placeholder'
+        }
+      })
+      &lt;p&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;input type="submit" value="Create this page" class="button"/&gt;
+        &lt;/span&gt;
+      &lt;/p&gt;
     &lt;/form&gt;
     {{/html}}
 
   #end ## has class sheet and class template
-  = Existing pages =##
+  = Existing pages =
+
+  {{html}}
   #set ($columns = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
   #set ($columnsProperties = {
     'doc.title': {'type': 'text', 'size': 30, 'link': 'view', 'filterable': false},
@@ -204,9 +206,12 @@
   #set ($options = {
     'className': $doc.fullName,
     'translationPrefix' : 'platform.index.',
-    'rowCount': 10
+    'rowCount': 10,
+    'outputOnlyHtml': true
   })
   #livetable("classEntries" $columns $columnsProperties $options)
+  {{/html}}
+
   = The class sheets =
   #if (!$hasClassSheets || !$hasClassTemplate)
 

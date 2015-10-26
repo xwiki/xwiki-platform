@@ -112,9 +112,6 @@ public class RepositoryManager implements Initializable, Disposable
 
     private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
 
-    private static final String[] COLUMNS = new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
-    XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS };
-
     /**
      * Get the reference of the class in the current wiki.
      */
@@ -240,18 +237,17 @@ public class RepositoryManager implements Initializable, Disposable
 
         if (cachedDocumentReference == null) {
             Query query =
-                this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
+                this.queryManager.createQuery("select doc.fullName from Document doc, doc.object("
                     + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension where extension."
                     + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :extensionId", Query.XWQL);
 
             query.bindValue("extensionId", extensionId);
 
-            List<Object[]> documentNames = query.execute();
+            List<String> documentNames = query.execute();
 
             if (!documentNames.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] { new DocumentReference(this.xcontextProvider.get().getWikiId(),
-                        (String) documentNames.get(0)[0], (String) documentNames.get(0)[1]) };
+                    new DocumentReference[] { this.currentStringResolver.resolve(documentNames.get(0)) };
             } else {
                 cachedDocumentReference = new DocumentReference[1];
             }

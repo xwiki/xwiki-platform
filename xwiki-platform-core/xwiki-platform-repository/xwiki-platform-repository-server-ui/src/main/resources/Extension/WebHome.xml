@@ -107,7 +107,6 @@ Contribute Extension...
 })
 #set($options = { 
    "tagCloud":true,
-   "resultPage":"ExtensionCode.ExtensionJSON",
    "className":"ExtensionCode.ExtensionClass",
    "selectedColumn":"doc.creationDate",
    "defaultOrder":"desc",

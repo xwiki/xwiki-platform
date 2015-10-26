@@ -111,8 +111,7 @@ Contribute Extension...
    "selectedColumn":"doc.creationDate",
    "defaultOrder":"desc",
    "translationPrefix" : "extension.repository.",
-   "rowCount": 30,
-   "extraParams" : 'space=Extension'
+   "rowCount": 30
 })
 #livetable("extensions" $columns $columnsProperties $options)
 

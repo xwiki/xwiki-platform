@@ -219,14 +219,14 @@ public class RepositoryManager implements Initializable, Disposable
 
     public <T> XWikiDocument getDocument(T[] data) throws XWikiException
     {
-        return getDocument((String) data[0], (String) data[1]);
+        return getDocument((String) data[0]);
     }
 
-    public XWikiDocument getDocument(String space, String name) throws XWikiException
+    public XWikiDocument getDocument(String fullName) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getWikiId(), space, name), xcontext);
+        return xcontext.getWiki().getDocument(this.currentStringResolver.resolve(fullName), xcontext);
     }
 
     public XWikiDocument getExistingExtensionDocumentById(String extensionId) throws QueryException, XWikiException
@@ -463,7 +463,7 @@ public class RepositoryManager implements Initializable, Disposable
     public void validateExtensions() throws QueryException, XWikiException
     {
         Query query =
-            this.queryManager.createQuery("select doc.space, doc.name from Document doc, doc.object("
+            this.queryManager.createQuery("select doc.fullName from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
         for (Object[] documentName : query.<Object[]>execute()) {

@@ -190,7 +190,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("1.0", extension.getVersion());
 
-        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), "WebHome"),
+        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         // File
@@ -218,7 +218,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("2.0", extension.getVersion());
 
-        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), "WebHome"),
+        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         // File
@@ -245,7 +245,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
 
-        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), "WebHome"),
+        Assert.assertEquals(getUtil().getURL(Arrays.asList("Extension", this.baseExtension.getName()), ""),
             extension.getWebsite());
 
         ExtensionDependency dependency1 = extension.getDependencies().get(0);

@@ -2732,11 +2732,11 @@ public class XWiki extends Api
     }
 
     /**
-     * Get the syntax of the document currently being executed.
+     * Get the syntax of the content currently being executed.
      * <p>
-     * The document currently being executed is not the same than the context document since when including a page with
-     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
-     * execute and render the included document before insert it in the includer document.
+     * The document currently being executed is not the same than the actual content syntax since the executed code
+     * might come from an included page or some macro that change the context syntax. The same logic used inside
+     * rendering macros is used (see {@link org.xwiki.rendering.macro.MacroContentParser}).
      * <p>
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with

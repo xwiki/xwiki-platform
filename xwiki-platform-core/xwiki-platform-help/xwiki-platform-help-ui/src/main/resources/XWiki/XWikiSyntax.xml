@@ -289,11 +289,11 @@ $syntaxMenu.add($cat)
       &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
         &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
           #set ($query = "syntax=1.0&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(1.0)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(1.0)&lt;/option&gt;
           #set ($query = "syntax=2.0&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.0)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.0)&lt;/option&gt;
           #set ($query = "syntax=2.1&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.1)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.1)&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;

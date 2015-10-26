@@ -129,7 +129,12 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -6152,11 +6157,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Get the syntax of the document currently being executed.
+     * Get the syntax of the content currently being executed.
      * <p>
-     * The document currently being executed is not the same than the context document since when including a page with
-     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
-     * execute and render the included document before insert it in the includer document.
+     * The document currently being executed is not the same than the actual content syntax since the executed code
+     * might come from an included page or some macro that change the context syntax. The same logic used inside
+     * rendering macros is used (see {@link org.xwiki.rendering.macro.MacroContentParser}).
      * <p>
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
@@ -6177,11 +6182,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Get the syntax of the document currently being executed.
+     * Get the syntax of the content currently being executed.
      * <p>
-     * The document currently being executed is not the same than the context document since when including a page with
-     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
-     * execute and render the included document before insert it in the includer document.
+     * The document currently being executed is not the same than the actual content syntax since the executed code
+     * might come from an included page or some macro that change the context syntax. The same logic used inside
+     * rendering macros is used (see {@link org.xwiki.rendering.macro.MacroContentParser}).
      * <p>
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
@@ -6200,19 +6205,67 @@ public class XWiki implements EventListener
         return syntaxId;
     }
 
+    /**
+     * Get the syntax of the content currently being executed.
+     * <p>
+     * The document currently being executed is not the same than the actual content syntax since the executed code
+     * might come from an included page or some macro that change the context syntax. The same logic used inside
+     * rendering macros is used (see {@link org.xwiki.rendering.macro.MacroContentParser}).
+     * <p>
+     * If the current document can't be found, the method assume that the executed document is the context document
+     * (it's generally the case when a document is directly rendered with
+     * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
+     *
+     * @return the syntax identifier
+     */
     private String getCurrentContentSyntaxIdInternal(XWikiContext context)
     {
-        String syntaxId = null;
+        Syntax syntax = getCurrentContentSyntaxInternal(context);
 
-        if (context.get("sdoc") != null) {
-            // The content document
-            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntax().toIdString();
-        } else if (context.getDoc() != null) {
-            // The context document
-            syntaxId = context.getDoc().getSyntax().toIdString();
+        return syntax != null ? syntax.toIdString() : null;
+    }
+
+    /**
+     * Get the syntax of the code currently being executed.
+     * <p>
+     * The document currently being executed is not the same than the actual content syntax since the executed code
+     * might come from an included page or some macro that change the context syntax. The same logic used inside
+     * rendering macros is used (see {@link org.xwiki.rendering.macro.MacroContentParser}).
+     * <p>
+     * If the current document can't be found, the method assume that the executed document is the context document
+     * (it's generally the case when a document is directly rendered with
+     * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
+     *
+     * @return the syntax
+     */
+    private Syntax getCurrentContentSyntaxInternal(XWikiContext context)
+    {
+        Syntax syntax = null;
+
+        // Try to find the current syntax
+        if (getRenderingContext() != null) {
+            Block curentBlock = getRenderingContext().getCurrentBlock();
+
+            if (curentBlock != null) {
+                MetaDataBlock metaDataBlock =
+                    curentBlock.getFirstBlock(new MetadataBlockMatcher(MetaData.SYNTAX), Axes.ANCESTOR_OR_SELF);
+
+                if (metaDataBlock != null) {
+                    return (Syntax) metaDataBlock.getMetaData().getMetaData(MetaData.SYNTAX);
+                }
+            }
         }
 
-        return syntaxId;
+        // Fallback on secure and current document in the context
+        if (context.get("sdoc") != null) {
+            // The content document
+            syntax = ((XWikiDocument) context.get("sdoc")).getSyntax();
+        } else if (context.getDoc() != null) {
+            // The context document
+            syntax = context.getDoc().getSyntax();
+        }
+
+        return syntax;
     }
 
     /**

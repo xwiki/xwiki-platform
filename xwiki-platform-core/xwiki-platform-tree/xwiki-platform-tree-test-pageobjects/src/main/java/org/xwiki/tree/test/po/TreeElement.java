@@ -19,6 +19,10 @@
  */
 package org.xwiki.tree.test.po;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -28,7 +32,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Page object used to interact with the generic tree widget available in XWiki.
- * 
+ *
  * @version $Id$
  * @since 6.3RC1
  */
@@ -41,7 +45,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Creates a new instance that can be used to interact with the tree represented by the given element.
-     * 
+     *
      * @param element the element that represents the tree
      */
     public TreeElement(WebElement element)
@@ -68,13 +72,12 @@ public class TreeElement extends BaseElement
         // such as backslash (which is used to escape special characters in an entity reference which the node id can
         // be). Such an element id is technically invalid but the browsers are handling it fine.
         // See https://code.google.com/p/selenium/issues/detail?id=8173
-        return getDriver().findElementsWithoutWaiting(this.element,
-            By.xpath(".//*[@id = '" + nodeId + "']")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(this.element, By.xpath(".//*[@id = '" + nodeId + "']")).size() > 0;
     }
 
     /**
      * Open the tree to the specified node.
-     * 
+     *
      * @param nodeId the node to open to
      * @return this tree
      */
@@ -90,7 +93,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Clear the selection in the tree.
-     * 
+     *
      * @return this tree
      * @since 7.2M3
      */
@@ -105,7 +108,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Wait as long as the tree in busy (loading).
-     * 
+     *
      * @return this tree
      */
     public TreeElement waitForIt()
@@ -126,7 +129,7 @@ public class TreeElement extends BaseElement
 
     /**
      * Waits for the specified node to be selected.
-     * 
+     *
      * @param nodeId the id of the node to wait for
      * @return this tree
      * @since 7.2
@@ -141,5 +144,36 @@ public class TreeElement extends BaseElement
     protected WebElement getElement()
     {
         return this.element;
+    }
+
+    public List<String> getSelectedNodeIDs()
+    {
+        if (getDriver() instanceof JavascriptExecutor) {
+            List<String> selectedNodeIDs =
+                (List<String>) ((JavascriptExecutor) getDriver()).executeScript(
+                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
+
+            return selectedNodeIDs;
+        }
+
+        return new ArrayList<String>();
+    }
+
+    /**
+     * @return a list of loaded node IDs.
+     */
+    public List<String> getNodeIDs()
+    {
+        if (getDriver() instanceof JavascriptExecutor) {
+            String[] selectedNodeIDs =
+                (String[]) ((JavascriptExecutor) getDriver()).executeScript(
+                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
+                        + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
+                    this.element);
+
+            return Arrays.asList(selectedNodeIDs);
+        }
+
+        return new ArrayList<String>();
     }
 }

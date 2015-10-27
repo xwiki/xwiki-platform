@@ -98,6 +98,7 @@ public class CreatePageTest extends AbstractTest
         // Save the number of available templates so that we can make some checks later on.
         int availableTemplateSize = createPagePage.getAvailableTemplateSize();
         String templateInstanceName = TEMPLATE_NAME + "Instance";
+        createPagePage.getDocumentPicker().toggleLocationAdvancedEdit();
         EditPage templateInstanceEditWysiwyg =
             createPagePage.createPageFromTemplate(templateInstanceName, getTestClassName(), null,
                 templateProviderFullName);
@@ -122,7 +123,7 @@ public class CreatePageTest extends AbstractTest
             getUtil().resolveDocumentReference(getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".NewPage");
         vp.clickWantedLink(wantedLinkReference, true);
         // TODO: a page object should be better here
-        List<WebElement> templates = 
+        List<WebElement> templates =
                 getDriver().findElements(By.xpath("//input[@name='type' and @data-type='template']"));
         // Note: We need to remove 1 to exclude the "Empty Page" template entry
         assertEquals(availableTemplateSize, templates.size());
@@ -162,6 +163,7 @@ public class CreatePageTest extends AbstractTest
 
         CreatePagePage createEmptyPage = unexistingPageEdit.clickCancel().createPage();
         assertTrue(createEmptyPage.getAvailableTemplateSize() > 0);
+        createEmptyPage.getDocumentPicker().toggleLocationAdvancedEdit();
         EditPage editEmptyPage = createEmptyPage.createPage(getTestClassName(), "EmptyPage");
         ViewPage emptyPage = editEmptyPage.clickSaveAndView();
         // make sure it's empty
@@ -191,7 +193,9 @@ public class CreatePageTest extends AbstractTest
 
         // Modify the target space and verify the form can't be submitted
         createPagePage.setTemplate(templateProviderFullName);
-        createPagePage.setSpace("Foobar");
+        createPagePage.getDocumentPicker().toggleLocationAdvancedEdit();
+        createPagePage.getDocumentPicker().setParent("Foo");
+        createPagePage.getDocumentPicker().setName("Bar");
         String currentURL = getDriver().getCurrentUrl();
         createPagePage.clickCreate();
         assertEquals(currentURL, getDriver().getCurrentUrl());
@@ -237,8 +241,9 @@ public class CreatePageTest extends AbstractTest
         // First we must click on create from a page that already exists as otherwise we won't get the create UI
         ViewPage vp = getUtil().gotoPage(existingPageReference);
         CreatePagePage createPage = vp.createPage();
-        createPage.setSpace(getTestClassName());
-        createPage.setPage("ExistingPage");
+        createPage.getDocumentPicker().toggleLocationAdvancedEdit();
+        createPage.getDocumentPicker().setParent(getTestClassName());
+        createPage.getDocumentPicker().setName("ExistingPage");
         String currentURL = getDriver().getCurrentUrl();
         createPage.clickCreate();
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
@@ -250,8 +255,9 @@ public class CreatePageTest extends AbstractTest
         // restart everything to make sure it's not the error before
         vp = getUtil().gotoPage(existingPageReference);
         createPage = vp.createPage();
-        createPage.setSpace(getTestClassName());
-        createPage.setPage("ExistingPage");
+        createPage.getDocumentPicker().toggleLocationAdvancedEdit();
+        createPage.getDocumentPicker().setParent(getTestClassName());
+        createPage.getDocumentPicker().setName("ExistingPage");
         createPage.setTemplate(getTestClassName() + "." + templateProviderName);
         currentURL = getDriver().getCurrentUrl();
         createPage.clickCreate();
@@ -274,6 +280,7 @@ public class CreatePageTest extends AbstractTest
         currentURL =
             currentURL.substring(0, currentURL.indexOf('?') > 0 ? currentURL.indexOf('?') : currentURL.length());
         // Try to create the a space (non-terminal document) that already exist.
+        createSpace.getDocumentPicker().toggleLocationAdvancedEdit();
         createSpace.createPage(existingSpaceName, "", null, false);
         String urlAfterSubmit = getDriver().getCurrentUrl();
         urlAfterSubmit =
@@ -308,6 +315,7 @@ public class CreatePageTest extends AbstractTest
 
         // create the page
         CreatePagePage createPage = templatePage.createPage();
+        createPage.getDocumentPicker().toggleLocationAdvancedEdit();
         EditPage editCreatedPage =
             createPage.createPageFromTemplate(getTestClassName(), "NewPage", templateProviderFullName);
         // and now cancel it

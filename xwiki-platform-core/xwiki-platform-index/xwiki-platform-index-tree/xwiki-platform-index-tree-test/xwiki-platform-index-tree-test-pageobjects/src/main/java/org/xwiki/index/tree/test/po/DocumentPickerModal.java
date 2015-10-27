@@ -17,19 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.po;
+package org.xwiki.index.tree.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.DocumentPicker;
 
 /**
  * Represents the modal opened when the user changes the location with the {@link DocumentPicker}.
- * 
+ *
  * @version $Id$
  * @since 7.2M3
  */
@@ -39,9 +39,11 @@ public class DocumentPickerModal extends BaseElement
 
     private DocumentTreeElement tree;
 
-    public DocumentPickerModal(WebElement container)
+    public DocumentPickerModal()
     {
-        this.container = container;
+        this.container = getDriver().findElement(By.cssSelector(".location-tree.modal.fade.in"));
+
+        this.waitForIt();
     }
 
     public DocumentTreeElement getTree()
@@ -94,7 +96,7 @@ public class DocumentPickerModal extends BaseElement
     /**
      * Helper method to wait for the specified document to be selected. This is useful when you open the modal and the
      * tree is expanded to the current selection.
-     * 
+     *
      * @param path the path used to locate the element to wait for
      * @return this modal
      * @since 7.2

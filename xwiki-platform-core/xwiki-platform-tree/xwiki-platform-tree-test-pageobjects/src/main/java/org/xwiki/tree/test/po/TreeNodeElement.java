@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Page object used to interact with a tree node.
- * 
+ *
  * @version $Id$
  * @since 6.3RC1
  */
@@ -53,7 +53,7 @@ public class TreeNodeElement extends BaseElement
 
     /**
      * Creates a new instance that can be used to interact with the tree node represented by the specified element.
-     * 
+     *
      * @param treeElement the tree that contains this node
      * @param locator the element that represents the tree node
      */
@@ -65,7 +65,7 @@ public class TreeNodeElement extends BaseElement
 
     /**
      * The element that represents this tree node is often replaced so we cannot cache it.
-     * 
+     *
      * @return the element that represents this tree node
      */
     private WebElement getElement()
@@ -125,7 +125,7 @@ public class TreeNodeElement extends BaseElement
 
     /**
      * Opens this tree node.
-     * 
+     *
      * @return this tree node
      */
     public TreeNodeElement open()
@@ -138,7 +138,7 @@ public class TreeNodeElement extends BaseElement
 
     /**
      * Closes this tree node.
-     * 
+     *
      * @return this tree node
      */
     public TreeNodeElement close()
@@ -156,7 +156,7 @@ public class TreeNodeElement extends BaseElement
 
     /**
      * Selects this tree node by clicking on its label.
-     * 
+     *
      * @return this tree node
      */
     public TreeNodeElement select()
@@ -168,8 +168,21 @@ public class TreeNodeElement extends BaseElement
     }
 
     /**
+     * Deselects this tree node by clicking on its label.
+     *
+     * @return this tree node
+     */
+    public TreeNodeElement deselect()
+    {
+        if (isSelected()) {
+            getLabelElement().click();
+        }
+        return this;
+    }
+
+    /**
      * Wait as long as this node is in loading state.
-     * 
+     *
      * @return this tree node
      */
     public TreeNodeElement waitForIt()

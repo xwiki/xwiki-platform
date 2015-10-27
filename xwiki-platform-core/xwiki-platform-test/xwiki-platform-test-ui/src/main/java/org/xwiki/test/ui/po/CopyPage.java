@@ -24,7 +24,9 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the common actions possible on the Copy Page page.
- * 
+ * <p/>
+ * TODO: Refactor using the {@link DocumentPicker} and drop the org.xwiki.index.test.po.CopyPage workaround.
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -108,7 +110,7 @@ public class CopyPage extends ViewPage
 
     /**
      * Sets the name of the space where the page should be copied.
-     * 
+     *
      * @param targetSpaceName the name of the space where the page should be copied
      */
     public void setTargetSpaceName(String targetSpaceName)
@@ -127,7 +129,7 @@ public class CopyPage extends ViewPage
 
     /**
      * Sets the name of the target page.
-     * 
+     *
      * @param targetPageName the name of the target page
      */
     public void setTargetPageName(String targetPageName)
@@ -138,7 +140,7 @@ public class CopyPage extends ViewPage
 
     /**
      * Submit the copy page form.
-     * 
+     *
      * @return the confirmation page
      */
     public CopyConfirmationPage clickCopyButton()

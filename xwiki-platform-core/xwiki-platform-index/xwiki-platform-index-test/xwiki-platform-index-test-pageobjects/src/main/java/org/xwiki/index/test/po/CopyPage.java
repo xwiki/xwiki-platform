@@ -21,6 +21,7 @@ package org.xwiki.index.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.DocumentPicker;
 
 /**
  * Copy Page enhanced with a Document Tree Picker.

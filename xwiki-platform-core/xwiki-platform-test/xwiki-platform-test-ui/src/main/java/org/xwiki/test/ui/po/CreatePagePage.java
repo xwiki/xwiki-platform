@@ -39,22 +39,16 @@ import org.xwiki.test.ui.po.editor.EditPage;
  */
 public class CreatePagePage extends ViewPage
 {
-    @FindBy(name = "title")
-    private WebElement titleTextField;
+    /**
+     * The element that contains the document picker used to select the target document.
+     */
+    @FindBy(className = "location-picker")
+    private WebElement documentPickerElement;
 
-    @FindBy(name = "spaceReference")
-    private WebElement spaceTextField;
-
-    @FindBy(name = "name")
-    private WebElement pageTextField;
+    private DocumentPicker documentPicker;
 
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
-
-    @FindBy(css = ".location-picker .breadcrumb")
-    private WebElement locationPreviewElement;
-
-    private BreadcrumbElement locationPreview;
 
     public static CreatePagePage gotoPage()
     {
@@ -62,34 +56,16 @@ public class CreatePagePage extends ViewPage
         return new CreatePagePage();
     }
 
-    public String getTitle()
+    /**
+     * @return the document picker used to select the target document
+     */
+    public DocumentPicker getDocumentPicker()
     {
-        return titleTextField.getAttribute("value");
-    }
+        if (this.documentPicker == null) {
+            this.documentPicker = new DocumentPicker(this.documentPickerElement);
+        }
 
-    public void setTitle(String title)
-    {
-        getDriver().setTextInputValue(this.titleTextField, title);
-    }
-
-    public String getSpace()
-    {
-        return spaceTextField.getAttribute("value");
-    }
-
-    public void setSpace(String space)
-    {
-        getDriver().setTextInputValue(this.spaceTextField, space);
-    }
-
-    public String getPage()
-    {
-        return pageTextField.getAttribute("value");
-    }
-
-    public void setPage(String page)
-    {
-        getDriver().setTextInputValue(this.pageTextField, page);
+        return this.documentPicker;
     }
 
     private List<WebElement> getAvailableTemplateInputs()
@@ -137,7 +113,7 @@ public class CreatePagePage extends ViewPage
         }
         throw new RuntimeException("Failed to find template [" + template + "]");
     }
-    
+
     public void setType(String type)
     {
         List<WebElement> types = getAvailableTypeInputs();
@@ -155,7 +131,8 @@ public class CreatePagePage extends ViewPage
 
     public void clickCreate()
     {
-        this.pageTextField.submit();
+        // Submit the create form. Don`t use the DocumentPicker element since it might not always be there.
+        getDriver().findElementWithoutWaiting(By.id("create")).submit();
     }
 
     public EditPage createPage(String spaceValue, String pageValue)
@@ -212,15 +189,15 @@ public class CreatePagePage extends ViewPage
     private void createPageInternal(String title, String spaceValue, String pageValue, boolean isTerminalPage)
     {
         if (title != null) {
-            setTitle(title);
+            getDocumentPicker().setTitle(title);
         }
 
         if (spaceValue != null) {
-            setSpace(spaceValue);
+            getDocumentPicker().setParent(spaceValue);
         }
 
         if (pageValue != null) {
-            setPage(pageValue);
+            getDocumentPicker().setName(pageValue);
         }
 
         // Since the default is to not create terminal pages, only set this if the user is asking to create a terminal
@@ -309,7 +286,7 @@ public class CreatePagePage extends ViewPage
                 public Boolean apply(WebDriver driver)
                 {
                     try {
-                        String value = getLocationPreview().getPathAsString();
+                        String value = getDocumentPicker().getLocation().getPathAsString();
 
                         currentValue.setLength(0);
                         currentValue.append(value);
@@ -325,13 +302,5 @@ public class CreatePagePage extends ViewPage
             throw new WebDriverException(String.format("Found [%s], was expecting [%s]", currentValue.toString(),
                 expectedPathString), e);
         }
-    }
-
-    public BreadcrumbElement getLocationPreview()
-    {
-        if (this.locationPreview == null) {
-            this.locationPreview = new BreadcrumbElement(this.locationPreviewElement);
-        }
-        return this.locationPreview;
     }
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.po;
+package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.test.ui.po.BaseElement;
-import org.xwiki.test.ui.po.BreadcrumbElement;
 
 /**
  * Represents the Document Picker.
@@ -52,9 +50,7 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setTitle(String title)
     {
-        WebElement titleInput = getTitleInput();
-        titleInput.clear();
-        titleInput.sendKeys(title);
+        getDriver().setTextInputValue(getTitleInput(), title);
         return this;
     }
 
@@ -81,9 +77,7 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setParent(String parent)
     {
-        WebElement parentInput = getParentInput();
-        parentInput.clear();
-        parentInput.sendKeys(parent);
+        getDriver().setTextInputValue(getParentInput(), parent);
         return this;
     }
 
@@ -99,9 +93,7 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setName(String name)
     {
-        WebElement nameInput = getNameInput();
-        nameInput.clear();
-        nameInput.sendKeys(name);
+        getDriver().setTextInputValue(getNameInput(), name);
         return this;
     }
 
@@ -110,16 +102,16 @@ public class DocumentPicker extends BaseElement
         return this.container.findElement(By.className("location-name-field"));
     }
 
-    public DocumentPicker selectDocument(String... path)
-    {
-        browseDocuments().selectDocument(path);
-        return this;
-    }
-
-    public DocumentPickerModal browseDocuments()
+    /**
+     * Clicks the "pick document" button that triggers a modal pop-up to be displayed.
+     * <p/>
+     * The caller is responsible for handling the modal (or instantiating the right page object element), such we limit
+     * the extra coupling that would be required from the test framework if it were to instantiate and return the page
+     * object for the modal pop-up.
+     */
+    public void browseDocuments()
     {
         this.container.findElement(By.className("location-action-pick")).click();
-        return new DocumentPickerModal(this.container.findElement(By.cssSelector(".location-tree.modal"))).waitForIt();
     }
 
     /**

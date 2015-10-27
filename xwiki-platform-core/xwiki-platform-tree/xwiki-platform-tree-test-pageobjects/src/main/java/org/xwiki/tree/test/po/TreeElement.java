@@ -72,7 +72,8 @@ public class TreeElement extends BaseElement
         // such as backslash (which is used to escape special characters in an entity reference which the node id can
         // be). Such an element id is technically invalid but the browsers are handling it fine.
         // See https://code.google.com/p/selenium/issues/detail?id=8173
-        return getDriver().findElementsWithoutWaiting(this.element, By.xpath(".//*[@id = '" + nodeId + "']")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(this.element,
+            By.xpath(".//*[@id = '" + nodeId + "']")).size() > 0;
     }
 
     /**
@@ -146,6 +147,9 @@ public class TreeElement extends BaseElement
         return this.element;
     }
 
+    /**
+     * @return the list of selected node IDs.
+     */
     public List<String> getSelectedNodeIDs()
     {
         if (getDriver() instanceof JavascriptExecutor) {

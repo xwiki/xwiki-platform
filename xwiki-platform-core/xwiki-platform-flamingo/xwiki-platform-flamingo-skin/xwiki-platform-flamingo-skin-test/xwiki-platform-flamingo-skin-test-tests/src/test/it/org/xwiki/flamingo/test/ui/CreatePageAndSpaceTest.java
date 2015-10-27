@@ -74,7 +74,7 @@ public class CreatePageAndSpaceTest extends AbstractTest
 
         // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
         // by using directly the direct action URL for it. This time on a non-exsiting page.
-        getUtil().gotoPage(getUtil().getURL("create", new String[]{ spaceName, "NonExistingPage" }, 
+        getUtil().gotoPage(getUtil().getURL("create", new String[]{ spaceName, "NonExistingPage" },
                 "tocreate=space&type=blank"));
         EditPage editPage = new EditPage();
 
@@ -121,43 +121,43 @@ public class CreatePageAndSpaceTest extends AbstractTest
 
         CreatePagePage createPage = new ViewPage().createPage();
         // Check that by default we have an empty title and name and the parent is the current document's space.
-        assertEquals("", createPage.getTitle());
-        assertEquals("", createPage.getPage());
-        assertEquals(getTestClassName(), createPage.getSpace());
+        assertEquals("", createPage.getDocumentPicker().getTitle());
+        assertEquals("", createPage.getDocumentPicker().getName());
+        assertEquals(getTestClassName(), createPage.getDocumentPicker().getParent());
         // Check the initial state of the breadcrumb.
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
 
         // Set a new title and check that the page name and the breadcrumb are also updated.
         String newTitle = "New Title";
-        createPage.setTitle(newTitle);
-        assertEquals(newTitle, createPage.getPage());
+        createPage.getDocumentPicker().setTitle(newTitle);
+        assertEquals(newTitle, createPage.getDocumentPicker().getName());
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
 
         // Set a new page name and check that the breadcrumb is not updated, since we have a title specified.
         String newName = "SomeNewName";
-        createPage.setPage(newName);
+        createPage.getDocumentPicker().setName(newName);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
 
         // Clear the title, set a page name and check that the breadcrumb now uses the page name as a fallback.
-        createPage.setTitle("");
-        assertEquals("", createPage.getPage());
-        createPage.setPage(newName);
+        createPage.getDocumentPicker().setTitle("");
+        assertEquals("", createPage.getDocumentPicker().getName());
+        createPage.getDocumentPicker().setName(newName);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newName);
 
         // Set a new parent space and check that the breadcrumb is updated.
         // Before that, reset the title, just for completeness.
-        createPage.setTitle(newTitle);
+        createPage.getDocumentPicker().setTitle(newTitle);
         String newSpace = "SomeNewSpace";
-        createPage.setSpace(newSpace);
+        createPage.getDocumentPicker().setParent(newSpace);
         createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newTitle);
 
         // Set a new parent in nested spaces and check that the breadcrumb is updated.
         String newSpaceLevel2 = "Level2";
-        createPage.setSpace(newSpace + "." + newSpaceLevel2);
+        createPage.getDocumentPicker().setParent(newSpace + "." + newSpaceLevel2);
         createPage.waitForLocationPreviewContent("/" + newSpace + "/" + newSpaceLevel2 + "/" + newTitle);
 
         // Clear the parent and check that the breadcrumb is updated, since we are creating a top level document.
-        createPage.setSpace("");
+        createPage.getDocumentPicker().setParent("");
         createPage.waitForLocationPreviewContent("/" + newTitle);
     }
 

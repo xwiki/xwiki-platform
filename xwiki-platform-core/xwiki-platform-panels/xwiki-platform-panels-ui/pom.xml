@@ -132,6 +132,7 @@
           <contentPages combine.self="override"/>
           <technicalPages>
             <technicalPage>EditTranslations\.xml</technicalPage>
+            <technicalPage>(?!Translation.*\.xml).*\.xml</technicalPage>
           </technicalPages>
         </configuration>
       </plugin>

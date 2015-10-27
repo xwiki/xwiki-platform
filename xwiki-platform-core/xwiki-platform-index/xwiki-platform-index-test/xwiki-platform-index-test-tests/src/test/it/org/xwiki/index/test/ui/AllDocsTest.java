@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.index.test.po.AllDocsPage;
-import org.xwiki.index.test.po.DocumentTreeElement;
+import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
@@ -36,11 +36,13 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the AllDocs page.
- * 
+ *
  * @version $Id$
  * @since 2.4M2
  */

@@ -45,9 +45,10 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used by the XWiki.Treeview document. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tree-macro</artifactId>
+      <artifactId>xwiki-platform-index-tree-macro</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
@@ -78,21 +79,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Used to check access rights for tree nodes. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- The document tree macro uses FontAwesome for the node icons. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-fontawesome</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -24,6 +24,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**

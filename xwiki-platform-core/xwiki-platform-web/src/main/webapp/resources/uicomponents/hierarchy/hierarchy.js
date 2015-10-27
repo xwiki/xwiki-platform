@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 /**
  * Expand hierarchy breadcrumbs on clicks.
  */
@@ -66,4 +67,28 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     
   });
   
+});
+
+/**
+ * Extend the breadcrumbs with tree navigation.
+ */
+require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+  require(['tree', 'bootstrap'], function($) {
+    $('ol.breadcrumb > li.dropdown > .dropdown-menu').click(function(event) {
+      // Prevent the drop-down from closing when the user expands the tree nodes.
+      event.stopPropagation();
+    });
+    $('ol.breadcrumb > li.dropdown').on('shown.bs.dropdown', function(event) {
+      $(this).find('.dropdown-menu > .xtree').each(function() {
+        if (!$.jstree.reference($(this))) {
+          $(this).xtree().one('ready.jstree', function(event, data) {
+            var tree = data.instance;
+            var openToNodeId = tree.element.attr('data-openTo');
+            // Open the tree to the specified node and select it.
+            openToNodeId && tree.openTo(openToNodeId);
+          });
+        }
+      });
+    });
+  });
 });

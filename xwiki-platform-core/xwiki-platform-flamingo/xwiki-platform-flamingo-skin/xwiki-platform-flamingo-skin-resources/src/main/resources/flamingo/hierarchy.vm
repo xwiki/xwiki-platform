@@ -41,7 +41,7 @@
       ##
       ## Default mode: display the hierarchy for the current page
       ##
-      #hierarchy($NULL {'id': 'hierarchy', 'limit': 5})
+      #hierarchy($NULL {'id': 'hierarchy', 'limit': 5, 'treeNavigation': true})
     #end
   #end
 #end

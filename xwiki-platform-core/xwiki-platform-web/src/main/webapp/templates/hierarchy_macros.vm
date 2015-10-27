@@ -131,6 +131,7 @@
       #if ($item.classNames)
         #set ($discard = $classNames.addAll($item.classNames))
       #end
+      #getTreeNavigation($pathData $foreach.index $options)
       ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
       #set ($closingTag = '</li><li')
       #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
@@ -140,9 +141,48 @@
         #set ($closingTag = '')
       #end
       class="$stringtool.join($classNames, ' ')">#if ($item.url)<a href="$item.url"
-        >#end$item.label#if ($item.url)</a>#end$closingTag##
+        >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
   </li></ol>
+#end
+
+#macro (getTreeNavigation $pathData $index $options)
+  #set ($treeNavigation = '')
+  #if ($options.treeNavigation)
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+      'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+    #set ($discard = $classNames.add('dropdown'))
+    #set ($rootId = $NULL)
+    #set ($openTo = $pathData.get($mathtool.sub($pathData.size(), 1)).reference)
+    #if ($index > 0)
+      #set ($root = $pathData.get($mathtool.sub($index, 1)).reference)
+      #if ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+        ## The tree shows nested documents.
+        #set ($root = $services.model.resolveDocument('', 'default', $root))
+      #end
+      #set ($rootType = $root.type.toString().toLowerCase())
+      #set ($rootId = "$rootType:$services.model.serialize($root, 'default')")
+      #set ($openTo = $pathData.get($index).reference)
+    #end
+    #if ($openTo.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+      ## The tree shows nested documents.
+      #set ($openTo = $services.model.resolveDocument('', 'default', $openTo))
+    #end
+    #set ($openToType = $openTo.type.toString().toLowerCase())
+    #set ($openToId = "$openToType:$services.model.serialize($openTo, 'default')")
+    ## FIXME: The tree navigation must work on an empty wiki.
+    ## FIXME: The tree navigation should take into account the current hierarchy mode.
+    ## FIXME: Make sure the tree shows entities of type $root.type and $openTo.type
+    #set ($url = $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+      'outputSyntax': 'plain',
+      'root': $rootId
+    })))
+    #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
+      "$services.icon.renderHTML('caret-down')</span>")
+    #set ($treeElement = "<div class='xtree' data-responsive='true' data-url='$escapetool.xml($url)' " +
+      "data-openTo='$escapetool.xml($openToId)'></div>")
+    #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>$treeElement</div>")
+  #end
 #end
 
 #macro (getHierarchyPathData $path $return $options)

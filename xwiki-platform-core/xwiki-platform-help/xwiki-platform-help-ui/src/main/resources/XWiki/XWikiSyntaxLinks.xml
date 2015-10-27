@@ -91,32 +91,30 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </category>
-      <maxSyntaxVersion>
+      <maxSyntaxId>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>maxSyntaxVersion</name>
+        <name>maxSyntaxId</name>
         <number>4</number>
-        <numberType>float</numberType>
         <prettyName>Maximum Syntax Version</prettyName>
         <size>10</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </maxSyntaxVersion>
-      <minSyntaxVersion>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>minSyntaxVersion</name>
+        <name>minSyntaxId</name>
         <number>3</number>
-        <numberType>float</numberType>
         <prettyName>Minimum Syntax Version</prettyName>
         <size>10</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </minSyntaxVersion>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
       <section>
         <customDisplay/>
         <disabled>0</disabled>
@@ -139,10 +137,10 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
       <category>1</category>
     </property>
     <property>
-      <maxSyntaxVersion>2.1</maxSyntaxVersion>
+      <maxSyntaxId>2.1</maxSyntaxId>
     </property>
     <property>
-      <minSyntaxVersion>1.0</minSyntaxVersion>
+      <minSyntaxId>1.0</minSyntaxId>
     </property>
     <property>
       <section>7</section>

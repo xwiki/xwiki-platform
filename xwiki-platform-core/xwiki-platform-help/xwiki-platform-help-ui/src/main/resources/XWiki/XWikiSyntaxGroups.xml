@@ -65,32 +65,30 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </category>
-      <maxSyntaxVersion>
+      <maxSyntaxId>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>maxSyntaxVersion</name>
+        <name>maxSyntaxId</name>
         <number>4</number>
-        <numberType>float</numberType>
         <prettyName>Maximum Syntax Version</prettyName>
         <size>10</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </maxSyntaxVersion>
-      <minSyntaxVersion>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>minSyntaxVersion</name>
+        <name>minSyntaxId</name>
         <number>3</number>
-        <numberType>float</numberType>
         <prettyName>Minimum Syntax Version</prettyName>
         <size>10</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-      </minSyntaxVersion>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
       <section>
         <customDisplay/>
         <disabled>0</disabled>
@@ -113,10 +111,10 @@
       <category>2</category>
     </property>
     <property>
-      <maxSyntaxVersion>2.0</maxSyntaxVersion>
+      <maxSyntaxId>2.0</maxSyntaxId>
     </property>
     <property>
-      <minSyntaxVersion>2.0</minSyntaxVersion>
+      <minSyntaxId>2.0</minSyntaxId>
     </property>
     <property>
       <section>2</section>

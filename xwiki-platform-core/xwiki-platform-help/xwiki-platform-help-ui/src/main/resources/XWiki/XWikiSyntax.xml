@@ -41,21 +41,13 @@
   <hidden>false</hidden>
   <content>{{velocity output="false"}}
 #set($SUPPORTED_SYNTAXES = {})
-#set($void = $SUPPORTED_SYNTAXES.put(1.0, 'XWiki Syntax 1.0'))
-#set($void = $SUPPORTED_SYNTAXES.put(2.0, 'XWiki Syntax 2.0'))
-#set($void = $SUPPORTED_SYNTAXES.put(2.1, 'XWiki Syntax 2.1'))
-
-## We need a way to have a mapping between a string and a number, and we cannot use $mathtool.toDouble() because
-## it is locale dependent (see: http://jira.xwiki.org/browse/XWIKI-11343).
-## TODO: fix $mathtool or create a script service that handles this english-locale string&lt;-&gt;number conversion,
-## because this fix is a bit hacky/spaghetti.
-## A better fix would be to refactor this application, because the syntax number SHOULD NOT BE USED because a syntax
-## is not supposed to be a number (imagine that we switch to 'Markdown', it is impossible to compare).
-## Instead, a syntax object should have a list of categories that the syntax supports.
-#set($NUMBERS_CONVERSION = {})
-#set($void = $NUMBERS_CONVERSION.put('1.0', 1.0))
-#set($void = $NUMBERS_CONVERSION.put('2.0', 2.0))
-#set($void = $NUMBERS_CONVERSION.put('2.1', 2.1))
+#set($void = $SUPPORTED_SYNTAXES.put('1.0', 'XWiki Syntax 1.0'))
+#set($void = $SUPPORTED_SYNTAXES.put('2.0', 'XWiki Syntax 2.0'))
+#set($void = $SUPPORTED_SYNTAXES.put('2.1', 'XWiki Syntax 2.1'))
+##
+## needed for sections that contain descriptions valid for several syntaxes
+## basically it is hack to reuse the 2.0 descriptions for 2.1 
+#set($SUPPORTED_SYNTAX_ORDER = ['1.0', '2.0', '2.1'])
 
 #if ($request.xaction == 'switchContext')
   $response.sendRedirect($request.target)
@@ -67,10 +59,11 @@
   #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
 #end
 #set ($crtSectionId = "$!{request.section}")
-#set ($crtSyntaxVer = $NUMBERS_CONVERSION.get($request.syntax))
-#if ("$!crtSyntaxVer" == '' || !$SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
-  #set ($crtSyntaxVer = 2.1) ## Default to Syntax 2.1
+#set ($crtSyntaxVer = "$!{request.syntax}")
+#if (!$SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
+  #set ($crtSyntaxVer = "2.1") ## Default to Syntax 2.1
 #end
+#set($crtSyntaxPos = $SUPPORTED_SYNTAX_ORDER.indexOf($crtSyntaxVer))
 
 #set ($extraParamList = []) 
 #if ($request.language)
@@ -139,7 +132,7 @@
     #end
 
     ## Add new sections to category children map
-    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxVersion").value, 'maxSyntax' : $obj.getProperty("maxSyntaxVersion").value, 'name' : $sectionTitle})
+    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxId").value, 'maxSyntax' : $obj.getProperty("maxSyntaxId").value, 'name' : $sectionTitle})
     $catChildren.add($child)
   #end
 #end
@@ -154,11 +147,11 @@ $syntaxMenu.add($cat)
 #foreach ($category in $syntaxMenu)
   #set ($sectionsToRemove = [])
   #foreach ($section on $category.children)
-    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
-    #if ($section.minSyntax &gt; $crtSyntaxVer)
+    #set($minSyntaxPos = $SUPPORTED_SYNTAX_ORDER.indexOf($section.minSyntax))
+    #if ($minSyntaxPos &gt; $crtSyntaxPos)
       #set ($discard = $sectionsToRemove.add($section))
       #if ($section.id == $crtSectionId)
-        #set ($crtSectionId = '') ## clear section if it doesn't exist (can happen when switching from 2.0 to 2.1 syntax)
+        #set ($crtSectionId = '') ## clear section if it doesn't exist (can happen when switching from 2.x to 1.0 syntax)
       #end
     #end
   #end
@@ -223,16 +216,22 @@ $syntaxMenu.add($cat)
  *#
 #macro(syntax_displayCategory $sections $translationPrefix $heading)
   #foreach ($section in $sections)
+    #syntax_displaySection($section $translationPrefix $heading)
+  #end
+#end
+
+#macro(syntax_displaySection $section $translationPrefix $heading)
     #set ($displayVersion = $crtSyntaxVer)
-    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
-    #if ($crtSyntaxVer &gt; $section.maxSyntax)
+    ## here is the hack to display the description for 2.0 if we have no description for 2.x
+    ## this likely needs more work if e.g. there is a 3.x which is not compatible with 2.x
+    #set($maxSyntaxPos = $SUPPORTED_SYNTAX_ORDER.indexOf($section.maxSyntax))
+    #if ($crtSyntaxPos &gt; $maxSyntaxPos)
       #set ($displayVersion = $section.maxSyntax)
     #end
     (% class="sectionheader" %)
     $heading $section.name $heading
 
     {{include reference="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
-  #end
 #end
 
 
@@ -289,11 +288,11 @@ $syntaxMenu.add($cat)
       &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
         &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
           #set ($query = "syntax=1.0&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(1.0)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="1.0")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('1.0')&lt;/option&gt;
           #set ($query = "syntax=2.0&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.0)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="2.0")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('2.0')&lt;/option&gt;
           #set ($query = "syntax=2.1&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.1)&lt;/option&gt;
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="2.1")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('2.1')&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
@@ -336,12 +335,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
     #set ($subHeading = '===')
     #syntax_displayCategory($crtCategory.children 'syntax.' '==')
   #else
-      #set ($displayVersion = $crtSyntaxVer)
-      #if ($crtSyntaxVer &gt; $crtSection.maxSyntax)
-        #set ($displayVersion = $crtSection.maxSyntax)
-      #end
-      #set ($subHeading = '==')
-      {{include reference="XWiki.XWikiSyntax${crtSection.id}" section="H${displayVersion}${crtSection.id}"/}}
+      #syntax_displaySection($crtSection 'syntax.' '==')      
   #end
   ))) ## syntax-page-content
 {{/velocity}}</content>

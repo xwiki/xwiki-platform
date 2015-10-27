@@ -35,7 +35,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       ellipsis.addClass('loading');
       // Get the full breadcumb with an AJAX call
       var breadcrumb  = $(this).parents('.breadcrumb-expandable');
-      var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT)).getURL('get', 'xpage=hierarchy');
+      var ajaxURL     = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT)).getURL('get', 'xpage=hierarchy_reference');
       $.ajax(ajaxURL, { 'data': {
           'id'           : breadcrumb[0].id,
           'displayTitle' : breadcrumb.data('displaytitle'),

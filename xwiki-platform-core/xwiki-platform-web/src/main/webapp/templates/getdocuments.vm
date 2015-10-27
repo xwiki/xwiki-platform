@@ -21,15 +21,16 @@ $response.setContentType("application/json")
 #if ("$!request.get('doc.location')" != '')
   ## Location is a special case, that we need to handle separatly.
   ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
-  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '◊'")
-  ## Note: the "_" character has a special meaning in standard SQL servers: "Matches a single character".
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '/'")
+  #set ($locationFilterValue = $request.get('doc.location'))
+  ## Note: the "_" and the "%" characters has special meanings in standard SQL servers (they behave as wildcards).
   ## However, it is not what the user expects (e.g. http://jira.xwiki.org/browse/XWIKI-12608).
-  ## As a consequence, we must escape this character.
-  ## See https://blogs.oracle.com/JPQL01/entry/how_to_use_like_expression to understand why we use the special
-  ## clause 'escape' above. We cannot simply replace all '_' by '\_' because '\' is escaped too afterwards.
-  ## We use the '◊' character for the escaping because it's pretty uncommon and there is a low chance that a 
-  ## page name contains this character.
-  #set ($locationFilterValue = $request.get('doc.location').replaceAll('_', '◊_'))
+  ## As a consequence, we must escape these characters.
+  ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+  ## We use the '/' character for the escaping because Tomcat already prevents to have slashes in page name by default.
+  ## Note: we do not replace by '/' directly because the slashes written by the user are handled afterwards and we don't
+  ## want our own slashes to be affected.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('([%_])', '##XWIKI_ESCAPED_SLASH##$1'))
   ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
   ## (the space separator) or "/" (as it is in the document name).
   ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
@@ -37,6 +38,8 @@ $response.setContentType("application/json")
   ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
   ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
   #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
+  ## Put back the slashes introduced by the filtering of "%" and "_".
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('##XWIKI_ESCAPED_SLASH##', '/'))
   #set ($discard = $queryParams.add("%${locationFilterValue}%"))
 #end
 ##

@@ -251,9 +251,11 @@ $syntaxMenu.add($cat)
     #if ($crtSyntaxPos &gt; $maxSyntaxPos)
       #set ($displayVersion = $section.maxSyntax)
     #end
+    #if($heading)
     (% class="sectionheader" %)
     $heading $section.name $heading
 
+    #end
     {{include reference="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
 #end
 
@@ -356,7 +358,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
     #set ($subHeading = '===')
     #syntax_displayCategory($crtCategory.children 'syntax.' '==')
   #else
-      #syntax_displaySection($crtSection 'syntax.' '==')      
+      #syntax_displaySection($crtSection 'syntax.' false)      
   #end
   ))) ## syntax-page-content
 {{/velocity}}</content>

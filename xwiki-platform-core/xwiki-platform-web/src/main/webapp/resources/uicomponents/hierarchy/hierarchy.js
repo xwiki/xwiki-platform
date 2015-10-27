@@ -54,9 +54,14 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     * Add a link to expand breadcrumbs.
     */
     var addExpandLinkToBreadcrumbs = function () {
-      $('.breadcrumb-expandable .ellipsis').removeClass('ellipsis').wrapInner(function () {
-        // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
-        return $('<a href="#"></a>').click(expandBreadCrumb);
+      $('.breadcrumb-expandable .ellipsis').each(function() {
+        var ellipsis = $(this);
+        if (!ellipsis.children().first().is('a')) {
+          ellipsis.wrapInner(function () {
+            // Wrap the ellipsis with a link (to be consistent with other path items) that expands the breadcrumb
+            return $('<a href="#"></a>').click(expandBreadCrumb);
+          });
+        }
       });
     };
     

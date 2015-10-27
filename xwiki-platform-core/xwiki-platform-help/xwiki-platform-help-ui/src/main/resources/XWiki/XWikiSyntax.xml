@@ -48,6 +48,26 @@
 ## needed for sections that contain descriptions valid for several syntaxes
 ## basically it is hack to reuse the 2.0 descriptions for 2.1 
 #set($SUPPORTED_SYNTAX_ORDER = ['1.0', '2.0', '2.1'])
+##
+## filter all syntaxes that are not installed/configured
+#set($configuredSyntaxIds = $xwiki.getConfiguredSyntaxes())
+#set($enabledSyntaxIds = [])
+#foreach($syntax in $services.rendering.getAvailableParserSyntaxes())
+  #if($configuredSyntaxIds.contains($syntax.toIdString()))
+    #set($discard = $enabledSyntaxIds.add($syntax.toIdString()))
+  #end
+#end
+#set($unavailableSyntaxes=[])
+#foreach($supportedSyntax in $SUPPORTED_SYNTAX_ORDER)
+  #set($fullSyntaxId = "xwiki/$supportedSyntax")
+  #if(!$enabledSyntaxIds.contains($fullSyntaxId))
+    #set($discard = $unavailableSyntaxes.add($supportedSyntax))
+  #end
+#end
+#foreach($unavailableSyntax in $unavailableSyntaxes)
+  #set($discard = $SUPPORTED_SYNTAX_ORDER.remove($unavailableSyntax))
+  #set($discard = $SUPPORTED_SYNTAXES.removeKey($unavailableSyntax))
+#end
 
 #if ($request.xaction == 'switchContext')
   $response.sendRedirect($request.target)
@@ -61,7 +81,10 @@
 #set ($crtSectionId = "$!{request.section}")
 #set ($crtSyntaxVer = "$!{request.syntax}")
 #if (!$SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
-  #set ($crtSyntaxVer = "2.1") ## Default to Syntax 2.1
+  ## Default to the most current one (if we have any)
+  #if(!$SUPPORTED_SYNTAX_ORDER.isEmpty())
+    #set ($crtSyntaxVer = $SUPPORTED_SYNTAX_ORDER.get($mathtool.sub($SUPPORTED_SYNTAX_ORDER.size(),1)))
+  #end
 #end
 #set($crtSyntaxPos = $SUPPORTED_SYNTAX_ORDER.indexOf($crtSyntaxVer))
 
@@ -95,7 +118,7 @@
     #set($obj = $sectionDoc.getObject("XWiki.XWikiSyntaxClass"))
 
     ## detect if we entered a new category
-    #if($catCount &lt; $obj.getProperty("category").value))
+    #if($catCount &lt; $obj.getProperty("category").value)
       ## Put previous category into map (if existing), and reset children map
       #if($catId)
         #set($cat = { 'id' : $catId, 'name' : $catName, 'children' : $catChildren })
@@ -287,12 +310,10 @@ $syntaxMenu.add($cat)
       #end
       &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
         &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
-          #set ($query = "syntax=1.0&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="1.0")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('1.0')&lt;/option&gt;
-          #set ($query = "syntax=2.0&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="2.0")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('2.0')&lt;/option&gt;
-          #set ($query = "syntax=2.1&amp;${crtSelection}")
-          &lt;option value="$escapetool.xml($doc.getURL('view', $query))" #if($crtSyntaxVer=="2.1")selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get('2.1')&lt;/option&gt;
+        #foreach($syntaxId in $SUPPORTED_SYNTAX_ORDER)
+          #set ($query = "syntax=${escapetool.url($syntaxId)}&amp;${crtSelection}")
+          &lt;option value="$escapetool.xml($doc.getURL('view', $query))"#if($crtSyntaxVer == $syntaxId) selected="selected"#end&gt;$escapetool.html($SUPPORTED_SYNTAXES.get($syntaxId))&lt;/option&gt;
+        #end
         &lt;/optgroup&gt;
       &lt;/select&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;

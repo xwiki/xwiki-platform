@@ -189,14 +189,30 @@ public class RepositoryTestUtils
 
     private LocalDocumentReference getExtensionPageReference(Extension extension)
     {
-        String spaceName = extension.getName() != null ? extension.getName() : extension.getId().getId();
+        String extensionName = extension.getName() != null ? extension.getName() : extension.getId().getId();
 
-        return new LocalDocumentReference(Arrays.asList(SPACENAME_EXTENSION, spaceName), "WebHome");
+        return getExtensionPageReference(extensionName);
+    }
+
+    /**
+     * @since 7.3M2
+     */
+    private LocalDocumentReference getExtensionPageReference(String extensionName)
+    {
+        return new LocalDocumentReference(Arrays.asList(SPACENAME_EXTENSION, extensionName), "WebHome");
     }
 
     public void deleteExtension(Extension extension) throws Exception
     {
         this.testUtils.rest().delete(getExtensionPageReference(extension));
+    }
+
+    /**
+     * @since 7.3M2
+     */
+    public void deleteExtension(String extensionName) throws Exception
+    {
+        this.testUtils.rest().delete(getExtensionPageReference(extensionName));
     }
 
     public void addExtension(Extension extension) throws Exception

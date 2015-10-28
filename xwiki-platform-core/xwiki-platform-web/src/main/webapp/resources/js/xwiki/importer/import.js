@@ -264,11 +264,11 @@ var XWiki = (function(XWiki){
             this.container.down("div.packagesubmit input[type=radio]").checked = true;
             // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
 
-            $('.xtree').xtree({
+            $('#package').xtree({
               plugins: ['checkbox']
             });
 
-            this.xtree = $.jstree.reference($('.xtree'));
+            this.xtree = $.jstree.reference($('#package'));
             this.xtree.check_all();
         },
 

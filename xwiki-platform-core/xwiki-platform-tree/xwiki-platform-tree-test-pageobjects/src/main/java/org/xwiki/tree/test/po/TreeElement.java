@@ -77,7 +77,7 @@ public class TreeElement extends BaseElement
     }
 
     /**
-     * Open the tree to the specified node.
+     * Open the tree to the specified node and select it.
      *
      * @param nodeId the node to open to
      * @return this tree
@@ -88,7 +88,8 @@ public class TreeElement extends BaseElement
             ((JavascriptExecutor) getDriver()).executeScript(
                 "jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element, nodeId);
         }
-        getDriver().waitUntilElementIsVisible(By.id(nodeId));
+        waitForNodeSelected(nodeId);
+
         return this;
     }
 
@@ -135,7 +136,7 @@ public class TreeElement extends BaseElement
      * @return this tree
      * @since 7.2
      */
-    protected TreeElement waitForNodeSelected(String nodeId)
+    public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));

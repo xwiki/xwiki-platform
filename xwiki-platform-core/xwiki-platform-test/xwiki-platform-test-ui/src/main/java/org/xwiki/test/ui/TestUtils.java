@@ -574,7 +574,7 @@ public class TestUtils
      */
     public String getURLToDeleteSpace(String space)
     {
-        return getURL(space, "WebHome", "deletespace", "confirm=1");
+        return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
     }
 
     public ViewPage createPage(String space, String page, String content, String title)

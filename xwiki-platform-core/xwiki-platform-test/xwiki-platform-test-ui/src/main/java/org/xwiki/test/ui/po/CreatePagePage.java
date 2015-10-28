@@ -70,12 +70,12 @@ public class CreatePagePage extends ViewPage
 
     private List<WebElement> getAvailableTemplateInputs()
     {
-        return getDriver().findElements(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
+        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type' and @data-type = 'template']"));
     }
 
     private List<WebElement> getAvailableTypeInputs()
     {
-        return getDriver().findElements(By.xpath("//input[@name = 'type']"));
+        return getDriver().findElementsWithoutWaiting(By.xpath("//input[@name = 'type']"));
     }
 
     /**
@@ -106,7 +106,8 @@ public class CreatePagePage extends ViewPage
             if (templateInput.getAttribute("value").equals(template)) {
                 // Get the label corresponding to the input so we can click on it
                 WebElement label =
-                    getDriver().findElement(By.xpath("//label[@for = '" + templateInput.getAttribute("id") + "']"));
+                    getDriver().findElementWithoutWaiting(
+                        By.xpath("//label[@for = '" + templateInput.getAttribute("id") + "']"));
                 label.click();
                 return;
             }
@@ -121,7 +122,8 @@ public class CreatePagePage extends ViewPage
             if (typeInput.getAttribute("value").equals(type)) {
                 // Get the label corresponding to the input so we can click on it
                 WebElement label =
-                        getDriver().findElement(By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
+                    getDriver().findElementWithoutWaiting(
+                        By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
                 label.click();
                 return;
             }

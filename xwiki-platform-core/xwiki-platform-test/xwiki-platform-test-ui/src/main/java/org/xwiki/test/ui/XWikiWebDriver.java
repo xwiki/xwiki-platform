@@ -282,14 +282,14 @@ public class XWikiWebDriver extends RemoteWebDriver
             public WebElement apply(WebDriver driver)
             {
                 WebElement element = null;
-                for (int i = 0; i < locators.length; i++) {
+                for (By locator : locators) {
                     try {
                         if (parentElement != null) {
                             // Use the locator from the passed parent element.
-                            element = parentElement.findElement(locators[i]);
+                            element = parentElement.findElement(locator);
                         } else {
                             // Use the locator from the root.
-                            element = driver.findElement(locators[i]);
+                            element = driver.findElement(locator);
                         }
                     } catch (NotFoundException e) {
                         // This exception is caught by WebDriverWait

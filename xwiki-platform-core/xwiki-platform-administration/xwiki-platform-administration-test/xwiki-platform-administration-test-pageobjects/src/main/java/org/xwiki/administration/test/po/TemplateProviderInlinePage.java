@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -131,10 +133,22 @@ public class TemplateProviderInlinePage extends InlinePage
         }
 
         // Open to and select the given spaces.
-        for (String space : spaces) {
+        for (final String space : spaces) {
             String nodeId = getNodeIDFromSpace(space);
 
             getSpacesTree().openTo(nodeId);
+
+            // Wait for the selection to get registered by the template provider UI javascript code.
+            getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
+            {
+                @Override
+                public WebElement apply(WebDriver input)
+                {
+                    return getDriver().findElementWithoutWaiting(
+                        By.xpath("//input[@id='XWiki.TemplateProviderClass_0_spaces' and contains(@value, '" + space
+                            + "')]"));
+                }
+            });
         }
     }
 

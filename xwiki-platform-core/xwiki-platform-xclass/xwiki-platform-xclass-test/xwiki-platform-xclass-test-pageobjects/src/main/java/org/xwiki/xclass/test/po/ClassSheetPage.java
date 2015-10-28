@@ -37,13 +37,13 @@ public class ClassSheetPage extends ViewPage
     /**
      * The link to view the class template.
      */
-    @FindBy(partialLinkText = "View the template document")
+    @FindBy(partialLinkText = "View the template page")
     private WebElement templateLink;
 
     /**
      * The link to view the class sheet.
      */
-    @FindBy(partialLinkText = "View the sheet document")
+    @FindBy(partialLinkText = "View the sheet page")
     private WebElement sheetLink;
 
     /**
@@ -61,7 +61,7 @@ public class ClassSheetPage extends ViewPage
     /**
      * The button used to create the class sheet.
      */
-    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create the document sheet']")
+    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create the sheet']")
     private WebElement createSheetButton;
 
     /**
@@ -73,7 +73,7 @@ public class ClassSheetPage extends ViewPage
     /**
      * The button used to create the class template.
      */
-    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create the document template']")
+    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create the template']")
     private WebElement createTemplateButton;
 
     /**

@@ -40,12 +40,15 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-## Javascript and CSS
-#set ($discard     = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
-#set ($discard     = $xwiki.ssx.use('XWiki.TemplateProviderSheet'))
 ## Variables
 #set ($providerObj = $doc.getObject('XWiki.TemplateProviderClass'))
 #set ($isEditing   = $xcontext.action == 'edit')
+## Javascript and CSS
+#if ($isEditing)
+  ## Use the JSX only in edit mode.
+  #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
+#end
+#set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderSheet'))
 
 ##
 ## Display the sheet.
@@ -145,6 +148,7 @@
           #foreach ($spacesValue in $providerObj.getValue('spaces'))
             #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
           #end
+
           &lt;input id="XWiki.TemplateProviderClass_0_spaces" name="XWiki.TemplateProviderClass_0_spaces"
             value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
 
@@ -308,7 +312,7 @@
     }
 
     function addEnabledSpacesTreeExtraConfiguration() {
-      var treeElement = $('.xtree');
+      var treeElement = $('#enabled-spaces .xtree');
       var dataElement = $('#XWiki\\.TemplateProviderClass_0_spaces');
 
       // Extract the list of initially checked elements.
@@ -518,7 +522,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.breadcrumb &gt; .active:last-of-type a {
+      <code>#enabled-spaces .breadcrumb &gt; .active:last-of-type a {
   color: @link-color;
 }
 

@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ApplicationCreatePage extends ViewPage
 {
-    @FindBy(id = "appName")
+    @FindBy(id = "appTitle")
     private WebElement appNameInput;
 
     @FindBy(id = "wizard-next")

@@ -94,7 +94,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void waitForApplicationNameError()
     {
-        getDriver().waitUntilElementHasAttributeValue(By.id("appName"), "class", "xErrorField");
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#appTitle.xErrorField"));
     }
 
     /**

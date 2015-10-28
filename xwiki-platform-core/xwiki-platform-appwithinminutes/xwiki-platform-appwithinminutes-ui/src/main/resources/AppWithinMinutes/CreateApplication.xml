@@ -305,7 +305,14 @@
     setTimeout(fetchPreviewUpdate, 500);
   };
 
-  appNameInput.add(appParentInput).on('input', schedulePreviewUpdate);
+  appNameInput.add(appParentInput)
+    .on('input', schedulePreviewUpdate)
+    .keyup(function(event) {
+      // Show the error message if the user presses Enter before typing anything.
+      if (event.which == 13 &amp;&amp; appNameInput.val() == '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
+        fetchPreviewUpdate();
+      }
+    });
 });</code>
     </property>
     <property>

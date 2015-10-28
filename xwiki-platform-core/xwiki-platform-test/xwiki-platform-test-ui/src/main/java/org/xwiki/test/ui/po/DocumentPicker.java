@@ -38,6 +38,14 @@ public class DocumentPicker extends BaseElement
 {
     protected WebElement container;
 
+    /**
+     * Use this constructor only if there is only one document picker on the page.
+     */
+    public DocumentPicker()
+    {
+        this.container = getDriver().findElementByClassName("location-picker");
+    }
+
     public DocumentPicker(WebElement container)
     {
         this.container = container;

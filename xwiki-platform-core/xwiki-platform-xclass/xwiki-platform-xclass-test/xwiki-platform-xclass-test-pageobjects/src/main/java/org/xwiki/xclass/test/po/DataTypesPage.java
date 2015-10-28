@@ -19,9 +19,10 @@
  */
 package org.xwiki.xclass.test.po;
 
-import java.lang.String;import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.DocumentPicker;
+import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -34,22 +35,20 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
 public class DataTypesPage extends ViewPage
 {
     /**
-     * The input used to specify the name of the space where to create the class.
+     * The widget used to specify the class to create.
      */
-    @FindBy(id = "space")
-    private WebElement spaceNameInput;
-
-    /**
-     * The input used to specify the class name.
-     */
-    @FindBy(id = "name")
-    private WebElement classNameInput;
+    private DocumentPicker documentPicker = new DocumentPicker();
 
     /**
      * The button used to create a new class.
      */
     @FindBy(xpath = "//*[@class = 'button' and @value = 'Create this Class']")
     private WebElement createClassButton;
+
+    /**
+     * The live table that lists the existing classes.
+     */
+    private LiveTableElement classesLiveTable = new LiveTableElement("classes");
 
     /**
      * Opens the page that list the available data types.
@@ -71,29 +70,11 @@ public class DataTypesPage extends ViewPage
      */
     public ClassSheetPage createClass(String spaceName, String className)
     {
-        spaceNameInput.clear();
-        spaceNameInput.sendKeys(spaceName);
-        classNameInput.clear();
-        classNameInput.sendKeys(className);
-        createClassButton.click();
+        this.documentPicker.setParent(spaceName);
+        this.documentPicker.setName(className);
+        this.createClassButton.click();
         new WikiEditPage().clickSaveAndView();
         return new ClassSheetPage();
-    }
-
-    /**
-     * @return the input used to specify the name of the space where to create the class
-     */
-    public WebElement getSpaceNameInput()
-    {
-        return spaceNameInput;
-    }
-
-    /**
-     * @return the input used to specify the class name
-     */
-    public WebElement getClassNameInput()
-    {
-        return classNameInput;
     }
 
     /**
@@ -111,7 +92,15 @@ public class DataTypesPage extends ViewPage
      */
     public boolean isClassListed(String spaceName, String className)
     {
-        String xpath = String.format("//dd//a[. = '%s' and contains(@href, '/%s/')]", className, spaceName);
-        return getDriver().findElementsWithoutWaiting(By.xpath(xpath)).size() == 1;
+        String classReference = spaceName + "." + className;
+        this.classesLiveTable.filterColumn("xwiki-livetable-classes-filter-2", classReference);
+        return this.classesLiveTable.getRowCount() > 0;
+    }
+
+    @Override
+    public DataTypesPage waitUntilPageIsLoaded()
+    {
+        this.classesLiveTable.waitUntilReady();
+        return this;
     }
 }

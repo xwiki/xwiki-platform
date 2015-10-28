@@ -19,10 +19,12 @@
  */
 package org.xwiki.xclass.test.po;
 
-import java.lang.Override;import java.lang.String;import org.openqa.selenium.By;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 
@@ -83,22 +85,20 @@ public class ClassSheetPage extends ViewPage
     private WebElement addObjectToTemplateLink;
 
     /**
-     * The text input used to specify the space where to create a new document.
+     * The widget used to specify the class instance to create.
      */
-    @FindBy(id = "spaceName")
-    private WebElement spaceNameInput;
-
-    /**
-     * The text input used to specify the name of the document.
-     */
-    @FindBy(id = "docName")
-    private WebElement documentNameInput;
+    private DocumentPicker documentPicker;
 
     /**
      * The button used to create a new document based on the class template.
      */
-    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create this document']")
+    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create this page']")
     private WebElement createDocumentButton;
+
+    /**
+     * The live table that lists the existing class entries.
+     */
+    private LiveTableElement classEntriesLiveTable = new LiveTableElement("classEntries");
 
     /**
      * Clicks on the template link and returns the template page
@@ -203,20 +203,12 @@ public class ClassSheetPage extends ViewPage
         return new ClassSheetPage();
     }
 
-    /**
-     * @return the input used to specify the name of the space where to create the new document
-     */
-    public WebElement getSpaceNameInput()
+    public DocumentPicker getNewPagePicker()
     {
-        return spaceNameInput;
-    }
-
-    /**
-     * @return the input used to specify the name of the new document
-     */
-    public WebElement getDocumentNameInput()
-    {
-        return documentNameInput;
+        if (this.documentPicker == null) {
+            this.documentPicker = new DocumentPicker();
+        }
+        return this.documentPicker;
     }
 
     /**
@@ -239,10 +231,8 @@ public class ClassSheetPage extends ViewPage
      */
     public InlinePage createNewDocument(String spaceName, String pageName)
     {
-        spaceNameInput.clear();
-        spaceNameInput.sendKeys(spaceName);
-        documentNameInput.clear();
-        documentNameInput.sendKeys(pageName);
+        this.documentPicker.setParent(spaceName);
+        this.documentPicker.setName(pageName);
         return clickCreateDocumentButton();
     }
 
@@ -253,15 +243,15 @@ public class ClassSheetPage extends ViewPage
      */
     public boolean hasDocument(String documentName)
     {
-        // Make sure we look inside the page content and not in some panel like My Recent Modifications.
-        String xpath = String.format("//div[@id = 'xwikicontent']//li//a[. = '%s']", documentName);
-        return getDriver().findElementsWithoutWaiting(By.xpath(xpath)).size() == 1;
+        this.classEntriesLiveTable.filterColumn("xwiki-livetable-classEntries-filter-2", documentName);
+        // This can lead to false positives, but it should be fine if the passed document name is specific enough.
+        return this.classEntriesLiveTable.getRowCount() > 0;
     }
 
     @Override
     public ClassSheetPage waitUntilPageIsLoaded()
     {
-        getDriver().waitUntilElementIsVisible(By.id("HTheclasstemplate"));
+        this.classEntriesLiveTable.waitUntilReady();
         return this;
     }
 }

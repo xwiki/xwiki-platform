@@ -19,9 +19,8 @@
  */
 package org.xwiki.xclass.test.ui;
 
-import java.lang.String;import org.junit.Assert;
-
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
@@ -49,7 +48,7 @@ public class ClassSheetTest extends AbstractTest
     @Test
     public void createClass()
     {
-	//TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
+	    //TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
         getUtil().setHierarchyMode("parentchild");
         try {
             String spaceName = getTestClassName();
@@ -61,7 +60,7 @@ public class ClassSheetTest extends AbstractTest
             getUtil().deletePage(spaceName, pageName);
 
             // Create the class document.
-            DataTypesPage dataTypesPage = DataTypesPage.gotoPage();
+            DataTypesPage dataTypesPage = DataTypesPage.gotoPage().waitUntilPageIsLoaded();
             String dataTypesPageTitle = dataTypesPage.getDocumentTitle();
             Assert.assertTrue(dataTypesPage.isClassListed("XWiki", "XWikiRights"));
             Assert.assertFalse(dataTypesPage.isClassListed(spaceName, classDocName));
@@ -107,7 +106,7 @@ public class ClassSheetTest extends AbstractTest
             editPage.clickBreadcrumbLink(classTitle);
 
             // Create a document based on the class template.
-            Assert.assertEquals(spaceName, classSheetPage.getSpaceNameInput().getAttribute("value"));
+            Assert.assertEquals(spaceName, classSheetPage.getNewPagePicker().getParentInput().getAttribute("value"));
             editPage = classSheetPage.createNewDocument(spaceName, pageName);
 
             Assert.assertEquals(pageName, editPage.getDocumentTitle());

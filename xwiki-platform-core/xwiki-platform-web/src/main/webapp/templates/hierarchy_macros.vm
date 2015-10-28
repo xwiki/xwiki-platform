@@ -148,21 +148,23 @@
 
 #macro (getTreeNavigation $pathData $index $options)
   #set ($treeNavigation = '')
-  #if ($options.treeNavigation)
+  #if ($options.treeNavigation && $pathData.get($index).reference.type != 'ellipsis')
     #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
       'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $classNames.add('dropdown'))
-    #set ($rootId = $NULL)
     #set ($openTo = $pathData.get($mathtool.sub($pathData.size(), 1)).reference)
+    #set ($rootId = $NULL)
     #if ($index > 0)
+      #set ($openTo = $pathData.get($index).reference)
       #set ($root = $pathData.get($mathtool.sub($index, 1)).reference)
-      #if ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+      #if ($root.type == 'ellipsis')
+        #set ($root = $openTo.parent)
+      #elseif ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
         ## The tree shows nested documents.
         #set ($root = $services.model.resolveDocument('', 'default', $root))
       #end
       #set ($rootType = $root.type.toString().toLowerCase())
       #set ($rootId = "$rootType:$services.model.serialize($root, 'default')")
-      #set ($openTo = $pathData.get($index).reference)
     #end
     #if ($openTo.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
       ## The tree shows nested documents.

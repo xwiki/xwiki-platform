@@ -35,6 +35,9 @@
   #set ($local = ($request.local == 'true'))
   #set ($discard = $options.put('local', $local))
 #end
+#if ("$!request.treeNavigation" != '')
+  #set ($discard = $options.put('treeNavigation', $request.treeNavigation.equals('true')))
+#end
 ##
 ## Display the hierarchy
 ##

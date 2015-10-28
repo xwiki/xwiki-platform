@@ -40,7 +40,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           'id'           : breadcrumb[0].id,
           'displayTitle' : breadcrumb.data('displaytitle'),
           'local'        : breadcrumb.data('local'),
-          'excludeSelf'  : breadcrumb.data('excludeself')
+          'excludeSelf'  : breadcrumb.data('excludeself'),
+          'treeNavigation': breadcrumb.data('treenavigation')
       }}).done(function (newBreadcrumb) {
           var $newBreadcrumb = $(newBreadcrumb);
           breadcrumb.replaceWith($newBreadcrumb);
@@ -85,17 +86,29 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
       // Prevent the drop-down from closing when the user expands the tree nodes.
       event.stopPropagation();
     });
-    $('ol.breadcrumb > li.dropdown').on('shown.bs.dropdown', function(event) {
-      $(this).find('.dropdown-menu > .xtree').each(function() {
-        if (!$.jstree.reference($(this))) {
-          $(this).xtree().one('ready.jstree', function(event, data) {
-            var tree = data.instance;
-            var openToNodeId = tree.element.attr('data-openTo');
-            // Open the tree to the specified node and select it.
-            openToNodeId && tree.openTo(openToNodeId);
-          });
-        }
+
+    var enhanceBreadcrumb = function(breadcrumb) {
+      breadcrumb.children('li.dropdown').on('shown.bs.dropdown', function(event) {
+        $(this).find('.dropdown-menu > .xtree').each(function() {
+          if (!$.jstree.reference($(this))) {
+            $(this).xtree().one('ready.jstree', function(event, data) {
+              var tree = data.instance;
+              var openToNodeId = tree.element.attr('data-openTo');
+              // Open the tree to the specified node and select it.
+              openToNodeId && tree.openTo(openToNodeId);
+            });
+          }
+        });
       });
+    };
+
+    // Re-initialize the tree navigation when the breadcrumb is expanded.
+    $(document).on('xwiki:dom:updated', function(event, data) {
+      var source = $(data.elements);
+      source.is('.breadcrumb') && enhanceBreadcrumb(source);
     });
+
+    // Initialize the tree navigation on page load.
+    enhanceBreadcrumb($('ol.breadcrumb'));
   });
 });

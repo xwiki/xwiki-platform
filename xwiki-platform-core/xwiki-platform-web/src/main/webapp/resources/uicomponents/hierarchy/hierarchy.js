@@ -42,10 +42,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           'local'        : breadcrumb.data('local'),
           'excludeSelf'  : breadcrumb.data('excludeself'),
           'treeNavigation': breadcrumb.data('treenavigation')
-      }}).done(function (newBreadcrumb) {
-          var $newBreadcrumb = $(newBreadcrumb);
-          breadcrumb.replaceWith($newBreadcrumb);
-          $(document).trigger('xwiki:dom:updated', {'elements': $newBreadcrumb.toArray()});
+      }}).done(function (data) {
+          var updatedBreadcrumb = $(data);
+          breadcrumb.replaceWith(updatedBreadcrumb);
+          $(document).trigger('xwiki:dom:updated', {'elements': updatedBreadcrumb.toArray()});
         })
         .fail(function (){
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('web.hierarchy.error'))", 'error');

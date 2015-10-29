@@ -64,7 +64,7 @@ public class ClassSheetTest extends AbstractTest
             String dataTypesPageTitle = dataTypesPage.getDocumentTitle();
             Assert.assertTrue(dataTypesPage.isClassListed("XWiki", "XWikiRights"));
             Assert.assertFalse(dataTypesPage.isClassListed(spaceName, classDocName));
-            ClassSheetPage classSheetPage = dataTypesPage.createClass(spaceName, className);
+            ClassSheetPage classSheetPage = dataTypesPage.createClass(spaceName, className).waitUntilPageIsLoaded();
             Assert.assertEquals(classTitle, classSheetPage.getDocumentTitle());
             Assert.assertTrue(classSheetPage.hasBreadcrumbContent(dataTypesPageTitle, false));
 
@@ -74,7 +74,7 @@ public class ClassSheetTest extends AbstractTest
             classEditor.clickSaveAndView();
 
             // Add a new property.
-            classEditor = classSheetPage.clickEditClassLink();
+            classEditor = classSheetPage.waitUntilPageIsLoaded().clickEditClassLink();
             classEditor.addProperty("age", "Number").setPrettyName("Your current age");
             classEditor.clickSaveAndView();
 
@@ -88,13 +88,16 @@ public class ClassSheetTest extends AbstractTest
             Assert.assertTrue(classSheetPage.hasProperty("age", "Your current age", "Number"));
 
             // Create and bind a sheet.
-            classSheetPage = classSheetPage.clickCreateSheetButton().clickBindSheetLink();
+            classSheetPage = classSheetPage.clickCreateSheetButton().waitUntilPageIsLoaded()
+                .clickBindSheetLink().waitUntilPageIsLoaded();
             ViewPage sheetPage = classSheetPage.clickSheetLink();
             Assert.assertEquals(className + " Sheet", sheetPage.getDocumentTitle());
             sheetPage.clickBreadcrumbLink(classTitle);
+            classSheetPage.waitUntilPageIsLoaded();
 
             // Create the template.
-            classSheetPage = classSheetPage.clickCreateTemplateButton().clickAddObjectToTemplateLink();
+            classSheetPage = classSheetPage.clickCreateTemplateButton().waitUntilPageIsLoaded()
+                .clickAddObjectToTemplateLink().waitUntilPageIsLoaded();
             ViewPage templatePage = classSheetPage.clickTemplateLink();
             Assert.assertEquals(className + " Template", templatePage.getDocumentTitle());
             // The default edit button should take us to the In-line edit mode.
@@ -104,6 +107,7 @@ public class ClassSheetTest extends AbstractTest
             editPage.setValue("age", "13");
             editPage.clickSaveAndContinue();
             editPage.clickBreadcrumbLink(classTitle);
+            classSheetPage.waitUntilPageIsLoaded();
 
             // Create a document based on the class template.
             Assert.assertEquals(spaceName, classSheetPage.getNewPagePicker().getParentInput().getAttribute("value"));
@@ -120,6 +124,7 @@ public class ClassSheetTest extends AbstractTest
             Assert.assertEquals(pageName, viewPage.getDocumentTitle());
             Assert.assertEquals("Your favorite color\nblue\nYour current age\n27", viewPage.getContent());
             viewPage.clickBreadcrumbLink(classTitle);
+            classSheetPage.waitUntilPageIsLoaded();
 
             // Assert the created document is listed.
             Assert.assertTrue(classSheetPage.hasDocument(pageName));

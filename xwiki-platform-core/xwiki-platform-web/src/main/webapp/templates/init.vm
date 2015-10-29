@@ -76,7 +76,7 @@
       // <![CDATA[
         require.config({
           baseUrl: '/',
-            paths: { 'jquery': '${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=jquery%2F1.11.1%2Fjquery.min.js' },
+            paths: { 'jquery': '${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=jquery%2F1.11.3%2Fjquery.min.js' },
           map: {
             '*': { 'jquery': 'jQueryNoConflict' },
             'jQueryNoConflict': { 'jquery': 'jquery' }

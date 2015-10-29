@@ -920,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Yeti 3.3.4
+      <lessCode>// Yeti 3.3.5
 // Variables
 // --------------------------------------------------
 
@@ -1093,6 +1093,11 @@
 @btn-danger-border:              darken(@btn-danger-bg, 5%);
 
 @btn-link-disabled-color:        @gray-light;
+
+// Allows for customizing button radius independently from global border radius
+@btn-border-radius-base:         @border-radius-base;
+@btn-border-radius-large:        @border-radius-large;
+@btn-border-radius-small:        @border-radius-small;
 
 
 //== Forms
@@ -1307,7 +1312,7 @@
 @navbar-default-toggle-border-color:       transparent;
 
 
-// Inverted navbar
+//=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      #fff;
 @navbar-inverse-bg:                         @brand-primary;
@@ -1408,6 +1413,7 @@
 @jumbotron-bg:                   #fafafa;
 @jumbotron-heading-color:        inherit;
 @jumbotron-font-size:            ceil((@font-size-base * 1.5));
+@jumbotron-heading-font-size:    ceil((@font-size-base * 4.5));
 
 
 //== Form states and alerts
@@ -1784,7 +1790,7 @@
 //** Horizontal line color.
 @hr-border:                   @table-border-color;
 
-// Yeti 3.3.4
+// Yeti 3.3.5
 // Bootswatch
 // -----------------------------------------------------
 
@@ -2103,12 +2109,14 @@ input[type="checkbox"] {
     }
   }
 
-  &amp;-lg &gt; li &gt; a {
+  &amp;-lg &gt; li &gt; a,
+  &amp;-lg &gt; li &gt; span {
     padding-left: 22px;
     padding-right: 22px;
   }
 
-  &amp;-sm &gt; li &gt; a {
+  &amp;-sm &gt; li &gt; a,
+  &amp;-sm &gt; li &gt; span {
     padding: 0 5px;
   }
 }
@@ -2220,11 +2228,6 @@ input[type="checkbox"] {
   .close {
     color: @text-color;
   }
-}
-
-// XWiki customization
-.globalsearch .btn {
-  height: 30px;
 }</lessCode>
     </property>
     <property>

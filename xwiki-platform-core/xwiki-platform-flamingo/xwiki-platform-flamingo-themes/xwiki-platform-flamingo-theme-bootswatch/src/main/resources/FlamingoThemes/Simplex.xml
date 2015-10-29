@@ -920,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Simplex 3.3.4
+      <lessCode>// Simplex 3.3.5
 // Variables
 // --------------------------------------------------
 
@@ -1091,6 +1091,11 @@
 @btn-danger-border:              @btn-danger-bg;
 
 @btn-link-disabled-color:        @gray-light;
+
+// Allows for customizing button radius independently from global border radius
+@btn-border-radius-base:         @border-radius-base;
+@btn-border-radius-large:        @border-radius-large;
+@btn-border-radius-small:        @border-radius-small;
 
 
 //== Forms
@@ -1305,7 +1310,7 @@
 @navbar-default-toggle-border-color:       #ddd;
 
 
-// Inverted navbar
+//=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      lighten(@brand-primary, 40%);
 @navbar-inverse-bg:                         @brand-primary;
@@ -1406,6 +1411,7 @@
 @jumbotron-bg:                   darken(@body-bg, 3%);
 @jumbotron-heading-color:        inherit;
 @jumbotron-font-size:            ceil((@font-size-base * 1.5));
+@jumbotron-heading-font-size:    ceil((@font-size-base * 4.5));
 
 
 //== Form states and alerts
@@ -1782,7 +1788,7 @@
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Simplex 3.3.4
+// Simplex 3.3.5
 // Bootswatch
 // -----------------------------------------------------
 
@@ -1867,7 +1873,16 @@ label {
 
 .has-warning {
   .help-block,
-  .control-label {
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
     color: @brand-danger;
   }
 
@@ -1879,7 +1894,16 @@ label {
 
 .has-error {
   .help-block,
-  .control-label {
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
     color: @brand-primary;
   }
 
@@ -1891,7 +1915,16 @@ label {
 
 .has-success {
   .help-block,
-  .control-label {
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
     color: @brand-success;
   }
 

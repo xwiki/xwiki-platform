@@ -929,7 +929,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Darkly 3.3.4
+      <lessCode>// Darkly 3.3.5
 // Variables
 // --------------------------------------------------
 
@@ -1102,6 +1102,11 @@
 @btn-danger-border:              @btn-danger-bg;
 
 @btn-link-disabled-color:        @gray-light;
+
+// Allows for customizing button radius independently from global border radius
+@btn-border-radius-base:         @border-radius-base;
+@btn-border-radius-large:        @border-radius-large;
+@btn-border-radius-small:        @border-radius-small;
 
 
 //== Forms
@@ -1316,7 +1321,7 @@
 @navbar-default-toggle-border-color:       darken(@navbar-default-bg, 10%);
 
 
-// Inverted navbar
+//=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      #fff;
 @navbar-inverse-bg:                         @brand-success;
@@ -1417,6 +1422,7 @@
 @jumbotron-bg:                   @gray-dark;
 @jumbotron-heading-color:        inherit;
 @jumbotron-font-size:            ceil((@font-size-base * 1.5));
+@jumbotron-heading-font-size:    ceil((@font-size-base * 4.5));
 
 
 //== Form states and alerts
@@ -1793,8 +1799,7 @@
 //** Horizontal line color.
 @hr-border:                   @gray;
 
-
-// Darkly 3.3.4
+// Darkly 3.3.5
 // Bootswatch
 // -----------------------------------------------------
 
@@ -1947,6 +1952,10 @@ textarea {
   .checkbox,
   .radio-inline,
   .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
   .form-control-feedback {
     color: @brand-warning;
   }
@@ -1968,6 +1977,10 @@ textarea {
   .checkbox,
   .radio-inline,
   .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
   .form-control-feedback {
     color: @brand-danger;
   }
@@ -1989,6 +2002,10 @@ textarea {
   .checkbox,
   .radio-inline,
   .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
   .form-control-feedback {
     color: @brand-success;
   }
@@ -2127,14 +2144,7 @@ a.list-group-item {
 
 .panel-default &gt; .panel-heading {
   background-color: @panel-footer-bg;
-}
-
-
-// XWiki customization
-@xwiki-panel-header-text:  @text-color;
-@navbar-height:            50px;
-@xwiki-page-content-bg:    @body-bg;
-</lessCode>
+}</lessCode>
     </property>
     <property>
       <link-color/>
@@ -2164,7 +2174,7 @@ a.list-group-item {
       <navbar-default-link-hover-color/>
     </property>
     <property>
-      <navbar-height/>
+      <navbar-height>50px</navbar-height>
     </property>
     <property>
       <panel-bg>#222222</panel-bg>

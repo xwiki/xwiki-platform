@@ -1743,7 +1743,7 @@ $xwiki.ssx.use('Main.Activity')##
     #set ($value = "$!{xcontext.macro.params.get($param)}")
     #if ($value != '')
       #foreach($piece in $value.split('\s*,\s*'))
-        #set($extraQueryString = "${param}=$!{piece}&amp;$!{extraQueryString}")
+        #set($extraQueryString = "${param}=$!{escapetool.url($piece)}&amp;$!{extraQueryString}")
       #end
     #end
   #end

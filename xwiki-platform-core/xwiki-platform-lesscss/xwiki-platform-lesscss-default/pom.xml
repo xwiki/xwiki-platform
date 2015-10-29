@@ -69,7 +69,7 @@
     <dependency>
       <groupId>com.github.sommeri</groupId>
       <artifactId>less4j</artifactId>
-      <version>1.14.0</version>
+      <version>1.15.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.json</groupId>

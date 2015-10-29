@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
-import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -221,39 +220,9 @@ public class TextAreaClass extends StringClass
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
                 String syntax = getObjectDocumentSyntax(object, context).toIdString();
-                // We don't know for sure who is the author of the TextArea's content. It's not necessarily the last
-                // author or the content author of the current document. Thus we need to render the TextArea's content
-                // without programming rights to be safe (and to be sure that the programming rights of the content
-                // author of the current document don't leak).
-                // See XWiki-7941: PR leak in sheets when displaying TextArea properties
-                buffer.append(renderContentSafely(result.toString(), syntax, context));
+                buffer.append(context.getDoc().getRenderedContent(result.toString(), syntax, context));
             } else {
                 buffer.append(result);
-            }
-        }
-    }
-
-    /**
-     * Renders the given content without programming rights, in the context of the current document.
-     *
-     * @param content the content to be rendered
-     * @param syntax the syntax of the given content
-     * @param context the XWiki context, used to access the context document
-     * @return the rendered content
-     */
-    private String renderContentSafely(String content, String syntax, XWikiContext context)
-    {
-        boolean restorePermissions = false;
-        if (!context.hasDroppedPermissions()) {
-            context.dropPermissions();
-            restorePermissions = true;
-        }
-
-        try {
-            return context.getDoc().getRenderedContent(content, syntax, context);
-        } finally {
-            if (restorePermissions) {
-                context.remove(XWikiConstant.DROPPED_PERMISSIONS);
             }
         }
     }

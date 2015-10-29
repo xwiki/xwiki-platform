@@ -3138,6 +3138,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             backupContext(backup, context);
             setAsContextDoc(context);
 
+            // Make sure to execute with the right of the document author instead of the content author
+            // (because modifying object property does not modify content author)
+            XWikiDocument sdoc = context.getDoc();
+            if (sdoc != null && !Objects.equals(sdoc.getContentAuthorReference(), sdoc.getAuthorReference())) {
+                // Hack the sdoc to make test module believe the content author is the author
+                sdoc = sdoc.clone();
+                sdoc.setContentAuthorReference(sdoc.getAuthorReference());
+                context.put(CKEY_SDOC, sdoc);
+            }
+
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);

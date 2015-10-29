@@ -208,9 +208,9 @@ public final class XWikiSecurityRule implements SecurityRule
         ToStringBuilder builder = new ToStringBuilder(this, new XWikiToStringStyle());
 
         return builder
-            .append("State" , state)
+            .append("State", state)
             .append("Rights", rights)
-            .append("Users" , users)
+            .append("Users", users)
             .append("Groups", groups)
             .toString();
     }

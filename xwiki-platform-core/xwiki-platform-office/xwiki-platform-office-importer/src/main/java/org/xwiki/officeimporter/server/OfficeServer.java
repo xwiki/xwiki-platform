@@ -34,7 +34,7 @@ public interface OfficeServer
     /**
      * Enumeration used to represent the office server state.
      */
-    public enum ServerState
+    enum ServerState
     {
         /**
          * Connected.
@@ -66,7 +66,7 @@ public interface OfficeServer
          * 
          * @param description description of current server state
          */
-        private ServerState(String description)
+        ServerState(String description)
         {
             this.description = description;
         }

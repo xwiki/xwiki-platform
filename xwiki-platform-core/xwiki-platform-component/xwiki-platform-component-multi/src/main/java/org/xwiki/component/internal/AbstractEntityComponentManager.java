@@ -45,7 +45,7 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
 
         protected final ComponentManager componentManager;
 
-        public EntityComponentManagerInstance(EntityReference entityReference, ComponentManager componentManager)
+        EntityComponentManagerInstance(EntityReference entityReference, ComponentManager componentManager)
         {
             this.entityReference = entityReference;
             this.componentManager = componentManager;

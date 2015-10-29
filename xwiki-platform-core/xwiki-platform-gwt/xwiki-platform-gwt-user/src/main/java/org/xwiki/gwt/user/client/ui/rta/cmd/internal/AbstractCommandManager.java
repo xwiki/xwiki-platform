@@ -59,7 +59,7 @@ public abstract class AbstractCommandManager implements CommandManager
          * @param listener the listener that is waiting to be handled
          * @param add {@code true} if the listener is waiting to be added, {@code false} if it is waiting to be removed
          */
-        public PendingRegistration(CommandListener listener, boolean add)
+        PendingRegistration(CommandListener listener, boolean add)
         {
             this.listener = listener;
             this.add = add;

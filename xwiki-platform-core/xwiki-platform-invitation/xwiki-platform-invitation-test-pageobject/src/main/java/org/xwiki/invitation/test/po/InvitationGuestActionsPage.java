@@ -34,7 +34,7 @@ import org.xwiki.test.ui.po.BasePage;
  */
 public class InvitationGuestActionsPage extends BasePage
 {
-    public static enum Action
+    public enum Action
     {
         // Accept is null because the user is forwarded to RegistrationPage, decline is null because it includes the name
         // of the sender.

@@ -72,7 +72,7 @@ public class EditPage extends BasePage
     /**
      * Enumerates the available editors.
      */
-    public static enum Editor
+    public enum Editor
     {
         WYSIWYG("WYSIWYG"),
         WIKI("Wiki"),

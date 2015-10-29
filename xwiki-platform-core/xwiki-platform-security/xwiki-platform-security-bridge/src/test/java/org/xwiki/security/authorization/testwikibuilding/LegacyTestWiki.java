@@ -860,12 +860,12 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         private final Map<String, TestDocument> documents = new HashMap<String, TestDocument>();
 
-        public TestSpace(String name, TestWiki wiki)
+        TestSpace(String name, TestWiki wiki)
         {
             this(name, wiki, null);
         }
 
-        public TestSpace(String name, TestWiki wiki, String alt)
+        TestSpace(String name, TestWiki wiki, String alt)
         {
             this.name = name;
             this.alt = alt;

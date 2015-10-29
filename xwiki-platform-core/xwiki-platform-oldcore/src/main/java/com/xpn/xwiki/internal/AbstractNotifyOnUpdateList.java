@@ -264,7 +264,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         /**
          * @param iterator wrapped iteratlr
          */
-        public Itr(Iterator<E> iterator)
+        Itr(Iterator<E> iterator)
         {
             this.iterator = iterator;
         }
@@ -302,7 +302,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         /**
          * @param iterator wrapped iterator.
          */
-        public ListItr(ListIterator<E> iterator)
+        ListItr(ListIterator<E> iterator)
         {
             super(iterator);
             this.iterator = iterator;

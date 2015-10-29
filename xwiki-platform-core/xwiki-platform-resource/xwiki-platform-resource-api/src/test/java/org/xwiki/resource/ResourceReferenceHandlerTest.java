@@ -36,7 +36,7 @@ public class ResourceReferenceHandlerTest
 {
     private class TestableResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
     {
-        public TestableResourceReferenceHandler(int priority)
+        TestableResourceReferenceHandler(int priority)
         {
             setPriority(priority);
         }

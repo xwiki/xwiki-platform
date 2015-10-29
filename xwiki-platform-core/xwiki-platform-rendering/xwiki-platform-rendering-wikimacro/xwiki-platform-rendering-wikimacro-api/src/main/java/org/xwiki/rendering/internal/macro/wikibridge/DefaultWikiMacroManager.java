@@ -109,7 +109,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
          * @param hint see {@link #getHint()}
          * @param wikiMacro see {@link #getWikiMacro()}
          */
-        public WikiMacroData(String hint, WikiMacro wikiMacro)
+        WikiMacroData(String hint, WikiMacro wikiMacro)
         {
             this.hint = hint;
             this.wikiMacro = wikiMacro;

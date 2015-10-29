@@ -135,7 +135,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
          *            migration fails
          * @param dataType the data type printed in the logs when a migration fails
          */
-        public R35102Work(String tableName, String columnName, String idColumnName, String dataType)
+        R35102Work(String tableName, String columnName, String idColumnName, String dataType)
         {
             this.tableName = tableName;
             this.columnName = columnName;

@@ -56,7 +56,7 @@ public class BaseSearchResult extends XWikiResource
     protected static final String QUERY_TEMPLATE_INFO =
         "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
-    protected static enum SearchScope
+    protected enum SearchScope
     {
         SPACES,
         NAME,

@@ -58,7 +58,7 @@ public enum KeyboardAction
     /**
      * @param keyCodes The key codes associated with the keyboard action being created.
      */
-    private KeyboardAction(char[] keyCodes)
+    KeyboardAction(char[] keyCodes)
     {
         this.keyCodes = keyCodes;
     }

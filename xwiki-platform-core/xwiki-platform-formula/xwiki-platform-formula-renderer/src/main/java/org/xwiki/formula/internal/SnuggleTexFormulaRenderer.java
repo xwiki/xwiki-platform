@@ -100,7 +100,7 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
          * @param target the target output, see {@link #target}
          * @param size the desired font size
          */
-        public CustomMathMLImageSavingCallback(OutputStream target, int size)
+        CustomMathMLImageSavingCallback(OutputStream target, int size)
         {
             this.target = target;
             setFontSize(String.valueOf(size));

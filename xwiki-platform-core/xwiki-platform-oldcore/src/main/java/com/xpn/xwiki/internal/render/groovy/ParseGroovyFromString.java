@@ -126,7 +126,7 @@ public class ParseGroovyFromString
     {
         protected Class<?> cl;
 
-        public CachedGroovyClass(Class<?> cl)
+        CachedGroovyClass(Class<?> cl)
         {
             this.cl = cl;
         }

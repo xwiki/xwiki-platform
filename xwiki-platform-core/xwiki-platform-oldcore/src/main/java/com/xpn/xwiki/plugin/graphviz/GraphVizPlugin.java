@@ -408,7 +408,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
          *
          * @param converterThread the thread to monitor
          */
-        public Hangcheck(Thread converterThread)
+        Hangcheck(Thread converterThread)
         {
             this.converterThread = converterThread;
         }

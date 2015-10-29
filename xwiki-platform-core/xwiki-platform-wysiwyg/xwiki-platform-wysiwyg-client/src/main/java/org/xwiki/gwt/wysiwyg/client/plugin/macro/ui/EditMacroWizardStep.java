@@ -63,7 +63,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
          * 
          * @param wizardCallback the call-back used to notify the wizard that this wizard step has finished loading
          */
-        public MacroDescriptorAsyncCallback(AsyncCallback<?> wizardCallback)
+        MacroDescriptorAsyncCallback(AsyncCallback<?> wizardCallback)
         {
             this.wizardCallback = wizardCallback;
             this.index = ++macroDescriptorRequestIndex;

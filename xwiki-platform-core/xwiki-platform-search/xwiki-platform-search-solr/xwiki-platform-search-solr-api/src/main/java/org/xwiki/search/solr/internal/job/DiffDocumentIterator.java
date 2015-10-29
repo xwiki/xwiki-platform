@@ -36,7 +36,7 @@ public class DiffDocumentIterator<T> extends AbstractDocumentIterator<DiffDocume
     /**
      * The action that must be taken in order to move from the previous version to the next version.
      */
-    public static enum Action
+    public enum Action
     {
         /** This document hasn't changed so you can skip it. */
         SKIP,

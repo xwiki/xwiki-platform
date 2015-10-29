@@ -34,7 +34,7 @@ public class EntityReference implements IsSerializable
     /**
      * Represents a type of entity that can be referenced from the client.
      */
-    public static enum EntityType
+    public enum EntityType
     {
         /**
          * Represents a Wiki Entity.

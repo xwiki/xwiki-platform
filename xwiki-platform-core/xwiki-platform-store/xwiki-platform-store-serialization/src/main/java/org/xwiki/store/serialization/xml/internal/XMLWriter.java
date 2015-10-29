@@ -310,7 +310,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
          *
          * @param toWrap the Writer to send all calls to.
          */
-        public LastCharWriter(final Writer toWrap)
+        LastCharWriter(final Writer toWrap)
         {
             super(toWrap);
         }

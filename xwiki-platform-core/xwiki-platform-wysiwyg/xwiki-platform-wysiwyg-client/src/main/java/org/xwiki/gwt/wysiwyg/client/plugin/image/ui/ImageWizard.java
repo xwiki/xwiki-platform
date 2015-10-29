@@ -52,7 +52,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     /**
      * Enumeration steps handled by this image wizard.
      */
-    public static enum ImageWizardStep
+    public enum ImageWizardStep
     {
         /** The step that parses the image reference. Loaded when editing an image. */
         IMAGE_REFERENCE_PARSER,

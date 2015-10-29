@@ -216,7 +216,7 @@ public class InternalTemplateManager
 
     private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractEnvironmentResource>
     {
-        public EnvironmentTemplate(AbstractEnvironmentResource resource)
+        EnvironmentTemplate(AbstractEnvironmentResource resource)
         {
             super(resource);
         }
@@ -230,7 +230,7 @@ public class InternalTemplateManager
 
     private class DefaultTemplate extends AbtractTemplate<DefaultTemplateContent, Resource<?>>
     {
-        public DefaultTemplate(Resource<?> resource)
+        DefaultTemplate(Resource<?> resource)
         {
             super(resource);
         }
@@ -263,14 +263,14 @@ public class InternalTemplateManager
 
         protected Map<String, Object> properties = new HashMap<String, Object>();
 
-        public DefaultTemplateContent(String content)
+        DefaultTemplateContent(String content)
         {
             this.content = content;
 
             init();
         }
 
-        public DefaultTemplateContent(String content, DocumentReference authorReference)
+        DefaultTemplateContent(String content, DocumentReference authorReference)
         {
             this(content);
 

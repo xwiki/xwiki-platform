@@ -63,7 +63,7 @@ class ColumnGadget extends Gadget
      * 
      * @param gadget the gadget to copy into a column gadget.
      */
-    public ColumnGadget(Gadget gadget)
+    ColumnGadget(Gadget gadget)
     {
         super(gadget.getId(), gadget.getTitle(), gadget.getContent(), gadget.getPosition());
         this.setTitleSource(gadget.getTitleSource());

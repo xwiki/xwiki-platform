@@ -345,7 +345,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * or {@link FilesystemAttachmentVersioningStore#
          * getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
          */
-        public AttachmentSaveTransactionRunnable(final XWikiAttachment attachment,
+        AttachmentSaveTransactionRunnable(final XWikiAttachment attachment,
             final boolean updateDocument,
             final XWikiContext context,
             final File attachFile,
@@ -430,7 +430,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param lock this Lock will be locked while the attachment file is being written to.
          * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
-        public AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment,
+        AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment,
             final boolean updateDocument,
             final XWikiContext context,
             final File attachFile,

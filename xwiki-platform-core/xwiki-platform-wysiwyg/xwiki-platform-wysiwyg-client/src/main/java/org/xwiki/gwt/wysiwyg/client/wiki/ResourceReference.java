@@ -35,7 +35,7 @@ public class ResourceReference implements IsSerializable
     /**
      * Lists the type of resources that can be linked.
      */
-    public static enum ResourceType
+    public enum ResourceType
     {
         /**
          * Represents a Document.

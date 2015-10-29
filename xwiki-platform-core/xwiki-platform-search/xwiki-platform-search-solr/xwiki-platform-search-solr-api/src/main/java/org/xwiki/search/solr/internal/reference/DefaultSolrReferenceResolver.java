@@ -67,7 +67,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
         /**
          * @param wikis the wikis
          */
-        public FarmIterator(List<String> wikis)
+        FarmIterator(List<String> wikis)
         {
             this.currentWiki = wikis.iterator();
         }

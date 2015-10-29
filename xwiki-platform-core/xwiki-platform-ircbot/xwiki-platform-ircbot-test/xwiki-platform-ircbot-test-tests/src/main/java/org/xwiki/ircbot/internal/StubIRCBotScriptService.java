@@ -50,7 +50,7 @@ public class StubIRCBotScriptService implements ScriptService
 
     private class TestChannel extends Channel
     {
-        public TestChannel(PircBotX bot, String name)
+        TestChannel(PircBotX bot, String name)
         {
             super(bot, name);
         }
@@ -58,7 +58,7 @@ public class StubIRCBotScriptService implements ScriptService
 
     private class TestUser extends User
     {
-        protected TestUser(PircBotX bot, String nick)
+        TestUser(PircBotX bot, String nick)
         {
             super(bot, nick);
         }

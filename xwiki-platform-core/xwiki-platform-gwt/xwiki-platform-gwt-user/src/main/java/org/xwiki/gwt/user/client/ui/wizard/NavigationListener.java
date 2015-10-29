@@ -31,7 +31,7 @@ public interface NavigationListener
      * 
      * @version $Id$
      */
-    public static enum NavigationDirection
+    enum NavigationDirection
     {
         /**
          * The navigation directions defined by this wizard: cancel the whole wizard, go to previous step, go to next

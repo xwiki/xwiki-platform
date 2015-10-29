@@ -63,7 +63,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
          *
          * @param document the document whose deleted versions you want to retrieve from the recycle bin store
          */
-        public DeletedDocumentsHibernateCallback(XWikiDocument document)
+        DeletedDocumentsHibernateCallback(XWikiDocument document)
         {
             this.document = document;
         }

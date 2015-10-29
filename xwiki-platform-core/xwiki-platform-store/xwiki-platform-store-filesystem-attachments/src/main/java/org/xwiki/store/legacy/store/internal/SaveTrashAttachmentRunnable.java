@@ -56,7 +56,7 @@ class SaveTrashAttachmentRunnable extends StartableTransactionRunnable
      * @param context the legacy XWikiContext which might be needed to get the attachment archive.
      * @throws XWikiException if loading the attachment content or archive fails.
      */
-    public SaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
+    SaveTrashAttachmentRunnable(final DeletedFilesystemAttachment deleted,
         final DeletedAttachmentFileProvider provider,
         final FilesystemStoreTools fileTools,
         final Serializer<DeletedAttachment, ? extends DeletedAttachment> deletedAttachmentSerializer,

@@ -33,7 +33,7 @@ import org.openqa.selenium.support.FindBy;
 public class EditRightsPane extends BaseElement
 {
     /** The known access rights. */
-    public static enum Right
+    public enum Right
     {
         VIEW,
         COMMENT,
@@ -50,7 +50,7 @@ public class EditRightsPane extends BaseElement
     }
 
     /** The possible states of an access right box. */
-    public static enum State
+    public enum State
     {
         NONE("/xwiki/resources/js/xwiki/usersandgroups/img/none.png"),
         ALLOW("/xwiki/resources/js/xwiki/usersandgroups/img/allow.png"),

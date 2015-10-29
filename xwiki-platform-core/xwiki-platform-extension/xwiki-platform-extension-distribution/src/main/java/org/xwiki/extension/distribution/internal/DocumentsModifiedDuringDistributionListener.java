@@ -74,7 +74,7 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
 
     public static class DocumentStatus
     {
-        public static enum Action
+        public enum Action
         {
             CREATED,
             DELETED,

@@ -38,7 +38,7 @@ public class ExtendedPircBotXTest extends AbstractComponentTestCase
 {
     private class TestableExtendedPircBotX extends ExtendedPircBotX
     {
-        public TestableExtendedPircBotX()
+        TestableExtendedPircBotX()
         {
             _outputThread = getMockery().mock(OutputThread.class);
         }
@@ -69,7 +69,7 @@ public class ExtendedPircBotXTest extends AbstractComponentTestCase
 
     private class TestableChannel extends Channel
     {
-        public TestableChannel(PircBotX bot, String name)
+        TestableChannel(PircBotX bot, String name)
         {
             super(bot, name);
         }
@@ -77,7 +77,7 @@ public class ExtendedPircBotXTest extends AbstractComponentTestCase
 
     private class TestableUser extends User
     {
-        protected TestableUser(PircBotX bot, String nick)
+        TestableUser(PircBotX bot, String nick)
         {
             super(bot, nick);
         }

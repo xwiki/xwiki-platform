@@ -46,7 +46,7 @@ public class LinkWizard extends Wizard
     /**
      * Enumeration steps handled by this link wizard.
      */
-    public static enum LinkWizardStep
+    public enum LinkWizardStep
     {
         /** The step that parses the link reference. */
         LINK_REFERENCE_PARSER,

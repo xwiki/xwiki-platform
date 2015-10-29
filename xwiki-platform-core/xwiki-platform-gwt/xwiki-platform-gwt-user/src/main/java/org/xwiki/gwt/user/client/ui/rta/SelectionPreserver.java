@@ -76,7 +76,7 @@ public class SelectionPreserver
          * 
          * @param range The range to be marked within its document.
          */
-        public RangePlaceHolder(Range range)
+        RangePlaceHolder(Range range)
         {
             DOMUtils domUtils = DOMUtils.getInstance();
             Node startContainer = range.getStartContainer();

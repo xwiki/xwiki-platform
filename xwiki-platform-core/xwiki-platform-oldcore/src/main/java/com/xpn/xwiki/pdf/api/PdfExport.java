@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface PdfExport
 {
     /** Describes export types. */
-    static class ExportType
+    class ExportType
     {
         /** Export type: PDF. */
         public static final ExportType PDF = new ExportType("application/pdf", "pdf");

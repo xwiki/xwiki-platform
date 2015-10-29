@@ -83,7 +83,7 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
         /**
          * @param runnable the object whose run method is called.
          */
-        public XWikiContextualizedThread(Runnable runnable)
+        XWikiContextualizedThread(Runnable runnable)
         {
             super(runnable);
         }

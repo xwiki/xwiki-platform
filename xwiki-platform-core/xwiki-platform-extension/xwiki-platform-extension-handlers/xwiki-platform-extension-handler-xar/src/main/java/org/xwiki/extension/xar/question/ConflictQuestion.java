@@ -27,7 +27,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class ConflictQuestion
 {
-    public static enum GlobalAction
+    public enum GlobalAction
     {
         CURRENT,
         PREVIOUS,

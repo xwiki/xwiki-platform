@@ -90,7 +90,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
          * 
          * @param descriptors the list of macro descriptors
          */
-        public CreateMacroListItemsCommand(List<MacroDescriptor> descriptors)
+        CreateMacroListItemsCommand(List<MacroDescriptor> descriptors)
         {
             this.descriptors = descriptors;
             itemsByCategory.put(CATEGORY_ALL, new ArrayList<ListItem<MacroDescriptor>>());
@@ -161,7 +161,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         /**
          * Creates a new macro filter.
          */
-        public MacroFilter()
+        MacroFilter()
         {
             categoryList = new com.google.gwt.user.client.ui.ListBox(false);
             categoryList.setTitle(Strings.INSTANCE.macroCategoriesToolTip());

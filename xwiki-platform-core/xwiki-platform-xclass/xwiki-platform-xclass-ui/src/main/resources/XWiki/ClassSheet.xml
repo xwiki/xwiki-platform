@@ -64,7 +64,7 @@
 #elseif("$!request.docName" != '')
   ## Request for creating a new instance. We don't actually create a new instance here, we just redirect to the edit mode.
   #set ($targetSpaceRef = $services.model.resolveSpace($request.spaceName))
-  #set ($targetDocRef = $services.model.createEntityReference($request.docName, 'DOCUMENT', $targetSpaceRef))
+  #set ($targetDocRef = $services.model.createDocumentReference($request.docName, $targetSpaceRef))
   #if (!$xwiki.exists($targetDocRef) &amp;&amp; $services.security.authorization.hasAccess('edit', $targetDocRef))
     ## Compute the default edit mode to ensure backward compatibility with documents still using the deprecated inline action.
     #set ($editAction = $xwiki.getDocument($request.template).getDefaultEditMode())
@@ -104,19 +104,19 @@
   #if ($classSheetReferences.isEmpty())
     ## There is no class sheet explicitly bound to this class. Fall-back on naming convention.
     ## Before XWiki 2.0, the default class sheet was suffixed with "ClassSheet". Since 2.0, the suffix is just "Sheet".
-    #set ($defaultClassSheetReference = $services.model.createEntityReference("${className}ClassSheet", 'DOCUMENT',
+    #set ($defaultClassSheetReference = $services.model.createDocumentReference("${className}ClassSheet",
       $doc.documentReference.parent))
     #if (!$xwiki.exists($defaultClassSheetReference))
-      #set ($defaultClassSheetReference = $services.model.createEntityReference("${className}Sheet", 'DOCUMENT',
+      #set ($defaultClassSheetReference = $services.model.createDocumentReference("${className}Sheet",
         $doc.documentReference.parent))
     #end
   #end
   ## Determine the template using naming convention.
   ## Before XWiki 2.0, the default class template was suffixed with "ClassTemplate". Since 2.0, the suffix is just "Template".
-  #set ($classTemplateReference = $services.model.createEntityReference("${className}ClassTemplate", 'DOCUMENT',
+  #set ($classTemplateReference = $services.model.createDocumentReference("${className}ClassTemplate",
     $doc.documentReference.parent))
   #if (!$xwiki.exists($classTemplateReference))
-    #set ($classTemplateReference = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
+    #set ($classTemplateReference = $services.model.createDocumentReference("${className}Template",
       $doc.documentReference.parent))
   #end
   #set($classTemplateDoc = $xwiki.getDocument($classTemplateReference))

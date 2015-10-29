@@ -120,12 +120,25 @@ public class ModelScriptService implements ScriptService
      * 
      * @param reference the reference (with or without locale)
      * @param locale the locale of the new reference
-     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @return the typed Document Reference object
      * @since 5.4RC1
      */
     public DocumentReference createDocumentReference(DocumentReference reference, Locale locale)
     {
         return new DocumentReference(reference, locale);
+    }
+
+    /**
+     * Creates a new {@link DocumentReference} from a given page name and the reference of the parent space.
+     * 
+     * @param pageName the page name
+     * @param parent the parent space reference
+     * @return the typed {@link DocumentReference} object
+     * @since 7.3M2
+     */
+    public DocumentReference createDocumentReference(String pageName, SpaceReference parent)
+    {
+        return new DocumentReference(pageName, parent);
     }
 
     /**

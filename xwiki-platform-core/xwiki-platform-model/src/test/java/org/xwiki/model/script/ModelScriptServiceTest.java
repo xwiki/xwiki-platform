@@ -39,9 +39,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.model.script.ModelScriptService}.
@@ -191,6 +189,14 @@ public class ModelScriptServiceTest
         verify(this.logger).warn("Deprecated usage of DocumentReferenceResolver with hint [{}]. "
             + "Please consider using a DocumentReferenceResolver that takes into account generic types.",
             "current/reference");
+    }
+
+    @Test
+    public void createDocumentReferenceFromPageNameAndSpaceReference()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        Assert.assertEquals(documentReference, this.service.createDocumentReference(documentReference.getName(),
+            documentReference.getLastSpaceReference()));
     }
 
     @Test

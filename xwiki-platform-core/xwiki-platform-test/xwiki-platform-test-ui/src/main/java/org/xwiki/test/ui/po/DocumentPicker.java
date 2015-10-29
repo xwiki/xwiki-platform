@@ -85,8 +85,7 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setParent(String parent)
     {
-        getDriver().setTextInputValue(getParentInput(), parent);
-        return this;
+        return setAdvancedField(getParentInput(), parent);
     }
 
     public WebElement getParentInput()
@@ -101,13 +100,21 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setName(String name)
     {
-        getDriver().setTextInputValue(getNameInput(), name);
-        return this;
+        return setAdvancedField(getNameInput(), name);
     }
 
     public WebElement getNameInput()
     {
         return this.container.findElement(By.className("location-name-field"));
+    }
+
+    private DocumentPicker setAdvancedField(WebElement field, String value)
+    {
+        if (!field.isDisplayed()) {
+            toggleLocationAdvancedEdit();
+        }
+        getDriver().setTextInputValue(field, value);
+        return this;
     }
 
     /**

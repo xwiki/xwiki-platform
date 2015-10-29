@@ -231,8 +231,8 @@ public class ClassSheetPage extends ViewPage
      */
     public InlinePage createNewDocument(String spaceName, String pageName)
     {
-        this.documentPicker.setParent(spaceName);
-        this.documentPicker.setName(pageName);
+        getNewPagePicker().setParent(spaceName);
+        getNewPagePicker().setName(pageName);
         return clickCreateDocumentButton();
     }
 

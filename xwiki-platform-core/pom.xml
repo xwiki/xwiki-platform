@@ -106,11 +106,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15on</artifactId>
           </exclusion>
-          <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
-          <exclusion>
-            <artifactId>asm-debug-all</artifactId>
-            <groupId>org.ow2.asm</groupId>
-          </exclusion>
           <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
                org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
                we can safely exclude it. The other reason for excluding it is that it itself depends on
@@ -120,18 +115,12 @@
             <artifactId>regexp</artifactId>
             <groupId>regexp</groupId>
           </exclusion>
-          <!-- TODO: Remove when https://issues.apache.org/jira/browse/TIKA-1695 is fixed. -->
+          <!-- We don't need it the way we use Tika and it causes various conflicts -->
           <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <groupId>org.apache.cxf</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <!-- See the explanation in the tika-parsers exclusion above -->
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm</artifactId>
-        <version>4.1</version>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>

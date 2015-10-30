@@ -89,7 +89,7 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
 
     var enhanceBreadcrumb = function(breadcrumb) {
       breadcrumb.children('li.dropdown').on('shown.bs.dropdown', function(event) {
-        $(this).find('.dropdown-menu > .xtree').each(function() {
+        $(this).find('.dropdown-menu > .breadcrumb-tree').each(function() {
           if (!$.jstree.reference($(this))) {
             $(this).xtree().one('ready.jstree', function(event, data) {
               var tree = data.instance;

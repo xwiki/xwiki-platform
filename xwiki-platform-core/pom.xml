@@ -469,6 +469,8 @@
             <!-- Remove the following excludes after we release the current version as final -->
             <!-- XMLRPC code has been moved to another module, this is not an API breakage -->
             <exclude>**/com/xpn/xwiki/xmlrpc/**</exclude>
+            <!-- Old query plugin has been moved to its own deprecated module on contrib -->
+            <exclude>**/com/xpn/xwiki/plugin/query/**</exclude>
           </excludes>
         </configuration>
       </plugin>

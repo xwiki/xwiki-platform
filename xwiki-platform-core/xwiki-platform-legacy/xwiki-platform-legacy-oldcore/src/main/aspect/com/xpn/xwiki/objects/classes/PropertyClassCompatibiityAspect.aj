@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
-import org.hibernate.annotations.common.reflection.XClass;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;

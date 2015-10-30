@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
  * Add a backward compatibility layer to the {@link XWikiServletRequest} class.
  * 

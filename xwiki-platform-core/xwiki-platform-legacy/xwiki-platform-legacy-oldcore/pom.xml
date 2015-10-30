@@ -57,29 +57,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- Version 1.1 of jackrabbit core needs to be uploaded to central repository. In addition there was a  POM
-         issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
-    <!-- TODO: Version 1.4.2 is published in the central repo, can we use that? -->
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>1.1-xwiki</version>
-    </dependency>
-
-    <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
-    <dependency>
-      <groupId>org.apache.portals</groupId>
-      <artifactId>graffito-jcr-mapping</artifactId>
-      <version>1.0-a1-amelentev-dev</version>
-    </dependency>
-
-    <!-- See http://jira.codehaus.org/browse/MEV-488 -->
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
-    </dependency>
-
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
     <dependency>

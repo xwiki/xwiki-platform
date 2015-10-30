@@ -21,7 +21,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +31,8 @@ import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 
 /**

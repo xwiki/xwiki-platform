@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.api;
 
-import java.lang.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

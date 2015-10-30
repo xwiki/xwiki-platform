@@ -37,6 +37,7 @@ import java.io.IOException;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -51,7 +52,6 @@ import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
@@ -66,7 +66,6 @@ import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.util.Util;
@@ -405,12 +404,16 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public <T> List<T> XWiki.search(XWikiQuery query, XWikiContext context) throws XWikiException
     {
-        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        Object qp = getPlugin("query", context);
         if (qp == null) {
             return null;
         }
 
-        return qp.search(query);
+        try {
+            return (List<T>) MethodUtils.invokeMethod(qp, "search", query);
+        } catch (Exception e) {
+            throw new XWikiException("Failed to execute search", e);
+        }
     }
 
     @Deprecated
@@ -422,12 +425,18 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public String XWiki.searchAsTable(XWikiQuery query, XWikiContext context) throws XWikiException
     {
-        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        Object qp = getPlugin("query", context);
         if (qp == null) {
             return null;
         }
 
-        List<String> list = qp.search(query);
+        List<String> list;
+        try {
+            list = (List<String>) MethodUtils.invokeMethod(qp, "search", query);
+        } catch (Exception e) {
+            throw new XWikiException("Failed to execute search", e);
+        }
+
         String result = "{table}\r\n";
         List<String> headerColumns = new ArrayList<String>();
         List<String> displayProperties = query.getDisplayProperties();

@@ -67,17 +67,6 @@
     <dependency>
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet.ext.jaxrs</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>javax.xml.stream</groupId>
-        </exclusion>
-        <!-- We use a more accurate and up to date JSON framework version -->
-        <exclusion>
-          <artifactId>org.restlet.lib.org.json</artifactId>
-          <groupId>org.restlet.jse</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Replace the version triggered by restlet by a more accurate and up to date one -->
     <dependency>

@@ -183,24 +183,10 @@
       </visibility>
     </class>
     <property>
-      <code>{{velocity}}
+      <code>{{include reference="DocumentTreeConfig" /}}
+
+{{velocity}}
 #macro (escapeMacroParam $value)$!value.replaceAll('([~"])', '~$1')#end
-#set ($docTreeConfig = {
-  'showWikis': false,
-  'showWikiPrettyName': true,
-  'showSpaces': false,
-  'showDocumentTitle': true,
-  'showTerminalDocuments': true,
-  'showTranslations': true,
-  'showAttachments': true,
-  'showObjects': false,
-  'showClassProperties': false,
-  'hierarchyMode': 'reference',
-  'showOnlyViewable': true,
-  'filterByClass': '',
-  'root': '',
-  'showRoot': false
-})
 ## showChildDocuments is deprecated since 7.2M2. Fall-back on hierarchyMode for backwards compatibility.
 #if ($xcontext.macro.params.showChildDocuments == 'true')
   #set ($discard = $xcontext.macro.params.set('hierarchyMode', 'parentchild'))

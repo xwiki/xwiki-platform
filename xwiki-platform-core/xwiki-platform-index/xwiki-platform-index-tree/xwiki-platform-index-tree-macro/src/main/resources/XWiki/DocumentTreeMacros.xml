@@ -41,27 +41,9 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SuggestSolrMacros" /}}
 
-{{velocity output="false"}}
-## Configuration options.
-#set ($docTreeConfig = {
-  'showWikis': false,
-  'showWikiPrettyName': true,
-  'showSpaces': false,
-  'showDocumentTitle': true,
-  'showAddDocument': false,
-  'showTerminalDocuments': true,
-  'showTranslations': true,
-  'showAttachments': true,
-  'showAddAttachment': false,
-  'showObjects': false,
-  'showClassProperties': false,
-  'hierarchyMode': 'reference',
-  'showOnlyViewable': true,
-  'filterByClass': '',
-  'root': '',
-  'showRoot': false
-})
+{{include reference="DocumentTreeConfig" /}}
 
+{{velocity output="false"}}
 #macro (updateDocTreeConfigFromRequest)
   #foreach ($entry in $docTreeConfig.entrySet())
     #set ($valueFromRequest = $request.getParameter($entry.key))
@@ -76,6 +58,14 @@
   ## Show the wikis only for global users.
   #set ($docTreeConfig.showWikis = $docTreeConfig.showWikis &amp;&amp;
     $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName)
+  #if ($docTreeConfig.showWikis)
+    #set ($docTreeConfig.defaultRoot = 'farm:')
+  #else
+    #set ($docTreeConfig.defaultRoot = "wiki:$xcontext.database")
+  #end
+  #if ($docTreeConfig.root == $docTreeConfig.defaultRoot)
+    #set ($docTreeConfig.root = '')
+  #end
 #end
 
 #macro (handleDocumentTreeRequest)
@@ -113,32 +103,35 @@
 
 #macro (getChildren $nodeId $return)
   #set ($children = [])
-  #if ($nodeId == '#' &amp;&amp; $docTreeConfig.root == '')
-    ## Select the default root node.
-    #if ($docTreeConfig.showWikis)
-      #set ($nodeType = 'farm')
+  #if ($nodeId == '#')
+    ## Return the top level nodes.
+    #if ($docTreeConfig.root == '')
+      ## Return the children of the default root node.
+      #set ($actualNodeId = $docTreeConfig.defaultRoot)
     #else
-      #set ($nodeType = 'wiki')
-      #set ($nodeReference = $xcontext.database)
-    #end
-  #else
-    #set ($actualNodeId = $nodeId)
-    #if ($actualNodeId == '#')
+      ## Return the children of the specified root node.
       #set ($actualNodeId = $docTreeConfig.root)
     #end
-    #set ($parts = $actualNodeId.split(':', 2))
-    #set ($nodeType = $parts[0])
-    #set ($nodeReference = $parts[1])
+  #else
+    ## Return the children of the specified node.
+    #set ($actualNodeId = $nodeId)
   #end
+  #set ($parts = $actualNodeId.split(':', 2))
+  #set ($nodeType = $parts[0])
+  #set ($nodeReference = $parts[1])
   #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
   #if ("$!offset" == '')
     #set ($offset = 0)
+  #end
+  #set ($limit = $mathtool.max($mathtool.toInteger($request.limit), 1))
+  #if ("$!limit" == '')
+    #set ($limit = 15)
   #end
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($nodeType $nodeReference $children)
   #else
     #evaluate("${escapetool.h}add$stringtool.capitalize($nodeType)Children(${escapetool.d}nodeReference
-      $offset 15 ${escapetool.d}children)")
+      $offset $limit ${escapetool.d}children)")
   #end
   #if ($children.isEmpty() &amp;&amp; $nodeId == '#')
     ## Inform the user that the tree is empty.

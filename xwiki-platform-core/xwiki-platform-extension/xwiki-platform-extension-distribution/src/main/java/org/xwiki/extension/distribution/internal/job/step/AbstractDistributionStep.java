@@ -24,11 +24,13 @@ import javax.inject.Provider;
 
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
+import org.xwiki.job.annotation.Serializable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.internal.template.TemplateManager;
 
+@Serializable
 public abstract class AbstractDistributionStep implements DistributionStep
 {
     @Inject

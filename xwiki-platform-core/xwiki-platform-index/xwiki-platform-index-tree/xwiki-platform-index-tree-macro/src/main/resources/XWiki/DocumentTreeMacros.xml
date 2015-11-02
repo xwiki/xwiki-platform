@@ -819,9 +819,7 @@
       'canDelete': $services.security.authorization.hasAccess('delete', $translationReference)
     },
     'a_attr': {
-      'href': $xwiki.getURL($translationReference, 'view', $escapetool.url({
-        'language': $translationReference.locale
-      }))
+      'href': $xwiki.getURL($translationReference)
     }
   }))
 #end

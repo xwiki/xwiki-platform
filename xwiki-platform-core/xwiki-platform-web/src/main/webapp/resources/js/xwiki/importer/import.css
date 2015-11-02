@@ -6,7 +6,7 @@
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.titleColor;
   display: block;
-  font-size: 1.33em;
+  font-size: 1.5em;
   font-weight: 400;
   line-height: 1.2em;
   margin: 20px 0 10px;
@@ -71,11 +71,9 @@ div.loading {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 1px;
-  width: 95%;
 }
 
 #packagecontainer .packageinfos {
-  font-size: .9em;
   margin-bottom: .5em;
 }
 
@@ -83,13 +81,9 @@ div.loading {
   display: table-row;
 }
 
-#packagecontainer .packageinfos .filename {
-  font-weight: 700;
-}
-
 #packagecontainer .packageinfos span {
   color: $theme.textSecondaryColor;
-  margin: 0 5px 0;
+  margin: 0 5px 0 0;
 }
 
 #packagecontainer .packageinfos span.label {
@@ -111,14 +105,14 @@ div.loading {
   margin-left: .2em;
 }
 
-div#package div.importOption {
+#package .importOption {
   margin-bottom:5px;
 }
 
-div#package {
+#package {
   background-color: $theme.pageContentBackgroundColor;
   border: 1px dotted $theme.borderColor;
-  width: 98%;
+  margin-bottom: 1em;
 }
 
 .documentName{
@@ -127,7 +121,6 @@ div#package {
 }
 
 .historyStrategyOption {
-  font-size: .9em;
   line-height: 1.2em;
   margin-bottom: 0;
 }

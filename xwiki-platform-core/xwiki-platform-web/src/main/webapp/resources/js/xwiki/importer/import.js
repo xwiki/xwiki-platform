@@ -303,7 +303,7 @@ var XWiki = (function(XWiki){
         {
             var submitBlock = new Element("div", {'class':'packagesubmit'});
 
-            submitBlock.insert( new Element("em").update( translations["whenDocumentAlreadyExists"] ));
+            submitBlock.insert( new Element("div").update( translations["whenDocumentAlreadyExists"] ));
 
             var defaultChoiceRadioButton =  new Element("input", { 'type':'radio','name':'historyStrategy',
                                                                       'checked':'checked', 'value': 'add' });

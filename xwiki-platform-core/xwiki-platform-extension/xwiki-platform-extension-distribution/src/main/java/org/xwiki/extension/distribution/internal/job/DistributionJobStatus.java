@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
@@ -101,7 +102,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public DistributionStep getStep(String stepId)
     {
         for (DistributionStep step : getSteps()) {
-            if (step.getId().equals(stepId)) {
+            if (StringUtils.equals(step.getId(), stepId)) {
                 return step;
             }
         }

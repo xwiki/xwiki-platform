@@ -98,10 +98,11 @@
         ##
         ## List the documents to be deleted using a livetable
         ##
-        #set ($collist = ['doc.title','doc.date', 'doc.author'])
+        #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
         #set ($colprops = {
-          'doc.title' : { 'link' : 'view' },
-          'doc.author' : { 'link' : 'author' }
+          'doc.title'    : { 'link' : 'view' },
+          'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
+          'doc.author'   : { 'link' : 'author' }
         })
         #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
         #set ($options = { 

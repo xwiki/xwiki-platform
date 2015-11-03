@@ -140,7 +140,7 @@ public class CreateActionTest
 
         velocityContext = new VelocityContext();
         context.put("vcontext", velocityContext);
-        
+
         when(mockRequest.get("type")).thenReturn("plain");
     }
 
@@ -164,6 +164,31 @@ public class CreateActionTest
         assertNull(result);
 
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentButNonTerminalFromURL() throws Exception
+    {
+        // new document = xwiki:X.Y
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Pass the tocreate=nonterminal request parameter
+        when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -281,12 +306,15 @@ public class CreateActionTest
 
         // The tests are below this line!
 
-        // Verify null is returned (this means the response has been returned)
-        assertNull(result);
+        // Verify that the create template is rendered, so the UI is displayed for the user to enter the missing values.
+        assertEquals("create", result);
 
-        // Note: We are creating X.WebHome even if the tocreate parameter says "terminal" because there is nowhere else
-        // to go upwards since we are already in a top level space.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
+        // Note: We can not create the "X" terminal document, since it is already at the top level of the hierarchy and
+        // none was able to be deducted from the given information. The user needs to specify more info in order to
+        // continue.
+        // We should not get this far so no redirect should be done, just the template will be rendered.
+        verify(mockURLFactory, never()).createURL(anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyString(), any(XWikiContext.class));
     }
 
     @Test

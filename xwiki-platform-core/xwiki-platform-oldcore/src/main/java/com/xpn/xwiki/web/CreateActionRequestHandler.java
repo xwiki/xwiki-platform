@@ -102,6 +102,11 @@ public class CreateActionRequestHandler
     private static final String TOCREATE_TERMINAL = "terminal";
 
     /**
+     * The value of the tocreate parameter when a non-terminal document is to be created.
+     */
+    private static final String TOCREATE_NONTERMINAL = "nonterminal";
+
+    /**
      * The name of the template field inside the template provider, or the template parameter which can be sent
      * directly, without passing through the template provider.
      */
@@ -163,7 +168,7 @@ public class CreateActionRequestHandler
     private BaseObject templateProvider;
 
     private List<Document> availableTemplateProviders;
-    
+
     private String type;
 
     /**
@@ -240,31 +245,19 @@ public class CreateActionRequestHandler
      */
     private void processNewDocument(String toCreate)
     {
-        // Usually for this case, it would be a terminal document.
-        isSpace = false;
-
         // Current space and page name.
         spaceReference = document.getDocumentReference().getLastSpaceReference();
         name = document.getDocumentReference().getName();
 
+        // Determine if the current document is in a top-level space.
+        EntityReference parentSpaceReference = spaceReference.getParent();
+        boolean isTopLevelSpace = parentSpaceReference.extractReference(EntityType.SPACE) == null;
+
+        // Determine the default value of isSpace, based on the new document's location.
         if (WEBHOME.equals(name)) {
             // If it's a space homepage, then we can handle it as a non-terminal document, since it's behavior is
             // the same.
             isSpace = true;
-            // ...unless explicitly overridden from the request.
-            isSpace &= !TOCREATE_TERMINAL.equals(toCreate);
-
-            // Determine if the current document is in a top-level space.
-            EntityReference parentSpaceReference = spaceReference.getParent();
-            boolean isTopLevelSpace = parentSpaceReference.extractReference(EntityType.SPACE) == null;
-
-            // If overridden from the request to be a terminal document but we can`t go up any further (already in a
-            // top-level space), there is nothing left to do.
-            if (!isSpace && isTopLevelSpace) {
-                return;
-            }
-
-            // Go one level above...
 
             // Determine its name.
             name = spaceReference.getName();
@@ -279,7 +272,18 @@ public class CreateActionRequestHandler
                 // request).
                 spaceReference = null;
             }
+        } else {
+            // Otherwise, it's a terminal document, use it as it is.
+            isSpace = false;
+        }
 
+        // Look at the request to see what the user wanted to create (terminal or non-terminal).
+        if (!StringUtils.isBlank(toCreate)) {
+            if (isSpace && TOCREATE_TERMINAL.equals(toCreate)) {
+                isSpace = false;
+            } else if (!isSpace && TOCREATE_NONTERMINAL.equals(toCreate)) {
+                isSpace = true;
+            }
         }
     }
 
@@ -599,9 +603,9 @@ public class CreateActionRequestHandler
         return templateProvider;
     }
 
-    /** 
+    /**
      * @return the type of document to create, read from the request, or {@code null} if none was set
-     * @since 7.2 
+     * @since 7.2
      */
     public String getType()
     {

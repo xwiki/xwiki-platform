@@ -117,15 +117,17 @@
         {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('type'){{/html}}{{html clean='false'}}
       &lt;/dd&gt;
       ##
-      ## Terminal
+      ## Terminal page creation - Advanced user (both view and edit mode)
       ##
-      &lt;dt&gt;
-        &lt;label for="XWiki.TemplateProviderClass_0_terminal"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal'))&lt;/label&gt;
-        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('terminal'){{/html}}{{html clean='false'}}
-      &lt;/dd&gt;
+      #if ($isAdvancedUser || $isSuperAdmin)
+        &lt;dt&gt;
+          &lt;label for="XWiki.TemplateProviderClass_0_terminal"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal'))&lt;/label&gt;
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('terminal'){{/html}}{{html clean='false'}}
+        &lt;/dd&gt;
+      #end
       ##
       ## Action
       ##

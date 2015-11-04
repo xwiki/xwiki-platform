@@ -140,6 +140,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * Constructs a new {@link DefaultWikiMacro}.
      * 
      * @param macroDocumentReference the name of the document which contains the definition of this macro
+     * @param macroAuthor the author of the wiki macro
      * @param supportsInlineMode says if macro support inline mode or not
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param macroContent macro content to be evaluated.

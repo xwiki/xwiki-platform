@@ -148,6 +148,12 @@ public class CreateActionRequestHandler
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
 
+    private static final String TP_TERMINAL_PROPERTY = TOCREATE_TERMINAL;
+
+    private static final String TP_TYPE_PROPERTY = TYPE;
+
+    private static final String TP_TYPE_PROPERTY_SPACE_VALUE = SPACE;
+
     /**
      * Space homepage document name.
      */
@@ -188,6 +194,21 @@ public class CreateActionRequestHandler
      */
     public void processRequest() throws XWikiException
     {
+        // Get the template provider for creating this document, if any template provider is specified
+        DocumentReferenceResolver<EntityReference> referenceResolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT_RESOLVER_HINT);
+        DocumentReference templateProviderClassReference = referenceResolver.resolve(TEMPLATE_PROVIDER_CLASS);
+        templateProvider = getTemplateProvider(templateProviderClassReference);
+
+        // Get the available templates, in the current space, to check if all conditions to create a new document are
+        // met
+        availableTemplateProviders =
+            loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
+                templateProviderClassReference, context);
+
+        // Get the type of document to create
+        type = request.get(TYPE);
+
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
         String toCreate = request.getParameter("tocreate");
@@ -220,24 +241,23 @@ public class CreateActionRequestHandler
 
                 name = request.getParameter(NAME);
 
-                isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+                // Determine the type of document we are creating (terminal vs non-terminal).
+
+                if (TOCREATE_TERMINAL.equals(toCreate) || TOCREATE_NONTERMINAL.equals(toCreate)) {
+                    // Look at the request to see what the user wanted to create (terminal or non-terminal).
+
+                    isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+                } else if (templateProvider != null) {
+                    // A template provider is specified. Use it and extract the type of document.
+
+                    boolean providerTerminal = getTemplateProviderTerminalValue();
+                    isSpace = !providerTerminal;
+                } else {
+                    // Default to creating non-terminal documents.
+                    isSpace = true;
+                }
             }
         }
-
-        // Get the template provider for creating this document, if any template provider is specified
-        DocumentReferenceResolver<EntityReference> referenceResolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT_RESOLVER_HINT);
-        DocumentReference templateProviderClassReference = referenceResolver.resolve(TEMPLATE_PROVIDER_CLASS);
-        templateProvider = getTemplateProvider(templateProviderClassReference);
-
-        // Get the available templates, in the current space, to check if all conditions to create a new document are
-        // met
-        availableTemplateProviders =
-            loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
-                templateProviderClassReference, context);
-
-        // Get the type of document to create
-        type = request.get(TYPE);
     }
 
     /**
@@ -253,16 +273,15 @@ public class CreateActionRequestHandler
         EntityReference parentSpaceReference = spaceReference.getParent();
         boolean isTopLevelSpace = parentSpaceReference.extractReference(EntityType.SPACE) == null;
 
-        // Determine the default value of isSpace, based on the new document's location.
-        if (WEBHOME.equals(name)) {
-            // If it's a space homepage, then we can handle it as a non-terminal document, since it's behavior is
-            // the same.
-            isSpace = true;
+        // Remember this since we might update it below.
+        String originalName = name;
 
-            // Determine its name.
+        // Since WebHome is a convention, determine the real name and parent of our document.
+        if (WEBHOME.equals(name)) {
+            // Determine its name from the space name.
             name = spaceReference.getName();
 
-            // Determine its space reference.
+            // Determine its space reference by looking at the space's parent.
             if (!isTopLevelSpace) {
                 // The parent reference is a space reference. Use it.
                 spaceReference = new SpaceReference(parentSpaceReference);
@@ -272,19 +291,47 @@ public class CreateActionRequestHandler
                 // request).
                 spaceReference = null;
             }
-        } else {
-            // Otherwise, it's a terminal document, use it as it is.
-            isSpace = false;
         }
 
-        // Look at the request to see what the user wanted to create (terminal or non-terminal).
-        if (!StringUtils.isBlank(toCreate)) {
-            if (isSpace && TOCREATE_TERMINAL.equals(toCreate)) {
-                isSpace = false;
-            } else if (!isSpace && TOCREATE_NONTERMINAL.equals(toCreate)) {
-                isSpace = true;
-            }
+        // Determine the type of document we are creating (terminal vs non-terminal).
+
+        if (TOCREATE_TERMINAL.equals(toCreate) || TOCREATE_NONTERMINAL.equals(toCreate)) {
+            // Look at the request to see what the user wanted to create (terminal or non-terminal).
+
+            isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+        } else if (templateProvider != null) {
+            // A template provider is specified. Use it and extract the type of document.
+
+            boolean providerTerminal = getTemplateProviderTerminalValue();
+            isSpace = !providerTerminal;
+        } else {
+            // Last option is to check the document's original name and see if it was "WebHome".
+            isSpace = WEBHOME.equals(originalName);
         }
+    }
+
+    /**
+     * @return
+     */
+    private boolean getTemplateProviderTerminalValue()
+    {
+        boolean providerTerminal;
+        Integer providerTerminalValue = templateProvider.getIntValue(TP_TERMINAL_PROPERTY);
+        if (providerTerminalValue == null) {
+            // Backwards compatibility with providers that did not have the "terminal" property. We are deducing it
+            // from the value of the "type" property.
+            String providerType = templateProvider.getStringValue(TP_TYPE_PROPERTY);
+            if (TP_TYPE_PROPERTY_SPACE_VALUE.equals(providerType)) {
+                providerTerminal = false;
+            } else {
+                // 'page' or NULL both resolve to true, for backwards compatibility reasons.
+                providerTerminal = true;
+            }
+        } else {
+            // Use the "terminal" value from the template provider.
+            providerTerminal = (1 == providerTerminalValue);
+        }
+        return providerTerminal;
     }
 
     /**

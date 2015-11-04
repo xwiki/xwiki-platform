@@ -21,7 +21,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
   $(document).ready(function() {
 
     var form = $('#create');
-    
+
     /**
      * Compute the page name of the target
      */
@@ -62,10 +62,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }
         }
       }
-      
+
       return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki)));
     };
-    
+
     /**
      * Add an hidden input that indicates which template to use
      */
@@ -86,21 +86,21 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // Get the type of the page to create
       var typeField = $('input[name="type"]:checked');
       var type = typeField.attr('data-type');
-      
+
       // A blank document
       if (type == 'blank') {
         // The 'templateprovider' field is needed by the CreateAction, even empty
         setTemplateProvider('');
         return true;
       }
-      
+
       // A document from a template
       if (type == 'template') {
         var templateName = typeField.val();
         setTemplateProvider(templateName);
         return true;
       }
-     
+
       // An office document: we redirect to the office importer
       // TODO: handle this use-case with an extension point
       if (type == 'office') {
@@ -116,8 +116,31 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         }
         return false;
       }
-      
+
     });
-  
+
+    /*
+     * Terminal checkbox value updating when switching between document types.
+     */
+    var terminalCheckbox = form.find('#terminal');
+    // Only do the work if the checkbox is displayed (advanced user).
+    if (terminalCheckbox.length > 0) {
+      var updateTerminalCheckboxFromTemplateProviderInput = function(input) {
+        var pageShouldBeTerminalString = input.attr('data-terminal');
+        var pageShouldBeTerminal = false;
+        if (pageShouldBeTerminalString) {
+          pageShouldBeTerminal = $.parseJSON(input.attr('data-terminal'));
+        }
+        // Set the default value for the page type.
+        terminalCheckbox.prop('checked', pageShouldBeTerminal);
+      };
+
+      // Update the allowed spaces based on the selected template provider.
+      form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
+        var type = $('input[name="type"]:checked');
+        updateTerminalCheckboxFromTemplateProviderInput(type);
+      });
+    }
+
   });
 });

@@ -84,11 +84,21 @@
 ## ---------------------------------------------------------------------------------------------------------
 #macro (displayTypes)
   #if ($template == '')
-    #set($options = [
+    #set ($blankTerminalState = !$isSpace)
+    #set ($options = [
       { 
         'name': $services.localization.render('core.create.type.default'),
         'options': [
-          { 'name': $services.localization.render('core.create.type.blank'), 'value': 'blank', 'description': $services.localization.render('core.create.type.blank.description'), 'icon': 'file-white', 'data': {'type': 'blank'}}
+          {
+            'name': $services.localization.render('core.create.type.blank'),
+            'value': 'blank',
+            'description': $services.localization.render('core.create.type.blank.description'),
+            'icon': 'file-white',
+            'data': {
+              'type': 'blank',
+              'terminal' : "$blankTerminalState"
+            }
+          }
         ]
       }])
     #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && "$!services.officemanager.serverState" == 'Connected')
@@ -117,11 +127,36 @@
         #else
           #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
         #end
+        ## Determine if it's a terminal page template
+        #set ($isTerminalProvider = $tpobj.getValue('terminal'))
+        #if ("$!isTerminalProvider" == '')
+          ## Fall-back on the 'type' property, if available.
+          #set ($type = $tpobj.getValue('type'))
+          #if ($type == 'space')
+            #set ($isTerminalProvider = false)
+          #else
+            ## 'page' or NULL both resolve to true, for backwards compatibility reasons.
+            #set ($isTerminalProvider = true)
+          #end
+        #else
+          #set ($isTerminalProvider = ($isTerminalProvider == 1))
+        #end
         ##
         ## Display the template provider field option in the form.
         ##
         #set ($inputId = "xwiki-create-form-${velocityCount}")
-        #set ($discard = $templateOptions.add({'name': $services.localization.render($tpobj.getProperty('name').value), 'value': "$tpdocRef", 'description': '', 'icon':'file-white', 'data': {'allowed-spaces': $jsAllowedSpacesArray, 'allowed-spaces-message': $message, 'type': 'template'}}))
+        #set ($discard = $templateOptions.add({
+          'name': $services.localization.render($tpobj.getProperty('name').value),
+          'value': "$tpdocRef",
+          'description': '',
+          'icon':'file-white',
+          'data': {
+            'allowed-spaces': $jsAllowedSpacesArray,
+            'allowed-spaces-message': $message,
+            'type': 'template',
+            'terminal' : $isTerminalProvider
+          }
+        }))
       #end
     #end
     <dt><label>$services.localization.render('core.create.type')</label></dt>

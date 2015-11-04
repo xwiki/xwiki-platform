@@ -32,9 +32,14 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 4.0RC1
  */
-@Component(hints = {"hidden", "hidden/document"})
+@Component(hints = {"hidden", HiddenDocumentFilter.HINT})
 public class HiddenDocumentFilter extends AbstractHiddenFilter
 {
+    /**
+     * The role hint of that component.
+     */
+    public static final String HINT = "hidden/document";
+
     @Override
     protected String filterHidden(String statement, String language)
     {

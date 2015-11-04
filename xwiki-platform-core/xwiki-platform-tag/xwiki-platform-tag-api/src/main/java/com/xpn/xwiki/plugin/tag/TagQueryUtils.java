@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.internal.HiddenDocumentFilter;
+import org.xwiki.query.internal.UniqueDocumentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,7 +48,7 @@ public final class TagQueryUtils
     /**
      * Hint of the "hidden" QueryFilter.
      */
-    public static final String HIDDEN_QUERYFILTER_HINT = "hidden";
+    public static final String HIDDEN_QUERYFILTER_HINT = HiddenDocumentFilter.HINT;
 
     /**
      * Utility class, private constructor.
@@ -72,7 +74,7 @@ public final class TagQueryUtils
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -124,7 +126,7 @@ public final class TagQueryUtils
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues((List<Object>) params);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -194,8 +196,9 @@ public final class TagQueryUtils
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues(parameters);
+            query.addFilter(Utils.getComponent(QueryFilter.class, UniqueDocumentFilter.HINT));
             if (!includeHiddenDocuments) {
-                query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+                query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             }
             results = query.execute();
         } catch (QueryException e) {

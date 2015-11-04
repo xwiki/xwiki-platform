@@ -35,8 +35,6 @@ public class GetAction extends XWikiAction
 {
     /**
      * The identifier of the view action.
-     *
-     * @todo need an enumerated class for actions.
      */
     public static final String GET_ACTION = "get";
 

@@ -39,10 +39,15 @@ import org.xwiki.query.Query;
  * @since 4.1M1
  */
 @Component
-@Named("unique")
+@Named(UniqueDocumentFilter.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class UniqueDocumentFilter extends AbstractQueryFilter
 {
+    /**
+     * The role hint of that component.
+     */
+    public static final String HINT = "unique";
+
     /**
      * Used to log debug information.
      */

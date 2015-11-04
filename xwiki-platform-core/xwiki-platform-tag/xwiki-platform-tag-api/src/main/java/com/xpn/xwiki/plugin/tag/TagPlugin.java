@@ -20,11 +20,12 @@
 package com.xpn.xwiki.plugin.tag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -72,6 +73,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * L10N key for the "tag added" document edit comment.
      */
     public static final String DOC_COMMENT_TAG_ADDED = "plugin.tag.editcomment.added";
+
+    private static final Pattern LIKE_ESCAPE = Pattern.compile("[_%\\\\]");
 
     /**
      * Tag plugin constructor.
@@ -178,7 +181,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Get cardinality map of tags for a specific wiki space.
+     * Get cardinality map of tags for a specific wiki space (including sub spaces).
      * 
      * @param spaceReference the local reference of the space to get tags from. If blank, return tags for the whole
      *            wiki.
@@ -190,8 +193,20 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCount(String spaceReference, XWikiContext context) throws XWikiException
     {
         if (!StringUtils.isBlank(spaceReference)) {
-            return getTagCountForQuery("", "doc.space = ?", Collections.singletonList(spaceReference), context);
+            StringBuilder where = new StringBuilder();
+            where.append('(');
+            where.append("doc.space = ?");
+            where.append(" OR ");
+            where.append("doc.space LIKE ?");
+            where.append(')');
+
+            // Make sure to escape the LIKE syntax
+            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll("\\\\$1");
+
+            return getTagCountForQuery("", where.toString(),
+                Arrays.asList(spaceReference, escapedSpaceReference + ".%"), context);
         }
+
         return getTagCount(context);
     }
 

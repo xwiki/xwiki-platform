@@ -725,7 +725,18 @@ public class CreateActionTest
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
-        List<String> allowedSpaces, boolean terminal) throws Exception
+        List<String> allowedSpaces, Boolean terminal) throws Exception
+    {
+        mockExistingTemplateProviders(fullName, resolvedDocumentReference, allowedSpaces, terminal, null);
+    }
+
+    /**
+     * Mocks 1 existing template provider.
+     * <p/>
+     * Note: Calling it multiple times does not add multiple providers.
+     */
+    private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
+        List<String> allowedSpaces, Boolean terminal, String type) throws Exception
     {
         // Mock resolving the templateProviderClass
         EntityReference templateProviderClassRelativeReference =
@@ -752,7 +763,14 @@ public class CreateActionTest
         when(templateProviderObject.getListValue("spaces")).thenReturn(allowedSpaces);
         String templateDocumentFullName = fullName.substring(0, fullName.indexOf("Provider"));
         when(templateProviderObject.getStringValue("template")).thenReturn(templateDocumentFullName);
-        when(templateProviderObject.getIntValue("terminal")).thenReturn(terminal ? 1 : 0);
+        if (terminal != null) {
+            when(templateProviderObject.getIntValue("terminal", -1)).thenReturn(terminal ? 1 : 0);
+        } else {
+            when(templateProviderObject.getIntValue("terminal", -1)).thenReturn(-1);
+        }
+        if (type != null) {
+            when(templateProviderObject.getStringValue("type")).thenReturn(type);
+        }
         when(templateProviderDocument.getXObject(templateProviderClassReference)).thenReturn(templateProviderObject);
 
         // Mock the template document as existing
@@ -1046,7 +1064,7 @@ public class CreateActionTest
     @Test
     public void newDocumentFromURLTemplateProviderSpecifiedNonTerminal() throws Exception
     {
-        // new document = xwiki:X.Y.WebHome
+        // new document = xwiki:X.Y
         DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
@@ -1074,6 +1092,39 @@ public class CreateActionTest
         // provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
             context);
+    }
+
+    @Test
+    public void newDocumentFromURLTemplateProviderSpecifiedNonTerminalButOverriddenFromUITerminal() throws Exception
+    {
+        // new document = xwiki:X.Y
+        DocumentReference documentReference = new DocumentReference("xwiki", "X", "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+        when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
+
+        // Mock 1 existing template provider
+        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
+            "MyTemplateProvider"), Collections.EMPTY_LIST, false);
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
+        // provider.
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1282,8 +1333,155 @@ public class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        // Note: We are creating the document X.Y.WebHome as terminal, even if the template provider says otherwise.
+        // Note: We are creating the document X.Y as terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageType() throws Exception
+    {
+        // new document = xwiki:X.Y.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+
+        // Mock 1 existing template provider
+        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
+            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "page");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating the document X.Y as terminal, since the template provider did not specify a "terminal"
+        // property and it used the old "page" type instead. Also using a template, as specified in the template
+        // provider.
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentWebHomeFromURLTemplateProviderSpecifiedButOldPageTypeButOverriddenFromUIToNonTerminal()
+        throws Exception
+    {
+        // new document = xwiki:X.Y.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X", "Y"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+        when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
+
+        // Mock 1 existing template provider
+        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
+            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "page");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating the document X.Y.WebHome as non-terminal, since even if the template provider did not
+        // specify a "terminal" property and it used the old "page" type, the UI explicitly asked for a non-terminal
+        // document. Also using a template, as specified in the template provider.
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
+            context);
+    }
+
+    @Test
+    public void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceType() throws Exception
+    {
+        // current document = xwiki:Main.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(false);
+        context.setDoc(document);
+
+        // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("spaceReference")).thenReturn("X");
+        when(mockRequest.getParameter("name")).thenReturn("Y");
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+
+        // Mock the resolving of the passed space reference.
+        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
+            new SpaceReference("X", new WikiReference("xwiki")));
+
+        // Mock 1 existing template provider
+        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
+            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "space");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating X.Y.WebHome as non-terminal, since the template provider does not specify a "terminal"
+        // property and we fallback on the "type" property's value. Also using the template extracted from the template
+        // provider.
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
+            context);
+    }
+
+    @Test
+    public void existingDocumentFromUITemplateProviderSpecifiedButOldSpaceTypeButOverridenFromUIToTerminal()
+        throws Exception
+    {
+        // current document = xwiki:Main.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(false);
+        context.setDoc(document);
+
+        // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
+        String templateProviderFullName = "XWiki.MyTemplateProvider";
+        when(mockRequest.getParameter("spaceReference")).thenReturn("X");
+        when(mockRequest.getParameter("name")).thenReturn("Y");
+        when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
+        when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
+
+        // Mock the resolving of the passed space reference.
+        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
+            new SpaceReference("X", new WikiReference("xwiki")));
+
+        // Mock 1 existing template provider
+        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
+            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "space");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating X.Y as terminal, since it is overriden from the UI, regardless of any backwards
+        // compatibility resolutions. Also using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
     }
 }

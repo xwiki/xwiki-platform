@@ -102,11 +102,11 @@ public class BooleanClass extends PropertyClass
         Number nvalue = null;
         if (StringUtils.isNotEmpty(value)) {
             if (StringUtils.isNumeric(value)) {
-                nvalue = new Integer(value);
+                nvalue = Integer.valueOf(value);
             } else if (TRUE_PATTERN.matcher(value).matches()) {
-                nvalue = Integer.valueOf(1);
+                nvalue = 1;
             } else if (FALSE_PATTERN.matcher(value).matches()) {
-                nvalue = Integer.valueOf(0);
+                nvalue = 0;
             }
         }
         // We don't return null if there's no value, since the BooleanProperty really works that way

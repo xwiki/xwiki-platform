@@ -78,6 +78,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.velocity.VelocityContext;
@@ -792,12 +793,14 @@ public class XWiki implements EventListener
             method.setAccessible(true);
             return method.invoke(obj, args);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to call private method [{}]: [{}]", methodName, e);
+
             return null;
         } catch (NoSuchMethodException e) {
             return null;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            LOGGER.error("Private method [{}] failed: [{}]", methodName, e);
+
             return null;
         }
     }
@@ -846,7 +849,8 @@ public class XWiki implements EventListener
         } catch (NoSuchFieldException e) {
             return null;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to get private field with name [{}]: [{}]", fieldName, e);
+
             return null;
         } finally {
         }
@@ -2983,7 +2987,8 @@ public class XWiki implements EventListener
                 return -1;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_VALIDATE_USER,
                 "Exception while validating user", e, null);
         }
@@ -3066,10 +3071,12 @@ public class XWiki implements EventListener
 
             return result;
         } catch (XWikiException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_CREATE_USER,
                 "Exception while creating user", e, null);
         }
@@ -3722,6 +3729,10 @@ public class XWiki implements EventListener
         return StringUtils.split(str, sep);
     }
 
+    /**
+     * @deprecated use {@link ExceptionUtils#getStackTrace(Throwable)} instead
+     */
+    @Deprecated
     public String printStrackTrace(Throwable e)
     {
         StringWriter strwriter = new StringWriter();
@@ -4514,6 +4525,7 @@ public class XWiki implements EventListener
                 if (context.getAction().equals("delete")) {
                     if (doc == null) {
                         setPhonyDocument(reference, context, vcontext);
+                        doc = context.getDoc();
                     }
                     if (!checkAccess("admin", doc, context)) {
                         throw e;
@@ -4780,7 +4792,8 @@ public class XWiki implements EventListener
                     try {
                         this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage(), e);
+
                         this.statsService = new XWikiStatsServiceImpl();
                     }
 
@@ -5067,7 +5080,6 @@ public class XWiki implements EventListener
      */
     public String evaluateVelocity(String content, String name)
     {
-        StringWriter writer = new StringWriter();
         try {
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext velocityContext = velocityManager.getVelocityContext();
@@ -6644,7 +6656,9 @@ public class XWiki implements EventListener
         List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
 
         // Index through the document names, get relivent attachments
-        for (String fullName : filenamesByDocFullName.keySet()) {
+        for (Map.Entry<String, List<String>> entry : filenamesByDocFullName.entrySet()) {
+            String fullName = entry.getKey();
+
             XWikiDocument doc = getDocument(fullName, context);
             if (checkRight) {
                 if (!context.getWiki().getRightService()
@@ -6652,7 +6666,7 @@ public class XWiki implements EventListener
                     continue;
                 }
             }
-            List<String> returnedAttachmentNames = filenamesByDocFullName.get(fullName);
+            List<String> returnedAttachmentNames = entry.getValue();
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 if (returnedAttachmentNames.contains(attach.getFilename())) {
                     out.add(attach);

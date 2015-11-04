@@ -162,13 +162,13 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             serverInfo.setBuildId(version);
             if (version.indexOf('.') != -1) {
                 String[] components = version.split("\\.");
-                majorVersion = new Integer(components[0]);
+                majorVersion = Integer.valueOf(components[0]);
                 serverInfo.setMajorVersion(majorVersion);
                 if (components[1].indexOf('-') != -1) {
                     // Removing possible suffixes (-SNAPSHOT for example)
-                    minorVersion = new Integer(components[1].substring(0, components[1].indexOf('-')));
+                    minorVersion = Integer.valueOf(components[1].substring(0, components[1].indexOf('-')));
                 } else {
-                    minorVersion = new Integer(components[1]);
+                    minorVersion = Integer.valueOf(components[1]);
                 }
                 serverInfo.setMinorVersion(minorVersion);
             }

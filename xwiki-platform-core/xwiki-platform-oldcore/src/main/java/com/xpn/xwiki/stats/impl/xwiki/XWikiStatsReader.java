@@ -190,7 +190,7 @@ public class XWikiStatsReader
             if (stats.size() > 0) {
                 actionCount = stats.get(0).getPageViews();
             }
-            activity.put(stepStart, new Integer(actionCount));
+            activity.put(stepStart, actionCount);
             stepStart = stepEnd;
         }
 

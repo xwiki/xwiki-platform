@@ -980,7 +980,7 @@ public class Package
 
     private void setStatus(int status, XWikiContext context)
     {
-        context.put("install_status", new Integer((status)));
+        context.put("install_status", status);
     }
 
     public List<String> getErrors(XWikiContext context)

@@ -382,7 +382,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     obj.set("imgurl", context.get("feedimgurl"), context);
                     context.remove("feedimgurl");
                 }
-                obj.set("nb", new Integer(nb), context);
+                obj.set("nb", nb, context);
                 obj.set("date", new Date(), context);
 
                 // Update original document

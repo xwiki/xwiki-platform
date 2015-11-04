@@ -2557,9 +2557,9 @@ public class XWiki extends Api
         XWikiEngineContext econtext = this.context.getEngineContext();
         Integer counter = (Integer) econtext.getAttribute(name);
         if (counter == null) {
-            counter = new Integer(0);
+            counter = 0;
         }
-        counter = new Integer(counter.intValue() + 1);
+        counter = counter.intValue() + 1;
         econtext.setAttribute(name, counter);
 
         return counter.toString();

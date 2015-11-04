@@ -56,7 +56,7 @@ public class TOCGenerator
             String id = idGenerator.generateUniqueId("H", text);
 
             Map<String, Object> tocEntry = new HashMap<String, Object>();
-            tocEntry.put(TOC_DATA_LEVEL, new Integer(level));
+            tocEntry.put(TOC_DATA_LEVEL, level);
             tocEntry.put(TOC_DATA_TEXT, text);
 
             if (level >= init && level <= max) {

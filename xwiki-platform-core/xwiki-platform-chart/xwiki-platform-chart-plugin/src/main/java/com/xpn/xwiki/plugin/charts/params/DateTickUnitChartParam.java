@@ -48,13 +48,13 @@ public class DateTickUnitChartParam extends DateFormatChartParam
     public void init()
     {
         unitChoice = new HashMap();
-        unitChoice.put("day", new Integer(DateTickUnit.DAY));
-        unitChoice.put("hour", new Integer(DateTickUnit.HOUR));
-        unitChoice.put("millisecond", new Integer(DateTickUnit.MILLISECOND));
-        unitChoice.put("minute", new Integer(DateTickUnit.MINUTE));
-        unitChoice.put("month", new Integer(DateTickUnit.MONTH));
-        unitChoice.put("second", new Integer(DateTickUnit.SECOND));
-        unitChoice.put("year", new Integer(DateTickUnit.YEAR));
+        unitChoice.put("day", DateTickUnit.DAY);
+        unitChoice.put("hour", DateTickUnit.HOUR);
+        unitChoice.put("millisecond", DateTickUnit.MILLISECOND);
+        unitChoice.put("minute", DateTickUnit.MINUTE);
+        unitChoice.put("month", DateTickUnit.MONTH);
+        unitChoice.put("second", DateTickUnit.SECOND);
+        unitChoice.put("year", DateTickUnit.YEAR);
     }
 
     @Override

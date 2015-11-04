@@ -316,7 +316,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 15;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/plain");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         source.setParams(params);
         doc.setStringValue(ARTICLE_CLASS_NAME, "content", "Somewhere in la Mancha, in a place..");
@@ -334,7 +334,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 16;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/html");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "Somewhere \n\tin   <i>la</i> <a href=\"http://www.mancha.es\">  Mancha</a>, in a place..");
@@ -349,7 +349,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 17;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/xml");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "<text>Somewhere \n\tin   la <region>  Mancha</region>, in a place..</text>");

@@ -194,7 +194,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         } else {
             loginAttempts = 1;
         }
-        request.getSession().setAttribute(LOGIN_ATTEMPTS, new Integer(loginAttempts));
+        request.getSession().setAttribute(LOGIN_ATTEMPTS, loginAttempts);
 
         if (loginAttempts <= MAX_ATTEMPTS) {
             response.setHeader("WWW-Authenticate", "BASIC realm=\"" + realmName + "\"");

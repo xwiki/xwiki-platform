@@ -49,10 +49,10 @@ public class FontChartParam extends AbstractChartParam
 
     public void init()
     {
-        styleChoices.put("plain", new Integer(Font.PLAIN));
-        styleChoices.put("bold", new Integer(Font.BOLD));
-        styleChoices.put("italic", new Integer(Font.ITALIC));
-        styleChoices.put("bold+italic", new Integer(Font.BOLD + Font.ITALIC));
+        styleChoices.put("plain", Font.PLAIN);
+        styleChoices.put("bold", Font.BOLD);
+        styleChoices.put("italic", Font.ITALIC);
+        styleChoices.put("bold+italic", Font.BOLD + Font.ITALIC);
     }
 
     @Override

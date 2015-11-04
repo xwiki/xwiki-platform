@@ -192,7 +192,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         // default parameters for all instances of this class
         DEFAULT_PARAMS = new HashMap<String, Object>();
         DEFAULT_PARAMS.put(CONTENT_TYPE, "text/html");
-        DEFAULT_PARAMS.put(CONTENT_LENGTH, new Integer(-1)); // no limit by default
+        DEFAULT_PARAMS.put(CONTENT_LENGTH, -1); // no limit by default
     }
 
     /**

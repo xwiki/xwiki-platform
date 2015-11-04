@@ -51,7 +51,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "Blog.BlogPostClass_content");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_PUBLISHED_DATE, "Blog.BlogPostClass_publishDate");
-        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.CONTENT_LENGTH, 400);
     }
 
     public FeedPluginApi(FeedPlugin plugin, XWikiContext context)
@@ -298,7 +298,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         defParams.put(SyndEntryDocumentSource.FIELD_TITLE, "XWiki.ArticleClass_title");
         defParams.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "XWiki.ArticleClass_content");
         defParams.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "XWiki.ArticleClass_category");
-        defParams.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
+        defParams.put(SyndEntryDocumentSource.CONTENT_LENGTH, 400);
         defParams.putAll(params);
         return this.getSyndEntrySource(SyndEntryDocumentSource.class.getName(), defParams);
     }

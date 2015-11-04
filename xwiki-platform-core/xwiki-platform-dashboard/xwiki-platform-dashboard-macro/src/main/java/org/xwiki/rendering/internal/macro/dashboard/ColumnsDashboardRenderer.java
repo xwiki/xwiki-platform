@@ -95,8 +95,8 @@ class ColumnGadget extends Gadget
         // split by comma, first position is column, second position is index
         String[] split = position.split(",");
         try {
-            this.column = new Integer(split[0].trim());
-            this.index = new Integer(split[1].trim());
+            this.column = Integer.valueOf(split[0].trim());
+            this.index = Integer.valueOf(split[1].trim());
         } catch (ArrayIndexOutOfBoundsException e) {
             // nothing, just leave column and index null. Not layoutable in columns
         } catch (NumberFormatException e) {

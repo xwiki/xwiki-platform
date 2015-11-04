@@ -96,7 +96,7 @@ public class Wizard {
         updateStatus();
 
         // Show the next dialog unless we are finished
-        previousSteps.add(new Integer(status));
+        previousSteps.add(status);
         if (status<dialogs.size()) {
             Dialog nextDialog = (Dialog) dialogs.get(status);
             nextDialog.show();

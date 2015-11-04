@@ -78,7 +78,7 @@ public class RightsManagerUsersApi extends Api
     {
         LOGGER.error(comment, e);
 
-        this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+        this.context.put(CONTEXT_LASTERRORCODE, e.getCode());
         this.context.put(CONTEXT_LASTEXCEPTION, e);
     }
 

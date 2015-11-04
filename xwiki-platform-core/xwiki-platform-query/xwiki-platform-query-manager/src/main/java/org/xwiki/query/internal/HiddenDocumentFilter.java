@@ -38,10 +38,15 @@ import javax.inject.Named;
  * @since 4.0RC1
  */
 @Component
-@Named("hidden")
+@Named(HiddenDocumentFilter.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class HiddenDocumentFilter extends AbstractWhereQueryFilter implements Initializable
 {
+    /**
+     * The role hint of that component.
+     */
+    public static final String HINT = "hidden";
+
     /**
      * Used to retrieve user preference regarding hidden documents.
      */

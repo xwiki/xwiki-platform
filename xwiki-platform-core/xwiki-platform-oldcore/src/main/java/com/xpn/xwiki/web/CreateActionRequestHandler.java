@@ -316,8 +316,8 @@ public class CreateActionRequestHandler
     private boolean getTemplateProviderTerminalValue()
     {
         boolean providerTerminal;
-        Integer providerTerminalValue = templateProvider.getIntValue(TP_TERMINAL_PROPERTY);
-        if (providerTerminalValue == null) {
+        int providerTerminalValue = templateProvider.getIntValue(TP_TERMINAL_PROPERTY, -1);
+        if (providerTerminalValue == -1) {
             // Backwards compatibility with providers that did not have the "terminal" property. We are deducing it
             // from the value of the "type" property.
             String providerType = templateProvider.getStringValue(TP_TYPE_PROPERTY);

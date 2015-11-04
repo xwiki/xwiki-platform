@@ -82,7 +82,7 @@ public class MetaClass extends BaseClass
         addField(PROPERTY_NAME_PREFIX + name, property);
         if (property instanceof PropertyClass) {
             ((PropertyClass) property).setObject(this);
-            ((BaseProperty) property).setName(name);
+            ((PropertyClass) property).setName(name);
         }
     }
 

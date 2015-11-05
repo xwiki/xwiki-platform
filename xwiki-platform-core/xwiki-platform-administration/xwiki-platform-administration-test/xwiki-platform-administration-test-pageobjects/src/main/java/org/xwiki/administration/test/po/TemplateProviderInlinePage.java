@@ -56,6 +56,9 @@ public class TemplateProviderInlinePage extends InlinePage
     @FindBy(name = "XWiki.TemplateProviderClass_0_type")
     private WebElement templateTypeSelect;
 
+    @FindBy(name = "XWiki.TemplateProviderClass_0_terminal")
+    private WebElement terminalSelect;
+
     @FindBy(name = "XWiki.TemplateProviderClass_0_action")
     private WebElement templateActionSelect;
 
@@ -97,6 +100,25 @@ public class TemplateProviderInlinePage extends InlinePage
             value = "page";
         } else {
             value = "space";
+        }
+
+        select.selectByValue(value);
+    }
+
+    public boolean isTerminal()
+    {
+        return this.terminalSelect.findElement(By.xpath("//option[@value='1']")).isSelected();
+    }
+
+    public void setTerminal(boolean isTerminal)
+    {
+        Select select = new Select(this.terminalSelect);
+
+        String value;
+        if (isTerminal) {
+            value = "1";
+        } else {
+            value = "0";
         }
 
         select.selectByValue(value);

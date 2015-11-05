@@ -92,6 +92,9 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmWatchWiki")
     private WebElement watchWikiLink;
 
+    @FindBy(css = "#tmMoreActions a[title='Children']")
+    private WebElement childrenLink;
+
     /**
      * Used to scroll the page to the top before accessing the floating menu.
      */
@@ -495,5 +498,18 @@ public class BasePage extends BaseElement
         // JQuery and dependencies
         // JQuery dropdown plugin needed for the edit button's dropdown menu.
         getDriver().waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+    }
+
+    /**
+     * Opens the viewer that lists the children of the current page.
+     * 
+     * @return the viewer that lists the child pages
+     * @since 7.3RC1
+     */
+    public ChildrenViewer viewChildren()
+    {
+        toggleActionMenu();
+        this.childrenLink.click();
+        return new ChildrenViewer();
     }
 }

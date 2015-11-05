@@ -144,6 +144,7 @@ public class CreatePageTest extends AbstractTest
         assertTrue(createUnexistingPage.getAvailableTemplates().contains(templateProviderFullName));
         // select it
         createUnexistingPage.setTemplate(templateProviderFullName);
+        createUnexistingPage.setTerminalPage(true);
         // and create
         createUnexistingPage.clickCreate();
         EditPage ep = new EditPage();

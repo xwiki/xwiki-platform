@@ -418,13 +418,13 @@ public class TestUtils
 
     public String getLoggedInUserName()
     {
-        By userAvatar = By.xpath("//div[@id='xwikimainmenu']//li[contains(@class, 'navbar-avatar')]/a");
-        if (!getDriver().hasElementWithoutWaiting(userAvatar)) {
+        By userAvatarInDrawer = By.id("tmUser");
+        if (!getDriver().hasElementWithoutWaiting(userAvatarInDrawer)) {
             // Guest
             return null;
         }
 
-        WebElement element = getDriver().findElementWithoutWaiting(userAvatar);
+        WebElement element = getDriver().findElementWithoutWaiting(userAvatarInDrawer);
         String href = element.getAttribute("href");
         String loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
 

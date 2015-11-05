@@ -3225,11 +3225,11 @@ public class XWiki implements EventListener
     public int createUser(String userName, Map<String, ?> map, String userRights, XWikiContext context)
         throws XWikiException
     {
-        BaseClass userClass = context.getWiki().getUserClass(context);
+        BaseClass userClass = getUserClass(context);
 
         String content;
         Syntax syntax;
-        if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
+        if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
             content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
             syntax = Syntax.XWIKI_2_0;
         } else {

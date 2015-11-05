@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.impl.LDAP.LDAPProfileXClass;
 import com.xpn.xwiki.web.Utils;
@@ -278,9 +280,8 @@ public class XWikiLDAPUtils
     {
         Cache<Map<String, String>> cache;
 
-        String cacheKey =
-            getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
-                + this.connection.getConnection().getPort();
+        String cacheKey = getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
+            + this.connection.getConnection().getPort();
 
         synchronized (cachePool) {
             Map<String, Cache<Map<String, String>>> cacheMap;
@@ -921,15 +922,13 @@ public class XWikiLDAPUtils
     public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
         // search for the user in LDAP
-        String filter =
-            MessageFormat.format(
-                this.userSearchFormatString,
-                new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
-                    XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
+        String filter = MessageFormat.format(this.userSearchFormatString,
+            new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
+                XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Searching for the user in LDAP: user [{}] base [{}] query [{}] uid [{}]", new Object[] {uid,
-                this.baseDN, filter, this.uidAttributeName});
+            LOGGER.debug("Searching for the user in LDAP: user [{}] base [{}] query [{}] uid [{}]",
+                new Object[] {uid, this.baseDN, filter, this.uidAttributeName});
         }
 
         return this.connection.searchLDAP(this.baseDN, filter, attributeNameTable, LDAPConnection.SCOPE_SUB);
@@ -963,8 +962,8 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @throws XWikiException error when updating or creating XWiki user.
      */
-    public void syncUser(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributeListIn,
-        String ldapDn, String ldapUid, XWikiContext context) throws XWikiException
+    public void syncUser(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributeListIn, String ldapDn,
+        String ldapUid, XWikiContext context) throws XWikiException
     {
         // check if we have to create the user
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
@@ -978,9 +977,8 @@ public class XWikiLDAPUtils
             // get attributes from LDAP if we don't already have them
             if (searchAttributeList == null) {
                 // didn't get attributes before, so do it now
-                searchAttributeList =
-                    this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
-                        LDAPConnection.SCOPE_BASE);
+                searchAttributeList = this.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
+                    LDAPConnection.SCOPE_BASE);
             }
 
             if (searchAttributeList == null) {
@@ -1069,6 +1067,37 @@ public class XWikiLDAPUtils
         return attributeNameTable;
     }
 
+    private Map<String, Object> toMap(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings)
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (searchAttributes != null) {
+            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+                String lval = lattr.value;
+                String xattr = userMappings.get(lattr.name.toLowerCase());
+
+                if (xattr == null) {
+                    continue;
+                }
+
+                Object existingValue = map.get(xattr);
+                if (existingValue != null) {
+                    if (existingValue instanceof String) {
+                        List<String> listValue = new ArrayList<>();
+                        listValue.add((String) existingValue);
+                        listValue.add(lval);
+                    } else if (existingValue instanceof List) {
+                        List<String> listValue = (List<String>) existingValue;
+                        listValue.add(lval);
+                    }
+                }
+
+                map.put(xattr, lval);
+            }
+        }
+
+        return map;
+    }
+
     /**
      * Create an XWiki user and set all mapped attributes from LDAP to XWiki attributes.
      * 
@@ -1089,19 +1118,7 @@ public class XWikiLDAPUtils
         LOGGER.debug("Start first synchronization of LDAP profile [{}] with new user profile based on mapping [{}]",
             searchAttributes, userMappings);
 
-        Map<String, String> map = new HashMap<String, String>();
-        if (searchAttributes != null) {
-            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-                String lval = lattr.value;
-                String xattr = userMappings.get(lattr.name.toLowerCase());
-
-                if (xattr == null) {
-                    continue;
-                }
-
-                map.put(xattr, lval);
-            }
-        }
+        Map<String, Object> map = toMap(searchAttributes, userMappings);
 
         // Mark user active
         map.put("active", "1");
@@ -1141,18 +1158,21 @@ public class XWikiLDAPUtils
         LOGGER.debug("Start synchronization of LDAP profile [{}] with existing user profile based on mapping [{}]",
             searchAttributes, userMappings);
 
-        Map<String, String> map = new HashMap<String, String>();
-        if (searchAttributes != null) {
-            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-                String key = userMappings.get(lattr.name.toLowerCase());
-                if (key == null || userClass.get(key) == null) {
-                    continue;
-                }
-                String value = lattr.value;
+        Map<String, Object> map = toMap(searchAttributes, userMappings);
+        for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, Object> entry = it.next();
+            String key = entry.getKey();
+            Object value = entry.getValue();
 
+            if (value instanceof String) {
                 String objValue = userObj.getStringValue(key);
-                if (objValue == null || !objValue.equals(value)) {
-                    map.put(key, value);
+                if (objValue != null && objValue.equals(value)) {
+                    it.remove();
+                }
+            } else {
+                Object objValue = ((BaseProperty) userObj.get(key)).getValue();
+                if (objValue != null && objValue.equals(value)) {
+                    it.remove();
                 }
             }
         }
@@ -1257,9 +1277,8 @@ public class XWikiLDAPUtils
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
         // Try default profile name (generally in the cache)
-        XWikiDocument userProfile =
-            context.getWiki().getDocument(
-                new DocumentReference(context.getWikiId(), XWIKI_USER_SPACE, validXWikiUserName), context);
+        XWikiDocument userProfile = context.getWiki()
+            .getDocument(new DocumentReference(context.getWikiId(), XWIKI_USER_SPACE, validXWikiUserName), context);
 
         if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
             // Search for existing profile with provided uid

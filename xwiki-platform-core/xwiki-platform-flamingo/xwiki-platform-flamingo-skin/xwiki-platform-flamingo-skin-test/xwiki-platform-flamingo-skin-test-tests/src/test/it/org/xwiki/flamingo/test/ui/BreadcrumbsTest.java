@@ -87,6 +87,7 @@ public class BreadcrumbsTest extends AbstractTest
         // Verify breadcrumb doesn't display page title for the parent page (since the guest user doesn't have view
         // permission for it).
         vp = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        assertFalse(vp.isAuthenticated());
         assertFalse(vp.hasBreadcrumbContent(PARENT_TITLE, false, true));
         assertTrue(vp.hasBreadcrumbContent(CHILD_TITLE, true, true));
         assertTrue(vp.hasBreadcrumbContent(parentPageName, false, false));

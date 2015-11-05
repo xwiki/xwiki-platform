@@ -82,95 +82,98 @@
   {{/html}}
 #end
 
-#macro(getAppDescriptor $appReference)
-  #set($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
-  #set($appDescriptorStatement = "from doc.object($appDescriptorClassName) as obj where doc.space = :space")
-  #set($localSpaceReference = $services.model.serialize($appReference, 'local'))
-  #set($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $localSpaceReference).execute())
-  #if($appDescriptors.size() &gt; 0)
-    #set($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
-  #end
-#end
-
 #macro (processStep)
   ## Check if the application already exists.
   #getAppReference
-  #set ($appName = $appReference.name)
   #getAppDescriptor($appReference)
-  #if($appDescriptor)
+  #if ($appDescriptor)
     ## Edit an existing application. Use the configured class name.
-    #set($appClassStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
-    ## The class string reference is relative to the document holding the application descriptor.
-    #set($appClassRef = $services.model.resolveDocument($appClassStringRef, 'explicit', $appDescriptor.documentReference))
+    #set ($appClassRef = $appDescriptor.getObject($appDescriptorClassName).getValue('class'))
+    ## The class reference is relative to the document holding the application descriptor.
+    #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
   #else
     ## Create a new application. Use the default class name.
-    #set($className = "#toXMLName($appName)")
-    #set($appCodeRef = $services.model.createEntityReference("$!{className}Code", 'SPACE', $appReference.parent))
-    #set($appClassRef = $services.model.createEntityReference("$!{className}Class", 'DOCUMENT', $appCodeRef))
+    #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
+    #set ($appClassRef = $services.model.createDocumentReference("$!{appReference.name}Class", $appCodeRef))
   #end
-  #set($queryString = {'wizard': true})
-  #if(!$xwiki.exists($appClassRef))
-    #set($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
-    #set($discard = $queryString.putAll({
+  #set ($queryString = {'wizard': true})
+  #if (!$xwiki.exists($appClassRef))
+    #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
+    #set ($discard = $queryString.putAll({
       'editor': 'inline',
       'template': 'AppWithinMinutes.ClassTemplate',
       'parent': $services.model.serialize($appHomeRef),
-      'title': "$appName Class",
-      'AppWithinMinutes.MetadataClass_0_dataSpaceName': $services.model.serialize($appReference, 'local')
+      'title': "$appReference.name Class"
     }))
   #end
   $response.sendRedirect($xwiki.getURL($appClassRef, 'edit', $escapetool.url($queryString)))
 #end
 
-#macro(validateAppName)
+#macro (validateAppName)
   #getAppReference
-  #getAppDescriptor($appReference)
-  #if($appDescriptor)
-    ## Edit an existing application.
-    #set($classStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
-    ## The class string reference is relative to the document holding the application descriptor.
-    #set($appClassRef = $services.model.resolveDocument($classStringRef, 'explicit', $appDescriptor.documentReference))
+  #if (!$appReference)
+    (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameEmptyError')
   #else
-    ## Create a new application.
-    #set($className = "#toXMLName($appReference.name)")
-    #if($className == '')
-      (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameInvalidClassNameError')
+    #getAppDescriptor($appReference)
+    #if ($appDescriptor)
+      ## Edit an existing application.
+      #set ($appDescriptorObj = $appDescriptor.getObject($appDescriptorClassName))
+      #set ($appClassRef = $appDescriptorObj.getValue('class'))
+      ## The class reference is relative to the document holding the application descriptor.
+      #set ($appClassRef = $services.model.resolveDocument($appClassRef, 'explicit', $appDescriptor.documentReference))
+      #set ($appDataRef = $appDescriptorObj.getValue('dataSpace'))
+      ## The data space reference is relative to the document holding the application descriptor.
+      #set ($appDataRef = $services.model.resolveSpace($appDataRef, 'explicit', $appDescriptor.documentReference))
+    #else
+      ## Create a new application.
+      #set ($appDataRef = $services.model.createSpaceReference('Data', $appReference))
+      #set ($appCodeRef = $services.model.createSpaceReference('Code', $appReference))
+      #set ($appClassRef = $services.model.createDocumentReference("$!{appReference.name}Class", $appCodeRef))
     #end
-    #set($appCodeRef = $services.model.createEntityReference("$!{className}Code", 'SPACE', $appReference.parent))
-    #set($appClassRef = $services.model.createEntityReference("$!{className}Class", 'DOCUMENT', $appCodeRef))
-  #end
-  #set($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
-  #set($appHomeURL = $stringtool.removeEnd($xwiki.getDocument($appHomeRef).getExternalURL(), 'WebHome'))
-  ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
-  : {{{$!appHomeURL}}}
-  ; $services.localization.render('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
-  : {{html clean="false"}}#hierarchy($appHomeRef){{/html}}
-  ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
-  : {{html clean="false"}}#hierarchy($appClassRef.parent){{/html}}
-  ; $services.localization.render('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
-  : {{html clean="false"}}#hierarchy($appClassRef){{/html}}
-  #if($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
+    ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
+    : {{{$!xwiki.getDocument($appReference).externalURL}}}
+    ; $services.localization.render('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
+    : {{html clean="false"}}#hierarchy($appDataRef){{/html}}
+    ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
+    : {{html clean="false"}}#hierarchy($appClassRef.parent){{/html}}
+    ; $services.localization.render('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
+    : {{html clean="false"}}#hierarchy($appClassRef){{/html}}
+    #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
+    #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
 
-    {{warning}}$services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+      {{warning}}$services.localization.render('platform.appwithinminutes.appNameIsUsedWarning'){{/warning}}
+    #end
   #end
 #end
 
 #macro (getAppReference)
   #if ($request.resolve == 'true')
     #set ($appReference = $services.model.resolveSpace($request.appName))
-  #else
+  #elseif ("$!request.appName" != '')
     #set ($parentReference = $doc.documentReference.wikiReference)
     #if ("$!request.appParentReference" != '')
       #set ($parentReference = $services.model.resolveSpace($request.appParentReference, 'explicit', $parentReference))
     #end
-    #set ($appReference = $services.model.createEntityReference($request.appName, 'SPACE', $parentReference))
+    #set ($appReference = $services.model.createSpaceReference($request.appName, $parentReference))
+  #else
+    #set ($appReference = $NULL)
+  #end
+#end
+
+#macro (getAppDescriptor $appReference)
+  #set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
+  #set ($appDescriptorStatement = "from doc.object($appDescriptorClassName) as obj where doc.space = :space")
+  #set ($localSpaceReference = $services.model.serialize($appReference, 'local'))
+  #set ($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $localSpaceReference).execute())
+  #if ($appDescriptors.size() &gt; 0)
+    #set ($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
   #end
 #end
 {{/velocity}}
 
 {{velocity}}
-#if("$!request.appName" != '')
-  #if($xcontext.action == 'get')
+#if ("$!request.appName" != '')
+  #if ($xcontext.action == 'get')
     #validateAppName
   #else
     ## CSRF protection is not needed because this step only redirects to the next one passing data in the query string.
@@ -179,7 +182,7 @@
 #else
   #showStep
 #end
-#set($docextras=[])
+#set ($docextras = [])
 {{/velocity}}</content>
   <object>
     <name>AppWithinMinutes.CreateApplication</name>

@@ -35,9 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link EntityReference}.
@@ -459,6 +457,37 @@ public class EntityReferenceTest
         Assert.assertEquals(reference.getParent().getName(),referenceWiki.getParent().getName());
         Assert.assertTrue(checkParamMap(referenceWiki.getParent(), map2));
         Assert.assertNull(referenceWiki.getParent().getParent());
+    }
+
+    @Test
+    public void testHasParent()
+    {
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
+        EntityReference alice = new EntityReference("alice", EntityType.SPACE, wiki);
+        EntityReference bob = new EntityReference("bob", EntityType.SPACE, alice);
+        EntityReference carol = new EntityReference("carol", EntityType.DOCUMENT, bob);
+
+        assertTrue(wiki.hasParent(null));
+        assertFalse(wiki.hasParent(wiki));
+        assertFalse(wiki.hasParent(alice));
+
+        assertFalse(alice.hasParent(null));
+        assertTrue(alice.hasParent(wiki));
+        assertFalse(alice.hasParent(alice));
+        assertFalse(alice.hasParent(bob));
+        assertFalse(alice.hasParent(carol));
+
+        assertTrue(bob.hasParent(wiki));
+        assertTrue(bob.hasParent(alice));
+
+        assertFalse(carol.hasParent(null));
+        assertTrue(carol.hasParent(wiki));
+        assertTrue(carol.hasParent(alice));
+        assertTrue(carol.hasParent(bob));
+        assertFalse(carol.hasParent(carol));
+
+        assertFalse(carol.hasParent(bob.removeParent(alice)));
+        assertFalse(carol.hasParent(bob.removeParent(wiki)));
     }
 
     @Test

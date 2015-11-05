@@ -48,14 +48,11 @@
       $doc.documentReference.wikiReference))
   #end
   #set ($appLocalStringRef = $services.model.serialize($appReference, 'local'))
-  #set ($appName = $appReference.name)
+  #set ($appHomeReference = $services.model.resolveDocument('', 'default', $appReference))
   #set ($scope = $request.scope)
-  #set ($dataHomeRef = $services.model.resolveDocument('', 'default', $appReference))
-  #set ($dataHomeDoc = $xwiki.getDocument($dataHomeRef))
-  #set ($liveTableObj = $dataHomeDoc.getObject('AppWithinMinutes.LiveTableClass'))
-  #set ($classFullName = $liveTableObj.getProperty('class').value)
   ## Make sure a valid application name has been passed, otherwise stop here.
-  #if ("$!classFullName" != '')
+  #set ($appDescriptor = $xwiki.getDocument($appReference).getObject('AppWithinMinutes.LiveTableClass'))
+  #if ($appDescriptor)
     #if ($request.confirm == '1')
       ## CSRF protection.
       #if(!$services.csrf.isTokenValid($request.form_token))
@@ -63,35 +60,57 @@
         #stop
       #end
       ##
-      #set ($classRef = $services.model.resolveDocument($classFullName, 'explicit', $dataHomeRef))
+      #set ($classLocalReference = $appDescriptor.getValue('class'))
+      #set ($classReference = $services.model.resolveDocument($classLocalReference, 'explicit', $appHomeReference))
+      #set ($classLocalReference = $services.model.serialize($classReference, 'local'))
+      #set ($dataSpace = $appDescriptor.getValue('dataSpace'))
+      #set ($dataSpaceReference = $services.model.resolveSpace($dataSpace, 'explicit', $appReference))
       ##
       ## Common values for both cases.
-      #set ($deleteQueryString = "WHERE doc.space in (:spaces)")
-      #set ($deleteQuerySpaces = [$appLocalStringRef])
-      #set ($templateDocFullName = $NULL)
+      #set ($fromClause = '')
+      #set ($constraints = [])
+      #set ($parameters = [])
+      #set ($spacesToDelete = [])
       ##
-      #if ("$!scope" == 'entries')
+      #if ($scope == 'entries')
         ## Delete only the application's entries (just data) from the data space.
-        ##
-        ## Note: XWQL does not support parametrised object class, so we just have to push it directly in the query string.    
-        #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') AS obj $deleteQueryString AND doc.fullName &lt;&gt; :template")
-        #set ($classShortName = $classRef.lastSpaceReference.name)
-        #set ($templateDocRef = $services.model.createEntityReference("${classShortName}Template",
-          'DOCUMENT', $classRef.lastSpaceReference))
-        #set ($templateDocFullName = $services.model.serialize($templateDocRef, 'local'))
+        #set ($fromClause = ', BaseObject as obj')
+        #set ($discard = $constraints.addAll([
+          'doc.fullName = obj.name',
+          'obj.className = ?',
+          'doc.fullName &lt;&gt; ?'
+        ]))
+        #set ($templateLocalReference = "$stringtool.removeEnd($classLocalReference, 'Class')Template")
+        #set ($discard = $parameters.addAll([$classLocalReference, $templateLocalReference]))
+        #set ($discard = $spacesToDelete.add($dataSpaceReference))
       #else
-        ## Delete the entire application (code + data spaces).
-        ##
-        #set ($codeLocalSpaceRef = $services.model.serialize($classRef.lastSpaceReference, 'local'))
-        #set ($discard = $deleteQuerySpaces.add($codeLocalSpaceRef))
+        ## Delete the entire application (application space, code space and data space).
+        #set ($discard = $spacesToDelete.add($appReference))
+        #if (!$classReference.hasParent($appReference))
+          ## The code space is outside the application space.
+          #set ($discard = $spacesToDelete.add($classReference.parent))
+        #end
+        #if (!$dataSpaceReference.hasParent($appReference))
+          ## The data space is outside the application space.
+          #set ($discard = $spacesToDelete.add($dataSpaceReference))
+        #end
       #end
+      ##
+      ## Build the query.
+      #set ($spaceConstraint = $stringtool.repeat("doc.space = ? or doc.space like ? escape '\'", ' or ',
+        $spacesToDelete.size()))
+      #set ($discard = $constraints.add("($spaceConstraint)"))
+      #set ($likeSpecialCharsPattern = $regextool.compile('([%_\\])'))
+      #foreach ($spaceToDelete in $spacesToDelete)
+        #set ($spaceLocalReference = $services.model.serialize($spaceToDelete, 'local'))
+        #set ($discard = $parameters.addAll([$spaceLocalReference,
+          $likeSpecialCharsPattern.matcher($spaceLocalReference).replaceAll('\\$1').concat('.%')]))
+      #end
+      #set ($whereClause = $stringtool.join($constraints, ' and '))
+      #set ($deleteQuery = $services.query.hql("$fromClause where $whereClause"))
+      #set ($deleteQuery = $deleteQuery.bindValues($parameters))
       ##
       ## Run the query and delete the documents.
-      #set ($deleteQuery = $services.query.xwql($deleteQueryString))
-      #set ($discard = $deleteQuery.bindValue('spaces', $deleteQuerySpaces))
-      #if ($templateDocFullName)
-        #set ($discard = $deleteQuery.bindValue('template', $templateDocFullName))
-      #end
       #set ($docNamesToDelete = $deleteQuery.execute())
       #foreach ($docNameToDelete in $docNamesToDelete)
         #set ($docToDelete = $xwiki.getDocument($docNameToDelete))
@@ -104,10 +123,13 @@
       #end
     #else
       ## Confirmation dialog
-      #if ("$!scope" == 'entries')
-        #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
+      #set ($appName = $appReference.name)
+      #if ($scope == 'entries')
+        #set ($confirmationMessage = $services.localization.render(
+          'platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
       #else
-        #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation', $escapetool.xml($appName)))
+        #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation',
+          $escapetool.xml($appName)))
       #end
       #set ($cancelURL = $doc.getURL())
       #set ($confirmParams = {
@@ -119,7 +141,7 @@
       })
       #if ("$!request.xredirect" != '')
         #set ($cancelURL = $request.xredirect)
-        #set ($confirmParams.xredirect = $request.xredirect)
+        #set ($confirmParams.xredirect = $cancelURL)
       #end
       #set ($confirmURL = $doc.getURL($xcontext.action, $escapetool.url($confirmParams)))
       {{html}}
@@ -129,7 +151,7 @@
     #end
   #else
     ## Unusable application name.
-    #if (!$xwiki.exists($dataHomeRef))
+    #if (!$xwiki.exists($appHomeReference))
       {{error}}$services.localization.render('platform.appwithinminutes.deleteAppDoesNotExistError'){{/error}}
     #else
       {{error}}$services.localization.render('platform.appwithinminutes.deleteAppInvalidAppError'){{/error}}

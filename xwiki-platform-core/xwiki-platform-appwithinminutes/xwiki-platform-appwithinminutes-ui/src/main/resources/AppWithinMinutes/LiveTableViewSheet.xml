@@ -50,12 +50,17 @@
     #set($classFullName = $liveTableObj.getProperty('class').value)
     #set($className = $stringtool.removeEnd($classFullName, 'Class'))
     #set($classRef = $services.model.resolveDocument($classFullName))
-    #set($hasCreateData = $hasCreatePage)
-    #set($hasDeleteData = $hasSpaceAdmin)
-    #set($hasEditApplication = $xwiki.hasAccessLevel('edit', $classRef))
-    #set($translationsDoc = $xwiki.getDocument("${className}Translations"))
-    #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; !$translationsDoc.isNew() &amp;&amp; $translationsDoc.hasAccessLevel('edit'))
-    #set($hasDeleteApplication = $hasDeleteData &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
+    #set($dataSpaceRef = $services.model.resolveSpace($liveTableObj.getValue('dataSpace'), 'explicit',
+      $doc.documentReference))
+    #set($hasCreateData = $services.security.authorization.hasAccess('edit', $dataSpaceRef))
+    #set($hasDeleteData = $services.security.authorization.hasAccess('admin', $dataSpaceRef))
+    #set($hasEditApplication = $services.security.authorization.hasAccess('edit', $classRef))
+    #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
+    #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; $xwiki.exists($translationsRef)
+      &amp;&amp; $services.security.authorization.hasAccess('edit', $translationsRef))
+    #set($hasDeleteApplication = $hasDeleteData
+      &amp;&amp; $services.security.authorization.hasAccess('admin', $doc.documentReference.parent)
+      &amp;&amp; $services.security.authorization.hasAccess('admin', $classRef.parent))
     ## Display the application actions based on the user's rights
     #if($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
       (% id="actionBox" class="floatinginfobox" %)
@@ -63,10 +68,10 @@
         = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
         #if($hasCreateData)
           * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #set($entryDoc = $services.model.resolveDocument('__entryName__'))
+            #set($entryDoc = $services.model.resolveDocument('__entryName__', 'explicit', $dataSpaceRef))
             #set ($params = {
               'template': "${className}Template",
-              'parent': 'WebHome'
+              'parent': $services.model.serialize($doc.documentReference, 'local')
             })
             #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
               ## The entry has properties so go in edit mode to edit them.
@@ -99,7 +104,7 @@
           * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
         #end
         #if($hasEditTranslations)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$translationsDoc.getURL('edit', 'editor=wiki')||class="action translate"]]
+          * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
         #end
         #if($hasDeleteApplication)
           #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({

@@ -178,29 +178,82 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the options to create/update the class template, the class sheet and the class translation bundle.
  *#
 #macro(displayClassOptions)
-  #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-  #set($templateName = "${className}Template")
-  #set($translationsName = "${className}Translations")
-  #set($classSheets = $services.sheet.getClassSheets($doc))
-  #if($classSheets.isEmpty())
-    #set($sheetName = "${className}Sheet")
-  #elseif($classSheets.size() == 1)
-    #set($sheetName = $services.model.serialize($classSheets.get(0)))
+  #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+  #set ($templateReference = $services.model.resolveDocument("${className}Template"))
+  #set ($translationsReference = $services.model.resolveDocument("${className}Translations"))
+  #set ($classSheets = $services.sheet.getClassSheets($doc))
+  #set ($sheetReference = $null)
+  #if ($classSheets.isEmpty())
+    #set ($sheetReference = $services.model.resolveDocument("${className}Sheet"))
+  #elseif ($classSheets.size() == 1)
+    #set ($sheetReference = $classSheets.get(0))
   #end
-  {{html wiki="true"}}
-  ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be updated, they have to be created.
-  (% id="options" #if(!$xwiki.exists($sheetName) &amp;&amp; !$xwiki.exists($templateName) &amp;&amp; !$xwiki.exists($translationsName))class="hidden" #end%)
-  ; &lt;label for="updateClassTemplate"&gt;&lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateLabel')&lt;/label&gt;
-  : (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateHint', "[[$templateName]]")
-  ; &lt;label for="updateClassSheet"&gt;&lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet" #if($sheetName)checked="checked" #{else}disabled="disabled" #end/&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateSheetLabel')&lt;/label&gt;
-  : #if($sheetName)
-      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateSheetHint', "[[$sheetName]]")
+  {{html}}
+  ## Hide the options if neither the sheet nor the template nor the translation bundle exists. They don't have to be
+  ## updated, they have to be created.
+  &lt;dl id="options" #if (!$xwiki.exists($sheetReference) &amp;&amp; !$xwiki.exists($templateReference)
+      &amp;&amp; !$xwiki.exists($translationsReference))class="hidden"#end&gt;
+    &lt;dt&gt;
+      &lt;label for="updateClassTemplate"&gt;
+        &lt;input type="checkbox" id="updateClassTemplate" name="updateClassTemplate" checked="checked" /&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateLabel')
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateTemplateHint',
+          ["#pageLink($templateReference)"])
+      &lt;/span&gt;
+    &lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="updateClassSheet"&gt;
+        &lt;input type="checkbox" id="updateClassSheet" name="updateClassSheet"
+          #if ($sheetReference)checked="checked" #{else}disabled="disabled" #end/&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateSheetLabel')
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+    #if ($sheetReference)
+      &lt;span class="xHint"&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateSheetHint',
+          ["#pageLink($sheetReference)"])
+      &lt;/span&gt;
     #else
-      (% class="warningmessage" %)$services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning')
+      &lt;span class="warningmessage"&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning')
+      &lt;/span&gt;
     #end
-  ; &lt;label for="updateClassTranslations"&gt;&lt;input type="checkbox" id="updateClassTranslations" name="updateClassTranslations" checked="checked" /&gt;$services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsLabel')&lt;/label&gt;
-  : (% class="xHint" %)$services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsHint', "[[$translationsName]]")
+    &lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="updateClassTranslations"&gt;
+        &lt;input type="checkbox" id="updateClassTranslations" name="updateClassTranslations" checked="checked" /&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsLabel')
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;span class="xHint"&gt;
+        $services.localization.render('platform.appwithinminutes.classEditorUpdateTranslationsHint',
+          ["#pageLink($translationsReference)"])
+      &lt;/span&gt;
+    &lt;/dd&gt;
+  &lt;/dl&gt;
   {{/html}}
+#end
+
+#macro (pageLink $reference)
+  #set ($class = 'wikilink')
+  #set ($action = 'view')
+  #set ($params = {})
+  #if (!$xwiki.exists($reference))
+    #set ($class = 'wikicreatelink')
+    #set ($action = 'create')
+    #set ($discard = $params.put('parent', $doc.fullName))
+  #end
+  &lt;span class="$class"&gt;##
+    &lt;a href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"&gt;##
+      $escapetool.xml($reference.name)##
+    &lt;/a&gt;##
+  &lt;/span&gt;##
 #end
 
 #**
@@ -221,9 +274,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     &lt;input type="hidden" id="template-$field.name" name="template-$field.name" value="$escapetool.xml($formFieldDoc.fullName)" /&gt;
   {{/html}}
 
-  #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-  #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
-    $doc.documentReference.parent))
+  #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+  #set($templateRef = $services.model.resolveDocument("${className}Template"))
   #set($templateDoc = $xwiki.getDocument($templateRef))
   ## Simulate the editing of the class instance from the template document.
   ## Note that we can't simply call display on the template document because $field could be a new field that hasn't
@@ -487,11 +539,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     ## as well. Note that there is a possibility that objects in the class' document are automatically updated. Needs checking.
     ##
     #set($instancesStatement = "from doc.object('$doc.fullName') as obj where doc.fullName not in (:className,:templateName)")
-    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
-      $doc.documentReference.parent))
-    #set($templateFullName = $services.model.serialize($templateRef, 'local'))
-    #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName).bindValue('templateName', $templateFullName))
+    #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+    #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName).bindValue(
+      'templateName', "${className}Template"))
     #foreach($instanceDocName in $instancesQuery.execute())
       #set($instanceDoc = $xwiki.getDocument($instanceDocName))
       #set($discard = $instanceDoc.document.renameProperties($doc.documentReference, $fieldsToRename))
@@ -528,9 +578,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(updateAndSaveTemplate)
   #if(!$errorMessage &amp;&amp; $request.updateClassTemplate)
-    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($templateRef = $services.model.createEntityReference("${className}Template", 'DOCUMENT',
-      $doc.documentReference.parent))
+    #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+    #set($templateRef = $services.model.resolveDocument("${className}Template"))
     #set($templateDoc = $xwiki.getDocument($templateRef))
     #set($discard = $templateDoc.setParent($doc.name))
     #if ($request.templateTitle)
@@ -559,9 +608,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #if(!$errorMessage &amp;&amp; $request.updateClassSheet)
     #set($classSheets = $services.sheet.getClassSheets($doc))
     #if($classSheets.isEmpty())
-      #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-      #set($sheetReference = $services.model.createEntityReference("${className}Sheet", 'DOCUMENT',
-        $doc.documentReference.parent))
+      #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+      #set($sheetReference = $services.model.resolveDocument("${className}Sheet"))
       #set($discard = $services.sheet.bindClassSheet($doc, $sheetReference))
       #set($discard = $doc.save($services.localization.render('platform.appwithinminutes.classEditorBindSheetSaveComment'),
         $minorEdit))
@@ -586,9 +634,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(updateAndSaveTranslations)
   #if(!$errorMessage &amp;&amp; $request.updateClassTranslations)
-    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-    #set($translationsRef = $services.model.createEntityReference("${className}Translations", 'DOCUMENT',
-      $doc.documentReference.parent))
+    #set($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+    #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
     #set($translationsDoc = $xwiki.getDocument($translationsRef))
     #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
     ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
@@ -606,6 +653,31 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #end
 #end
 
+#macro (getAppReference)
+  #set ($appLocalRef = $doc.getValue('dataSpaceName'))
+  #if ("$!appLocalRef" != '')
+    ## Between 6.3M2 (XWIKI-11249) and 7.3RC1 (XWIKI-12741).
+    #set ($appReference = $services.model.resolveSpace($appLocalRef))
+  #else
+    ## Possible locations:
+    ## 1. same space (&lt;6.2M1, XWIKI-8757)
+    ## 2. sibling space (between 6.2M1 and 6.3M2)
+    ## 3. grand parent space (7.3RC1+)
+    #set ($appReferences = [
+      $doc.documentReference.parent,
+      $services.model.createSpaceReference($stringtool.removeEnd($doc.title, ' Class'),
+        $doc.documentReference.parent.parent),
+      $doc.documentReference.parent.parent
+    ])
+    #foreach ($item in $appReferences)
+      #set ($appReference = $item)
+      #if ($xwiki.getDocument($appReference).getObject($appDescriptorClassName))
+        #break
+      #end
+    #end
+  #end
+#end
+
 #**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
@@ -620,26 +692,19 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set($appLocalRef = $doc.getValue('dataSpaceName'))
-      #if("$!appLocalRef" != '')
-        #set($appReference = $services.model.resolveSpace($appLocalRef))
-      #else
-        ## Backwards compatibility for apps created before 6.3M2 when the code space was not properly cleaned and the
-        ## data space name was restricted as a consequence.
-        #set($appReference = $services.model.createSpaceReference($stringtool.removeEnd($doc.title, ' Class'),
-          $doc.documentReference.wikiReference))
-      #end
+      #set ($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
+      #getAppReference
       #set($homePageRef = $services.model.resolveDocument('', 'default', $appReference))
       #set($queryString = {"wizard" : true})
       #if(!$xwiki.exists($homePageRef))
         #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
         #set($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
         #set($discard = $queryString.putAll({
-          "editor":"inline",
-          "template":"AppWithinMinutes.LiveTableTemplate",
-          "AppWithinMinutes.LiveTableClass_0_class":$doc.fullName,
-          "title":'$doc.documentReference.lastSpaceReference.name',
-          "parent":$wikiHomePage
+          'editor': 'inline',
+          'template': 'AppWithinMinutes.LiveTableTemplate',
+          "${appDescriptorClassName}_0_class": $doc.fullName,
+          'title': '$doc.documentReference.lastSpaceReference.name',
+          'parent': $wikiHomePage
         }))
       #end
       #set($queryString = $escapetool.url($queryString))

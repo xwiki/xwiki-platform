@@ -91,8 +91,9 @@
   (((
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     &lt;input type="hidden" name="xpage" value="plain" /&gt;
-    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
+    ## We prevent the class name and the data space from being edited directly. They can be specified in the URL.
     $doc.display('class', 'hidden')
+    $doc.display('class', 'dataSpace')
     ## We have to pass the list of available columns to the JavaScript code.
     #listAvailableColumns()
   )))
@@ -149,33 +150,34 @@
   {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
-#macro(maybeGrantSpaceAdminRight $spaceHomeRef)
-  ## Grant space administration rights only if the space is new.
-  #if(!$xwiki.exists($spaceHomeRef))
-    #set($spacePrefsRef = $services.model.createDocumentReference($spaceHomeRef.wikiReference.name, $spaceHomeRef.lastSpaceReference.name, 'WebPreferences'))
-    #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
-    ## Don't overwrite existing space preferences.
-    #if($spacePrefsDoc.isNew())
-      #set($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
-      #set($discard = $spacePrefsDoc.set('allow', 1))
-      #set($discard = $spacePrefsDoc.set('levels', 'admin'))
-      #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
-      #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
-      #set($discard = $spacePrefsDoc.setHidden(true))
-      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
-    #end
+#macro (maybeGrantSpaceAdminRight $spaceRef)
+  ## Grant space administration rights only if the space is new. Don't overwrite existing space preferences.
+  #set ($spaceHomeRef = $services.model.resolveDocument('', 'default', $spaceRef))
+  #set ($spacePrefsRef = $services.model.resolveDocument('WebPreferences', 'explicit', $spaceRef))
+  #if (!$xwiki.exists($spaceHomeRef) &amp;&amp; !$xwiki.exists($spacePrefsRef))
+    #set ($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
+    #set ($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
+    #set ($discard = $spacePrefsDoc.set('allow', 1))
+    #set ($discard = $spacePrefsDoc.set('levels', 'admin'))
+    #set ($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
+    #set ($discard = $spacePrefsDoc.setTitle('$services.localization.render(''admin.preferences.title'')'))
+    #set ($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
+    #set ($discard = $spacePrefsDoc.setHidden(true))
+    #set ($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render(
+      'platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
   #end
 #end
 
-#macro(maybeGrantSpaceAdminRights)
-  ## Data space
-  #set($dataSpaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
-  #maybeGrantSpaceAdminRight($dataSpaceHomeRef)
-  ## Code space
-  #set($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
-  #set($classRef = $services.model.resolveDocument($className))
-  #set($codeSpaceHomeRef = $services.model.createDocumentReference($classRef.wikiReference.name, $classRef.lastSpaceReference.name, 'WebHome'))
-  #maybeGrantSpaceAdminRight($codeSpaceHomeRef)
+#macro (maybeGrantSpaceAdminRights)
+  ## Application space
+  #set ($appReference = $doc.documentReference.parent)
+  #maybeGrantSpaceAdminRight($appReference)
+  ## Code space (if it's not nested inside the application space)
+  #set ($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
+  #set ($classReference = $services.model.resolveDocument($className))
+  #if (!$classReference.hasParent($appReference))
+    #maybeGrantSpaceAdminRight($classReference.parent)
+  #end
 #end
 
 #macro(updateAndSaveLiveTable)
@@ -199,12 +201,12 @@
   #set($discard = $doc.save($comment, $minorEdit))
 #end
 
-#macro(maybeCreateLiveTableResultsPage)
+#macro (maybeCreateLiveTableResultsPage)
   #set ($className = "$!doc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value")
   #set ($liveTableResultsDoc = $xwiki.getDocument("$!stringtool.removeEnd($className, 'Class')LiveTableResults"))
   #set ($liveTableResultsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableResultsGenerator'))
   #if ($liveTableResultsDoc.isNew())
-    #set ($discard = $liveTableResultsDoc.setParent($doc.name))
+    #set ($discard = $liveTableResultsDoc.setParent($doc.fullName))
     #set ($discard = $liveTableResultsDoc.setHidden(true))
     #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
     #set ($discard = $liveTableResultsDoc.save($services.localization.render('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
@@ -215,7 +217,7 @@
   #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
   #set($appName = $doc.documentReference.parent.name)
   #set($discard = $uix.set('name', "platform.panels.${appName}Application"))
-  #set($discard = $uix.set('extensionPointId', "org.xwiki.platform.panels.Applications"))
+  #set($discard = $uix.set('extensionPointId', 'org.xwiki.platform.panels.Applications'))
   #set($discard = $uix.set('parameters', "label=${appName}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
   #set ($hasWikiAdminRights = $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
   #set($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))

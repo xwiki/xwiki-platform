@@ -424,6 +424,28 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         return new EntityReference(this, oldParent, null);
     }
 
+    /**
+     * Checks if a given reference is a parent of this reference.
+     * 
+     * @param expectedParent the parent reference to check
+     * @return {@code true} if the given reference is a parent of this reference, {@code false} otherwise
+     */
+    public boolean hasParent(EntityReference expectedParent)
+    {
+        EntityReference actualParent = getParent();
+
+        // Handle the case when both the expectedParent and the actualParent are null.
+        if (actualParent == expectedParent) {
+            return true;
+        }
+
+        while (actualParent != null && !actualParent.equals(expectedParent)) {
+            actualParent = actualParent.getParent();
+        }
+
+        return actualParent != null;
+    }
+
     @Override
     public String toString()
     {

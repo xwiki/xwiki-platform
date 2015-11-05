@@ -246,6 +246,19 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * Creates a {@link SpaceReference} from a string representing the space name and the reference of the parent space.
+     *
+     * @param spaceName the space name (e.g. "Main")
+     * @param parent the reference of the parent space
+     * @return the reference to the space
+     * @since 7.3RC1
+     */
+    public SpaceReference createSpaceReference(String spaceName, SpaceReference parent)
+    {
+        return new SpaceReference(spaceName, parent);
+    }
+
+    /**
      * Creates a {@link SpaceReference} from a list of string representing the space name and the name of its parents.
      *
      * @param spaces the list of the spaces name (eg ["A", "B", "C"])

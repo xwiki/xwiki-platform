@@ -236,10 +236,13 @@ public class ModelScriptServiceTest
         Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")),
             this.service.createSpaceReference("space", this.service.createWikiReference("wiki")));
 
-        Assert.assertEquals(
-                new SpaceReference("C", new SpaceReference("B", new SpaceReference("A", new WikiReference("wiki")))),
-                this.service.createSpaceReference(Arrays.asList("A", "B", "C"),
-                        this.service.createWikiReference("wiki")));
+        SpaceReference spaceReference =
+            new SpaceReference("C", new SpaceReference("B", new SpaceReference("A", new WikiReference("wiki"))));
+        Assert.assertEquals(spaceReference,
+            this.service.createSpaceReference(Arrays.asList("A", "B", "C"), this.service.createWikiReference("wiki")));
+
+        Assert.assertEquals(spaceReference,
+            this.service.createSpaceReference(spaceReference.getName(), (SpaceReference) spaceReference.getParent()));
     }
 
     @Test

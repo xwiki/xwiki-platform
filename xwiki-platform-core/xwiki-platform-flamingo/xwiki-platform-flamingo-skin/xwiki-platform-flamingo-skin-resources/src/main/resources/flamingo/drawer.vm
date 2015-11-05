@@ -72,7 +72,7 @@
       #end
       #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
       $content
-      #if ($stringtool.isNotBlank($content))
+      #if (!$canHaveMenuSeparator && $stringtool.isNotBlank($content))
         #set ($canHaveMenuSeparator = true)
       #end
     #end

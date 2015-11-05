@@ -10,12 +10,12 @@
     ## Right menu
     #xwikitopmenurightstart()
       #displayDrawerActivator()
-      #displaySecureUIX('org.xwiki.platform.topmenu.right')
+      #displaySimpleSecureUIX('org.xwiki.platform.topmenu.right')
     #xwikitopmenurightend()
     
     ## Left menu
     #xwikitopmenuleftstart()
-      #displaySecureUIX('org.xwiki.platform.topmenu.left')
+      #displaySimpleSecureUIX('org.xwiki.platform.topmenu.left')
     #xwikitopmenuleftend()
     
   ## End of Top Menu

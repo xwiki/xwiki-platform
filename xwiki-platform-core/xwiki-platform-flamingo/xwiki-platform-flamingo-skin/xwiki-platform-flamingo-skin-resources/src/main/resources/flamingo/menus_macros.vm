@@ -191,8 +191,9 @@
  * Display extension points only if the author of the UIX has the admin right on the wiki.
  *
  * @param $name name of the extension points to display
+ * @since 7.3RC1
  *#
-#macro(displaySecureUIX $name)
+#macro(displaySimpleSecureUIX $name)
   #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       $services.rendering.render($uix.execute(), 'html/5.0')

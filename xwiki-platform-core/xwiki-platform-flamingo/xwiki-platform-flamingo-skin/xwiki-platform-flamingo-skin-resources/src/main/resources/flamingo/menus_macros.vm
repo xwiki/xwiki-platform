@@ -141,14 +141,14 @@
 ###    Toplevel Menu entry separator
 ###
 #macro(xwikitopmenuseparator)
-  <li class="divider"></li>
+  <li class="divider" role="separator"></li>
 #end
 
 ###
 ###    Menu submenu separator
 ###
 #macro(submenuseparator)
-  <li class="divider"></li>
+  <li class="divider" role="separator"></li>
 #end
 
 ###
@@ -185,4 +185,17 @@
 #macro(xwikibuttonentryend $actionurl $linktext $id $class $icon)
     </ul>
   </div>
+#end
+
+#**
+ * Display extension points only if the author of the UIX has the admin right on the wiki.
+ *
+ * @param $name name of the extension points to display
+ *#
+#macro(displaySecureUIX $name)
+  #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
+    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      $services.rendering.render($uix.execute(), 'html/5.0')
+    #end
+  #end
 #end

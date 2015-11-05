@@ -1,6 +1,6 @@
-################################
-##        MENU VIEW
-################################
+##
+## Top Menu
+##
 #if ($isInServletMode)## Visible only in a page
   #template("menus_macros.vm")
   
@@ -10,37 +10,24 @@
     ## Right menu
     #xwikitopmenurightstart()
       #displayDrawerActivator()
-      #displayUserAvatar()
-      #displaySearch()
+      #displaySecureUIX('org.xwiki.platform.topmenu.right')
     #xwikitopmenurightend()
+    
+    ## Left menu
+    #xwikitopmenuleftstart()
+      #displaySecureUIX('org.xwiki.platform.topmenu.left')
+    #xwikitopmenuleftend()
     
   ## End of Top Menu
   #xwikitopmenuend()
   
   #template("drawer.vm")
 #end
-################################
-##  DISPLAY DRAWER ACTIVATOR
-################################
+#**
+ * Display the drawer activator with an humberger-style icon.
+ *#
 #macro(displayDrawerActivator)
   <li>
     <a class="icon-navbar drawer-toggle" id="tmDrawerActivator"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
   </li>
-#end
-################################
-##       DISPLAY SEARCH
-################################
-#macro(displaySearch)
-  #template("quicksearch.vm")
-#end
-################################
-##    DISPLAY USER AVATAR
-################################
-#macro(displayUserAvatar)
-  #if ($xcontext.user != 'XWiki.XWikiGuest')
-    #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
-    <li class="navbar-avatar">
-      <a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"><span class="sr-only">$services.localization.render('homepage')</span>#smallUserAvatar($xcontext.user)</a>
-    </li>
-  #end
 #end

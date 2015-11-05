@@ -149,8 +149,7 @@ public class BasePage extends BaseElement
      */
     public boolean isAuthenticated()
     {
-        return getDriver().hasElementWithoutWaiting(
-                By.xpath("//div[@id='xwikimainmenu']//li[contains(@class, 'navbar-avatar')]//img"));
+        return getDriver().hasElementWithoutWaiting(By.id("tmUser"));
     }
 
     /**

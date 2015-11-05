@@ -127,7 +127,7 @@
       <name>org.xwiki.platform.user.profile</name>
     </property>
     <property>
-      <parameters>order=1000</parameters>
+      <parameters>order=10000</parameters>
     </property>
     <property>
       <scope>wiki</scope>

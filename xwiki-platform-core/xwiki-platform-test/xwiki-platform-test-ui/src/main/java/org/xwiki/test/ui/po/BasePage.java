@@ -77,7 +77,7 @@ public class BasePage extends BaseElement
     @FindBy(xpath = "//a[@id='tmLogin']")
     private WebElement loginLink;
 
-    @FindBy(xpath = "//div[@id='xwikimainmenu']//li[contains(@class, 'navbar-avatar')]/a")
+    @FindBy(xpath = "//a[@id='tmUser']")
     private WebElement userLink;
 
     @FindBy(xpath = "//li[contains(@class, 'navbar-avatar')]//img[contains(@class, 'avatar')]")

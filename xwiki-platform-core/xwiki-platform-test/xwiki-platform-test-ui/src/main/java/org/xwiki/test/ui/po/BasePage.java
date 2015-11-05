@@ -94,6 +94,9 @@ public class BasePage extends BaseElement
 
     @FindBy(css = "#tmMoreActions a[title='Children']")
     private WebElement childrenLink;
+    
+    @FindBy(id = "tmNotifications")
+    private WebElement notificationsMenu;
 
     /**
      * Used to scroll the page to the top before accessing the floating menu.
@@ -513,5 +516,34 @@ public class BasePage extends BaseElement
         toggleActionMenu();
         this.childrenLink.click();
         return new ChildrenViewer();
+    }
+
+    /**
+     * Says if the notifications menu is present (it is displayed only if it has some content).
+     *  
+     * @return either or not the notifications menu is present
+     * @since 7.4M1 
+     */
+    public boolean hasNotificationsMenu()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id("tmNotifications"));
+    }
+
+    /**
+     * Open/Close the notifications menu.
+     * @since 7.4M1 
+     */
+    public void toggleNotificationsMenu()
+    {
+        this.notificationsMenu.click();
+    }
+
+    /** 
+     * @return true if the notifications menu is open
+     * @since 7.4M1
+     */
+    public boolean isNotificationsMenuOpen()
+    {
+        return this.notificationsMenu.findElement(By.className("dropdown-menu")).isDisplayed();
     }
 }

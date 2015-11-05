@@ -425,8 +425,7 @@ public class BasePage extends BaseElement
      */
     public String getCurrentUser()
     {
-        // Get the user from the title attribute of the image displaying the user's avatar in the nav bar
-        return this.userAvatarImage.getAttribute("title");
+        return this.userLink.getText();
     }
 
     /**

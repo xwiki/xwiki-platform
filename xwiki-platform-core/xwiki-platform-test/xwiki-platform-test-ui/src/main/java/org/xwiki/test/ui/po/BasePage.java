@@ -428,7 +428,10 @@ public class BasePage extends BaseElement
      */
     public String getCurrentUser()
     {
-        return this.userLink.getText();
+        toggleDrawer();
+        String user = this.userLink.getText();  
+        toggleDrawer();
+        return user;
     }
 
     /**

@@ -429,6 +429,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * 
      * @param expectedParent the parent reference to check
      * @return {@code true} if the given reference is a parent of this reference, {@code false} otherwise
+     * @since 7.3RC1
      */
     public boolean hasParent(EntityReference expectedParent)
     {

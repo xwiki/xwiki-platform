@@ -644,7 +644,7 @@ public class XWiki implements EventListener
     private ResourceReferenceManager getResourceReferenceManager()
     {
         if (this.resourceReferenceManager == null) {
-            this.resourceReferenceManager = Utils.getComponent((Type) SyntaxFactory.class);
+            this.resourceReferenceManager = Utils.getComponent((Type) ResourceReferenceManager.class);
         }
 
         return this.resourceReferenceManager;

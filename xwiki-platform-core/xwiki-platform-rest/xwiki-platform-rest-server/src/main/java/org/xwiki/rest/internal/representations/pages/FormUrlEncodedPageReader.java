@@ -58,6 +58,8 @@ public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiR
 
     private static String PARENT_FIELD_NAME = "parent";
 
+    private static String HIDDEN_FIELD_NAME = "hidden";
+
     private static String CONTENT_FIELD_NAME = "content";
 
     @Override
@@ -88,10 +90,12 @@ public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiR
         if (form.getNames().isEmpty()) {
             page.setTitle(httpServletRequest.getParameter(TITLE_FIELD_NAME));
             page.setParent(httpServletRequest.getParameter(PARENT_FIELD_NAME));
+            page.setHidden(Boolean.valueOf(httpServletRequest.getParameter(HIDDEN_FIELD_NAME)));
             page.setContent(httpServletRequest.getParameter(CONTENT_FIELD_NAME));
         } else {
             page.setTitle(form.getFirstValue(TITLE_FIELD_NAME));
             page.setParent(form.getFirstValue(PARENT_FIELD_NAME));
+            page.setHidden(Boolean.valueOf(form.getFirstValue(HIDDEN_FIELD_NAME)));
             page.setContent(form.getFirstValue(CONTENT_FIELD_NAME));
         }
 

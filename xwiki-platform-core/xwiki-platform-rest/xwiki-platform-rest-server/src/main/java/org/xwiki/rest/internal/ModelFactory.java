@@ -145,6 +145,8 @@ public class ModelFactory
             modified = true;
         }
 
+        doc.setHidden(restPage.isHidden());
+
         // Set objects
         if (restPage.getObjects() != null) {
             Set<ObjectReference> newReferences = new HashSet<>();
@@ -664,6 +666,7 @@ public class ModelFactory
 
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
+        page.setHidden(doc.isHidden());
         page.setLanguage(doc.getLocale().toString());
         page.setCreator(doc.getCreator());
         if (withPrettyNames) {

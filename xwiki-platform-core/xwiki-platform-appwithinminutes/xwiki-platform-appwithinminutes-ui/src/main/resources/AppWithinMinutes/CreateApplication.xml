@@ -152,7 +152,7 @@
   #elseif ("$!request.appName" != '')
     #set ($parentReference = $doc.documentReference.wikiReference)
     #if ("$!request.appParentReference" != '')
-      #set ($parentReference = $services.model.resolveSpace($request.appParentReference, 'explicit', $parentReference))
+      #set ($parentReference = $services.model.resolveSpace($request.appParentReference))
     #end
     #set ($appReference = $services.model.createSpaceReference($request.appName, $parentReference))
   #else

@@ -167,13 +167,14 @@
   ##
   ## HTML Table
   ##
+  #set ($htmlLiveTableId = $escapetool.xml($divid))
 <div class="xwiki-livetable-container">
   #if("$!topfilters" !='') #set($hasTopFilters = true) #else #set($hasTopFilters = false) #end
   #if($tagcloud || $hasTopFilters)
   <div class="tipfilters">
   #end
   #if($hasTopFilters)
-  <div id="${divid}-topfilters" class="xwiki-livetable-topfilters-tip #if($tagcloud)splitted#end">
+  <div id="${htmlLiveTableId}-topfilters" class="xwiki-livetable-topfilters-tip #if($tagcloud)splitted#end">
     <div>
       <div class="xwiki-livetable-topfilters-container">
       $topfilters
@@ -186,7 +187,7 @@
   #end
   #if($tagcloud)
     #set($discard = $xwiki.ssx.use('XWiki.TagCloud'))
-    <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
+    <div id="${htmlLiveTableId}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
           <h2>$services.localization.render('platform.livetable.tagsHelp') $services.localization.render('platform.livetable.tagsHelpCancel')</h2>
@@ -201,20 +202,20 @@
   #if($tagcloud || $hasTopFilters)
   </div>
   #end
-  <table id="${divid}" class="xwiki-livetable">
+  <table id="${htmlLiveTableId}" class="xwiki-livetable">
     #if("$!options.description" != '')
       <caption class="sr-only">$options.description</caption>
     #end
     <tr>
       <td class="xwiki-livetable-pagination">
-        <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
+        <span id="${htmlLiveTableId}-limits" class="xwiki-livetable-limits"></span>
   #if($hasPageSize)
-        <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
+        <span id="${htmlLiveTableId}-pagesize" class="xwiki-livetable-pagesize">
             <span>$services.localization.render('platform.livetable.pagesizeLabel')</span>
             <span class="xwiki-livetable-pagesize-content" ></span>
         </span>
   #end
-        <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
+        <span id="${htmlLiveTableId}-ajax-loader" class="xwiki-livetable-loader hidden">
           <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$escapetool.xml($services.localization.render('platform.livetable.loading'))" title="" />
         </span>
         <span class="controlPagination">
@@ -248,7 +249,7 @@
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
+                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
                 #if($isSortable)</a>#end
@@ -275,7 +276,7 @@
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
+                <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
@@ -288,7 +289,7 @@
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>
@@ -301,7 +302,7 @@
               </td>
             </tr>
           </thead>
-          <tbody id="${divid}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+          <tbody id="${htmlLiveTableId}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
         </table>
       </td>
     </tr>
@@ -319,7 +320,7 @@
       </td>
     </tr>
   </table>
-  <div id="${divid}-inaccessible-docs" class="hidden">
+  <div id="${htmlLiveTableId}-inaccessible-docs" class="hidden">
     #info($services.localization.render('rightsmanager.documentrequireviewrights'))
   </div>
   <script type="text/javascript">
@@ -328,14 +329,15 @@
   function startup() {
     // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+      #set ($jsLiveTableId = $escapetool.javascript($divid))
       #set ($liveTableParams = {
         'maxPages': $maxPages,
         'limit': $count,
         'selectedTags': $selectedTags
       })
       #if ($hasTopFilters)
-        #set ($discard = $liveTableParams.put('filterNodes', ["$('$divid').down('.xwiki-livetable-display-filters')",
-          "$('${divid}-topfilters')"]))
+        #set ($discard = $liveTableParams.put('filterNodes', ["$('$jsLiveTableId').down('.xwiki-livetable-display-filters')",
+          "$('${jsLiveTableId}-topfilters')"]))
       #end
       #if ($hasPageSize && "$!pageSizeBounds" != '')
         #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
@@ -344,11 +346,15 @@
       #if ($!callback != '')
         #set ($callbackParam = "$callback, ")
       #end
-      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}",
+      window[$jsontool.serialize($jsName)] = new XWiki.widgets.LiveTable("$dataurl", "$jsLiveTableId",
         $callbackParam$jsontool.serialize($liveTableParams));
       #if ($hasPageSize)
-        document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
-        document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
+        document.observe("xwiki:livetable:${jsLiveTableId}:loadingEntries", function() {
+          $('${jsLiveTableId}-pagesize').addClassName("hidden");
+        });
+        document.observe("xwiki:livetable:${jsLiveTableId}:loadingComplete", function() {
+          $('${jsLiveTableId}-pagesize').removeClassName("hidden");
+        });
       #end
       return true;
     }
@@ -526,7 +532,7 @@ function (row, i, table) {
         #end
       #end
     #end
-    $('${divid}-inaccessible-docs').removeClassName('hidden');
+    $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
   return tr;
 }

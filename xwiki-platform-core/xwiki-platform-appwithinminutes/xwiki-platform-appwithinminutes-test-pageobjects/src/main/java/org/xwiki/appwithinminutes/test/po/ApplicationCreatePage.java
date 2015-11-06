@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -36,8 +37,10 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ApplicationCreatePage extends ViewPage
 {
-    @FindBy(id = "appTitle")
-    private WebElement appNameInput;
+    /**
+     * The widget used to select the application location.
+     */
+    private DocumentPicker locationPicker = new DocumentPicker();
 
     @FindBy(id = "wizard-next")
     private WebElement nextStepButton;
@@ -60,8 +63,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void setApplicationName(String appName)
     {
-        appNameInput.clear();
-        appNameInput.sendKeys(appName);
+        this.locationPicker.setTitle(appName);
     }
 
     /**
@@ -69,7 +71,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public WebElement getApplicationNameInput()
     {
-        return appNameInput;
+        return this.locationPicker.getTitleInput();
     }
 
     /**
@@ -77,7 +79,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void waitForApplicationNamePreview()
     {
-        final String appName = appNameInput.getAttribute("value");
+        final String appName = this.locationPicker.getTitle();
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
@@ -95,6 +97,17 @@ public class ApplicationCreatePage extends ViewPage
     public void waitForApplicationNameError()
     {
         getDriver().waitUntilElementIsVisible(By.cssSelector("#appTitle.xErrorField"));
+    }
+
+    /**
+     * Sets the location where to create the application.
+     * 
+     * @param location the location where to create the application
+     * @since 7.3RC1
+     */
+    public void setLocation(String location)
+    {
+        this.locationPicker.setParent(location);
     }
 
     /**

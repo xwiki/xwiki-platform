@@ -48,7 +48,7 @@ $keySpecialCharsPattern.matcher($key).replaceAll('\\$1')=$value
 #end
 {{/velocity}}
 
-{{velocity}}
+{{velocity wiki="false"}}
 $escapetool.h Class fields
 #set ($prefix = "${doc.fullName}_")
 #foreach ($property in $doc.getxWikiClass().properties)

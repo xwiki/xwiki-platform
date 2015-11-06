@@ -4,6 +4,9 @@
  *  Prototype is freely distributable under the terms of an MIT-style license.
  *  For details, see the Prototype web site: http://www.prototypejs.org/
  *
+ *  Changes made by the XWiki Dev Team:
+ *  * Sizzle doesn't escape the escape character (backslash) in the CSS selector passed to querySelectorAll.
+ *
  *--------------------------------------------------------------------------*/
 
 var Prototype = {
@@ -5564,7 +5567,8 @@ if ( document.querySelectorAll ) {
 					if ( !old ) {
 						context.setAttribute( "id", nid );
 					} else {
-						nid = nid.replace( /'/g, "\\$&" );
+						// XWIKI Fix: The escape character must be escaped too.
+						nid = nid.replace( /['\\]/g, "\\$&" );
 					}
 					if ( relativeHierarchySelector && hasParent ) {
 						context = context.parentNode;

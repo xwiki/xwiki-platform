@@ -139,27 +139,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </terminal>
-      <type>
-        <cache>0</cache>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>type</name>
-        <number>3</number>
-        <picker>0</picker>
-        <prettyName>type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>page|space</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </type>
     </class>
     <property>
       <action>edit</action>
@@ -175,9 +154,6 @@
     </property>
     <property>
       <terminal>0</terminal>
-    </property>
-    <property>
-      <type>page</type>
     </property>
   </object>
 </xwikidoc>

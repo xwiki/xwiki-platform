@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -30,7 +29,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.EmailClass;
@@ -65,12 +63,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
     private SheetBinder classSheetBinder;
 
     /**
-     * Used to access current XWikiContext.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
      * Default constructor.
      */
     public XWikiUsersDocumentInitializer()
@@ -90,8 +82,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             document.setSyntax(Syntax.XWIKI_2_1);
             needsUpdate = true;
         }
-
-        XWikiContext xcontext = this.xcontextProvider.get();
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);

@@ -66,7 +66,20 @@ public class ApplicationsLiveTableElement extends LiveTableElement
      */
     public boolean isApplicationListed(String... appPath)
     {
-        return hasRow(APP_NAME_COLUMN_TITLE, StringUtils.join(appPath, " \u00BB "));
+        return hasRow(APP_NAME_COLUMN_TITLE, join(appPath));
+    }
+
+    public ApplicationHomePage viewApplication(String... path)
+    {
+        String escapedPath = join(path).replace("'", "''");
+        getDriver().findElementWithoutWaiting(
+            By.xpath("//td[contains(@class, 'doc_space')]/a[. = '" + escapedPath + "']")).click();
+        return new ApplicationHomePage();
+    }
+
+    private String join(String... path)
+    {
+        return StringUtils.join(path, " \u00BB ");
     }
 
     /**

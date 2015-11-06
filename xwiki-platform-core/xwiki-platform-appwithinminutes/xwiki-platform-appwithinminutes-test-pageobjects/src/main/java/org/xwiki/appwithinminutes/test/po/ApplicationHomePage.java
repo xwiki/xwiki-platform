@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -40,6 +41,12 @@ public class ApplicationHomePage extends ViewPage
 
     @FindBys({@FindBy(id = "actionBox"), @FindBy(className = "edit")})
     private WebElement editClassLink;
+
+    @FindBy(css = "#actionBox .action.deleteData")
+    private WebElement deleteAllEntriesLink;
+
+    @FindBy(css = "#actionBox .action.delete")
+    private WebElement deleteApplicationLink;
 
     /**
      * The live table used to browse application data.
@@ -99,6 +106,18 @@ public class ApplicationHomePage extends ViewPage
     public boolean hasEntriesLiveTable()
     {
         return getDriver().findElements(By.className("xwiki-livetable")).size() > 0;
+    }
+
+    public ConfirmationPage clickDeleteAllEntries()
+    {
+        this.deleteAllEntriesLink.click();
+        return new ConfirmationPage();
+    }
+
+    public ConfirmationPage clickDeleteApplication()
+    {
+        this.deleteApplicationLink.click();
+        return new ConfirmationPage();
     }
 
     @SuppressWarnings("unchecked")

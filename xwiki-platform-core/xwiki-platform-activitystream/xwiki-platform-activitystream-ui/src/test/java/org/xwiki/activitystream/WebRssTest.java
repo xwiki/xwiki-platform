@@ -81,7 +81,7 @@ public class WebRssTest extends PageTest
 
         FeedPlugin plugin = new FeedPlugin("feed", FeedPlugin.class.getName(), context);
         FeedPluginApi pluginApi = new FeedPluginApi(plugin, context);
-        when(xwiki.getPluginApi("feed", context)).thenReturn(pluginApi);
+        doReturn(pluginApi).when(xwiki).getPluginApi("feed", context);
 
         // Render the page to test
         String xml = renderPage(new DocumentReference("xwiki", "Main", "WebRss"));

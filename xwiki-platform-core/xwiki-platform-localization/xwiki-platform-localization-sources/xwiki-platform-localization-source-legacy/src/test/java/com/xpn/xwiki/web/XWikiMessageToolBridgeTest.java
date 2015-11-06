@@ -77,14 +77,14 @@ public class XWikiMessageToolBridgeTest
             "XWikiPreferences"));
         preferencesDocument.addXObject(preferencesObject);
         preferencesDocument.setSyntax(Syntax.PLAIN_1_0);
-        this.oldcore.getMockXWiki().saveDocument(preferencesDocument, "", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(preferencesDocument, "", this.oldcore.getXWikiContext());
 
         this.defaultWikiTranslationReference =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "Translations");
 
         XWikiDocument defaultWikiTranslation = new XWikiDocument(this.defaultWikiTranslationReference);
         defaultWikiTranslation.setSyntax(Syntax.PLAIN_1_0);
-        this.oldcore.getMockXWiki().saveDocument(defaultWikiTranslation, "", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(defaultWikiTranslation, "", this.oldcore.getXWikiContext());
 
         // MessageTool
 
@@ -96,20 +96,20 @@ public class XWikiMessageToolBridgeTest
     private void setBundles(String bundles) throws XWikiException
     {
         XWikiDocument preferencesDocument =
-            this.oldcore.getMockXWiki().getDocument(this.preferencesDocumentReference, this.oldcore.getXWikiContext());
+            this.oldcore.getSpyXWiki().getDocument(this.preferencesDocumentReference, this.oldcore.getXWikiContext());
         BaseObject preferencesObject = preferencesDocument.getXObject();
 
         if (!bundles.equals(preferencesObject.getStringValue("documentBundles"))) {
             preferencesObject.setStringValue("documentBundles", bundles);
 
-            this.oldcore.getMockXWiki().saveDocument(preferencesDocument, "", this.oldcore.getXWikiContext());
+            this.oldcore.getSpyXWiki().saveDocument(preferencesDocument, "", this.oldcore.getXWikiContext());
         }
     }
 
     private void addWikiTranslation(String key, String message, Locale locale) throws XWikiException
     {
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(this.defaultWikiTranslationReference,
+            this.oldcore.getSpyXWiki().getDocument(this.defaultWikiTranslationReference,
                 this.oldcore.getXWikiContext());
 
         if (!locale.equals(Locale.ROOT)) {
@@ -132,15 +132,15 @@ public class XWikiMessageToolBridgeTest
 
         document.setContent(builder.toString());
 
-        this.oldcore.getMockXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
 
         setBundles(document.getFullName());
     }
 
     private void deleteWikiTranslation() throws XWikiException
     {
-        this.oldcore.getMockXWiki().deleteAllDocuments(
-            this.oldcore.getMockXWiki().getDocument(this.defaultWikiTranslationReference,
+        this.oldcore.getSpyXWiki().deleteAllDocuments(
+            this.oldcore.getSpyXWiki().getDocument(this.defaultWikiTranslationReference,
                 this.oldcore.getXWikiContext()), this.oldcore.getXWikiContext());
     }
 
@@ -241,7 +241,7 @@ public class XWikiMessageToolBridgeTest
                 "OtherTranslations"));
         otherWikiTranslation.setSyntax(Syntax.PLAIN_1_0);
         otherWikiTranslation.setContent("wiki.othertranslation=Other translation");
-        this.oldcore.getMockXWiki().saveDocument(otherWikiTranslation, "", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(otherWikiTranslation, "", this.oldcore.getXWikiContext());
 
         setBundles(" " + otherWikiTranslation.getFullName());
 
@@ -272,7 +272,7 @@ public class XWikiMessageToolBridgeTest
         Assert.assertEquals("Language", this.tool.get("language"));
 
         XWikiDocument defaultWikiTranslation =
-            this.oldcore.getMockXWiki().getDocument(this.defaultWikiTranslationReference,
+            this.oldcore.getSpyXWiki().getDocument(this.defaultWikiTranslationReference,
                 this.oldcore.getXWikiContext());
         defaultWikiTranslation.setDefaultLocale(Locale.FRENCH);
 

@@ -56,7 +56,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.user1
 
         XWikiDocument userDocument =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user1"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user1"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(userDocument.isNew());
@@ -80,7 +80,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.user2
 
         userDocument =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user2"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user2"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(userDocument.isNew());
@@ -104,7 +104,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.group1
 
         XWikiDocument groupDocument =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group1"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group1"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(groupDocument.isNew());
@@ -117,7 +117,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.group2
 
         groupDocument =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(groupDocument.isNew());
@@ -128,7 +128,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.emptygroup
 
         groupDocument =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "emptygroup"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "emptygroup"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(groupDocument.isNew());
@@ -150,7 +150,7 @@ public class UserInstanceOutputFilterStreamTest extends AbstractInstanceFilterSt
         // XWiki.user
 
         XWikiDocument userDocument =
-            this.oldcore.getMockXWiki().getDocument(
+            this.oldcore.getSpyXWiki().getDocument(
                 new DocumentReference("wiki", "XWiki", "user"),
                 this.oldcore.getXWikiContext());
 

@@ -74,9 +74,6 @@ public class ExportActionTest
         // Make the current user have programming rights
         when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
 
-        // Use the Wiki Filters implementation
-        when(oldcore.getMockXWiki().ParamAsLong("xwiki.action.export.xar.usefilter", 1)).thenReturn(1L);
-
         // Register some mock resolver to resolve passed page references
         when(oldcore.getMockStore().searchDocumentsNames("where doc.fullName like ?", Arrays.asList("Space.%"),
             context)).thenReturn(Arrays.asList("Space.Page1", "Space.Page2"));

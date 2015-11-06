@@ -66,20 +66,28 @@ import static org.mockito.Mockito.*;
 @ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class})
 public class SolrQueryExecutorTest
 {
-    private static final String   ITERABLE_PARAM_NAME = "multiParam";
+    private static final String ITERABLE_PARAM_NAME = "multiParam";
+
     private static final String[] ITERABLE_PARAM_EXPECTED = {"value1", "value2"};
+
     private static final Iterable<String> ITERABLE_PARAM_VALUE = Arrays.asList(ITERABLE_PARAM_EXPECTED);
 
-    private static final String   INT_ARR_PARAM_NAME = "intArrayParam";
-    private static final String[] INT_ARR_PARAM_EXPECTED = {"-42", "4711"};
-    private static final int[]    INT_ARR_PARAM_VALUE = {-42, 4711};
+    private static final String INT_ARR_PARAM_NAME = "intArrayParam";
 
-    private static final String   STR_ARR_PARAM_NAME = "stringArrayParam";
+    private static final String[] INT_ARR_PARAM_EXPECTED = {"-42", "4711"};
+
+    private static final int[] INT_ARR_PARAM_VALUE = {-42, 4711};
+
+    private static final String STR_ARR_PARAM_NAME = "stringArrayParam";
+
     private static final String[] STR_ARR_PARAM_EXPECTED = {"valueA", "valueB"};
+
     private static final String[] STR_ARR_PARAM_VALUE = STR_ARR_PARAM_EXPECTED;
 
     private static final String SINGLE_PARAM_NAME = "singleParam";
+
     private static final Object SINGLE_PARAM_VALUE = new Object();
+
     private static final Object SINGLE_PARAM_EXPECTED = SINGLE_PARAM_VALUE.toString();
 
     public final MockitoComponentMockingRule<QueryExecutor> componentManager =
@@ -109,14 +117,16 @@ public class SolrQueryExecutorTest
     @Test
     public void testMultiValuedQueryArgs() throws Exception
     {
-        when(solr.query(any(SolrQuery.class))).then(new Answer<Object>() {
+        when(solr.query(any(SolrQuery.class))).then(new Answer<Object>()
+        {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
                 SolrQuery solrQuery = (SolrQuery) invocation.getArguments()[0];
 
                 Assert.assertArrayEquals(ITERABLE_PARAM_EXPECTED, solrQuery.getParams(ITERABLE_PARAM_NAME));
-                Assert.assertArrayEquals(INT_ARR_PARAM_EXPECTED,  solrQuery.getParams(INT_ARR_PARAM_NAME));
-                Assert.assertArrayEquals(STR_ARR_PARAM_EXPECTED,  solrQuery.getParams(STR_ARR_PARAM_NAME));
+                Assert.assertArrayEquals(INT_ARR_PARAM_EXPECTED, solrQuery.getParams(INT_ARR_PARAM_NAME));
+                Assert.assertArrayEquals(STR_ARR_PARAM_EXPECTED, solrQuery.getParams(STR_ARR_PARAM_NAME));
                 Assert.assertEquals(SINGLE_PARAM_EXPECTED, solrQuery.get(SINGLE_PARAM_NAME));
 
                 // Check that the default list of supported locales is taken from the wiki configuration.
@@ -130,16 +140,16 @@ public class SolrQueryExecutorTest
 
         DefaultQuery query = new DefaultQuery("TestQuery", null);
         query.bindValue(ITERABLE_PARAM_NAME, ITERABLE_PARAM_VALUE);
-        query.bindValue(INT_ARR_PARAM_NAME,  INT_ARR_PARAM_VALUE);
-        query.bindValue(STR_ARR_PARAM_NAME,  STR_ARR_PARAM_VALUE);
-        query.bindValue(SINGLE_PARAM_NAME,   SINGLE_PARAM_VALUE);
+        query.bindValue(INT_ARR_PARAM_NAME, INT_ARR_PARAM_VALUE);
+        query.bindValue(STR_ARR_PARAM_NAME, STR_ARR_PARAM_VALUE);
+        query.bindValue(SINGLE_PARAM_NAME, SINGLE_PARAM_VALUE);
 
         // The default list of supported locales should be taken from the wiki configuration.
         XWikiContext xcontext = this.oldCore.getXWikiContext();
-        when(this.oldCore.getMockXWiki().getAvailableLocales(xcontext)).thenReturn(
-            Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN));
+        doReturn(Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN)).when(this.oldCore.getSpyXWiki())
+            .getAvailableLocales(xcontext);
 
-        componentManager.getComponentUnderTest().execute(query);
+        this.componentManager.getComponentUnderTest().execute(query);
     }
 
     @Test

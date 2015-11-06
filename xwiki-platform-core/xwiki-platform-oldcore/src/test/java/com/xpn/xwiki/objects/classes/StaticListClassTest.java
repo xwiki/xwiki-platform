@@ -34,7 +34,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for {@link StaticListClass}.
@@ -65,8 +65,8 @@ public class StaticListClassTest
         assertEquals("Default order was not preserved.", "[a, c, d, b]",
             listClass.getList(this.oldcore.getXWikiContext()).toString());
         listClass.setSort("id");
-        assertEquals("Items were not ordered by ID.", "[a, b, c, d]", listClass.getList(this.oldcore.getXWikiContext())
-            .toString());
+        assertEquals("Items were not ordered by ID.", "[a, b, c, d]",
+            listClass.getList(this.oldcore.getXWikiContext()).toString());
         listClass.setSort("value");
         assertEquals("Items were not ordered by value.", "[a, b, d, c]",
             listClass.getList(this.oldcore.getXWikiContext()).toString());
@@ -144,12 +144,11 @@ public class StaticListClassTest
     @Test
     public void testDisplayEditSelect()
     {
-        String expectedHTML =
-            "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
-                + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
-                + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"
-                + "<option value='x&#123;y&#38;z' label='z&#38;y&#123;x'>z&#38;y&#123;x</option>"
-                + "</select><input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>";
+        String expectedHTML = "<select id='w&#62;vb&#38;a&#60;r' name='w&#62;vb&#38;a&#60;r' size='7'>"
+            + "<option value='a&#60;b&#62;c' label='c&#62;b&#60;a'>c&#62;b&#60;a</option>"
+            + "<option selected='selected' value='1&#34;2&#39;3' label='3&#39;2&#34;1'>3&#39;2&#34;1</option>"
+            + "<option value='x&#123;y&#38;z' label='z&#38;y&#123;x'>z&#38;y&#123;x</option>"
+            + "</select><input name='w&#62;vb&#38;a&#60;r' type='hidden' value=''/>";
         testDisplayEdit("select", Arrays.asList(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)), expectedHTML);
     }
 
@@ -207,8 +206,9 @@ public class StaticListClassTest
         BaseObject object = new BaseObject();
         object.addField(propertyName, listProperty);
 
-        assertEquals("<input id='f&#60;o&#38;o' value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' "
-            + "name='f&#60;o&#38;o' type='hidden'/>",
+        assertEquals(
+            "<input id='f&#60;o&#38;o' value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' "
+                + "name='f&#60;o&#38;o' type='hidden'/>",
             new StaticListClass().displayHidden(propertyName, "", object, null));
     }
 
@@ -244,12 +244,12 @@ public class StaticListClassTest
 
         staticListClass.setDisplayType("input");
         staticListClass.setPicker(true);
-        when(this.oldcore.getMockXWiki().getURL("Main.WebHome", "view", this.oldcore.getXWikiContext())).thenReturn(
-            "/xwiki/bin/view/Main/WebHome");
+        doReturn("/xwiki/bin/view/Main/WebHome").when(this.oldcore.getSpyXWiki()).getURL("Main.WebHome", "view",
+            this.oldcore.getXWikiContext());
         String output = staticListClass.displayEdit(propertyName, prefix, object, this.oldcore.getXWikiContext());
         System.err.println(output);
-        assertTrue(output
-            .contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"
+        assertTrue(
+            output.contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"
                 + "classname=ClassSpace.ClassName&#38;fieldname=b&#38;a&#60;r&#38;firCol=-&#38;"
                 + "secCol=-&#38;&#34;, varname:&#34;input&#34;} )"));
     }

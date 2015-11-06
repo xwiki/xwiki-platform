@@ -43,6 +43,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,9 +85,8 @@ public class XWikiAuthServiceImplTest
     @Test
     public void testAuthenticateWithSuperAdminWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        Principal principal =
-            this.authService
-                .authenticate(XWikiRightService.SUPERADMIN_USER, "whatever", this.oldcore.getXWikiContext());
+        Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "whatever",
+            this.oldcore.getXWikiContext());
 
         assertNull(principal);
     }
@@ -98,9 +98,8 @@ public class XWikiAuthServiceImplTest
     @Test
     public void testAuthenticateWithSuperAdminPrefixedWithXWikiWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        Principal principal =
-            this.authService.authenticate(XWikiRightService.SUPERADMIN_USER_FULLNAME, "whatever",
-                this.oldcore.getXWikiContext());
+        Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER_FULLNAME, "whatever",
+            this.oldcore.getXWikiContext());
 
         assertNull(principal);
     }
@@ -108,9 +107,8 @@ public class XWikiAuthServiceImplTest
     @Test
     public void testAuthenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        Principal principal =
-            this.authService.authenticate(" " + XWikiRightService.SUPERADMIN_USER + " ", "whatever",
-                this.oldcore.getXWikiContext());
+        Principal principal = this.authService.authenticate(" " + XWikiRightService.SUPERADMIN_USER + " ", "whatever",
+            this.oldcore.getXWikiContext());
 
         assertNull(principal);
     }
@@ -123,9 +121,8 @@ public class XWikiAuthServiceImplTest
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword", "pass");
 
-        Principal principal =
-            this.authService.authenticate(XWikiRightService.SUPERADMIN_USER.toUpperCase(), "pass",
-                this.oldcore.getXWikiContext());
+        Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER.toUpperCase(), "pass",
+            this.oldcore.getXWikiContext());
 
         assertNotNull(principal);
         assertEquals(XWikiRightService.SUPERADMIN_USER_FULLNAME, principal.getName());
@@ -143,7 +140,7 @@ public class XWikiAuthServiceImplTest
         mockUserObj.setStringValue("password", "pass");
 
         // Save the user
-        this.oldcore.getMockXWiki().saveDocument(userDoc, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(userDoc, this.oldcore.getXWikiContext());
 
         // Finally run the test: Using xwiki:Admin should correctly authenticate the Admin user
         Principal principal = this.authService.authenticate("xwiki:SomeUser", "pass", this.oldcore.getXWikiContext());
@@ -166,7 +163,7 @@ public class XWikiAuthServiceImplTest
         mockUserObj.setStringValue("password", "admin");
 
         // Save the user
-        this.oldcore.getMockXWiki().saveDocument(userDocLocal, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(userDocLocal, this.oldcore.getXWikiContext());
 
         // Run the test: Using XWiki.Admin should correctly authenticate the Admin user
         Principal principalLocal =
@@ -187,34 +184,28 @@ public class XWikiAuthServiceImplTest
     @Test
     public void testStripContextPathFromURLWithSlashAfter() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("xwiki/");
+        doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
-        assertEquals(
-            "/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"),
-                this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService
+            .stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), this.oldcore.getXWikiContext()));
     }
 
     @Test
     public void testStripContextPathFromURLWhenRootContextPathWithSlash() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("/");
+        doReturn("/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
-        assertEquals(
-            "/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
-                this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
+            this.oldcore.getXWikiContext()));
     }
 
     @Test
     public void testStripContextPathFromURLWhenRootContextPathWithoutSlash() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("");
+        doReturn("").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
-        assertEquals(
-            "/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
-                this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
+            this.oldcore.getXWikiContext()));
     }
 
     /**
@@ -223,44 +214,40 @@ public class XWikiAuthServiceImplTest
     @Test
     public void testStripContextPathFromURLWhenOutBoundRewriteRuleChangingContextPath() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("xwiki/");
+        doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
-        when(xwikiResponse.encodeURL(anyString())).thenReturn(
-            "http://localhost:8080/anothercontext;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en");
+        when(xwikiResponse.encodeURL(anyString()))
+            .thenReturn("http://localhost:8080/anothercontext;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en");
         this.oldcore.getXWikiContext().setResponse(xwikiResponse);
 
         // Note: the passed URL to stripContextPathFromURL() has also gone through encodeURL() which is why its
         // context path has been changed from "xwiki" to "anothercontext".
-        assertEquals("/something", this.authService.stripContextPathFromURL(new URL(
-            "http://localhost:8080/anothercontext/something"), this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService.stripContextPathFromURL(
+            new URL("http://localhost:8080/anothercontext/something"), this.oldcore.getXWikiContext()));
     }
 
     @Test
     public void testStripContextPathFromURLWithSlashBefore() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("xwiki/");
+        doReturn("xwiki/").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
-        assertEquals(
-            "/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"),
-                this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService
+            .stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), this.oldcore.getXWikiContext()));
     }
 
     @Test
     public void testStripContextPathFromURLWhenRootWebAppAndJSessionId() throws Exception
     {
-        when(this.oldcore.getMockXWiki().getWebAppPath(any(XWikiContext.class))).thenReturn("");
+        doReturn("").when(this.oldcore.getSpyXWiki()).getWebAppPath(any(XWikiContext.class));
 
         // Simulate a rewrite filter that would add a jsession id and add a leading slash!
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
-        when(xwikiResponse.encodeURL("http://localhost:8080")).thenReturn(
-            "http://localhost:8080/;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F");
+        when(xwikiResponse.encodeURL("http://localhost:8080"))
+            .thenReturn("http://localhost:8080/;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F");
         this.oldcore.getXWikiContext().setResponse(xwikiResponse);
 
-        assertEquals(
-            "/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
-                this.oldcore.getXWikiContext()));
+        assertEquals("/something", this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"),
+            this.oldcore.getXWikiContext()));
     }
 }

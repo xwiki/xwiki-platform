@@ -63,7 +63,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         importFromXML("document1", outputProperties);
 
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(document.isNew());
@@ -165,7 +165,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         importFromXML("documentwithunexistingobjectproperty", outputProperties);
 
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(document.isNew());
@@ -195,7 +195,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         importFromXML("documentwithnumberversion", outputProperties);
 
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(document.isNew());
@@ -219,7 +219,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         importFromXML("documentwithnumberversion", outputProperties);
 
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(document.isNew());
@@ -239,7 +239,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         importFromXML("documentwithattachmentwithoutdate", outputProperties);
 
         XWikiDocument document =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(document.isNew());

@@ -103,24 +103,24 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
             "last_name=sn,first_name=givenName,fullname=cn,email=mail,listfield=description");
 
         // Add a list field to user class
-        this.mocker.getMockXWiki().getUserClass(this.mocker.getXWikiContext());
+        this.mocker.getSpyXWiki().getUserClass(this.mocker.getXWikiContext());
         XWikiDocument userDocument =
-            this.mocker.getMockXWiki().getDocument(USER_XCLASS_REFERENCE, this.mocker.getXWikiContext());
+            this.mocker.getSpyXWiki().getDocument(USER_XCLASS_REFERENCE, this.mocker.getXWikiContext());
         BaseClass userClass = userDocument.getXClass();
         userClass.addStaticListField("listfield", "List field", 30, true, "");
-        this.mocker.getMockXWiki().saveDocument(userDocument, this.mocker.getXWikiContext());
+        this.mocker.getSpyXWiki().saveDocument(userDocument, this.mocker.getXWikiContext());
 
         this.ldapAuth = new XWikiLDAPAuthServiceImpl();
     }
 
     private XWikiDocument getDocument(String name) throws XWikiException
     {
-        return this.mocker.getMockXWiki().getDocument(name, this.mocker.getXWikiContext());
+        return this.mocker.getSpyXWiki().getDocument(name, this.mocker.getXWikiContext());
     }
 
     private void saveDocument(XWikiDocument document) throws XWikiException
     {
-        this.mocker.getMockXWiki().saveDocument(document, this.mocker.getXWikiContext());
+        this.mocker.getSpyXWiki().saveDocument(document, this.mocker.getXWikiContext());
     }
 
     private void assertAuthenticate(String login, String password, String storedDn) throws XWikiException
@@ -257,7 +257,7 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
     @Test
     public void testAuthenticateWhenNonLDAPUserAlreadyExists() throws XWikiException
     {
-        this.mocker.getMockXWiki().createEmptyUser(LDAPTestSetup.HORATIOHORNBLOWER_CN, "edit",
+        this.mocker.getSpyXWiki().createEmptyUser(LDAPTestSetup.HORATIOHORNBLOWER_CN, "edit",
             this.mocker.getXWikiContext());
 
         assertAuthenticate(LDAPTestSetup.HORATIOHORNBLOWER_CN, LDAPTestSetup.HORATIOHORNBLOWER_PWD,

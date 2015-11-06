@@ -51,6 +51,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -126,7 +127,7 @@ public class DownloadActionTest
         this.document = new XWikiDocument(this.documentReference);
         this.oldcore.getXWikiContext().setDoc(this.document);
 
-        when(this.oldcore.getMockXWiki().getPluginManager()).thenReturn(pluginManager);
+        doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
         when(this.ec.getMimeType("file.txt")).thenReturn("text/plain");
         when(this.response.getOutputStream()).thenReturn(this.out);
         when(

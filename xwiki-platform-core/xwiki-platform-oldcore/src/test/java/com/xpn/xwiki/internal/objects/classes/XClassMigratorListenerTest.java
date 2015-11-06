@@ -111,7 +111,7 @@ public class XClassMigratorListenerTest
         this.xclassDocument.getXClass().addTextField("property", "property", 30);
         saveXClassDocument();
         this.xobjectDocument.setStringValue(this.xclassDocument.getDocumentReference(), "property", "42");
-        this.oldcore.getMockXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
 
         // Modify the class
         this.xclassDocument.getXClass().removeField("property");
@@ -120,7 +120,7 @@ public class XClassMigratorListenerTest
 
         // Verify the document has been modified
         this.xobjectDocument =
-            this.oldcore.getMockXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
+            this.oldcore.getSpyXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
                 this.oldcore.getXWikiContext());
 
         assertEquals(42, ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference())
@@ -129,9 +129,9 @@ public class XClassMigratorListenerTest
 
     private void saveXClassDocument() throws XWikiException
     {
-        this.oldcore.getMockXWiki().saveDocument(this.xclassDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.xclassDocument, this.oldcore.getXWikiContext());
         this.xclassDocument =
-            this.oldcore.getMockXWiki().getDocument(this.xclassDocument.getDocumentReference(),
+            this.oldcore.getSpyXWiki().getDocument(this.xclassDocument.getDocumentReference(),
                 this.oldcore.getXWikiContext());
     }
 }

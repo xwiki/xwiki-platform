@@ -92,7 +92,7 @@ public class WikiMacrosTest
         this.macroObject.setStringValue("visibility", "Current Wiki");
 
         // Save wiki macro
-        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
 
         Macro testMacro = getWikiComponentManager().getInstance(Macro.class, "macroid");
 
@@ -118,7 +118,7 @@ public class WikiMacrosTest
         this.macroDocument.setAuthorReference(user1);
 
         // Save wiki macro
-        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
 
         // Try to lookup the macro
         this.oldcore.getXWikiContext().setUserReference(user1);
@@ -133,7 +133,7 @@ public class WikiMacrosTest
         this.macroDocument.setAuthorReference(user2);
 
         // Save wiki macro
-        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
 
         // Try to lookup the macro
         this.oldcore.getXWikiContext().setUserReference(user2);

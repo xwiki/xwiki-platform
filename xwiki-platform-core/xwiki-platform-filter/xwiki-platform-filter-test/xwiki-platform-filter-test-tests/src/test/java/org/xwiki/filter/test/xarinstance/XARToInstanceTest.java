@@ -136,7 +136,7 @@ public class XARToInstanceTest
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "space", "page2");
 
         // Force save to fail
-        doThrow(XWikiException.class).when(this.oldcore.getMockXWiki()).saveDocument(
+        doThrow(XWikiException.class).when(this.oldcore.getSpyXWiki()).saveDocument(
             OldcoreMatchers.isDocument(pageReference), Matchers.<String>any(), eq(false), Matchers.<XWikiContext>any());
 
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
@@ -156,14 +156,14 @@ public class XARToInstanceTest
         assertTrue("Unexpected log " + this.logger.getMessage(0),
             this.logger.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR));
 
-        assertTrue(this.oldcore.getMockXWiki().getDocument(pageReference, this.oldcore.getXWikiContext()).isNew());
+        assertTrue(this.oldcore.getSpyXWiki().getDocument(pageReference, this.oldcore.getXWikiContext()).isNew());
 
         // Page2
 
         assertTrue("Unexpected log " + this.logger.getMessage(1),
             this.logger.getMarker(1).contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED));
 
-        XWikiDocument page2 = this.oldcore.getMockXWiki().getDocument(page2Reference, this.oldcore.getXWikiContext());
+        XWikiDocument page2 = this.oldcore.getSpyXWiki().getDocument(page2Reference, this.oldcore.getXWikiContext());
 
         assertFalse(page2.isNew());
     }

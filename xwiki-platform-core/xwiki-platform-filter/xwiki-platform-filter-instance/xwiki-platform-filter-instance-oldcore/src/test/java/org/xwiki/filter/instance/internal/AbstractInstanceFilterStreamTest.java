@@ -28,7 +28,6 @@ import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.mockito.Mockito;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.filterxml.input.FilterXMLInputProperties;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
@@ -42,8 +41,10 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Base class to validate an instance sub {@link OutputInstanceFilterStream}.
@@ -65,18 +66,16 @@ public class AbstractInstanceFilterStreamTest
     @Before
     public void before() throws Exception
     {
-        this.xmlInputFilterStreamFactory =
-            this.oldcore.getMocker().getInstance(InputFilterStreamFactory.class, FilterStreamType.FILTER_XML.serialize());
-        this.outputFilterStreamFactory =
-            this.oldcore.getMocker().getInstance(OutputFilterStreamFactory.class,
-                FilterStreamType.XWIKI_INSTANCE.serialize());
+        this.xmlInputFilterStreamFactory = this.oldcore.getMocker().getInstance(InputFilterStreamFactory.class,
+            FilterStreamType.FILTER_XML.serialize());
+        this.outputFilterStreamFactory = this.oldcore.getMocker().getInstance(OutputFilterStreamFactory.class,
+            FilterStreamType.XWIKI_INSTANCE.serialize());
 
         this.oldcore.getXWikiContext().setWikiId("wiki");
 
         // XWiki
 
-        Mockito.when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(Mockito.any(XWikiContext.class))).thenReturn(
-            true);
+        doReturn(true).when(this.oldcore.getSpyXWiki()).hasAttachmentRecycleBin(anyXWikiContext());
     }
 
     protected void importFromXML(String resource) throws FilterException
@@ -84,15 +83,15 @@ public class AbstractInstanceFilterStreamTest
         importFromXML(resource, null);
     }
 
-    protected void importFromXML(String resource, InstanceOutputProperties instanceProperties)
-        throws FilterException
+    protected void importFromXML(String resource, InstanceOutputProperties instanceProperties) throws FilterException
     {
         if (instanceProperties == null) {
             instanceProperties = new InstanceOutputProperties();
             instanceProperties.setVerbose(false);
         }
 
-        OutputFilterStream outputFilterStream = this.outputFilterStreamFactory.createOutputFilterStream(instanceProperties);
+        OutputFilterStream outputFilterStream =
+            this.outputFilterStreamFactory.createOutputFilterStream(instanceProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");
 

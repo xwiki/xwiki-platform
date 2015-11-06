@@ -52,7 +52,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -84,13 +83,11 @@ import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiDocument;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -111,7 +108,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     private XWikiContext context;
 
-    private XWiki mockXWiki;
+    private XWiki spyXWiki;
 
     protected File permanentDirectory;
 
@@ -226,19 +223,19 @@ public class MockitoOldcoreRule implements MethodRule
         this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
-        this.mockXWiki = mock(XWiki.class);
-        getXWikiContext().setWiki(this.mockXWiki);
+        this.spyXWiki = spy(new XWiki());
+        getXWikiContext().setWiki(this.spyXWiki);
 
         this.mockHibernateStore = mock(XWikiHibernateStore.class);
         this.mockVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockRightService = mock(XWikiRightService.class);
         this.mockGroupService = mock(XWikiGroupService.class);
 
-        when(mockXWiki.getStore()).thenReturn(this.mockHibernateStore);
-        when(mockXWiki.getHibernateStore()).thenReturn(this.mockHibernateStore);
-        when(mockXWiki.getVersioningStore()).thenReturn(this.mockVersioningStore);
-        when(mockXWiki.getRightService()).thenReturn(this.mockRightService);
-        when(mockXWiki.getGroupService(getXWikiContext())).thenReturn(this.mockGroupService);
+        doReturn(this.mockHibernateStore).when(this.spyXWiki).getStore();
+        doReturn(this.mockHibernateStore).when(this.spyXWiki).getHibernateStore();
+        doReturn(this.mockVersioningStore).when(this.spyXWiki).getVersioningStore();
+        doReturn(this.mockRightService).when(this.spyXWiki).getRightService();
+        doReturn(this.mockGroupService).when(this.spyXWiki).getGroupService(getXWikiContext());
 
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());
@@ -373,65 +370,58 @@ public class MockitoOldcoreRule implements MethodRule
 
         // XWiki
 
-        when(getMockXWiki().getLanguagePreference(anyXWikiContext())).thenReturn("en");
-        when(getMockXWiki().getSectionEditingDepth()).thenReturn(2L);
-        when(getMockXWiki().getEncoding()).thenReturn("UTF-8");
-        when(getMockXWiki().getDefaultDocumentSyntax()).thenCallRealMethod();
+        doReturn("en").when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
 
-        when(getMockXWiki().getDocument(anyXWikiDocument(), anyString(), anyXWikiContext()))
-            .then(new Answer<XWikiDocument>()
+        doAnswer(new Answer<XWikiDocument>()
+        {
+            @Override
+            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument doc = invocation.getArgumentAt(0, XWikiDocument.class);
-                    String revision = invocation.getArgumentAt(1, String.class);
+                XWikiDocument doc = invocation.getArgumentAt(0, XWikiDocument.class);
+                String revision = invocation.getArgumentAt(1, String.class);
 
-                    if (StringUtils.equals(revision, doc.getVersion())) {
-                        return doc;
-                    }
-
-                    // TODO: implement version store mocking
-                    return new XWikiDocument(doc.getDocumentReference());
+                if (StringUtils.equals(revision, doc.getVersion())) {
+                    return doc;
                 }
-            });
-        when(getMockXWiki().getDocument(any(DocumentReference.class), anyXWikiContext()))
-            .then(new Answer<XWikiDocument>()
+
+                // TODO: implement version store mocking
+                return new XWikiDocument(doc.getDocumentReference());
+            }
+        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), anyString(), anyXWikiContext());
+        doAnswer(new Answer<XWikiDocument>()
+        {
+            @Override
+            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    DocumentReference target = invocation.getArgumentAt(0, DocumentReference.class);
+                DocumentReference target = invocation.getArgumentAt(0, DocumentReference.class);
 
-                    if (target.getLocale() == null) {
-                        target = new DocumentReference(target, Locale.ROOT);
-                    }
-
-                    XWikiDocument document = documents.get(target);
-
-                    if (document == null) {
-                        document = new XWikiDocument(target, target.getLocale());
-                        document.setSyntax(Syntax.PLAIN_1_0);
-                        document.setOriginalDocument(document.clone());
-                    }
-
-                    return document;
+                if (target.getLocale() == null) {
+                    target = new DocumentReference(target, Locale.ROOT);
                 }
-            });
-        when(getMockXWiki().getDocument(anyXWikiDocument(), any(XWikiContext.class))).then(new Answer<XWikiDocument>()
+
+                XWikiDocument document = documents.get(target);
+
+                if (document == null) {
+                    document = new XWikiDocument(target, target.getLocale());
+                    document.setSyntax(Syntax.PLAIN_1_0);
+                    document.setOriginalDocument(document.clone());
+                }
+
+                return document;
+            }
+        }).when(getSpyXWiki()).getDocument(any(DocumentReference.class), anyXWikiContext());
+        doAnswer(new Answer<XWikiDocument>()
         {
             @Override
             public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
                 XWikiDocument target = invocation.getArgumentAt(0, XWikiDocument.class);
 
-                return getMockXWiki().getDocument(target.getDocumentReferenceWithLocale(),
+                return getSpyXWiki().getDocument(target.getDocumentReferenceWithLocale(),
                     invocation.getArgumentAt(1, XWikiContext.class));
             }
-        });
-        when(getMockXWiki().getDocument(any(EntityReference.class), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().getDocument(anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().exists(any(DocumentReference.class), anyXWikiContext())).then(new Answer<Boolean>()
+        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(XWikiContext.class));
+        doAnswer(new Answer<Boolean>()
         {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable
@@ -444,8 +434,7 @@ public class MockitoOldcoreRule implements MethodRule
 
                 return documents.containsKey(target);
             }
-        });
-        when(getMockXWiki().exists(anyString(), anyXWikiContext())).thenCallRealMethod();
+        }).when(getSpyXWiki()).exists(any(DocumentReference.class), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -487,7 +476,7 @@ public class MockitoOldcoreRule implements MethodRule
 
                 XWikiDocument originalDocument = document.getOriginalDocument();
                 if (originalDocument == null) {
-                    originalDocument = mockXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
+                    originalDocument = spyXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
                     document.setOriginalDocument(originalDocument);
                 }
 
@@ -512,9 +501,7 @@ public class MockitoOldcoreRule implements MethodRule
 
                 return null;
             }
-        }).when(getMockXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
-        doCallRealMethod().when(getMockXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyXWikiContext());
-        doCallRealMethod().when(getMockXWiki()).saveDocument(anyXWikiDocument(), anyXWikiContext());
+        }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -531,7 +518,7 @@ public class MockitoOldcoreRule implements MethodRule
 
                 return null;
             }
-        }).when(getMockXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+        }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -539,11 +526,11 @@ public class MockitoOldcoreRule implements MethodRule
             {
                 XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
-                mockXWiki.deleteDocument(document, true, context);
+                spyXWiki.deleteDocument(document, true, context);
 
                 return null;
             }
-        }).when(getMockXWiki()).deleteDocument(anyXWikiDocument(), anyXWikiContext());
+        }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -556,16 +543,15 @@ public class MockitoOldcoreRule implements MethodRule
                 List<Locale> locales = document.getTranslationLocales(context);
 
                 for (Locale locale : locales) {
-                    XWikiDocument translation =
-                        mockXWiki.getDocument(new DocumentReference(reference, locale), context);
-                    mockXWiki.deleteDocument(translation, context);
+                    XWikiDocument translation = spyXWiki.getDocument(new DocumentReference(reference, locale), context);
+                    spyXWiki.deleteDocument(translation, context);
                 }
 
-                mockXWiki.deleteDocument(document, context);
+                spyXWiki.deleteDocument(document, context);
 
                 return null;
             }
-        }).when(getMockXWiki()).deleteAllDocuments(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+        }).when(getSpyXWiki()).deleteAllDocuments(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -573,41 +559,28 @@ public class MockitoOldcoreRule implements MethodRule
             {
                 XWikiDocument document = invocation.getArgumentAt(0, XWikiDocument.class);
 
-                mockXWiki.deleteAllDocuments(document, true, context);
+                spyXWiki.deleteAllDocuments(document, true, context);
 
                 return null;
             }
-        }).when(getMockXWiki()).deleteAllDocuments(anyXWikiDocument(), anyXWikiContext());
-        when(getMockXWiki().getXClass(any(DocumentReference.class), anyXWikiContext())).then(new Answer<BaseClass>()
+        }).when(getSpyXWiki()).deleteAllDocuments(anyXWikiDocument(), anyXWikiContext());
+        doAnswer(new Answer<BaseClass>()
         {
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
             {
-                return getMockXWiki().getDocument((DocumentReference) invocation.getArguments()[0],
+                return getSpyXWiki().getDocument((DocumentReference) invocation.getArguments()[0],
                     invocation.getArgumentAt(1, XWikiContext.class)).getXClass();
             }
-        });
-        when(getMockXWiki().getLanguagePreference(anyXWikiContext())).then(new Answer<String>()
+        }).when(getSpyXWiki()).getXClass(any(DocumentReference.class), anyXWikiContext());
+        doAnswer(new Answer<String>()
         {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable
             {
                 return getXWikiContext().getLanguage();
             }
-        });
-        when(getMockXWiki().getConfig()).thenCallRealMethod();
-        when(getMockXWiki().Param(anyString(), anyString())).thenCallRealMethod();
-        when(getMockXWiki().Param(anyString())).thenCallRealMethod();
-        when(getMockXWiki().ParamAsLong(anyString())).thenCallRealMethod();
-        when(getMockXWiki().ParamAsLong(anyString(), anyLong())).thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreference(anyString(), anyString(), anyString(), anyXWikiContext()))
-            .thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreference(anyString(), anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreference(anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreferenceAsInt(anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreferenceAsInt(anyString(), anyInt(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().getXWikiPreferenceAsInt(anyString(), anyString(), anyInt(), anyXWikiContext()))
-            .thenCallRealMethod();
+        }).when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
 
         // XWikiStoreInterface
 
@@ -636,21 +609,21 @@ public class MockitoOldcoreRule implements MethodRule
             @Override
             public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                return getMockXWiki().getDocument(invocation.getArgumentAt(0, XWikiDocument.class),
+                return getSpyXWiki().getDocument(invocation.getArgumentAt(0, XWikiDocument.class),
                     invocation.getArgumentAt(1, XWikiContext.class));
             }
         });
 
         // Users
 
-        when(getMockXWiki().getUserClass(anyXWikiContext())).then(new Answer<BaseClass>()
+        doAnswer(new Answer<BaseClass>()
         {
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
             {
                 XWikiContext xcontext = invocation.getArgumentAt(0, XWikiContext.class);
 
-                XWikiDocument userDocument = getMockXWiki()
+                XWikiDocument userDocument = getSpyXWiki()
                     .getDocument(new DocumentReference(USER_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
 
                 final BaseClass userClass = userDocument.getXClass();
@@ -666,20 +639,20 @@ public class MockitoOldcoreRule implements MethodRule
                     userClass.addTextField("phone", "Phone", 30);
                     userClass.addTextAreaField("address", "Address", 40, 3);
 
-                    getMockXWiki().saveDocument(userDocument, xcontext);
+                    getSpyXWiki().saveDocument(userDocument, xcontext);
                 }
 
                 return userClass;
             }
-        });
-        when(getMockXWiki().getGroupClass(anyXWikiContext())).then(new Answer<BaseClass>()
+        }).when(getSpyXWiki()).getUserClass(anyXWikiContext());
+        doAnswer(new Answer<BaseClass>()
         {
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
             {
                 XWikiContext xcontext = invocation.getArgumentAt(0, XWikiContext.class);
 
-                XWikiDocument groupDocument = getMockXWiki()
+                XWikiDocument groupDocument = getSpyXWiki()
                     .getDocument(new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
 
                 final BaseClass groupClass = groupDocument.getXClass();
@@ -687,19 +660,12 @@ public class MockitoOldcoreRule implements MethodRule
                 if (groupDocument.isNew()) {
                     groupClass.addTextField("member", "Member", 30);
 
-                    getMockXWiki().saveDocument(groupDocument, xcontext);
+                    getSpyXWiki().saveDocument(groupDocument, xcontext);
                 }
 
                 return groupClass;
             }
-        });
-        when(getMockXWiki().createUser(anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().createUser(anyBoolean(), anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().createUser(anyString(), anyMap(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().createUser(anyString(), anyMap(), anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().createUser(anyString(), anyMap(), any(EntityReference.class), anyString(),
-            any(Syntax.class), anyString(), anyXWikiContext())).thenCallRealMethod();
-        when(getMockXWiki().createEmptyUser(anyString(), anyString(), anyXWikiContext())).thenCallRealMethod();
+        }).when(getSpyXWiki()).getGroupClass(anyXWikiContext());
 
         // Query Manager
         // If there's already a Query Manager registered, use it instead.
@@ -762,9 +728,9 @@ public class MockitoOldcoreRule implements MethodRule
         return this.context;
     }
 
-    public XWiki getMockXWiki()
+    public XWiki getSpyXWiki()
     {
-        return this.mockXWiki;
+        return this.spyXWiki;
     }
 
     public File getPermanentDirectory()

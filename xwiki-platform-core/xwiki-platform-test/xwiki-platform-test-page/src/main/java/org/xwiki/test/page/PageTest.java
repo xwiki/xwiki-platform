@@ -193,7 +193,7 @@ public class PageTest
     {
         // Configure mocks from OldcoreRule
         context = oldcore.getXWikiContext();
-        xwiki = oldcore.getMockXWiki();
+        xwiki = oldcore.getSpyXWiki();
 
         // We need this one because some component in its init creates a query...
         when(oldcore.getQueryManager().createQuery(any(String.class), any(String.class))).thenReturn(mock(Query.class));

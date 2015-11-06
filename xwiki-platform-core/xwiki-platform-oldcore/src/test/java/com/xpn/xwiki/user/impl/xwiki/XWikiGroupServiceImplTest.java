@@ -36,7 +36,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 @ReferenceComponentList
 public class XWikiGroupServiceImplTest
@@ -59,23 +59,23 @@ public class XWikiGroupServiceImplTest
     {
         this.groupService = new XWikiGroupServiceImpl();
 
-        when(this.oldcore.getMockXWiki().getMaxRecursiveSpaceChecks(any(XWikiContext.class))).thenReturn(0);
+        doReturn(0).when(this.oldcore.getSpyXWiki()).getMaxRecursiveSpaceChecks(any(XWikiContext.class));
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
         this.user.newXObject(new DocumentReference("wiki", "XWiki", "XWikiUser"), this.oldcore.getXWikiContext());
-        this.oldcore.getMockXWiki().saveDocument(this.user, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.user, this.oldcore.getXWikiContext());
 
         this.userWithSpaces = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user with spaces"));
         this.userWithSpaces.newXObject(new DocumentReference("wiki", "XWiki", "XWikiUser"),
             this.oldcore.getXWikiContext());
-        this.oldcore.getMockXWiki().saveDocument(this.userWithSpaces, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.userWithSpaces, this.oldcore.getXWikiContext());
 
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
         this.groupObject =
             this.group
                 .newXObject(new DocumentReference("wiki", "XWiki", "XWikiGroups"), this.oldcore.getXWikiContext());
         this.groupObject.setStringValue("member", this.user.getFullName());
-        this.oldcore.getMockXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
 
         this.oldcore.getXWikiContext().setWikiId("wiki");
     }
@@ -89,7 +89,7 @@ public class XWikiGroupServiceImplTest
                 this.oldcore.getXWikiContext())));
 
         this.groupObject.setStringValue("member", this.userWithSpaces.getFullName());
-        this.oldcore.getMockXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.group, this.oldcore.getXWikiContext());
 
         assertEquals(new HashSet<String>(Arrays.asList(this.userWithSpaces.getFullName())), new HashSet<String>(
             this.groupService.listMemberForGroup(this.group.getFullName(), this.oldcore.getXWikiContext())));

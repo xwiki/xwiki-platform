@@ -51,6 +51,7 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import org.junit.Assert;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,14 +82,13 @@ public class DocumentTranslationBundleFactoryTest
         this.oldcore.getXWikiContext().setMainXWiki("xwiki");
         this.oldcore.getXWikiContext().setWikiId("xwiki");
 
-        when(
-            this.oldcore.getMockXWiki().getCurrentContentSyntaxId(Mockito.any(String.class),
-                Mockito.any(XWikiContext.class))).thenReturn("plain/1.0");
+        doReturn("plain/1.0").when(this.oldcore.getSpyXWiki()).getCurrentContentSyntaxId(Mockito.any(String.class),
+            Mockito.any(XWikiContext.class));
 
         this.mockQuery = mock(Query.class);
 
-        when(this.mockQueryManager.createQuery(Mockito.any(String.class), Mockito.any(String.class))).thenReturn(
-            this.mockQuery);
+        when(this.mockQueryManager.createQuery(Mockito.any(String.class), Mockito.any(String.class)))
+            .thenReturn(this.mockQuery);
         when(this.mockQuery.execute()).thenReturn(Collections.EMPTY_LIST);
 
         when(this.mockWikiDescriptorManager.getMainWikiId()).thenReturn(this.oldcore.getXWikiContext().getMainXWiki());
@@ -115,20 +115,20 @@ public class DocumentTranslationBundleFactoryTest
     private void addTranslation(String key, String message, DocumentReference reference, Locale locale, Scope scope)
         throws XWikiException
     {
-        XWikiDocument document = this.oldcore.getMockXWiki().getDocument(reference, this.oldcore.getXWikiContext());
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(reference, this.oldcore.getXWikiContext());
 
         if (document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE) == null) {
             BaseObject translationObject = new BaseObject();
-            translationObject.setXClassReference(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(),
-                "XWiki", "TranslationDocumentClass"));
+            translationObject.setXClassReference(
+                new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "TranslationDocumentClass"));
             if (scope != null) {
-                translationObject
-                    .setStringValue(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE, scope.toString());
+                translationObject.setStringValue(TranslationDocumentModel.TRANSLATIONCLASS_PROP_SCOPE,
+                    scope.toString());
             }
             document.addXObject(translationObject);
 
             if (!locale.equals(Locale.ROOT)) {
-                this.oldcore.getMockXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
+                this.oldcore.getSpyXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
             }
         }
 
@@ -152,7 +152,7 @@ public class DocumentTranslationBundleFactoryTest
 
         document.setContent(builder.toString());
 
-        this.oldcore.getMockXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, "", this.oldcore.getXWikiContext());
     }
 
     private void assertTranslation(String key, String message, Locale locale)
@@ -179,8 +179,9 @@ public class DocumentTranslationBundleFactoryTest
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
-        addTranslation("wiki.translation", "Wiki translation", new DocumentReference(this.oldcore.getXWikiContext()
-            .getWikiId(), "space", "translation"), Locale.ROOT, Scope.WIKI);
+        addTranslation("wiki.translation", "Wiki translation",
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "space", "translation"), Locale.ROOT,
+            Scope.WIKI);
 
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
@@ -195,8 +196,8 @@ public class DocumentTranslationBundleFactoryTest
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
-        addTranslation("wiki.translation", "Wiki translation", new DocumentReference("otherwiki", "space",
-            "translation"), Locale.ROOT, Scope.WIKI);
+        addTranslation("wiki.translation", "Wiki translation",
+            new DocumentReference("otherwiki", "space", "translation"), Locale.ROOT, Scope.WIKI);
 
         assertTranslation("wiki.translation", null, Locale.ROOT);
 

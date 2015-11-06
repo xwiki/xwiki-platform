@@ -54,7 +54,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.velocity.VelocityManager;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -78,6 +77,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -151,7 +151,7 @@ public class XWikiDocumentMockitoTest
         this.baseObject2 = this.baseObject.clone();
         this.document.addXObject(this.baseObject2);
 
-        this.oldcore.getMockXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         this.defaultEntityReferenceSerializer =
             this.oldcore.getMocker().getInstance(EntityReferenceSerializer.TYPE_STRING);
@@ -216,9 +216,8 @@ public class XWikiDocumentMockitoTest
 
         this.document.setLocale(Locale.US);
         XWikiDocument defaultTranslation = new XWikiDocument(this.document.getDocumentReference());
-        when(
-            this.oldcore.getMockXWiki().getDocument(this.document.getDocumentReference(),
-                this.oldcore.getXWikiContext())).thenReturn(defaultTranslation);
+        doReturn(defaultTranslation).when(this.oldcore.getSpyXWiki()).getDocument(this.document.getDocumentReference(),
+            this.oldcore.getXWikiContext());
 
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
@@ -323,11 +322,10 @@ public class XWikiDocumentMockitoTest
     public void readObjectsFromForm() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.oldcore.getMockXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         MockitoComponentManagerRule mocker = this.oldcore.getMocker();
-        XWiki wiki = this.oldcore.getMockXWiki();
         XWikiContext context = this.oldcore.getXWikiContext();
         DocumentReferenceResolver<String> documentReferenceResolverString =
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -373,11 +371,10 @@ public class XWikiDocumentMockitoTest
     public void readObjectsFromFormUpdateOrCreate() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.oldcore.getMockXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         MockitoComponentManagerRule mocker = this.oldcore.getMocker();
-        XWiki wiki = this.oldcore.getMockXWiki();
         XWikiContext context = this.oldcore.getXWikiContext();
         DocumentReferenceResolver<String> documentReferenceResolverString =
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -392,19 +389,21 @@ public class XWikiDocumentMockitoTest
 
         when(request.getParameterMap()).thenReturn(parameters);
         when(documentReferenceResolverString.resolve("space.page")).thenReturn(this.document.getDocumentReference());
-        when(documentReferenceResolverString.resolve("InvalidSpace.InvalidPage")).thenReturn(
-            new DocumentReference("wiki", "InvalidSpace", "InvalidPage"));
+        when(documentReferenceResolverString.resolve("InvalidSpace.InvalidPage"))
+            .thenReturn(new DocumentReference("wiki", "InvalidSpace", "InvalidPage"));
         // This entity resolver with this 'resolve' method is used in
         // <BaseCollection>.getXClassReference()
         when(documentReferenceResolverEntity.resolve(any(EntityReference.class), any(DocumentReference.class)))
             .thenReturn(this.document.getDocumentReference());
-        when(wiki.getDocument(this.document.getDocumentReference(), context)).thenReturn(this.document);
+        doReturn(this.document).when(this.oldcore.getSpyXWiki()).getDocument(this.document.getDocumentReference(),
+            context);
 
         eform.setRequest(request);
         this.document.readObjectsFromFormUpdateOrCreate(eform, context);
 
         assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
-        assertEquals("bloublou", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals("bloublou",
+            this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
         assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
@@ -414,8 +413,8 @@ public class XWikiDocumentMockitoTest
         assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
         assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
-        assertEquals("bloublou", this.document.getXObject(baseClass.getDocumentReference(), 42)
-            .getStringValue("string"));
+        assertEquals("bloublou",
+            this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
     }
 
@@ -595,10 +594,10 @@ public class XWikiDocumentMockitoTest
         tagDocument.setFullName(XWikiConstant.TAG_CLASS);
         BaseClass tagClass = tagDocument.getXClass();
         tagClass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
-        this.oldcore.getMockXWiki().saveDocument(tagDocument, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(tagDocument, this.oldcore.getXWikiContext());
 
         XWikiDocument doc = new XWikiDocument(new DocumentReference("test", "test", "document"));
-        when(this.oldcore.getMockXWiki().getEncoding()).thenReturn("iso-8859-1");
+        doReturn("iso-8859-1").when(this.oldcore.getSpyXWiki()).getEncoding();
 
         BaseObject object1 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
         BaseObject object2 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
@@ -633,9 +632,10 @@ public class XWikiDocumentMockitoTest
     {
         Assert.assertSame(this.baseObject, this.document.getXObject(this.baseObject.getReference()));
 
-        Assert.assertSame(this.baseObject, this.document.getXObject(new ObjectReference(
-            this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()), this.document
-                .getDocumentReference())));
+        Assert.assertSame(this.baseObject,
+            this.document.getXObject(new ObjectReference(
+                this.defaultEntityReferenceSerializer.serialize(this.baseObject.getXClassReference()),
+                this.document.getDocumentReference())));
     }
 
     @Test
@@ -1074,7 +1074,7 @@ public class XWikiDocumentMockitoTest
         template.setTitle("Enter title here");
         template.setSyntax(Syntax.XWIKI_2_0);
         template.setContent("Enter content here");
-        this.oldcore.getMockXWiki().saveDocument(template, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(template, this.oldcore.getXWikiContext());
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
         target.readFromTemplate(template.getDocumentReference(), this.oldcore.getXWikiContext());
@@ -1169,9 +1169,8 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(1, targetDoc.getXObjects().size());
         assertEquals(0, targetDoc.getXObjectSize(CLASS_REFERENCE));
-        DocumentReference classReference =
-            CLASS_REFERENCE.replaceParent(CLASS_REFERENCE.getWikiReference(), targetDoc.getDocumentReference()
-                .getWikiReference());
+        DocumentReference classReference = CLASS_REFERENCE.replaceParent(CLASS_REFERENCE.getWikiReference(),
+            targetDoc.getDocumentReference().getWikiReference());
         assertEquals(2, targetDoc.getXObjectSize(classReference));
 
         // Try to merge the objects again.
@@ -1248,9 +1247,8 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testRelativeObjectReferencesAfterDocumentCopy() throws Exception
     {
-        XWikiDocument copy =
-            this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument copy = this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
+            this.oldcore.getXWikiContext());
 
         // Verify that the XObject's XClass reference points to the target wiki and not the old wiki.
         // This tests the XObject cache.
@@ -1268,9 +1266,8 @@ public class XWikiDocumentMockitoTest
     {
         this.document.getXClass().setCustomMapping("internal");
 
-        XWikiDocument copy =
-            this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
-                this.oldcore.getXWikiContext());
+        XWikiDocument copy = this.document.copyDocument(new DocumentReference("copywiki", "copyspace", "copypage"),
+            this.oldcore.getXWikiContext());
 
         assertEquals("", copy.getXClass().getCustomMapping());
     }
@@ -1346,8 +1343,8 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
     {
-        copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "page1"), "page1", new DocumentReference(
-            "wiki2", "space2", "page2"), "page2");
+        copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "page1"), "page1",
+            new DocumentReference("wiki2", "space2", "page2"), "page2");
 
         copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "WebHome"), "space1",
             new DocumentReference("wiki2", "space2", "page2"), "page2");
@@ -1374,21 +1371,20 @@ public class XWikiDocumentMockitoTest
         this.document.setValidationScript("validationScript");
         this.baseClass.setValidationScript("validationScript");
 
-        when(this.oldcore.getMockXWiki().parseGroovyFromPage("validationScript", this.oldcore.getXWikiContext()))
-            .thenReturn(new XWikiValidationInterface()
+        doReturn(new XWikiValidationInterface()
+        {
+            @Override
+            public boolean validateObject(BaseObject object, XWikiContext context)
             {
-                @Override
-                public boolean validateObject(BaseObject object, XWikiContext context)
-                {
-                    return true;
-                }
+                return true;
+            }
 
-                @Override
-                public boolean validateDocument(XWikiDocument doc, XWikiContext context)
-                {
-                    return true;
-                }
-            });
+            @Override
+            public boolean validateDocument(XWikiDocument doc, XWikiContext context)
+            {
+                return true;
+            }
+        }).when(this.oldcore.getSpyXWiki()).parseGroovyFromPage("validationScript", this.oldcore.getXWikiContext());
 
         // With PR
 
@@ -1396,9 +1392,9 @@ public class XWikiDocumentMockitoTest
         assertTrue(this.baseClass.validateObject(this.baseObject, this.oldcore.getXWikiContext()));
 
         // Without PR
-        
-        doThrow(AccessDeniedException.class).when(this.oldcore.getMockContextualAuthorizationManager()).checkAccess(
-            Right.PROGRAM, new DocumentReference("wiki", "space", "validationScript"));
+
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockContextualAuthorizationManager())
+            .checkAccess(Right.PROGRAM, new DocumentReference("wiki", "space", "validationScript"));
 
         assertFalse(this.document.validate(this.oldcore.getXWikiContext()));
         assertFalse(this.baseClass.validateObject(this.baseObject, this.oldcore.getXWikiContext()));

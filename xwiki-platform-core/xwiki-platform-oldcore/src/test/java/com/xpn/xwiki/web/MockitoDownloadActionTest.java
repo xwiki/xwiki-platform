@@ -98,7 +98,7 @@ public class MockitoDownloadActionTest
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
         when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
-        when(this.oldcore.getMockXWiki().getPluginManager()).thenReturn(pluginManager);
+        doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
 
         // Set the Response
         XWikiResponse response = mock(XWikiResponse.class);
@@ -165,13 +165,13 @@ public class MockitoDownloadActionTest
         when(attachment.clone()).thenReturn(attachment);
 
         // Configure an existing doc in the store
-        XWiki xwiki = this.oldcore.getMockXWiki();
+        XWiki xwiki = this.oldcore.getSpyXWiki();
         XWikiDocument backwardCompatDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         backwardCompatDocument.addAttachment(attachment);
         xwiki.saveDocument(backwardCompatDocument, xcontext);
 
         // Make sure the user has permission to access the doc
-        when(xwiki.checkAccess(eq("download"), any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(true);
+        doReturn(true).when(xwiki).checkAccess(eq("download"), any(XWikiDocument.class), any(XWikiContext.class));
 
         // Setup ExecutionContextManager & VelocityManager using in the context backup
         ExecutionContextManager ecm = this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
@@ -182,7 +182,7 @@ public class MockitoDownloadActionTest
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
         when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
-        when(this.oldcore.getMockXWiki().getPluginManager()).thenReturn(pluginManager);
+        doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
 
         assertNull(action.render(xcontext));
 

@@ -738,9 +738,21 @@ public class MockitoOldcoreRule implements MethodRule
         return this.context;
     }
 
+    /**
+     * @since 7.3RC1
+     */
     public XWiki getSpyXWiki()
     {
         return this.spyXWiki;
+    }
+
+    /**
+     * @deprecated since 7.3RC1, use {@link #getSpyXWiki()} instead
+     */
+    @Deprecated
+    public XWiki getMockXWiki()
+    {
+        return getSpyXWiki();
     }
 
     public File getPermanentDirectory()

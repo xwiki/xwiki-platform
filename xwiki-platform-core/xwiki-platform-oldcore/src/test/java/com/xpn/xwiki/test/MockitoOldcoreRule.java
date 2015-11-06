@@ -371,8 +371,6 @@ public class MockitoOldcoreRule implements MethodRule
 
         // XWiki
 
-        doReturn("en").when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
-
         doAnswer(new Answer<XWikiDocument>()
         {
             @Override
@@ -582,6 +580,8 @@ public class MockitoOldcoreRule implements MethodRule
                 return getXWikiContext().getLanguage();
             }
         }).when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
+
+        getXWikiContext().setLocale(Locale.ENGLISH);
 
         // XWikiStoreInterface
 

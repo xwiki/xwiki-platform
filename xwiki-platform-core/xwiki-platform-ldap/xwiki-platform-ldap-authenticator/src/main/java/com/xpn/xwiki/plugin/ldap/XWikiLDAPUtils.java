@@ -1085,13 +1085,16 @@ public class XWikiLDAPUtils
                         List<String> listValue = new ArrayList<>();
                         listValue.add((String) existingValue);
                         listValue.add(lval);
+                        map.put(xattr, listValue);
                     } else if (existingValue instanceof List) {
                         List<String> listValue = (List<String>) existingValue;
                         listValue.add(lval);
+                    } else {
+                        map.put(xattr, lval);
                     }
+                } else {
+                    map.put(xattr, lval);
                 }
-
-                map.put(xattr, lval);
             }
         }
 
@@ -1170,7 +1173,8 @@ public class XWikiLDAPUtils
                     it.remove();
                 }
             } else {
-                Object objValue = ((BaseProperty) userObj.get(key)).getValue();
+                BaseProperty property = (BaseProperty) userObj.get(key);
+                Object objValue = property != null ? ((BaseProperty) userObj.get(key)).getValue() : null;
                 if (objValue != null && objValue.equals(value)) {
                     it.remove();
                 }

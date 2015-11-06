@@ -109,13 +109,13 @@
   #set ($wikiReference = $services.model.createWikiReference($wiki))
   #if ($terminal)
     #set ($spaceReference = $services.model.resolveSpace($localSpaceReference, 'explicit', $wikiReference))
-    #set ($documentReference = $services.model.createEntityReference($name, 'DOCUMENT', $spaceReference))
+    #set ($documentReference = $services.model.createDocumentReference($name, $spaceReference))
   #else
     #set ($parentReference = $wikiReference)
     #if ($localSpaceReference != "")
       #set ($parentReference = $services.model.resolveSpace($localSpaceReference, 'explicit', $wikiReference))
     #end
-    #set ($spaceReference = $services.model.createEntityReference($name, 'SPACE', $parentReference))
+    #set ($spaceReference = $services.model.createSpaceReference($name, $parentReference))
     #set ($documentReference = $services.model.resolveDocument('', 'default', $spaceReference))
   #end
   #set ($documentReference = $services.model.createDocumentReference($documentReference, $locale))

@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -29,7 +28,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -59,9 +57,6 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
     @Named("class")
     protected SheetBinder classSheetBinder;
 
-    @Inject
-    protected Provider<XWikiContext> xcontextProvider;
-
     /**
      * Default constructor.
      */
@@ -81,8 +76,6 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
             needsUpdate = true;
             bclass.setCustomMapping("internal");
         }
-
-        XWikiContext xcontext = this.xcontextProvider.get();
 
         needsUpdate |= bclass.addTextField("parent", "Parent Space", 30);
         needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");

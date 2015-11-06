@@ -144,6 +144,8 @@ public class MockitoOldcoreRule implements MethodRule
 
     private MemoryConfigurationSource wikiConfigurationSource;
 
+    private MemoryConfigurationSource spaceConfigurationSource;
+
     public MockitoOldcoreRule()
     {
         this(new MockitoComponentManagerRule());
@@ -274,6 +276,13 @@ public class MockitoOldcoreRule implements MethodRule
             getMocker().registerComponent(MockConfigurationSource.getDescriptor("wiki"), this.wikiConfigurationSource);
         }
 
+        // Make sure a "space" ConfigurationSource is available
+        if (!getMocker().hasComponent(ConfigurationSource.class, "space")) {
+            this.spaceConfigurationSource = new MockConfigurationSource();
+            getMocker().registerComponent(MockConfigurationSource.getDescriptor("space"), this.spaceConfigurationSource);
+        }
+
+        
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)

@@ -60,6 +60,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -217,11 +218,11 @@ public class PageTest
             eq(context))).thenReturn(true);
 
         // Set up URL Factory
-        when(xwiki.getWebAppPath(context)).thenReturn(XWIKI);
+        doReturn(XWIKI).when(xwiki).getWebAppPath(context);
         context.setURL(new URL("http://localhost:8080/xwiki/bin/Main/WebHome"));
-        when(xwiki.showViewAction(context)).thenReturn(true);
+        doReturn(true).when(xwiki).showViewAction(context);
         context.setURLFactory(new XWikiServletURLFactory(context));
-        when(xwiki.getServletPath(XWIKI, context)).thenReturn("/bin/");
+        doReturn("/bin/").when(xwiki).getServletPath(XWIKI, context);
 
         // All translation return their key as translation values
         LocalizationScriptService lss = mock(LocalizationScriptService.class);

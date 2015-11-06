@@ -494,7 +494,7 @@ public class XWiki implements EventListener
     private ObservationManager getObservationManager()
     {
         if (this.observationManager == null) {
-            this.observationManager = Utils.getComponent((Type) ObservationManager.class);
+            this.observationManager = Utils.getComponent(ObservationManager.class);
         }
 
         return this.observationManager;
@@ -635,7 +635,7 @@ public class XWiki implements EventListener
     private SyntaxFactory getSyntaxFactory()
     {
         if (this.syntaxFactory == null) {
-            this.syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
+            this.syntaxFactory = Utils.getComponent(SyntaxFactory.class);
         }
 
         return this.syntaxFactory;
@@ -644,7 +644,7 @@ public class XWiki implements EventListener
     private ResourceReferenceManager getResourceReferenceManager()
     {
         if (this.resourceReferenceManager == null) {
-            this.resourceReferenceManager = Utils.getComponent((Type) ResourceReferenceManager.class);
+            this.resourceReferenceManager = Utils.getComponent(ResourceReferenceManager.class);
         }
 
         return this.resourceReferenceManager;
@@ -686,7 +686,7 @@ public class XWiki implements EventListener
 
                         if (job.getStatus() == null) {
                             // "Pre-initialize" XWikiStubContextProvider so that XWiki initializer can find one
-                            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class)
+                            Utils.<XWikiStubContextProvider>getComponent(XWikiStubContextProvider.class)
                                 .initialize(context);
 
                             job.startAsync();
@@ -972,7 +972,7 @@ public class XWiki implements EventListener
 
             // "Pre-initialize" XWikiStubContextProvider with a XWikiContext containing a XWiki instance as soon as
             // possible
-            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+            Utils.<XWikiStubContextProvider>getComponent(XWikiStubContextProvider.class).initialize(context);
 
             // Prepare the store
             if (config != null) {
@@ -994,35 +994,33 @@ public class XWiki implements EventListener
             setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
                 "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-            setAttachmentStore(
-                Utils.<XWikiAttachmentStoreInterface>getComponent((Type) XWikiAttachmentStoreInterface.class,
-                    getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
+            setAttachmentStore(Utils.<XWikiAttachmentStoreInterface>getComponent(XWikiAttachmentStoreInterface.class,
+                getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
 
-            setVersioningStore(
-                Utils.<XWikiVersioningStoreInterface>getComponent((Type) XWikiVersioningStoreInterface.class,
-                    getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
+            setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(XWikiVersioningStoreInterface.class,
+                getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
 
             setAttachmentVersioningStore(
-                Utils.<AttachmentVersioningStore>getComponent((Type) AttachmentVersioningStore.class,
+                Utils.<AttachmentVersioningStore>getComponent(AttachmentVersioningStore.class,
                     hasAttachmentVersioning(context)
                         ? getConfiguration().getProperty("xwiki.store.attachment.versioning.hint", "hibernate")
                         : "void"));
 
             if (hasRecycleBin(context)) {
                 setRecycleBinStore(
-                    Utils.<XWikiRecycleBinStoreInterface>getComponent((Type) XWikiRecycleBinStoreInterface.class,
+                    Utils.<XWikiRecycleBinStoreInterface>getComponent(XWikiRecycleBinStoreInterface.class,
                         getConfiguration().getProperty("xwiki.store.recyclebin.hint", "hibernate")));
             }
 
             if (hasAttachmentRecycleBin(context)) {
                 setAttachmentRecycleBinStore(
-                    Utils.<AttachmentRecycleBinStore>getComponent((Type) AttachmentRecycleBinStore.class,
+                    Utils.<AttachmentRecycleBinStore>getComponent(AttachmentRecycleBinStore.class,
                         getConfiguration().getProperty("xwiki.store.attachment.recyclebin.hint", "hibernate")));
             }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
             // potential document changes can use it
-            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+            Utils.<XWikiStubContextProvider>getComponent(XWikiStubContextProvider.class).initialize(context);
 
             getProgress().startStep(this);
 
@@ -1186,9 +1184,7 @@ public class XWiki implements EventListener
                     context.put("initdone", "1");
 
                     // Send event to notify listeners that the subwiki is ready
-                    @SuppressWarnings("deprecation")
-                    ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-                    observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
+                    getObservationManager().notify(new WikiReadyEvent(wikiName), wikiName, context);
                 }
             }
         } finally {
@@ -4130,7 +4126,7 @@ public class XWiki implements EventListener
     {
         int documents = copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
 
-        ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+        ObservationManager om = getObservationManager();
 
         if (om != null) {
             om.notify(new WikiCopiedEvent(sourceWiki, targetWiki), sourceWiki, context);
@@ -6348,7 +6344,7 @@ public class XWiki implements EventListener
         rolledbackDoc.setVersion(tdoc.getVersion());
         rolledbackDoc.setContentDirty(true);
 
-        ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+        ObservationManager om = getObservationManager();
         if (om != null) {
             // Notify listeners about the document that is going to be rolled back.
             // Note that for the moment the event being send is a bridge event, as we are still passing around

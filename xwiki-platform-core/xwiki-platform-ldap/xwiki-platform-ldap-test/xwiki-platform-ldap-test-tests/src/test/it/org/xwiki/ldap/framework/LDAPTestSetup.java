@@ -19,7 +19,9 @@
  */
 package org.xwiki.ldap.framework;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -91,6 +93,8 @@ public class LDAPTestSetup
      * The value of the LDAP mail for user Horatio Hornblower.
      */
     public static final String HORATIOHORNBLOWER_MAIL = "hhornblo@royalnavy.mod.uk";
+
+    public static final List<String> HORATIOHORNBLOWER_DESCRIPTION = Arrays.<String>asList("Capt. Horatio Hornblower, R.N", "value2", "value3");
 
     /**
      * The LDAP DN of user Thomas Quist.

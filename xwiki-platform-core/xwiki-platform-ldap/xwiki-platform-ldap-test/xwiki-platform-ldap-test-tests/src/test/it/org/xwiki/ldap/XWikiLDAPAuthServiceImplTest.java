@@ -35,6 +35,7 @@ import org.xwiki.test.annotation.AllComponents;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
 import com.xpn.xwiki.user.impl.LDAP.LDAPProfileXClass;
 import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
@@ -99,7 +100,15 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.try_local", "0");
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.update_user", "1");
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.fields_mapping",
-            "last_name=sn,first_name=givenName,fullname=cn,email=mail");
+            "last_name=sn,first_name=givenName,fullname=cn,email=mail,listfield=description");
+
+        // Add a list field to user class
+        this.mocker.getMockXWiki().getUserClass(this.mocker.getXWikiContext());
+        XWikiDocument userDocument =
+            this.mocker.getMockXWiki().getDocument(USER_XCLASS_REFERENCE, this.mocker.getXWikiContext());
+        BaseClass userClass = userDocument.getXClass();
+        userClass.addStaticListField("listfield", "List field", 30, true, "");
+        this.mocker.getMockXWiki().saveDocument(userDocument, this.mocker.getXWikiContext());
 
         this.ldapAuth = new XWikiLDAPAuthServiceImpl();
     }
@@ -359,6 +368,7 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
         assertEquals(LDAPTestSetup.HORATIOHORNBLOWER_SN, userProfileObj.getStringValue("last_name"));
         assertEquals(LDAPTestSetup.HORATIOHORNBLOWER_GIVENNAME, userProfileObj.getStringValue("first_name"));
         assertEquals(LDAPTestSetup.HORATIOHORNBLOWER_MAIL, userProfileObj.getStringValue("email"));
+        assertEquals(LDAPTestSetup.HORATIOHORNBLOWER_DESCRIPTION, userProfileObj.getListValue("listfield"));
 
         // Check non mapped properties are not touched
 

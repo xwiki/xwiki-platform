@@ -57,6 +57,8 @@ sn: Hornblower
 uid: hhornblo
 mail: hhornblo@royalnavy.mod.uk
 userpassword: {SHA}nU4eI71bcnBGqeO0t9tXvY1u5oQ=
+description: value2
+description: value3
 
 dn: cn=William Bush,ou=people,o=sevenSeas
 objectclass: person

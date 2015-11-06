@@ -124,7 +124,7 @@ public class XarExtensionHandlerTest
             .initialize(getXWikiContext());
 
         CoreConfiguration coreConfiguration = this.componentManager.getInstance(CoreConfiguration.class);
-        when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.PLAIN_1_0);
+        doReturn(Syntax.PLAIN_1_0).when(coreConfiguration).getDefaultDocumentSyntax();
 
         // lookup
 

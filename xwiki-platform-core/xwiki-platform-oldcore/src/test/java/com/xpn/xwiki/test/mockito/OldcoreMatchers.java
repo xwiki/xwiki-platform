@@ -22,8 +22,10 @@ package com.xpn.xwiki.test.mockito;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 
 /**
@@ -45,5 +47,25 @@ public class OldcoreMatchers
     public static CacheConfiguration isCacheConfiguration(String id)
     {
         return argThat(new CacheConfigurationMatcher(id));
+    }
+
+    /**
+     * Any <code>XWikiContext</code>.
+     * 
+     * @since 7.3RC1
+     */
+    public static XWikiContext anyXWikiContext()
+    {
+        return any(XWikiContext.class);
+    }
+
+    /**
+     * Any <code>XWikiDocument</code>.
+     * 
+     * @since 7.3RC1
+     */
+    public static XWikiDocument anyXWikiDocument()
+    {
+        return any(XWikiDocument.class);
     }
 }

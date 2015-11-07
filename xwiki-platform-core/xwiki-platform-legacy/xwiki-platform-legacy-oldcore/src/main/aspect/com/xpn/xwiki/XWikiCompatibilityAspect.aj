@@ -720,7 +720,7 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public String XWiki.getDocumentNameFromPath(String path, XWikiContext context)
     {
-        return this.localStringEntityReferenceSerializer.serialize(getDocumentReferenceFromPath(path, context));
+        return getLocalStringEntityReferenceSerializer().serialize(getDocumentReferenceFromPath(path, context));
     }
 
     /**
@@ -729,7 +729,7 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public String XWiki.getDocumentName(XWikiRequest request, XWikiContext context)
     {
-        return this.localStringEntityReferenceSerializer.serialize(getDocumentReference(request, context));
+        return getLocalStringEntityReferenceSerializer().serialize(getDocumentReference(request, context));
     }
 
     /**

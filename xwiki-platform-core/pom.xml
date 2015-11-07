@@ -451,6 +451,18 @@
               <method>org.xwiki.rest.model.jaxb.Page getPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean)</method>
               <justification>New URL parameters</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>org.xwiki.model.reference.EntityReferenceSerializer ajc$get$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki)</method>
+              <justification>The initialization of com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer is now deferred until it is first used.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>void ajc$set$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
+              <justification>The initialization of com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer is now deferred until it is first used.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

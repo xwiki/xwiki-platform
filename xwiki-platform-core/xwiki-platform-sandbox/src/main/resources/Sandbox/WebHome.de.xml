@@ -134,7 +134,7 @@ Sie können einfache Tabellen in Ihren Wiki-Seiten erzeugen:
 
 = Links =
 
-Xwiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
+XWiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
 
 * [[WebHome]] -&gt; Link zur Startseite des aktuellen Bereichs
 * [[Startseite Sandkasten&gt;&gt;WebHome]] -&gt; Links können Beschriftungen haben

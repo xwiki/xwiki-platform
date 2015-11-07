@@ -123,6 +123,7 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Le nom d'affichage du wiki.
 platform.wiki.currentwiki.prop.wikiprettyname.label=Nom d'affichage
 platform.wiki.currentwiki.welcome=Bienvenue sur le Wiki {0}{1}{2}.
 platform.wiki.currentwiki.wikiusers.title=Membres du wiki
+platform.wiki.drawer.homeWiki=Accueil
 platform.wiki.panel.title=Informations sur le wiki
 </content>
 </xwikidoc>

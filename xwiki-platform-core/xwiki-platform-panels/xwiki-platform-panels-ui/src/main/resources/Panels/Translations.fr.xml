@@ -47,7 +47,9 @@
 panels._actions=Actions
 panels.available=Liste des Panels
 panels.category=Catégorie
+panels.children.title=Pages enfants
 panels.description=Description
+panels.emptyvalue=\ 
 panels.name=Nom
 panels.type=Type
 </content>

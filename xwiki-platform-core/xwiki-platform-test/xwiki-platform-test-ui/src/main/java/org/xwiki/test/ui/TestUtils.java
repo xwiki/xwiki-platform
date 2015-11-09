@@ -36,6 +36,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -1713,12 +1715,16 @@ public class TestUtils
 
         public static final Map<EntityType, Class<?>> RESOURCES_MAP = new IdentityHashMap<>();
 
+        /**
+         * Used to match number part of the object reference name.
+         */
+        private static final Pattern OBJECT_NAME_PATTERN = Pattern.compile("(\\\\*)\\[(\\d*)\\]$");
+
         static {
             try {
                 // Initialize REST related tools
-                JAXBContext jaxbContext =
-                    JAXBContext.newInstance("org.xwiki.rest.model.jaxb"
-                        + ":org.xwiki.extension.repository.xwiki.model.jaxb");
+                JAXBContext jaxbContext = JAXBContext
+                    .newInstance("org.xwiki.rest.model.jaxb:org.xwiki.extension.repository.xwiki.model.jaxb");
                 marshaller = jaxbContext.createMarshaller();
                 unmarshaller = jaxbContext.createUnmarshaller();
             } catch (JAXBException e) {
@@ -1901,6 +1907,28 @@ public class TestUtils
                     }
 
                     builder.append(this.testUtils.escapeURL(ref.getName()));
+                } else if (ref.getType() == EntityType.OBJECT) {
+                    // The REST API is no in sync with the ObjectReference structure:
+                    // was is a unique name in ObjectReference is two separated class name and index in REST API
+                    String classReferenceStr;
+                    String objectNumberStr;
+
+                    Matcher matcher = OBJECT_NAME_PATTERN.matcher(ref.getName());
+                    if (matcher.find()) {
+                        if (matcher.group(1).length() % 2 == 0) {
+                            classReferenceStr = ref.getName().substring(0, matcher.end(1));
+                            objectNumberStr = matcher.group(2);
+                        } else {
+                            classReferenceStr = ref.getName();
+                            objectNumberStr = null;
+                        }
+                    } else {
+                        classReferenceStr = ref.getName();
+                        objectNumberStr = null;
+                    }
+
+                    elements.add(classReferenceStr);
+                    elements.add(objectNumberStr);
                 } else {
                     elements.add(this.testUtils.escapeURL(ref.getName()));
                 }
@@ -2046,17 +2074,27 @@ public class TestUtils
 
         public boolean exists(EntityReference reference) throws Exception
         {
-            Class<?> resource = RESOURCES_MAP.get(reference.getType());
-
-            if (resource == null) {
-                throw new Exception("Unsuported type [" + reference.getType() + "]");
-            }
-
-            GetMethod getMethod = executeGet(resource, toElements(reference));
+            GetMethod getMethod = executeGet(reference);
 
             getMethod.releaseConnection();
 
             return getMethod.getStatusCode() == Status.OK.getStatusCode();
+        }
+
+        /**
+         * @since 7.3
+         */
+        public <T> T get(EntityReference reference) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(reference), false, STATUS_OK);
+
+            try {
+                try (InputStream stream = getMethod.getResponseBodyAsStream()) {
+                    return toResource(stream);
+                }
+            } finally {
+                getMethod.releaseConnection();
+            }
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
@@ -2077,6 +2115,11 @@ public class TestUtils
             return executePost(resourceUri, restObject, queryParams, elements).getResponseBodyAsStream();
         }
 
+        public <T> T toResource(InputStream is) throws JAXBException
+        {
+            return (T) unmarshaller.unmarshal(is);
+        }
+
         protected InputStream toResourceInputStream(Object restObject) throws JAXBException
         {
             InputStream resourceStream;
@@ -2089,6 +2132,20 @@ public class TestUtils
             }
 
             return resourceStream;
+        }
+
+        /**
+         * @since 7.3
+         */
+        public GetMethod executeGet(EntityReference reference) throws Exception
+        {
+            Class<?> resource = RESOURCES_MAP.get(reference.getType());
+
+            if (resource == null) {
+                throw new Exception("Unsuported type [" + reference.getType() + "]");
+            }
+
+            return executeGet(resource, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception

@@ -535,7 +535,13 @@ public class BasePage extends BaseElement
      */
     public void toggleNotificationsMenu()
     {
+        boolean hasMenu = isNotificationsMenuOpen();
         this.notificationsMenu.click();
+        if (hasMenu) {
+            getDriver().waitUntilElementDisappears(this.notificationsMenu, By.className("dropdown-menu"));
+        } else {
+            getDriver().waitUntilElementIsVisible(this.notificationsMenu, By.className("dropdown-menu"));
+        }
     }
 
     /** 

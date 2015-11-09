@@ -101,14 +101,14 @@ public class TestUtils
     /**
      * @since 5.0M2
      */
-    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("Admin",
-        "admin");
+    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS =
+        new UsernamePasswordCredentials("Admin", "admin");
 
     /**
      * @since 5.1M1
      */
-    public static final UsernamePasswordCredentials SUPER_ADMIN_CREDENTIALS = new UsernamePasswordCredentials(
-        "superadmin", "pass");
+    public static final UsernamePasswordCredentials SUPER_ADMIN_CREDENTIALS =
+        new UsernamePasswordCredentials("superadmin", "pass");
 
     /**
      * @since 5.0M2
@@ -134,8 +134,8 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_OK_NOT_FOUND = new int[] {Status.OK.getStatusCode(),
-        Status.NOT_FOUND.getStatusCode()};
+    public static final int[] STATUS_OK_NOT_FOUND =
+        new int[] {Status.OK.getStatusCode(), Status.NOT_FOUND.getStatusCode()};
 
     /**
      * @since 7.3M1
@@ -150,8 +150,8 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_CREATED_ACCEPTED = new int[] {Status.CREATED.getStatusCode(),
-        Status.ACCEPTED.getStatusCode()};
+    public static final int[] STATUS_CREATED_ACCEPTED =
+        new int[] {Status.CREATED.getStatusCode(), Status.ACCEPTED.getStatusCode()};
 
     /**
      * @since 7.3M1
@@ -1063,7 +1063,8 @@ public class TestUtils
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
+            .size() > 0;
     }
 
     public boolean isInViewMode()
@@ -1523,8 +1524,8 @@ public class TestUtils
     public static void assertStatuses(int actualCode, int... expectedCodes)
     {
         if (!ArrayUtils.contains(expectedCodes, actualCode)) {
-            Assert.fail("Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes)
-                + "]");
+            Assert.fail(
+                "Unexpected code [" + actualCode + "], was expecting one of [" + Arrays.toString(expectedCodes) + "]");
         }
     }
 
@@ -1816,8 +1817,8 @@ public class TestUtils
 
         private String toSpaceElement(String spaceReference)
         {
-            return toSpaceElement(RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE)
-                .getReversedReferenceChain());
+            return toSpaceElement(
+                RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
         }
 
         protected Object[] toElements(Page page)
@@ -2174,10 +2175,9 @@ public class TestUtils
                 builder = getUriBuilder((Class) resourceUri);
             } else {
                 String stringResourceUri = (String) resourceUri;
-                builder =
-                    UriBuilder.fromUri(getBaseURL().substring(0, getBaseURL().length() - 1)).path(
-                        !stringResourceUri.isEmpty() && stringResourceUri.charAt(0) == '/' ? stringResourceUri
-                            .substring(1) : stringResourceUri);
+                builder = UriBuilder.fromUri(getBaseURL().substring(0, getBaseURL().length() - 1))
+                    .path(!stringResourceUri.isEmpty() && stringResourceUri.charAt(0) == '/'
+                        ? stringResourceUri.substring(1) : stringResourceUri);
             }
 
             // Add query parameters

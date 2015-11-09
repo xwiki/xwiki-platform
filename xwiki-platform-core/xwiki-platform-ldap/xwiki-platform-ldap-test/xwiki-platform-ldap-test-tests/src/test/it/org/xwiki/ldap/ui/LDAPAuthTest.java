@@ -22,16 +22,21 @@ package org.xwiki.ldap.ui;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.xwiki.ldap.framework.LDAPRunner;
 import org.xwiki.ldap.framework.LDAPTestSetup;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.ui.AbstractGuestTest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ViewPage;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
@@ -72,6 +77,8 @@ public class LDAPAuthTest extends AbstractGuestTest
     {
         super.setUp();
 
+        getUtil().rest().deletePage("XWiki", "XWikiPreferences");
+
         this.vp = getUtil().gotoPage("Main", "WebHome");
     }
 
@@ -106,19 +113,16 @@ public class LDAPAuthTest extends AbstractGuestTest
 
         // ///////////////////
         // Validate XE-136: log with LDAP user then search for provided user uid/pass
-        getUtil().loginAsSuperAdmin();
+        getUtil().setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
         Page page = getUtil().rest().page(new LocalDocumentReference("XWiki", "XWikiPreferences"));
         org.xwiki.rest.model.jaxb.Object obj = object("XWiki.XWikiPreferences");
-        obj.getProperties().add(property("XWiki.XWikiPreferences_0_ldap_bind_DN", LDAPTestSetup.HORATIOHORNBLOWER_DN));
+        obj.getProperties().add(property("ldap_bind_DN", LDAPTestSetup.HORATIOHORNBLOWER_DN));
+        obj.getProperties().add(property("ldap_bind_pass", LDAPTestSetup.HORATIOHORNBLOWER_PWD));
+        obj.getProperties().add(property("ldap_UID_attr", LDAPTestSetup.LDAP_USERUID_FIELD_UID));
+        obj.getProperties().add(property("fields_mapping", "name=" + LDAPTestSetup.LDAP_USERUID_FIELD_UID
+            + ",last_name=sn,first_name=givenname,fullname=description,email=mail"));
         obj.getProperties()
-            .add(property("XWiki.XWikiPreferences_0_ldap_bind_pass", LDAPTestSetup.HORATIOHORNBLOWER_PWD));
-        obj.getProperties()
-            .add(property("XWiki.XWikiPreferences_0_ldap_UID_attr", LDAPTestSetup.LDAP_USERUID_FIELD_UID));
-        obj.getProperties()
-            .add(property("XWiki.XWikiPreferences_0_ldap_fields_mapping", "name=" + LDAPTestSetup.LDAP_USERUID_FIELD_UID
-                + ",last_name=sn,first_name=givenname,fullname=description,email=mail"));
-        obj.getProperties().add(property("XWiki.XWikiPreferences_0_ldap_group_mapping",
-            "XWiki.XWikiAdminGroup=cn=HMS Lydia,ou=crews,ou=groups,o=sevenSeas"));
+            .add(property("ldap_group_mapping", "XWiki.XWikiAdminGroup=cn=HMS Lydia,ou=crews,ou=groups,o=sevenSeas"));
         page.setObjects(new Objects());
         page.getObjects().getObjectSummaries().add(obj);
         getUtil().rest().save(page);
@@ -132,8 +136,10 @@ public class LDAPAuthTest extends AbstractGuestTest
 
         // ///////////////////
         // Validate XWIKI-2201: LDAP group mapping defined in XWikiPreferences is not working
-        getUtil().gotoPage("XWiki", "XWikiAdminGroup");
-        getDriver().hasElement(By.partialLinkText("XWiki." + LDAPTestSetup.WILLIAMBUSH_UID));
+        getUtil().setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+        Property groupMember = getUtil().rest().get(new ObjectPropertyReference("member",
+            new ObjectReference("XWiki.XWikiGroups[0]", new DocumentReference("xwiki", "XWiki", "XWikiAdminGroup"))));
+        assertEquals("XWiki." + LDAPTestSetup.WILLIAMBUSH_UID, groupMember.getValue());
 
         // ///////////////////
         // Validate

@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.WatchListNotificationsUIX" locale="">
+  <web>XWiki</web>
+  <name>WatchListNotificationsUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1446468725000</creationDate>
+  <parent>XWiki.WatchListMacro</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1447083576000</date>
+  <contentUpdateDate>1447068415000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>XWiki.WatchListNotificationsUIX</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5f5a2c84-f31f-4e63-a7cc-69cf394427c8</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>'use strict';
+## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+#set ($jsExtension = '.min.js')
+#if (!$services.debug.minify)
+  #set ($jsExtension = '.js')
+#end
+///
+/// Start the requirejs config.
+///
+require.config({
+  paths: {
+    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', "js/bootstrap-switch${jsExtension}")'
+  },
+  shim: {
+    'bootstrap-switch' : ['jquery']
+  }
+});
+///
+/// Start the real script
+///
+require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
+  $(document).ready(function () {
+  
+    ///
+    /// Get the watchlist inputs for future usage
+    ///
+    var watchPageSwitch  = $('#tmWatchDocument');
+    var watchSpaceSwitch = $('#tmWatchSpace');
+    var watchWikiSwitch  = $('#tmWatchWiki');
+  
+    ///
+    /// Apply the bootstrap switch plugin to the watchlist inputs
+    ///
+    $('notifications-watchlist-item input').each(function() {
+      var input = $(this);
+      input.bootstrapSwitch('onColor', 'success');
+      input.bootstrapSwitch('offColor', 'danger');
+      input.bootstrapSwitch('onText', 'ON');
+      input.bootstrapSwitch('offText', 'OFF');
+      input.bootstrapSwitch('size', 'small');
+    });
+    
+    ///
+    /// Set the icon corresponding to each switch
+    ///
+    watchPageSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('page'))');
+    watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
+    watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
+    
+    ///
+    /// Add a tooltip to each switch
+    ///
+    $('.bootstrap-switch-id-tmWatchDocument').tooltip({title: 'Watch this page', placement: 'bottom'});
+    $('.bootstrap-switch-id-tmWatchSpace').tooltip({title: 'Watch this page and children', placement: 'bottom'});
+    $('.bootstrap-switch-id-tmWatchWiki').tooltip({title: 'Watch this wiki', placement: 'bottom'});
+    
+    /**
+     * Change the watchlist status of a document/space/wiki.
+     * @param action the action to execute ('adddocument', 'removedocument', 'addspace', 'removespace', 'addwiki'
+     * or 'removewiki').
+     */
+    var changeWatchListStatus = function (action) {
+      var url = XWiki.currentDocument.getURL('get', 'xpage=watch');
+      $.ajax(url, { 'data': { 'do': action } } )
+        .fail (function() {
+          new XWiki.widgets.Notification('Failed to change the status of the WatchList.', 'error');
+        });
+    }
+    
+    ///
+    /// Change the watchlist status when the switched are manipulated by the user
+    ///
+    watchPageSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'adddocument' : 'removedocument');
+    });
+    watchSpaceSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'addspace' : 'removespace');
+    });
+    watchWikiSwitch.bootstrapSwitch('onSwitchChange', function (event, status) {
+      changeWatchListStatus(status ? 'addwiki' : 'removewiki');
+    });
+
+    ///
+    /// Avoid the dropdown menu to be closed when the user click on the bootstrap switch
+    ///
+    $('.bootstrap-switch').click(function(event) {
+      event.stopImmediatePropagation();
+    });
+    
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.WatchListNotificationsUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>9e56d70c-43b0-4008-9cce-ef2db85c0e64</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* TODO: replace with @import statement when XWIKI-12788 is closed. Reason: http://www.stevesouders.com/blog/2009/04/09/dont-use-import/ */
+@import url("$services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css')");
+
+.notifications-watchlist-item {
+  margin: 0;
+  padding: 5px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.notifications-watchlist-item pre {
+  margin: 0;
+}
+
+.notifications-watchlist-item .bootstrap-switch .bootstrap-switch-label {
+  /* TODO: use color theme */
+  background-image: linear-gradient(#FFF, #ECECEC 50%, #DFDFDF);
+}
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.WatchListNotificationsUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>684dc8f1-fa89-4748-b9f0-2e83295dfa22</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #submenuitem()
+##
+## Enable SSX and JSX
+##
+#set ($discard = $xwiki.ssx.use('XWiki.WatchListNotificationsUIX'))
+#set ($discard = $xwiki.jsx.use('XWiki.WatchListNotificationsUIX'))
+##
+## Display the 3 toggle buttons
+##
+&lt;li class="notifications-watchlist-item"&gt;
+  #macro(displayCheckedIfWatched $scope)#if($services.watchlist.isWatched($scope))checked="checked"#end#end
+  &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;
+&lt;/li&gt;
+</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.notifications</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.watchlist.ui.watchlistNotificationUix</name>
+    </property>
+    <property>
+      <parameters>order:10000
+separator:true</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

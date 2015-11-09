@@ -222,58 +222,6 @@
 #macro(diplayOptionsMenu)
   #set ($staticExtensions = [])
   ##
-  ## WATCH /UNWATCH PAGE
-  ## TODO: the watchlist items will be moved afterwards, so we implement them here as static extensions for now,
-  ## but then we have to implement them as regular UIX in the watchlist module.
-  ##
-  #if (!$doc.isNew() && $hasWatch)
-    #set ($watchClasses = '')
-    #set ($unwatchClasses = 'hidden')
-    #if ($services.watchlist.isWatched("DOCUMENT"))
-      #set ($watchClasses = 'hidden')
-      #set ($unwatchClasses = '')
-    #end
-    #define ($watchPage)
-      #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses 'eye-open')
-      #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses 'eye-close')
-    #end
-    #set ($discard = $staticExtensions.add( { 'content': $watchPage, 'order': 10000}))
-  #end
-  ##
-  ## WATCH /UNWATCH SPACE
-  ## TODO: see watch page
-  ##
-  #if ($hasWatch)
-    #set ($watchClasses = '')
-    #set ($unwatchClasses = 'hidden')
-    #if ($services.watchlist.isWatched("SPACE"))
-      #set ($watchClasses = 'hidden')
-      #set ($unwatchClasses = '')
-    #end
-    #define ($watchSpace)
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space') 'tmWatchSpace', $watchClasses, 'eye-open')
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses, 'eye-close')
-    #end
-    #set ($discard = $staticExtensions.add( { 'content': $watchSpace, 'order': 20000}))
-  #end
-  ##
-  ## WATCH /UNWATCH WIKI
-  ## TODO: see watch page
-  ##
-  #if ($hasWatch)
-    #set ($watchClasses = '')
-    #set ($unwatchClasses = 'hidden')
-    #if ($services.watchlist.isWatched("WIKI"))
-      #set ($watchClasses = 'hidden')
-      #set ($unwatchClasses = '')
-    #end
-    #define ($watchWiki)
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.wiki') 'tmWatchWiki', $watchClasses 'eye-open')
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses 'eye-close')
-    #end
-    #set ($discard = $staticExtensions.add( { 'content': $watchWiki, 'order': 30000}))
-  #end
-  ##
   ## EXPORT / PRINT / SOURCE / SHARE
   ##
   #if ($canView)

@@ -411,6 +411,9 @@ Object.extend(XWiki, {
 
   /**
    * Watchlist methods.
+   * 
+   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not 
+   * break the retro-compatibility but we can consider removing it.
    */
   watchlist : {
 
@@ -473,6 +476,15 @@ Object.extend(XWiki, {
 
             if (element.nodeName != 'A') {
               element = $(button).down('A');
+            }
+            
+            if (!element) {
+              // This is supposed to happen every time since the watchlist icons are implemented in the notifications
+              // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a 
+              // custom solution (bootstrap-switch).
+              // For these reasons, we stop the initialization here.
+              // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
+              return;
             }
 
             // unregister previously registered handler if any

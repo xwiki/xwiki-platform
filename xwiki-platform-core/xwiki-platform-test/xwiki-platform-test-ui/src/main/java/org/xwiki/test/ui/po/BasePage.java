@@ -65,7 +65,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmActionDelete")
     private WebElement deletePageLink;
 
-    @FindBy(id = "tmWatchDocument")
+    @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
 
     @FindBy(id = "tmPage")
@@ -86,10 +86,10 @@ public class BasePage extends BaseElement
     @FindBy(id = "document-title")
     private WebElement documentTitle;
 
-    @FindBy(id = "tmWatchSpace")
+    @FindBy(xpath = "//input[@id='tmWatchSpace']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchSpaceLink;
 
-    @FindBy(id = "tmWatchWiki")
+    @FindBy(xpath = "//input[@id='tmWatchWiki']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchWikiLink;
 
     @FindBy(css = "#tmMoreActions a[title='Children']")
@@ -397,7 +397,7 @@ public class BasePage extends BaseElement
      */
     public void watchDocument()
     {
-        toggleActionMenu();
+        toggleNotificationsMenu();
         this.watchDocumentLink.click();
         toggleActionMenu();
     }
@@ -472,9 +472,9 @@ public class BasePage extends BaseElement
      */
     public void watchSpace()
     {
-        toggleActionMenu();
+        toggleNotificationsMenu();
         this.watchSpaceLink.click();
-        toggleActionMenu();
+        toggleNotificationsMenu();
     }
 
     /**
@@ -482,9 +482,9 @@ public class BasePage extends BaseElement
      */
     public void watchWiki()
     {
-        toggleActionMenu();
+        toggleNotificationsMenu();
         this.watchWikiLink.click();
-        toggleActionMenu();
+        toggleNotificationsMenu();
     }
 
     /**

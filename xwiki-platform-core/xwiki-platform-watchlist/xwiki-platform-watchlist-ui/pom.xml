@@ -67,5 +67,20 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Needed to have the notifications menu. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- Needed to have a nice toggle buttons on watchlist notifications area. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-switch</artifactId>
+      <version>3.3.2</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

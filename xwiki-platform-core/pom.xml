@@ -461,7 +461,7 @@
               <differenceType>7002</differenceType>
               <className>com/xpn/xwiki/XWiki</className>
               <method>void ajc$set$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
-              <justification>The initialization of com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer is now deferred until it is first used.</justification>
+              <justification>False positive. AspectJ internal hack.</justification>
             </difference>
           </ignored>
           <excludes>

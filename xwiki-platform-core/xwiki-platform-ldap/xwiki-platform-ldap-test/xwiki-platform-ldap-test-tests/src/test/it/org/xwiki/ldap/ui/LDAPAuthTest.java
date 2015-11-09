@@ -100,7 +100,7 @@ public class LDAPAuthTest extends AbstractGuestTest
 
         // ///////////////////
         // Validate exclusion group
-        LoginPage loginPage = this.vp.login();
+        LoginPage loginPage = LoginPage.gotoPage();
         loginPage.loginAs(LDAPTestSetup.THOMASQUIST_CN, LDAPTestSetup.THOMASQUIST_PWD, true);
         assertFalse(LDAPTestSetup.THOMASQUIST_CN + " user has been authenticated", this.vp.isAuthenticated());
 

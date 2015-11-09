@@ -63,7 +63,7 @@ public class TextPlainTagsReader extends TextPlainReader<Tags>
         Tags tags = objectFactory.createTags();
 
         String text = getEntityAsString(entityStream);
-        String[] tagNames = text.split(" |,|\\|");
+        String[] tagNames = text.split(" |,|\\||\\r?\\n");
 
         for (String tagName : tagNames) {
             Tag tag = objectFactory.createTag();

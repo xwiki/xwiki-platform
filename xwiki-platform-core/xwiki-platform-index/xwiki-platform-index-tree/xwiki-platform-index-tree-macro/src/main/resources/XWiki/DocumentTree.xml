@@ -183,7 +183,7 @@
       </visibility>
     </class>
     <property>
-      <code>{{include reference="DocumentTreeConfig" /}}
+      <code>{{include reference="XWiki.DocumentTreeConfig" /}}
 
 {{velocity}}
 #macro (escapeMacroParam $value)$!value.replaceAll('([~"])', '~$1')#end

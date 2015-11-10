@@ -72,16 +72,6 @@ public class LDAPAuthTest extends AbstractGuestTest
         }
     }
 
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        getUtil().rest().deletePage("XWiki", "XWikiPreferences");
-
-        this.vp = getUtil().gotoPage("Main", "WebHome");
-    }
-
     /**
      * Validate that it tries to log as "common" XWiki login if user is not found in LDAP.
      */

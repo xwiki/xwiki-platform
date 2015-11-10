@@ -76,6 +76,8 @@
       <input type="checkbox" name="terminal" value="true" #if ($sourcePageIsTerminal)checked="checked"#end/>
       $services.localization.render($options.label)
     </label>
+    ## Hidden input used to ensure that an unchecked terminal checkbox means non-terminal and that the default is not used by mistake.
+    <input type="hidden" name="terminal" value="false" />
     <span class="xHint">$services.localization.render($options.hint)</span>
   </dt>
 #end

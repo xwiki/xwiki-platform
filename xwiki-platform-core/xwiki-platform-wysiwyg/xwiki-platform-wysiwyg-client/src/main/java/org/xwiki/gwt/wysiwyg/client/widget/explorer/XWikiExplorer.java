@@ -273,6 +273,11 @@ public class XWikiExplorer extends Widget implements HasDoubleClickNodeHandlers
         // Mark the tree as busy so that the functional tests can wait for it.
         tree.element.attr('aria-busy', true);
 
+        // Clear the finder value. If the specified node is not found then the finder value is set to the node id. This
+        // way the functional tests can detect when the tree is fully loaded: either there is a node selected or the
+        // finder value is not empty.
+        tree.element.prev('.xtree-finder').val('');
+
         var self = this;
         tree.openTo(nodeId, function(node) {
             // The last node in the path may be different than the requested node, e.g. when the target document or

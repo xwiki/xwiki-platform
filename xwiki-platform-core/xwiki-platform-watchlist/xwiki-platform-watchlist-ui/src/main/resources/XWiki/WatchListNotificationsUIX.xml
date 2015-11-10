@@ -157,8 +157,8 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
       var input = $(this);
       input.bootstrapSwitch('onColor', 'success');
       input.bootstrapSwitch('offColor', 'danger');
-      input.bootstrapSwitch('onText', 'ON');
-      input.bootstrapSwitch('offText', 'OFF');
+      input.bootstrapSwitch('onText', '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.on'))');
+      input.bootstrapSwitch('offText', '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.off'))');
       input.bootstrapSwitch('size', 'small');
     });
     
@@ -172,9 +172,18 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
     ///
     /// Add a tooltip to each switch
     ///
-    $('.bootstrap-switch-id-tmWatchDocument').tooltip({title: 'Watch this page', placement: 'bottom'});
-    $('.bootstrap-switch-id-tmWatchSpace').tooltip({title: 'Watch this page and children', placement: 'bottom'});
-    $('.bootstrap-switch-id-tmWatchWiki').tooltip({title: 'Watch this wiki', placement: 'bottom'});
+    $('.bootstrap-switch-id-tmWatchDocument').tooltip({
+      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
+      placement: 'bottom'
+    });
+    $('.bootstrap-switch-id-tmWatchSpace').tooltip({
+      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))',
+      placement: 'bottom'
+    });
+    $('.bootstrap-switch-id-tmWatchWiki').tooltip({
+      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.wiki'))',
+      placement: 'bottom'
+    });
     
     /**
      * Change the watchlist status of a document/space/wiki.
@@ -185,7 +194,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
       var url = XWiki.currentDocument.getURL('get', 'xpage=watch');
       $.ajax(url, { 'data': { 'do': action } } )
         .fail (function() {
-          new XWiki.widgets.Notification('Failed to change the status of the WatchList.', 'error');
+          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('watchlist.notifications.changeStatusError'))', 'error');
         });
     }
     
@@ -319,7 +328,9 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>/* TODO: replace with @import statement when XWIKI-12788 is closed. Reason: http://www.stevesouders.com/blog/2009/04/09/dont-use-import/ */
+      <code>#template('colorThemeInit.vm')
+
+/* TODO: replace with @import statement when XWIKI-12788 is closed. Reason: http://www.stevesouders.com/blog/2009/04/09/dont-use-import/ */
 @import url("$services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css')");
 
 .notifications-watchlist-item {
@@ -334,8 +345,8 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
 }
 
 .notifications-watchlist-item .bootstrap-switch .bootstrap-switch-label {
-  /* TODO: use color theme */
-  background-image: linear-gradient(#FFF, #ECECEC 50%, #DFDFDF);
+  background-image: linear-gradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor 50%);
+  color: $theme.buttonSecondaryTextColor;
 }
 </code>
     </property>
@@ -347,6 +358,137 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
     </property>
     <property>
       <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.WatchListNotificationsUIX</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7070b937-84b5-4289-9737-02578371f5d2</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.notifications-watchlist-item .bootstrap-switch {
+
+  .bootstrap-switch-label {
+    .btn-default;
+    .btn-gradient(lighten(@btn-default-bg, 5%));
+    .btn-border(@btn-default-bg);
+
+    &amp;:hover,
+    &amp;:focus {
+      .btn-gradient(@btn-default-bg);
+      .btn-border(@btn-default-bg);
+    }
+  }
+
+  .bootstrap-switch-handle-off {
+    background-color: @btn-default-bg;
+    color: @btn-default-color;
+  }
+
+}
+</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name>LESS (using bootstrap styles)</name>
+    </property>
+    <property>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -423,18 +565,20 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
     </class>
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #submenuitem()
-##
-## Enable SSX and JSX
-##
-#set ($discard = $xwiki.ssx.use('XWiki.WatchListNotificationsUIX'))
-#set ($discard = $xwiki.jsx.use('XWiki.WatchListNotificationsUIX'))
-##
-## Display the 3 toggle buttons
-##
-&lt;li class="notifications-watchlist-item"&gt;
-  #macro(displayCheckedIfWatched $scope)#if($services.watchlist.isWatched($scope))checked="checked"#end#end
-  &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;
-&lt;/li&gt;
+#if ($hasWatch)
+  ##
+  ## Enable SSX and JSX
+  ##
+  #set ($discard = $xwiki.ssx.use('XWiki.WatchListNotificationsUIX'))
+  #set ($discard = $xwiki.jsx.use('XWiki.WatchListNotificationsUIX'))
+  ##
+  ## Display the 3 toggle buttons
+  ##
+  &lt;li class="notifications-watchlist-item"&gt;
+    #macro(displayCheckedIfWatched $scope)#if($services.watchlist.isWatched($scope))checked="checked"#end#end
+    &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+#end
 </content>
     </property>
     <property>

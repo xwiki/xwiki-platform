@@ -47,7 +47,16 @@ rendering.macro.watchlist.description=Show the content of your current watchlist
 XWiki.WatchListClass_interval_realtime=Realtime
 XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
 XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
-XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly</content>
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
+
+### Notification Icons    
+watchlist.notifications.icons.on=ON
+watchlist.notifications.icons.on=OFF
+watchlist.notifications.icons.tooltip.page=Watch this page
+watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and children
+watchlist.notifications.icons.tooltip.wiki=Watch this wiki
+watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
+  </content>
   <object>
     <name>XWiki.WatchListTranslations</name>
     <number>0</number>

@@ -28,12 +28,11 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1446732984000</creationDate>
-  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1446733949000</date>
   <contentUpdateDate>1446732984000</contentUpdateDate>
-  <parent>Main.WebHome</parent>
+  <parent>XWiki.WebHome</parent>
   <version>1.1</version>
   <title/>
   <comment/>

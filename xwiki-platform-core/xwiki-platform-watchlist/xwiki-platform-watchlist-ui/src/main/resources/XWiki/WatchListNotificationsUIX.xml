@@ -576,7 +576,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
   ##
   &lt;li class="notifications-watchlist-item"&gt;
     #macro(displayCheckedIfWatched $scope)#if($services.watchlist.isWatched($scope))checked="checked"#end#end
-    &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;
+    &lt;pre&gt;&lt;input type="checkbox" id="tmWatchDocument" #displayCheckedIfWatched('DOCUMENT')/&gt; &lt;input type="checkbox" id="tmWatchSpace" #displayCheckedIfWatched('SPACE')/&gt; &lt;input type="checkbox" id="tmWatchWiki" #displayCheckedIfWatched('WIKI')/&gt;&lt;/pre&gt;
   &lt;/li&gt;
 #end
 </content>

@@ -40,6 +40,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
+  <attachment>
+    <filename>logo.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1447169769000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>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</content>
+    <filesize>1955</filesize>
+  </attachment>
   <object>
     <name>FlamingoThemes.Sandstone</name>
     <number>0</number>
@@ -1989,7 +1999,7 @@ input,
       <link-color>#93c54b</link-color>
     </property>
     <property>
-      <logo/>
+      <logo>logo.png</logo>
     </property>
     <property>
       <navbar-default-bg>#4d4c4d</navbar-default-bg>

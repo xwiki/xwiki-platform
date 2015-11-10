@@ -40,6 +40,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
+  <attachment>
+    <filename>logo.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1447169737000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>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</content>
+    <filesize>1732</filesize>
+  </attachment>
   <object>
     <name>FlamingoThemes.Slate</name>
     <number>0</number>
@@ -2247,7 +2257,7 @@ ul.nav.nav-pills.nav-stacked li{
       <link-color>#ffffff</link-color>
     </property>
     <property>
-      <logo/>
+      <logo>logo.png</logo>
     </property>
     <property>
       <navbar-default-bg>#3a3f44</navbar-default-bg>

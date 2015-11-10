@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SuggestSolrMacros" /}}
 
-{{include reference="DocumentTreeConfig" /}}
+{{include reference="XWiki.DocumentTreeConfig" /}}
 
 {{velocity output="false"}}
 #macro (updateDocTreeConfigFromRequest)

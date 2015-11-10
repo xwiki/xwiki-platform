@@ -24,10 +24,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the page breadcrumb.
@@ -81,38 +78,22 @@ public class BreadcrumbElement extends BaseElement
         }
         return result.size() > 0;
     }
-    
+
     public void expand()
     {
         // Remember the id of the container so that we can retrieve it when it will be removed and re-inserted.
         final String containerId = this.container.getAttribute("id");
-        
-        clickPathElement("…");
-        
-        // Expanding the breadcrumb remove the current container and replace it by an updated one (with the full 
-        // hierarchy inside).
-        // So we wait until the container is re-inserted without any "ellipsis" item.
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {   
-                try {
-                    WebElement container = getDriver().findElementById(containerId);
-                    return container != null && !getDriver().hasElementWithoutWaiting(container, By.className("ellipsis"));
-                } catch (StaleElementReferenceException e) {
-                    // Happens when the container is removed between the 2 driver actions (findElementById() and 
-                    // hasElementWithoutWaiting()). It's a race condition.
-                    return false;
-                }
 
-            }
-        });
-        
+        clickPathElement("…");
+
+        // Expanding the breadcrumb remove the current container and replace it by an updated one (with the full
+        // hierarchy inside). So we wait until the container is re-inserted without any "ellipsis" item.
+        getDriver().waitUntilElementDisappears(By.cssSelector("#" + containerId + " .ellipsis"));
+
         // Update the internal reference
         this.container = getDriver().findElementById(containerId);
     }
-    
+
     public boolean canBeExpanded()
     {
         return hasPathElement("…", false, true);

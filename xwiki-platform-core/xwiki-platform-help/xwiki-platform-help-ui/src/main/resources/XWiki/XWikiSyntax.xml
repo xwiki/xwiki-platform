@@ -343,7 +343,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
 #syntaxSwitch()
 (((
 #set ($query = "syntax=$escapetool.url(${crtSyntaxVer})${extraParams}")
-#if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle#{end}#if ($crtCategory) (% class="separator" %)» #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}#{end}#if ($crtSection) (% class="separator" %)» (% class="current" %)${crtSection.name}#end#end
+#if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle#{end}#if ($crtCategory) » #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}#{end}#if ($crtSection) » (% class="current" %)${crtSection.name}#end#end
 )))
 == $syntaxTitle: $sectionName ==
 

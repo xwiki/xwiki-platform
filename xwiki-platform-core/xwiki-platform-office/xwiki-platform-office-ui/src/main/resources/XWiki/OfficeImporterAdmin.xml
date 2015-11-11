@@ -63,6 +63,7 @@
 #set($msgRestart=$services.localization.render('xe.officeimporter.openoffice.actions.restart'))
 #set($msgUpdate=$services.localization.render('xe.officeimporter.openoffice.update'))
 #set($msgLimitedControl=$services.localization.render('xe.officeimporter.openoffice.limitedcontrol'))
+#set ($msgServerPathError = $services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected'))
 #if($hasAdmin)
   #set($currentAction = "$!{request.action}")
   #if($currentAction == "stop" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
@@ -115,7 +116,13 @@
 &lt;dd&gt;#if($services.officemanager.config.autoStart)$msgYes#else$msgNo#end&lt;/dd&gt;
 #if($services.officemanager.config.serverType == 0)
   &lt;dt&gt;&lt;label&gt;$msgServerPath&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;$services.officemanager.config.homePath&lt;/dd&gt;
+  &lt;dd&gt;#set ($homePath = $services.officemanager.config.homePath)
+      #if ("$!homePath" != '')
+        $homePath
+      #else
+        {{error}}$msgServerPathError{{/error}}
+      #end
+  &lt;/dd&gt;
   &lt;dt&gt;&lt;label&gt;$msgServerProfile&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;#if("$!services.officemanager.config.profilePath" == '' &amp;&amp; $services.officemanager.config.profilePath != '')$msgServerProfileDefault#{else}$services.officemanager.config.profilePath#end&lt;/dd&gt;
 #end

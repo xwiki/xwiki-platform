@@ -1395,7 +1395,8 @@ if (htmlElement.readAttribute('data-xwiki-reference') != null) {
   XWiki.Document.currentDocumentReference = XWiki.currentDocument.getDocumentReference();
 }
 XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
-XWiki.Document.ViewURLTemplate = "$xwiki.getURL('__space__.__page__', 'view')";
+// We need a separate template for the view URL because the action name is missing when Short URLs are enabled.
+XWiki.Document.ViewURLTemplate = "$xwiki.getURL('__space__.__page__')";
 XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
 XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
 XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";

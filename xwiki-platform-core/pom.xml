@@ -445,33 +445,11 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/rest/resources/pages/PageResource</className>
-              <method>org.xwiki.rest.model.jaxb.Page getPage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean)</method>
-              <justification>New URL parameters</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>org.xwiki.model.reference.EntityReferenceSerializer ajc$get$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki)</method>
-              <justification>The initialization of com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer is now deferred until it is first used.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>void ajc$set$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
-              <justification>False positive. AspectJ internal hack.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- XMLRPC code has been moved to another module, this is not an API breakage -->
-            <exclude>**/com/xpn/xwiki/xmlrpc/**</exclude>
-            <!-- Old query plugin has been moved to its own deprecated module on contrib -->
-            <exclude>**/com/xpn/xwiki/plugin/query/**</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -23,7 +23,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var form = $('form#create');
     var nameField = form.find('input.location-name-field');
     var parentReferenceField = form.find('input.location-parent-field');
-    var terminalCheckbox = form.find('input[name="terminal"]');
+    var terminalCheckbox = form.find('input[name="tocreate"]');
 
     /**
      * Compute the page name of the target

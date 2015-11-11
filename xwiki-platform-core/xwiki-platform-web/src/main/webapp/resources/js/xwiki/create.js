@@ -20,14 +20,16 @@
 require(['jquery', 'xwiki-meta'], function($, xm) {
   $(document).ready(function() {
 
-    var form = $('#create');
+    var form = $('form#create');
+    var nameField = form.find('input.location-name-field');
+    var parentReferenceField = form.find('input.location-parent-field');
+    var terminalCheckbox = form.find('input[name="terminal"]');
 
     /**
      * Compute the page name of the target
      */
     var computeTargetPageName = function() {
       var documentReference = new XWiki.DocumentReference();
-      var parentReferenceField = $('#ParentReference');
       // Test if the parent reference field exists
       if (parentReferenceField.length > 0) {
         var parentReference = parentReferenceField.val();
@@ -35,16 +37,16 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           // If there is no parent, then the document cannot be terminal.
           // There is a live validation rule for that and it displays the proper error, but we need this check here too
           // to avoid sending the form anyway.
-          if ($('#terminal').prop('checked')) {
+          if (terminalCheckbox.prop('checked')) {
             return false;
           }
-          documentReference = new XWiki.DocumentReference(xm.wiki, $('#Name').val(), 'WebHome');
+          documentReference = new XWiki.DocumentReference(xm.wiki, nameField.val(), 'WebHome');
         } else {
           var spaceReference = XWiki.Model.resolve(parentReference, XWiki.EntityType.SPACE);
-          if ($('#terminal').prop('checked')) {
-            documentReference = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+          if (terminalCheckbox.prop('checked')) {
+            documentReference = new XWiki.EntityReference(nameField.val(), XWiki.EntityType.DOCUMENT, spaceReference);
           } else {
-            var parent = new XWiki.EntityReference($('#Name').val(), XWiki.EntityType.SPACE, spaceReference);
+            var parent = new XWiki.EntityReference(nameField.val(), XWiki.EntityType.SPACE, spaceReference);
             documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, parent);
           }
         }
@@ -55,7 +57,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
         } else {
           // We are in the create page action, but with a page name already filled
-          if ($('#terminal').prop('checked')) {
+          if (terminalCheckbox.prop('checked')) {
             documentReference = xm.documentReference.parent;
           } else {
             documentReference = xm.documentReference;
@@ -105,7 +107,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // TODO: handle this use-case with an extension point
       if (type == 'office') {
         // Verify that the target page name has been filled (only if the location picker is displayed).
-        if ($('#Name').length > 0 && $('#Name').val().trim().length == 0) {
+        if (nameField.length > 0 && nameField.val().trim().length == 0) {
           return false;
         }
         // The office importer is a wiki page which takes the 'page' parameter.
@@ -122,7 +124,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     /*
      * Terminal checkbox value updating when switching between document types.
      */
-    var terminalCheckbox = form.find('#terminal');
     // Only do the work if the checkbox is displayed (advanced user).
     if (terminalCheckbox.length > 0) {
       var updateTerminalCheckboxFromTemplateProviderInput = function(input) {

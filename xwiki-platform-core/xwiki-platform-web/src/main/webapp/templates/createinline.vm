@@ -103,7 +103,15 @@
       }])
     #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && "$!services.officemanager.serverState" == 'Connected')
       ## TODO: handle this use case with an extension point
-      #set($discard = $options[0].options.add({ 'name': $services.localization.render('office.createForm.type.name'), 'value': 'office', 'description': $services.localization.render('office.createForm.type.description'), 'icon': 'file-word', 'data': {'type':'office'}}))
+      #set ($discard = $options[0].options.add({
+        'name': $services.localization.render('office.createForm.type.name'),
+        'value': 'office',
+        'description': $services.localization.render('office.createForm.type.description'),
+        'icon': 'file-word',
+        'data': {
+          'type':'office'
+        }
+      }))
     #end
     #if (!$availableTemplateProviders.isEmpty())
       #set ($templateOptions = [])

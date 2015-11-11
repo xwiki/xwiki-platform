@@ -134,7 +134,7 @@
   #else
     = Class properties =
     #foreach($property in $doc.getxWikiClass().properties)
-      * $property.prettyName (${property.name}: $xwiki.metaclass.get($property.classType).prettyName)
+      * $services.rendering.escape("$property.prettyName ($property.name: $xwiki.metaclass.get($property.classType).prettyName)", $xwiki.currentContentSyntaxId)
     #end
     * //You can use the class editor to {{html}}&lt;a href="$doc.getURL('edit', 'editor=class')"&gt;add or modify the class properties&lt;/a&gt;{{/html}}.//
 

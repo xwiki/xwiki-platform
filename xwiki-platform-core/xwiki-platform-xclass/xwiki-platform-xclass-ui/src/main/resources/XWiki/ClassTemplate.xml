@@ -37,14 +37,14 @@
   <title>Class Template</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 ## Replace the default space with the space where you want your documents to be created.
 ## Replace the default parent with the one of your choice and save the document.
 ##
-#set($defaultSpace = $doc.space)
-#set($defaultParent = $doc.fullName)
+#set ($defaultSpace = $doc.space)
+#set ($defaultParent = $doc.fullName)
 {{/velocity}}</content>
   <object>
     <name>XWiki.ClassTemplate</name>

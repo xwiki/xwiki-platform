@@ -327,7 +327,7 @@ public class OfficeImporterScriptService implements ScriptService
                 String currentSyntaxId = this.docBridge.getDocument(documentReference).getSyntax().toIdString();
                 if (!currentSyntaxId.equals(syntaxId)) {
                     String message =
-                        "Target document [%s] exists but its syntax [%s] is different from specified syntax [%s]";
+                        "The target page [%s] exists but its syntax [%s] is different from the specified syntax [%s]";
                     throw new OfficeImporterException(String.format(message, documentReference, currentSyntaxId,
                         syntaxId));
                 }

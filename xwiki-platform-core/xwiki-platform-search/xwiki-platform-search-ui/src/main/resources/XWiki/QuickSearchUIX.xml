@@ -151,6 +151,11 @@
         }
       }, 1);
     });
+    
+    // Close dropdown menus when the search button is clicked
+    globalSearchButton.click(function(event) {
+      $('[data-toggle="dropdown"][aria-expanded="true"]').dropdown('toggle');
+    });
 
   });
 });</code>

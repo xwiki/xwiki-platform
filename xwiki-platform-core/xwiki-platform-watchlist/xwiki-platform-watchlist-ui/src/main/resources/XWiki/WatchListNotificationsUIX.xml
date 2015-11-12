@@ -330,9 +330,6 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
     <property>
       <code>#template('colorThemeInit.vm')
 
-/* TODO: replace with @import statement when XWIKI-12788 is closed. Reason: http://www.stevesouders.com/blog/2009/04/09/dont-use-import/ */
-@import url("$services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css')");
-
 .notifications-watchlist-item {
   margin: 0;
   padding: 5px;
@@ -571,6 +568,8 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
   ##
   #set ($discard = $xwiki.ssx.use('XWiki.WatchListNotificationsUIX'))
   #set ($discard = $xwiki.jsx.use('XWiki.WatchListNotificationsUIX'))
+  ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
   ##
   ## Display the 3 toggle buttons
   ##

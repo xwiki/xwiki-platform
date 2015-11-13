@@ -117,9 +117,7 @@
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
       #set($orderDirection = 'desc')
     #end
-    ## Only safe version should be used in SQL queries
-    #set($safe_tableAlias = $order.replaceAll('[^a-zA-Z0-9_.]', ''))
-    ##
+    #livetable_getTableAlias($order)
     #if($order.startsWith('doc.'))
       ## The column is a document field.
       ##
@@ -627,8 +625,7 @@
 
 
 #macro (livetable_filterProperty $colname $filterValue)
-  ## Only safe version should be used in SQL queries
-  #set ($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
+  #livetable_getTableAlias($colname)
   #livetable_getTableName($colname)
   #set ($fromSql = "$fromSql, $tableName as $safe_tableAlias")
   ##
@@ -795,6 +792,22 @@
  *#
 #macro(grid_addcolumn $colname)
   #livetable_addColumnToQuery($colname)
+#end
+
+#**
+ * Generates a valid SQL table alias for the specified live table column.
+ *#
+#macro (livetable_getTableAlias $columnName)
+  #set ($prefix = 'doc.')
+  #if ($columnName.startsWith($prefix))
+    #set ($suffix = $stringtool.removeStart($columnName, $prefix))
+  #else
+    ## Force a prefix to avoid the cases when the column name is a reserved SQL keyword.
+    #set ($prefix = 'prop_')
+    #set ($suffix = $columnName)
+  #end
+  ## Remove non-word characters.
+  #set ($safe_tableAlias = "$prefix$suffix.replaceAll('\W', '')")
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -19,9 +19,13 @@
  */
 package org.xwiki.test.page;
 
-import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,6 +42,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
@@ -46,6 +51,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +66,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -84,9 +91,9 @@ public class PageTest
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     /**
-     * The document being tested.
+     * The documents that have been loaded with {@link #loadPage(DocumentReference)}.
      */
-    protected XWikiDocument document;
+    protected Map<DocumentReference, XWikiDocument> documents = new HashMap<>();
 
     /**
      * The stubbed request used to simulate a real Servlet Request.
@@ -147,16 +154,21 @@ public class PageTest
     }
 
     /**
-     * @param reference the reference of the Document to test (and thus load from the Classloader)
+     * @param documentReference the reference of the Document to load from the ClassLoader
+     * @return the loaded document
      * @throws Exception in case of errors
      */
-    protected void loadPage(DocumentReference reference) throws Exception
+    protected XWikiDocument loadPage(DocumentReference documentReference) throws Exception
     {
-        document = new XWikiDocument(reference);
-        // TODO: Add support for NS
-        InputStream is = getClass().getClassLoader().getResourceAsStream(
-            reference.getLastSpaceReference().getName() + "/" + reference.getName() + ".xml");
-        document.fromXML(is);
+        List<String> path = new ArrayList<>();
+        for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
+            path.add(spaceReference.getName());
+        }
+        path.add(documentReference.getName() + ".xml");
+        XWikiDocument document = new XWikiDocument(documentReference);
+        document.fromXML(getClass().getClassLoader().getResourceAsStream(StringUtils.join(path, '/')));
+        this.documents.put(documentReference, document);
+        return document;
     }
 
     /**
@@ -166,8 +178,7 @@ public class PageTest
      */
     protected String renderPage(DocumentReference reference) throws Exception
     {
-        loadPage(reference);
-        return document.getRenderedContent(context);
+        return loadPage(reference).getRenderedContent(this.context);
     }
 
     /**
@@ -237,6 +248,28 @@ public class PageTest
                 }
             }
         );
+
+        // Make XWiki#getDocument() return the documents that have been loaded.
+        doAnswer(new Answer<XWikiDocument>()
+        {
+            @Override
+            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
+            {
+                DocumentReference documentReference = invocation.getArgumentAt(0, DocumentReference.class);
+                XWikiDocument document = documents.get(documentReference);
+                if (document == null) {
+                    // Try to get the default document translation.
+                    document = documents.get(new DocumentReference(documentReference, null));
+                    if (document == null) {
+                        // Return a new document.
+                        document = new XWikiDocument(documentReference);
+                        // Avoid "Failed to find parser for the default syntax [XWiki 1.0]".
+                        document.setSyntax(Syntax.XWIKI_2_1);
+                    }
+                }
+                return document;
+            }
+        }).when(oldcore.getSpyXWiki()).getDocument(any(DocumentReference.class), any(XWikiContext.class));
     }
 
     /**
@@ -249,5 +282,19 @@ public class PageTest
     {
         MutableRenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
         renderingContext.pop();
+    }
+
+    /**
+     * Adds a tool to the Velocity context.
+     * 
+     * @param name the name of the tool
+     * @param tool the tool to register; can be a mock
+     * @throws Exception in case of errors
+     * @since 7.4M1
+     */
+    protected void registerVelocityTool(String name, Object tool) throws Exception
+    {
+        VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
+        velocityManager.getVelocityContext().put(name, tool);
     }
 }

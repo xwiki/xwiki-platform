@@ -34,8 +34,6 @@ REM -------------------------------------------------------------------------
 
 setlocal EnableDelayedExpansion
 
-set JETTY_HOME=jetty
-set JETTY_BASE=.
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 
@@ -86,14 +84,19 @@ if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
-REM Create directories that Jetty would otherwise create. We create them to avoid the confusing messages such as:
-REM "MKDIR: ${jetty.base}/lib"
+REM Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
+REM Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
+REM cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
+set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
+if not exist "%JETTY_BASE%" mkdir "%JETTY_BASE%"
 if not exist "%JETTY_BASE%\lib" mkdir "%JETTY_BASE%\lib"
 if not exist "%JETTY_BASE%\lib\ext" mkdir "%JETTY_BASE%\lib\ext"
 if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
 if not exist "%JETTY_BASE%\resources" mkdir "%JETTY_BASE%\resources"
+if not exist "%JETTY_BASE%\webapps" mkdir "%JETTY_BASE%\webapps"
 
 REM Specify Jetty's home and base directories
+set JETTY_HOME=jetty
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BASE%"
 
 REM Specify the encoding to use

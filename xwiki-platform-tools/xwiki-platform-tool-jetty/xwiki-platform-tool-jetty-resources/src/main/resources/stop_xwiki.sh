@@ -67,9 +67,6 @@ done
 PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
-JETTY_HOME=jetty
-JETTY_BASE=.
-
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
   JETTY_PORT=8080
@@ -115,7 +112,12 @@ done
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
 
+# Location where XWiki stores generated data and where database files are.
+XWIKI_DATA_DIR=${xwikiDataDir}
+
 # Specify Jetty's home and base directories
+JETTY_HOME=jetty
+JETTY_BASE=$XWIKI_DATA_DIR/jetty
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 # Specify port and key to stop a running Jetty instance

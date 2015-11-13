@@ -19,13 +19,17 @@
  */
 package org.xwiki.model.reference;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.xwiki.model.EntityType;
 
 /**
  * A node in a {@link EntityReferenceTree}.
@@ -62,7 +66,7 @@ public class EntityReferenceTreeNode
 
     private final Comparator<String> comparator;
 
-    private Map<String, EntityReferenceTreeNode> children;
+    private Map<String, Map<EntityType, EntityReferenceTreeNode>> children;
 
     private Map<Locale, EntityReference> locales;
 
@@ -83,13 +87,20 @@ public class EntityReferenceTreeNode
     void addChild(EntityReference childReference)
     {
         if (this.children == null) {
-            this.children = new TreeMap<String, EntityReferenceTreeNode>(this.comparator);
+            this.children = new TreeMap<String, Map<EntityType, EntityReferenceTreeNode>>(this.comparator);
         }
 
         List<EntityReference> childReferenceList = childReference.getReversedReferenceChain();
 
         EntityReference childNodeReference = childReferenceList.get(this.referenceSize);
-        EntityReferenceTreeNode childNode = this.children.get(childNodeReference.getName());
+
+        Map<EntityType, EntityReferenceTreeNode> childrenByType = this.children.get(childNodeReference.getName());
+        if (childrenByType == null) {
+            childrenByType = new IdentityHashMap<>();
+            this.children.put(childNodeReference.getName(), childrenByType);
+        }
+
+        EntityReferenceTreeNode childNode = childrenByType.get(childNodeReference.getType());
         if (childNode == null) {
             childNode = new EntityReferenceTreeNode(childNodeReference, this.comparator);
         }
@@ -102,7 +113,7 @@ public class EntityReferenceTreeNode
             childNode.addLocale(childReference);
         }
 
-        this.children.put(childNode.getReference().getName(), childNode);
+        childrenByType.put(childNodeReference.getType(), childNode);
     }
 
     void addLocale(EntityReference childReference)
@@ -123,12 +134,20 @@ public class EntityReferenceTreeNode
     }
 
     /**
+     * Return the first found direct child with passed name.
+     * 
      * @param name the name of the child node
      * @return the node associated to the passed name
      */
     public EntityReferenceTreeNode get(String name)
     {
-        return this.children != null ? this.children.get(name) : null;
+        Collection<EntityReferenceTreeNode> childrenWhithName = getChildrenInternal(name);
+
+        if (childrenWhithName != null && !childrenWhithName.isEmpty()) {
+            return childrenWhithName.iterator().next();
+        }
+
+        return null;
     }
 
     /**
@@ -144,8 +163,17 @@ public class EntityReferenceTreeNode
 
         EntityReferenceTreeNode descendant = this;
         for (EntityReference pathElement : path.getReversedReferenceChain()) {
-            descendant = descendant.get(pathElement.getName());
-            if (descendant == null || descendant.getReference().getType() != pathElement.getType()) {
+            if (descendant.children == null) {
+                return null;
+            }
+
+            Map<EntityType, EntityReferenceTreeNode> descendantByType = descendant.children.get(pathElement.getName());
+            if (descendantByType == null) {
+                return null;
+            }
+
+            descendant = descendantByType.get(pathElement.getType());
+            if (descendant == null) {
                 return null;
             }
         }
@@ -158,7 +186,70 @@ public class EntityReferenceTreeNode
      */
     public Collection<EntityReferenceTreeNode> getChildren()
     {
-        return this.children != null ? this.children.values() : Collections.<EntityReferenceTreeNode> emptyList();
+        if (this.children != null) {
+            List<EntityReferenceTreeNode> childrenList = new ArrayList<>(this.children.size() * 2);
+
+            for (Map<EntityType, EntityReferenceTreeNode> childrenByType : this.children.values()) {
+                childrenList.addAll(childrenByType.values());
+            }
+
+            return childrenList;
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * @param name the name of the children to return
+     * @return the children with the passed name
+     * @since 7.4M1
+     */
+    public Collection<EntityReferenceTreeNode> getChildren(String name)
+    {
+        Collection<EntityReferenceTreeNode> childrenWhithName = getChildrenInternal(name);
+
+        return childrenWhithName != null ? Collections.unmodifiableCollection(childrenWhithName)
+            : Collections.<EntityReferenceTreeNode>emptyList();
+    }
+
+    /**
+     * @param type the type of the children to return
+     * @return the children with the passed {@link EntityType}
+     * @since 7.4M1
+     */
+    public Collection<EntityReferenceTreeNode> getChildren(EntityType type)
+    {
+        if (this.children != null) {
+            List<EntityReferenceTreeNode> childrenList = new ArrayList<>(this.children.size());
+
+            for (Map<EntityType, EntityReferenceTreeNode> childrenByType : this.children.values()) {
+                EntityReferenceTreeNode child = childrenByType.get(type);
+                if (child != null) {
+                    childrenList.add(child);
+                }
+            }
+
+            return childrenList;
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * @param name the name of the children to return
+     * @return the children with the passed name
+     */
+    public Collection<EntityReferenceTreeNode> getChildrenInternal(String name)
+    {
+        if (this.children != null) {
+            Map<EntityType, EntityReferenceTreeNode> childrenByType = this.children.get(name);
+
+            if (childrenByType != null) {
+                return childrenByType.values();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -166,7 +257,7 @@ public class EntityReferenceTreeNode
      */
     public Collection<EntityReference> getLocales()
     {
-        return this.locales != null ? this.locales.values() : Collections.<EntityReference> emptyList();
+        return this.locales != null ? this.locales.values() : Collections.<EntityReference>emptyList();
     }
 
     @Override

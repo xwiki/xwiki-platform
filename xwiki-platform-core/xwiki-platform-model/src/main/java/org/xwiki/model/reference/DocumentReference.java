@@ -140,7 +140,7 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName)
     {
-        super(pageName, EntityType.DOCUMENT, constructSpaceReference(wikiName, spaceNames));
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
     }
 
     /**
@@ -154,7 +154,7 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, constructSpaceReference(wikiName, spaceNames));
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
         setLocale(locale);
     }
 
@@ -306,24 +306,6 @@ public class DocumentReference extends EntityReference
         Collections.reverse(references);
 
         return references;
-    }
-
-    /**
-     * Create a space reference from a wikiname and a list of space names.
-     *
-     * @param wikiName the wikiname
-     * @param spaceNames the list of space name from root to child
-     * @return the space reference
-     */
-    private static EntityReference constructSpaceReference(String wikiName, List<String> spaceNames)
-    {
-        EntityReference spaceReference = null;
-        EntityReference parent = new EntityReference(wikiName, EntityType.WIKI);
-        for (String spaceName : spaceNames) {
-            spaceReference = new EntityReference(spaceName, EntityType.SPACE, parent);
-            parent = spaceReference;
-        }
-        return spaceReference;
     }
 
     @Override

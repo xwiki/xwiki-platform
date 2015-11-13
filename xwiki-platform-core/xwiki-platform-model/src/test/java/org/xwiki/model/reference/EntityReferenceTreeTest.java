@@ -62,10 +62,9 @@ public class EntityReferenceTreeTest
     @Test
     public void testSeveralReferences()
     {
-        EntityReferenceTreeNode tree =
-            new EntityReferenceTree(new DocumentReference("wiki", "space", "page"), new DocumentReference("wiki",
-                "space2", "page2"), new DocumentReference("wiki", "space", "page2"), new DocumentReference("wiki2",
-                "space2", "page2"));
+        EntityReferenceTreeNode tree = new EntityReferenceTree(new DocumentReference("wiki", "space", "page"),
+            new DocumentReference("wiki", "space2", "page2"), new DocumentReference("wiki", "space", "page2"),
+            new DocumentReference("wiki2", "space2", "page2"));
 
         Assert.assertEquals(null, tree.getReference());
         Assert.assertEquals(2, tree.getChildren().size());
@@ -119,19 +118,62 @@ public class EntityReferenceTreeTest
 
         Assert.assertSame(documentReference.getWikiReference(), tree.get(new WikiReference("wiki")).getReference());
 
-        Assert.assertSame(documentReference.getLastSpaceReference(), tree
-            .get(documentReference.getLastSpaceReference()).getReference());
+        Assert.assertSame(documentReference.getLastSpaceReference(),
+            tree.get(documentReference.getLastSpaceReference()).getReference());
 
         EntityReference entityReference =
             new EntityReference(documentReference.getName(), EntityType.DOCUMENT, documentReference.getParent());
         Assert.assertSame(documentReference, tree.get(entityReference).getReference());
 
         // The entity type should be taken into account.
-        Assert.assertNull(tree.get(new EntityReference(documentReference.getName(), EntityType.SPACE, documentReference
-            .getParent())));
+        Assert.assertNull(tree
+            .get(new EntityReference(documentReference.getName(), EntityType.SPACE, documentReference.getParent())));
 
         Assert.assertNull(tree.get((EntityReference) null));
 
         Assert.assertNull(tree.get(new SpaceReference("From", documentReference.getParent().getParent())));
+    }
+
+    @Test
+    public void testSiblingWithDifferentType()
+    {
+        DocumentReference document = new DocumentReference("wiki", "space", "entity");
+        SpaceReference space = new SpaceReference("wiki", "space", "entity");
+
+        EntityReferenceTreeNode tree = new EntityReferenceTree(document, space);
+
+        Assert.assertSame(document, tree.get(document).getReference());
+        Assert.assertSame(space, tree.get(space).getReference());
+
+        EntityReferenceTreeNode treeNode = tree;
+
+        Assert.assertEquals(null, treeNode.getReference());
+        Assert.assertEquals(1, treeNode.getChildren().size());
+
+        treeNode = treeNode.get("wiki");
+
+        Assert.assertNotNull(treeNode);
+        Assert.assertSame(document.getWikiReference(), treeNode.getReference());
+        Assert.assertEquals(1, treeNode.getChildren().size());
+
+        treeNode = treeNode.get("space");
+
+        Assert.assertNotNull(treeNode);
+        Assert.assertSame(document.getParent(), treeNode.getReference());
+        Assert.assertEquals(2, treeNode.getChildren().size());
+        Assert.assertEquals(1, treeNode.getChildren(EntityType.DOCUMENT).size());
+        Assert.assertEquals(1, treeNode.getChildren(EntityType.SPACE).size());
+
+        EntityReferenceTreeNode documentNode = treeNode.getChildren(EntityType.DOCUMENT).iterator().next();
+
+        Assert.assertNotNull(documentNode);
+        Assert.assertSame(document, documentNode.getReference());
+        Assert.assertEquals(0, documentNode.getChildren().size());
+
+        EntityReferenceTreeNode spaceNode = treeNode.getChildren(EntityType.SPACE).iterator().next();
+
+        Assert.assertNotNull(spaceNode);
+        Assert.assertSame(space, spaceNode.getReference());
+        Assert.assertEquals(0, spaceNode.getChildren().size());
     }
 }

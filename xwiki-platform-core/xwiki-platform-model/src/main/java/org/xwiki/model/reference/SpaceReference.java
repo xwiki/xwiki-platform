@@ -21,6 +21,8 @@ package org.xwiki.model.reference;
 
 import java.beans.Transient;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -99,6 +101,31 @@ public class SpaceReference extends EntityReference
     public SpaceReference(String spaceName, EntityReference parent)
     {
         super(spaceName, EntityType.SPACE, parent);
+    }
+
+    /**
+     * Create a space reference based on a space name and a parent space reference.
+     *
+     * @param wikiName the name of the wiki
+     * @param spaceNames the spaces names
+     * @since 7.4M1
+     */
+    public SpaceReference(String wikiName, String... spaceNames)
+    {
+        this(wikiName, Arrays.<String>asList(spaceNames));
+    }
+
+    /**
+     * Create a space reference based on a space name and a parent space reference.
+     *
+     * @param wikiName the name of the wiki
+     * @param spaceNames the spaces names
+     * @since 7.4M1
+     */
+    public SpaceReference(String wikiName, List<String> spaceNames)
+    {
+        this(spaceNames.get(spaceNames.size() - 1), spaceNames.size() > 1
+            ? new SpaceReference(wikiName, spaceNames.subList(0, spaceNames.size() - 1)) : new WikiReference(wikiName));
     }
 
     /**

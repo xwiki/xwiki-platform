@@ -1,4 +1,4 @@
-﻿﻿@echo off
+@echo off
 REM -------------------------------------------------------------------------
 REM See the NOTICE file distributed with this work for additional
 REM information regarding copyright ownership.

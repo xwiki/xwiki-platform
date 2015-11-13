@@ -48,7 +48,7 @@ public class ClassSheetTest extends AbstractTest
     @Test
     public void createClass()
     {
-	    //TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
+        //TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
         getUtil().setHierarchyMode("parentchild");
         try {
             String spaceName = getTestClassName();

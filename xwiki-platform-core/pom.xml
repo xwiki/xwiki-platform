@@ -481,6 +481,7 @@
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-colibri</module>
     <module>xwiki-platform-colorthemes</module>
+    <module>xwiki-platform-comments</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>

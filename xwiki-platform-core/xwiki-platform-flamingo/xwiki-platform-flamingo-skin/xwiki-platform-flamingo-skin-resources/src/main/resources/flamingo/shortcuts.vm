@@ -36,6 +36,17 @@
   #if($viewer != 'information' && $showinformation)
     #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'info-sign']))
   #end
+  ###
+  ### Display links to viewers implemented as UIX
+  ###
+  #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.viewers', {'sortByParameter': 'order'}))
+    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      #set ($params  = $uix.parameters)
+      #set ($name    = $services.localization.render($params.name))
+      #set ($count   = $mathtool.toInteger($services.rendering.render($services.rendering.parse($params.count, 'xwiki/2.1'), 'plain/1.0')))
+      #set ($discard = $docextralinks.add([$uix.id, $name, $count, $params.icon]))
+    #end
+  #end
 #end
 
 #foreach($docextralink in $docextralinks)

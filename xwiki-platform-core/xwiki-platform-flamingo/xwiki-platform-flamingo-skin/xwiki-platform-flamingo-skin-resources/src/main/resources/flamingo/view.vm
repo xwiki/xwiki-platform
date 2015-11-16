@@ -23,7 +23,22 @@
   #if($viewer == 'content')
     #template("contentview.vm")
   #else
-    #template("${viewer}.vm")
+    ##
+    ## Display a viewer contained in a UI extension.
+    ##
+    #set ($viewerFoundAsUIX = false)
+    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.viewers', {'select': $viewer}))
+      #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+        $services.rendering.render($uix.execute(), 'html/5.0')
+        #set ($viewerFoundAsUIX = true)
+      #end
+    #end
+    ##
+    ## If no UI extension is matching, display the viewer from the templates
+    ##
+    #if (!$viewerFoundAsUIX)
+      #template("${viewer}.vm")
+    #end
   #end
   <div class="clearfloats"></div>
   </div>## mainContentArea

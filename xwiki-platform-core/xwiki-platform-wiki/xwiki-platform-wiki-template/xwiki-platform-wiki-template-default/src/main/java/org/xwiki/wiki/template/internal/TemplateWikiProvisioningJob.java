@@ -30,10 +30,10 @@ import org.xwiki.bridge.event.WikiProvisioningFailedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.job.internal.AbstractJob;
-import org.xwiki.job.internal.DefaultJobStatus;
-import org.xwiki.wiki.provisioning.WikiCopier;
+import org.xwiki.job.AbstractJob;
+import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiCopier;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 
@@ -48,8 +48,8 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(TemplateWikiProvisioningJob.JOBTYPE)
-public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJobRequest,
-        DefaultJobStatus<WikiProvisioningJobRequest>> implements WikiProvisioningJob
+public class TemplateWikiProvisioningJob extends
+    AbstractJob<WikiProvisioningJobRequest, DefaultJobStatus<WikiProvisioningJobRequest>> implements WikiProvisioningJob
 {
     /**
      * The id of the job.

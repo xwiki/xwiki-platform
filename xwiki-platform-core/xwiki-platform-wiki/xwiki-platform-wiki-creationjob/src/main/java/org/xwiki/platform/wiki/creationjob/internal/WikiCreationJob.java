@@ -29,11 +29,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.job.internal.AbstractJob;
-import org.xwiki.job.internal.DefaultJobStatus;
+import org.xwiki.job.AbstractJob;
+import org.xwiki.job.DefaultJobStatus;
+import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreationStep;
-import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 
 /**
  * Job that create a wiki and execute the WikiCreationSteps.
@@ -60,8 +60,7 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
     protected void runInternal() throws Exception
     {
         try {
-            List<WikiCreationStep> wikiCreationStepList =
-                    componentManager.getInstanceList(WikiCreationStep.class);
+            List<WikiCreationStep> wikiCreationStepList = componentManager.getInstanceList(WikiCreationStep.class);
             // Some extra steps needs to be executed AFTER some others, so we have introduce a getOrder() method in the
             // interface. We use this method to sort the list of extra steps by this order.
             Collections.sort(wikiCreationStepList, new Comparator<WikiCreationStep>()

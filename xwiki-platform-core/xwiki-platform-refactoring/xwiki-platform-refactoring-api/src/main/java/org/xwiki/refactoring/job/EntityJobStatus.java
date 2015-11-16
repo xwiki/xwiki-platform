@@ -19,8 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.stability.Unstable;
@@ -51,7 +51,7 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
     public EntityJobStatus(T request, ObservationManager observationManager, LoggerManager loggerManager,
         JobStatus parentJobStatus)
     {
-        super(request, observationManager, loggerManager, parentJobStatus);
+        super(request, parentJobStatus, observationManager, loggerManager);
     }
 
     /**

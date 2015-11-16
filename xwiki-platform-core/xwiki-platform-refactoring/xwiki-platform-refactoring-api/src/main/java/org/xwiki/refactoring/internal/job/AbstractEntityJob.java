@@ -23,10 +23,10 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.xwiki.job.AbstractJob;
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
-import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

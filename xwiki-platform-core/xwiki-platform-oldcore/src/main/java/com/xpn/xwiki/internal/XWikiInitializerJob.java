@@ -26,8 +26,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.AbstractJob;
 import org.xwiki.job.Request;
-import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;

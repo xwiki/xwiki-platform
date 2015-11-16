@@ -41,8 +41,8 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
+import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.job.Request;
-import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.marker.BeginTranslationMarker;
 import org.xwiki.logging.marker.EndTranslationMarker;
 

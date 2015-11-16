@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
-import org.xwiki.job.internal.AbstractJobStatus;
+import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -39,7 +39,7 @@ public class XWikiInitializerJobStatus extends AbstractJobStatus<XWikiInitialize
     public XWikiInitializerJobStatus(XWikiInitializerRequest request, ObservationManager observationManager,
         LoggerManager loggerManager)
     {
-        super(request, observationManager, loggerManager, null);
+        super(request, null, observationManager, loggerManager);
 
         setIsolated(false);
     }

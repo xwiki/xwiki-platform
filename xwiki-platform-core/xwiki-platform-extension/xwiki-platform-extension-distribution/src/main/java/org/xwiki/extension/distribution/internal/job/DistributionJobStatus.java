@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -70,7 +70,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), observationManager, loggerManager, null);
+        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), null, observationManager, loggerManager);
 
         if (status instanceof DistributionJobStatus) {
             DistributionJobStatus<R> distributionJobStatus = (DistributionJobStatus<R>) status;
@@ -89,7 +89,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
         List<DistributionStep> steps)
     {
-        super(request, observationManager, loggerManager, null);
+        super(request, null, observationManager, loggerManager);
 
         this.stepList = steps;
     }

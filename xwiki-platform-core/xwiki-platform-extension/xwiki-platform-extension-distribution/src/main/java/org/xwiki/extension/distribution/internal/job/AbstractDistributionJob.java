@@ -31,8 +31,8 @@ import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
+import org.xwiki.job.AbstractJob;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.job.internal.AbstractJob;
 
 /**
  * @version $Id$

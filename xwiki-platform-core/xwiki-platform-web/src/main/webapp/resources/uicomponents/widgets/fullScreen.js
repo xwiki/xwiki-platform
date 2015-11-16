@@ -566,7 +566,12 @@ widgets.FullScreen = Class.create({
   cleanup : function() {
     Event.stopObserving(window, 'unload', this.unloadHandler);
     // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
-    this.actionCloseButtonWrapper.remove();
+    // This can throw an exception in certain browsers (IE9 for one), since the DOM may be already cleaned
+    try {
+      this.actionCloseButtonWrapper.remove();
+    } catch (ex) {
+      // Not important, just ignore
+    }
   }
 });
 

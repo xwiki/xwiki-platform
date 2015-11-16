@@ -21,6 +21,7 @@ Read our [Release Notes](http://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 ## Tools
 * [Continuous Integration](http://ci.xwiki.org/) setup launches a build for each commit
 * [Issue Tracker](http://jira.xwiki.org/) if you want to report an issue
+* [Development Flow](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HGeneralDevelopmentFlow) to see the full list of tools we use to build XWiki
 
 ## Community
 We're always looking for contributors! 

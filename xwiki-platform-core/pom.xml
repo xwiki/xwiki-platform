@@ -451,12 +451,6 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
-              <method>java.lang.Object getRenderingEngine()</method>
-              <justification>Not a breakage. The legacy method was not in the right place (which mean that it was not available so it actually fix a breakage)</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

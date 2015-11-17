@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-resource</artifactId>
-    <version>7.1.3</version>
+    <version>7.1.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource-api</artifactId>
   <name>XWiki Platform - Resource - API</name>

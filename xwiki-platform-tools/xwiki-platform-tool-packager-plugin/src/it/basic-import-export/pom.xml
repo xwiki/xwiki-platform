@@ -98,7 +98,7 @@
             <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
             <dependencies>
               <dependency>
-                <groupId>com.cenqua.clover</groupId>
+                <groupId>com.atlassian.clover</groupId>
                 <artifactId>clover</artifactId>
                 <version>${clover.version}</version>
               </dependency>

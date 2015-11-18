@@ -136,7 +136,7 @@
            It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
       <dependencies>
         <dependency>
-          <groupId>com.cenqua.clover</groupId>
+          <groupId>com.atlassian.clover</groupId>
           <artifactId>clover</artifactId>
         </dependency>
       </dependencies>
@@ -150,7 +150,7 @@
             <version>${project.version}</version>
             <dependencies>
               <dependency>
-                <groupId>com.cenqua.clover</groupId>
+                <groupId>com.atlassian.clover</groupId>
                 <artifactId>clover</artifactId>
                 <version>${clover.version}</version>
               </dependency>

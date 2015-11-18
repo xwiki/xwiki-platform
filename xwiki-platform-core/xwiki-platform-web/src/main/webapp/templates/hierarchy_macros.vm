@@ -1,3 +1,5 @@
+#template('documentTree_macros.vm')
+
 #**
  * Display the path of the specified entity within the hierarchy.
  *
@@ -148,9 +150,7 @@
 
 #macro (getTreeNavigation $pathData $index $options)
   #set ($treeNavigation = '')
-  #if ($options.treeNavigation && $pathData.get($index).reference.type != 'ellipsis')
-    #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
-      'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #if ($isDocumentTreeAvailable && $options.treeNavigation && $pathData.get($index).reference.type != 'ellipsis')
     #set ($discard = $classNames.add('dropdown'))
 
     ## Open the tree to an intermediary path element, showing its siblings and its children.
@@ -184,21 +184,19 @@
     ## wiki while the last path element points to a document from a subwiki).
     #set ($showWikis = $pathData.get(0).reference.extractReference('WIKI') != $openTo.extractReference('WIKI'))
 
-    ## FIXME: The tree navigation must work on an empty wiki.
     ## FIXME: The tree navigation should take into account the current hierarchy mode.
     ## FIXME: Make sure the tree shows entities of type $root.type and $openTo.type
-    #set ($url = $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
-      'outputSyntax': 'plain',
+    #set ($treeParams = {
+      'class': 'breadcrumb-tree',
       'root': $rootId,
+      'openTo': $openToId,
       'showTranslations': $xwiki.isMultiLingual(),
       'showWikis': $showWikis,
       'limit': 10
-    })))
+    })
     #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
       "$services.icon.renderHTML('caret-down')</span>")
-    #set ($treeElement = "<div class='breadcrumb-tree' data-responsive='true' data-url='$escapetool.xml($url)' " +
-      "data-openTo='$escapetool.xml($openToId)'></div>")
-    #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>$treeElement</div>")
+    #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end
 #end
 

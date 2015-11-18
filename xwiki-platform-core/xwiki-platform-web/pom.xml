@@ -37,6 +37,19 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-war</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-war</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
       <scope>test</scope>

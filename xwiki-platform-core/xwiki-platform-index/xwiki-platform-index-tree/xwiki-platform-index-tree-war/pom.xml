@@ -24,29 +24,36 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-index</artifactId>
+    <artifactId>xwiki-platform-index-tree</artifactId>
     <version>7.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-index-tree</artifactId>
-  <name>XWiki Platform - Index - Tree - Parent POM</name>
-  <description>XWiki Platform - Index - Tree - Parent POM</description>
-  <packaging>pom</packaging>
-    <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
+  <artifactId>xwiki-platform-index-tree-war</artifactId>
+  <name>XWiki Platform - Index - Tree - WAR</name>
+  <packaging>war</packaging>
+  <description>Velocity macros that can't be packaged in the XAR</description>
+  <properties>
+    <!-- Don't run CLIRR on this module since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <modules>
-    <module>xwiki-platform-index-tree-macro</module>
-    <module>xwiki-platform-index-tree-war</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-index-tree-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <!-- Include License resources -->
+            <resource>
+              <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+              <targetPath>META-INF</targetPath>
+            </resource>
+          </webResources>
+          <!-- Exclude the LICENSE/NOTICE files from the classes/ directory since we're including them in META-INF/ at
+               the root of the WAR -->
+          <packagingExcludes>WEB-INF/**</packagingExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -105,107 +105,6 @@
   <object>
     <name>Macros.Tree</name>
     <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>cdf8656d-0058-4ea0-b42d-8ec9c27fae8c</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
-  require(['tree'], function($) {
-    $('.xtree').xtree().one('ready.jstree', function(event, data) {
-      var tree = data.instance;
-      var openToNodeId = tree.element.attr('data-openTo');
-      // Open the tree to the specified node and select it.
-      openToNodeId &amp;&amp; data.instance.openTo(openToNodeId);
-    });
-  });
-});</code>
-    </property>
-    <property>
-      <name>Initialization Code</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>Macros.Tree</name>
-    <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>b082a404-08fa-45e5-b6d0-abc5fcf6fc61</guid>
     <class>
@@ -318,68 +217,18 @@
       </visibility>
     </class>
     <property>
-      <code>{{velocity output="false"}}
-#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
-  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-#set ($discard = $xwiki.jsx.use($xcontext.macro.doc))
-#set ($classes = ['xtree', "$!xcontext.macro.params.get('class')"])
-#set ($noLinks = $xcontext.macro.params.links != 'true')
-#if ($noLinks)
-  #set ($discard = $classes.add('jstree-no-links'))
+      <code>{{template name="tree_macros.vm" /}}
+
+{{velocity output="false"}}
+#set ($options = {})
+#foreach ($parameterName in $xcontext.macro.params.parameterNames)
+  #set ($discard = $options.put($parameterName, $xcontext.macro.params.get($parameterName)))
 #end
-#set ($attributes = [
-  "class='$!escapetool.xml($stringtool.join($classes, ' '))'",
-  'data-responsive="true"'
-])
-#if ("$!xcontext.macro.params.reference" != '')
-  #set ($defaultResourceParams = {
-    'root': '',
-    'showRoot': false
-  })
-  #set ($resourceParams = {})
-  #foreach ($entry in $defaultResourceParams.entrySet())
-    #set ($value = $xcontext.macro.params.get($entry.key))
-    #if ("$!value" != '' &amp;&amp; $value != "$!entry.value")
-      #set ($discard = $resourceParams.put($entry.key, $value))
-    #end
-  #end
-  #set ($reference = $xcontext.macro.params.reference)
-  #if ($reference.startsWith('path:'))
-    ## URL/Path reference
-    #set ($resourceURL = $reference.substring(5))
-    #set ($resourceURL = "$resourceURL#if ($resourceURL.indexOf('?') &lt; 0)?#else&amp;#end$escapetool.url($resourceParams)")
-  #else
-    ## Document reference
-    #if ($reference.startsWith('doc:'))
-      #set ($reference = $reference.substring(4))
-    #end
-    #set ($resourceParams.outputSyntax = 'plain')
-    #set ($resourceURL = $xwiki.getURL($reference, 'get', $escapetool.url($resourceParams)))
-  #end
-  #set ($discard = $attributes.add("data-url='$resourceURL'"))
-#end
-#set ($dragAndDrop = $xcontext.macro.params.dragAndDrop == 'true')
-#set ($discard = $attributes.add("data-dragAndDrop='$dragAndDrop'"))
-#set ($contextMenu = $xcontext.macro.params.contextMenu == 'true')
-#set ($discard = $attributes.add("data-contextMenu='$contextMenu'"))
-#set ($icons = $xcontext.macro.params.icons == 'true')
-#set ($discard = $attributes.add("data-icons='$icons'"))
-#set ($edges = $xcontext.macro.params.edges == 'true')
-#set ($discard = $attributes.add("data-edges='$edges'"))
-#set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
-#set ($discard = $attributes.add("data-checkboxes='$checkboxes'"))
-#set ($discard = $attributes.add("data-openTo='$!escapetool.xml($xcontext.macro.params.openTo)'"))
-#set ($finder = $xcontext.macro.params.finder == 'true')
-#if ($finder)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
-    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-#end
-#set ($discard = $attributes.add("data-finder='$finder'"))
 #set ($content = $xcontext.macro.content)
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit' &amp;&amp; $editor == 'wysiwyg')
   #set ($content = "$services.icon.render('chart_organisation') $services.localization.render('tree.macro.editModeWarning')")
 #end
-#set ($output = "(% $stringtool.join($attributes, ' ') %)((($!content)))")
+#set ($output = "(% #treeAttributes($options) %)((($!content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
 {{/velocity}}</code>

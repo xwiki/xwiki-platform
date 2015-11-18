@@ -24,8 +24,8 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
     $('.location-picker').each(function() {
       var picker = $(this);
       var trigger = picker.find('.location-action-pick');
-      var modal = picker.find('.location-tree.modal');
-      var treeElement = modal.find('.xtree');
+      var modal = picker.find('.location-picker.modal');
+      var treeElement = modal.find('.location-tree');
       var selectButton = modal.find('.modal-footer .btn-primary');
 
       trigger.click(function(event) {
@@ -91,7 +91,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       }
     });
 
-    picker.find('.location-tree.modal').on('xwiki:locationTreePicker:select', function(event, data) {
+    picker.find('.location-picker.modal').on('xwiki:locationTreePicker:select', function(event, data) {
       var selectedNodeId = data.tree.get_selected()[0];
       var separatorIndex = selectedNodeId.indexOf(':');
       var nodeType = selectedNodeId.substr(0, separatorIndex);

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,15 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.4-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-tree</artifactId>
-  <name>XWiki Platform - Tree - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Tree - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-tree-macro</module>
-    <module>xwiki-platform-tree-test-pageobjects</module>
-    <module>xwiki-platform-tree-war</module>
-    <module>xwiki-platform-tree-webjar</module>
-  </modules>
-</project>
+ */
+// TODO: Move this file in the WebJar once we add support for loading JavaScript files from WebJars as Skin Extensions.
+require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+  require(['tree'], function($) {
+    $('.xtree').xtree().one('ready.jstree', function(event, data) {
+      var tree = data.instance;
+      var openToNodeId = tree.element.attr('data-openTo');
+      // Open the tree to the specified node and select it.
+      openToNodeId && data.instance.openTo(openToNodeId);
+    });
+  });
+});

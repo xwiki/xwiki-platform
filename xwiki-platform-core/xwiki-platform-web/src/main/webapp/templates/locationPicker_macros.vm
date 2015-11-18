@@ -1,7 +1,6 @@
 #template('hierarchy_macros.vm')
 
 #set ($displayWikiFields = $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName && $xwiki.hasSubWikis())
-#set ($isDocumentTreeAvailable = $xwiki.exists('XWiki.DocumentTree'))
 
 #macro (locationPicker $options)
   #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js'))
@@ -148,29 +147,8 @@
   </div>
 #end
 
-#macro (documentTree $options)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
-    'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
-    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($showWikis = $options.wiki && $displayWikiFields)
-  ## If we don't show the wikis then we need to show the root node (the current wiki) in order to be able to target top
-  ## level documents (e.g. create a top level document, move a document to the top level, etc.).
-  #set ($showRoot = !$showWikis)
-  ## FIXME: The document picker must work on an empty wiki.
-  #set ($url = $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
-    'outputSyntax': 'plain',
-    'showRoot': $showRoot,
-    'showWikis': $showWikis,
-    'showTerminalDocuments': false,
-    'showAttachments': false,
-    'showTranslations': false
-  })))
-  <div class="xtree jstree-no-links" data-responsive="true" data-url="$url" data-finder="true"></div>
-#end
-
 #macro (documentPickerModal $options)
-  <div class="location-tree modal fade" tabindex="-1" role="dialog" data-backdrop="static">
+  <div class="location-picker modal fade" tabindex="-1" role="dialog" data-backdrop="static">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -180,7 +158,19 @@
           <h4 class="modal-title">$services.localization.render('core.documentPicker.title')</h4>
         </div>
         <div class="modal-body">
-          #documentTree($options)
+          #set ($showWikis = $options.wiki && $displayWikiFields)
+          ## If we don't show the wikis then we need to show the root node (the current wiki) in order to be able to
+          ## target top level documents (e.g. create a top level document, move a document to the top level, etc.).
+          #set ($showRoot = !$showWikis)
+          #documentTree({
+            'class': 'location-tree',
+            'finder': true,
+            'showAttachments': false,
+            'showRoot': $showRoot,
+            'showTerminalDocuments': false,
+            'showTranslations': false,
+            'showWikis': $showWikis
+          })
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">

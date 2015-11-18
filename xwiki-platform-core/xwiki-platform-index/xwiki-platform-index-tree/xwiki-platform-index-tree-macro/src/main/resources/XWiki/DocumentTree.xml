@@ -183,42 +183,16 @@
       </visibility>
     </class>
     <property>
-      <code>{{include reference="XWiki.DocumentTreeConfig" /}}
+      <code>{{template name="documentTree_macros.vm" /}}
 
 {{velocity}}
-#macro (escapeMacroParam $value)$!value.replaceAll('([~"])', '~$1')#end
-## showChildDocuments is deprecated since 7.2M2. Fall-back on hierarchyMode for backwards compatibility.
-#if ($xcontext.macro.params.showChildDocuments == 'true')
-  #set ($discard = $xcontext.macro.params.set('hierarchyMode', 'parentchild'))
+#set ($options = {})
+#foreach ($parameterName in $xcontext.macro.params.parameterNames)
+  #set ($discard = $options.put($parameterName, $xcontext.macro.params.get($parameterName)))
 #end
-#set ($resourceParams = {'outputSyntax': 'plain'})
-#foreach ($entry in $docTreeConfig.entrySet())
-  #set ($value = $xcontext.macro.params.get($entry.key))
-  #if ("$!value" != '' &amp;&amp; $value != "$!entry.value")
-    #set ($discard = $resourceParams.put($entry.key, $value))
-  #end
-#end
-#set ($reference = "path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))")
-#set ($editable = $xcontext.macro.params.readOnly != 'true')
-#set ($isFullWidthAvailable = $xcontext.macro.params.compact != 'true')
-#set ($links = $xcontext.macro.params.links == 'true')
-#set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
-#set ($finder = $xcontext.macro.params.finder == 'true')
-## We use directly FontAwesome for the tree node icons for two reasons:
-## * the XWiki icon set (available through the icon themes) is limited
-## * jsTree expects an URL/path or a CSS class name as the value of the tree node icon configuration when JSON source is
-##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
-##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
-##   configuration becomes complex.
-## We don't load the FontAwesome CSS directly from its WebJar because it contains some relative paths that currently are
-## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
-## SSX instead.
-#set ($discard = $xwiki.ssx.use('IconThemes.FontAwesome'))
-## Include also the fix for the FontAwesome loading issue on IE8.
-#set ($discard = $xwiki.jsx.use('IconThemes.FontAwesome'))
-{{tree reference="#escapeMacroParam($reference)" dragAndDrop="$editable" contextMenu="$editable"
-  icons="$isFullWidthAvailable" edges="$isFullWidthAvailable" links="$links" checkboxes="$checkboxes"
-  openTo="#escapeMacroParam($xcontext.macro.params.openTo)" finder="$finder" /}}
+{{html clean="false"}}
+#documentTree($options)
+{{/html}}
 {{/velocity}}</code>
     </property>
     <property>

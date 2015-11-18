@@ -116,7 +116,7 @@
   ##
   #set($config               = 'AnnotationCode.AnnotationConfig')
   #set($configObj            = $xwiki.getDocument($config).getObject($config))
-  #set($annotationsActivated = $configObj.getValue('activated'))
+  #set($annotationsActivated = "$!configObj.getValue('activated')" == '1')
   #set($exceptionSpaces      = $configObj.getValue('exceptionSpaces'))
   ##
   ## The annotations UIX is displayed if:

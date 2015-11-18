@@ -78,7 +78,7 @@
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>annotations.title=Annotations
+  <content>annotations.title=Annotate
 annotations.menu.loading=Loading annotations settings
 annotations.menu.loaderror=Failed: 
 annotations.tab.info.noannotations=No annotations for this page

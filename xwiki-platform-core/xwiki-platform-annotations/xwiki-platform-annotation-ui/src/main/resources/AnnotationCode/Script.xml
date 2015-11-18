@@ -684,16 +684,13 @@ XWiki.Annotation = Class.create({
   },
 
   hookMenuButton : function() {
-    // Flamingo case
-    if (window.document.body.hasClassName('skin-flamingo')) {
-      var moreActionsMenu = $('tmMoreActions').getElementsBySelector('ul')[0];
-      var annContainer = new Element('li');
-      var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");
-      annContainer.insert(annLink);
-      moreActionsMenu.insert(annContainer);
-      annLink.observe('click', this.toggleSettingsPanel.bind(this));      
+    // Since 7.4M1, the annotations trigger is inserted via an UIX.
+    var annotationsTrigger = $('tmAnnotationsTrigger');
+    if (annotationsTrigger) {
+      annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
     } else {
+      // If the UIX is not there, then it means we are in an old skin (such as colibri), and so we let the following
+      // legacy code to maintain backward compatibility.
       var contentmenu = $('contentmenu');
       if (contentmenu) {
         var rightMenu = contentmenu.down('.rightmenu');
@@ -1679,7 +1676,8 @@ document.observe('xwiki:dom:loaded', function() {
     // initialize the annotations on the xwikicontent element which is the document content by default  
     new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
-});</code>
+});
+</code>
     </property>
     <property>
       <name>Annotation Javascript -- Annotation application</name>

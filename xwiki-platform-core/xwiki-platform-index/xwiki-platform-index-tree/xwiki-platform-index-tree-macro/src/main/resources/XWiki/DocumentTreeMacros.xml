@@ -276,8 +276,10 @@
     #set ($orderByClause = '')
   #end
   #set ($_query = $services.query.hql("$selectClause $whereClause $orderByClause"))
-  #set ($wikiReference = $parentReference.extractReference('WIKI'))
-  #set ($_query = $_query.setWiki($wikiReference.name).addFilter('hidden/space'))
+  #set ($_query = $_query.setWiki($parentReference.extractReference('WIKI').name))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($_query = $_query.addFilter('hidden/space'))
+  #end
   #foreach ($entry in $parameters.entrySet())
     #set ($_query = $_query.bindValue($entry.key, $entry.value))
   #end
@@ -407,7 +409,9 @@
   #set ($statement = "$selectClause $fromClause $whereClause $orderByClause")
   #set ($_query = $services.query.hql($statement))
   #set ($_query = $_query.setWiki($parentReference.extractReference('WIKI').name))
-  #set ($_query = $_query.addFilter('hidden/document').addFilter('hidden/space'))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($_query = $_query.addFilter('hidden/document').addFilter('hidden/space'))
+  #end
   #foreach ($entry in $parameters.entrySet())
     #set ($_query = $_query.bindValue($entry.key, $entry.value))
   #end
@@ -452,7 +456,10 @@
   #foreach ($entry in $parameters.entrySet())
     #set ($query = $query.bindValue($entry.key, $entry.value))
   #end
-  #set ($count = $count + $query.addFilter('hidden/document').count())
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/document'))
+  #end
+  #set ($count = $count + $query.count())
   #set ($return = $NULL)
   #setVariable("$return" $count)
 #end
@@ -707,7 +714,9 @@
   #foreach ($entry in $finalParameters.entrySet())
     #set ($docsQuery = $docsQuery.bindValue($entry.key, $entry.value))
   #end
-  #set ($discard = $docsQuery.addFilter('hidden/document'))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($discard = $docsQuery.addFilter('hidden/document'))
+  #end
   #set ($return = $NULL)
   #setVariable("$return" $docsQuery)
 #end
@@ -1447,10 +1456,13 @@
 #macro (searchSpaces $text $limit $return)
   #set ($matchSpaceName = 'upper(space.name) like upper(:spaceNamePattern)')
   #set ($statement = "select space.reference from XWikiSpace space where $matchSpaceName order by space.reference")
-  #set ($query = $services.query.hql($statement).addFilter('hidden/document'))
+  #set ($query = $services.query.hql($statement).setLimit($limit))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/space'))
+  #end
   #set ($query = $query.bindValue('spaceNamePattern', "%$text%"))
   #set ($spaceReferences = [])
-  #foreach ($localSpaceRef in $query.setLimit($limit).execute())
+  #foreach ($localSpaceRef in $query.execute())
     #set ($discard = $spaceReferences.add($services.model.resolveSpace($localSpaceRef)))
   #end
   #set ($return = $NULL)
@@ -1513,8 +1525,10 @@
   #end
   #set ($constraints = $stringtool.join($constraints, ' and '))
   #set ($statement = "select doc.fullName from XWikiDocument doc, XWikiSpace space where $constraints")
-  #set ($query = $services.query.hql($statement).addFilter('hidden/document'))
-  #set ($query = $query.setLimit($limit).bindValue('text', "%$text%"))
+  #set ($query = $services.query.hql($statement).setLimit($limit).bindValue('text', "%$text%"))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/document'))
+  #end
   #set ($documentReferences = [])
   #foreach ($docFullName in $query.execute())
     #set ($discard = $documentReferences.add($services.model.resolveDocument($docFullName)))

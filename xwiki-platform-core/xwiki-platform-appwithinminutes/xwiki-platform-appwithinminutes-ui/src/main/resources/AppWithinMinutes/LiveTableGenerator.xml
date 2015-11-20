@@ -143,8 +143,6 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uico
 {{{##
 {{velocity}}
 #set($className = $liveTableObj.getProperty('class').value)
-#set($translationBundleId = "$stringtool.removeEnd($className, 'Class')Translations")
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '#escapeSingleQuotes($translationBundleId)'))
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
@@ -152,7 +150,6 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localizatio
 #generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
   'className': '#escapeSingleQuotes($className)',
-  'resultPage': '#escapeSingleQuotes($stringtool.removeEnd($className, 'Class'))LiveTableResults',
   'translationPrefix': '#escapeSingleQuotes($shortName).livetable.',
   'tagCloud': true,
   'rowCount': 15,

@@ -62,7 +62,8 @@ $escapetool.h Class fields
 #end
 
 $escapetool.h Live table generic keys
-#set ($prefix = "${doc.name.replaceAll('Class', '').toLowerCase()}.livetable.")
+#set ($appName = $doc.name.replaceAll('Class', '').toLowerCase())
+#set ($prefix = "${appName}.livetable.")
 #set ($liveTableGenericKeys = {
   'doc.title': 'liveTableEditorDocTitleColumnName',
   'doc.name': 'liveTableEditorDocNameColumnName',
@@ -88,5 +89,7 @@ $escapetool.h Live table specific keys
 #foreach ($property in $doc.getxWikiClass().properties)
 #map("$prefix$property.name" $property.prettyName)
 #end
+
+${appName}.dataSpace.title=Data
 {{/velocity}}</content>
 </xwikidoc>

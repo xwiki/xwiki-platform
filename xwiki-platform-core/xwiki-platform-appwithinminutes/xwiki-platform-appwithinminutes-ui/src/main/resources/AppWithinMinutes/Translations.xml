@@ -44,7 +44,11 @@ appWithinMinutes.createApp.location.label=Location
 appWithinMinutes.createApp.location.hint=The location in the page hierarchy where to create the application.
 appWithinMinutes.createApp.parent.label=Parent
 appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave empty if you want to create a top level application.
-appWithinMinutes.createApp.parent.placeholder=Path.To.Parent</content>
+appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+
+appWithinMinutes.codeSpace.title=Code
+appWithinMinutes.codeSpace.description=This is the place where the application code is located.
+appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent it, because otherwise none of the application code pages would be visible as they are all hidden by default.</content>
   <object>
     <name>AppWithinMinutes.Translations</name>
     <number>0</number>

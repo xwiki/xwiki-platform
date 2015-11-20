@@ -281,20 +281,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // (and showViewAction = false)
         if ((!"view".equals(action) || (showViewAction))
             || (!showViewAction && spaceReference != null && "view".equals(action)
-            && this.actionLister.listActions().contains(extractFirstSpaceName(spaceReference).getName())))
+            && this.actionLister.listActions().contains(
+                spaceReference.extractFirstReference(EntityType.SPACE).getName())))
         {
             newpath.append(action);
             newpath.append("/");
         }
-    }
-
-    private EntityReference extractFirstSpaceName(EntityReference spaceReference)
-    {
-        EntityReference current = spaceReference;
-        while (current.getParent() != null && current.getParent().getType().equals(EntityType.SPACE)) {
-            current = current.getParent();
-        }
-        return current;
     }
 
     private void addSpaces(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)

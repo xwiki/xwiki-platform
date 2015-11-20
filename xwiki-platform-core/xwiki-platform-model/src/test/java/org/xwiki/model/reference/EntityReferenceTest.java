@@ -68,13 +68,28 @@ public class EntityReferenceTest
     public void extractReference()
     {
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
-        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki);
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space);
+        EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
+        EntityReference space2 = new EntityReference("space2", EntityType.SPACE, space1);
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space2);
 
         Assert.assertSame(wiki, reference.extractReference(EntityType.WIKI));
-        Assert.assertSame(space, reference.extractReference(EntityType.SPACE));
+        Assert.assertSame(space2, reference.extractReference(EntityType.SPACE));
         Assert.assertSame(reference, reference.extractReference(EntityType.DOCUMENT));
         Assert.assertNull(reference.extractReference(EntityType.ATTACHMENT));
+    }
+
+    @Test
+    public void extractFirstReference()
+    {
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
+        EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
+        EntityReference space2 = new EntityReference("space2", EntityType.SPACE, space1);
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space2);
+
+        Assert.assertSame(wiki, reference.extractFirstReference(EntityType.WIKI));
+        Assert.assertSame(space1, reference.extractFirstReference(EntityType.SPACE));
+        Assert.assertSame(reference, reference.extractFirstReference(EntityType.DOCUMENT));
+        Assert.assertNull(reference.extractFirstReference(EntityType.ATTACHMENT));
     }
 
     @Test

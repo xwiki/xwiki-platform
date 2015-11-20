@@ -5,6 +5,7 @@
 ## Configuration options for the Document Tree.
 #set ($docTreeConfig = {
   'filterByClass': '',
+  'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
   'limit': 15,
   'root': '',

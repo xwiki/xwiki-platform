@@ -37,7 +37,7 @@
   <title>Document Tree Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.documentTree.name=Page Tree
 rendering.macro.documentTree.description=Displays the tree of XWiki pages.
@@ -79,6 +79,8 @@ rendering.macro.documentTree.parameter.finder.name=Finder
 rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
 rendering.macro.documentTree.parameter.hierarchyMode.name=Page Hierarchy Mode
 rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between pages. Possible values are "reference" (default) and "parentchild". If "reference" is used then the page hierarchy is defined using only the page reference, especially the nested spaces component of the page reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" page field from the database.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
 
 index.documentTree.empty=No pages found
 

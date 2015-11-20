@@ -445,6 +445,30 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/extension/xar/job/diff/DiffXarJobStatus</className>
+              <to>org/xwiki/job/internal/AbstractJobStatus</to>
+              <justification>Was wrongly extending internal class</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/extension/xar/job/diff/DiffXarJobStatus</className>
+              <to>org/xwiki/job/internal/DefaultJobStatus</to>
+              <justification>Was wrongly extending internal class</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/refactoring/job/EntityJobStatus</className>
+              <to>org/xwiki/job/internal/AbstractJobStatus</to>
+              <justification>Was wrongly extending internal class</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/refactoring/job/EntityJobStatus</className>
+              <to>org/xwiki/job/internal/DefaultJobStatus</to>
+              <justification>Was wrongly extending internal class</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

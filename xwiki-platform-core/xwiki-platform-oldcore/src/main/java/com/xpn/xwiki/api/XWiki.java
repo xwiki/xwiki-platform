@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -955,20 +956,6 @@ public class XWiki extends Api
      * XWiki Preferences
      *
      * @param preference Preference name
-     * @param space The space for which this preference is requested
-     * @return The preference for this wiki and the current language
-     */
-    public String getSpacePreferenceFor(String preference, String space)
-    {
-        return this.xwiki.getSpacePreference(preference, space, "", getXWikiContext());
-    }
-
-    /**
-     * API to access an Space Preference There can be one preference object per language This function will find the
-     * right preference object associated to the current active language If no preference is found it will look in the
-     * XWiki Preferences
-     *
-     * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current language
      */
@@ -1001,17 +988,66 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference as a long number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then empty String is returned.
      *
      * @param preference Preference name
      * @param space The space for which this preference is requested
-     * @param defaultValue default value to return if the prefenrece does not exist or is empty
+     * @return The preference for this wiki and the current language
+     */
+    public String getSpacePreferenceFor(String preference, String space)
+    {
+        return getSpacePreferenceFor(preference, space, "");
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then <code>defaultValue</code> is returned.
+     *
+     * @param preference Preference name
+     * @param space The space for which this preference is requested
+     * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current language in long format
      */
     public String getSpacePreferenceFor(String preference, String space, String defaultValue)
     {
         return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then empty String is returned.
+     * 
+     * @param preferenceKey the name of the preference key
+     * @param spaceReference the reference of the space
+     * @param defaultValue the value to return if the preference can't be found
+     * @param context the XWiki context
+     * @return the value of the preference or empty String if it could not be found
+     * @since 7.4M1
+     */
+    public String getSpacePreferenceFor(String preference, SpaceReference spaceReference)
+    {
+        return this.xwiki.getSpacePreference(preference, spaceReference, getXWikiContext());
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then <code>defaultValue</code> is returned.
+     * 
+     * @param preferenceKey the name of the preference key
+     * @param spaceReference the reference of the space
+     * @param defaultValue the value to return if the preference can't be found
+     * @param context the XWiki context
+     * @return the value of the preference or <code>defaultValue</code> if it could not be found
+     * @since 7.4M1
+     */
+    public String getSpacePreferenceFor(String preference, SpaceReference spaceReference, String defaultValue)
+    {
+        return this.xwiki.getSpacePreference(preference, spaceReference, defaultValue, getXWikiContext());
     }
 
     /**

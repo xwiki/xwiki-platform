@@ -116,7 +116,9 @@ public class IntegrationTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
         // Isolate from Environment
-        this.componentManager.registerMockComponent(EntityResourceActionLister.class);
+        EntityResourceActionLister actionLister =
+            this.componentManager.registerMockComponent(EntityResourceActionLister.class);
+        when(actionLister.listActions()).thenReturn(Arrays.asList("view"));
 
         // Simulate a configured Execution Context
         Execution execution = this.componentManager.registerMockComponent(Execution.class);

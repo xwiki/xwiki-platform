@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
+import org.xwiki.test.annotation.BeforeComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -81,6 +84,14 @@ public class XWikiServletURLFactoryTest
      * Tests can add values to this map to control the value returned by {@link XWikiRequest#getHeader(String)}.
      */
     private final Map<String, String> httpHeaders = new HashMap<>();
+
+    @BeforeComponent
+    public void beforeComponent() throws Exception
+    {
+        EntityResourceActionLister actionLister =
+            this.oldcore.getMocker().registerMockComponent(EntityResourceActionLister.class);
+        when(actionLister.listActions()).thenReturn(Arrays.asList("view"));
+    }
 
     @Before
     public void before() throws Exception
@@ -563,5 +574,23 @@ public class XWikiServletURLFactoryTest
         URL url =
             this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "viewrev", null, xwikiContext);
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/viewattachrev/currentspace/currentpage/file"), url);
+    }
+
+    @Test
+    public void createURLWhenShowViewActionFalse() throws Exception
+    {
+        doReturn(false).when(this.oldcore.getSpyXWiki()).showViewAction(any(XWikiContext.class));
+
+        URL url = this.urlFactory.createURL("Space", "Page", "view", this.oldcore.getXWikiContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/Space/Page"), url);
+    }
+
+    @Test
+    public void createURLWhenShowViewActionFalseAndSpaceIsNamedAfterAnAction() throws Exception
+    {
+        doReturn(false).when(this.oldcore.getSpyXWiki()).showViewAction(any(XWikiContext.class));
+
+        URL url = this.urlFactory.createURL("view.space2", "page", "view", this.oldcore.getXWikiContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/view/space2/page"), url);
     }
 }

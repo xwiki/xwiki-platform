@@ -46,7 +46,6 @@
   <content>{{include reference="Blog.BlogCode"/}}
 
 {{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
 ##
 ##
 ##
@@ -172,6 +171,5 @@
     #displayBlogMonthArchive($blogDoc $year $month)
   #end
 #end
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

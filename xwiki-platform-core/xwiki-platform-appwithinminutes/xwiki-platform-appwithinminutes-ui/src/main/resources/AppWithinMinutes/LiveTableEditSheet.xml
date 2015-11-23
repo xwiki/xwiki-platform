@@ -202,9 +202,13 @@
     #set ($escapedAppName = $doc.documentReference.parent.name.toLowerCase().replace("'", "''"))
     #set ($discard = $dataHomePage.setTitle("${escapetool.d}services.localization.render('${escapedAppName}.dataSpace.title')"))
 
-    ## Include the data home page in the application home page.
-    #set ($escapedReference = $services.model.serialize($dataSpaceHomeReference).replaceAll('([~"])', '~$1'))
-    #set ($discard = $doc.setContent("{{include reference=""$escapedReference"" /}}"))
+    #set ($homePageContent = '')
+    #if ("$!generatedLiveTableContent" != '')
+      ## Include the data home page in the application home page.
+      #set ($escapedReference = $services.model.serialize($dataSpaceHomeReference).replaceAll('([~"])', '~$1'))
+      #set ($homePageContent = "{{include reference=""$escapedReference"" /}}")
+    #end
+    #set ($discard = $doc.setContent($homePageContent))
   #end
   #set ($discard = $dataHomePage.setContent($generatedLiveTableContent))
 

@@ -56,7 +56,6 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.configuration.internal.DocumentsConfigurationSource}.
  *
  * @version $Id$
- * @since 6.1M2
  */
 public class SpacesConfigurationSourceTest
 {

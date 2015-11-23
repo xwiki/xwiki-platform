@@ -53,7 +53,12 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     @Override
     protected String getCacheKeyPrefix()
     {
-        return this.wikiManager.getCurrentWikiId();
+        DocumentReference currentDocumentReference = getDocumentReference();
+        if (currentDocumentReference != null) {
+            return this.referenceSerializer.serialize(currentDocumentReference.getParent());
+        }
+
+        return null;
     }
 
     @Override

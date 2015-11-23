@@ -50,14 +50,14 @@ public class DocumentsConfigurationSource extends CompositeConfigurationSource i
     private ConfigurationSource wikiPreferencesSource;
 
     @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    @Named("spaces")
+    private ConfigurationSource spacesPreferencesSource;
 
     @Override
     public void initialize() throws InitializationException
     {
         // First source is looked up first when a property value is requested.
-        addConfigurationSource(this.spacePreferencesSource);
+        addConfigurationSource(this.spacesPreferencesSource);
         addConfigurationSource(this.wikiPreferencesSource);
     }
 }

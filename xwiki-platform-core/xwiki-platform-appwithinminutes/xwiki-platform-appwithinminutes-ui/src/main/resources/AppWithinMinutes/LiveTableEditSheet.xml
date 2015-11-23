@@ -199,12 +199,14 @@
   #else
     ## The application data is stored in a different space.
     #set ($dataHomePage = $xwiki.getDocument($dataSpaceHomeReference))
+    #set ($discard = $dataHomePage.setHidden(true))
     #set ($escapedAppName = $doc.documentReference.parent.name.toLowerCase().replace("'", "''"))
     #set ($discard = $dataHomePage.setTitle("${escapetool.d}services.localization.render('${escapedAppName}.dataSpace.title')"))
 
+    ## Update the home page content.
     #set ($homePageContent = '')
     #if ("$!generatedLiveTableContent" != '')
-      ## Include the data home page in the application home page.
+      ## Include the entries live table in the application home page.
       #set ($escapedReference = $services.model.serialize($dataSpaceHomeReference).replaceAll('([~"])', '~$1'))
       #set ($homePageContent = "{{include reference=""$escapedReference"" /}}")
     #end

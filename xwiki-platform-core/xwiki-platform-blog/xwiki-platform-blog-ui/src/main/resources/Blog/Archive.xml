@@ -90,7 +90,7 @@
       #end
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticle'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticle'){{/info}}
   #end
 #end
 ##
@@ -123,7 +123,7 @@
       #end
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticlesyear'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticlesyear'){{/info}}
   #end
 #end
 ##
@@ -146,7 +146,7 @@
       #displayEntry($entryDoc $entryObj true true)
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticlesmonth'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticlesmonth'){{info}}
   #end
 #end
 ##

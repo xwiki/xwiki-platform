@@ -203,7 +203,7 @@
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
-        <version>4.1.4</version>
+        <version>4.4.1</version>
         <exclusions>
           <!-- Already part of Java SE 6 -->
           <exclusion>

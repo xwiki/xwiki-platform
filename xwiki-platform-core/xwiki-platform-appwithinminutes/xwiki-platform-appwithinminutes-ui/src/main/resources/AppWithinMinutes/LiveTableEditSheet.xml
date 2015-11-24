@@ -43,9 +43,8 @@
 #macro(listAvailableColumns)
   {{html}}
   &lt;select id="availableColumns"&gt;
-    #set($className = "$!liveTableObj.getProperty('class').value")
+    #set($className = "$!liveTableObj.getValue('class')")
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
-    #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
     #if($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
         #foreach($field in $classFields)

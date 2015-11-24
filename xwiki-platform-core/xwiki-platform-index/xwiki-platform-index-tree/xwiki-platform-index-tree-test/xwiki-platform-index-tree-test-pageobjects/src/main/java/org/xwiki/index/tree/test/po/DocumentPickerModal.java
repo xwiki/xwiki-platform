@@ -41,7 +41,7 @@ public class DocumentPickerModal extends BaseElement
 
     public DocumentPickerModal()
     {
-        this.container = getDriver().findElement(By.cssSelector(".location-tree.modal.fade.in"));
+        this.container = getDriver().findElement(By.cssSelector(".location-picker .modal.fade.in"));
 
         this.waitForIt();
     }

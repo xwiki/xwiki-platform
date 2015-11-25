@@ -270,7 +270,7 @@
     #set ($whereClause = "where $stringtool.join($constraints, ' and ')")
   #end
   #set ($selectClause = 'select space.name from XWikiSpace space')
-  #set ($orderByClause = 'order by space.name')
+  #set ($orderByClause = 'order by lower(space.name), space.name')
   #if ($count)
     #set ($selectClause = 'select count(*) from XWikiSpace space')
     #set ($orderByClause = '')
@@ -401,10 +401,14 @@
   #set ($isChildSpace = 'space.parent = :parentSpaceRef')
   #set ($whereClause = "where ($isChildSpace or $isChildDocument)")
   ## List the child spaces first and then the child documents.
-  #set ($orderByClause = 'order by type, name')
+  ## We cannot call the lower() function with an alias because:
+  ## * MySql throws com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'name' in 'order clause'
+  ## * HSQLDB throws org.hsqldb.HsqlException: user lacks privilege or object not found: NAME
+  ## We have to duplicate the CASE expression in the ORDER BY clause.
+  #set ($orderByClause = "order by type, lower($selectEntityName), $selectEntityName")
   #if (!$docTreeConfig.showSpaces)
     ## Mix terminal and non-terminal documents in nested documents mode.
-    #set ($orderByClause = 'order by name')
+    #set ($orderByClause = "order by lower($selectEntityName), $selectEntityName")
   #end
   #set ($statement = "$selectClause $fromClause $whereClause $orderByClause")
   #set ($_query = $services.query.hql($statement))
@@ -710,7 +714,9 @@
   #end
   #set ($discard = $finalConstraints.addAll($constraints))
   #set ($discard = $finalParameters.putAll($parameters))
-  #set ($docsQuery = $services.query.hql("$fromClause where $stringtool.join($finalConstraints, ' and ') order by doc.name"))
+  #set ($statement = "$fromClause where $stringtool.join($finalConstraints, ' and ') "
+    + "order by lower(doc.name), doc.name")
+  #set ($docsQuery = $services.query.hql($statement))
   #foreach ($entry in $finalParameters.entrySet())
     #set ($docsQuery = $docsQuery.bindValue($entry.key, $entry.value))
   #end
@@ -1455,7 +1461,8 @@
 
 #macro (searchSpaces $text $limit $return)
   #set ($matchSpaceName = 'upper(space.name) like upper(:spaceNamePattern)')
-  #set ($statement = "select space.reference from XWikiSpace space where $matchSpaceName order by space.reference")
+  #set ($statement = "select space.reference from XWikiSpace space where $matchSpaceName "
+    + "order by lower(space.reference), space.reference")
   #set ($query = $services.query.hql($statement).setLimit($limit))
   #if ($docTreeConfig.filterHiddenDocuments)
     #set ($query = $query.addFilter('hidden/space'))

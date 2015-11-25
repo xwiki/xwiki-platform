@@ -144,6 +144,19 @@ public class LiveTableResultsTest extends PageTest
                 + "order by lower(prop_where.value) asc, prop_where.value asc");
     }
 
+    /**
+     * @see "XWIKI-12855: Unable to sort the Location column in Page Index"
+     */
+    @Test
+    public void orderByLocation() throws Exception
+    {
+        setSort("doc.location", false);
+
+        renderPage();
+
+        verify(queryService).hql("  where 1=1    order by lower(doc.fullName) desc, doc.fullName desc");
+    }
+
     //
     // Helper methods
     //

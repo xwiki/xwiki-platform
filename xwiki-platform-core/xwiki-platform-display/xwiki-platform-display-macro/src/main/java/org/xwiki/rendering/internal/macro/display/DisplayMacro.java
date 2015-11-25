@@ -131,7 +131,7 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         checkRecursiveDisplayOrInclude(context.getCurrentMacroBlock(), includedReference);
 
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
-            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUser()
+            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUserReference()
                 + "] doesn't have view rights on document ["
                 + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
         }

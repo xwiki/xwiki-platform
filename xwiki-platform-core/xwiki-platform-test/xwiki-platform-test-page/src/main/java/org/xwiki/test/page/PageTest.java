@@ -47,6 +47,7 @@ import org.xwiki.query.Query;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -133,6 +134,7 @@ public class PageTest
         mocker.registerMockComponent(Environment.class);
         mocker.registerMockComponent(JobProgressManager.class);
         mocker.registerMockComponent(RenderingCache.class);
+        mocker.registerMockComponent(EntityResourceActionLister.class);
 
         CacheManager cacheManager = mocker.registerMockComponent(CacheManager.class);
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));

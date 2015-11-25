@@ -49,7 +49,7 @@ public class DocumentPickerModal extends BaseElement
     public DocumentTreeElement getTree()
     {
         if (this.tree == null) {
-            this.tree = new DocumentTreeElement(this.container.findElement(By.className("xtree")));
+            this.tree = new DocumentTreeElement(this.container.findElement(By.className("location-tree")));
         }
         return this.tree;
     }

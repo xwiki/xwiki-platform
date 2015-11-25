@@ -111,6 +111,9 @@
     #end
   #end
   #set($order = "$!request.sort")
+  #if ($order == 'doc.location')
+    #set ($order = 'doc.fullName')
+  #end
   #set ($orderSql = '')
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir').toLowerCase()}")

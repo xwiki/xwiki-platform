@@ -31,7 +31,7 @@ import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update the WikiManagerCode.WikiTemplateClass document with all required information.
+ * Update the XWiki.XWikiServerClass document with all required information.
  *
  * @since 5.3M2
  * @version $Id$
@@ -85,13 +85,6 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
         // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
         // getDocumentReference() returns the actual main wiki document reference.
         super(DOCUMENT_SPACE, DOCUMENT_NAME);
-    }
-
-    @Override
-    protected boolean isMainWikiOnly()
-    {
-        // The class is used inside wiki descriptors which are located on main wiki
-        return true;
     }
 
     @Override

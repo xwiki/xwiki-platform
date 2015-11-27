@@ -23,9 +23,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -72,7 +75,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     /**
      * @since 7.3M1
      */
-    private Map<String, String> parameters;
+    private Map<String, List<String>> parameters;
 
     public XWikiServletRequestStub()
     {
@@ -135,18 +138,18 @@ public class XWikiServletRequestStub implements XWikiRequest
         if (this.parameters == null) {
             this.parameters = new HashMap<>();
         }
-        this.parameters.put(name, value);
+        List<String> values = this.parameters.get(name);
+        if (values == null) {
+            values = new ArrayList<>();
+            this.parameters.put(name, values);
+        }
+        values.add(value);
     }
 
     @Override
     public String get(String name)
     {
-        String result = null;
-        if (this.parameters != null) {
-            result = this.parameters.get(name);
-        }
-
-        return result;
+        return getParameter(name);
     }
 
     @Override
@@ -354,25 +357,33 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getParameter(String s)
     {
+        if (this.parameters != null) {
+            List<String> values = this.parameters.get(s);
+            return values != null && values.size() > 0 ? values.get(0) : null;
+        }
         return null;
     }
 
     @Override
     public Enumeration getParameterNames()
     {
-        return null;
+        return this.parameters != null ? Collections.enumeration(this.parameters.keySet()) : null;
     }
 
     @Override
     public String[] getParameterValues(String s)
     {
-        return new String[0];
+        if (this.parameters != null) {
+            List<String> values = this.parameters.get(s);
+            return values != null ? values.toArray(new String[] {}) : null;
+        }
+        return null;
     }
 
     @Override
     public Map getParameterMap()
     {
-        return null;
+        return this.parameters != null ? Collections.unmodifiableMap(this.parameters) : null;
     }
 
     @Override

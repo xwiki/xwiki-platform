@@ -157,6 +157,19 @@ public class LiveTableResultsTest extends PageTest
         verify(queryService).hql("  where 1=1    order by lower(doc.fullName) desc, doc.fullName desc");
     }
 
+    @Test
+    public void filterByLocation() throws Exception
+    {
+        setColumns("doc.location");
+        setFilter("doc.location", "web");
+
+        renderPage();
+
+        verify(queryService).hql(
+            "  where 1=1  and ((doc.name = 'WebHome' and upper(doc.space) like upper(?) escape '!')"
+                + " or (doc.name <> 'WebHome' and upper(doc.fullName) like upper(?) escape '!')) ");
+    }
+
     //
     // Helper methods
     //
@@ -201,6 +214,11 @@ public class LiveTableResultsTest extends PageTest
         if (ascending != null) {
             request.put("dir", ascending ? "asc" : "desc");
         }
+    }
+
+    private void setFilter(String column, String value)
+    {
+        request.put(column, value);
     }
 
     private void setQueryFilters(String... filters)

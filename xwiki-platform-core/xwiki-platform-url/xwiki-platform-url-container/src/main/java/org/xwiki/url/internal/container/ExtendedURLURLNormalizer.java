@@ -19,13 +19,11 @@
  */
 package org.xwiki.url.internal.container;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,10 +32,10 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Prefixes the passed Extended URL with the webapp's Servlet context. For example {@code /some/path} would be
@@ -60,37 +58,22 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     @Inject
     private Container container;
 
+    /** Provides access to the application context configuration. */
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private Environment environment;
 
     @Override
     public ExtendedURL normalize(ExtendedURL partialURL)
     {
-        String contextPath = getConfiguredContextPath();
+        String contextPath = StringUtils.strip(getContextPath(), URL_SEGMENT_DELIMITER);
 
-        // If the context path is not configured, extract it from the current request.
         if (contextPath == null) {
-            contextPath = getRequestContextPath();
-
-            // If there's no request (e.g. the code is executed by a daemon thread), extract the context path from the
-            // URL specified by the current execution context.
-            // TODO: Instead of trying to extract from the URL, save the context path at webapp init (using a
-            // ServlettContextListener for example).
-            if (contextPath == null) {
-                contextPath = getExecutionContextPath();
-
-                if (contextPath == null) {
-                    throw new RuntimeException(String.format("Failed to normalize the URL [%s] since the "
-                        + "application's Servlet context couldn't be computed.", partialURL));
-                }
-            }
+            throw new RuntimeException(String.format("Failed to normalize the URL [%s] since the "
+                + "application's Servlet context couldn't be computed.", partialURL));
         }
 
-        // Remove any leading or trailing slashes.
-        contextPath = StringUtils.strip(contextPath, URL_SEGMENT_DELIMITER);
-
         List<String> segments = new ArrayList<>();
-        if (!StringUtils.isEmpty(contextPath)) {
+        if (StringUtils.isNotEmpty(contextPath)) {
             segments.add(contextPath);
         }
         segments.addAll(partialURL.getSegments());
@@ -98,12 +81,41 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
         return new ExtendedURL(segments, partialURL.getParameters());
     }
 
-    private String getConfiguredContextPath()
+    private String getContextPath()
+    {
+        String contextPath = getContextPathFromConfiguration();
+
+        // If the context path is not configured, extract it from the current request
+        if (contextPath == null) {
+            contextPath = getContextPathFromCurrentRequest();
+        }
+
+        // Finally, try to extract it from the application context
+        if (contextPath == null) {
+            contextPath = getContextPathFromApplicationContext();
+        }
+
+        return contextPath;
+    }
+
+    /**
+     * Look in the XWiki configuration for a hard-coded value. Currently, this is specified using the
+     * {@code xwiki.webapppath} setting in {@code xwiki.cfg}.
+     *
+     * @return the value specified in the settings, or {@code null} if not specified
+     */
+    private String getContextPathFromConfiguration()
     {
         return this.configurationSource.getProperty("xwiki.webapppath");
     }
 
-    private String getRequestContextPath()
+    /**
+     * Look in the current request, if there is such a request (non-background thread) and it is a HTTP Servlet Request.
+     *
+     * @return the context path taken from the current HTTP Servlet Request (may be the empty string), or {@code null}
+     *         if there is no such request
+     */
+    private String getContextPathFromCurrentRequest()
     {
         Request request = this.container.getRequest();
         if (request instanceof ServletRequest) {
@@ -112,13 +124,16 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
         return null;
     }
 
-    private String getExecutionContextPath()
+    /**
+     * Look in the application context, if there is such a context.
+     *
+     * @return the context path taken from the application context, or {@code null} if this isn't running in a servlet
+     *         environment
+     */
+    private String getContextPathFromApplicationContext()
     {
-        URL currentURL = this.xcontextProvider.get().getURL();
-        if (currentURL != null) {
-            // Extract the context path by getting the first path segment.
-            return StringUtils.substringBefore(StringUtils.stripStart(currentURL.getPath(), URL_SEGMENT_DELIMITER),
-                URL_SEGMENT_DELIMITER);
+        if (this.environment instanceof ServletEnvironment) {
+            return ((ServletEnvironment) this.environment).getServletContext().getContextPath();
         }
         return null;
     }

@@ -22,25 +22,27 @@ package com.xpn.xwiki.web;
 import java.io.File;
 import java.io.IOException;
 
-import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
-import org.xwiki.environment.internal.ServletEnvironment;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link TempResourceAction}.
  * 
  * @version $Id$
  */
-public class TempResourceActionTest extends AbstractBridgedComponentTestCase
+public class TempResourceActionTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     /**
      * The action being tested.
      */
@@ -51,43 +53,17 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
      */
     private File base;
 
-    private ExecutionContext executionContext;
-
-    @Override
+    @Before
     public void setUp() throws Exception
     {
         base = new File(getClass().getResource("/").toURI());
-
-        super.setUp();
-
-        action = new TempResourceAction();
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        this.executionContext = new ExecutionContext();
-
+        
         // Configure Servlet Environment defined in AbstractBridgedComponentTestCase so that it returns a good
         // temporary directory
-        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
-        environment.setTemporaryDirectory(base);
+        Environment environment = oldcore.getMocker().registerMockComponent(Environment.class);
+        when(environment.getTemporaryDirectory()).thenReturn(base);
 
-        final ExecutionContextManager mockExecutionContextManager =
-            registerMockComponent(ExecutionContextManager.class);
-        final Execution mockExecution = registerMockComponent(Execution.class);
-        
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockExecutionContextManager).initialize(with(any(ExecutionContext.class)));
-
-                allowing(mockExecution).getContext(); will(returnValue(executionContext));
-                allowing(mockExecution).removeContext();
-            }
-        });
+        action = new TempResourceAction();
     }
 
     /**
@@ -112,7 +88,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     public void testGetTemporaryFileForBadURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", getContext()));
+        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -123,7 +99,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     public void testGetTemporaryFileForRelativeURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", getContext()));
+        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -133,7 +109,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     public void testGetTemporaryFileMissing() throws Exception
     {
         Assert.assertFalse(new File(base, "temp/module/xwiki/Space/Page/file.txt").exists());
-        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", getContext()));
+        Assert.assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -142,9 +118,9 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     @Test
     public void testGetTemporaryFile() throws Exception
     {
-        getContext().setWikiId("wiki");
+        oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");
-        Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", getContext()));
+        Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
     }
 
     /**
@@ -155,7 +131,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
     {
         createEmptyFile("temp/officeviewer/xwiki/Sp*ace/Pa-ge/presentation.odp/presentation-slide0.jpg");
         Assert.assertNotNull(action.getTemporaryFile(
-            "/xwiki/bin/temp/Sp%2Aace/Pa%2Dge/officeviewer/presentation.odp/presentation-slide0.jpg", getContext()));
+            "/xwiki/bin/temp/Sp%2Aace/Pa%2Dge/officeviewer/presentation.odp/presentation-slide0.jpg", oldcore.getXWikiContext()));
     }
 
     /**
@@ -168,6 +144,6 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
         createEmptyFile("temp/officeviewer/xwiki/Space/Page/"
             + "attach%3Axwiki%3ASpace.Page%40pres%2Fentation.odp/13/presentation-slide0.jpg");
         Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/officeviewer/"
-            + "attach:xwiki:Space.Page@pres%2Fentation.odp/13/presentation-slide0.jpg", getContext()));
+            + "attach:xwiki:Space.Page@pres%2Fentation.odp/13/presentation-slide0.jpg", oldcore.getXWikiContext()));
     }
 }

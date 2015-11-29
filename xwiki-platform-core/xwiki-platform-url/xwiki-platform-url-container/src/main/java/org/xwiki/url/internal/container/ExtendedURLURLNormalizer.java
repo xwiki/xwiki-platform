@@ -29,9 +29,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
-import org.xwiki.container.Request;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.url.ExtendedURL;
@@ -54,9 +51,6 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource configurationSource;
-
-    @Inject
-    private Container container;
 
     /** Provides access to the application context configuration. */
     @Inject
@@ -85,12 +79,7 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     {
         String contextPath = getContextPathFromConfiguration();
 
-        // If the context path is not configured, extract it from the current request
-        if (contextPath == null) {
-            contextPath = getContextPathFromCurrentRequest();
-        }
-
-        // Finally, try to extract it from the application context
+        // If the context path is not configured, try to extract it from the application context
         if (contextPath == null) {
             contextPath = getContextPathFromApplicationContext();
         }
@@ -107,21 +96,6 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     private String getContextPathFromConfiguration()
     {
         return this.configurationSource.getProperty("xwiki.webapppath");
-    }
-
-    /**
-     * Look in the current request, if there is such a request (non-background thread) and it is a HTTP Servlet Request.
-     *
-     * @return the context path taken from the current HTTP Servlet Request (may be the empty string), or {@code null}
-     *         if there is no such request
-     */
-    private String getContextPathFromCurrentRequest()
-    {
-        Request request = this.container.getRequest();
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest().getContextPath();
-        }
-        return null;
     }
 
     /**

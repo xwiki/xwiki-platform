@@ -25,14 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -55,8 +52,6 @@ public class ExtendedURLURLNormalizerTest
 {
     private ConfigurationSource configurationSource;
 
-    private Container container;
-
     @Rule
     public MockitoComponentMockingRule<URLNormalizer<ExtendedURL>> mocker =
         new MockitoComponentMockingRule<URLNormalizer<ExtendedURL>>(ExtendedURLURLNormalizer.class);
@@ -65,7 +60,6 @@ public class ExtendedURLURLNormalizerTest
     public void configure() throws Exception
     {
         this.configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        this.container = this.mocker.getInstance(Container.class);
     }
 
     @Test
@@ -87,17 +81,7 @@ public class ExtendedURLURLNormalizerTest
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndRequest() throws Exception
-    {
-        HttpServletRequest request = createMockRequest();
-        when(request.getContextPath()).thenReturn("/xwiki");
-
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
-    }
-
-    @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestButEnvironment() throws Exception
+    public void normalizeWhenNoConfigurationPropertyButEnvironment() throws Exception
     {
         ServletContext sc = mock(ServletContext.class);
         ServletEnvironment environment = mock(ServletEnvironment.class);
@@ -110,7 +94,7 @@ public class ExtendedURLURLNormalizerTest
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestButEnvironmentWithRootContext() throws Exception
+    public void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext() throws Exception
     {
         ServletContext sc = mock(ServletContext.class);
         ServletEnvironment environment = mock(ServletEnvironment.class);
@@ -123,7 +107,7 @@ public class ExtendedURLURLNormalizerTest
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestAndNoServletEnvironment() throws Exception
+    public void normalizeWhenNoConfigurationPropertyAndNoServletEnvironment() throws Exception
     {
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         try {
@@ -155,16 +139,5 @@ public class ExtendedURLURLNormalizerTest
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
-    }
-
-    private HttpServletRequest createMockRequest()
-    {
-        ServletRequest request = mock(ServletRequest.class);
-        when(this.container.getRequest()).thenReturn(request);
-
-        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        when(request.getHttpServletRequest()).thenReturn(httpRequest);
-
-        return httpRequest;
     }
 }

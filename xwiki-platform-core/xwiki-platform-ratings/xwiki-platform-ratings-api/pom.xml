@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ratings</artifactId>
-    <version>7.4-milestone-1</version>
+    <version>7.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ratings-api</artifactId>
   <packaging>jar</packaging>

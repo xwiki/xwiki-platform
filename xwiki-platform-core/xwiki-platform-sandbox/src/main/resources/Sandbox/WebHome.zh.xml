@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>沙箱是您的wiki中可以任意改动的部分。您可以用它来练习和测试wiki页面的编辑。通过这些练习，你能够学习和发现页面是怎样被创建和修改的。让我们从点击 **编辑** 链接开始！
 

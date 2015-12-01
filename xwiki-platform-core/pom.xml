@@ -575,6 +575,7 @@
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
+    <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>

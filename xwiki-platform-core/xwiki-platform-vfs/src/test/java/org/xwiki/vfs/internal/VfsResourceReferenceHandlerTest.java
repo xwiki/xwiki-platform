@@ -47,6 +47,8 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.vfs.VfsException;
+import org.xwiki.vfs.VfsPermissionChecker;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -77,21 +79,21 @@ public class VfsResourceReferenceHandlerTest
 
     private VfsResourceReference reference;
 
-    private void setUp(String wikiName, String spaceName, String pageName, String attachmentName, List<String> path)
-        throws Exception
+    private void setUp(String scheme, String wikiName, String spaceName, String pageName, String attachmentName,
+        List<String> path) throws Exception
     {
         Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         String attachmentReferenceAsString =
-            String.format("attach:%s:%s.%s@%s", wikiName, spaceName, pageName, attachmentName);
+            String.format("%s:%s:%s.%s@%s", scheme, wikiName, spaceName, pageName, attachmentName);
         this.reference = new VfsResourceReference(URI.create(attachmentReferenceAsString), path);
 
         ResourceReferenceSerializer<VfsResourceReference, URI> serializer = mocker.registerMockComponent(
             new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                URI.class), "truevfs/attach");
-        String truevfsURIFragment = String.format("attach://%s:%s.%s/%s/%s", wikiName, spaceName, pageName,
+                URI.class), "truevfs/" + scheme);
+        String truevfsURIFragment = String.format("%s://%s:%s.%s/%s/%s", scheme, wikiName, spaceName, pageName,
             attachmentName, StringUtils.join(path, '/'));
         when(serializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
 
@@ -132,7 +134,7 @@ public class VfsResourceReferenceHandlerTest
     @Test
     public void handleWhenNotPermitted() throws Exception
     {
-        setUp("wiki2", "space2", "page2", "test.zip", Arrays.asList("test.txt"));
+        setUp("attach", "wiki2", "space2", "page2", "test.zip", Arrays.asList("test.txt"));
 
         // Disallow access to the document
         ContextualAuthorizationManager authorizationManager =
@@ -153,7 +155,7 @@ public class VfsResourceReferenceHandlerTest
     @Test
     public void handleOk() throws Exception
     {
-        setUp("wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
+        setUp("attach", "wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
 
         // Allow access to the document
         ContextualAuthorizationManager authorizationManager =
@@ -165,6 +167,23 @@ public class VfsResourceReferenceHandlerTest
         this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
+    }
+
+    @Test
+    public void handleWhenNoGenericPermissionForScheme() throws Exception
+    {
+        setUp("customscheme", "wiki3", "space3", "page3", "test.zip", Arrays.asList("test.txt"));
+
+        // Don't allow permission for "customscheme"
+        VfsPermissionChecker checker = this.mocker.getInstance(VfsPermissionChecker.class, "cascading");
+        doThrow(new VfsException("no permission")).when(checker).checkPermission(this.reference);
+
+        try {
+            this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
+            fail("Should have thrown exception here");
+        } catch (ResourceReferenceHandlerException expected) {
+            assertEquals("VfsException: no permission", ExceptionUtils.getRootCauseMessage(expected));
+        }
     }
 
     private InputStream createZipInputStream(String fileName, String content) throws Exception

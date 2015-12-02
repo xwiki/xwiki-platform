@@ -44,6 +44,7 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.internal.attach.AttachDriver;
 
 import net.java.truevfs.access.TArchiveDetector;
@@ -67,6 +68,10 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    @Named("cascading")
+    private VfsPermissionChecker permissionChecker;
 
     @Override
     public List<ResourceType> getSupportedResourceReferences()
@@ -92,8 +97,12 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
         // This code only handles VFS Resource References.
         VfsResourceReference vfsResourceReference = (VfsResourceReference) resourceReference;
 
-        // Extract the asked resource from inside the zip and return its content for display.
         try {
+            // Verify that the user has the permission for the specified VFS scheme
+            this.permissionChecker.checkPermission(vfsResourceReference);
+
+            // Extract the asked resource from inside the zip and return its content for display.
+
             // We need to convert the VFS Resource Reference into a hierarchical URI supported by TrueVFS
             URI trueVFSURI = convertResourceReference(vfsResourceReference);
 

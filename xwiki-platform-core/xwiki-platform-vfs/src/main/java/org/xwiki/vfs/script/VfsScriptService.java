@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.internal.VfsResourceReference;
 
@@ -42,7 +43,7 @@ import org.xwiki.vfs.internal.VfsResourceReference;
 @Component
 @Named("vfs")
 @Singleton
-//@Unstable
+@Unstable
 public class VfsScriptService implements ScriptService
 {
     @Inject

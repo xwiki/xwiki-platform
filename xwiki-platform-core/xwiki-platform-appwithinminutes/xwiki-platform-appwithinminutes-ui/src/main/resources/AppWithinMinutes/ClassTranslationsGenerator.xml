@@ -83,13 +83,13 @@ $escapetool.h Live table generic keys
 #foreach ($entry in $liveTableGenericKeys.entrySet())
 #map("$prefix$entry.key" $services.localization.render("platform.appwithinminutes.$entry.value"))
 #end
-#map("${prefix}emptyvalue", '-')
+#map("${prefix}emptyvalue" '-')
 
 $escapetool.h Live table specific keys
 #foreach ($property in $doc.getxWikiClass().properties)
 #map("$prefix$property.name" $property.prettyName)
 #end
 
-${appName}.dataSpace.title=Data
+#map("${appName}.dataSpace.title" 'Data')
 {{/velocity}}</content>
 </xwikidoc>

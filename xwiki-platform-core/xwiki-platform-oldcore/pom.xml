@@ -243,32 +243,33 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>fop</artifactId>
-      <version>1.1</version>
+      <version>2.0</version>
       <exclusions>
         <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
-        <!-- Useless here -->
+        <!-- We want a cleaner (from Maven point of view) version of avalon -->
         <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-js</artifactId>
-        </exclusion>
-        <!-- FOP 1.1's POM is wrong, see https://issues.apache.org/jira/browse/FOP-2255 -->
-        <exclusion>
-          <groupId>org.apache.avalon.framework</groupId>
           <artifactId>avalon-framework-api</artifactId>
+          <groupId>avalon-framework</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.avalon.framework</groupId>
           <artifactId>avalon-framework-impl</artifactId>
+          <groupId>avalon-framework</groupId>
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Get proper version of avalon required by FOP -->
     <dependency>
+      <artifactId>avalon-framework-api</artifactId>
       <groupId>org.apache.avalon.framework</groupId>
+      <version>4.3.1</version>
+    </dependency>
+    <dependency>
       <artifactId>avalon-framework-impl</artifactId>
+      <groupId>org.apache.avalon.framework</groupId>
       <version>4.3.1</version>
     </dependency>
     <dependency>

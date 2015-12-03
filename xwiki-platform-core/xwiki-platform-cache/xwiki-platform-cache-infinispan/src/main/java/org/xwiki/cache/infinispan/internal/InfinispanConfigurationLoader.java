@@ -117,7 +117,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
                     || configuration.eviction().maxEntries() != maxEntries) {
                     builder = builder(builder, null);
                     builder.eviction().strategy(EvictionStrategy.LRU);
-                    builder.eviction().maxEntries(maxEntries);
+                    builder.eviction().maxEntries((long) maxEntries);
                 }
             }
 

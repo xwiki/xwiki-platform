@@ -21,6 +21,7 @@ package org.xwiki.vfs.internal;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +61,16 @@ public class VfsResourceReference extends AbstractResourceReference
         setType(TYPE);
         this.uri = uri;
         this.pathSegments = new ArrayList<>(pathSegments);
+    }
+
+    /**
+     * @param uri the URI pointing to the archive (without the path inside the archive),
+     *       e.g. {@code attach:space.page@attachment}
+     * @param pathSegments see {@link #getPathSegments()}, specified as "/"-separated string (e.g. "path/to/file")
+     */
+    public VfsResourceReference(URI uri, String pathSegments)
+    {
+        this(uri, Arrays.asList(StringUtils.split(pathSegments, RESOURCE_PATH_SEPARATOR)));
     }
 
     /**

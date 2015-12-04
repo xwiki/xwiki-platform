@@ -90,12 +90,12 @@ public class VfsResourceReferenceHandlerTest
             String.format("%s:%s:%s.%s@%s", scheme, wikiName, spaceName, pageName, attachmentName);
         this.reference = new VfsResourceReference(URI.create(attachmentReferenceAsString), path);
 
-        ResourceReferenceSerializer<VfsResourceReference, URI> serializer = mocker.registerMockComponent(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                URI.class), "truevfs/" + scheme);
+        ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer =
+            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+                VfsResourceReference.class, URI.class), "truevfs");
         String truevfsURIFragment = String.format("%s://%s:%s.%s/%s/%s", scheme, wikiName, spaceName, pageName,
             attachmentName, StringUtils.join(path, '/'));
-        when(serializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
+        when(trueVfsResourceReferenceSerializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
 
         Provider<XWikiContext> xwikiContextProvider = mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, XWikiContext.class));

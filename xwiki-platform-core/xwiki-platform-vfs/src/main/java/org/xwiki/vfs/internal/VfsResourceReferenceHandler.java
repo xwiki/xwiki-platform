@@ -32,11 +32,9 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
@@ -72,6 +70,10 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
     @Inject
     @Named("cascading")
     private VfsPermissionChecker permissionChecker;
+
+    @Inject
+    @Named("truevfs")
+    private ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer;
 
     @Override
     public List<ResourceType> getSupportedResourceReferences()
@@ -127,14 +129,7 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
         URI resultURI;
 
         try {
-            ResourceReferenceSerializer<VfsResourceReference, URI> serializer =
-                this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
-                    ResourceReferenceSerializer.class, VfsResourceReference.class, URI.class),
-                        String.format("truevfs/%s", reference.getURI().getScheme()));
-            resultURI = serializer.serialize(reference);
-        } catch (ComponentLookupException e) {
-            // No serializer exist, we just don't perform any conversion!
-            resultURI = reference.toURI();
+            resultURI = this.trueVfsResourceReferenceSerializer.serialize(reference);
         } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
             throw new ResourceReferenceHandlerException(
                 String.format("Failed to convert VFS URI [%s] into a valid FS format", reference), e);

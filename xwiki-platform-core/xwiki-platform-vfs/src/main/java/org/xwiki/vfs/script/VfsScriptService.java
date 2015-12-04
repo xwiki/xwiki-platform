@@ -20,19 +20,19 @@
 package org.xwiki.vfs.script;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
-import org.xwiki.url.ExtendedURL;
+import org.xwiki.vfs.VfsManager;
 import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.internal.script.WrappingDirectoryStream;
 
 /**
  * Offers scripting APIs for the VFS module.
@@ -47,23 +47,46 @@ import org.xwiki.vfs.internal.VfsResourceReference;
 public class VfsScriptService implements ScriptService
 {
     @Inject
-    private ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer;
+    private VfsManager vfsManager;
 
     /**
-     * Generate a VFS URL to access a resource inside an archive.
+     * Generate a relative VFS URL to access a resource inside an archive.
      *
      * @param resourceReference the string representation of a VFS resource reference which defines the location of an
-     *        archive. For example {@code attach:space.page@my.zip}.
+     * archive. For example {@code attach:space.page@my.zip}.
      * @param pathInArchive the path of the resource inside the archive for which to generate a URL for. For example
-     *        {@code /some/path/in/archive/test.txt}.
-     * @return a URL that can be used to access the content of a file inside an archive (ZIP, EAR, TAR.GZ, etc)
+     * {@code /some/path/in/archive/test.txt}.
+     * @return a relative URL that can be used to access the content of a file inside an archive (ZIP, EAR, TAR.GZ, etc)
      */
     public String url(String resourceReference, String pathInArchive)
     {
         try {
-            VfsResourceReference vfsResourceReference = new VfsResourceReference(
-                new URI(resourceReference), Arrays.asList(StringUtils.split(pathInArchive, "/")));
-            return this.serializer.serialize(vfsResourceReference).toString();
+            VfsResourceReference vfsResourceReference =
+                new VfsResourceReference(new URI(resourceReference), pathInArchive);
+            return this.vfsManager.getURL(vfsResourceReference);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * List all entries inside the referenced archive, starting at the specified path and applying the passed Filter.
+     * <p/>
+     * WARNING: <b>it's important that the caller closes the stream or use a try-with-resource construct</b>
+     *
+     * @param resourceReference the reference to the archive (e.g. {@code attach:Sandbox.WebHome@my.zip})
+     * @param pathInArchive the starting path in that archive (e.g {@code /})
+     * @param filter the NIO2 filter to apply
+     * @return a {@link DirectoryStream} containing the result or null if an error occurred. Note that this method
+     *         doesn't recurse into directories
+     */
+    public DirectoryStream<Path> getPaths(String resourceReference, String pathInArchive,
+        DirectoryStream.Filter<Path> filter)
+    {
+        try {
+            VfsResourceReference vfsResourceReference =
+                new VfsResourceReference(new URI(resourceReference), pathInArchive);
+            return new WrappingDirectoryStream(this.vfsManager.getPaths(vfsResourceReference, filter));
         } catch (Exception e) {
             return null;
         }

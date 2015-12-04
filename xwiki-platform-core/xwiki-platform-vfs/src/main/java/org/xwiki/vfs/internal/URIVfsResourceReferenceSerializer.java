@@ -17,56 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.vfs.internal.attach;
+package org.xwiki.vfs.internal;
 
 import java.net.URI;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.vfs.internal.VfsResourceReference;
 
 /**
- * Converts a {@link VfsResourceReference} into a {@link URI} in a format compatible with TrueVFS. Specifically TrueVFS
- * requires a hierarchical URI. We make the following type of transformation:
- * <ul>
- *   <li>Example input: {@code attach:wiki:space.page@attachment/path/inside/archive}</li>
- *   <li>Example output: {@code attach://wiki:space.page/attachment/path/inside/archive}</li>
- * </ul>
+ * Serializer which transforms a {@link VfsResourceReference} into a {@link URI} by looking for a URI scheme-specific
+ * Serializer and if none is found then returning the URI from the {@link VfsResourceReference} as is.
  *
  * @version $Id$
  * @since 7.4M2
  */
 @Component
-@Named("truevfs/attach")
+@Named("truevfs")
 @Singleton
 public class URIVfsResourceReferenceSerializer implements ResourceReferenceSerializer<VfsResourceReference, URI>
 {
     @Inject
-    @Named("current")
-    private AttachmentReferenceResolver<String> attachmentResolver;
-
-    @Inject
-    private EntityReferenceSerializer<String> documentSerializer;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     public URI serialize(VfsResourceReference reference)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        AttachmentReference attachmentReference =
-            this.attachmentResolver.resolve(reference.getURI().getSchemeSpecificPart());
-        String scheme = reference.getURI().getScheme();
-        String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
+        URI resultURI;
 
-        return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString, attachmentReference.getName(),
-            reference.getPath()));
+        try {
+            ResourceReferenceSerializer<VfsResourceReference, URI> serializer =
+                this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
+                        ResourceReferenceSerializer.class, VfsResourceReference.class, URI.class),
+                    String.format("truevfs/%s", reference.getURI().getScheme()));
+            resultURI = serializer.serialize(reference);
+        } catch (ComponentLookupException e) {
+            // No serializer exist, we just don't perform any conversion!
+            resultURI = reference.toURI();
+        }
+
+        return resultURI;
     }
 }

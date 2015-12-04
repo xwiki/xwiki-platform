@@ -31,7 +31,7 @@
   <name>XWiki Platform - VFS API</name>
   <description>VFS API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -53,7 +53,7 @@ public class VfsResourceReferenceResolverTest
             VfsResourceReference.TYPE, Collections.<String, Object>emptyMap());
 
         VfsResourceReference expected = new VfsResourceReference(URI.create("attach:wiki:space.page@attachment"),
-            Arrays.asList("path1", "path2", "test.txt"));
+            "path1/path2/test.txt");
         expected.addParameter("key", "value");
         assertEquals(expected, reference);
     }

@@ -1,8 +1,14 @@
+org.xwiki.vfs.script.VfsScriptService
 org.xwiki.vfs.internal.VfsResourceReferenceResolver
 org.xwiki.vfs.internal.VfsResourceReferenceSerializer
 org.xwiki.vfs.internal.VfsResourceReferenceHandler
 org.xwiki.vfs.internal.CascadingVfsPermissionChecker
 org.xwiki.vfs.internal.DefaultVfsPermissionChecker
-org.xwiki.vfs.internal.attach.URIVfsResourceReferenceSerializer
+org.xwiki.vfs.internal.DefaultVfsManager
+org.xwiki.vfs.internal.URIVfsResourceReferenceSerializer
+org.xwiki.vfs.internal.attach.AttachURIVfsResourceReferenceSerializer
 org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker
-org.xwiki.vfs.script.VfsScriptService
+org.xwiki.vfs.internal.script.DirectoryStreamFilterConverter
+org.xwiki.vfs.internal.script.AllDirectoryStreamFilter
+org.xwiki.vfs.internal.script.FileDirectoryStreamFilter
+org.xwiki.vfs.internal.script.DirectoryDirectoryStreamFilter

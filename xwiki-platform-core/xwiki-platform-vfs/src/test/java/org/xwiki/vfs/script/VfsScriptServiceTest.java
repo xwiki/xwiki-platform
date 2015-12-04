@@ -20,18 +20,19 @@
 package org.xwiki.vfs.script;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.url.ExtendedURL;
+import org.xwiki.vfs.VfsException;
+import org.xwiki.vfs.VfsManager;
 import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.internal.script.WrappingDirectoryStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link VfsScriptService}.
@@ -49,14 +50,62 @@ public class VfsScriptServiceTest
     public void url() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), Arrays.asList("path1", "path2", "test.txt"));
+            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
 
-        ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
-                ExtendedURL.class));
-        when(serializer.serialize(reference)).thenReturn(new ExtendedURL(Arrays.asList("generated", "url")));
+        VfsManager manager = this.mocker.getInstance(VfsManager.class);
+        when(manager.getURL(reference)).thenReturn("/generated/url");
 
         assertEquals("/generated/url",
             this.mocker.getComponentUnderTest().url("attach:xwiki:space.page@attachment", "path1/path2/test.txt"));
+    }
+
+    @Test
+    public void urlError() throws Exception
+    {
+        VfsResourceReference reference = new VfsResourceReference(
+            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
+
+        VfsManager manager = this.mocker.getInstance(VfsManager.class);
+        when(manager.getURL(reference)).thenThrow(new VfsException("error"));
+
+        assertNull(this.mocker.getComponentUnderTest().url(
+            "attach:xwiki:space.page@attachment", "path1/path2/test.txt"));
+    }
+
+    @Test
+    public void getPaths() throws Exception
+    {
+        VfsResourceReference reference = new VfsResourceReference(
+            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
+
+        @SuppressWarnings("unchecked")
+        DirectoryStream<Path> mockDs = (DirectoryStream<Path>) mock(DirectoryStream.class);
+
+        VfsManager manager = this.mocker.getInstance(VfsManager.class);
+        when(manager.getPaths(eq(reference), any(DirectoryStream.Filter.class))).thenReturn(mockDs);
+
+        @SuppressWarnings("unchecked")
+        DirectoryStream.Filter<Path> mockFilter = (DirectoryStream.Filter<Path>) mock(DirectoryStream.Filter.class);
+
+        Object resultDs = this.mocker.getComponentUnderTest().getPaths(
+            "attach:xwiki:space.page@attachment", "path1/path2/test.txt", mockFilter);
+
+        assertEquals(WrappingDirectoryStream.class.getName(), resultDs.getClass().getName());
+    }
+
+    @Test
+    public void getPathsError() throws Exception
+    {
+        VfsResourceReference reference = new VfsResourceReference(
+            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
+
+        VfsManager manager = this.mocker.getInstance(VfsManager.class);
+        when(manager.getPaths(eq(reference), any(DirectoryStream.Filter.class))).thenThrow(new VfsException("error"));
+
+        @SuppressWarnings("unchecked")
+        DirectoryStream.Filter<Path> mockFilter = (DirectoryStream.Filter<Path>) mock(DirectoryStream.Filter.class);
+
+        assertNull(this.mocker.getComponentUnderTest().getPaths(
+            "attach:xwiki:space.page@attachment", "path1/path2/test.txt", mockFilter));
     }
 }

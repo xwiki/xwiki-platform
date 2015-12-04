@@ -48,7 +48,7 @@ public class VfsResourceReferenceSerializerTest
     public void serialize() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:wiki:space.page@attachment"), Arrays.asList("path1", "path2", "test.txt"));
+            URI.create("attach:wiki:space.page@attachment"), "path1/path2/test.txt");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));

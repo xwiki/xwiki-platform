@@ -20,7 +20,6 @@
 package org.xwiki.vfs.internal;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -38,10 +37,10 @@ public class VfsResourceReferenceTest
     public void equality()
     {
         VfsResourceReference reference1 =
-            new VfsResourceReference(URI.create("scheme:specific"), Arrays.asList("a", "b"));
+            new VfsResourceReference(URI.create("scheme:specific"), "a/b");
         reference1.addParameter("key", "value");
         VfsResourceReference reference2 =
-            new VfsResourceReference(URI.create("scheme:specific"), Arrays.asList("a", "b"));
+            new VfsResourceReference(URI.create("scheme:specific"), "a/b");
 
         assertNotEquals(reference1, reference2);
 
@@ -54,7 +53,7 @@ public class VfsResourceReferenceTest
     public void toURI()
     {
         VfsResourceReference reference =
-            new VfsResourceReference(URI.create("scheme:specific"), Arrays.asList("a", "b"));
+            new VfsResourceReference(URI.create("scheme:specific"), "a/b");
 
         URI expected = URI.create("scheme:specific/a/b");
         assertEquals(expected, reference.toURI());
@@ -64,7 +63,7 @@ public class VfsResourceReferenceTest
     public void stringValue()
     {
         VfsResourceReference reference =
-            new VfsResourceReference(URI.create("scheme:specific"), Arrays.asList("a", "b"));
+            new VfsResourceReference(URI.create("scheme:specific"), "a/b");
         reference.addParameter("key", "value");
         assertEquals("uri = [scheme:specific], path = [a/b], parameters = [[key] = [[value]]]", reference.toString());
     }

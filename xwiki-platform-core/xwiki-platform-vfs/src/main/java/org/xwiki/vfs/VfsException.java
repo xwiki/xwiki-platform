@@ -56,4 +56,17 @@ public class VfsException extends Exception
     {
         super(message, throwable);
     }
+
+    /**
+     * Construct a new Exception with the specified detail message and cause.
+     *
+     * @param message The detailed message using the String.format format.
+     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
+     *            permitted, and indicates that the cause is nonexistent or unknown)
+     * @param parameters the parameters to the String.format format
+     */
+    public VfsException(String message, Throwable throwable, Object... parameters)
+    {
+        super(String.format(message, parameters), throwable);
+    }
 }

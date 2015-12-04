@@ -20,7 +20,6 @@
 package org.xwiki.vfs.internal;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,8 +53,7 @@ public class CascadingVfsPermissionCheckerTest
     @Test
     public void checkPermissionWhenReservedScheme() throws Exception
     {
-        VfsResourceReference reference =
-            new VfsResourceReference(URI.create("cascading:whatever"), Arrays.asList("whatever"));
+        VfsResourceReference reference = new VfsResourceReference(URI.create("cascading:whatever"), "whatever");
 
         try {
             this.mocker.getComponentUnderTest().checkPermission(reference);
@@ -68,8 +66,7 @@ public class CascadingVfsPermissionCheckerTest
     @Test
     public void checkPermissionWithAttachSchemeChecker() throws Exception
     {
-        VfsResourceReference reference =
-            new VfsResourceReference(URI.create("attach:whatever"), Arrays.asList("whatever"));
+        VfsResourceReference reference = new VfsResourceReference(URI.create("attach:whatever"), "whatever");
 
         this.mocker.getComponentUnderTest().checkPermission(reference);
     }
@@ -77,8 +74,7 @@ public class CascadingVfsPermissionCheckerTest
     @Test
     public void checkPermissionWhenNoSpecificSchemeCheckerAndAllowed() throws Exception
     {
-        VfsResourceReference reference =
-            new VfsResourceReference(URI.create("customscheme:whatever"), Arrays.asList("whatever"));
+        VfsResourceReference reference = new VfsResourceReference(URI.create("customscheme:whatever"), "whatever");
 
         ContextualAuthorizationManager authorizationManager =
             this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
@@ -90,8 +86,7 @@ public class CascadingVfsPermissionCheckerTest
     @Test
     public void checkPermissionWhenNoSpecificSchemeCheckerAndNotAllowed() throws Exception
     {
-        VfsResourceReference reference =
-            new VfsResourceReference(URI.create("customscheme:whatever"), Arrays.asList("whatever"));
+        VfsResourceReference reference = new VfsResourceReference(URI.create("customscheme:whatever"), "whatever");
 
         ContextualAuthorizationManager authorizationManager =
             this.mocker.registerMockComponent(ContextualAuthorizationManager.class);

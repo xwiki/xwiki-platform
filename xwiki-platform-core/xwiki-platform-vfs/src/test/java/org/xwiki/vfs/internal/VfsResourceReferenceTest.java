@@ -34,6 +34,15 @@ import static org.junit.Assert.*;
 public class VfsResourceReferenceTest
 {
     @Test
+    public void constructor()
+    {
+        VfsResourceReference reference = new VfsResourceReference(
+            URI.create("attach:Sandbox.WebHome@my.zip/path/to/file"));
+        assertEquals("attach:Sandbox.WebHome@my.zip", reference.getURI().toString());
+        assertEquals("path/to/file", reference.getPath());
+    }
+
+    @Test
     public void equality()
     {
         VfsResourceReference reference1 =

@@ -19,16 +19,9 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -85,45 +78,5 @@ public class DefaultVfsManagerTest
             assertEquals("Failed to compute URL for [uri = [attach:xwiki:space.page@attachment], "
                 + "path = [path1/path2/test.txt], parameters = []]", expected.getMessage());
         }
-    }
-
-    @Test
-    public void getPaths() throws Exception
-    {
-        VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
-
-        // Locate the test.zip and get its URL
-        URI uri = URI.create(getClass().getClassLoader().getResource("sample.zip").toExternalForm());
-
-        ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer =
-            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-                VfsResourceReference.class, URI.class), "truevfs");
-        when(trueVfsResourceReferenceSerializer.serialize(reference)).thenReturn(uri);
-
-        DirectoryStream<Path> ds = this.mocker.getComponentUnderTest().getPaths(reference,
-            new DirectoryStream.Filter<Path>()
-            {
-                @Override
-                public boolean accept(Path entry) throws IOException
-                {
-                    return true;
-                }
-            });
-
-        List<String> contents = new ArrayList<>();
-        Iterator<Path> it = ds.iterator();
-        while (it.hasNext()) {
-            Path path = it.next();
-            contents.add(path.getFileName().toString());
-        }
-
-        // Note that the content of test.zip is:
-        // |_ test.txt
-        // |_ test2.text
-        // |_ directory
-        //   |_ test3.txt
-        // Here we request all entries at the root, hence: test.txt, test2.txt and directory.
-        assertThat(contents, CoreMatchers.hasItems("test.txt", "test2.text", "directory"));
     }
 }

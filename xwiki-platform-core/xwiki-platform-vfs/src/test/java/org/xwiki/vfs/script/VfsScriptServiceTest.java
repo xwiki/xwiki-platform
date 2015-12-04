@@ -20,8 +20,6 @@
 package org.xwiki.vfs.script;
 
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +27,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsManager;
 import org.xwiki.vfs.internal.VfsResourceReference;
-import org.xwiki.vfs.internal.script.WrappingDirectoryStream;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -56,7 +53,8 @@ public class VfsScriptServiceTest
         when(manager.getURL(reference)).thenReturn("/generated/url");
 
         assertEquals("/generated/url",
-            this.mocker.getComponentUnderTest().url("attach:xwiki:space.page@attachment", "path1/path2/test.txt"));
+            this.mocker.getComponentUnderTest().url(
+                new VfsResourceReference(URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt")));
     }
 
     @Test
@@ -69,43 +67,6 @@ public class VfsScriptServiceTest
         when(manager.getURL(reference)).thenThrow(new VfsException("error"));
 
         assertNull(this.mocker.getComponentUnderTest().url(
-            "attach:xwiki:space.page@attachment", "path1/path2/test.txt"));
-    }
-
-    @Test
-    public void getPaths() throws Exception
-    {
-        VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
-
-        @SuppressWarnings("unchecked")
-        DirectoryStream<Path> mockDs = (DirectoryStream<Path>) mock(DirectoryStream.class);
-
-        VfsManager manager = this.mocker.getInstance(VfsManager.class);
-        when(manager.getPaths(eq(reference), any(DirectoryStream.Filter.class))).thenReturn(mockDs);
-
-        @SuppressWarnings("unchecked")
-        DirectoryStream.Filter<Path> mockFilter = (DirectoryStream.Filter<Path>) mock(DirectoryStream.Filter.class);
-
-        Object resultDs = this.mocker.getComponentUnderTest().getPaths(
-            "attach:xwiki:space.page@attachment", "path1/path2/test.txt", mockFilter);
-
-        assertEquals(WrappingDirectoryStream.class.getName(), resultDs.getClass().getName());
-    }
-
-    @Test
-    public void getPathsError() throws Exception
-    {
-        VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
-
-        VfsManager manager = this.mocker.getInstance(VfsManager.class);
-        when(manager.getPaths(eq(reference), any(DirectoryStream.Filter.class))).thenThrow(new VfsException("error"));
-
-        @SuppressWarnings("unchecked")
-        DirectoryStream.Filter<Path> mockFilter = (DirectoryStream.Filter<Path>) mock(DirectoryStream.Filter.class);
-
-        assertNull(this.mocker.getComponentUnderTest().getPaths(
-            "attach:xwiki:space.page@attachment", "path1/path2/test.txt", mockFilter));
+            new VfsResourceReference(URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt")));
     }
 }

@@ -19,13 +19,7 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -33,8 +27,6 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsManager;
-
-import net.java.truevfs.access.TPath;
 
 /**
  * Default implementation of the {@link VfsManager} API.
@@ -49,10 +41,6 @@ public class DefaultVfsManager implements VfsManager
     @Inject
     private ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer;
 
-    @Inject
-    @Named("truevfs")
-    private ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer;
-
     @Override
     public String getURL(VfsResourceReference reference) throws VfsException
     {
@@ -61,27 +49,5 @@ public class DefaultVfsManager implements VfsManager
         } catch (Exception e) {
             throw new VfsException("Failed to compute URL for [%s]", e, reference);
         }
-    }
-
-    @Override
-    public DirectoryStream<Path> getPaths(VfsResourceReference reference, DirectoryStream.Filter<Path> filter)
-        throws VfsException
-    {
-        DirectoryStream<Path> result;
-        try {
-            // First, convert the XWiki VFS reference into a valid TrueVFS URI
-            URI trueVFSURI = this.trueVfsResourceReferenceSerializer.serialize(reference);
-
-            // Then, use the NIO2 API to get all the paths
-            Path archivePath = new TPath(trueVFSURI);
-            if (filter == null) {
-                result = Files.newDirectoryStream(archivePath);
-            } else {
-                result = Files.newDirectoryStream(archivePath, filter);
-            }
-        } catch (Exception e) {
-            throw new VfsException("Failed to get paths for [%s]", e, reference);
-        }
-        return result;
     }
 }

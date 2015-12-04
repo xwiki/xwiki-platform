@@ -12,3 +12,5 @@ org.xwiki.vfs.internal.script.DirectoryStreamFilterConverter
 org.xwiki.vfs.internal.script.AllDirectoryStreamFilter
 org.xwiki.vfs.internal.script.FileDirectoryStreamFilter
 org.xwiki.vfs.internal.script.DirectoryDirectoryStreamFilter
+org.xwiki.vfs.internal.script.PathConverter
+org.xwiki.vfs.internal.script.VfsResourceReferenceConverter

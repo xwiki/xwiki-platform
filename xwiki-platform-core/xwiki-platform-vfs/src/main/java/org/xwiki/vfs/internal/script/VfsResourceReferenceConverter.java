@@ -17,47 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.vfs.script;
+package org.xwiki.vfs.internal.script;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.lang.reflect.Type;
+import java.net.URI;
+
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
-import org.xwiki.vfs.VfsManager;
+import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.vfs.internal.VfsResourceReference;
 
 /**
- * Offers scripting APIs for the VFS module.
+ * Converts {@link String} into {@link VfsResourceReference} objects.
+ * <p/>
+ * Example:
+ * <ul>
+ *   <li>Input: {@code attach:Sandbox.WebHome@my.zip/some/path}</li>
+ *   <li>Output: uri = {@code attach:Sandbox.WebHome@my.zip}, path = {@code some/path}</li>
+ * </ul>
+ * Note that if the input contains "/" characters they need to be URL-encoded.
  *
  * @version $Id$
  * @since 7.4M2
  */
 @Component
-@Named("vfs")
 @Singleton
-@Unstable
-public class VfsScriptService implements ScriptService
+public class VfsResourceReferenceConverter extends AbstractConverter<VfsResourceReference>
 {
-    @Inject
-    private VfsManager vfsManager;
-
-    /**
-     * Generate a relative VFS URL to access a resource inside an archive.
-     *
-     * @param reference the reference to a file inside a an archive.
-     *                  For example {@code attach:space.page@my.zip/path/to/file}.
-     * @return a relative URL that can be used to access the content of a file inside an archive (ZIP, EAR, TAR.GZ, etc)
-     *         or null if the URL couldn't be constructed
-     */
-    public String url(VfsResourceReference reference)
+    @Override
+    protected VfsResourceReference convertToType(Type targetType, Object value)
     {
-        try {
-            return this.vfsManager.getURL(reference);
-        } catch (Exception e) {
+        if (value == null) {
             return null;
         }
+
+        VfsResourceReference reference;
+
+        try {
+            reference = new VfsResourceReference(new URI(value.toString()));
+        } catch (Exception e) {
+            throw new ConversionException(
+                String.format("Failed to convert [%s] to a VFS Resource Reference", value), e);
+        }
+
+        return reference;
     }
 }

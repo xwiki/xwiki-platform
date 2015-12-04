@@ -19,9 +19,6 @@
  */
 package org.xwiki.vfs;
 
-import java.nio.file.DirectoryStream;
-import java.nio.file.Path;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 import org.xwiki.vfs.internal.VfsResourceReference;
@@ -45,18 +42,4 @@ public interface VfsManager
      * @exception VfsException if an error occurs computing the URL
      */
     String getURL(VfsResourceReference reference) throws VfsException;
-
-    /**
-     * List all entries inside the referenced archive, starting at the specified path and applying the passed Filter.
-     * <p/>
-     * WARNING: <b>it's important that the caller closes the stream or use a try-with-resource construct</b>
-     *
-     * @param reference the archive reference (e.g. {@code attach:Sandbox.WebHome@my.zip}) and starting path in that
-     *        archive (e.g {@code /})
-     * @param filter the NIO2 filter to apply
-     * @return a {@link DirectoryStream} containing the result. Note that this method doesn't recurse into directories
-     * @exception VfsException if an error occurs when getting the entries
-     */
-    DirectoryStream<Path> getPaths(VfsResourceReference reference, DirectoryStream.Filter<Path> filter)
-        throws VfsException;
 }

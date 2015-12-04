@@ -45,7 +45,7 @@ public class VfsResourceReference extends AbstractResourceReference
      */
     public static final ResourceType TYPE = new ResourceType("vfs");
 
-    private static final char RESOURCE_PATH_SEPARATOR = '/';
+    private static final String RESOURCE_PATH_SEPARATOR = "/";
 
     private URI uri;
 
@@ -71,6 +71,18 @@ public class VfsResourceReference extends AbstractResourceReference
     public VfsResourceReference(URI uri, String pathSegments)
     {
         this(uri, Arrays.asList(StringUtils.split(pathSegments, RESOURCE_PATH_SEPARATOR)));
+    }
+
+    /**
+     * @param fullURI the full opaque URI containing both the reference to the archive and the path to the entry inside
+     *        it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that any
+     *        "/" character inside the reference to the archive be URL-encoded
+     */
+    public VfsResourceReference(URI fullURI)
+    {
+        // Find the first "/" and consider that everything after is the path
+        this(URI.create(StringUtils.substringBefore(fullURI.toString(), RESOURCE_PATH_SEPARATOR)),
+            StringUtils.substringAfter(fullURI.toString(), RESOURCE_PATH_SEPARATOR));
     }
 
     /**

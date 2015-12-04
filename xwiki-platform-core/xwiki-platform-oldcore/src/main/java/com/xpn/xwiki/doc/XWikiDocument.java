@@ -8590,6 +8590,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setSyntax(MergeUtils
             .mergeOject(previousDocument.getSyntax(), newDocument.getSyntax(), getSyntax(), mergeResult));
 
+        // Default locale
+        setDefaultLocale(MergeUtils.mergeOject(previousDocument.getDefaultLocale(), newDocument.getDefaultLocale(),
+            getDefaultLocale(), mergeResult));
+
         // Parent
         setParentReference(MergeUtils.mergeOject(previousDocument.getRelativeParentReference(),
             newDocument.getRelativeParentReference(), getRelativeParentReference(), mergeResult));
@@ -8828,6 +8832,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         if (ObjectUtils.notEqual(getSyntax(), document.getSyntax())) {
             setSyntax(document.getSyntax());
+            modified = true;
+        }
+
+        if (ObjectUtils.notEqual(getDefaultLocale(), document.getDefaultLocale())) {
+            setDefaultLocale(document.getDefaultLocale());
             modified = true;
         }
 

@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -117,6 +118,18 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         merge();
 
         Assert.assertEquals("some new content", this.currentDocument.getContent());
+    }
+
+    @Test
+    public void testMergeDefaultLocale() throws Exception
+    {
+        this.previousDocument.setDefaultLocale(Locale.ENGLISH);
+        this.nextDocument.setDefaultLocale(Locale.FRENCH);
+        this.currentDocument.setDefaultLocale(Locale.ENGLISH);
+
+        merge();
+
+        Assert.assertEquals(Locale.FRENCH, this.currentDocument.getDefaultLocale());
     }
 
     @Test

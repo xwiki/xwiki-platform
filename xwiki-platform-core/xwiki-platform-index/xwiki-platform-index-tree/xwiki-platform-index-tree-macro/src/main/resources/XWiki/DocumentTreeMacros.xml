@@ -117,8 +117,13 @@
     #set ($actualNodeId = $nodeId)
   #end
   #set ($parts = $actualNodeId.split(':', 2))
-  #set ($nodeType = $parts[0])
-  #set ($nodeReference = $parts[1])
+  #if ($parts.size() == 2)
+    #set ($nodeType = $parts[0])
+    #set ($nodeReference = $parts[1])
+  #else
+    #set ($nodeType = 'unknown')
+    #set ($nodeReference = $actualNodeId)
+  #end
   #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
   #if ("$!offset" == '')
     #set ($offset = 0)
@@ -130,8 +135,8 @@
   #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
     #maybeAddNode($nodeType $nodeReference $children)
   #else
-    #evaluate("${escapetool.h}add$stringtool.capitalize($nodeType)Children(${escapetool.d}nodeReference
-      $offset $limit ${escapetool.d}children)")
+    #set ($discard = "#evaluate(""${escapetool.h}add$stringtool.capitalize($nodeType)Children(
+      ${escapetool.d}nodeReference $offset $limit ${escapetool.d}children)"")")
   #end
   #if ($children.isEmpty() &amp;&amp; $nodeId == '#')
     ## Inform the user that the tree is empty.
@@ -1122,7 +1127,8 @@
     #set ($nodeType = $parts[0])
     #set ($nodeId = $parts[1])
     #set ($path = [])
-    #evaluate("${escapetool.h}get$stringtool.capitalize($nodeType)Path(${escapetool.d}nodeId ${escapetool.d}path)")
+    #set ($discard = "#evaluate(""${escapetool.h}get$stringtool.capitalize($nodeType)Path(
+      ${escapetool.d}nodeId ${escapetool.d}path)"")")
     #if ("$!docTreeConfig.root" != '')
       ## The path needs to be relative to the specified root because only a sub-tree is displayed.
       #getRelativePath($path $docTreeConfig.root)
@@ -1426,13 +1432,20 @@
   #set ($limit = 6)
   #set ($text = "$!request.query")
   #set ($lists = [])
-  #if (!$docTreeConfig.showSpaces || $docTreeConfig.showTerminalDocuments)
+  #getRootReference
+  #set ($ancestorsOf = {
+    'space': ['farm', 'wiki', 'space'],
+    'document': ['farm', 'wiki', 'space', 'document'],
+    'attachment': ['farm', 'wiki', 'space', 'document', 'attachments']
+  })
+  #if ((!$docTreeConfig.showSpaces || $docTreeConfig.showTerminalDocuments)
+      &amp;&amp; $ancestorsOf.document.contains($rootType))
     #addDocumentSuggestions($text $limit $lists)
   #end
-  #if ($docTreeConfig.showAttachments)
+  #if ($docTreeConfig.showAttachments &amp;&amp; $ancestorsOf.attachment.contains($rootType))
     #addAttachmentSuggestions($text $limit $lists)
   #end
-  #if ($docTreeConfig.showSpaces)
+  #if ($docTreeConfig.showSpaces &amp;&amp; $ancestorsOf.space.contains($rootType))
     #addSpaceSuggestions($text $limit $lists)
   #end
   #limitTotalCount($lists $limit)
@@ -1441,13 +1454,39 @@
     #foreach ($node in $list)
       ## Use the node path as suggestion info.
       #getPath($node.id $path)
-      #displayPath($path)
-      #set ($node.data.info = $stringtool.join($path.subList(0, $mathtool.sub($path.size(), 1)), ' / '))
-      #set ($discard = $output.add($node))
+      ## The path is empty when the node is not found in the tree. This happens if the tree finder doesn't restrict the
+      ## search to the nodes that are available in the tree.
+      #if ($path.size() &gt; 0)
+        #displayPath($path)
+        #set ($node.data.info = $stringtool.join($path.subList(0, $mathtool.sub($path.size(), 1)), ' / '))
+        #set ($discard = $output.add($node))
+      #end
     #end
   #end
   #set ($return = $NULL)
   #setVariable("$return" $output)
+#end
+
+#macro (getRootReference)
+  #set ($root = $docTreeConfig.root)
+  #if ($root == '')
+    #set ($root = $docTreeConfig.defaultRoot)
+  #end
+  #set ($parts = $root.split(':', 2))
+  #if ($parts.size() == 2)
+    #set ($rootType = $parts[0])
+    #set ($rootReference = $parts[1])
+    #if ($rootType == 'wiki')
+      #set ($rootReference = $services.model.createWikiReference($parts[1]))
+    #elseif ($rootType == 'space')
+      #set ($rootReference = $services.model.resolveSpace($parts[1]))
+    #elseif ($rootType == 'document' || $rootType == 'attachments')
+      #set ($rootReference = $services.model.resolveDocument($parts[1]))
+    #end
+  #else
+    #set ($rootType = 'unknown')
+    #set ($rootReference = $parts[0])
+  #end
 #end
 
 #macro (addSpaceSuggestions $text $limit $suggestions)
@@ -1460,14 +1499,19 @@
 #end
 
 #macro (searchSpaces $text $limit $return)
-  #set ($matchSpaceName = 'upper(space.name) like upper(:spaceNamePattern)')
-  #set ($statement = "select space.reference from XWikiSpace space where $matchSpaceName "
+  #set ($constraints = ["upper(space.name) like upper(:spaceNamePattern) escape '!'"])
+  #set ($params = {'spaceNamePattern': "%$!text.replaceAll('([%_!])', '!$1')%"})
+  #addSpaceLocationDatabaseConstraint($rootReference $constraints $params 'space.reference')
+  #set ($statement = "select space.reference from XWikiSpace space where $stringtool.join($constraints, ' and ') "
     + "order by lower(space.reference), space.reference")
   #set ($query = $services.query.hql($statement).setLimit($limit))
+  #addWikiLocationDatabaseConstraint($rootReference $query)
   #if ($docTreeConfig.filterHiddenDocuments)
     #set ($query = $query.addFilter('hidden/space'))
   #end
-  #set ($query = $query.bindValue('spaceNamePattern', "%$text%"))
+  #foreach ($entry in $params.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
+  #end
   #set ($spaceReferences = [])
   #foreach ($localSpaceRef in $query.execute())
     #set ($discard = $spaceReferences.add($services.model.resolveSpace($localSpaceRef)))
@@ -1518,21 +1562,27 @@
     'doc.space = space.reference'
   ])
   #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
-  #set ($matchDocTitle = 'upper(doc.title) like upper(:text)')
+  #set ($matchDocTitle = "upper(doc.title) like upper(:text) escape '!'")
+  #set ($params = {'text': "%$!text.replaceAll('([%_!])', '!$1')%"})
   #if ($docTreeConfig.showTerminalDocuments)
-    #set ($matchDocName = "(doc.name &lt;&gt; '$defaultDocumentName' and upper(doc.name) like upper(:text))")
-    #set ($matchSpaceName = "(doc.name = '$defaultDocumentName' and upper(space.name) like upper(:text))")
+    #set ($matchDocName = "(doc.name &lt;&gt; '$defaultDocumentName' and upper(doc.name) like upper(:text) escape '!')")
+    #set ($matchSpaceName = "(doc.name = '$defaultDocumentName' and upper(space.name) like upper(:text) escape '!')")
     #set ($discard = $constraints.add("($matchDocTitle or $matchDocName or $matchSpaceName)"))
   #else
-    #set ($matchSpaceName = 'upper(space.name) like upper(:text)')
+    #set ($matchSpaceName = "upper(space.name) like upper(:text) escape '!'")
     #set ($discard = $constraints.addAll([
       "doc.name = '$defaultDocumentName'",
       "($matchDocTitle or $matchSpaceName)"
     ]))
   #end
+  #addDocumentLocationDatabaseConstraint($rootReference $constraints $params)
   #set ($constraints = $stringtool.join($constraints, ' and '))
   #set ($statement = "select doc.fullName from XWikiDocument doc, XWikiSpace space where $constraints")
-  #set ($query = $services.query.hql($statement).setLimit($limit).bindValue('text', "%$text%"))
+  #set ($query = $services.query.hql($statement).setLimit($limit))
+  #foreach ($entry in $params.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
+  #end
+  #addWikiLocationDatabaseConstraint($rootReference $query)
   #if ($docTreeConfig.filterHiddenDocuments)
     #set ($query = $query.addFilter('hidden/document'))
   #end
@@ -1581,12 +1631,25 @@
 #end
 
 #macro (searchAttachmentsDatabase $text $limit $return)
-  #set ($statement = 'where upper(attach.filename) like upper(?)')
-  #set ($displayHiddenDocuments = $xwiki.getUserPreference('displayHiddenDocuments'))
-  #if ("$!displayHiddenDocuments" != '1')
-    #set ($statement = "$statement and (doc.hidden &lt;&gt; true or doc.hidden is null)")
+  #set ($constraints = ["upper(attach.filename) like upper(:text) escape'!'"])
+  #set ($params = {'text': "%$!text.replaceAll('([%_!])', '!$1')%"})
+  #if ($docTreeConfig.filterHiddenDocuments &amp;&amp; "$!xwiki.getUserPreference('displayHiddenDocuments')" != '1')
+    #set ($discard = $constraints.add("(doc.hidden &lt;&gt; true or doc.hidden is null)"))
   #end
-  #set ($attachments = $xwiki.searchAttachments($statement, $limit, 0, ["%$text%"]))
+  #set ($exactMatch = $rootType == 'attachments')
+  #addDocumentLocationDatabaseConstraint($rootReference $constraints $params $exactMatch)
+  #set ($statement = "where $stringtool.join($constraints, ' and ')")
+  ##
+  ## Convert named parameters to positional parameters.
+  #set ($paramList = [])
+  #foreach ($item in $regextool.findAll($statement, ':(\w+)'))
+    #set ($paramName = $item.get(1).getGroup())
+    #set ($discard = $paramList.add($params.get($paramName)))
+  #end
+  #set ($statement = $statement.replaceAll(':\w+', '\?'))
+  ##
+  ## TODO: Search in the wiki that corresponds to the root node.
+  #set ($attachments = $xwiki.searchAttachments($statement, $limit, 0, $paramList))
   #set ($attachmentReferences = [])
   #foreach ($attachment in $attachments)
     #set ($discard = $attachmentReferences.add($services.model.createAttachmentReference(
@@ -1597,13 +1660,91 @@
 #end
 
 #macro (addCommonDocTreeSolrParams $params)
-  #if (!$docTreeConfig.showWikis)
-    ## Limit the search to the current wiki
-    #set ($discard = $params.add("fq=wiki:$xcontext.database"))
+  #if ($rootType == 'wiki')
+    ## Limit the search to the specified wiki.
+    #addWikiLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'space')
+    ## Limit the search to the specified space.
+    #addSpaceLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'document')
+    ## Limit the search to the specified document.
+    #addDocumentLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'attachments')
+    ## Limit the search to the attachments of the specified document.
+    #addDocumentLocationSolrParams($rootReference $params true)
   #end
   #if (!$docTreeConfig.showTerminalDocuments)
     #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
     #set ($discard = $params.add("fq=name:$defaultDocumentName"))
+  #end
+  #if (!$docTreeConfig.filterHiddenDocuments)
+    ## Force the inclusion of the hidden documents.
+    #set ($discard = $params.add("fq=hidden:*"))
+  #end
+#end
+
+#macro (addWikiLocationSolrParams $rootReference $params)
+  #set ($wikiReference = $rootReference.extractReference('WIKI'))
+  #if ($wikiReference)
+    #set ($discard = $params.add("fq=wiki:$wikiReference.name"))
+  #end
+#end
+
+#macro (addWikiLocationDatabaseConstraint $rootReference $query)
+  #set ($wikiReference = $rootReference.extractReference('WIKI'))
+  #if ($wikiReference)
+    #set ($query = $query.setWiki($wikiReference.name))
+  #end
+#end
+
+#macro (addSpaceLocationSolrParams $rootReference $params $exactMatch)
+  #addWikiLocationSolrParams($rootReference $params)
+  #set ($spaceReference = $rootReference.extractReference('SPACE'))
+  #if ($spaceReference &amp;&amp; ($docTreeConfig.showSpaces || $docTreeConfig.hierarchyMode == 'reference'))
+    #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+    #set ($spaceField = 'space_prefix')
+    #if ($exactMatch)
+      #set ($spaceField = 'space_exact')
+    #end
+    #set ($discard = $params.add("fq=$spaceField:$localSpaceReference"))
+  #end
+#end
+
+#macro (addSpaceLocationDatabaseConstraint $rootReference $constraints $params $field)
+  #set ($spaceReference = $rootReference.extractReference('SPACE'))
+  #if ($spaceReference &amp;&amp; ($docTreeConfig.showSpaces || $docTreeConfig.hierarchyMode == 'reference'))
+    #set ($discard = $constraints.add("($field = :localSpaceReference or $field like :spaceReferencePattern escape '!')"))
+    #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+    #set ($discard = $params.put('localSpaceReference', $localSpaceReference))
+    #set ($spaceReferencePattern = $services.model.createEntityReference('x', 'SPACE', $spaceReference))
+    #set ($spaceReferencePattern = $services.model.serialize($spaceReferencePattern, 'local'))
+    #set ($spaceReferencePattern = $stringtool.removeEnd($spaceReferencePattern, 'x').replaceAll('([%_!])', '!$1'))
+    #set ($discard = $params.put('spaceReferencePattern', "$spaceReferencePattern%"))
+  #end
+#end
+
+#macro (addDocumentLocationSolrParams $rootReference $params $exactMatch)
+  #set ($documentReference = $rootReference.extractReference('DOCUMENT'))
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($macro.exactMatch = $exactMatch || ($docTreeConfig.hierarchyMode == 'reference'
+    &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
+  #addSpaceLocationSolrParams($rootReference $params $macro.exactMatch)
+  #if ($documentReference &amp;&amp; $macro.exactMatch)
+    #set ($discard = $params.add("fq=name_exact:$documentReference.name"))
+  #end
+#end
+
+#macro (addDocumentLocationDatabaseConstraint $rootReference $constraints $params $exactMatch)
+  #set ($documentReference = $rootReference.extractReference('DOCUMENT'))
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($macro.exactMatch = $exactMatch || ($docTreeConfig.hierarchyMode == 'reference'
+    &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
+  #if ($documentReference &amp;&amp; $macro.exactMatch)
+    #set ($localDocumentReference = $services.model.serialize($documentReference, 'local'))
+    #set ($discard = $constraints.add('doc.fullName = :localDocumentReference'))
+    #set ($discard = $params.put('localDocumentReference', $localDocumentReference))
+  #elseif (!$macro.exactMatch)
+    #addSpaceLocationDatabaseConstraint($rootReference $constraints $params 'doc.space')
   #end
 #end
 

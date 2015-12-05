@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.cache.tests.CacheEntryListenerTest.EventType;
 
@@ -106,13 +107,43 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
      * @throws Exception error
      */
     @Test
-    public void testCreateAndDestroyCacheLRUTimeToLive() throws Exception
+    public void testCreateAndDestroyCacheLRUMAxIdle() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-        lec.setTimeToLive(1);
+        lec.setMaxIdle(1);
+        conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
+
+        Cache<Object> cache = factory.newCache(conf);
+
+        Assert.assertNotNull(cache);
+
+        cache.set(KEY, VALUE);
+
+        Assert.assertEquals(VALUE, cache.get(KEY));
+
+        Thread.sleep(1100);
+
+        Assert.assertNull(cache.get(KEY));
+
+        cache.dispose();
+    }
+
+    /**
+     * Validate the maximum time to live constraint.
+     * 
+     * @throws Exception error
+     */
+    @Test
+    public void testCreateAndDestroyCacheLRULifespan() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        CacheConfiguration conf = new CacheConfiguration();
+        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
+        lec.setLifespan(1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
@@ -140,11 +171,11 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
     {
         CacheFactory factory = getCacheFactory();
 
-        CacheConfiguration conf = new CacheConfiguration();
-        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
+        LRUCacheConfiguration conf = new LRUCacheConfiguration();
+        LRUEvictionConfiguration lec = conf.getLRUEvictionConfiguration();
         lec.setMaxEntries(1);
-        lec.setTimeToLive(1);
-        conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
+        lec.setMaxIdle(1);
+        lec.setLifespan(1);
 
         Cache<Object> cache = factory.newCache(conf);
 

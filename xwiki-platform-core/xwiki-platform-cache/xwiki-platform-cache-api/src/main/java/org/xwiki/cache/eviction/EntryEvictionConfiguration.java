@@ -43,7 +43,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     public static final String CONFIGURATIONID = "eviction";
 
     /**
-     * The key used to access time to live duration in the {@link EntryEvictionConfiguration}.
+     * @see #getTimeToLive()
      */
     public static final String TIMETOLIVE_ID = "timetolive";
 
@@ -90,7 +90,8 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     }
 
     /**
-     * @param timeToLive the maximum time to live in seconds of a cache entry.
+     * @param timeToLive the maximum time to live in seconds of a cache entry. The exact meaning may vary depending on
+     *            the Algorithm type.
      */
     public void setTimeToLive(int timeToLive)
     {
@@ -98,7 +99,8 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     }
 
     /**
-     * @return the maximum time to live in seconds of a cache entry.
+     * @return the maximum time to live in seconds of a cache entry. The exact meaning may vary depending on the
+     *         Algorithm type.
      */
     public int getTimeToLive()
     {

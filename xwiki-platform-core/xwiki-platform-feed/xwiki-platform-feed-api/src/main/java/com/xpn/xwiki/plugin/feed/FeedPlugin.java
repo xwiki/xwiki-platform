@@ -195,7 +195,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             configuration.setConfigurationId("xwiki.plugin.feedcache");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
-            lru.setTimeToLive(this.refreshPeriod);
+            lru.setMaxIdle(this.refreshPeriod);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
             CacheManager cacheManager = Utils.getComponent(CacheManager.class);

@@ -40,7 +40,9 @@
         <value>flate</value>
       </filterList>
       <fonts>
-        <!-- This allows all fonts in the WEB-INF/fonts/ directory to be indexed -->
+        <!-- Fonts located in WEB-INF/fonts/ are automatically loaded -->
+
+        <!-- Load system fonts -->
         <auto-detect/>
       </fonts>
     </renderer>

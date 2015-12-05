@@ -131,9 +131,6 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
                 if (configuration.expiration() == null || configuration.expiration().maxIdle() != maxIdle) {
                     builder = builder(builder, null);
                     builder.expiration().maxIdle(eec.getTimeToLive() * 1000L);
-                    if (eec.containsKey(LRUEvictionConfiguration.LIFESPAN_ID)) {
-                        builder.expiration().lifespan((Integer) eec.get(LRUEvictionConfiguration.LIFESPAN_ID) * 1000L);
-                    }
                 }
             }
         }

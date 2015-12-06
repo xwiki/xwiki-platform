@@ -1,3 +1,4 @@
+900:org.xwiki.url.internal.standard.ContextAndActionURLNormalizer
 org.xwiki.url.internal.standard.StandardExtendedURLResourceReferenceSerializer
 org.xwiki.url.internal.standard.StandardExtendedURLResourceReferenceResolver
 org.xwiki.url.internal.standard.StandardExtendedURLResourceTypeResolver

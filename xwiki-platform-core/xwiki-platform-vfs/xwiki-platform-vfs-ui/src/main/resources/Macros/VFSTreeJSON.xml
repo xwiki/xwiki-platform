@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,8 +30,8 @@
   <parent>Macros.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1449400519000</date>
-  <contentUpdateDate>1449400519000</contentUpdateDate>
+  <date>1449478236000</date>
+  <contentUpdateDate>1449478236000</contentUpdateDate>
   <version>1.1</version>
   <title>JSON for the VFS Tree Macro</title>
   <comment/>
@@ -58,19 +57,15 @@
   #set ($children = [])
   #foreach ($childId in $ds)
     #set ($isDirectory = $niotool.isDirectory($childId))
-    #if ($isDirectory)
-      #set ($hrefValue = $NULL)
-    #else
-      #set ($hrefValue = $services.vfs.url("${vfsReference}/$childId.getFileName()"))
-    #end
-    #set ($discard = $children.add({
+    #set ($child = {
       'id': "${nodeId}/$childId.getFileName()",
       'text': $escapetool.json("$childId.getFileName()"),
-      'children': $isDirectory,
-      'a_attr': {
-        'href': $hrefValue
-      }
-    }))    
+      'children': $isDirectory
+    })
+    #if (!$isDirectory)
+      #set ($child.a_attr = { 'href': $services.vfs.url("${vfsReference}/$childId.getFileName()") })
+    #end
+    #set ($discard = $children.add($child))
   #end
   #set ($return = $NULL)
   #setVariable("$return" $children)

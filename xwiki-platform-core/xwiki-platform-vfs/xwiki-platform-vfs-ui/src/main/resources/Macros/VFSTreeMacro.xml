@@ -30,8 +30,8 @@
   <parent>Macros.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1449423132000</date>
-  <contentUpdateDate>1449422910000</contentUpdateDate>
+  <date>1449477629000</date>
+  <contentUpdateDate>1449400638000</contentUpdateDate>
   <version>1.1</version>
   <title>VFS Tree Macro</title>
   <comment/>
@@ -155,7 +155,7 @@
     </class>
     <property>
       <code>{{velocity}}
-{{tree root="$xcontext.macro.params.root" reference="Macros.VFSTreeJSON"/}}
+{{tree root="$xcontext.macro.params.root" reference="Macros.VFSTreeJSON" links="true"/}}
 {{/velocity}}</code>
     </property>
     <property>

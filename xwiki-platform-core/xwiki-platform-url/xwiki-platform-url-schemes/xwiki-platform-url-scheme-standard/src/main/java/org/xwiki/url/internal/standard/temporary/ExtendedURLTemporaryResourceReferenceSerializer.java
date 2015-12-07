@@ -19,8 +19,11 @@
  */
 package org.xwiki.url.internal.standard.temporary;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -56,12 +59,22 @@ import org.xwiki.url.ExtendedURL;
 public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
 {
+    @Inject
+    @Named("contextpath+actionservletpath")
+    private URLNormalizer<ExtendedURL> extendedURLNormalizer;
+
     @Override
     public ExtendedURL serialize(TemporaryResourceReference resource)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         DocumentReference owningReference = (DocumentReference) resource.getOwningEntityReference();
-        return new ExtendedURL(Arrays.asList(owningReference.getLastSpaceReference().getName(),
-            owningReference.getName(), resource.getModuleId(), resource.getResourceName()));
+        List<String> segments = new LinkedList<>();
+        segments.add("temp");
+        segments.add(owningReference.getLastSpaceReference().getName());
+        segments.add(owningReference.getName());
+        segments.add(resource.getModuleId());
+        segments.add(resource.getResourceName());
+        ExtendedURL result = new ExtendedURL(segments, new HashMap<String, List<String>>());
+        return this.extendedURLNormalizer.normalize(result);
     }
 }

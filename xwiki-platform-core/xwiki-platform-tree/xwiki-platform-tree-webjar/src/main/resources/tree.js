@@ -396,7 +396,8 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       var selectedNode = data.node;
       if (selectedNode.data && selectedNode.data.type === 'pagination') {
         addMoreChildren(tree, selectedNode);
-      } else if (data.event && !$(this).hasClass('jstree-no-links')) {
+      } else if (data.event && !$(data.event.target).hasClass('jstree-no-link')
+          && $(data.event.target).closest('.jstree-no-links').length === 0) {
         // The node selection was triggered by an user event and links are enabled.
         window.location.href = selectedNode.a_attr.href;
       }

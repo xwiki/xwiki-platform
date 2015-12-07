@@ -73,28 +73,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
-    <!-- Required by the XML-RPC implementation and tests.
-         Hopefully they will eventually make it into a swizzle release. -->
-    <dependency>
-      <groupId>org.codehaus.swizzle</groupId>
-      <artifactId>swizzle-confluence</artifactId>
-      <version>1.2-20080419</version>
-      <classifier>xwiki</classifier>
-      <exclusions>
-        <!-- We need to explicitely exclude JUnit since swizzle confluence depends transitively
-             on Apache WS Common which wrongly defines a compile dependency on JUnit.
-             See JIRA issue: http://jira.codehaus.org/browse/MEV-567 -->
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xmlrpc</groupId>
-          <artifactId>xmlrpc-client</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <!-- Standard dependencies found in the central repository -->
     <!-- Apache Commons -->

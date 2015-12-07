@@ -469,6 +469,79 @@
               <to>org/xwiki/job/internal/DefaultJobStatus</to>
               <justification>Was wrongly extending internal class</justification>
             </difference>
+
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>org.apache.xmlrpc.server.XmlRpcServer ajc$get$xmlRpcServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>void ajc$set$xmlRpcServer(com.xpn.xwiki.XWikiContext, org.apache.xmlrpc.server.XmlRpcServer)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>org.apache.xmlrpc.server.XmlRpcServer getXMLRPCServer()</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>void setXMLRPCServer(org.apache.xmlrpc.server.XmlRpcServer)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>org.apache.xmlrpc.server.XmlRpcServer ajc$interFieldGetDispatch$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$xmlRpcServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>ajc$interFieldInit$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$xmlRpcServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>void ajc$interFieldSetDispatch$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$xmlRpcServer(com.xpn.xwiki.XWikiContext, org.apache.xmlrpc.server.XmlRpcServer)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>org.apache.xmlrpc.server.XmlRpcServer ajc$interMethod$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$getXMLRPCServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>void ajc$interMethod$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$setXMLRPCServer(com.xpn.xwiki.XWikiContext, org.apache.xmlrpc.server.XmlRpcServer)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>org.apache.xmlrpc.server.XmlRpcServer ajc$interMethodDispatch1$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$getXMLRPCServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>void ajc$interMethodDispatch1$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$setXMLRPCServer(com.xpn.xwiki.XWikiContext, org.apache.xmlrpc.server.XmlRpcServer)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <method>void ajc$interFieldInit$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$xmlRpcServer(com.xpn.xwiki.XWikiContext)</method>
+              <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

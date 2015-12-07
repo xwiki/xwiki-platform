@@ -24,16 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-vfs</artifactId>
     <version>7.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-vfs</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - VFS - Parent POM</name>
-  <description>XWiki Platform - VFS - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-vfs-api</module>
-    <module>xwiki-platform-vfs-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-vfs-ui</artifactId>
+  <name>VFS Application</name>
+  <packaging>xar</packaging>
+  <description>Provides a VFS Tree Macro</description>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-vfs-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -29,8 +29,10 @@
   </parent>
   <artifactId>xwiki-platform-vfs-api</artifactId>
   <name>XWiki Platform - VFS - API</name>
+  <packaging>jar</packaging>
   <description>VFS API</description>
   <properties>
+    <vfs.version>0.11.0</vfs.version>
     <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -56,9 +58,68 @@
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
-      <artifactId>truevfs-profile-default</artifactId>
-      <version>0.11.0</version>
-      <type>pom</type>
+      <artifactId>truevfs-access</artifactId>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-jar</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-zip</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-kernel-impl</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-http</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-odf</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-bzip2</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-gzip</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-xz</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-zip-raes</artifactId>
+      <scope>runtime</scope>
+      <version>${vfs.version}</version>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

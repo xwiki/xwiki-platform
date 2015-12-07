@@ -585,7 +585,6 @@
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
-    <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>

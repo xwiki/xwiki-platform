@@ -3,38 +3,20 @@
  * Search results list
  */
 #searchResults {
-  clear: both;
-  display: table;
-  width: 100%;
+  margin: 1em 0;
 }
 .resultItem {
-  display: block;
   margin-top: 1em;
   padding: .2em 0;
 }
-.resultItem:after{
+.resultItem:after {
   clear: both;
   content: ".";
   display: block;
   height: 0;
   visibility: hidden;
 }
-.resultItem:hover {
-  background-color: $theme.highlightColor;
-}
-.itemDescription {
-  background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat left 3px transparent;
-  display: inline-block;
-  float: left;
-  padding-left: 20px;
-  width: 82%;
-}
-.resultItem .type-comment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment.png')");
-}
-.resultItem .type-attachment {
-  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
-}
+
 .itemTitle {
   border: 0;
   font-weight: bold;
@@ -45,40 +27,39 @@
   border: none;
   margin: 0;
 }
-.itemTitle a, .itemTitle a:hover {
-  color: $theme.titleColor;
+.itemTitle a {
   font-size: 130%;
   font-weight: bold;
 }
+
 .itemLocation, .itemModified {
-  color: $theme.textPrimaryColor;
+  color: $theme.textSecondaryColor;
   font-size: 90%;
 }
-.itemContext em {
-  background-color: $theme.highlightColor;
+.itemLocation .breadcrumb {
+  background-color: transparent;
+  display: inline;
   margin: 0;
   padding: 0;
 }
+/* Fix the breadcrumb in Colibri skin. */
+.skin-colibri .itemLocation .breadcrumb > li {
+  display: inline;
+}
+.skin-colibri .itemLocation .breadcrumb > li + li:before {
+  color: $theme.textSecondaryColor;
+  content: ' \00BB  ';
+}
+
 .itemOthers {
   font-size: 80%;
 }
-.itemOthers .itemComments, .itemOthers .itemAttachments, .itemOthers .itemRating {
+.itemOthers .itemRating {
   clear: none;
   display: inline;
   float: left;
   font-size: 80%;
   padding-right: 5px;
-}
-.itemOthers .itemComments a, .itemOthers .itemAttachments a {
-  background: transparent no-repeat right center;
-  display: inline-block;
-  padding-right: 16px;
-}
-.itemOthers .itemComments a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/comment.png')");
-}
-.itemOthers .itemAttachments a {
-  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
 }
 .itemRating {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/rating.png')");
@@ -90,9 +71,13 @@
   position: relative;
   width: 55px;
 }
-.relevance .currentRelevance, .itemRating .currentRating {
+.itemRating .currentRating {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/rating.png')");
+  background-position: left center;
   border: none;
+  height: 11px;
   left: 0;
+  line-height: 11px;
   outline: none;
   overflow: hidden;
   position: absolute;
@@ -100,87 +85,17 @@
   top: 0;
   z-index: 1;
 }
-.itemRating .currentRating {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/rating.png')");
-  background-position: left center;
-  height: 11px;
-  line-height: 11px;
-}
-.itemRelevance {
-  display: inline-block;
-  float: left;
-  text-align: right;
-  width: 15%;
-}
-.relevance {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/relevance.png')");
-  background-position: left bottom;
-  float: right;
-  height: 8px;
-  list-style: none;
-  margin: 3px 0 0 0;
-  overflow: hidden;
-  padding: 0 !important;
-  position: relative;
-  width: 48px;
-}
-.relevance .currentRelevance {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/relevance.png')");
-  background-position: left top;
-  height: 8px;
-  line-height: 8px;
-}
-.relevanceText {
-  float: right;
-  font-size: 80%;
-  margin-right: 5px;
-}
 
-/*
- * Item actions
- */
-.itemActions {
-  clear: both;
-  color: $theme.textPrimaryColor;
-  display: block;
-  font-size: 90%;
+.iconRSS {
+  background: url("$xwiki.getSkinFile('icons/silk/feed.png')") no-repeat scroll 0 0 transparent;
   padding-left: 20px;
 }
-.itemActions .tool {
-  background: transparent no-repeat center center;
-  float: left;
-  height: 16px;
-  line-height: 40em;
-  margin: 0 2px;
-  overflow: hidden;
-  text-indent: 1000em;
-  width: 16px;
-}
-.itemActions .copy {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_copy.png')");
-}
-.itemActions .delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-.itemActions .rename {
-  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
-}
-.itemActions .rights {
-  background-image: url("$xwiki.getSkinFile('icons/silk/lock_edit.png')");
-}
+
 /*
  * Search box
  */
 #searchBar {
-  clear: both;
   margin-bottom: 1em;
-  padding-left: 5px;
-}
-#searchBar select {
-  border: 2px solid $theme.borderColor;
-  color: $theme.textColor;
-  font-size: 1.1em;
-  padding: .25em;
 }
 #searchBar .searchQuery {
   background: transparent url("$xwiki.getSkinFile('icons/xwiki/search.png')") left center no-repeat;
@@ -195,8 +110,4 @@
   height: 2.4em;
   position: relative;
   top: -2px;
-}
-.searchHelp {
-  font-size: 80%;
-  color: $theme.textPrimaryColor;
 }

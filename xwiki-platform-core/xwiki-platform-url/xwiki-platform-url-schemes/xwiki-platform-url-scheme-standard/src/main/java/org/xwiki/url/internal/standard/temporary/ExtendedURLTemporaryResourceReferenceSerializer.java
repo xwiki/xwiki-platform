@@ -34,6 +34,7 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 
 /**
  * Resolver that generates {@link ExtendedURL} out of {@link org.xwiki.resource.temporary.TemporaryResourceReference}.

@@ -890,28 +890,6 @@ div.buttonwrapper {
   width: 100%;
 }
 
-/* --------------Old WYSYWYG Editor----------------------*/
-/* Should be in editor_ui.css */
-iframe.mceEditorIframe, .mceEditor {
-  width: 100% !important;
-}
-
-.mceEditor td {
-  padding:0;
-}
-
-.mceEditorContainer {
-  display: block;
-  height: 100% !important;
-  position: relative;
-  width: 100%;
-}
-
-#body.mceContentBody {
-  background: $theme.pageContentBackgroundColor;
-  min-width: 100px;
-}
-
 /* ----------------New WYSYWYG Editor--------------------*/
 /* Should be in RichTextArea.css - for table resizing */
 #body.main table {

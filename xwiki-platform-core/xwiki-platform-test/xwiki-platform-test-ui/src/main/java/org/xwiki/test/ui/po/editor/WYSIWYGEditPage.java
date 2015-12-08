@@ -51,16 +51,7 @@ public class WYSIWYGEditPage extends PreviewableEditPage
      */
     public String getContent()
     {
-        // Handle both the TinyMCE editor and the GWT Editor depending on the syntax
-        if ("xwiki/1.0".equals(getSyntaxId())) {
-            String windowHandle = getDriver().getWindowHandle();
-            getDriver().switchTo().frame("mce_editor_0");
-            String content = getDriver().findElement(By.id("mceSpanFonts")).getText();
-            getDriver().switchTo().window(windowHandle);
-            return content;
-        } else {
-            return editor.getRichTextArea().getText();
-        }
+        return editor.getRichTextArea().getText();
     }
 
     /**

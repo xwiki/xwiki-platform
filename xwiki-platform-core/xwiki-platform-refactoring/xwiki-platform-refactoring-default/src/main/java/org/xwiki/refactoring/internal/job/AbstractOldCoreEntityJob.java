@@ -51,10 +51,11 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Abstract job that targets multiple entities and which relies on the old-core implementation.
- * 
+ *
  * @param <R> the request type
  * @param <S> the job status type
  * @version $Id$
@@ -137,6 +138,30 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
         }
     }
 
+    /**
+     * @since 7.4M2
+     */
+    protected boolean create(DocumentReference destination)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        DocumentReference userReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(this.request.getUserReference());
+
+            XWikiDocument newDocument = xcontext.getWiki().getDocument(destination, xcontext);
+            xcontext.getWiki().saveDocument(newDocument, xcontext);
+            this.logger.info("Document [{}] has been created.", destination);
+        } catch (Exception e) {
+            this.logger.error("Failed to create document [{}].", destination, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(userReference);
+        }
+
+        return true;
+    }
+
     protected boolean delete(DocumentReference reference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -154,6 +179,33 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
             return true;
         } catch (Exception e) {
             this.logger.error("Failed to delete document [{}].", reference, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(userReference);
+        }
+    }
+
+    /**
+     * @since 7.4M2
+     */
+    protected boolean removeLock(DocumentReference reference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference userReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(this.request.getUserReference());
+            XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
+
+            XWikiLock lock = document.getLock(xcontext);
+            if (lock != null) {
+                document.removeLock(xcontext);
+                this.logger.info("Document [{}] has been unlocked.", reference);
+            }
+
+            return true;
+        } catch (Exception e) {
+            // Just warn, since it's a recoverable situation.
+            this.logger.warn("Failed to unlock document [{}].", reference, e);
             return false;
         } finally {
             xcontext.setUserReference(userReference);

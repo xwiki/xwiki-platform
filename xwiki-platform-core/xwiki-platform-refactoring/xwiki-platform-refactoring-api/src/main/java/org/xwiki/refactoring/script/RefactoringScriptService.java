@@ -43,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
@@ -213,6 +214,23 @@ public class RefactoringScriptService implements ScriptService
     {
         EntityRequest request = new EntityRequest();
         initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
+        return request;
+    }
+
+    /**
+     * Creates a request to create the specified entities.
+     *
+     * @param entityReferences the entities to create
+     * @return the create request
+     * @since 7.4M2
+     */
+    public CreateRequest createCreateRequest(Collection<EntityReference> entityReferences)
+    {
+        CreateRequest request = new CreateRequest();
+        initEntityRequest(request, RefactoringJobs.CREATE, entityReferences);
+        // Set deep create by default, to copy (if possible) any existing hierarchy of a specified template document.
+        // TODO: expose this in the create UI to advanced users to allow them to opt-out?
+        request.setDeep(true);
         return request;
     }
 
@@ -494,8 +512,47 @@ public class RefactoringScriptService implements ScriptService
     }
 
     /**
+     * Schedules an asynchronous job to perform the given create request.
+     *
+     * @param request the create request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(CreateRequest request)
+    {
+        return execute(RefactoringJobs.CREATE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to create the specified entities.
+     *
+     * @param entityReferences the entities to create
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(Collection<EntityReference> entityReferences)
+    {
+        return create(createCreateRequest(entityReferences));
+    }
+
+    /**
+     * Schedules an asynchronous job to create the specified entity.
+     *
+     * @param entityReference the entity to create
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(EntityReference entityReference)
+    {
+        return create(Arrays.asList(entityReference));
+    }
+
+    /**
      * Executes a refactoring request.
-     * 
+     *
      * @param type the type of refactoring to execute
      * @param request the refactoring request to execute
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,

@@ -97,8 +97,7 @@ public class VfsResourceReferenceHandlerTest
             attachmentName, StringUtils.join(path, '/'));
         when(trueVfsResourceReferenceSerializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
 
-        Provider<XWikiContext> xwikiContextProvider = mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> xwikiContextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xwikiContextProvider.get()).thenReturn(xcontext);
 

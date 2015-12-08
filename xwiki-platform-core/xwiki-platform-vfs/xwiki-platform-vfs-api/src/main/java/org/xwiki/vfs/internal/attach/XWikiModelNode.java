@@ -27,7 +27,6 @@ import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -105,8 +104,7 @@ public class XWikiModelNode
     {
         if (this.xcontext == null) {
             try {
-                Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(
-                    new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+                Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(XWikiContext.TYPE_PROVIDER);
                 this.xcontext = xcontextProvider.get();
             } catch (Exception e) {
                 throw new IOException(String.format("Failed to get XWiki Context for [%s]", this.uri), e);

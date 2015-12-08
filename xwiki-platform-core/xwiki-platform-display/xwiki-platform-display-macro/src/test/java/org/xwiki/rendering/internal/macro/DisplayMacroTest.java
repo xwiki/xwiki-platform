@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro;
 
-import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
-
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -28,15 +26,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.hamcrest.collection.IsArray;
 import org.jmock.Expectations;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.display.DisplayMacro;
@@ -55,6 +59,8 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
+import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
+
 /**
  * Unit tests for {@link DisplayMacro}.
  * 
@@ -67,6 +73,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     private DisplayMacro displayMacro;
 
     private PrintRendererFactory rendererFactory;
+
+    /**
+     * Mocks the component that is used to resolve the 'reference' parameter.
+     */
+    private DocumentReferenceResolver<String> mockDocumentReferenceResolver;
 
     private AuthorizationManager mockAuthorization;
 
@@ -87,6 +98,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
 
+        this.mockDocumentReferenceResolver =
+            registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
         this.mockAuthorization = registerMockComponent(AuthorizationManager.class);
 
         this.displayMacro = (DisplayMacro) getComponentManager().getInstance(Macro.class, "display");
@@ -177,35 +190,59 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
+    private static class ExpectedRecursiveInclusionException extends RuntimeException
+    {
+    }
+
     @Test
     public void testDisplayMacroWithRecursiveDisplay() throws Exception
     {
+        final DocumentDisplayer mockDocumentDisplayer = getMockery().mock(DocumentDisplayer.class);
+
+        this.displayMacro.setDocumentAccessBridge(mockSetup.bridge);
+        FieldUtils.writeField(this.displayMacro, "documentDisplayer", mockDocumentDisplayer, true);
+
+        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+
+        final DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("wiki:space.page");
+
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
+                allowing(mockDocumentReferenceResolver).resolve("wiki:space.page", macroContext.getCurrentMacroBlock());
                 will(returnValue(new DocumentReference("wiki", "space", "page")));
-                allowing(mockSetup.documentReferenceResolver).resolve("space.page");
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
+
+                allowing(mockSetup.bridge).isDocumentViewable(with(any(DocumentReference.class)));
+                will(returnValue(true));
+                allowing(mockSetup.bridge).getDocument(with(any(DocumentReference.class)));
+                will(returnValue(null));
+
+                allowing(mockDocumentDisplayer).display(with(same((DocumentModelBridge) null)),
+                    with(any(DocumentDisplayerParameters.class)));
+                will(new CustomAction("recursively call the include macro again")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        try {
+                            displayMacro.execute(parameters, null, macroContext);
+                        } catch (Exception expected) {
+                            if (expected.getMessage().contains("Found recursive display")) {
+                                throw new ExpectedRecursiveInclusionException();
+                            }
+                        }
+                        return true;
+                    }
+                });
             }
         });
 
-        this.displayMacro.setDocumentAccessBridge(mockSetup.bridge);
-
-        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
-        // Add an Display Macro MarkerBlock as a parent of the display Macro block since this is what would have
-        // happened if an Display macro is displayed in another Display macro.
-        new MacroMarkerBlock("display", Collections.singletonMap("reference", "space.page"),
-            Collections.<Block> singletonList(macroContext.getCurrentMacroBlock()), false);
-
-        DisplayMacroParameters parameters = new DisplayMacroParameters();
-        parameters.setReference("wiki:space.page");
-
         try {
             this.displayMacro.execute(parameters, null, macroContext);
-            Assert.fail("The display macro hasn't checked the recursive inclusion");
+            Assert.fail("The display macro hasn't checked the recursive display");
         } catch (MacroExecutionException expected) {
-            if (!expected.getMessage().startsWith("Found recursive inclusion")) {
+            if (!(expected.getCause() instanceof ExpectedRecursiveInclusionException)) {
                 throw expected;
             }
         }
@@ -236,9 +273,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockSetup.documentReferenceResolver).resolve("wiki:space.page");
+                allowing(mockDocumentReferenceResolver).resolve(with("wiki:space.page"),
+                    with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(sourceReference));
-                oneOf(mockSetup.documentReferenceResolver).resolve("relativePage", sourceReference);
+                allowing(mockDocumentReferenceResolver).resolve(with("relativePage"),
+                    with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(resolvedReference));
                 oneOf(mockSetup.bridge).isDocumentViewable(resolvedReference);
                 will(returnValue(true));
@@ -311,7 +350,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockSetup.documentReferenceResolver).resolve(resolve);
+                allowing(mockDocumentReferenceResolver).resolve(with(resolve),
+                    with(IsArray.array(any(MacroBlock.class))));
                 will(returnValue(reference));
                 allowing(mockSetup.bridge).getDocument(reference);
                 will(returnValue(mockDocument));

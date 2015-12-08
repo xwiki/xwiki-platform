@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -47,6 +48,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver =
         Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+
+    private EntityResourceActionLister actionLister = Utils.getComponent(EntityResourceActionLister.class);
 
     /**
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
@@ -229,8 +232,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpaces(newpath, spaces, action, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(newpath, spaceReference, action, context);
+        addSpaces(newpath, spaceReference, action, context);
         addName(newpath, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
@@ -265,25 +272,26 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         newpath.append(spath);
     }
 
-    private void addAction(StringBuffer newpath, String action, XWikiContext context)
+    private void addAction(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)
     {
         boolean showViewAction = context.getWiki().showViewAction(context);
-        if ((!"view".equals(action) || (showViewAction))) {
+
+        // - Always output the action if it's not "view" or if showViewAction is true
+        // - Output "view/<first space name>" when the first space name is an action name and the action is View
+        // (and showViewAction = false)
+        if ((!"view".equals(action) || (showViewAction))
+            || (!showViewAction && spaceReference != null && "view".equals(action)
+            && this.actionLister.listActions().contains(
+                spaceReference.extractFirstReference(EntityType.SPACE).getName())))
+        {
             newpath.append(action);
             newpath.append("/");
         }
     }
 
-    /**
-     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
-     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
-     */
-    private void addSpaces(StringBuffer newpath, String spaces, String action, XWikiContext context)
+    private void addSpaces(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)
     {
-        // Parse the spaces list into Space References
-        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
-
-        // Skip outputting the default space is the proper config parameter has been set AND there's only a single
+        // Skip outputting the default space if the proper config parameter has been set AND there's only a single
         // space (the concept doesn't work with multiple spaces)
         if (spaceReference.getParent() == null) {
             boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
@@ -363,8 +371,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
-        addAction(newpath, "skin", context);
-        addSpaces(newpath, spaces, "skin", context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(newpath, null, "skin", context);
+        addSpaces(newpath, spaceReference, "skin", context);
         addName(newpath, name, "skin", context);
         addFileName(newpath, filename, false, context);
         try {
@@ -381,7 +393,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         if (forceSkinAction) {
             addServletPath(newpath, context.getWikiId(), context);
-            addAction(newpath, "skin", context);
+            addAction(newpath, null, "skin", context);
         }
         newpath.append("resources");
         addFileName(newpath, filename, false, context);
@@ -432,8 +444,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpaces(newpath, spaces, action, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(newpath, spaceReference, action, context);
+        addSpaces(newpath, spaceReference, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 
@@ -489,8 +505,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String action = "downloadrev";
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpaces(newpath, spaces, action, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(newpath, spaceReference, action, context);
+        addSpaces(newpath, spaceReference, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 

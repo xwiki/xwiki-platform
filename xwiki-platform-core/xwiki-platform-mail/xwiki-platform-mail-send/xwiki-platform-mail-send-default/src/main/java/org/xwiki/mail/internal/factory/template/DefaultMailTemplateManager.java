@@ -164,14 +164,14 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     private VelocityContext createVelocityContext(Map<String, Object> velocityVariables)
     {
         // Note: We create an inner Velocity Context to make it read only and try to prevent the script to modify
-        // its bindings. We also clone its values to try to protect them. It's not guaranteed though since the
-        // clone() method of VelocityContext only performs shallow cloning.
+        // its bindings. VelocityContext protect the inner VelocitContext but value could be modified directly
+        // (when value are mutable, like Map or List for example).
         // However, this whole code is executed in a thread and we recreate the context for each email so it should be
         // pretty safe!
         VelocityContext existingVelocityContext = this.velocityManager.getVelocityContext();
         VelocityContext velocityContext;
         if (existingVelocityContext != null) {
-            velocityContext = new VelocityContext((VelocityContext) existingVelocityContext.clone());
+            velocityContext = new VelocityContext(existingVelocityContext);
         } else {
             velocityContext = new VelocityContext();
         }

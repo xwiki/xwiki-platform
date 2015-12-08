@@ -28,13 +28,27 @@ public interface XWikiURLFactory
 {
     void init(XWikiContext context);
 
+    /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
+     */
     URL createURL(String spaces, String name, XWikiContext context);
 
+    /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
+     */
     URL createURL(String spaces, String name, String action, XWikiContext context);
 
+    /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
+     */
     URL createURL(String spaces, String name, String action, boolean redirect, XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -45,6 +59,8 @@ public interface XWikiURLFactory
     URL createURL(String spaces, String name, String action, String querystring, String anchor, XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -56,6 +72,8 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -67,6 +85,8 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -86,6 +106,8 @@ public interface XWikiURLFactory
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -97,6 +119,8 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -108,6 +132,8 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
@@ -119,6 +145,8 @@ public interface XWikiURLFactory
         XWikiContext context);
 
     /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
      *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
      *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input

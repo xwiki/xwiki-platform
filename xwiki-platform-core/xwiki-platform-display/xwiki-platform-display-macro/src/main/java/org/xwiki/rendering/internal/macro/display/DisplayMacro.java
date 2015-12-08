@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.display;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,10 +36,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -67,11 +67,11 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to transform the passed document reference macro parameter to a typed {@link DocumentReference} object.
+     * Used to transform the passed document reference macro parameter into a typed {@link DocumentReference} object.
      */
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
@@ -86,6 +86,11 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
     @Inject
     @Named("configured")
     private DocumentDisplayer documentDisplayer;
+
+    /**
+     * A stack of all currently executing include macros with context=new for catching recursive inclusion.
+     */
+    private ThreadLocal<Stack<Object>> displaysBeingExecuted = new ThreadLocal<Stack<Object>>();
 
     /**
      * Default constructor.
@@ -126,12 +131,12 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
                 "You must specify a 'reference' parameter pointing to the entity to display.");
         }
 
-        DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters.getReference());
+        DocumentReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
 
-        checkRecursiveDisplayOrInclude(context.getCurrentMacroBlock(), includedReference);
+        checkRecursiveDisplay(context.getCurrentMacroBlock(), includedReference);
 
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
-            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUser()
+            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUserReference()
                 + "] doesn't have view rights on document ["
                 + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
         }
@@ -141,8 +146,9 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         try {
             documentBridge = this.documentAccessBridge.getDocument(includedReference);
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to load Document ["
-                + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]", e);
+            throw new MacroExecutionException(
+                "Failed to load Document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]",
+                e);
         }
 
         // Step 3: Display the content of the included document.
@@ -153,11 +159,21 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
+
+        Stack<Object> references = this.displaysBeingExecuted.get();
+        if (references == null) {
+            references = new Stack<Object>();
+            this.displaysBeingExecuted.set(references);
+        }
+        references.push(includedReference);
+
         XDOM result;
         try {
             result = this.documentDisplayer.display(documentBridge, displayParameters);
         } catch (Exception e) {
             throw new MacroExecutionException(e.getMessage(), e);
+        } finally {
+            references.pop();
         }
 
         // Step 4: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
@@ -167,75 +183,36 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
         metadata.getMetaData().addMetaData(MetaData.BASE, source);
 
-        return Arrays.<Block> asList(metadata);
+        return Arrays.<Block>asList(metadata);
     }
 
     /**
-     * Protect form recursive inclusion.
+     * Protect form recursive display.
      * 
      * @param currrentBlock the child block to check
      * @param documentReference the reference of the document being included
      * @throws MacroExecutionException recursive inclusion has been found
      */
-    private void checkRecursiveDisplayOrInclude(Block currrentBlock, DocumentReference documentReference)
+    private void checkRecursiveDisplay(Block currrentBlock, DocumentReference documentReference)
         throws MacroExecutionException
     {
-        Block parentBlock = currrentBlock.getParent();
-
-        if (parentBlock != null) {
-            if (parentBlock instanceof MacroMarkerBlock) {
-                MacroMarkerBlock parentMacro = (MacroMarkerBlock) parentBlock;
-
-                if (isRecursive(parentMacro, documentReference)) {
-                    throw new MacroExecutionException("Found recursive inclusion of document [" + documentReference
-                        + "]");
-                }
-            }
-
-            checkRecursiveDisplayOrInclude(parentBlock, documentReference);
+        // Try to find recursion in the thread
+        Stack<Object> references = this.displaysBeingExecuted.get();
+        if (references != null && references.contains(documentReference)) {
+            throw new MacroExecutionException("Found recursive display of document [" + documentReference + "]");
         }
     }
 
-    /**
-     * Indicate if the provided macro is an include macro with the provided included document.
-     * 
-     * @param parentMacro the macro block to check
-     * @param documentReference the document reference to compare to
-     * @return true if the documents are the same
-     */
-    // TODO: Add support for any kind of macro including content linked to a reference
-    private boolean isRecursive(MacroMarkerBlock parentMacro, DocumentReference documentReference)
+    private DocumentReference resolve(MacroBlock block, DisplayMacroParameters parameters)
+        throws MacroExecutionException
     {
-        if (parentMacro.getId().equals("display")) {
-            return documentReference.equals(resolve(parentMacro, parentMacro.getParameter("reference")));
+        String reference = parameters.getReference();
+
+        if (reference == null) {
+            throw new MacroExecutionException(
+                "You must specify a 'reference' parameter pointing to the entity to include.");
         }
 
-        return false;
-    }
-
-    /**
-     * Convert document name into proper {@link DocumentReference}.
-     * 
-     * @param block the block from which to look for a MetaData Block containing the Source
-     * @param documentName the document reference passed by the user to the macro
-     * @return the resolved absolute document reference
-     */
-    private DocumentReference resolve(Block block, String documentName)
-    {
-        DocumentReference result;
-
-        MetaDataBlock metaDataBlock = block.getFirstBlock(new MetadataBlockMatcher(MetaData.BASE), Block.Axes.ANCESTOR);
-
-        // If no Source MetaData was found resolve against the current document as a failsafe solution.
-        if (metaDataBlock == null) {
-            result = this.currentDocumentReferenceResolver.resolve(documentName);
-        } else {
-            String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.BASE);
-            result =
-                this.currentDocumentReferenceResolver.resolve(documentName,
-                    this.currentDocumentReferenceResolver.resolve(sourceMetaData));
-        }
-
-        return result;
+        return this.macroDocumentReferenceResolver.resolve(reference, block);
     }
 }

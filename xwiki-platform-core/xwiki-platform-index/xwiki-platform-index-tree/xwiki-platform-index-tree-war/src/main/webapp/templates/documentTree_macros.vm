@@ -2,7 +2,7 @@
 
 #set ($isDocumentTreeAvailable = $xwiki.exists('XWiki.DocumentTree'))
 
-## Configuration options for the Document Tree.
+## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'filterByClass': '',
   'filterHiddenDocuments': true,
@@ -25,7 +25,12 @@
 })
 
 #macro (documentTree $options)
-  #set ($macro.options = {})
+  ## Default values for configuration options that concern the display and behavior of the tree
+  ## (these are not passed to the Document Tree Source).
+  #set ($macro.options = {
+    'readOnly': true,
+    'compact': false
+  })
   #set ($discard = $macro.options.putAll($docTreeConfig))
   #set ($discard = $macro.options.putAll($options))
   ## showChildDocuments is deprecated since 7.2M2. Fall-back on hierarchyMode for backwards compatibility.

@@ -39,14 +39,21 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.avalon.framework.configuration.DefaultConfiguration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.fop.apps.EnvironmentProfile;
+import org.apache.fop.apps.EnvironmentalProfileFactory;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.PageSequenceResults;
 import org.apache.velocity.VelocityContext;
@@ -109,12 +116,12 @@ public class PdfExportImpl implements PdfExport
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfExportImpl.class);
 
     /** Document name resolver. */
-    private static DocumentReferenceResolver<String> referenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private static DocumentReferenceResolver<String> referenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Document name serializer. */
-    private static EntityReferenceSerializer<String> referenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.TYPE_STRING);
+    private static EntityReferenceSerializer<String> referenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /** Provides access to document properties. */
     private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);
@@ -145,35 +152,71 @@ public class PdfExportImpl implements PdfExport
         // ----------------------------------------------------------------------
         // FOP configuration
         // ----------------------------------------------------------------------
-        fopFactory = FopFactory.newInstance();
-        try {
-            Environment environment = Utils.getComponent(Environment.class);
-            String fontsPath = environment.getResource(FONTS_PATH).getPath();
-            Execution execution = Utils.getComponent(Execution.class);
-            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            if (xcontext != null) {
-                XWikiRequest request = xcontext.getRequest();
-                if (request != null && request.getSession() != null) {
-                    fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
+
+        EnvironmentProfile environmentProfile = EnvironmentalProfileFactory.createDefault(new File(".").toURI(),
+            Utils.getComponent(PDFResourceResolver.class));
+        FopFactoryBuilder builder = new FopFactoryBuilder(environmentProfile);
+
+        // Load configuration
+        Configuration configuration = null;
+        try (InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml")) {
+            if (fopConfigurationFile != null) {
+                configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Wrong FOP configuration: " + ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        if (configuration != null) {
+            // Get a writable configuration instance
+            DefaultConfiguration writableConfiguration = null;
+            if (configuration instanceof DefaultConfiguration) {
+                writableConfiguration = (DefaultConfiguration) configuration;
+            } else {
+                try {
+                    writableConfiguration = new DefaultConfiguration(configuration, true);
+                } catch (ConfigurationException e) {
+                    // Should never happen
+                    LOGGER.error("Failed to copy configuration", e);
                 }
             }
-            fopFactory.getFontManager().setFontBaseURL(fontsPath);
-        } catch (Throwable ex) {
-            LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
-                + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
-                + "FOP cannot access this directory. If this is an upgrade from a previous version, "
-                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
-        }
-        InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml");
-        if (fopConfigurationFile != null) {
-            try {
-                fopFactory.setUserConfig(new DefaultConfigurationBuilder().build(fopConfigurationFile));
-            } catch (Exception ex) {
-                LOGGER.warn("Wrong FOP configuration: " + ex.getMessage());
-            } finally {
-                IOUtils.closeQuietly(fopConfigurationFile);
+
+            if (writableConfiguration != null) {
+                // Add XWiki fonts folder to the configuration
+                try {
+                    Environment environment = Utils.getComponent(Environment.class);
+                    String fontsPath = environment.getResource(FONTS_PATH).getPath();
+                    Execution execution = Utils.getComponent(Execution.class);
+                    XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+                    if (xcontext != null) {
+                        XWikiRequest request = xcontext.getRequest();
+                        if (request != null && request.getSession() != null) {
+                            fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
+                        }
+                    }
+
+                    DefaultConfiguration rendererConfiguration =
+                        (DefaultConfiguration) writableConfiguration.getChild("renderer");
+                    if (rendererConfiguration != null) {
+                        DefaultConfiguration fontsConfiguration =
+                            (DefaultConfiguration) rendererConfiguration.getChild("fonts");
+                        DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
+                        directoryConfiguration.setValue(fontsPath);
+                        fontsConfiguration.addChild(directoryConfiguration);
+
+                    }
+                } catch (Throwable ex) {
+                    LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
+                        + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
+                        + "FOP cannot access this directory. If this is an upgrade from a previous version, "
+                        + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+                }
+
+                builder.setConfiguration(writableConfiguration);
             }
         }
+
+        fopFactory = builder.build();
     }
 
     @Override
@@ -183,8 +226,7 @@ public class PdfExportImpl implements PdfExport
     }
 
     @Override
-    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
-        throws XWikiException
+    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         // Note: The passed document is not used currently since we're calling pdf.vm and that
         // velocity template uses the XWiki Context to get the current doc or its translations.
@@ -306,9 +348,6 @@ public class PdfExportImpl implements PdfExport
     {
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-
-            // Use a custom URI Resolver to handle embedding images in the exported PDF.
-            foUserAgent.setURIResolver(new PDFURIResolver(context));
 
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
@@ -560,7 +599,7 @@ public class PdfExportImpl implements PdfExport
      */
     private XWikiException createException(Throwable source, ExportType exportType, int errorType)
     {
-        return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType, "Exception while exporting "
-            + exportType.getExtension(), source);
+        return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType,
+            "Exception while exporting " + exportType.getExtension(), source);
     }
 }

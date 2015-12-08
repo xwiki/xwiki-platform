@@ -43,9 +43,8 @@
 #macro(listAvailableColumns)
   {{html}}
   &lt;select id="availableColumns"&gt;
-    #set($className = "$!liveTableObj.getProperty('class').value")
+    #set($className = "$!liveTableObj.getValue('class')")
     #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
-    #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
     #if($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
         #foreach($field in $classFields)
@@ -190,27 +189,43 @@
   #set ($discard = $displayParameters.setContentTranslated(true))
   #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, { 'outputSyntaxId' : 'plain/1.0', 'displayerParameters' : $displayParameters }))
 
-  ## Use the generated LiveTable content for the current document.
-  #set ($discard = $doc.setContent($generatedLiveTableContent))
+  ## Use the generated LiveTable content for the data home page.
+  #set ($dataSpaceReference = $services.model.resolveSpace($doc.getValue('dataSpace')))
+  #set ($dataSpaceHomeReference = $services.model.resolveDocument('', 'default', $dataSpaceReference))
+  #if ($dataSpaceHomeReference.equals($doc.documentReference))
+    ## The application space and the data space are one and the same.
+    #set ($dataHomePage = $doc)
+  #else
+    ## The application data is stored in a different space.
+    #set ($dataHomePage = $xwiki.getDocument($dataSpaceHomeReference))
+    #set ($discard = $dataHomePage.setHidden(true))
+    #set ($escapedAppName = $doc.documentReference.parent.name.toLowerCase().replace("'", "''"))
+    #set ($discard = $dataHomePage.setTitle("${escapetool.d}services.localization.render('${escapedAppName}.dataSpace.title')"))
+
+    ## Update the home page content.
+    #set ($homePageContent = '')
+    #if ("$!generatedLiveTableContent" != '')
+      ## Include the entries live table in the application home page.
+      #set ($escapedReference = $services.model.serialize($dataSpaceHomeReference).replaceAll('([~"])', '~$1'))
+      #set ($homePageContent = "{{include reference=""$escapedReference"" /}}")
+    #end
+    #set ($discard = $doc.setContent($homePageContent))
+  #end
+  #set ($discard = $dataHomePage.setContent($generatedLiveTableContent))
 
   #set($minorEdit = "$!request.minorEdit" != '')
   #set($comment = $request.comment)
   #if("$!comment" == '')
     #set($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
   #end
-  #set($discard = $doc.save($comment, $minorEdit))
-#end
 
-#macro (maybeCreateLiveTableResultsPage)
-  #set ($className = "$!doc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value")
-  #set ($liveTableResultsDoc = $xwiki.getDocument("$!stringtool.removeEnd($className, 'Class')LiveTableResults"))
-  #set ($liveTableResultsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableResultsGenerator'))
-  #if ($liveTableResultsDoc.isNew())
-    #set ($discard = $liveTableResultsDoc.setParent($doc.fullName))
-    #set ($discard = $liveTableResultsDoc.setHidden(true))
-    #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-    #set ($discard = $liveTableResultsDoc.save($services.localization.render('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
+  #if ($dataHomePage != $doc)
+    ## Save the data home page.
+    #set ($discard = $dataHomePage.save($comment, $minorEdit))
   #end
+
+  ## Save the application home page.
+  #set($discard = $doc.save($comment, $minorEdit))
 #end
 
 #macro(updateAndSaveIcon)
@@ -227,7 +242,6 @@
 #macro(doSave)
   #maybeGrantSpaceAdminRights()
   #updateAndSaveLiveTable()
-  #maybeCreateLiveTableResultsPage()
   #updateAndSaveIcon()
   #if($action == 'save')
     #if($errorMessage)

@@ -33,6 +33,11 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     public static final String MAXENTRIES_ID = "maxentries";
 
     /**
+     * @see #getLifespan()
+     */
+    public static final String LIFESPAN_ID = "lifespan";
+
+    /**
      * Create a new EntryEvictionConfiguration based on LRU algorithm.
      */
     public LRUEvictionConfiguration()
@@ -69,5 +74,43 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
         Object obj = get(MAXENTRIES_ID);
 
         return obj == null ? 0 : (Integer) get(MAXENTRIES_ID);
+    }
+
+    /**
+     * @param maxIdle the maximum time to live since the last time the value was used. In seconds.
+     * @since 7.4M2
+     */
+    public void setMaxIdle(int maxIdle)
+    {
+        setTimeToLive(maxIdle);
+    }
+
+    /**
+     * @return the maximum time to live since the last time the value was used. In seconds.
+     * @since 7.4M2
+     */
+    public int getMaxIdle()
+    {
+        return getTimeToLive();
+    }
+
+    /**
+     * @param lifespan the maximum time to live since the value has been cached. In seconds.
+     * @since 7.4M2
+     */
+    public void setLifespan(int lifespan)
+    {
+        put(LIFESPAN_ID, lifespan);
+    }
+
+    /**
+     * @return the maximum time to live since the value has been cached. In seconds.
+     * @since 7.4M2
+     */
+    public int getLifespan()
+    {
+        Object obj = get(LIFESPAN_ID);
+
+        return obj == null ? 0 : (Integer) get(LIFESPAN_ID);
     }
 }

@@ -444,6 +444,25 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
+ * Create the home page of the application code space, if it doesn't exist already.
+ *#
+#macro (maybeCreateCodeSpace)
+  #set ($codeHomePageReference = $services.model.resolveDocument('', 'default', $doc.documentReference.parent))
+  #if (!$xwiki.exists($codeHomePageReference))
+    #set ($codeSpaceTemplate = $services.model.resolveDocument('AppWithinMinutes.CodeSpaceTemplate'))
+    #set ($copyAsJob = $services.refactoring.copyAs($codeSpaceTemplate, $codeHomePageReference))
+    #try()
+      #set ($discard = $copyAsJob.join())
+      #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
+      #set ($errorLogs = $copyAsJobStatus.log.getLogs('ERROR'))
+      #if ($errorLogs.size() &gt; 0)
+        #set ($errorMessage = $errorLogs.get(0).toString())
+      #end
+    #end
+  #end
+#end
+
+#**
  * Updates and saves the class definition based on the submitted data.
  *#
 #macro(updateAndSaveClass)
@@ -638,10 +657,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set($translationsRef = $services.model.resolveDocument("${className}Translations"))
     #set($translationsDoc = $xwiki.getDocument($translationsRef))
     #set($translationsObj = $translationsDoc.getObject('XWiki.TranslationDocumentClass', true))
-    ## We use the translation bundle on demand because none of the available scopes suits our needs. Simple users can't
-    ## register document translation bundles at WIKI level and the SPACE scope doesn't remove the need to create a
-    ## custom live table results page in the same space as the application.
-    #set($discard = $translationsObj.set('scope', 'ON_DEMAND'))
+    #set ($scope = 'USER')
+    #if ($services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
+      #set ($scope = 'WIKI')
+    #end
+    #set($discard = $translationsObj.set('scope', $scope))
     #set($discard = $translationsDoc.setParent($doc.name))
     #set($translationsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.ClassTranslationsGenerator'))
     #set($discard = $translationsDoc.setContent($doc.getRenderedContent($translationsGeneratorDoc.content,
@@ -683,10 +703,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro(doSave)
   #set($minorEdit = "$!request.minorEdit" != '')
-  #updateAndSaveClass()
-  #updateAndSaveTemplate()
-  #updateAndSaveSheet()
-  #updateAndSaveTranslations()
+  #maybeCreateCodeSpace
+  #updateAndSaveClass
+  #updateAndSaveTemplate
+  #updateAndSaveSheet
+  #updateAndSaveTranslations
   #if($action == 'save')
     #if($errorMessage)
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}

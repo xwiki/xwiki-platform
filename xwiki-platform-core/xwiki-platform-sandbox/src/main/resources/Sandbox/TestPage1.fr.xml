@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>Cliquez sur **"Modifier"** puis altérez le contenu de la page enfin cliquez sur **"Enregistrer &amp; Fermer** pour visualiser le résultat de vos modifications dans la page !
 

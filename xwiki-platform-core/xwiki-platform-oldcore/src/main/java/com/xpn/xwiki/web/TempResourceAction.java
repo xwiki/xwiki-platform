@@ -117,6 +117,9 @@ public class TempResourceAction extends XWikiAction
                 ex);
         }
         response.setContentType(contentType);
+        if ("1".equals(request.getParameter("force-download"))) {
+            response.addHeader("Content-disposition", "attachment; filename*=utf-8''" + tempFile.getName());
+        }
         try {
             response.setContentLength((int) tempFile.length());
             IOUtils.copy(FileUtils.openInputStream(tempFile), response.getOutputStream());

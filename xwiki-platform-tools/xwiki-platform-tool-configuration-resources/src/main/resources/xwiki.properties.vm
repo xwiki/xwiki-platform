@@ -556,7 +556,7 @@ extension.oldflavors=$oldFlavor.trim()
 #-# Note that this replaces the old xwiki.defaultservletpath property in the xwiki.cfg file.
 #-#
 #-# The default is:
-# url.standard.getEntityPathPrefix=bin
+# url.standard.entityPathPrefix=bin
 
 #-# [Since 5.3M1]
 #-# The action to take when a subwiki is not found (ie there's no wiki descriptor for it). Valid values are:
@@ -567,7 +567,7 @@ extension.oldflavors=$oldFlavor.trim()
 # url.standard.multiwiki.notFoundBehavior=redirect_to_main_wiki
 
 #-# [Since 7.2M1]
-#-# Whether the "view" action is omitted in URLs ()in order to have shorter URLs).
+#-# Whether the "view" action is omitted in URLs (in order to have shorter URLs).
 #-# Note that this replaces the old xwiki.showviewaction property in the xwiki.cfg file.
 #-#
 #-# The default is:

@@ -167,8 +167,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     @Override
     public VelocityContext getVelocityContext()
     {
-        // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are
-        // guaranteed it is defined when this method is called.
+        // The Velocity Context is set in VelocityExecutionContextInitializer, when the XWiki Request is initialized
+        // so we are guaranteed it is defined when this method is called.
         VelocityContext vcontext =
             (VelocityContext) this.execution.getContext().getProperty(
                 VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);

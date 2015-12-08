@@ -73,8 +73,6 @@ ${indentation}: ${escapetool.d}doc.display('#escapeSingleQuotes($property.name)'
 {{velocity}}
 {{html wiki="true"}}
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('#escapeSingleQuotes($doc.fullName)'))
-#set ($translationBundleId = "$stringtool.removeEnd($doc.fullName, 'Class')Translations")
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '#escapeSingleQuotes($translationBundleId)'))
 ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
 (% class="xform" %)
 (((

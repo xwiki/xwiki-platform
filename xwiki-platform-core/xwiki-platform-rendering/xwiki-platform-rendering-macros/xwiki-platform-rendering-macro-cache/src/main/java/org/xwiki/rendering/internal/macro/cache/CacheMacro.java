@@ -30,8 +30,7 @@ import javax.inject.Singleton;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -116,8 +115,8 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
             // Consider that the id contains wiki syntax and parse it with the same wiki parser than the current
             // transformation is using and render the result as plain text.
             WikiPrinter printer = new DefaultWikiPrinter();
-            this.plainTextBlockRenderer.render(
-                this.contentParser.parse(parameters.getId(), context, true, false), printer);
+            this.plainTextBlockRenderer.render(this.contentParser.parse(parameters.getId(), context, true, false),
+                printer);
             cacheKey = printer.toString();
         } else {
             cacheKey = content;
@@ -139,30 +138,25 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
     /**
      * Get a cache matching the passed time to live and max entries.
      * <p>
-     * Note that whenever a new cache is created it currently means a new thread is used too (since the JBoss cache
-     * used underneath uses a thread for evicting entries from the cache).
-     * We need to modify our xwiki-cache module to allow setting time to live on cache items, see
-     * http://jira.xwiki.org/jira/browse/XWIKI-5907
+     * Note that whenever a new cache is created it currently means a new thread is used too (since the JBoss cache used
+     * underneath uses a thread for evicting entries from the cache). We need to modify our xwiki-cache module to allow
+     * setting time to live on cache items, see http://jira.xwiki.org/jira/browse/XWIKI-5907
      * </p>
      *
-     * @param timeToLive the number of seconds to cache the content
+     * @param lifespan the number of seconds to cache the content
      * @param maxEntries the maximum number of entries in the cache (Least Recently Used entries are ejected)
      * @return the matching cache (a new cache is created if no existing one is found)
      * @throws MacroExecutionException in case we fail to create the new cache
      */
-    Cache<List<Block>> getContentCache(int timeToLive, int maxEntries) throws MacroExecutionException
+    Cache<List<Block>> getContentCache(int lifespan, int maxEntries) throws MacroExecutionException
     {
-        CacheKey cacheKey = new CacheKey(timeToLive, maxEntries);
+        CacheKey cacheKey = new CacheKey(lifespan, maxEntries);
         Cache<List<Block>> contentCache = this.contentCacheMap.get(cacheKey);
         if (contentCache == null) {
             // Create Cache
-            CacheConfiguration configuration =
-                new CacheConfiguration(String.format("cacheMacro.%s", cacheKey.toString()));
-
-            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-            lru.setMaxEntries(maxEntries);
-            lru.setTimeToLive(timeToLive);
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            LRUCacheConfiguration configuration =
+                new LRUCacheConfiguration(String.format("cacheMacro.%s", cacheKey.toString()), maxEntries);
+            configuration.getLRUEvictionConfiguration().setLifespan(lifespan);
 
             try {
                 contentCache = this.cacheManager.createNewLocalCache(configuration);
@@ -172,6 +166,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
 
             this.contentCacheMap.put(cacheKey, contentCache);
         }
+
         return contentCache;
     }
 }

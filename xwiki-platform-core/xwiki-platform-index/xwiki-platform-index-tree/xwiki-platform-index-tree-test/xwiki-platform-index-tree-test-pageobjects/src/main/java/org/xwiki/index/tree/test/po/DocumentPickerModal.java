@@ -41,7 +41,7 @@ public class DocumentPickerModal extends BaseElement
 
     public DocumentPickerModal()
     {
-        this.container = getDriver().findElement(By.cssSelector(".location-tree.modal.fade.in"));
+        this.container = getDriver().findElement(By.cssSelector(".location-picker .modal.fade.in"));
 
         this.waitForIt();
     }
@@ -49,7 +49,7 @@ public class DocumentPickerModal extends BaseElement
     public DocumentTreeElement getTree()
     {
         if (this.tree == null) {
-            this.tree = new DocumentTreeElement(this.container.findElement(By.className("xtree")));
+            this.tree = new DocumentTreeElement(this.container.findElement(By.className("location-tree")));
         }
         return this.tree;
     }

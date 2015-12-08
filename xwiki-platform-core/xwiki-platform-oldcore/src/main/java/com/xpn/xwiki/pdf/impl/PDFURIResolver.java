@@ -50,7 +50,9 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  * @since 5.0RC1
+ * @deprecated since 7.4M2, use {@link PDFResourceResolver} component instead
  */
+@Deprecated
 public class PDFURIResolver implements URIResolver
 {
     private static final String TEX_ACTION = "/tex/";

@@ -611,7 +611,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         if (vcontext == null) {
             // Use the original velocity context as a starting point
-            vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            vcontext = new VelocityContext(velocityManager.getVelocityContext());
         }
 
         vcontext.put("from.name", fromAddr);
@@ -638,7 +639,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String ccAddr, String bccAddr,
         Map<String, Object> parameters, XWikiContext context)
     {
-        VelocityContext vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+        VelocityContext vcontext = new VelocityContext(velocityManager.getVelocityContext());
 
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {

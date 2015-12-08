@@ -54,8 +54,6 @@
       $services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
     #end
   </div>
-  ## Show the spaceReference input for the user to change the value
-  #set ($showSpaceReferenceInput = true)
 #end
 ## check if the exception is about the document which already exists
 #if("$!exception" != '' && $exception.code == 11002)
@@ -68,10 +66,6 @@
         ]
       )
   </div>
-  ## Show the spaceReference input for the user to change the value
-  #set ($showSpaceReferenceInput = true)
-  ## Show the name input for the user to change the value
-  #set ($showNameInput = true)
 #end
 
 ## ---------------------------------------------------------------------------------------------------------
@@ -201,26 +195,9 @@
   ## Deprecated: Pass along any received page parent.
   <input type='hidden' name='parent' value="$!{escapetool.xml($parent)}"/>
 
-  ## Determine if we need to show the name input.
-  #if (!$showNameInput)
-    #set ($showNameInput = "$!name" == '')
-  #end
-
-  ## Determine if we need to show the space reference input.
-  #set ($deprecatedSpaceCreate = ("$!request.tocreate" == 'space'))
-  #if (!$showSpaceReferenceInput)
-    ## We are on an existing document and no space reference was specified for the new document to create.
-    #set ($showSpaceReferenceInput = (!$doc.isNew() && "$!spaceReference" == ''))
-    #if ($showSpaceReferenceInput)
-      ## In the deprecated space creation process however, we only needed the space name.
-      #set ($showSpaceReferenceInput = !$deprecatedSpaceCreate)
-    #end
-  #end
-
-  ## Determine if we need to show the first column.
-  #set ($showFirstColumn = $showSpaceReferenceInput || $showNameInput)
   <div class='row'>
-    #if ($showFirstColumn)
+    ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link.
+    #if (!$request.ajax)
       ## Determine the parent reference for the new document.
       #set ($parentReference = $spaceReference)
       #if (!$parentReference)
@@ -287,6 +264,7 @@
         ## ---------------------------------------------------------------------------------------------------------
         ## Terminal page - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
+        #set ($deprecatedSpaceCreate = "$!request.tocreate" == 'space')
         #if (($isAdvancedUser || $isSuperAdmin) && !$deprecatedSpaceCreate)
           <dt>
             <label for="terminal">

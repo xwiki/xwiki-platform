@@ -66,12 +66,15 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         // TODO: Right now we don't have any specific Resolver for GWT resources and we just consider them as Entity
         // Resources.
         //
-        // Note that we need to remove it from the ExtendedURL instance since it's passed to the specific resolvers
-        // and they shouldn't be aware of where it was located since they need to be able to resolve the rest of the
-        // URL independently of the URL scheme, in case they wish to have a single URL syntax for all URL schemes.
+        // Note that we need to remove the type from the ExtendedURL instance since it's passed to the specific
+        // resolvers and they shouldn't be aware of where it was located since they need to be able to resolve the
+        // rest of the URL independently of the URL scheme, in case they wish to have a single URL syntax for all URL
+        // schemes.
+        //
         // Examples:
         // - scheme 1: /<type>/something
         // - scheme 2: /something?type=<type>
+        //
         // The specific resolver for type <type> needs to be passed an ExtendedURL independent of the type, in this
         // case, "/something" for both examples.
         //

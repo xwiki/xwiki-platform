@@ -82,6 +82,7 @@ com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.internal.render.DefaultOldRendering
 com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
+com.xpn.xwiki.pdf.impl.PDFResourceResolver
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer

@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

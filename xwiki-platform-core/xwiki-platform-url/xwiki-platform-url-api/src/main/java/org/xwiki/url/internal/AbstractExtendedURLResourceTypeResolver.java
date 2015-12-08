@@ -45,6 +45,11 @@ import org.xwiki.url.ExtendedURL;
  */
 public abstract class AbstractExtendedURLResourceTypeResolver implements ResourceTypeResolver<ExtendedURL>
 {
+    /**
+     * Even though we use the Context Component Manager to locate Resource Reference Resolver, it may fall back on the
+     * Root Component Manager since at this stage the Context may not have been defined yet. For example this code is
+     * called by the RoutingFilter which executes before any Context has been set.
+     */
     @Inject
     @Named("context")
     private ComponentManager componentManager;

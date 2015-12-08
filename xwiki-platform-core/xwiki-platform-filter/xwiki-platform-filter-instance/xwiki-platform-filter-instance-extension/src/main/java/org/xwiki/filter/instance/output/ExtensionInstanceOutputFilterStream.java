@@ -90,6 +90,7 @@ public class ExtensionInstanceOutputFilterStream extends
 
         String namespace = null;
 
+        // TODO: This makes impossible to register an extension at root level through events, should find a cleaner way
         EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
         if (currentEntityReference != null) {
             namespace = WIKINAMESPACE + currentEntityReference.extractReference(EntityType.WIKI).getName();

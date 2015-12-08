@@ -98,7 +98,7 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
 
     /**
      * Used to get a {@link BlockRenderer} dynamically.
-     * 
+     *
      * @see #updateRelativeLinks(XWikiDocument, DocumentReference)
      */
     @Inject
@@ -107,7 +107,7 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
 
     /**
      * Used to serialize link references.
-     * 
+     *
      * @see #updateRelativeLinks(XWikiDocument, DocumentReference)
      */
     @Inject

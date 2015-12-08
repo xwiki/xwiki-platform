@@ -23,7 +23,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Known refactoring job types.
- * 
+ *
  * @version $Id$
  * @since 7.2M1
  */

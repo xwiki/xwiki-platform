@@ -78,6 +78,16 @@
     #end
     ## This input is used by the full screen widget: it stores the selector of the maximized element, so that the full screen can be restored when coming back from preview.
     <input type="hidden" name="x-maximized" value="$!{escapetool.xml($request.get('x-maximized'))}"/>
+    #if ("$!request.template" != '')
+      ## Used when creating a document (i.e. editing for the first time) from a template to wait asynchronously
+      ## (with javascript progress information) for the save operation to finish. Without this, the save operation
+      ## is synchronous by default.
+      #set ($async = $request.async)
+      #if ("$!async" == '')
+        #set ($async = 'true')
+      #end
+      <input type="hidden" name="async" value="$escapetool.xml($async)" />
+    #end
     </div>
   #end
   ##################

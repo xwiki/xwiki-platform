@@ -80,6 +80,16 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #if("$!request.xhidden" != '')
   <input type="hidden" name="xhidden" value="$escapetool.xml($!request.xhidden)" />
 #end
+#if ("$!request.template" != '')
+  ## Used when creating a document (i.e. editing for the first time) from a template to wait asynchronously
+  ## (with javascript progress information) for the save operation to finish. Without this, the save operation
+  ## is synchronous by default.
+  #set ($async = $request.async)
+  #if ("$!async" == '')
+    #set ($async = 'true')
+  #end
+  <input type="hidden" name="async" value="$escapetool.xml($async)" />
+#end
 ## ----------------------------
 ## Display the rendered content
 ## ----------------------------

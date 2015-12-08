@@ -33,7 +33,7 @@
   <description>VFS API</description>
   <properties>
     <vfs.version>0.11.0</vfs.version>
-    <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

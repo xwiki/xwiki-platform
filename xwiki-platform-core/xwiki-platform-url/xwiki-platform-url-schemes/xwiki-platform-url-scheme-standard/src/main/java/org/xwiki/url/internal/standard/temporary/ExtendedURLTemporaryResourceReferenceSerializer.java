@@ -75,6 +75,7 @@ public class ExtendedURLTemporaryResourceReferenceSerializer
         segments.add(owningReference.getName());
         segments.add(resource.getModuleId());
         segments.add(resource.getResourceName());
+        // A modifiable map is used here instead of Collections.emptyMap so that parameters can be added to the URL later
         ExtendedURL result = new ExtendedURL(segments, new HashMap<String, List<String>>());
         return this.extendedURLNormalizer.normalize(result);
     }

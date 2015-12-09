@@ -58,7 +58,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     /**
      * Clicks on the Next Step button.
-     * 
+     *
      * @return the page that represents the next step of the App Within Minutes wizard
      */
     public ApplicationHomeEditPage clickNextStep()
@@ -69,7 +69,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     /**
      * Clicks on the Previous Step button.
-     * 
+     *
      * @return the page that represents the previous step of the App Within Minutes wizard
      */
     public ApplicationCreatePage clickPreviousStep()
@@ -88,7 +88,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     /**
      * Drags a field of the specified type from the field palette to the field canvas.
-     * 
+     *
      * @param fieldType the type of field to add, as displayed on the field palette
      */
     public ClassFieldEditPane addField(String fieldType)
@@ -122,7 +122,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     /**
      * Moves the class field specified by the first parameter before the class field specified by the second parameter
-     * 
+     *
      * @param fieldToMove the class field to be moved
      * @param beforeField the class field before which to insert the field being moved
      */
@@ -133,7 +133,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
 
     /**
      * Sets whether the class sheet should be updated or not.
-     * 
+     *
      * @param update {@code true} to update the class sheet, {@code false} otherwise
      */
     public void setUpdateClassSheet(boolean update)

@@ -62,7 +62,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Clicks on the Previous Step button.
-     * 
+     *
      * @return the page that represents the previous step of the App Within Minutes wizard
      */
     public ApplicationClassEditPage clickPreviousStep()
@@ -73,7 +73,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Clicks on the Finish button.
-     * 
+     *
      * @return the page that represents the application home page
      */
     public ApplicationHomePage clickFinish()
@@ -91,7 +91,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Sets the application description.
-     * 
+     *
      * @param description the new application description
      */
     public void setDescription(String description)
@@ -104,7 +104,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Sets the application icon.
-     * 
+     *
      * @param icon the icon to set
      */
     public void setIcon(String icon)
@@ -125,7 +125,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Adds a new live table column.
-     * 
+     *
      * @param columnLabel the label of the live table column to be added
      */
     public void addLiveTableColumn(String columnLabel)
@@ -137,7 +137,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Removes the live table column with the specified label.
-     * 
+     *
      * @param columnLabel the label of the live table column to be removed
      */
     public void removeLiveTableColumn(String columnLabel)
@@ -151,7 +151,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Reorders the live table columns by moving one column before another.
-     * 
+     *
      * @param columnToMove the label of the live table column to be moved
      * @param beforeColumn the label of the reference column
      */
@@ -196,7 +196,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
 
     /**
      * Removes all deprecated columns or simply hides the warning message based on the given boolean value.
-     * 
+     *
      * @param yes {@code true} to remove all deprecated columns, {@code false} to just hide the warning message
      */
     public void removeAllDeprecatedLiveTableColumns(boolean yes)

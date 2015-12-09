@@ -27,7 +27,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the common actions possible on all Pages when using the "inline" action.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */

@@ -47,7 +47,7 @@ public class DocumentsConfigurationSourceTest
         ConfigurationSource wikiSource = this.mocker.getInstance(ConfigurationSource.class, "wiki");
         when(wikiSource.containsKey("key")).thenReturn(true);
 
-        ConfigurationSource spaceSource = this.mocker.getInstance(ConfigurationSource.class, "space");
+        ConfigurationSource spaceSource = this.mocker.getInstance(ConfigurationSource.class, "spaces");
         when(spaceSource.containsKey("key")).thenReturn(false);
 
         assertTrue(this.mocker.getComponentUnderTest().containsKey("key"));

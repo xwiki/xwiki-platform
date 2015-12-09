@@ -47,7 +47,7 @@ public class EntityReferenceTest
 {
     private Map<String, Serializable> getParamMap(int nb)
     {
-        Map<String, Serializable> map = new HashMap<String, Serializable>(nb);
+        Map<String, Serializable> map = new HashMap<>(nb);
         for (int i=0; i < nb; i++) {
             map.put(UUID.randomUUID().toString(), UUID.randomUUID());
         }
@@ -65,20 +65,35 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testExtractReference()
+    public void extractReference()
     {
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
-        EntityReference space = new EntityReference("space", EntityType.SPACE, wiki);
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space);
+        EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
+        EntityReference space2 = new EntityReference("space2", EntityType.SPACE, space1);
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space2);
 
         Assert.assertSame(wiki, reference.extractReference(EntityType.WIKI));
-        Assert.assertSame(space, reference.extractReference(EntityType.SPACE));
+        Assert.assertSame(space2, reference.extractReference(EntityType.SPACE));
         Assert.assertSame(reference, reference.extractReference(EntityType.DOCUMENT));
         Assert.assertNull(reference.extractReference(EntityType.ATTACHMENT));
     }
 
     @Test
-    public void testGetRoot()
+    public void extractFirstReference()
+    {
+        EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
+        EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
+        EntityReference space2 = new EntityReference("space2", EntityType.SPACE, space1);
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT, space2);
+
+        Assert.assertSame(wiki, reference.extractFirstReference(EntityType.WIKI));
+        Assert.assertSame(space1, reference.extractFirstReference(EntityType.SPACE));
+        Assert.assertSame(reference, reference.extractFirstReference(EntityType.DOCUMENT));
+        Assert.assertNull(reference.extractFirstReference(EntityType.ATTACHMENT));
+    }
+
+    @Test
+    public void getRoot()
     {
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
@@ -87,7 +102,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testGetReversedReferenceChain()
+    public void getReversedReferenceChain()
     {
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI, null);
         EntityReference space = new EntityReference("space", EntityType.SPACE, wiki);
@@ -102,7 +117,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testCopyConstructor()
+    public void copyConstructor()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(1);
@@ -120,7 +135,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEquals()
+    public void validateEquals()
     {
         EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -177,7 +192,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEqualsTo()
+    public void equalsTo()
     {
         EntityReference documentReference = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -191,7 +206,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEqualsFromTo()
+    public void equalsFromTo()
     {
         EntityReference documentReference =
             new EntityReference("page1", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
@@ -205,7 +220,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEqualsNonRecursive()
+    public void equalsNonRecursive()
     {
         EntityReference documentReference1 =
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
@@ -220,7 +235,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testHashCode()
+    public void validateHashCode()
     {
         EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -277,7 +292,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testCompareTo()
+    public void compareTo()
     {
         EntityReference reference = new EntityReference("f", EntityType.DOCUMENT,
             new EntityReference("e", EntityType.SPACE,
@@ -295,28 +310,28 @@ public class EntityReferenceTest
             new EntityReference("c", EntityType.DOCUMENT, new EntityReference("x", EntityType.SPACE,
                 new EntityReference("a", EntityType.SPACE, new EntityReference("a", EntityType.WIKI))));
 
-        Map map1 = new HashMap(3);
-        map1.put("param1","a");
-        map1.put("param2","b");
-        map1.put("param3","c");
-        Map map2 = new HashMap(2);
-        map2.put("param1","a");
-        map2.put("param3","c");
-        Map map3 = new HashMap(2);
-        map3.put("param1","b");
-        map3.put("param3","c");
+        Map<String, Serializable> map1 = new HashMap<>(3);
+        map1.put("param1", "a");
+        map1.put("param2", "b");
+        map1.put("param3", "c");
+        Map<String, Serializable> map2 = new HashMap<>(2);
+        map2.put("param1", "a");
+        map2.put("param3", "c");
+        Map<String, Serializable>  map3 = new HashMap<>(2);
+        map3.put("param1", "b");
+        map3.put("param3", "c");
 
         EntityReference reference4  = new EntityReference("c", EntityType.DOCUMENT,
             new EntityReference("a", EntityType.SPACE,
-                new EntityReference("a", EntityType.WIKI)),map1);
+                new EntityReference("a", EntityType.WIKI)), map1);
 
         EntityReference reference5  = new EntityReference("c", EntityType.DOCUMENT,
             new EntityReference("a", EntityType.SPACE,
-                new EntityReference("a", EntityType.WIKI)),map2);
+                new EntityReference("a", EntityType.WIKI)), map2);
 
         EntityReference reference6  = new EntityReference("c", EntityType.DOCUMENT,
             new EntityReference("a", EntityType.SPACE,
-                new EntityReference("a", EntityType.WIKI)),map3);
+                new EntityReference("a", EntityType.WIKI)), map3);
 
         EntityReference reference61 =
             new EntityReference("c", EntityType.DOCUMENT, new EntityReference("x", EntityType.SPACE,
@@ -324,7 +339,7 @@ public class EntityReferenceTest
 
         Assert.assertEquals(0, reference.compareTo(reference));
 
-        List<EntityReference> list = new ArrayList<EntityReference>();
+        List<EntityReference> list = new ArrayList<>();
         list.add(reference);
         list.add(reference2);
         list.add(reference3);
@@ -347,7 +362,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testNullType()
+    public void nullTypeInConstructor()
     {
         try {
             new EntityReference("name", null);
@@ -358,7 +373,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testNullName()
+    public void nullNameInConstructor()
     {
         try {
             new EntityReference(null, EntityType.WIKI);
@@ -369,7 +384,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEmptyName()
+    public void emptyNameInConstructor()
     {
         try {
             new EntityReference("", EntityType.WIKI);
@@ -380,7 +395,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    public void replaceParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -412,7 +427,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testAppendParent()
+    public void appendParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -437,7 +452,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testRemoveParent()
+    public void removeParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -460,7 +475,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testHasParent()
+    public void hasParent()
     {
         EntityReference wiki = new EntityReference("wiki", EntityType.WIKI);
         EntityReference alice = new EntityReference("alice", EntityType.SPACE, wiki);
@@ -491,7 +506,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testEntityReferenceSerialization() throws Exception
+    public void entityReferenceSerialization() throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -513,7 +528,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testToString()
+    public void validateToString()
     {
         EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -529,7 +544,7 @@ public class EntityReferenceTest
 
         // We don't handle parameters in Entity Reference because they're internal and not exposed and at the moment
         // they can only be used in a restricted manner (only LOCALE) by a DocumentReference.
-        Map<String, Serializable> map  = new HashMap<String, Serializable>();
+        Map<String, Serializable> map  = new HashMap<>();
         map.put("key1", "value1");
         EntityReference reference4 = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE), map);

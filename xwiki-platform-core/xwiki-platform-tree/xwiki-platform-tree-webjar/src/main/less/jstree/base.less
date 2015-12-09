@@ -27,6 +27,20 @@
   }
 }
 
+.jstree-no-link {
+  &.jstree-anchor:focus {
+    outline: 0;
+  }
+  &.jstree-anchor,
+  &.jstree-anchor:link,
+  &.jstree-anchor:visited,
+  &.jstree-anchor:hover,
+  &.jstree-anchor:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
 // base jstree rtl
 .jstree-rtl {
 	.jstree-anchor { padding:0 1px 0 4px; }

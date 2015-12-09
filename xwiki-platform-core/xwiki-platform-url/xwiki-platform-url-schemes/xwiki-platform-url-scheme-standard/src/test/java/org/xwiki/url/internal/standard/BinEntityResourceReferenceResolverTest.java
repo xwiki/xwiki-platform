@@ -129,9 +129,11 @@ public class BinEntityResourceReferenceResolverTest
             fullTwoSpacesReference, EntityType.DOCUMENT);
 
         // Test when space segment is called "view"
+        testCreateResource("http://localhost/bin/view/space/page", "view", fullSingleSpaceReference,
+            fullSingleSpaceReference, EntityType.DOCUMENT);
         EntityReference viewTwoSpacesReference =
             buildEntityReference("wiki", Arrays.asList("view", "space2"), "page");
-        testCreateResource("http://localhost/bin/view/space2/page", "view", viewTwoSpacesReference,
+        testCreateResource("http://localhost/bin/view/view/space2/page", "view", viewTwoSpacesReference,
             viewTwoSpacesReference, EntityType.DOCUMENT);
 
         // Test when space segment is called "download"
@@ -139,6 +141,10 @@ public class BinEntityResourceReferenceResolverTest
             buildEntityReference("wiki", Arrays.asList("download", "space2"), "page");
         testCreateResource("http://localhost/bin/view/download/space2/page", "view", downloadTwoSpacesReference,
             downloadTwoSpacesReference, EntityType.DOCUMENT);
+
+        // Test when download action
+        testCreateResource("http://localhost/bin/download/space/page", "download", fullSingleSpaceReference,
+            fullSingleSpaceReference, EntityType.DOCUMENT);
     }
 
     @Test
@@ -170,6 +176,11 @@ public class BinEntityResourceReferenceResolverTest
         // Test when 2 spaces and page segments
         testCreateResource("http://localhost/bin/view/space1/space2/page", "view", fullTwoSpacesReference,
             fullTwoSpacesReference, EntityType.DOCUMENT);
+
+        // Test when no "view" specified and space that is not an actio name
+        testCreateResource("http://localhost/bin/space/page", "view", fullSingleSpaceReference,
+            fullSingleSpaceReference, EntityType.DOCUMENT);
+
     }
 
     @Test

@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>Sandkassen er en del af denne wiki, som du frit kan ændre. Formålet er du kan prøve at redigere. Du kan lære hvordan redigering sker og hvordan man opretter nye side. Klik blot på **Redigér** for at komme igang!
 

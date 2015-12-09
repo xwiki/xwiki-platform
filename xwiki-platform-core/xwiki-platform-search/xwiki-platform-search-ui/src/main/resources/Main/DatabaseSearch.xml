@@ -20,145 +20,100 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Main.DatabaseSearch" locale="">
   <web>Main</web>
   <name>DatabaseSearch</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1274890129000</creationDate>
+  <creationDate>1274886529000</creationDate>
   <parent>Main.Search</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1298680377000</date>
-  <contentUpdateDate>1298680377000</contentUpdateDate>
+  <date>1449597351000</date>
+  <contentUpdateDate>1449597307000</contentUpdateDate>
   <version>1.1</version>
   <title>#if("$!{request.text}" == '')$services.localization.render('search.page.database.title.noquery')#else$services.localization.render('search.page.database.title.query', [$request.text])#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-$xwiki.ssfx.use("uicomponents/search/search.css", true)##
-## Disable the document extra data: comments, attachments, history...
-#set($docextras = [])
-#set ($rssmode = ("$!request.xpage" == 'plain'))
-## ---------------
-## Space filtering
-## ---------------
-#set($spaces = $xwiki.spaces)
-#set($selectedSpace = $escapetool.html($!request.space))
-## ---------------
-## Space macros
-## ---------------
-#macro(spaceoption $space $selectedSpace)
-  &lt;option value="${space}" #if($selectedSpace == $space)selected="selected"#end&gt;$space&lt;/option&gt;
+  <content>{{velocity output="false"}}
+#macro (databaseSearchForm)
+  {{html}}
+  &lt;form action="$doc.getURL()" id="searchBar"&gt;
+    &lt;div&gt;
+      &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
+      &lt;input type="text" id="text" name="text" class="searchQuery" value="$!escapetool.xml($request.text)"
+        title="$services.localization.render('search.page.bar.query.title')"
+        placeholder="$services.localization.render('search.page.bar.query.tip')" /&gt;
+      &lt;input type="text" name="space" class="suggestSpaces" value="$!escapetool.xml($request.space)"
+        placeholder="$services.localization.render('search.page.bar.spaces.title')" /&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input type="submit" class="searchButton button"
+          value="$services.localization.render('search.page.bar.submit')"
+          title="$services.localization.render('search.page.bar.submit.title')" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+  {{/html}}
 #end
-#macro(spaceselect $selectedSpace $spaces)
-  &lt;select name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
-    &lt;option value="" #if($selectedSpace == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
-    #foreach($space in $spaces)
-      #if (!$blacklistedSpaces.contains($space) &amp;&amp; $xwiki.hasAccessLevel('view', "${space}.DocumentReservedForInternalXWikiUsage${mathtool.random(0, 999)}"))
-        #spaceoption($space $selectedSpace)
-      #end
-    #end
-  &lt;/select&gt;
-#end
-##
-##
-#set($text = "$!request.getParameter('text')")
-#set($utext = $escapetool.url($text))
-## ---------------
-## Query form
-## ---------------
-#if(!$rssmode)
-{{html}}
-&lt;form action="$doc.getURL()" id="searchBar"&gt;
-  &lt;div class="centered"&gt;
-    &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
-    &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$services.localization.render('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$services.localization.render('search.page.bar.query.title')"/&gt;
-    #spaceselect($selectedSpace $spaces)
-    &lt;span class='buttonwrapper'&gt;
-      &lt;input type="submit" class="searchButton button" value="$services.localization.render('search.page.bar.submit')" title="$services.localization.render('search.page.bar.submit.title')"/&gt;
-    &lt;/span&gt;
-  &lt;/div&gt;
-&lt;/form&gt;
-{{/html}}
-#end
-#set($space = $selectedSpace)
-#set($datedlist = [])
-#if("$!text" == '')
-  ## No search
-#else
-  #set($text = $text.replaceAll("'", "''").replaceAll("%", "\\%"))
-  #set($nbitems = 50)
-  ## ----------------------------------------------------------------------
-  ## Exclude Blacklisted spaces ($blacklistedSpaces is set in xwikivars.vm)
-  ## Also exclude WebPreferences.
-  ## ----------------------------------------------------------------------
-  #set ($webClause = '')
-  #foreach ($blacklistedSpace in $blacklistedSpaces)
-    #set ($webClause = "${webClause} doc.space &lt;&gt; '$blacklistedSpace' and")
+
+#macro (databaseAddResults $statement $params $map)
+  #set ($query = $services.query.hql("$statement order by doc.date desc").addFilter('hidden').setLimit(50))
+  #foreach ($entry in $params.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
   #end
-  #if(!$hasAdmin &amp;&amp; !$isAdvancedUser)
-    #set ($webClause = "${webClause} doc.name&lt;&gt;'WebPreferences' and")
-  #end
-  ## -----------------------------------------------------------
-  ## Display only a given space if $request.space is defined
-  ## -----------------------------------------------------------
-  #if("$!space" != '')
-    #set ($webClause = "${webClause} doc.space='$space' and")
-  #end
-  #macro(addelement $item $list)
-    #if($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${item}"))
-      #set($itemdoc = $xwiki.getDocument($item))
-      ## All items will be sorted by the date; since the list is obtained from several queries, we can't order in the HQL.
-      ## Prefix all item names with the date for sorting the combined results.
-      #set($sdate = $xwiki.formatDate($itemdoc.date, 'yyyyMMddHHmmss'))
-      #set($sitem = "${sdate}${item}")
-      #if(!$list.contains($sitem))
-        #set($discard = $list.add($sitem))
-      #end
+  #foreach ($localDocRef in $query.execute())
+    #set ($documentReference = $services.model.resolveDocument($localDocRef))
+    #if ($services.security.authorization.hasAccess('view', $documentReference))
+      #set ($discard = $map.put($documentReference, $xwiki.getDocument($documentReference)))
     #end
   #end
-  ## -----------------------------------------------------------
+#end
+
+#macro (databaseSearch $text $list)
+  #set ($results = {})
+  #set ($matchLocation = '')
+  #set ($params = {
+    'text': "%$text.replaceAll('([%_!])', '!$1')%"
+  })
+  ## Search in the specified location, if $request.space is defined
+  #set ($space = $request.space)
+  #if ("$!space" != '')
+    #set ($matchLocation = "(doc.space = :space or doc.space like :spacePrefix escape '!') and")
+    #set ($params.space = $space)
+    #set ($spaceReference = $services.model.resolveSpace($space))
+    #set ($documentReference = $services.model.createDocumentReference('x', $spaceReference))
+    #set ($params.spacePrefix = $stringtool.removeEnd($services.model.serialize($documentReference), 'x'))
+    #set ($params.spacePrefix = "$params.spacePrefix.replaceAll('([%_!])', '!$1')%")
+  #end
   ## Search in the page names
-  ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("where $webClause upper(doc.fullName) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
-  #foreach ($item in $query.execute())
-    #addelement($item $datedlist)
-  #end
-  ## -----------------------------------------------------------
+  #databaseAddResults(", XWikiSpace as space where $matchLocation space.reference = doc.space and ((doc.name &lt;&gt; 'WebHome' and upper(doc.name) like upper(:text) escape '!') or (doc.name = 'WebHome' and upper(space.name) like upper(:text) escape '!'))" $params $results)
   ## Search in page content
-  ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("where $webClause upper(doc.content) like ?1 order by doc.date desc").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
-  #foreach ($item in $query.execute())
-    #addelement($item $datedlist)
-  #end
-  ## -----------------------------------------------------------
+  #databaseAddResults("where $matchLocation upper(doc.content) like upper(:text) escape '!'" $params $results)
   ## Search in text fields (simple String properties)
-  ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("from BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
-  #foreach ($item in $query.execute())
-    #addelement($item $datedlist)
-  #end
-  ## -----------------------------------------------------------
+  #databaseAddResults(", BaseObject as obj, StringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
   ## Search in big text fields (textarea properties)
-  ## -----------------------------------------------------------
-  #set($query = $services.query.xwql("from BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and upper(prop.value) like ?1").addFilter('hidden').bindValue(1, "%${text.toUpperCase()}%").setLimit($nbitems).setOffset(0))
-  #foreach ($item in $query.execute())
-    #addelement($item $datedlist)
-  #end
+  #databaseAddResults(", BaseObject as obj, LargeStringProperty as prop where $matchLocation obj.name = doc.fullName and prop.id.id = obj.id and upper(prop.value) like upper(:text) escape '!'" $params $results)
+  #set ($discard = $list.addAll($sorttool.sort($results, ['date'])))
 #end
-#set($list = [])
-#set ($discard = $collectionstool.sort($datedlist))
-#foreach($item in $datedlist)
-  ## datedlist contains items prefixed with the date; strip the date from the actual item name:
-  #set($ok = $list.add(0, $item.substring(14)))
+{{/velocity}}
+
+{{velocity}}
+#set ($rssMode = $xcontext.action == 'get')
+#if (!$rssMode)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/search/search.css', true))
+  ## Disable the document extra data: comments, attachments, history...
+  #set ($docextras = [])
+  #databaseSearchForm
 #end
-#if ("$!utext" != '')
-  #if($rssmode)
+#set ($text = "$!request.text")
+#if ($text != '')
+  #set ($list = [])
+  #databaseSearch($text $list)
+  #if ($rssMode)
     #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
     #set ($feedURI = $doc.getExternalURL("view"))
     #set ($discard = $feed.setLink($feedURI))
@@ -168,18 +123,20 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     #set ($discard = $feed.setDescription($services.localization.render('search.rss', [$text])))
     #set ($discard = $feed.setLanguage($xcontext.language))
     #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
+    #set ($discard = $response.setContentType('application/rss+xml'))
     {{{$xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))}}}
   #else
-
     {{include reference="XWiki.Results"/}}
 
-    #if($selectedSpace == '')
-      #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;outputSyntax=plain&amp;amp;text=${utext}" ))
-    #else
-      #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;outputSyntax=plain&amp;space=${selectedSpace}&amp;text=${utext}"))
-    #end
     {{html}}
-      &lt;a href="${rssURL}" class='hasIcon iconRSS'&gt;$services.localization.render('search.rss', ["[$escapetool.xml($text)]"])&lt;/a&gt;
+      #set ($rssURL = $doc.getURL('get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'space': $space,
+        'text': $text
+      })))
+      &lt;a href="$rssURL" class="hasIcon iconRSS"&gt;
+        $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
+      &lt;/a&gt;
     {{/html}}
   #end
 #end

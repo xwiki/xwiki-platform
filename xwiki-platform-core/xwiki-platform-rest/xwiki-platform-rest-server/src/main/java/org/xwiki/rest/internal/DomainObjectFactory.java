@@ -290,9 +290,11 @@ public class DomainObjectFactory
         status.setId(StringUtils.join(jobStatus.getRequest().getId(), "/"));
         status.setState(jobStatus.getState().name());
         status.setProgress(createJobProgress(objectFactory, jobStatus.getProgress()));
-        Calendar calendarStartDate = Calendar.getInstance();
-        calendarStartDate.setTime(jobStatus.getStartDate());
-        status.setStartDate(calendarStartDate);
+        if (jobStatus.getStartDate() != null) {
+            Calendar calendarStartDate = Calendar.getInstance();
+            calendarStartDate.setTime(jobStatus.getStartDate());
+            status.setStartDate(calendarStartDate);
+        }
         if (jobStatus.getEndDate() != null) {
             Calendar calendarEndDate = Calendar.getInstance();
             calendarEndDate.setTime(jobStatus.getEndDate());

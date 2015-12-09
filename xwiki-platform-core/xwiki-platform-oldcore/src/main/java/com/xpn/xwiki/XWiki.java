@@ -2189,6 +2189,34 @@ public class XWiki implements EventListener
         return result != null ? result : "";
     }
 
+    /**
+     * Obtain a preference value for the wiki, looking up first in the XWiki.XWikiPreferences document, then fallbacking
+     * on a config parameter when the first lookup gives an empty string, then returning the default value if the config
+     * parameter returned itself an empty string.
+     *
+     * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
+     *            document of the wiki.
+     * @param wiki the wiki to get preference from
+     * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
+     *            no result
+     * @param default_value the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
+     *            xwiki.cfg parameter gave no result
+     * @since 7.4M1
+     */
+    public String getXWikiPreference(String prefname, String wiki, String fallback_param, String default_value,
+        XWikiContext xcontext)
+    {
+        String currentWiki = xcontext.getWikiId();
+
+        try {
+            xcontext.setWikiId(wiki);
+
+            return getXWikiPreference(prefname, fallback_param, default_value, xcontext);
+        } finally {
+            xcontext.setWikiId(currentWiki);
+        }
+    }
+
     public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
     {
         return getXWikiPreference(prefname, "", default_value, context);
@@ -2201,27 +2229,74 @@ public class XWiki implements EventListener
 
     public String getSpacePreference(String preference, String defaultValue, XWikiContext context)
     {
-        return getSpacePreference(preference, null, defaultValue, context);
+        return getSpacePreference(preference, (SpaceReference) null, defaultValue, context);
     }
 
+    /**
+     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
+     */
+    @Deprecated
     public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
+    {
+        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
+            context);
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then empty String is returned.
+     * 
+     * @param preferenceKey the name of the preference key
+     * @param spaceReference the reference of the space
+     * @param context the XWiki context
+     * @return the value of the preference or empty String if it could not be found
+     * @since 7.4M1
+     */
+    public String getSpacePreference(String preferenceKey, SpaceReference spaceReference, XWikiContext context)
+    {
+        return getSpacePreference(preferenceKey, spaceReference, "", context);
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then <code>defaultValue</code> is returned.
+     * 
+     * @param preferenceKey the name of the preference key
+     * @param spaceReference the reference of the space
+     * @param defaultValue the value to return if the preference can't be found
+     * @param context the XWiki context
+     * @return the value of the preference or <code>defaultValue</code> if it could not be found
+     * @since 7.4M1
+     */
+    public String getSpacePreference(String preferenceKey, SpaceReference spaceReference, String defaultValue,
+        XWikiContext context)
     {
         XWikiDocument currentDocument = context.getDoc();
 
         try {
-            if (space != null) {
-                context.setDoc(new XWikiDocument(
-                    new DocumentReference(context.getWikiId() != null ? context.getWikiId() : context.getMainXWiki(),
-                        space, "WebPreferences")));
+            if (spaceReference != null) {
+                context.setDoc(new XWikiDocument(new DocumentReference("WebPreferences", spaceReference)));
+            } else if (currentDocument != null) {
+                spaceReference = currentDocument.getDocumentReference().getLastSpaceReference();
             }
 
-            String result = getSpaceConfiguration().getProperty(preference, String.class);
+            String result = getSpaceConfiguration().getProperty(preferenceKey, String.class);
 
             if (StringUtils.isEmpty(result)) {
-                result = getXWikiPreference(preference, defaultValue, context);
+                if (spaceReference == null) {
+                    result = getXWikiPreference(preferenceKey, defaultValue, context);
+                } else if (spaceReference.getParent() instanceof SpaceReference) {
+                    result = getSpacePreference(preferenceKey, (SpaceReference) spaceReference.getParent(),
+                        defaultValue, context);
+                } else if (spaceReference.getParent() instanceof WikiReference) {
+                    result =
+                        getXWikiPreference(preferenceKey, spaceReference.getParent().getName(), defaultValue, context);
+                }
             }
 
-            return result != null ? result : "";
+            return result != null ? result : defaultValue;
         } finally {
             context.setDoc(currentDocument);
         }

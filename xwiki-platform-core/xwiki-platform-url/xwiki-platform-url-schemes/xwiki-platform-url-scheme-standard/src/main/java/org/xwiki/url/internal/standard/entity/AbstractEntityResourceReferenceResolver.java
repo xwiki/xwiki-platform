@@ -91,45 +91,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         // Extract the wiki reference from the URL
         WikiReference wikiReference = extractWikiReference(extendedURL);
 
-        // - 0 segment:
-        //   - "": (default space).(default page), "view" action
-        // - 1 segment:
-        //   - "/": (default space).(default page), "view" action
-        //   - "/space": space.(default page), "view" action
-        //   - "/edit": (default space).(default page), "edit" action
-        // - 2 segments:
-        //   - "/space/": space.(default page), "view" action
-        //   - "/space/page" ("view" hidden, "space" != action name): space.page, "view" action
-        //   - "/view/space" ("view" shown): space.(default page), "view" action
-        // - 3 segments:
-        //   - "/space1/space2/" ("view" hidden, "space1" != action name): space1.space2.(default page), "view" action
-        //   - "/space1/space2/page" ("view" hidden, "space1" != action name): space1.space2.page, "view" action.
-        //   - "/view/space/page" ("view" hidden "space" != action name): view.space.page, "view" action.
-        //   - "/view/space/page" ("view" shown): space.page, "view" action.
-        //   - "/edit/space/page" ("view" hidden, 1st segment is an action name != "view"): space.page, "edit" action
-        //     (or any action other than "view")
-        //   - "/edit/space/page" ("view" shown): space.page, "edit" action (or any action other than "view").
-        //     Note: no need to check 1st segment name in this case.
-        //   - "/view/edit/page" ("view hidden", 1st segment is "view"): edit.page, "view" action.
-        //     Note: URL serialization must generate a 1st segment named "view" since "edit" is a reserved name for a
-        //     space (it's an action name)
-        // - 4 segments (or more):
-        //   - "/space1/space2/space3/" ("view" hidden, "space1" != action name): space1.space2.space3.(default page),
-        //     "view" action
-        //   - "/space1/space2/space3/page" ("view" hidden, "space1" != action name): space1.space2.space3.page,
-        //     "view" action
-        //   - "/view/space1/space2/page" ("view" shown): space1.space2.page, "view" action
-        //   - "/edit/space1/space2/page ("view" hidden, 1st segment is an action name != "view"):
-        //     space1.space2.page, "edit" action (or any action other than "view")
-        //   - "/download/space/page/attachment" (1st segment is "download"): space.page@attachment, "download" action
-        //     Note: if there are segments after "attachment" then they are ignored
-        //   - "/view/download/space/page" ("view" hidden, 1st segment is "view"): download.space.page, "view" action
-        //     Note: URL serialization must generate a 1st segment named "view" since "download" is a reserved name for
-        //     a space (it's an action name)
-        //   - "/delattachment/space/page/attachment (1st segment is "delattachment"): space.page@attachment,
-        //     "delattachment" action. Note: if there are segments after "delattachment" then they are ignored
-        //   - "/viewattachrev/space/page/attachment (1st segment is "viewattachrev"): space.page@attachment,
-        //     "viewattachrev" action. Note: if there are segments after "viewattachrev" then they are ignored
+        // See BinEntityResourceReferenceResolverTest to check the various cases supported.
 
         List<String> pathSegments = extendedURL.getSegments();
         List<String> spaceNames = null;
@@ -152,7 +114,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
             } else {
                 // Handle actions not specifying any attachment.
                 Pair<String, Integer> actionAndStartPosition =
-                    computeActionAndStartPosition(firstSegment, pathSegments, action);
+                    computeActionAndStartPosition(firstSegment, pathSegments);
                 action = actionAndStartPosition.getLeft();
                 int startPosition = actionAndStartPosition.getRight();
                 // Normally the last segment is always the page name but we want to handle a special case when we
@@ -183,27 +145,36 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         return reference;
     }
 
-    private Pair<String, Integer> computeActionAndStartPosition(String firstSegment, List<String> pathSegments,
-        String currentAction)
+    private Pair<String, Integer> computeActionAndStartPosition(String firstSegment, List<String> pathSegments)
     {
-        String action = currentAction;
-        int startPosition = 1;
+        String action;
+        int startPosition;
 
-        if (this.configuration.isViewActionHidden()) {
-            if (VIEW_ACTION.equals(firstSegment)) {
-                // Does the next segment have an action name?
-                String secondSegment = pathSegments.get(1);
-                if (this.entityResourceActionLister.listActions().contains(secondSegment)) {
-                    action = VIEW_ACTION;
-                } else {
-                    startPosition = 0;
-                }
+        // - If the first segment is not an action name, then consider that the action is "view"
+        //   (whether isViewActionHidden() is true or false)
+        // - If the first segment is an action name then always consider that it represents an action
+        //   (whether isViewActionHidden is true or false), e.g. if the first space is called "view" then "view/view"
+        //   will need to be used to produce a view URL for it.
+        //
+        // In addition we need to handle the special case of GWT resources, see AbstractExtendedURLResourceTypeResolver
+        // e.g. if we have "resources/js/xwiki/wysiwyg/xwe/MacroService.gwtrpc" as input then we need to return an
+        // action of "resources" and a document reference of "js.xwiki.wysiwyg.xwe.MacroService.gwtrpc"
+        // Note that "resources" is not a real action name which is why we ned a special handling.
+        // TODO: Remove this GWT handling and move it sto some more generic place
+
+        if (!this.entityResourceActionLister.listActions().contains(firstSegment)) {
+            if (pathSegments.size() > 0 && firstSegment.equals("resources")
+                && pathSegments.get(pathSegments.size() - 1).endsWith(".gwtrpc"))
+            {
+                action = firstSegment;
+                startPosition = 1;
             } else {
-                if (!this.entityResourceActionLister.listActions().contains(firstSegment)) {
-                    action = VIEW_ACTION;
-                    startPosition = 0;
-                }
+                action = VIEW_ACTION;
+                startPosition = 0;
             }
+        } else {
+            action = firstSegment;
+            startPosition = 1;
         }
 
         return new ImmutablePair<>(action, startPosition);

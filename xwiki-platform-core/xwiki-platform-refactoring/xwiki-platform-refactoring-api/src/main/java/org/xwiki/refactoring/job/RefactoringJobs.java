@@ -23,7 +23,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Known refactoring job types.
- * 
+ *
  * @version $Id$
  * @since 7.2M1
  */
@@ -64,4 +64,11 @@ public interface RefactoringJobs
      * The role hint of the job that deletes entities.
      */
     String DELETE = GROUP_PREFIX + "delete";
+
+    /**
+     * The role hint of the job that creates entities.
+     *
+     * @since 7.4M2
+     */
+    String CREATE = GROUP_PREFIX + "create";
 }

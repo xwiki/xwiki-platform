@@ -24,11 +24,15 @@ import java.util.Calendar;
 import java.util.Formatter;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
@@ -39,6 +43,8 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,6 +71,13 @@ public class BaseSearchResult extends XWikiResource
         OBJECTS
     }
 
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    @Named("hidden/space")
+    private QueryFilter hiddenSpaceFilter;
+
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
      * 
@@ -88,7 +101,7 @@ public class BaseSearchResult extends XWikiResource
                 orderField, order, withPrettyNames));
 
             if (searchScopes.contains(SearchScope.SPACES)) {
-                result.addAll(searchSpaces(keywords, wikiName, hasProgrammingRights, number, start));
+                result.addAll(searchSpaces(keywords, wikiName, number, start));
             }
 
             if (searchScopes.contains(SearchScope.OBJECTS)) {
@@ -284,85 +297,64 @@ public class BaseSearchResult extends XWikiResource
      * @param start 0-based start offset
      * @return the results.
      */
-    protected List<SearchResult> searchSpaces(String keywords, String wikiName, boolean hasProgrammingRights,
-        int number, int start) throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
+    protected List<SearchResult> searchSpaces(String keywords, String wikiName, int number, int start)
+        throws QueryException, IllegalArgumentException, UriBuilderException, XWikiException
     {
-        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+        List<SearchResult> result = new ArrayList<SearchResult>();
 
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
-
-        /* This try is just needed for executing the finally clause. */
-        try {
-            List<SearchResult> result = new ArrayList<SearchResult>();
-
-            if (keywords == null) {
-                return result;
-            }
-
-            Formatter f = new Formatter();
-
-            f.format("select distinct doc.space from XWikiDocument as doc where upper(doc.space) like :keywords ");
-
-            /* Add some filters if the user doesn't have programming rights. */
-            if (hasProgrammingRights) {
-                f.format(" order by doc.space asc");
-            } else {
-                f.format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' order by doc.space asc");
-            }
-
-            String query = f.toString();
-
-            List<Object> queryResult = null;
-            queryResult =
-                queryManager.createQuery(query, Query.XWQL)
-                    .bindValue("keywords", String.format("%%%s%%", keywords.toUpperCase())).setLimit(number)
-                    .setOffset(start).execute();
-
-            for (Object object : queryResult) {
-                String spaceId = (String) object;
-                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
-                Document spaceDoc = xwikiApi.getDocument(String.format("%s.WebHome", spaceId));
-
-                /* Check if the user has the right to see the found document */
-                if (xwikiApi.hasAccessLevel("view", spaceDoc.getPrefixedFullName())) {
-                    String title = spaceDoc.getDisplayTitle();
-
-                    SearchResult searchResult = objectFactory.createSearchResult();
-                    searchResult.setType("space");
-                    searchResult.setId(spaceId);
-                    searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceId);
-                    searchResult.setTitle(title);
-
-                    /* Add a link to the space information */
-                    Link spaceLink = new Link();
-                    spaceLink.setRel(Relations.SPACE);
-                    String spaceUri =
-                        Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaces).toString();
-                    spaceLink.setHref(spaceUri);
-                    searchResult.getLinks().add(spaceLink);
-
-                    /* Add a link to the webhome if it exists */
-                    String webHomePageId = Utils.getPageId(wikiName, spaces, "WebHome");
-                    if (xwikiApi.exists(webHomePageId) && xwikiApi.hasAccessLevel("view", webHomePageId)) {
-                        String pageUri =
-                            Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, "WebHome")
-                                .toString();
-
-                        Link pageLink = new Link();
-                        pageLink.setHref(pageUri);
-                        pageLink.setRel(Relations.HOME);
-                        searchResult.getLinks().add(pageLink);
-                    }
-
-                    result.add(searchResult);
-                }
-            }
-
+        if (StringUtils.isEmpty(keywords)) {
             return result;
-        } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
+        String escapedKeywords = keywords.replaceAll("([%_!])", "!$1");
+
+        String query = "select space.reference from XWikiSpace as space"
+            + " where lower(space.name) like lower(:keywords) escape '!'"
+            + " or lower(space.reference) like lower(:prefix) escape '!'"
+            + " order by lower(space.reference), space.reference";
+
+        List<Object> queryResult = queryManager.createQuery(query, Query.HQL)
+            .bindValue("keywords", String.format("%%%s%%", escapedKeywords))
+            .bindValue("prefix", String.format("%s%%", escapedKeywords))
+            .setWiki(wikiName).setLimit(number).setOffset(start)
+            .addFilter(this.hiddenSpaceFilter).execute();
+
+        XWiki xwikiApi = Utils.getXWikiApi(componentManager);
+        for (Object object : queryResult) {
+            String spaceId = (String) object;
+            List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
+            SpaceReference spaceReference = new SpaceReference(wikiName, spaces);
+
+            if (this.authorizationManager.hasAccess(Right.VIEW, spaceReference)) {
+                Document spaceDoc = xwikiApi.getDocument(spaceReference);
+
+                SearchResult searchResult = objectFactory.createSearchResult();
+                searchResult.setType("space");
+                searchResult.setId(spaceId);
+                searchResult.setWiki(wikiName);
+                searchResult.setSpace(spaceId);
+                searchResult.setTitle(spaceDoc != null ? spaceDoc.getPlainTitle() : spaceReference.getName());
+
+                // Add a link to the space information.
+                Link spaceLink = new Link();
+                spaceLink.setRel(Relations.SPACE);
+                spaceLink.setHref(Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaces)
+                    .toString());
+                searchResult.getLinks().add(spaceLink);
+
+                // Add a link to the home page if it exists and it is viewable.
+                if (spaceDoc != null && !spaceDoc.isNew()) {
+                    Link pageLink = new Link();
+                    pageLink.setHref(Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
+                        spaceDoc.getName()).toString());
+                    pageLink.setRel(Relations.HOME);
+                    searchResult.getLinks().add(pageLink);
+                }
+
+                result.add(searchResult);
+            }
+        }
+
+        return result;
     }
 
     /**

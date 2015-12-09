@@ -35,7 +35,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -91,7 +91,7 @@ public class XWikiLDAPUtils
     /**
      * The configuration of the LDAP group cache.
      */
-    private static CacheConfiguration cacheConfigurationGroups;
+    private static LRUCacheConfiguration cacheConfigurationGroups;
 
     /**
      * Default unique user field name.
@@ -846,11 +846,8 @@ public class XWikiLDAPUtils
         if (cacheConfigurationGroups == null) {
             XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
-            cacheConfigurationGroups = new CacheConfiguration();
-            cacheConfigurationGroups.setConfigurationId(CACHE_NAME_GROUPS);
-            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-            lru.setTimeToLive(config.getCacheExpiration(context));
-            cacheConfigurationGroups.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            cacheConfigurationGroups = new LRUCacheConfiguration(CACHE_NAME_GROUPS);
+            cacheConfigurationGroups.getLRUEvictionConfiguration().setLifespan(config.getCacheExpiration(context));
         }
 
         return cacheConfigurationGroups;

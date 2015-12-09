@@ -101,7 +101,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             cacheConfiguration.setConfigurationId(NAME);
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(this.configuration.getSize());
-            lru.setTimeToLive(this.configuration.getDuration());
+            lru.setLifespan(this.configuration.getDuration());
             cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
             try {

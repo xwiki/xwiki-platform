@@ -20,9 +20,8 @@
 package org.xwiki.configuration.internal;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.xwiki.configuration.ConfigurationSource;
 
@@ -33,7 +32,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * @version $Id$
  * @since 2.0M1
  */
-public class CompositeConfigurationSource extends AbstractConfigurationSource
+public class CompositeConfigurationSource extends AbstractCompositeConfigurationSource
 {
     /**
      * The order of sources is important. Sources located before other sources take priority.
@@ -46,99 +45,8 @@ public class CompositeConfigurationSource extends AbstractConfigurationSource
     }
 
     @Override
-    public boolean containsKey(String key)
+    public Iterator<ConfigurationSource> iterator()
     {
-        boolean result = false;
-
-        for (ConfigurationSource source : this.sources) {
-            if (source.containsKey(key)) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public <T> T getProperty(String key)
-    {
-        T result = null;
-
-        for (ConfigurationSource source : this.sources) {
-            if (source.containsKey(key)) {
-                result = source.<T> getProperty(key);
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
-    {
-        T result = null;
-
-        for (ConfigurationSource source : this.sources) {
-            if (source.containsKey(key)) {
-                result = source.getProperty(key, valueClass);
-                break;
-            }
-        }
-
-        // List and Properties must return empty collections and not null values.
-        if (result == null) {
-            result = getDefault(valueClass);
-        }
-
-        return result;
-    }
-
-    @Override
-    public <T> T getProperty(String key, T defaultValue)
-    {
-        T result = null;
-
-        for (ConfigurationSource source : this.sources) {
-            if (source.containsKey(key)) {
-                result = source.<T> getProperty(key, defaultValue);
-                break;
-            }
-        }
-
-        if (result == null) {
-            result = defaultValue;
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<String> getKeys()
-    {
-        // We use a linked hash set in order to keep the keys in the order in which they were defined in the sources.
-        Set<String> keys = new LinkedHashSet<String>();
-
-        for (ConfigurationSource source : this.sources) {
-            keys.addAll(source.getKeys());
-        }
-
-        return new ArrayList<String>(keys);
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        boolean result = true;
-
-        for (ConfigurationSource source : this.sources) {
-            if (!source.isEmpty()) {
-                result = false;
-                break;
-            }
-        }
-
-        return result;
+        return this.sources.iterator();
     }
 }

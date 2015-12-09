@@ -179,6 +179,8 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     this.savingBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.inprogress'))", "inprogress", {inactive: true});
     this.savedBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.done'))", "done", {inactive: true});
     this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
+    this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
+    this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
@@ -188,29 +190,72 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     if (event.stopped) {
       return;
     }
-    if (event.memo["continue"]) {
-      if (typeof (event.memo.originalEvent) != 'undefined') {
-        event.memo.originalEvent.stop();
-      }
-      this.form = $(event.memo.form);
-      this.savedBox.hide();
-      this.failedBox.hide();
-      this.savingBox.show();
-      var formData = new Hash(this.form.serialize({hash: true, submit: 'action_saveandcontinue'}));
-      formData.set('minorEdit', '1');
-      if (!Prototype.Browser.Opera) {
-        // Opera can't handle properly 204 responses.
-        formData.set('ajax', 'true');
-      }
-      new Ajax.Request(this.form.action, {
-        method : 'post',
-        parameters : formData.toQueryString(),
-        onSuccess : this.onSuccess.bindAsEventListener(this),
-        on1223 : this.on1223.bindAsEventListener(this),
-        on0 : this.on0.bindAsEventListener(this),
-        onFailure : this.onFailure.bind(this)
-      });
+
+    var isContinue = event.memo["continue"];
+
+    this.form = $(event.memo.form);
+    this.savedBox.hide();
+    this.failedBox.hide();
+
+    var isCreateFromTemplate = (this.form.template && this.form.template.value);
+
+    // Save & View with no template specified needs no special handling.
+    // Same for Save & Continue with no template specified in preview mode.
+    if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
+      return;
     }
+
+    // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
+    var isAsync = (this.form.async && this.form.async.value === 'true');
+    if (!isAsync) {
+      if (!isContinue) {
+        // Save & View in sync mode needs no more work.
+        return;
+      }
+
+      // A synchronous create from template operation should behave as a regular save operation,
+      // waiting for the Save(AndContinue)Action to finish its work.
+      isCreateFromTemplate = false;
+    }
+
+    // Below we handle the following cases:
+    // - S&C no template / S&C from template sync (handled the same way),
+    // - S&C from template async in edit/preview mode,
+    // - S&V from template async.
+
+    // Stop the original submit event.
+    if (typeof (event.memo.originalEvent) != 'undefined') {
+      event.memo.originalEvent.stop();
+    }
+
+    // Show the right notification message.
+    if (isCreateFromTemplate) {
+      this.progressBox.show();
+    } else if (isContinue) {
+      this.savingBox.show();
+    }
+
+    // Compute the data and submit the form in an AJAX request instead.
+    var submitValue = 'action_save';
+    if (isContinue) {
+      submitValue = 'action_saveandcontinue';
+    }
+    var formData = new Hash(this.form.serialize({hash: true, submit: submitValue}));
+    if (isContinue) {
+      formData.set('minorEdit', '1');
+    }
+    if (!Prototype.Browser.Opera) {
+      // Opera can't handle properly 204 responses.
+      formData.set('ajax', 'true');
+    }
+    new Ajax.Request(this.form.action, {
+      method : 'post',
+      parameters : formData.toQueryString(),
+      onSuccess : this.onSuccess.bindAsEventListener(this, isContinue, isCreateFromTemplate),
+      on1223 : this.on1223.bindAsEventListener(this),
+      on0 : this.on0.bindAsEventListener(this),
+      onFailure : this.onFailure.bind(this)
+    });
   },
   // IE converts 204 status code into 1223...
   on1223 : function(response) {
@@ -220,19 +265,31 @@ actionButtons.AjaxSaveAndContinue = Class.create({
   on0 : function(response) {
     response.request.options.onFailure(response);
   },
-  onSuccess : function(response) {
+  onSuccess : function(response, isContinue, isCreateFromTemplate) {
     // If there was a 'template' field in the form, disable it to avoid 'This document already exists' errors.
     if (this.form && this.form.template) {
       this.form.template.disabled = true;
       this.form.template.value = "";
     }
-    this.savingBox.replace(this.savedBox);
+
+    if (isCreateFromTemplate) {
+      if (!isContinue) {
+        // Disable the form while waiting for the save&view operation to finish.
+        this.form.disable();
+      }
+      // Start the progress display.
+      this.getStatus(response.responseJSON.links[0].href, isContinue);
+    } else if (isContinue) {
+      this.savingBox.replace(this.savedBox);
+    }
+
     // Announce that the document has been saved
     // TODO: We should send the new version as a memo field
     document.fire("xwiki:document:saved");
   },
   onFailure : function(response) {
     this.savingBox.replace(this.failedBox);
+    this.progressBox.replace(this.failedBox);
     if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
     } else if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
@@ -243,15 +300,72 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     }
     // Announce that a document save attempt has failed
     document.fire("xwiki:document:saveFailed", {'response' : response});
+  },
+  startStatusReport : function(statusUrl) {
+    updateStatus(0);
+  },
+  getStatus : function(statusUrl, isContinue, redirectUrl) {
+    new Ajax.Request(statusUrl, {
+      method : 'get',
+      parameters : { 'media' : 'json' },
+      onSuccess : function(response) {
+        var progressOffset = response.responseJSON.progress.offset;
+        this.updateStatus(progressOffset);
+        if (progressOffset < 1) {
+          // Start polling for status updates, every second.
+          setTimeout(this.getStatus.bind(this, statusUrl, isContinue), 1000);
+        } else {
+          // Job complete.
+          this.progressBox.replace(this.savedBox);
+          this.maybeRedirect(isContinue);
+        }
+      }.bindAsEventListener(this),
+      on1223 : this.on1223.bindAsEventListener(this),
+      on0 : this.on0.bindAsEventListener(this),
+      onFailure : this.onFailure.bindAsEventListener(this)
+    });
+  }, 
+  updateStatus : function(progressOffset) {
+    var stringProgress = "" + (progressOffset * 100);
+    var dotIndex = stringProgress.indexOf('.');
+    if (dotIndex > -1) {
+      var stringProgress = stringProgress.substring(0, dotIndex + 2);
+    }
+    var newProgressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', stringProgress), "inprogress");
+    this.progressBox.replace(newProgressBox);
+    this.progressBox = newProgressBox;
+  },
+  maybeRedirect : function(isContinue) {
+    var url = "";
+    if (!isContinue) {
+      // Redirect to view mode or to whatever URL was requested.
+      url = XWiki.currentDocument.getURL();
+      if (this.form.xredirect && this.form.xredirect.value) {
+        url = this.form.xredirect.value;
+      }
+    } else if ($('body').hasClassName('previewbody')) {
+      // In preview mode, the &continue part of the save&continue should lead back to the edit action.
+
+      // Redirect to edit mode or to the previous edit mode, if not overridden.
+      url = XWiki.currentDocument.getURL('edit');
+      if (this.form.xcontinue && this.form.xcontinue.value) {
+        url = this.form.xcontinue.value;
+      }
+    } else {
+      // No redirect needed.
+      return;
+    }
+
+    // Do the redirect.
+    if (url) {
+      window.location = url;
+    }
   }
 });
 
 function init() {
   new actionButtons.EditActions();
-  // In preview mode, the &continue part of the save&continue should lead back to the edit action.
-  if (!$('body').hasClassName("previewbody")) {
-    new actionButtons.AjaxSaveAndContinue();
-  }
+  new actionButtons.AjaxSaveAndContinue();
   return true;
 }
 

@@ -19,28 +19,28 @@
  */
 package org.xwiki.url.internal.container;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletContext;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 
-import com.xpn.xwiki.XWikiContext;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.url.internal.container.ExtendedURLURLNormalizer}.
@@ -52,22 +52,14 @@ public class ExtendedURLURLNormalizerTest
 {
     private ConfigurationSource configurationSource;
 
-    private Container container;
-
-    private XWikiContext xcontext = mock(XWikiContext.class);
-
     @Rule
-    public MockitoComponentMockingRule<ExtendedURLURLNormalizer> mocker =
-        new MockitoComponentMockingRule<>(ExtendedURLURLNormalizer.class);
+    public MockitoComponentMockingRule<URLNormalizer<ExtendedURL>> mocker =
+        new MockitoComponentMockingRule<URLNormalizer<ExtendedURL>>(ExtendedURLURLNormalizer.class);
 
     @Before
     public void configure() throws Exception
     {
         this.configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        this.container = this.mocker.getInstance(Container.class);
-
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
@@ -89,35 +81,33 @@ public class ExtendedURLURLNormalizerTest
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndRequest() throws Exception
+    public void normalizeWhenNoConfigurationPropertyButEnvironment() throws Exception
     {
-        HttpServletRequest request = createMockRequest();
-        when(request.getContextPath()).thenReturn("/xwiki");
+        ServletContext sc = mock(ServletContext.class);
+        ServletEnvironment environment = mock(ServletEnvironment.class);
+        this.mocker.registerComponent(Environment.class, environment);
+        when(environment.getServletContext()).thenReturn(sc);
+        when(sc.getContextPath()).thenReturn("/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestButURL() throws Exception
+    public void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext() throws Exception
     {
-        when(this.xcontext.getURL()).thenReturn(new URL("http://localhost:8080/xwiki/bin/view/space/page"));
+        ServletContext sc = mock(ServletContext.class);
+        ServletEnvironment environment = mock(ServletEnvironment.class);
+        this.mocker.registerComponent(Environment.class, environment);
+        when(environment.getServletContext()).thenReturn(sc);
+        when(sc.getContextPath()).thenReturn("");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestButURLWithNoTrailingSlash() throws Exception
-    {
-        when(this.xcontext.getURL()).thenReturn(new URL("http://localhost:8080/xwiki"));
-
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
-    }
-
-    @Test
-    public void normalizeWhenNoConfigurationPropertyAndNoRequestAndNoURL() throws Exception
+    public void normalizeWhenNoConfigurationPropertyAndNoServletEnvironment() throws Exception
     {
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         try {
@@ -149,16 +139,5 @@ public class ExtendedURLURLNormalizerTest
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
-    }
-
-    private HttpServletRequest createMockRequest()
-    {
-        ServletRequest request = mock(ServletRequest.class);
-        when(this.container.getRequest()).thenReturn(request);
-
-        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        when(request.getHttpServletRequest()).thenReturn(httpRequest);
-
-        return httpRequest;
     }
 }

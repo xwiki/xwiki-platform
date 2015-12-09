@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -360,16 +361,37 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Extract the entity of the given type from this one. This entity may be returned if it has the type requested.
+     * Extract the last entity of the given type from this one by traversing the current entity to the root.
      * 
      * @param type the type of the entity to be extracted
-     * @return the entity of the given type
+     * @return the last entity of the given type in the current entity when traversing to the root (the current entity
+     *         will be returned if it's of the passed type) or null if no entity of the passed type exist
      */
     public EntityReference extractReference(EntityType type)
     {
         EntityReference reference = this;
 
         while (reference != null && reference.getType() != type) {
+            reference = reference.getParent();
+        }
+
+        return reference;
+    }
+
+    /**
+     * Extract the first entity of the given type from this one by traversing the current entity to the root.
+     *
+     * @param type the type of the entity to be extracted
+     * @return the first entity of the given type in the current entity when traversing to the root or null if no
+     *         entity of the passed type exist
+     * @since 7.4M1
+     */
+    @Unstable
+    public EntityReference extractFirstReference(EntityType type)
+    {
+        EntityReference reference = extractReference(type);
+
+        while (reference != null && reference.getParent() != null && reference.getParent().getType().equals(type)) {
             reference = reference.getParent();
         }
 

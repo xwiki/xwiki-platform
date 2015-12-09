@@ -43,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
@@ -54,7 +55,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Provides refactoring-specific scripting APIs.
- * 
+ *
  * @version $Id$
  * @since 7.2M1
  */
@@ -103,7 +104,7 @@ public class RefactoringScriptService implements ScriptService
     /**
      * Creates a request to move the specified source entities to the specified destination entity (which becomes their
      * new parent).
-     * 
+     *
      * @param sources specifies the entities to be moved
      * @param destination specifies the place where to move the entities (their new parent entity)
      * @return the move request
@@ -116,7 +117,7 @@ public class RefactoringScriptService implements ScriptService
     /**
      * Creates a request to move the specified source entity to the specified destination entity (which becomes its new
      * parent).
-     * 
+     *
      * @param source specifies the entity to be moved
      * @param destination specifies the place where to move the source entity (its new parent entity)
      * @return the move request
@@ -128,7 +129,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to rename the entity specified by the given old reference.
-     * 
+     *
      * @param oldReference the entity to rename
      * @param newReference the new entity reference after the rename
      * @return the rename request
@@ -140,7 +141,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to rename the specified entity.
-     * 
+     *
      * @param reference the entity to rename
      * @param newName the new entity name
      * @return the rename request
@@ -152,7 +153,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to copy the specified source entities to the specified destination entity.
-     * 
+     *
      * @param sources specifies the entities to be copied
      * @param destination specifies the place where to copy the entities (becomes the parent of the copies)
      * @return the copy request
@@ -166,7 +167,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to copy the specified source entity to the specified destination entity.
-     * 
+     *
      * @param source specifies the entity to be copied
      * @param destination specifies the place where to copy the source entity (becomes the parent of the copy)
      * @return the copy request
@@ -178,7 +179,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to copy the specified entity with a different reference.
-     * 
+     *
      * @param sourceReference the entity to copy
      * @param copyReference the reference to use for the copy
      * @return the copy-as request
@@ -192,7 +193,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to copy the specified entity with a different name.
-     * 
+     *
      * @param reference the entity to copy
      * @param copyName the name of the entity copy
      * @return the copy-as request
@@ -205,7 +206,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Creates a request to delete the specified entities.
-     * 
+     *
      * @param entityReferences the entities to delete
      * @return the delete request
      */
@@ -213,6 +214,23 @@ public class RefactoringScriptService implements ScriptService
     {
         EntityRequest request = new EntityRequest();
         initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
+        return request;
+    }
+
+    /**
+     * Creates a request to create the specified entities.
+     *
+     * @param entityReferences the entities to create
+     * @return the create request
+     * @since 7.4M2
+     */
+    public CreateRequest createCreateRequest(Collection<EntityReference> entityReferences)
+    {
+        CreateRequest request = new CreateRequest();
+        initEntityRequest(request, RefactoringJobs.CREATE, entityReferences);
+        // Set deep create by default, to copy (if possible) any existing hierarchy of a specified template document.
+        // TODO: expose this in the create UI to advanced users to allow them to opt-out?
+        request.setDeep(true);
         return request;
     }
 
@@ -269,7 +287,7 @@ public class RefactoringScriptService implements ScriptService
     /**
      * Schedules an asynchronous job to move the specified source entities to the specified destination entity (which
      * becomes their new parent).
-     * 
+     *
      * @param sources specifies the entities to be moved
      * @param destination specifies the place where to move the entities (their new parent entity)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -283,7 +301,7 @@ public class RefactoringScriptService implements ScriptService
     /**
      * Schedules an asynchronous job to move the specified source entity to the specified destination entity (which
      * becomes its new parent).
-     * 
+     *
      * @param source specifies the entity to be moved
      * @param destination specifies the place where to move the entity (its new parent entity)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -308,7 +326,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to rename the specified entity.
-     * 
+     *
      * @param oldReference the entity to rename
      * @param newReference the new entity reference after the rename
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -321,7 +339,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to rename the specified entity.
-     * 
+     *
      * @param reference the entity to rename
      * @param newName the new entity name
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -336,7 +354,7 @@ public class RefactoringScriptService implements ScriptService
      * Schedules an asynchronous job to convert the specified terminal document to a nested document (that can have
      * child documents). E.g. the document {@code Space1.Space2.Name} is converted to {@code Space1.Space2.Name.WebHome}
      * .
-     * 
+     *
      * @param documentReference the terminal document to convert to a nested document (that can have child documents)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
@@ -356,7 +374,7 @@ public class RefactoringScriptService implements ScriptService
     /**
      * Schedules an asynchronous job to convert the specified nested document to a terminal document (that can't have
      * child documents). E.g. the document {@code One.Two.WebHome} is converted to {@code One.Two} .
-     * 
+     *
      * @param documentReference the nested document to convert to a terminal document (that can't have child documents)
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
@@ -394,7 +412,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to copy the specified source entities to the specified destination entity.
-     * 
+     *
      * @param sources specifies the entities to be copied
      * @param destination specifies the place where to copy the entities
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -407,7 +425,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to copy the specified source entity to the specified destination entity.
-     * 
+     *
      * @param source specifies the entity to be copied
      * @param destination specifies the place where to copy the entity
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -433,7 +451,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to copy the specified entity with a different reference.
-     * 
+     *
      * @param sourceReference the entity to copy
      * @param copyReference the reference to use for the copy
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -446,7 +464,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to copy the specified entity with a different name.
-     * 
+     *
      * @param reference the entity to copy
      * @param copyName the name to use for the copy
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -471,7 +489,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to delete the specified entities.
-     * 
+     *
      * @param entityReferences the entities to delete
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
@@ -483,7 +501,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Schedules an asynchronous job to delete the specified entity.
-     * 
+     *
      * @param entityReference the entity to delete
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
      *         {@code null} in case of failure
@@ -494,8 +512,47 @@ public class RefactoringScriptService implements ScriptService
     }
 
     /**
+     * Schedules an asynchronous job to perform the given create request.
+     *
+     * @param request the create request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(CreateRequest request)
+    {
+        return execute(RefactoringJobs.CREATE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to create the specified entities.
+     *
+     * @param entityReferences the entities to create
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(Collection<EntityReference> entityReferences)
+    {
+        return create(createCreateRequest(entityReferences));
+    }
+
+    /**
+     * Schedules an asynchronous job to create the specified entity.
+     *
+     * @param entityReference the entity to create
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 7.4M2
+     */
+    public Job create(EntityReference entityReference)
+    {
+        return create(Arrays.asList(entityReference));
+    }
+
+    /**
      * Executes a refactoring request.
-     * 
+     *
      * @param type the type of refactoring to execute
      * @param request the refactoring request to execute
      * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
@@ -526,7 +583,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Retrieve the status of a move job.
-     * 
+     *
      * @param id the id of a move job
      * @return the status of the specified job
      */
@@ -537,7 +594,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Retrieve the status of a rename job.
-     * 
+     *
      * @param id the id of a rename job
      * @return the status of the specified job
      */
@@ -548,7 +605,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Retrieve the status of a copy job.
-     * 
+     *
      * @param id the id of a copy job
      * @return the status of the specified job
      */
@@ -559,7 +616,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Retrieve the status of a copy-as job.
-     * 
+     *
      * @param id the id of a copy-as job
      * @return the status of the specified job
      */
@@ -570,7 +627,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Retrieve the status of a delete job.
-     * 
+     *
      * @param id the id of a delete job
      * @return the status of the specified job
      */
@@ -587,7 +644,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Get the error generated while performing the previously called action.
-     * 
+     *
      * @return an eventual exception or {@code null} if no exception was thrown
      */
     public Exception getLastError()
@@ -597,7 +654,7 @@ public class RefactoringScriptService implements ScriptService
 
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     * 
+     *
      * @param e the exception to store, can be {@code null} to clear the previously stored exception
      * @see #getLastError()
      */

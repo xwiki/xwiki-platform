@@ -174,7 +174,7 @@ public class XWikiDavContext
             CacheManager cacheManager = Utils.getComponent(CacheManager.class, "default");
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-            lec.setTimeToLive(300);
+            lec.setMaxIdle(300);
             conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
             davCache = cacheManager.createNewCache(conf);
         } catch (CacheException ex) {

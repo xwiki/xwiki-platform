@@ -274,6 +274,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 content.getFirstBlock(new CompositeBlockMatcher(new ClassBlockMatcher(HeaderBlock.class),
                     new BlockMatcher()
                     {
+                        @Override
                         public boolean match(Block block)
                         {
                             return ((HeaderBlock) block).getId().equals(parameters.getSectionId());

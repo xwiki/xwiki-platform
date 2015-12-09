@@ -22,12 +22,16 @@ package com.xpn.xwiki;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -44,6 +48,8 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -60,9 +66,15 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWiki}.
@@ -85,12 +97,12 @@ public class XWikiMockitoTest
     /**
      * A mock {@link XWikiContext};
      */
-    private XWikiContext context = mock(XWikiContext.class);
+    private XWikiContext context = new XWikiContext();
 
     private ConfigurationSource xwikiCfgConfigurationSource;
 
     private XWikiStoreInterface storeMock;
-    
+
     @Before
     public void setUp() throws Exception
     {
@@ -118,7 +130,7 @@ public class XWikiMockitoTest
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();
-        when(context.getWiki()).thenReturn(xwiki);
+        this.context.setWiki(this.xwiki);
 
         this.storeMock = mock(XWikiStoreInterface.class);
         xwiki.setStore(storeMock);
@@ -232,8 +244,8 @@ public class XWikiMockitoTest
 
         DocumentReference reference = document.getDocumentReference();
         this.mocker.registerMockComponent(ContextualLocalizationManager.class);
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(
-            new XWikiDocument(reference));
+        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context)))
+            .thenReturn(new XWikiDocument(reference));
 
         xwiki.rollback(document, revision, context);
 
@@ -299,7 +311,7 @@ public class XWikiMockitoTest
     public void getURLWithDotsAndBackslashInSpaceName() throws Exception
     {
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(context.getURLFactory()).thenReturn(urlFactory);
+        context.setURLFactory(urlFactory);
 
         DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
 
@@ -311,12 +323,12 @@ public class XWikiMockitoTest
 
         verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
     }
-    
+
     @Test
     public void getURLWithLocale() throws Exception
     {
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(context.getURLFactory()).thenReturn(urlFactory);
+        context.setURLFactory(urlFactory);
 
         DocumentReference reference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
 
@@ -338,7 +350,7 @@ public class XWikiMockitoTest
         AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
 
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-        when(context.getURLFactory()).thenReturn(urlFactory);
+        context.setURLFactory(urlFactory);
 
         EntityReferenceSerializer<String> localSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
@@ -360,5 +372,102 @@ public class XWikiMockitoTest
         this.xwiki.getURL(attachmentReference, this.context);
         verify(urlFactory).createAttachmentURL("image.png", "Path.To", "Success", "download", null, "tennis",
             this.context);
+    }
+
+    @Test
+    public void getSpacePreference() throws Exception
+    {
+        this.mocker.registerMockComponent(ConfigurationSource.class, "wiki");
+        ConfigurationSource spaceConfiguration = this.mocker.registerMockComponent(ConfigurationSource.class, "space");
+
+        when(this.xwikiCfgConfigurationSource.getProperty(anyString(), anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArgumentAt(1, String.class);
+            }
+        });
+
+        WikiReference wikiReference = new WikiReference("wiki");
+        SpaceReference space1Reference = new SpaceReference("space1", wikiReference);
+        SpaceReference space2Reference = new SpaceReference("space2", space1Reference);
+
+        // Without preferences and current doc
+
+        assertEquals("", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("defaultvalue", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+
+        // Without preferences but with current doc
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
+
+        assertEquals("", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("defaultvalue", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+
+        // With preferences
+
+        final Map<String, Map<String, String>> spacesPreferences = new HashMap<>();
+        Map<String, String> space1Preferences = new HashMap<>();
+        space1Preferences.put("pref", "prefvalue1");
+        space1Preferences.put("pref1", "pref1value1");
+        Map<String, String> space2Preferences = new HashMap<>();
+        space2Preferences.put("pref", "prefvalue2");
+        space2Preferences.put("pref2", "pref2value2");
+        spacesPreferences.put(space1Reference.getName(), space1Preferences);
+        spacesPreferences.put(space2Reference.getName(), space2Preferences);
+
+        when(spaceConfiguration.getProperty(anyString(), same(String.class))).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                if (context.getDoc() != null) {
+                    Map<String, String> spacePreferences =
+                        spacesPreferences.get(context.getDoc().getDocumentReference().getParent().getName());
+                    if (spacePreferences != null) {
+                        return spacePreferences.get(invocation.getArgumentAt(0, String.class));
+                    }
+                }
+
+                return null;
+            }
+        });
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref2", this.context));
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", this.context));
+        assertEquals("pref2value2", this.xwiki.getSpacePreference("pref2", this.context));
+
+        assertEquals("", this.xwiki.getSpacePreference("nopref", space1Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("nopref", space1Reference, "defaultvalue", this.context));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", space1Reference, this.context));
+        assertEquals("prefvalue1",
+            this.xwiki.getSpacePreference("pref", space1Reference, "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", space1Reference, this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref2", space1Reference, this.context));
+
+        assertEquals("", this.xwiki.getSpacePreference("nopref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("nopref", space2Reference, "defaultvalue", this.context));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("prefvalue2",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", space2Reference, this.context));
+        assertEquals("pref2value2", this.xwiki.getSpacePreference("pref2", space2Reference, this.context));
     }
 }

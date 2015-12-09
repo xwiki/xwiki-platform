@@ -24,7 +24,7 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
     $('.location-picker').each(function() {
       var picker = $(this);
       var trigger = picker.find('.location-action-pick');
-      var modal = picker.find('.location-picker.modal');
+      var modal = picker.find('.modal');
       var treeElement = modal.find('.location-tree');
       var selectButton = modal.find('.modal-footer .btn-primary');
 
@@ -91,7 +91,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       }
     });
 
-    picker.find('.location-picker.modal').on('xwiki:locationTreePicker:select', function(event, data) {
+    picker.find('.modal').on('xwiki:locationTreePicker:select', function(event, data) {
       var selectedNodeId = data.tree.get_selected()[0];
       var separatorIndex = selectedNodeId.indexOf(':');
       var nodeType = selectedNodeId.substr(0, separatorIndex);
@@ -459,7 +459,7 @@ require(['jquery'], function($) {
         // in the xwiki selector widget
         initiallyCheckedTemplateProviderInput = form.find('.xwiki-select input[name="type"]:checked');
     }
-      
+
     // Note that there could also be no template provider available, but we rely on jQuery's selectors here to avoid null values.
     updateSpaceValidatorFromTemplateProviderInput(initiallyCheckedTemplateProviderInput);
   });

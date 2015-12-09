@@ -19,12 +19,21 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.job.CreateRequest;
+import org.xwiki.refactoring.script.RefactoringScriptService;
+import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +54,8 @@ public class SaveAction extends PreviewAction
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
 
+    protected static final String ASYNC_PARAM = "async";
+
     public SaveAction()
     {
         this.waitForXWikiInitialization = true;
@@ -64,7 +75,7 @@ public class SaveAction extends PreviewAction
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
-        XWikiForm form = context.getForm();
+        EditForm form = (EditForm) context.getForm();
 
         // Check save session
         int sectionNumber = 0;
@@ -77,7 +88,7 @@ public class SaveAction extends PreviewAction
         // occurs during the save, the cached object will not reflect the actual document at all.
         doc = doc.clone();
 
-        String language = ((EditForm) form).getLanguage();
+        String language = form.getLanguage();
         // FIXME Which one should be used: doc.getDefaultLanguage or
         // form.getDefaultLanguage()?
         // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
@@ -111,7 +122,7 @@ public class SaveAction extends PreviewAction
         }
 
         try {
-            tdoc.readFromTemplate(((EditForm) form).getTemplate(), context);
+            tdoc.readFromTemplate(form.getTemplate(), context);
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                 context.put("exception", e);
@@ -121,14 +132,14 @@ public class SaveAction extends PreviewAction
 
         if (sectionNumber != 0) {
             XWikiDocument sectionDoc = tdoc.clone();
-            sectionDoc.readFromForm((EditForm) form, context);
+            sectionDoc.readFromForm(form, context);
             String sectionContent = sectionDoc.getContent() + "\n";
             String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
             tdoc.setContent(content);
             tdoc.setComment(sectionDoc.getComment());
             tdoc.setMinorEdit(sectionDoc.isMinorEdit());
         } else {
-            tdoc.readFromForm((EditForm) form, context);
+            tdoc.readFromForm(form, context);
         }
 
         // TODO: handle Author
@@ -168,9 +179,34 @@ public class SaveAction extends PreviewAction
         // We get the comment to be used from the document
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
-        XWikiLock lock = tdoc.getLock(context);
-        if (lock != null) {
-            tdoc.removeLock(context);
+
+        Job createJob = startCreateJob(tdoc.getDocumentReference(), form);
+        if (createJob != null) {
+            if (isAsync(request)) {
+                if (Utils.isAjaxRequest(context)) {
+                    // Redirect to the job status URL of the job we have just launched.
+                    sendRedirect(context.getResponse(), String.format("%s/rest/jobstatus/%s?media=json", context
+                        .getRequest().getContextPath(), serializeJobId(createJob.getRequest().getId())));
+                }
+
+                // else redirect normally and the operation will eventually finish in the background.
+                // Note: It is preferred that async mode is called in an AJAX request that can display the progress.
+            } else {
+                // Sync mode, default, wait for the work to finish.
+                try {
+                    createJob.join();
+                } catch (InterruptedException e) {
+                    throw new XWikiException(String.format(
+                        "Interrupted while waiting for template [%s] to be processed when creating the document [%s]",
+                        form.getTemplate(), tdoc.getDocumentReference()), e);
+                }
+            }
+        } else {
+            // Nothing more to do, just unlock the document.
+            XWikiLock lock = tdoc.getLock(context);
+            if (lock != null) {
+                tdoc.removeLock(context);
+            }
         }
 
         return false;
@@ -212,5 +248,49 @@ public class SaveAction extends PreviewAction
         }
 
         return "exception";
+    }
+
+    private boolean isAsync(XWikiRequest request)
+    {
+        return "true".equals(request.get(ASYNC_PARAM));
+    }
+
+    private Job startCreateJob(EntityReference entityReference, EditForm editForm) throws XWikiException
+    {
+        if (StringUtils.isBlank(editForm.getTemplate())) {
+            // No template specified, nothing more to do.
+            return null;
+        }
+
+        // If a template is set in the request, then this is a create action which needs to be handled by a create job,
+        // but skipping the target document, which is now already saved by the save action.
+
+        RefactoringScriptService refactoring =
+            (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
+
+        CreateRequest request = refactoring.createCreateRequest(Arrays.asList(entityReference));
+        // Set the target document.
+        request.setEntityReferences(Arrays.asList(entityReference));
+        // Set the template to use.
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        EntityReference templateReference = resolver.resolve(editForm.getTemplate());
+        request.setTemplateReference(templateReference);
+        // We`ve already created and populated the fields of the target document, focus only on the remaining children
+        // specified in the template.
+        request.setSkippedEntities(Arrays.asList(entityReference));
+
+        Job createJob = refactoring.create(request);
+        if (createJob != null) {
+            return createJob;
+        } else {
+            throw new XWikiException(String.format("Failed to schedule the create job for [%s]", entityReference),
+                refactoring.getLastError());
+        }
+    }
+
+    private String serializeJobId(List<String> jobId)
+    {
+        return StringUtils.join(jobId, "/");
     }
 }

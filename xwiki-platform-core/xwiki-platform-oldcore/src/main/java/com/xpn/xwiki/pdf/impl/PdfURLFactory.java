@@ -44,7 +44,7 @@ public class PdfURLFactory extends FileSystemURLFactory
 
     /**
      * We delegate to the XWiki Servlet URL Factory for the creation of attachment URLs since we want links to
-     * attachments to be absolute. Image URLs are converted by the {@link PDFURIResolver}.
+     * attachments to be absolute. Image URLs are resolved by the {@link PDFResourceResolver}.
      */
     private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
 
@@ -111,7 +111,7 @@ public class PdfURLFactory extends FileSystemURLFactory
      * @param page the page where the attachment is located
      * @param fileName the name of the attachment file
      * @param context the XWiki Context where to find the attachment map that we add to
-     * @see PDFURIResolver
+     * @see PDFResourceResolver
      */
     private void saveAttachmentReference(URL url, String wiki, String spaces, String page, String fileName,
         XWikiContext context)

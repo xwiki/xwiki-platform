@@ -116,22 +116,63 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
             (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
 
         if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
-            if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
-                int maxEntries = ((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue();
-                if (configuration.eviction() == null || configuration.eviction().strategy() != EvictionStrategy.LRU
-                    || configuration.eviction().maxEntries() != maxEntries) {
-                    builder = builder(builder, null);
-                    builder.eviction().strategy(EvictionStrategy.LRU);
-                    builder.eviction().maxEntries(maxEntries);
-                }
-            }
+            // Max entries
+            builder = customizeEvictionMaxEntries(builder, configuration, eec);
 
-            if (eec.getTimeToLive() > 0) {
-                long maxIdle = eec.getTimeToLive() * 1000L;
-                if (configuration.expiration() == null || configuration.expiration().maxIdle() != maxIdle) {
-                    builder = builder(builder, null);
-                    builder.expiration().maxIdle(eec.getTimeToLive() * 1000L);
-                }
+            // Max idle
+            builder = customizeEvictionMaxIdle(builder, configuration, eec);
+
+            // Lifespan
+            builder = customizeEvictionLifespan(builder, configuration, eec);
+        }
+
+        return builder;
+    }
+
+    private ConfigurationBuilder customizeEvictionMaxEntries(ConfigurationBuilder currentBuilder,
+        Configuration configuration, EntryEvictionConfiguration eec)
+    {
+        ConfigurationBuilder builder = currentBuilder;
+
+        if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
+            int maxEntries = ((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue();
+            if (configuration.eviction() == null || configuration.eviction().strategy() != EvictionStrategy.LRU
+                || configuration.eviction().maxEntries() != maxEntries) {
+                builder = builder(builder, null);
+                builder.eviction().strategy(EvictionStrategy.LRU);
+                builder.eviction().maxEntries((long) maxEntries);
+            }
+        }
+
+        return builder;
+    }
+
+    private ConfigurationBuilder customizeEvictionMaxIdle(ConfigurationBuilder currentBuilder,
+        Configuration configuration, EntryEvictionConfiguration eec)
+    {
+        ConfigurationBuilder builder = currentBuilder;
+
+        if (eec.getTimeToLive() > 0) {
+            long maxIdle = eec.getTimeToLive() * 1000L;
+            if (configuration.expiration() == null || configuration.expiration().maxIdle() != maxIdle) {
+                builder = builder(builder, null);
+                builder.expiration().maxIdle(eec.getTimeToLive() * 1000L);
+            }
+        }
+
+        return builder;
+    }
+
+    private ConfigurationBuilder customizeEvictionLifespan(ConfigurationBuilder currentBuilder,
+        Configuration configuration, EntryEvictionConfiguration eec)
+    {
+        ConfigurationBuilder builder = currentBuilder;
+
+        if (eec.containsKey(LRUEvictionConfiguration.LIFESPAN_ID)) {
+            long lifespan = (Integer) eec.get(LRUEvictionConfiguration.LIFESPAN_ID) * 1000L;
+            if (configuration.expiration() == null || configuration.expiration().lifespan() != lifespan) {
+                builder = builder(builder, null);
+                builder.expiration().lifespan(lifespan);
             }
         }
 

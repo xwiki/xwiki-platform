@@ -27,6 +27,10 @@ import org.xwiki.stability.Unstable;
  * relative URL into a full absolute {@link java.net.URL} object. Another implementation may simply prefix the passed
  * relative URL with a Servlet Container's webapp name (aka application context name). Note that in general the
  * implementations will depends on the Container in which XWiki is executing (eg Servlet Container).
+ * <p/>
+ * It's also important that Normalizers should be independent of URL Scheme formats since they should be usable
+ * for all URL Schemes. Note that Normalizers should not replace {@link org.xwiki.resource.ResourceReferenceSerializer}
+ * implementations.
  *
  * @param <T> the type of object to return (eg {@link ExtendedURL}, {@link java.net.URL})
  * @version $Id$

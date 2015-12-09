@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>El calaix és una part de la vostra wiki que podeu modificar lliurement. Es tracta de deixar-vos practicar l'edició. Podreu descobrir com treballa l'edició de pàgines i crear-n'hi de noves. Per a començar simplement cliqueu al damunt d' **Editar**!
 

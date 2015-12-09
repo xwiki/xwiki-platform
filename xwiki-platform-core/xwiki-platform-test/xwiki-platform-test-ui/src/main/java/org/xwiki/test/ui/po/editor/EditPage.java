@@ -22,15 +22,18 @@ package org.xwiki.test.ui.po.editor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -100,7 +103,7 @@ public class EditPage extends BasePage
 
         /**
          * Defines a new editor with the given pretty name.
-         * 
+         *
          * @param prettyName the string used to display the name of the editor on the edit menu
          */
         Editor(String prettyName)
@@ -145,6 +148,29 @@ public class EditPage extends BasePage
     public ViewPage clickSaveAndView()
     {
         this.save.click();
+
+        if (!getUtil().isInViewMode()) {
+            // Since we might have a loading step between clicking Save&View and the view page actually loading
+            // (specifically when using templates that have child documents associated), we need to wait for the save to
+            // finish and for the redirect to view mode to occur.
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver input)
+                {
+                    boolean inViewMode = getUtil().isInViewMode();
+                    // Hack: It may happen in edit mode that the page loads and the first click() action does
+                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
+                    // around it, we can simply click again on the save button.
+                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save")) && save.isEnabled()) {
+                        save.click();
+                    }
+
+                    return inViewMode;
+                }
+            });
+        }
+
         return new ViewPage();
     }
 
@@ -161,9 +187,9 @@ public class EditPage extends BasePage
     {
         String editor = "";
         String[] CSSClasses = this.currentEditorDiv.getAttribute("class").split(" ");
-        for (int i = 0; i < CSSClasses.length; ++i) {
-            if (CSSClasses[i].startsWith("editor-")) {
-                editor = CSSClasses[i].substring(7);
+        for (String cssClasse : CSSClasses) {
+            if (cssClasse.startsWith("editor-")) {
+                editor = cssClasse.substring(7);
                 break;
             }
         }

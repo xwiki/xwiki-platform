@@ -88,10 +88,10 @@ public class XWikiAuthentication extends ChallengeAuthenticator
          * We are also adding the XWiki version at the same moment.
          */
         Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
-        Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");
+        Form responseHeaders = (Form) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (responseHeaders == null) {
             responseHeaders = new Form();
-            response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+            response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
         }
         responseHeaders.add("XWiki-User", xwikiContext.getUser());
         responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());

@@ -27,7 +27,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
-import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
@@ -35,30 +34,17 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 /**
  * Represents the actions available when editing the application home page. This is also the third step of the App
  * Within Minutes wizard, in which the presentation of the application home page is customized.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
-public class ApplicationHomeEditPage extends InlinePage
+public class ApplicationHomeEditPage extends ApplicationEditPage
 {
     @FindBy(xpath = "//a[. = 'Previous Step']")
     private WebElement previousStepButton;
 
     @FindBy(id = "wizard-next")
     private WebElement finishButton;
-
-    /**
-     * The form used to edit the application home page overwrites the save button because it needs to process the
-     * submitted data. Otherwise the request is forwarded by the action filter to the save action.
-     */
-    @FindBy(name = "xaction_save")
-    private WebElement saveButton;
-
-    /**
-     * @see #saveButton
-     */
-    @FindBy(name = "xaction_saveandcontinue")
-    private WebElement saveAndContinueButton;
 
     @FindBy(id = "availableColumns")
     private WebElement availableColumns;
@@ -94,22 +80,6 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         finishButton.click();
         return new ApplicationHomePage();
-    }
-
-    @Override
-    public <T extends ViewPage> T clickSaveAndView()
-    {
-        saveButton.click();
-        return createViewPage();
-    }
-
-    @Override
-    public void clickSaveAndContinue()
-    {
-        saveAndContinueButton.click();
-
-        // Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
     }
 
     @SuppressWarnings("unchecked")

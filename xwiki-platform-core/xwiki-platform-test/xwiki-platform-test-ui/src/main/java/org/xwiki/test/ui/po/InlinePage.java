@@ -20,8 +20,10 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the common actions possible on all Pages when using the "inline" action.
@@ -67,6 +69,29 @@ public class InlinePage extends ViewPage
     public <T extends ViewPage> T clickSaveAndView()
     {
         save.click();
+
+        if (!getUtil().isInViewMode()) {
+            // Since we might have a loading step between clicking Save&View and the view page actually loading
+            // (specifically when using templates that have child documents associated), we need to wait for the save to
+            // finish and for the redirect to view mode to occur.
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver input)
+                {
+                    boolean inViewMode = getUtil().isInViewMode();
+                    // Hack: It may happen in edit mode that the page loads and the first click() action does
+                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
+                    // around it, we can simply click again on the save button.
+                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save")) && save.isEnabled()) {
+                        save.click();
+                    }
+
+                    return inViewMode;
+                }
+            });
+        }
+
         return createViewPage();
     }
 

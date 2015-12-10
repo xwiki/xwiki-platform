@@ -19,7 +19,6 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -63,16 +62,7 @@ public class ApplicationEditPage extends InlinePage
                 @Override
                 public Boolean apply(WebDriver input)
                 {
-                    boolean inViewMode = getUtil().isInViewMode();
-                    // Hack: It may happen in edit mode that the page loads and the first click() action does
-                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
-                    // around it, we can simply click again on the save button.
-                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save"))
-                        && saveButton.isEnabled()) {
-                        saveButton.click();
-                    }
-
-                    return inViewMode;
+                    return getUtil().isInViewMode();
                 }
             });
         }

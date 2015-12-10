@@ -79,15 +79,7 @@ public class InlinePage extends ViewPage
                 @Override
                 public Boolean apply(WebDriver input)
                 {
-                    boolean inViewMode = getUtil().isInViewMode();
-                    // Hack: It may happen in edit mode that the page loads and the first click() action does
-                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
-                    // around it, we can simply click again on the save button.
-                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save")) && save.isEnabled()) {
-                        save.click();
-                    }
-
-                    return inViewMode;
+                    return getUtil().isInViewMode();
                 }
             });
         }
@@ -153,5 +145,19 @@ public class InlinePage extends ViewPage
             xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
             new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
         }
+    }
+
+    /**
+     * @since 7.4M2
+     */
+    @Override
+    public void waitUntilPageJSIsLoaded()
+    {
+        super.waitUntilPageJSIsLoaded();
+
+        // Actionbuttons javascript for saving the page.
+        getDriver().waitUntilJavascriptCondition(
+            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
+                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 }

@@ -22,7 +22,6 @@ package org.xwiki.test.ui.po.editor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -158,15 +157,7 @@ public class EditPage extends BasePage
                 @Override
                 public Boolean apply(WebDriver input)
                 {
-                    boolean inViewMode = getUtil().isInViewMode();
-                    // Hack: It may happen in edit mode that the page loads and the first click() action does
-                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
-                    // around it, we can simply click again on the save button.
-                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save")) && save.isEnabled()) {
-                        save.click();
-                    }
-
-                    return inViewMode;
+                    return getUtil().isInViewMode();
                 }
             });
         }
@@ -230,5 +221,19 @@ public class EditPage extends BasePage
     public String getDocumentTitle()
     {
         return this.titleField.getAttribute("value");
+    }
+
+    /**
+     * @since 7.4M2
+     */
+    @Override
+    public void waitUntilPageJSIsLoaded()
+    {
+        super.waitUntilPageJSIsLoaded();
+
+        // // Actionbuttons javascript for saving the page.
+        getDriver().waitUntilJavascriptCondition(
+            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
+                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 }

@@ -28,7 +28,10 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.engine.http.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
 import com.xpn.xwiki.XWiki;
@@ -60,7 +63,7 @@ public class XWikiAuthentication extends ChallengeAuthenticator
 {
     public XWikiAuthentication(Context context) throws IllegalArgumentException
     {
-        super(context, ChallengeScheme.HTTP_BASIC, "XWiki");
+        super(context, true, ChallengeScheme.CUSTOM, "XWiki");
     }
 
     @Override
@@ -79,56 +82,49 @@ public class XWikiAuthentication extends ChallengeAuthenticator
         XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
         XWiki xwiki = Utils.getXWiki(componentManager);
 
+        DocumentReferenceResolver<String> resolver;
+        EntityReferenceSerializer<String> serializer;
+        try {
+            resolver = componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+            serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        } catch (ComponentLookupException e1) {
+            return false;
+        }
+
         /* By default set XWiki.Guest as the user that is sending the request. */
         xwikiContext.setUserReference(null);
 
         /*
-         * After performing the authentication we should add headers to the response
-         * to allow applications to verify if the authentication is still valid
-         * We are also adding the XWiki version at the same moment.
+         * After performing the authentication we should add headers to the response to allow applications to verify if
+         * the authentication is still valid We are also adding the XWiki version at the same moment.
          */
-        Form headers = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         Form responseHeaders = (Form) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (responseHeaders == null) {
             responseHeaders = new Form();
             response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
         }
-        responseHeaders.add("XWiki-User", xwikiContext.getUser());
+        responseHeaders.add("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));
         responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());
 
-        if (headers.getValues(HeaderConstants.HEADER_AUTHORIZATION) == null) {
-            /*
-             * If there isn't an authorization header, check if the context contains an already authenticated session.
-             * If it's the case use the previously authenticated user.
-             */
-            try {
-                XWikiUser xwikiUser = xwiki.getAuthService().checkAuth(xwikiContext);
-                if (xwikiUser != null) {
-                    // Make sure the user is absolute
-                    xwikiContext.setUser(xwikiUser.getUser().contains(":") ? xwikiUser.getUser() : xwikiContext
-                        .getWikiId() + ':' + xwikiUser.getUser());
-                    getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
-                }
-            } catch (XWikiException e) {
-                getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
+        // Try with standard XWiki auth
+        try {
+            XWikiUser xwikiUser = xwiki.checkAuth(xwikiContext);
+            if (xwikiUser != null) {
+                // Make sure the user is in the context
+                xwikiContext.setUserReference(resolver.resolve(xwikiUser.getUser()));
+
+                getLogger().fine(String.format("Authenticated as '%s'.", xwikiUser.getUser()));
+
+                // the user has changed so we need to reset the header
+                responseHeaders.set("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));
+
+                return true;
             }
-
-            // the user has changed so we need to reset the header
-            responseHeaders.set("XWiki-User", xwikiContext.getUser());
-
-            /*
-             * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or
-             * these credentials are no longer valid or an error occurred during authentication. We consider all these
-             * three cases as "successful". In the first case we have an authenticated user, in the other two cases we
-             * continue to process the request as "Guest".
-             */
-            return true;
+        } catch (XWikiException e) {
+            getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
         }
 
-        /*
-         * If we are here, then an authorization header is present in the request. Make Restlet process this request.
-         * The standard way it does this is by calling the checkSecret() method with the appropriate parameters.
-         */
+        // Falback on restlet auth
         return super.authenticate(request, response);
     }
 

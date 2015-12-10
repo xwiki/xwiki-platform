@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiContext;
  * Sets the current wiki in the XWiki Context.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 7.1.4, 7.4M2
  */
 @Component
 @Singleton

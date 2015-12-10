@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link DefaultContextInitializer}.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 7.1.4, 7.4M2
  */
 public class DefaultContextInitializerTest
 {

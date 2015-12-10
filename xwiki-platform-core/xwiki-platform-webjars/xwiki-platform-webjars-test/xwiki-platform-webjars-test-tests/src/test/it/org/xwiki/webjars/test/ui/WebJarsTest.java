@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * Functional tests for the WebJars integration.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 7.1.4, 7.4M2
  */
 public class WebJarsTest extends AbstractTest
 {

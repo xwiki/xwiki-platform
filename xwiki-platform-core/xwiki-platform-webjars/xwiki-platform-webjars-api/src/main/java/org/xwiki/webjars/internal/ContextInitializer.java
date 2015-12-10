@@ -26,7 +26,7 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
  * Initializes the Execution Context and XWiki Context for the WebJars Handler.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 7.1.4, 7.2M4
  */
 @Role
 public interface ContextInitializer

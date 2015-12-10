@@ -20,10 +20,8 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Represents the common actions possible on all Pages when using the "inline" action.
@@ -60,31 +58,75 @@ public class InlinePage extends ViewPage
 
     public void clickSaveAndContinue()
     {
-        this.saveandcontinue.click();
+        clickSaveAndContinue(true);
+    }
 
-        // Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
+    /**
+     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
+     * for a different message (e.g. an error message).
+     *
+     * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
+     */
+    public void clickSaveAndContinue(boolean wait)
+    {
+        getSaveAndContinueButton().click();
+
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
+    }
+
+    /**
+     * Use this method instead of {@link #clickSaveAndContinue()} and call {@link WebElement#click()} when you know that
+     * the next page is not a standard XWiki {@link InlinePage}.
+     *
+     * @return the save and continue button used to submit the form.
+     */
+    public WebElement getSaveAndContinueButton()
+    {
+        return saveandcontinue;
     }
 
     public <T extends ViewPage> T clickSaveAndView()
     {
-        save.click();
-
-        if (!getUtil().isInViewMode()) {
-            // Since we might have a loading step between clicking Save&View and the view page actually loading
-            // (specifically when using templates that have child documents associated), we need to wait for the save to
-            // finish and for the redirect to view mode to occur.
-            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver input)
-                {
-                    return getUtil().isInViewMode();
-                }
-            });
-        }
+        clickSaveAndView(true);
 
         return createViewPage();
+    }
+
+    /**
+     * Useful when the save&view operation could fail on the client side and a reload (the view part) might thus not
+     * take place.
+     *
+     * @param wait {@code true} to wait for the page to be saved and reloaded, {@code false} otherwise
+     * @since 7.4M2
+     */
+    public void clickSaveAndView(boolean wait)
+    {
+        if (wait) {
+            getDriver().addPageNotYetReloadedMarker();
+        }
+
+        this.getSaveAndViewButton().click();
+
+        if (wait) {
+            // Since we might have a loading step between clicking Save&View and the view page actually loading
+            // (specifically when using templates that have child documents associated), we need to wait for the save to
+            // finish and for the redirect to occur.
+            getDriver().waitUntilPageIsReloaded();
+        }
+    }
+
+    /**
+     * Use this method instead of {@link #clickSaveAndView()} and call {@link WebElement#click()} when you know that the
+     * next page is not a standard XWiki {@link InlinePage}.
+     *
+     * @return the save and view button used to submit the form.
+     */
+    public WebElement getSaveAndViewButton()
+    {
+        return save;
     }
 
     public <T extends ViewPage> T clickCancel()
@@ -160,4 +202,5 @@ public class InlinePage extends ViewPage
             "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
                 + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
+
 }

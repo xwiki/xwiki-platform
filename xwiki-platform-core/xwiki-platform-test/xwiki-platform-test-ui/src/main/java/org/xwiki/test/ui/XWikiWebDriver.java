@@ -844,4 +844,45 @@ public class XWikiWebDriver extends RemoteWebDriver
             textInputElement.sendKeys(newTextValue);
         }
     }
+
+    /**
+     * Adds a marker in the DOM of the browser that will only be available until we leave or reload the current page.
+     * <p/>
+     * To be used mainly before {@link #waitUntilPageIsReloaded()}.
+     *
+     * @since 7.4M2
+     */
+    public void addPageNotYetReloadedMarker()
+    {
+        StringBuilder markerJs = new StringBuilder();
+        markerJs.append("new function () {");
+        markerJs.append("  var marker = document.createElement('div');");
+        markerJs.append("  marker.style.display='none';");
+        markerJs.append("  marker.id='pageNotYetReloadedMarker';");
+        markerJs.append("  document.body.appendChild(marker);");
+        markerJs.append("}()");
+
+        executeJavascript(markerJs.toString());
+    }
+
+    /**
+     * Waits until the previously added marker is no longer found on the current page, signaling that the page has been
+     * changed or reloaded. Useful when the page loading is done by jJavaScript and Selenium can not help in telling us
+     * when we have left the old page.
+     * <p/>
+     * To be used always after {@link #addPageNotYetReloadedMarker()}.
+     *
+     * @since 7.4M2
+     */
+    public void waitUntilPageIsReloaded()
+    {
+        waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver input)
+            {
+                return !hasElementWithoutWaiting(By.id("pageNotYetReloadedMarker"));
+            }
+        });
+    }
 }

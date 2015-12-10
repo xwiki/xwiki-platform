@@ -19,12 +19,9 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents some custom actions available on application pages in inline edit mode, since the default save&view and
@@ -49,57 +46,14 @@ public class ApplicationEditPage extends InlinePage
     private WebElement saveAndContinueButton;
 
     @Override
-    public <T extends ViewPage> T clickSaveAndView()
-    {
-        saveButton.click();
-
-        if (!getUtil().isInViewMode()) {
-            // Since we might have a loading step between clicking Save&View and the view page actually loading
-            // (specifically when using templates that have child documents associated), we need to wait for the save to
-            // finish and for the redirect to view mode to occur.
-            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver input)
-                {
-                    return getUtil().isInViewMode();
-                }
-            });
-        }
-
-        return createViewPage();
-    }
-
-    @Override
-    public void clickSaveAndContinue()
-    {
-        clickSaveAndContinue(true);
-    }
-
-    /**
-     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
-     * for a different message (e.g. an error message).
-     *
-     * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
-     */
-    public void clickSaveAndContinue(boolean wait)
-    {
-        saveAndContinueButton.click();
-
-        if (wait) {
-            // Wait until the page is really saved.
-            waitForNotificationSuccessMessage("Saved");
-        }
-    }
-
-    /**
-     * Use this method instead of {@link #clickSaveAndView()} and call {@link WebElement#click()} when you know that the
-     * next page is not a standard XWiki {@link ViewPage}.
-     *
-     * @return the save and view button used to submit the form.
-     */
     public WebElement getSaveAndViewButton()
     {
         return saveButton;
+    }
+
+    @Override
+    public WebElement getSaveAndContinueButton()
+    {
+        return saveAndContinueButton;
     }
 }

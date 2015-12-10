@@ -22,27 +22,18 @@ package org.xwiki.test.ui.po.editor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.FormElement;
-import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the common actions possible on all Pages when using the "edit" action with the "class" editor.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
-// TODO: Fix the fact that this class should extend EditPage but the id of the save action is incorrectly different...
-public class ClassEditPage extends BasePage
+public class ClassEditPage extends EditPage
 {
-    @FindBy(name = "action_saveandcontinue")
-    private WebElement saveandcontinue;
-
     @FindBy(name = "action_propupdate")
     private WebElement saveandview;
-
-    @FindBy(name = "action_cancel")
-    private WebElement cancel;
 
     @FindBy(id = "propupdate")
     private WebElement propertyForm;
@@ -109,7 +100,7 @@ public class ClassEditPage extends BasePage
     /**
      * Use this method if you need to set generic meta-properties (common to all XClass property types). For specific
      * meta-properties use the methods dedicated to each XClass property type.
-     * 
+     *
      * @param propertyName the name of a property of this class
      * @return the pane used to edit the specified property
      * @since 4.5
@@ -134,23 +125,9 @@ public class ClassEditPage extends BasePage
         return (NumberClassEditElement) new NumberClassEditElement(getForm(), propertyName).expand();
     }
 
-    public void clickSaveAndContinue()
+    @Override
+    public WebElement getSaveAndViewButton()
     {
-        this.saveandcontinue.click();
-
-        // Wait until the class is really saved.
-        waitForNotificationSuccessMessage("Saved");
-    }
-
-    public ViewPage clickSaveAndView()
-    {
-        this.saveandview.click();
-        return new ViewPage();
-    }
-
-    public ViewPage clickCancel()
-    {
-        this.cancel.click();
-        return new ViewPage();
+        return saveandview;
     }
 }

@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Standard format of supported URLs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Standard URL Scheme</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

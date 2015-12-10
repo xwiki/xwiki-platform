@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Container-related URL code</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.98</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.97</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

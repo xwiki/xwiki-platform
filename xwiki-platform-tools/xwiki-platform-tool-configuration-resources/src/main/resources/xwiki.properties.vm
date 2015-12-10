@@ -398,6 +398,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# 
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=
+#if ($xwikiExtensionRepositories)
+#foreach ($extensionRepository in $xwikiExtensionRepositories.split(','))
+extension.repositories=$extensionRepository
+#end
+#end
 
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.

@@ -24,22 +24,20 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.1.4-SNAPSHOT</version>
+    <artifactId>xwiki-platform-webjars</artifactId>
+    <version>7.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-webjars</artifactId>
-  <name>XWiki Platform - WebJars - Parent POM</name>
+  <artifactId>xwiki-platform-webjars-test</artifactId>
+  <name>XWiki Platform - WebJars - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Adds support for packaging web resources (JavaScript, CSS, images, fonts, etc.) using WebJars</description>
+  <description>Tests for the WebJars feature</description>
+  <properties>
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-webjars-api</module>
+    <module>xwiki-platform-webjars-test-tests</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-webjars-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

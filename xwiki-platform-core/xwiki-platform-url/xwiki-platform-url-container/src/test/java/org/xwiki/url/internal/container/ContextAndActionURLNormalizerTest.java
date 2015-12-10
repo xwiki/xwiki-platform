@@ -122,6 +122,20 @@ public class ContextAndActionURLNormalizerTest
     }
 
     @Test
+    public void normalizeFromRootServletContextAndServletMapping() throws Exception
+    {
+        when(this.servletContext.getContextPath()).thenReturn("/");
+
+        when(this.servletContext.getServletRegistration("action").getMappings())
+            .thenReturn(Arrays.asList("/*", "/bin/*", "/wiki/*", "/testbin/*"));
+
+        HttpServletRequest req = createMockRequest();
+        when(req.getServletPath()).thenReturn("/");
+
+        assertEquals("/one/two", this.mocker.getComponentUnderTest().normalize(this.testURL).serialize());
+    }
+
+    @Test
     public void normalizeFromNonActionRequestUsesDefaultServletMapping() throws Exception
     {
         when(this.servletContext.getContextPath()).thenReturn("/xwiki");

@@ -34,12 +34,4 @@
   <modules>
     <module>xwiki-platform-webjars-api</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-webjars-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

@@ -1842,6 +1842,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context)
     {
+        // Attachment file name cannot be empty
+        if (StringUtils.isEmpty(filename)) {
+            return null;
+        }
+
         return context.getWiki().getAttachmentURL(new AttachmentReference(filename, this.getDocumentReference()),
             action, querystring, context);
     }
@@ -1853,6 +1858,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
+        // Attachment file name cannot be empty
+        if (StringUtils.isEmpty(filename)) {
+            return null;
+        }
+
         return context.getWiki().getAttachmentRevisionURL(new AttachmentReference(filename, getDocumentReference()),
             revision, querystring, context);
     }

@@ -792,11 +792,11 @@ public class Document extends Api
      * Return the relative URL of download for the the given attachment name.
      *
      * @param filename the name of the attachment
-     * @return A String with the URL
+     * @return A String with the URL or null if the file name is empty
      */
     public String getAttachmentURL(String filename)
     {
-        return this.doc.getAttachmentURL(filename, "download", getXWikiContext());
+        return this.doc.getAttachmentURL(filename, getXWikiContext());
     }
 
     /**
@@ -804,7 +804,7 @@ public class Document extends Api
      *
      * @param filename the name of the attachment.
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev".
-     * @return a string representation of a URL to do the given opperation.
+     * @return a string representation of a URL to do the given operation or null if the file name is empty
      */
     public String getAttachmentURL(String filename, String action)
     {
@@ -819,7 +819,7 @@ public class Document extends Api
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev"
      * @param queryString parameters added to the URL, the "rev" parameter is used to specify a revision if using the
      *            "downloadrev" action. The query string must not begin with an ? character.
-     * @return a string representation of a URL to do the given opperation.
+     * @return a string representation of a URL to do the given operation or null if the file name is empty
      */
     public String getAttachmentURL(String filename, String action, String queryString)
     {
@@ -831,7 +831,8 @@ public class Document extends Api
      *
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
-     * @return the URL for accessing to the archive of the attachment "filename" at the version "version"
+     * @return the URL for accessing to the archive of the attachment "filename" at the version "version" or null if the
+     *         file name is empty
      */
     public String getAttachmentRevisionURL(String filename, String version)
     {
@@ -845,7 +846,7 @@ public class Document extends Api
      * @param version a revision number such as "1.1" or "1.2".
      * @param queryString additional query parameters to pass in the request.
      * @return the URL for accessing to the archive of the attachment "filename" at the version "version" with the given
-     *         queryString parameters.
+     *         queryString parameters or null if the file name is empty
      */
     public String getAttachmentRevisionURL(String filename, String version, String queryString)
     {

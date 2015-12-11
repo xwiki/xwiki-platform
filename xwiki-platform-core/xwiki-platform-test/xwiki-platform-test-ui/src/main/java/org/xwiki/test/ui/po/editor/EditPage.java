@@ -141,7 +141,7 @@ public class EditPage extends BasePage
      */
     public void clickSaveAndContinue(boolean wait)
     {
-        this.saveandcontinue.click();
+        this.getSaveAndContinueButton().click();
 
         if (wait) {
             // Wait until the page is really saved.
@@ -180,7 +180,7 @@ public class EditPage extends BasePage
             getDriver().addPageNotYetReloadedMarker();
         }
 
-        this.save.click();
+        this.getSaveAndViewButton().click();
 
         if (wait) {
             // Since we might have a loading step between clicking Save&View and the view page actually loading

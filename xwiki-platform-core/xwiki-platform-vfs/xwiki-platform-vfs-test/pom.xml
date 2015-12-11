@@ -27,41 +27,17 @@
     <artifactId>xwiki-platform-vfs</artifactId>
     <version>7.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-vfs-ui</artifactId>
-  <name>XWiki Platform - VFS - UI</name>
-  <packaging>xar</packaging>
-  <description>Provides a VFS Tree Macro</description>
+  <artifactId>xwiki-platform-vfs-test</artifactId>
+  <name>XWiki Platform - VFS - Tests - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Tests for the VFS feature</description>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>VFS Application</xwiki.extension.name>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-vfs-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tree-macro</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for Wiki Macros -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-vfs-test-tests</module>
+  </modules>
 </project>

@@ -19,19 +19,22 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Type;
+import java.net.URI;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.URLNormalizer;
 
 /**
  * Converts a {@link VfsResourceReference} into a relative {@link ExtendedURL} (with the Context Path added).
@@ -41,32 +44,42 @@ import org.xwiki.url.URLNormalizer;
  */
 @Component
 @Singleton
-public class VfsResourceReferenceSerializer
-    implements ResourceReferenceSerializer<VfsResourceReference, ExtendedURL>
+public class VfsResourceReferenceSerializer extends AbstractVfsResourceReferenceSerializer
 {
+    private static final Type TYPE = new DefaultParameterizedType(null,
+        ResourceReferenceSerializer.class, VfsResourceReference.class, ExtendedURL.class);
+
     @Inject
-    @Named("contextpath")
-    private URLNormalizer<ExtendedURL> extendedURLNormalizer;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     public ExtendedURL serialize(VfsResourceReference resourceReference)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        List<String> segments = new ArrayList<>();
+        ExtendedURL extendedURL;
 
-        // Add the resource type segment.
-        segments.add("vfs");
+        // We need to ensure that the URI contains absolute references since the VFS handler that will handle
+        // the generated URL won't have any base reference to resolve any relative refeence.
+        //
+        // Look for a scheme-specific serializer to convert from a relative URI into an absolute URI and if not found
+        // then don't perform any transformation of the URI.
+        URI uri = resourceReference.getURI();
+        try {
+            ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> schemeSpecificSerializer =
+                this.componentManagerProvider.get().getInstance(TYPE, uri.getScheme());
+            extendedURL = schemeSpecificSerializer.serialize(resourceReference);
+        } catch (ComponentLookupException e) {
+            extendedURL = super.serialize(resourceReference);
+        }
 
-        // Add the VFS URI part
-        segments.add(resourceReference.getURI().toString());
+        return extendedURL;
+    }
 
-        // Add the VFS path
-        segments.addAll(resourceReference.getPathSegments());
-
-        // Add all optional parameters
-        ExtendedURL extendedURL = new ExtendedURL(segments, resourceReference.getParameters());
-
-        // Normalize the URL to add the Context Path since we want a full relative URL to be returned.
-        return this.extendedURLNormalizer.normalize(extendedURL);
+    @Override
+    protected URI makeAbsolute(URI uri)
+    {
+        // Don't make any transformation by default
+        return uri;
     }
 }

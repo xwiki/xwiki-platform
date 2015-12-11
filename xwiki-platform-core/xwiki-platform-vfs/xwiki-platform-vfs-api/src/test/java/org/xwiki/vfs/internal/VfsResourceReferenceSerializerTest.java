@@ -22,9 +22,14 @@ package org.xwiki.vfs.internal;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.inject.Provider;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
@@ -44,18 +49,44 @@ public class VfsResourceReferenceSerializerTest
     public MockitoComponentMockingRule<VfsResourceReferenceSerializer> mocker =
         new MockitoComponentMockingRule<>(VfsResourceReferenceSerializer.class);
 
+    @Before
+    public void setUp() throws Exception
+    {
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(componentManagerProvider.get()).thenReturn(this.mocker);
+    }
+
     @Test
-    public void serialize() throws Exception
+    public void serializeWhenNoSpecificSchemeSerializer() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:wiki:space.page@attachment"), "path1/path2/test.txt");
+            URI.create("somescheme:wiki:space.page@attachment"), "path1/path2/test.txt");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
+            "vfs", "somescheme:wiki:space.page@attachment", "path1", "path2", "test.txt"));
+
+        URLNormalizer<ExtendedURL> normalizer = this.mocker.getInstance(
+            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class), "contextpath");
+        when(normalizer.normalize(extendedURL)).thenReturn(extendedURL);
+
+        assertEquals("/vfs/somescheme%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
+            this.mocker.getComponentUnderTest().serialize(reference).toString());
+    }
+
+    @Test
+    public void serializeWhenSpecificSchemeSerializer() throws Exception
+    {
+        VfsResourceReference reference = new VfsResourceReference(
+            URI.create("attach:attachment"), "path1/path2/test.txt");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
             "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));
 
-        URLNormalizer<ExtendedURL> normalizer = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class), "contextpath");
-        when(normalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        ResourceReferenceSerializer<VfsResourceReference, ExtendedURL> serializer = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
+                ExtendedURL.class), "attach");
+        when(serializer.serialize(reference)).thenReturn(extendedURL);
 
         assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
             this.mocker.getComponentUnderTest().serialize(reference).toString());

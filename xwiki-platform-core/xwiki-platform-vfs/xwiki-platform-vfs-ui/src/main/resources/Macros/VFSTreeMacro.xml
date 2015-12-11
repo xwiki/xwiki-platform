@@ -156,7 +156,7 @@
     </class>
     <property>
       <code>{{velocity}}
-{{tree root="$xcontext.macro.params.root" reference="Macros.VFSTreeJSON" links="true"/}}
+{{tree root="$xcontext.macro.params.root" reference="path:$xwiki.getURL($doc.getDocumentReference(), 'get', 'sheet=Macros.VFSTreeJSON&amp;outputSyntax=plain')" links="true"/}}
 {{/velocity}}</code>
     </property>
     <property>

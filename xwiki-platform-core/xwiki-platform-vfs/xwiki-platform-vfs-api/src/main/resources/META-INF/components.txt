@@ -8,6 +8,7 @@ org.xwiki.vfs.internal.DefaultVfsManager
 org.xwiki.vfs.internal.URIVfsResourceReferenceSerializer
 org.xwiki.vfs.internal.attach.AttachURIVfsResourceReferenceSerializer
 org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker
+org.xwiki.vfs.internal.attach.AttachVfsResourceReferenceSerializer
 org.xwiki.vfs.internal.script.DirectoryStreamFilterConverter
 org.xwiki.vfs.internal.script.AllDirectoryStreamFilter
 org.xwiki.vfs.internal.script.FileDirectoryStreamFilter

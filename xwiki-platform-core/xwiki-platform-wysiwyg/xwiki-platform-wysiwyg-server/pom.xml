@@ -88,6 +88,27 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- The HTMLCleanerTestSuite uses the deprecated XWikiComponentInitializer which initializes the ECM and some
+         module draws the webjars-api module which itself has a dependency on the xwiki-platform-classloader-xwiki one
+         which contains the ThreadClassloaderExecutionContextInitializer. Since HTMLCleanerTestSuite calls
+         XWikiComponentInitializer.initializeExecution() the ExecutionContextInitializer are executed and thus
+         ThreadClassloaderExecutionContextInitializer is executed and thus requires an implementation of WikiManager to
+         be present...
+         TODO: Consider removing usage of XWikiComponentInitializer
+    -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed transitively by the xwiki-platform-wiki-default dependency... -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

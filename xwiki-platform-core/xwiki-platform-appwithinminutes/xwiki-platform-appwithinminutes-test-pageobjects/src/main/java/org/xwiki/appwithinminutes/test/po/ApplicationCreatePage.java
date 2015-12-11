@@ -117,7 +117,18 @@ public class ApplicationCreatePage extends ViewPage
      */
     public ApplicationClassEditPage clickNextStep()
     {
-        nextStepButton.click();
+        clickNextStepButton();
         return new ApplicationClassEditPage();
+    }
+
+    /**
+     * Simply clicks on the Next Stept button, nothing more.
+     * <p/>
+     * You should generally use {@link #clickNextStep()} instead if you are not expecting an error or something outside
+     * the normal flow.
+     */
+    public void clickNextStepButton()
+    {
+        nextStepButton.click();
     }
 }

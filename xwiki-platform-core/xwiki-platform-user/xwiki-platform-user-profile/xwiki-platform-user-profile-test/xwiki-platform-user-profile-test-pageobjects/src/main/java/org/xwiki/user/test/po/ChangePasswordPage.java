@@ -40,13 +40,13 @@ public class ChangePasswordPage extends BasePage
 
     @FindBy(xpath = "//a[@class='secondary button']")
     private WebElement cancelPasswordChange;
-    
+
     @FindBy(xpath = "//span[@class='box errormessage']")
     private WebElement errorMessage;
-    
+
     @FindBy(xpath = "//span[@class='LV_validation_message LV_invalid']")
     private WebElement validationErrorMessage;
-    
+
     @FindBy(xpath = "//span[@class='box infomessage']")
     private WebElement successMessage;
 
@@ -59,7 +59,7 @@ public class ChangePasswordPage extends BasePage
         this.password2.clear();
         this.password2.sendKeys(password2);
     }
-    
+
     public void changePasswordAsAdmin(String password, String password2)
     {
         this.password1.clear();
@@ -67,17 +67,17 @@ public class ChangePasswordPage extends BasePage
         this.password2.clear();
         this.password2.sendKeys(password2);
     }
-    
+
     public String getErrorMessage()
     {
         return errorMessage.getText();
     }
-    
+
     public String getValidationErrorMessage()
     {
         return validationErrorMessage.getText();
     }
-    
+
     public String getSuccessMessage()
     {
         return successMessage.getText();

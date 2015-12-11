@@ -22,13 +22,11 @@ package org.xwiki.test.ui.po.editor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -135,6 +133,12 @@ public class EditPage extends BasePage
         this.clickSaveAndContinue(true);
     }
 
+    /**
+     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
+     * for a different message (e.g. an error message).
+     *
+     * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
+     */
     public void clickSaveAndContinue(boolean wait)
     {
         this.saveandcontinue.click();
@@ -145,33 +149,56 @@ public class EditPage extends BasePage
         }
     }
 
-    public ViewPage clickSaveAndView()
+    /**
+     * Use this method instead of {@link #clickSaveAndContinue()} and call {@link WebElement#click()} when you know that
+     * the next page is not a standard XWiki {@link InlinePage}.
+     *
+     * @return the save and continue button used to submit the form.
+     */
+    public WebElement getSaveAndContinueButton()
     {
-        this.save.click();
+        return saveandcontinue;
+    }
 
-        if (!getUtil().isInViewMode()) {
-            // Since we might have a loading step between clicking Save&View and the view page actually loading
-            // (specifically when using templates that have child documents associated), we need to wait for the save to
-            // finish and for the redirect to view mode to occur.
-            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver input)
-                {
-                    boolean inViewMode = getUtil().isInViewMode();
-                    // Hack: It may happen in edit mode that the page loads and the first click() action does
-                    // absolutely nothing. Most likely a race condition with the actionbuttons javascript. To work
-                    // around it, we can simply click again on the save button.
-                    if (!inViewMode && getDriver().hasElementWithoutWaiting(By.name("action_save")) && save.isEnabled()) {
-                        save.click();
-                    }
+    public <T extends ViewPage> T clickSaveAndView()
+    {
+        clickSaveAndView(true);
 
-                    return inViewMode;
-                }
-            });
+        return (T) new ViewPage();
+    }
+
+    /**
+     * Useful when the save&view operation could fail on the client side and a reload (the view part) might thus not
+     * take place.
+     *
+     * @param wait if we should wait for the page to be reloaded
+     * @since 7.4M2
+     */
+    public void clickSaveAndView(boolean wait)
+    {
+        if (wait) {
+            getDriver().addPageNotYetReloadedMarker();
         }
 
-        return new ViewPage();
+        this.save.click();
+
+        if (wait) {
+            // Since we might have a loading step between clicking Save&View and the view page actually loading
+            // (specifically when using templates that have child documents associated), we need to wait for the save to
+            // finish and for the redirect to occur.
+            getDriver().waitUntilPageIsReloaded();
+        }
+    }
+
+    /**
+     * Use this method instead of {@link #clickSaveAndView()} and call {@link WebElement#click()} when you know that the
+     * next page is not a standard XWiki {@link InlinePage}.
+     *
+     * @return the save and view button used to submit the form.
+     */
+    public WebElement getSaveAndViewButton()
+    {
+        return save;
     }
 
     public ViewPage clickCancel()
@@ -230,5 +257,19 @@ public class EditPage extends BasePage
     public String getDocumentTitle()
     {
         return this.titleField.getAttribute("value");
+    }
+
+    /**
+     * @since 7.4M2
+     */
+    @Override
+    public void waitUntilPageJSIsLoaded()
+    {
+        super.waitUntilPageJSIsLoaded();
+
+        // // Actionbuttons javascript for saving the page.
+        getDriver().waitUntilJavascriptCondition(
+            "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
+                + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 }

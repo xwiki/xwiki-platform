@@ -28,88 +28,18 @@
     <version>7.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webjars</artifactId>
-  <name>XWiki Platform - WebJars Support</name>
-  <packaging>jar</packaging>
+  <name>XWiki Platform - WebJars - Parent POM</name>
+  <packaging>pom</packaging>
   <description>Adds support for packaging web resources (JavaScript, CSS, images, fonts, etc.) using WebJars</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
-    <!-- Too many dependencies required -->
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-classloader-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <!-- Used to determine the WebJar version when it is not specified. -->
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <!-- Used to determine the current wiki (i.e. the namespace where to look for installed WebJars when the WebJar
-        version is not specified). -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <!-- Used to evaluate the Velocity code from the WebJar resources. -->
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Required at runtime! -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-container</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <!-- Used to determine the Content Type of the requested resource. -->
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <!-- Test dependencies -->
-    <!-- Used by the Test -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>angular-paginate-anything</artifactId>
-      <version>2.5.3</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-webjars-api</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-webjars-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

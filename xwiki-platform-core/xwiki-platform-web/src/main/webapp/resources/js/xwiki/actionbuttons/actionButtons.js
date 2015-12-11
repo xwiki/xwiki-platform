@@ -205,9 +205,14 @@ actionButtons.AjaxSaveAndContinue = Class.create({
       return;
     }
 
+    // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
+    var isCustomForm = !this.form.action.contains("/preview/");
+
     // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
     var isAsync = (this.form.async && this.form.async.value === 'true');
-    if (!isAsync) {
+
+    // Avoid template asynchronous handling of templates for synchronous or custom forms.
+    if (!isAsync || isCustomForm) {
       if (!isContinue) {
         // Save & View in sync mode needs no more work.
         return;

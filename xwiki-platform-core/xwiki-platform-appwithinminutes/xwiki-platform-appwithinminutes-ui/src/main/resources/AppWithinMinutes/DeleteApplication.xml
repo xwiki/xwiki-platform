@@ -46,13 +46,13 @@
 #macro (deleteApplicationEntries $dataSpaceReference $classReference)
   #set ($statement = ', BaseObject as obj where doc.fullName = obj.name and ' +
     'obj.className = :class and doc.fullName &lt;&gt; :template and ' +
-    "(doc.space = :dataSpace or doc.space like :dataSpacePrefix escape '\')")
+    "(doc.space = :dataSpace or doc.space like :dataSpacePrefix escape '!')")
   #set ($query = $services.query.hql($statement))
   #set ($classLocalReference = $services.model.serialize($classReference, 'local'))
   #set ($discard = $query.bindValue('class', $classLocalReference))
   #set ($discard = $query.bindValue('template', "$stringtool.removeEnd($classLocalReference, 'Class')Template"))
   #set ($dataLocalSpaceReference = $services.model.serialize($dataSpaceReference, 'local'))
-  #set ($dataSpacePrefix = $dataLocalSpaceReference.replaceAll('([%_\\])', '\\$1').concat('.%'))
+  #set ($dataSpacePrefix = $dataLocalSpaceReference.replaceAll('([%_!])', '!$1').concat('.%'))
   #set ($discard = $query.bindValue('dataSpace', $dataLocalSpaceReference))
   #set ($discard = $query.bindValue('dataSpacePrefix', $dataSpacePrefix))
   #set ($entryReferences = [])

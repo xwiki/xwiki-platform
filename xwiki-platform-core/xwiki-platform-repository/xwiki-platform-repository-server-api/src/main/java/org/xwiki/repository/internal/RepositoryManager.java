@@ -534,7 +534,7 @@ public class RepositoryManager implements Initializable, Disposable
     public DocumentReference importExtension(String extensionId, ExtensionRepository repository, Type type)
         throws QueryException, XWikiException, ResolveException
     {
-        Map<Version, String> versions = new TreeMap<Version, String>();
+        TreeMap<Version, String> versions = new TreeMap<Version, String>();
 
         Version lastVersion = getVersions(extensionId, repository, type, versions);
 
@@ -542,7 +542,11 @@ public class RepositoryManager implements Initializable, Disposable
             throw new ResolveException("Can't find any version for the extension [" + extensionId + "] on repository ["
                 + repository + "]");
         } else if (versions.isEmpty()) {
+            // If no valid version import the last version
             versions.put(lastVersion, extensionId);
+        } else {
+            // Select the last valid version
+            lastVersion = versions.lastKey();
         }
 
         Extension extension = repository.resolve(new ExtensionId(extensionId, lastVersion));

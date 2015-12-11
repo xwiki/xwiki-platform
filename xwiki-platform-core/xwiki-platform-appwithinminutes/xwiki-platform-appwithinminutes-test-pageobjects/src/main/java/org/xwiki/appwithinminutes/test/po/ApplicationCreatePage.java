@@ -31,7 +31,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the first step of the App Within Minutes wizard.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -47,7 +47,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Loads the first step of the App Within Minutes wizard
-     * 
+     *
      * @return the page that represents the first step of the App Within Minutes wizard
      */
     public static ApplicationCreatePage gotoPage()
@@ -58,7 +58,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Types the given string into the application name input.
-     * 
+     *
      * @param appName the application name
      */
     public void setApplicationName(String appName)
@@ -101,7 +101,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Sets the location where to create the application.
-     * 
+     *
      * @param location the location where to create the application
      * @since 7.3RC1
      */
@@ -112,7 +112,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Clicks on the Next Step button.
-     * 
+     *
      * @return the page that represents the next step of the App Within Minutes wizard
      */
     public ApplicationClassEditPage clickNextStep()

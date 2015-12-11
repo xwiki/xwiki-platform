@@ -21,11 +21,11 @@ package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.EditPage;
+import org.xwiki.test.ui.po.BasePage;
 
 /** User profile, change password action. */
-public class ChangePasswordPage extends EditPage
-{   
+public class ChangePasswordPage extends BasePage
+{
     @FindBy(xpath = "//input[@id='xwikioriginalpassword']")
     private WebElement originalPassword;
 

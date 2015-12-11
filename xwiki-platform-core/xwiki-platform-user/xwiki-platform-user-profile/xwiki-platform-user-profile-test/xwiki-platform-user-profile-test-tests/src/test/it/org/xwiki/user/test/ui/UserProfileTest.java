@@ -22,7 +22,6 @@ package org.xwiki.user.test.ui;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
@@ -82,16 +81,6 @@ public class UserProfileTest extends AbstractTest
     private ProfileUserProfilePage customProfilePage;
 
     private String userName;
-
-    @BeforeClass
-    public static void globalSetUp()
-    {
-        getUtil().loginAsSuperAdminAndGotoPage(getUtil().getURL("XWiki", "ChangePassword"));
-        ChangePasswordPage changePasswordPage = new ChangePasswordPage();
-        changePasswordPage.edit();
-        changePasswordPage.clickSaveAndView();
-        getDriver().get(getUtil().getURLToLogout());
-    }
 
     @Before
     public void setUp()

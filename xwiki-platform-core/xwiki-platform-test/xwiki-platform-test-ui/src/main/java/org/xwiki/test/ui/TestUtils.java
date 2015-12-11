@@ -1179,10 +1179,9 @@ public class TestUtils
         gotoPage(space, page, "save", queryParameters);
     }
 
-    public ClassEditPage addClassProperty(String space, String page, String propertyName, String propertyType)
+    public void addClassProperty(String space, String page, String propertyName, String propertyType)
     {
         gotoPage(space, page, "propadd", "propname", propertyName, "proptype", propertyType);
-        return new ClassEditPage();
     }
 
     /**

@@ -1426,7 +1426,7 @@ public class TestUtils
 
     /**
      * Delete the latest version from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @since 7.0M2
@@ -1438,7 +1438,7 @@ public class TestUtils
 
     /**
      * Delete a specific version from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param version the version to delete
@@ -1451,7 +1451,7 @@ public class TestUtils
 
     /**
      * Delete an interval of versions from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param v1 the starting version to delete
@@ -1465,7 +1465,7 @@ public class TestUtils
 
     /**
      * Roll back a page to the previous version, using the {@code /rollback/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @since 7.0M2
@@ -1477,7 +1477,7 @@ public class TestUtils
 
     /**
      * Roll back a page to the specified version, using the {@code /rollback/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param version the version to rollback to
@@ -1490,7 +1490,7 @@ public class TestUtils
 
     /**
      * Set the hierarchy mode used in the wiki
-     * 
+     *
      * @param mode the mode to use ("reference" or "parentchild")
      * @since 7.2M2
      */
@@ -1501,7 +1501,7 @@ public class TestUtils
 
     /**
      * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
-     * 
+     *
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
      * @param value value to set to the property

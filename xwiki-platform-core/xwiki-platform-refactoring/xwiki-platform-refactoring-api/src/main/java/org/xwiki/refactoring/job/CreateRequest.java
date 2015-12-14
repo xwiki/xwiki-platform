@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.model.reference.EntityReference;
@@ -58,7 +59,7 @@ public class CreateRequest extends EntityRequest
      */
     public List<EntityReference> getSkippedEntities()
     {
-        return this.getProperty(PROPERTY_SKIPPED_ENTITIES);
+        return this.getProperty(PROPERTY_SKIPPED_ENTITIES, Collections.<EntityReference>emptyList());
     }
 
     /**

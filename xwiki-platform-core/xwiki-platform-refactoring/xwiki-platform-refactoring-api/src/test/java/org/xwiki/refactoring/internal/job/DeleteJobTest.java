@@ -26,18 +26,12 @@ import org.junit.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -47,7 +41,7 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-public class DeleteJobTest extends AbstractOldCoreEntityJobTest
+public class DeleteJobTest extends AbstractEntityJobTest
 {
     @Rule
     public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(DeleteJob.class);
@@ -62,25 +56,16 @@ public class DeleteJobTest extends AbstractOldCoreEntityJobTest
     public void deleteDocument() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        when(this.xcontext.getWiki().exists(documentReference, xcontext)).thenReturn(true);
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
-
-        DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
-        DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
-        when(this.xcontext.getUserReference()).thenReturn(bobReference);
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
         EntityRequest request = createRequest(documentReference);
         request.setCheckRights(false);
-        request.setUserReference(aliceReference);
+        request.setUserReference(userReference);
         run(request);
 
-        verify(this.xcontext).setUserReference(aliceReference);
-        verify(this.xcontext.getWiki()).deleteAllDocuments(document, xcontext);
-        verify(this.mocker.getMockedLogger()).info("Document [{}] has been deleted with all its translations.",
-            documentReference);
-        verify(this.xcontext).setUserReference(bobReference);
+        verify(this.modelBridge).delete(documentReference, userReference);
     }
 
     @Test
@@ -89,14 +74,14 @@ public class DeleteJobTest extends AbstractOldCoreEntityJobTest
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         run(createRequest(documentReference));
         verify(this.mocker.getMockedLogger()).warn("Skipping [{}] because it doesn't exist.", documentReference);
-        verify(this.xcontext.getWiki(), never()).deleteAllDocuments(any(XWikiDocument.class), eq(xcontext));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
     }
 
     @Test
     public void deleteDocumentWithoutDeleteRight() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        when(this.xcontext.getWiki().exists(documentReference, xcontext)).thenReturn(true);
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(false);
@@ -107,41 +92,29 @@ public class DeleteJobTest extends AbstractOldCoreEntityJobTest
         run(request);
 
         verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
-        verify(this.xcontext.getWiki(), never()).deleteAllDocuments(any(XWikiDocument.class), eq(xcontext));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
     }
 
     @Test
     public void deleteSpaceHomeDeep() throws Exception
     {
-        EntityRequest request = createRequest(new DocumentReference("wiki", "Space", "WebHome"));
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "WebHome");
+        EntityRequest request = createRequest(documentReference);
         request.setDeep(true);
         run(request);
 
-        // We only verify if the query manager is called. The rest of the test is in #deleteSpace()
-        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
-        verify(queryManager).createQuery(any(String.class), eq(Query.HQL));
+        // We only verify if the job fetches the documents from the space. The rest of the test is in #deleteSpace()
+        verify(this.modelBridge).getDocumentReferences(documentReference.getLastSpaceReference());
     }
 
     @Test
     public void deleteSpace() throws Exception
     {
         SpaceReference spaceReference = new SpaceReference("Space", new WikiReference("wiki"));
-        EntityReferenceSerializer<String> localEntityReferenceSerializer =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localEntityReferenceSerializer.serialize(spaceReference)).thenReturn("Space");
-
-        DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "explicit");
         DocumentReference aliceReference = new DocumentReference("wiki", "Space", "Alice");
-        when(explicitDocumentReferenceResolver.resolve("Space.Alice", spaceReference)).thenReturn(aliceReference);
         DocumentReference bobReference = new DocumentReference("wiki", "Space", "Bob");
-        when(explicitDocumentReferenceResolver.resolve("Space.Bob", spaceReference)).thenReturn(bobReference);
-
-        Query query = mock(Query.class);
-        when(query.execute()).thenReturn(Arrays.<Object>asList("Space.Alice", "Space.Bob"));
-
-        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
-        when(queryManager.createQuery(any(String.class), eq(Query.HQL))).thenReturn(query);
+        when(this.modelBridge.getDocumentReferences(spaceReference)).thenReturn(
+            Arrays.asList(aliceReference, bobReference));
 
         run(createRequest(spaceReference));
 
@@ -155,7 +128,7 @@ public class DeleteJobTest extends AbstractOldCoreEntityJobTest
     {
         run(createRequest(new WikiReference("foo")));
         verify(this.mocker.getMockedLogger()).error("Unsupported entity type [{}].", EntityType.WIKI);
-        verify(this.xcontext.getWiki(), never()).deleteAllDocuments(any(XWikiDocument.class), eq(xcontext));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
     }
 
     private EntityRequest createRequest(EntityReference... entityReference)

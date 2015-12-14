@@ -248,6 +248,7 @@ public class RefactoringScriptService implements ScriptService
         initEntityRequest(request, type, sources);
         request.setDestination(destination);
         request.setUpdateLinks(true);
+        request.setAutoRedirect(true);
         return request;
     }
 

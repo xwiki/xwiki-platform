@@ -38,7 +38,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.DELETE)
-public class DeleteJob extends AbstractOldCoreEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
+public class DeleteJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
 {
     @Override
     public String getType()
@@ -92,12 +92,12 @@ public class DeleteJob extends AbstractOldCoreEntityJob<EntityRequest, EntityJob
 
     private void maybeDelete(DocumentReference documentReference)
     {
-        if (!exists(documentReference)) {
+        if (!this.modelBridge.exists(documentReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);
         } else {
-            delete(documentReference);
+            this.modelBridge.delete(documentReference, this.request.getUserReference());
         }
     }
 }

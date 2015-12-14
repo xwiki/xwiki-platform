@@ -1,0 +1,271 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.refactoring.internal;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+/**
+ * Default implementation of {@link ModelBridge} based on the old XWiki model.
+ * 
+ * @version $Id$
+ * @since 7.4M2
+ */
+@Component
+@Singleton
+public class DefaultModelBridge implements ModelBridge
+{
+    /**
+     * Regular expression used to match the special characters supported by the like HQL operator (plus the escaping
+     * character).
+     */
+    private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_/])");
+
+    /**
+     * The reference to the type of object used to create an automatic redirect when renaming or moving a document.
+     */
+    private static final LocalDocumentReference REDIRECT_CLASS_REFERENCE = new LocalDocumentReference(
+        XWiki.SYSTEM_SPACE, "RedirectClass");
+
+    @Inject
+    private Logger logger;
+
+    /**
+     * Used to perform the low level operations on entities.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Used to query the child documents.
+     */
+    @Inject
+    private QueryManager queryManager;
+
+    /**
+     * Used to serialize a space reference in order to query the child documents.
+     */
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    /**
+     * Used to serialize the redirect location.
+     *
+     * @see #createRedirect(DocumentReference, DocumentReference)
+     */
+    @Inject
+    @Named("compact")
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+
+    /**
+     * Used to resolve the references of child documents.
+     */
+    @Inject
+    @Named("explicit")
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
+
+    @Override
+    public boolean create(DocumentReference documentReference, DocumentReference userReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        DocumentReference currentUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(userReference);
+
+            XWikiDocument newDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+            xcontext.getWiki().saveDocument(newDocument, xcontext);
+            this.logger.info("Document [{}] has been created.", documentReference);
+        } catch (Exception e) {
+            this.logger.error("Failed to create document [{}].", documentReference, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(currentUserReference);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean copy(DocumentReference source, DocumentReference destination, DocumentReference userReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference currentUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(userReference);
+            String language = source.getLocale() != null ? source.getLocale().toString() : null;
+            boolean result =
+                xcontext.getWiki().copyDocument(source, destination, language, false, true, false, xcontext);
+            if (result) {
+                this.logger.info("Document [{}] has been copied to [{}].", source, destination);
+            } else {
+                this.logger.warn("Cannot fully copy [{}] to [{}] because an orphan translation"
+                    + " exists at the destination.", source, destination);
+            }
+            return result;
+        } catch (Exception e) {
+            this.logger.error("Failed to copy [{}] to [{}].", source, destination, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(currentUserReference);
+        }
+    }
+
+    @Override
+    public boolean delete(DocumentReference reference, DocumentReference userReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference currentUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(userReference);
+            XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
+            if (document.getTranslation() == 1) {
+                xcontext.getWiki().deleteDocument(document, xcontext);
+                this.logger.info("Document [{}] has been deleted.", reference);
+            } else {
+                xcontext.getWiki().deleteAllDocuments(document, xcontext);
+                this.logger.info("Document [{}] has been deleted with all its translations.", reference);
+            }
+            return true;
+        } catch (Exception e) {
+            this.logger.error("Failed to delete document [{}].", reference, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(currentUserReference);
+        }
+    }
+
+    @Override
+    public boolean removeLock(DocumentReference reference, DocumentReference userReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference currentUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(userReference);
+            XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
+
+            if (document.getLock(xcontext) != null) {
+                document.removeLock(xcontext);
+                this.logger.info("Document [{}] has been unlocked.", reference);
+            }
+
+            return true;
+        } catch (Exception e) {
+            // Just warn, since it's a recoverable situation.
+            this.logger.warn("Failed to unlock document [{}].", reference, e);
+            return false;
+        } finally {
+            xcontext.setUserReference(currentUserReference);
+        }
+    }
+
+    @Override
+    public void createRedirect(DocumentReference oldReference, DocumentReference newReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference redirectClassReference =
+            new DocumentReference(REDIRECT_CLASS_REFERENCE, oldReference.getWikiReference());
+        if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
+            try {
+                XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
+                int number = oldDocument.createXObject(redirectClassReference, xcontext);
+                String location = this.compactEntityReferenceSerializer.serialize(newReference, oldReference);
+                oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
+                xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
+                this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
+            } catch (XWikiException e) {
+                this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference,
+                    e);
+            }
+        } else {
+            this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
+                oldReference, newReference, redirectClassReference);
+        }
+    }
+
+    @Override
+    public boolean exists(DocumentReference reference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        return xcontext.getWiki().exists(reference, xcontext);
+    }
+
+    @Override
+    public List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            return xcontext.getWiki().getDocument(documentReference, xcontext).getBackLinkedReferences(xcontext);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to retrieve the back-links for document [{}].", documentReference, e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<DocumentReference> getDocumentReferences(SpaceReference spaceReference)
+    {
+        try {
+            // At the moment we don't have a way to retrieve only the direct children so we select all the descendants.
+            // This means we select all the documents from the specified space and from all the nested spaces.
+            String statement =
+                "select distinct(doc.fullName) from XWikiDocument as doc "
+                    + "where doc.space = :space or doc.space like :spacePrefix escape '/'";
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            query.setWiki(spaceReference.getWikiReference().getName());
+            String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+            query.bindValue("space", localSpaceReference);
+            String spacePrefix = LIKE_SPECIAL_CHARS.matcher(localSpaceReference).replaceAll("/$1");
+            query.bindValue("spacePrefix", spacePrefix + ".%");
+
+            List<DocumentReference> descendants = new ArrayList<>();
+            for (Object fullName : query.execute()) {
+                descendants.add(this.explicitDocumentReferenceResolver.resolve((String) fullName, spaceReference));
+            }
+            return descendants;
+        } catch (Exception e) {
+            this.logger.error("Failed to retrieve the documents from [{}].", spaceReference, e);
+            return Collections.emptyList();
+        }
+    }
+}

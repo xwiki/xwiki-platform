@@ -22,6 +22,7 @@ package org.xwiki.refactoring.internal.job;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -29,6 +30,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
@@ -43,7 +45,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.MOVE)
-public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
+public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
 {
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
@@ -51,6 +53,12 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
      * {@code null} then a question is asked for each entity.
      */
     private Boolean overwriteAll;
+
+    /**
+     * The component used to refactor document links after a document is rename or moved.
+     */
+    @Inject
+    private LinkRefactoring linkRefactoring;
 
     @Override
     public String getType()
@@ -149,13 +157,13 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
     {
         // Perform checks that are specific to the document source/destination type.
 
-        if (!exists(oldReference)) {
+        if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
         } else if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.
             this.logger.error("You are not allowed to delete [{}].", oldReference);
         } else if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
-            || (exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
+            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
             this.logger
                 .error("You don't have sufficient permissions over the destination document [{}].", newReference);
         } else {
@@ -170,20 +178,20 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         try {
             // Step 1: Delete the destination document if needed.
             this.progressManager.startStep(this);
-            if (exists(newReference)) {
+            if (this.modelBridge.exists(newReference)) {
                 if (this.request.isInteractive() && !confirmOverwrite(oldReference, newReference)) {
                     this.logger.warn(
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
                     return;
-                } else if (!delete(newReference)) {
+                } else if (!this.modelBridge.delete(newReference, this.request.getUserReference())) {
                     return;
                 }
             }
 
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
-            if (!copy(oldReference, newReference)) {
+            if (!this.modelBridge.copy(oldReference, newReference, this.request.getUserReference())) {
                 return;
             }
 
@@ -196,7 +204,13 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
             // Step 4: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
-                delete(oldReference);
+                this.modelBridge.delete(oldReference, this.request.getUserReference());
+            }
+
+            // Step 5: Create an automatic redirect.
+            this.progressManager.startStep(this);
+            if (this.request.isAutoRedirect()) {
+                this.modelBridge.createRedirect(oldReference, newReference);
             }
         } finally {
             this.progressManager.popLevelProgress(this);
@@ -236,7 +250,7 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
             // Step 2: Update the relative links from the document content.
             this.progressManager.startStep(this);
-            updateRelativeLinks(oldReference, newReference);
+            this.linkRefactoring.updateRelativeLinks(oldReference, newReference);
         } finally {
             this.progressManager.popLevelProgress(this);
         }
@@ -244,14 +258,14 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
     private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference)
     {
-        List<DocumentReference> backlinkDocumentReferences = getBackLinkedReferences(oldReference);
+        List<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedReferences(oldReference);
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
         try {
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (hasAccess(Right.EDIT, backlinkDocumentReference)) {
-                    renameLinks(backlinkDocumentReference, oldReference, newReference);
+                    this.linkRefactoring.renameLinks(backlinkDocumentReference, oldReference, newReference);
                 }
             }
         } finally {

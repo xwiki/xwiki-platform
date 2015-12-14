@@ -52,13 +52,15 @@
             [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
-          ## We can't rename the children if the new page is terminal.
           #set ($success = false)
           #set ($renameRequest = $services.refactoring.createRenameRequest($doc.documentReference, $newDocReference))
+          ## We can't rename the children if the new page is terminal.
           #set ($deep = $request.deep == 'true' && !$terminal)
           #set ($discard = $renameRequest.setDeep($deep))
           #set ($updateLinks = $request.updateLinks == 'true')
           #set ($discard = $renameRequest.setUpdateLinks($updateLinks))
+          #set ($autoRedirect = $request.autoRedirect == 'true')
+          #set ($discard = $renameRequest.setAutoRedirect($autoRedirect))
           #set ($renameJob = $services.refactoring.rename($renameRequest))
           #try()
             #set ($discard = $renameJob.join())

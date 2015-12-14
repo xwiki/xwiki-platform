@@ -39,6 +39,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
@@ -114,6 +115,7 @@ public class RefactoringScriptServiceTest
         assertEquals(false, request.getValue().isDeep());
         assertEquals(true, request.getValue().isDeleteSource());
         assertEquals(true, request.getValue().isUpdateLinks());
+        assertEquals(true, request.getValue().isAutoRedirect());
         assertEquals(false, request.getValue().isInteractive());
         assertEquals(true, request.getValue().isCheckRights());
     }
@@ -221,6 +223,21 @@ public class RefactoringScriptServiceTest
         assertEquals(RefactoringJobs.DELETE, request.getValue().getJobType());
         assertEquals(Arrays.asList(source), request.getValue().getEntityReferences());
         assertFalse(request.getValue().isDeep());
+    }
+
+    @Test
+    public void create() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+
+        getService().create(documentReference);
+
+        ArgumentCaptor<CreateRequest> request = ArgumentCaptor.forClass(CreateRequest.class);
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.CREATE), request.capture());
+
+        assertEquals(RefactoringJobs.CREATE, request.getValue().getJobType());
+        assertEquals(Arrays.asList(documentReference), request.getValue().getEntityReferences());
+        assertTrue(request.getValue().isDeep());
     }
 
     @Test

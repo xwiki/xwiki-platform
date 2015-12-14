@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.CREATE)
-public class CreateJob extends AbstractOldCoreEntityJob<CreateRequest, EntityJobStatus<CreateRequest>>
+public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<CreateRequest>>
 {
     @Override
     public String getType()
@@ -100,7 +100,7 @@ public class CreateJob extends AbstractOldCoreEntityJob<CreateRequest, EntityJob
             progressManager.startStep(this, "Remove lock from the main document");
 
             // Remove any existing lock of the user that started this job on the target document.
-            removeLock(documentReference);
+            this.modelBridge.removeLock(documentReference, this.request.getUserReference());
         } finally {
             // Done, go back to parent progress level
             this.progressManager.popLevelProgress(this);
@@ -141,21 +141,21 @@ public class CreateJob extends AbstractOldCoreEntityJob<CreateRequest, EntityJob
     {
         if (request.getSkippedEntities().contains(newDocumentReference)) {
             this.logger.debug("Skipping creation of document [{}], as specified in the request.", newDocumentReference);
-        } else if (exists(newDocumentReference)) {
+        } else if (this.modelBridge.exists(newDocumentReference)) {
             // TODO: Ask the user if it's OK to override. For now, just log.
             this.logger.warn("Skipping creation of document [{}] because it already exists.", newDocumentReference);
         } else if (!hasAccess(Right.EDIT, newDocumentReference)) {
             this.logger.error("You are not allowed to create the document [{}].", newDocumentReference);
         } else if (templateDocumentReference == null) {
             // If no template is specified, then we are just creating an empty document.
-            create(newDocumentReference);
+            this.modelBridge.create(newDocumentReference, this.request.getUserReference());
         } else if (!hasAccess(Right.VIEW, templateDocumentReference)) {
             this.logger.error("You are not allowed to view the template document [{}].", templateDocumentReference);
-        } else if (!exists(templateDocumentReference)) {
+        } else if (!this.modelBridge.exists(templateDocumentReference)) {
             // Should generally not happen, but you never know.
             this.logger.error("Template document [{}] does not exist.", templateDocumentReference);
         } else {
-            copy(templateDocumentReference, newDocumentReference);
+            this.modelBridge.copy(templateDocumentReference, newDocumentReference, this.request.getUserReference());
         }
     }
 }

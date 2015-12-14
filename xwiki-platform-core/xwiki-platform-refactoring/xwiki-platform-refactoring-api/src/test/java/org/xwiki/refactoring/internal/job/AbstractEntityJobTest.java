@@ -19,43 +19,35 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import javax.inject.Provider;
-
 import org.junit.Before;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-
 import static org.mockito.Mockito.*;
 
 /**
- * Base class for writing unit tests for jobs extending {@link AbstractOldCoreEntityJob}.
+ * Base class for writing unit tests for jobs extending {@link AbstractEntityJob}.
  * 
  * @version $Id$
+ * @since 7.4M2
  */
-public abstract class AbstractOldCoreEntityJobTest
+public abstract class AbstractEntityJobTest
 {
-    protected XWikiContext xcontext = mock(XWikiContext.class);
-
     protected AuthorizationManager authorization;
+
+    protected ModelBridge modelBridge;
 
     @Before
     public void configure() throws Exception
     {
-        XWiki xwiki = mock(XWiki.class);
-        when(this.xcontext.getWiki()).thenReturn(xwiki);
-
-        Provider<XWikiContext> xcontextProvider = getMocker().getInstance(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.xcontext);
-
         this.authorization = getMocker().getInstance(AuthorizationManager.class);
+        this.modelBridge = getMocker().getInstance(ModelBridge.class);
 
         EntityReferenceProvider defaultEntityReferenceProvider = getMocker().getInstance(EntityReferenceProvider.class);
         when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(

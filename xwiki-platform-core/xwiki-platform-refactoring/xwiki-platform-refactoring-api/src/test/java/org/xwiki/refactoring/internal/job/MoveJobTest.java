@@ -20,24 +20,19 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.job.MoveRequest;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -45,7 +40,7 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-public class MoveJobTest extends AbstractOldCoreEntityJobTest
+public class MoveJobTest extends AbstractMoveJobTest
 {
     @Rule
     public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(MoveJob.class);
@@ -111,7 +106,7 @@ public class MoveJobTest extends AbstractOldCoreEntityJobTest
     public void moveDocumentWithoutDeleteRight() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        when(this.xcontext.getWiki().exists(documentReference, xcontext)).thenReturn(true);
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(false);
@@ -131,7 +126,7 @@ public class MoveJobTest extends AbstractOldCoreEntityJobTest
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
-        when(this.xcontext.getWiki().exists(oldReference, xcontext)).thenReturn(true);
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.authorization.hasAccess(Right.DELETE, userReference, oldReference)).thenReturn(true);
@@ -152,63 +147,80 @@ public class MoveJobTest extends AbstractOldCoreEntityJobTest
     public void moveDocumentToSpace() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
-        when(this.xcontext.getWiki().exists(oldReference, this.xcontext)).thenReturn(true);
-
-        XWikiDocument oldDocument = mock(XWikiDocument.class, "old");
-        when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
 
         DocumentReference backLinkReference = new DocumentReference("wiki", "Three", "BackLink");
-        when(oldDocument.getBackLinkedReferences(this.xcontext)).thenReturn(Arrays.asList(backLinkReference));
-
-        XWikiDocument backLinkDocument = mock(XWikiDocument.class, "backLink");
-        when(this.xcontext.getWiki().getDocument(backLinkReference, this.xcontext)).thenReturn(backLinkDocument);
-        when(backLinkDocument.getTranslationLocales(this.xcontext)).thenReturn(Arrays.asList(Locale.FRENCH));
-        when(backLinkDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
-
-        XWikiDocument backLinkDocumentFR = mock(XWikiDocument.class, "backLinkFR");
-        when(backLinkDocument.getTranslatedDocument(Locale.FRENCH, this.xcontext)).thenReturn(backLinkDocumentFR);
-        when(backLinkDocumentFR.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.modelBridge.getBackLinkedReferences(oldReference)).thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
-        when(this.xcontext.getWiki().exists(newReference, this.xcontext)).thenReturn(true);
+        when(this.modelBridge.exists(newReference)).thenReturn(true);
 
-        XWikiDocument newDocument = mock(XWikiDocument.class, "new");
-        when(this.xcontext.getWiki().getDocument(newReference, this.xcontext)).thenReturn(newDocument);
-        when(newDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
-        DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
-        DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
-        when(this.xcontext.getUserReference()).thenReturn(bobReference);
-
-        when(this.xcontext.getWiki().copyDocument(oldReference, newReference, null, false, true, false, this.xcontext))
-            .thenReturn(true);
+        when(this.modelBridge.delete(newReference, userReference)).thenReturn(true);
+        when(this.modelBridge.copy(oldReference, newReference, userReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
         request.setInteractive(false);
-        request.setUserReference(aliceReference);
+        request.setUserReference(userReference);
         run(request);
 
-        verify(this.xcontext, times(3)).setUserReference(aliceReference);
-        verify(this.xcontext.getWiki()).deleteAllDocuments(newDocument, this.xcontext);
-        verify(this.mocker.getMockedLogger())
-            .info("Document [{}] has been copied to [{}].", oldReference, newReference);
-        verify(this.xcontext.getWiki()).deleteAllDocuments(oldDocument, this.xcontext);
-        verify(this.xcontext, times(3)).setUserReference(bobReference);
+        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
+        verify(linkRefactoring).renameLinks(backLinkReference, oldReference, newReference);
+        verify(linkRefactoring).updateRelativeLinks(oldReference, newReference);
+
+        verify(this.modelBridge).delete(oldReference, userReference);
+        verify(this.modelBridge).createRedirect(oldReference, newReference);
     }
 
-    private MoveRequest createRequest(EntityReference source, EntityReference destination)
+    @Test
+    public void moveDocumentToSpaceHome() throws Exception
     {
-        MoveRequest request = new MoveRequest();
-        request.setEntityReferences(Arrays.asList(source));
-        request.setDestination(destination);
-        return request;
+        DocumentReference source = new DocumentReference("wiki", "A", "B");
+        when(this.modelBridge.exists(source)).thenReturn(true);
+        DocumentReference destination = new DocumentReference("wiki", "C", "WebHome");
+
+        MoveRequest request = createRequest(source, destination);
+        request.setCheckRights(false);
+        run(request);
+
+        verify(this.modelBridge).copy(source, new DocumentReference("wiki", "C", "B"), null);
     }
 
-    private void verifyNoMove() throws Exception
+    @Test
+    public void moveSpaceHomeDeep() throws Exception
     {
-        verify(this.xcontext.getWiki(), never()).deleteAllDocuments(any(XWikiDocument.class), eq(this.xcontext));
-        verify(this.xcontext.getWiki(), never()).copyDocument(any(DocumentReference.class),
-            any(DocumentReference.class), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), eq(this.xcontext));
+        DocumentReference spaceHome = new DocumentReference("chess", Arrays.asList("A", "B", "C"), "WebHome");
+        DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
+        when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference())).thenReturn(
+            Arrays.asList(docFromSpace));
+        when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
+
+        WikiReference newWiki = new WikiReference("tennis");
+
+        MoveRequest request = createRequest(spaceHome, newWiki);
+        request.setCheckRights(false);
+        request.setDeep(true);
+        run(request);
+
+        verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"), null);
+    }
+
+    @Test
+    public void moveSpaceToSpaceHome() throws Exception
+    {
+        SpaceReference sourceSpace = new SpaceReference("wiki", "A", "B");
+        DocumentReference sourceDoc = new DocumentReference("X", sourceSpace);
+        when(this.modelBridge.getDocumentReferences(sourceSpace)).thenReturn(Arrays.asList(sourceDoc));
+        when(this.modelBridge.exists(sourceDoc)).thenReturn(true);
+
+        DocumentReference destination = new DocumentReference("wiki", "C", "WebHome");
+
+        MoveRequest request = createRequest(sourceSpace, destination);
+        request.setCheckRights(false);
+        run(request);
+
+        verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"), null);
     }
 }

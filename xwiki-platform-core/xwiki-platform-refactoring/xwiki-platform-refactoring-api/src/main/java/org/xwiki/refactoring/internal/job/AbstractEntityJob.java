@@ -31,7 +31,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceTree;
 import org.xwiki.model.reference.EntityReferenceTreeNode;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -68,6 +71,12 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     private static final JobGroupPath ROOT_GROUP = new JobGroupPath(RefactoringJobs.GROUP, null);
 
     private static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
+
+    /**
+     * The component used to access the XWiki model and to perform low level operations on it.
+     */
+    @Inject
+    protected ModelBridge modelBridge;
 
     /**
      * Specifies the group this job is part of. If all the entities involved in this operation are from the same wiki
@@ -196,7 +205,17 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
             && PREFERENCES_DOCUMENT_NAME.equals(entityReference.getName());
     }
 
-    protected void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    protected void visitDocuments(SpaceReference spaceReference, Visitor<DocumentReference> visitor)
+    {
+        visitDocumentNodes(getDocumentReferenceTree(spaceReference), visitor);
+    }
+
+    private EntityReferenceTreeNode getDocumentReferenceTree(SpaceReference spaceReference)
+    {
+        return new EntityReferenceTree(this.modelBridge.getDocumentReferences(spaceReference)).get(spaceReference);
+    }
+
+    private void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
     {
         EntityReference nodeReference = node.getReference();
         EntityType nodeType = nodeReference != null ? nodeReference.getType() : null;

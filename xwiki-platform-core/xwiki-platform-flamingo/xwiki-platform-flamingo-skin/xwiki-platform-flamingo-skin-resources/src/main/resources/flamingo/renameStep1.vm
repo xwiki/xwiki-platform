@@ -38,6 +38,13 @@
           'label': 'core.rename.links.label',
           'hint': 'core.rename.links.hint'
         })
+        <dt>
+          <label>
+            <input type="checkbox" name="autoRedirect" value="true" checked="checked" />
+            $services.localization.render('core.rename.autoRedirect.label')
+          </label>
+          <span class="xHint">$services.localization.render('core.rename.autoRedirect.hint')</span>
+        </dt>
       </dl>
     </div>
     <div class="col-xs-12 col-lg-6">

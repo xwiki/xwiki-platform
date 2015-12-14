@@ -50,5 +50,9 @@ XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Hebdomadaire
 XWiki.WatchListClass_interval_realtime=Temps réel
 rendering.macro.watchlist.description=Affiche la liste des pages suivies
 rendering.macro.watchlist.name=Liste de suivi
+watchlist.notifications.changeStatusError=Impossible de modifier le status de suivi
+watchlist.notifications.icons.tooltip.page=Suivre cette page
+watchlist.notifications.icons.tooltip.pageAndChildren=Suivre cette page et les pages filles
+watchlist.notifications.icons.tooltip.wiki=Suivre ce wiki
 </content>
 </xwikidoc>

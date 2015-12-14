@@ -253,24 +253,11 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-rasterizer</artifactId>
-      <version>1.8</version>
-    </dependency>
-    <!-- css4j uses these, but in an older version; bump up the dependency version -->
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-css</artifactId>
-      <version>1.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-util</artifactId>
-      <version>1.8</version>
     </dependency>
     <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
-      <version>1.8</version>
       <scope>runtime</scope>
     </dependency>
 

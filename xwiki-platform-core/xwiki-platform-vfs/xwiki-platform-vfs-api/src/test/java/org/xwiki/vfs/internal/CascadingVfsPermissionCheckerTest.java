@@ -28,7 +28,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
-import org.xwiki.vfs.VfsPermissionChecker;
+import org.xwiki.vfs.VfsResourceReference;
 import org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker;
 
 import static org.junit.Assert.*;

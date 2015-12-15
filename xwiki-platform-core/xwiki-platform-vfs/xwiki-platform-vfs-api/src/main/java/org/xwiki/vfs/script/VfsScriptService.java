@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.vfs.VfsManager;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Offers scripting APIs for the VFS module.

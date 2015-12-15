@@ -22,6 +22,7 @@ package org.xwiki.vfs.internal;
 import java.net.URI;
 
 import org.junit.Test;
+import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.Assert.*;
 

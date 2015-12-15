@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.vfs.internal;
+package org.xwiki.vfs;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -38,6 +39,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 7.4M2
  */
+@Unstable
 public class VfsResourceReference extends AbstractResourceReference
 {
     /**

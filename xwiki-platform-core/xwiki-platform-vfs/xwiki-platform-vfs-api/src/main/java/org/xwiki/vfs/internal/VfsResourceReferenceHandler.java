@@ -43,6 +43,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.vfs.VfsPermissionChecker;
+import org.xwiki.vfs.VfsResourceReference;
 import org.xwiki.vfs.internal.attach.AttachDriver;
 
 import net.java.truevfs.access.TArchiveDetector;

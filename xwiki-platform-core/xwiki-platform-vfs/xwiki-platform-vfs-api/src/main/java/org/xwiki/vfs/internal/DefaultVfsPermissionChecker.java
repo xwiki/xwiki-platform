@@ -27,6 +27,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Generic Permission checked used when there's no scheme-specific Permission Checker and that verifies that the current

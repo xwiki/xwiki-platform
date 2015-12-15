@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Converts {@link String} into {@link VfsResourceReference} objects.

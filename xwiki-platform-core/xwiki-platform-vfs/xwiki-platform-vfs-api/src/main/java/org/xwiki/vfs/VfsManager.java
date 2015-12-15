@@ -21,7 +21,6 @@ package org.xwiki.vfs;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.vfs.internal.VfsResourceReference;
 
 /**
  * API to construct a VFS URL or access the content of an archive.

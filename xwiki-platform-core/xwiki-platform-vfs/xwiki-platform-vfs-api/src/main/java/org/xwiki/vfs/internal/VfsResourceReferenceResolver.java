@@ -36,6 +36,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractResourceReferenceResolver;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Transform VFS URLs into a typed Resource Reference. The URL format handled is {@code http://server/<servlet

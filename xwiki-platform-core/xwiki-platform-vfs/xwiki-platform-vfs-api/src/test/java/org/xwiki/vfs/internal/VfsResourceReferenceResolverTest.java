@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.Assert.assertEquals;
 

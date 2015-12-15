@@ -29,6 +29,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Verify VFS permission by first looking for a Permission Checker specific to a VFS URI scheme and if not found,

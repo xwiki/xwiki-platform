@@ -29,7 +29,7 @@ import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 import net.java.truevfs.access.TPath;
 

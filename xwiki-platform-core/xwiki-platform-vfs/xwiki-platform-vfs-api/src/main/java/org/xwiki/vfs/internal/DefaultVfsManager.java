@@ -27,6 +27,7 @@ import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsManager;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Default implementation of the {@link VfsManager} API.

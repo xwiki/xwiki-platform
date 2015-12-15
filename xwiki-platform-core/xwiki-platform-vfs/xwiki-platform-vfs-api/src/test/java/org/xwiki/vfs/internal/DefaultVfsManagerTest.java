@@ -30,6 +30,7 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsException;
+import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;

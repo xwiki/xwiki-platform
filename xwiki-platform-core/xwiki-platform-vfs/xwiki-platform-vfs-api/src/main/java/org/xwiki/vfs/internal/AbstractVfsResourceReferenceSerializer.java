@@ -31,6 +31,7 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Helper to implemet scheme-specific serializers to Converts a {@link VfsResourceReference} into a relative

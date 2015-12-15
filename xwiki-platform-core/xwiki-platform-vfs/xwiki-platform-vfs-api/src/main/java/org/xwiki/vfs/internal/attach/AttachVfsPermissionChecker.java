@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Permission checker for the Attach VFS which allows everyone to access it since it's safe as the Attach VFS driver

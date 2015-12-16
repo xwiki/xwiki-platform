@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>7.1.4-SNAPSHOT</version>
+    <version>7.1.4</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>

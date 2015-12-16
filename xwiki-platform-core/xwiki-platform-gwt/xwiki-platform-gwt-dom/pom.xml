@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-gwt</artifactId>
-    <version>7.1.4-SNAPSHOT</version>
+    <version>7.1.4</version>
   </parent>
   <artifactId>xwiki-platform-gwt-dom</artifactId>
   <name>XWiki Platform - GWT - DOM API</name>

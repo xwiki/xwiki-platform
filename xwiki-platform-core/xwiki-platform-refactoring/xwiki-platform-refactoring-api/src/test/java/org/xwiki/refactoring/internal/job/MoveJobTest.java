@@ -33,6 +33,7 @@ import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -222,5 +223,32 @@ public class MoveJobTest extends AbstractMoveJobTest
         run(request);
 
         verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"), null);
+    }
+
+    @Test
+    public void copyDocument() throws Exception
+    {
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(sourceReference)).thenReturn(true);
+
+        DocumentReference backLinkReference = new DocumentReference("wiki", "A", "BackLink");
+        when(this.modelBridge.getBackLinkedReferences(sourceReference)).thenReturn(Arrays.asList(backLinkReference));
+
+        DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
+        when(this.modelBridge.copy(sourceReference, copyReference, null)).thenReturn(true);
+
+        MoveRequest request = createRequest(sourceReference, copyReference.getParent());
+        request.setCheckRights(false);
+        request.setInteractive(false);
+        request.setDeleteSource(false);
+        run(request);
+
+        LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
+        verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),
+            any(DocumentReference.class));
+        verify(linkRefactoring).updateRelativeLinks(sourceReference, copyReference);
+
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
     }
 }

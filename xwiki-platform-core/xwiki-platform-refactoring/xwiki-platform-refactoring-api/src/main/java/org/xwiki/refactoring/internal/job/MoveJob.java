@@ -173,7 +173,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void move(DocumentReference oldReference, DocumentReference newReference)
     {
-        this.progressManager.pushLevelProgress(4, this);
+        this.progressManager.pushLevelProgress(5, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -209,7 +209,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
             // Step 5: Create an automatic redirect.
             this.progressManager.startStep(this);
-            if (this.request.isAutoRedirect()) {
+            if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);
             }
         } finally {

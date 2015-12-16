@@ -55,10 +55,10 @@ public abstract class AbstractContentResourceReferenceHandler extends AbstractRe
         // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
         // content type without affecting the stream (Tika may need to read a few bytes from the start of the
         // stream, in which case it will mark & reset the stream).
-        InputStream markResetSupportingStream = resourceStream;
-        if (!resourceStream.markSupported()) {
-            markResetSupportingStream = new BufferedInputStream(resourceStream);
-        }
+        //
+        // Note that even though the stream returned by TrueVFS returns true for markSupported() in practice it
+        // doesn't! Thus we need to wrap the stream to make it support mark and reset.
+        InputStream markResetSupportingStream = new BufferedInputStream(resourceStream);
 
         try {
             Response response = this.container.getResponse();

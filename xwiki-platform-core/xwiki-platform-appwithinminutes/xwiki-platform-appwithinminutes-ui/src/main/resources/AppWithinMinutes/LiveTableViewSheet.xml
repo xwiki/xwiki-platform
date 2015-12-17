@@ -121,8 +121,10 @@
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)
     = $services.localization.render('platform.appwithinminutes.appLiveTableHeading') =
-    ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
-    {{html}}$doc.getRenderedContent($doc.content, $doc.syntax.toIdString()).replace('{{', '&amp;#123;&amp;#123;'){{/html}}
+
+    ## The empty reference is resolved relative to the current document and thus produces the current document
+    ## reference, which means we are including the content of the current document.
+    {{include reference="" /}}
   #end
 #end
 {{/velocity}}</content>

@@ -1261,7 +1261,9 @@ ${Msz}Mb##
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
-{{html}}
+## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
+## attribute values (e.g. if the live table id contains whitespaces)
+{{html clean="false"}}
 #else {pre} #end
 #end
   ##

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-cache</artifactId>
-    <version>6.4-SNAPSHOT</version>
+    <version>6.4.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-cache-oscache</artifactId>
   <name>XWiki Platform - Cache - OSCache</name>

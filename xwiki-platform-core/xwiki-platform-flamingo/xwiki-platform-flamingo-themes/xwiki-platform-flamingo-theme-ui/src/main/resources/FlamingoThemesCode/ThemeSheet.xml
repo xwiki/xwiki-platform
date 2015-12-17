@@ -471,7 +471,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       var value = $("#var-logo").val();
       var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
       if (value == "") {
-        var url = "$xwiki.getSkinFile('logo.png')";
+        var url = "$xwiki.getSkinFile('logo.svg')";
         iFrameLogo.attr("src", url);
       } else {
         var url = $("#attachmentsURL").attr('data-value');

@@ -31,7 +31,7 @@
 ## Display the pretty name of a language
 ##########################################
 #macro(displayLanguagePrettyName $language)
-#if ($language == '')
+#if ($language != '')
 #set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))
 #else
 $services.localization.render('defaultlanguage')

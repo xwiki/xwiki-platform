@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-platform-flamingo</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.4.7</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-theme</artifactId>
   <packaging>xar</packaging>

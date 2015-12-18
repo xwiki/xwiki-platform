@@ -1,0 +1,41 @@
+$response.setContentType('application/json')
+#set ($result = {})
+
+#set ($jobId = $request.jobId)
+#if ("$!jobId" != '')
+  #set ($jobIdComponents = $jobId.split('/'))
+  #set ($jobIdComponents = [$jobIdComponents[0], $jobIdComponents[1], $jobIdComponents[2]])
+  #set ($jobStatus = $services.job.getJobStatus($jobIdComponents))
+  #if ($jobStatus)
+    #set ($action = "$!request.action")
+    #if ($action == 'getQuestion')
+      #if ($jobStatus.question)
+        #set ($sourceDocument = $xwiki.getDocument($jobStatus.question.source))
+        #set ($destinationDocument = $xwiki.getDocument($jobStatus.question.destination))
+        #set ($discard = $result.putAll({
+          'question' : $jobStatus.question,
+          'sourceTitle' : "$!{sourceDocument.plainTitle}",
+          'sourceURL' : "$!{sourceDocument.uRL}",
+          'destinationTitle' : "$!{destinationDocument.plainTitle}",
+          'destinationURL' : "$!{destinationDocument.uRL}"
+        }))
+      #end
+    #elseif ($action == 'answer')
+      #set ($overwrite = $request.overwrite == 'true')
+      #set ($discard = $jobStatus.question.setOverwrite($overwrite))
+      #set ($askAgain = $request.askAgain != 'false')
+      #set ($discard = $jobStatus.question.setAskAgain($askAgain))
+      #set ($discard = $jobStatus.answered())
+    #elseif ($action == 'cancel')
+      #set ($discard = $jobStatus.cancel())
+    #else
+      #set ($discard = $result.put('error', 'Action not supported.'))
+    #end
+  #else
+    #set ($discard = $result.put('error', "Job [${request.jobId}] does not exist."))
+  #end
+#else
+  #set ($discard = $result.put('error', 'No job ID specified.'))
+#end
+
+$jsontool.serialize($result)

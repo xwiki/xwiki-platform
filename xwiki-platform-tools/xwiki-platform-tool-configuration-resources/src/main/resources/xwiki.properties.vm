@@ -715,6 +715,11 @@ extension.oldflavors=$oldFlavor.trim()
 #-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
 # watchlist.realtime.enabled = false
 
+#-# [Since 7.1.5, 7.3.1, 7.4M3]
+#-# Controls if realtime notifications are triggered by remote events. Default value is false.
+#-# Enable if you don't have watchlist loaded on all instances in cluster.
+# watchlist.realtime.allow_remote = false
+
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------

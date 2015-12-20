@@ -36,11 +36,13 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.api.WatchListEventType;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
@@ -77,11 +79,22 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
         new DocumentUpdatedEvent(), new DocumentDeletedEvent());
 
     /**
+     * For parameters checking.
+     */
+    private static final String TRUE = "true";
+
+    /**
      * Used to detect if certain events are not independent, i.e. executed in the context of other events, case in which
      * they should be skipped.
      */
     @Inject
     private ObservationContext observationContext;
+
+    /**
+     * Used to obtain observation event context, i.e. if the event is remote.
+     */
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
 
     /**
      * Used to access watchlist data.
@@ -115,17 +128,35 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     private ConfigurationSource xwikiProperties;
 
     /**
+     * Allow processing of remote events.
+     */
+    private boolean allowRemote;
+
+    /**
      * Default constructor.
      */
     public RealtimeNotificationGenerator()
     {
         super(LISTENER_NAME, EVENTS);
+        allowRemote = false;
+    }
+
+    /**
+     * Component manager initialize class. Called after all dependencies are injected.
+     *
+     * @throws InitializationException if component isn't properly initialized
+     */
+    public void initialize() throws InitializationException
+    {
+        if (TRUE.equals(xwikiProperties.getProperty("watchlist.realtime.allow_remote"))) {
+            allowRemote = true;
+        }
     }
 
     @Override
     public List<Event> getEvents()
     {
-        if ("true".equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
+        if (TRUE.equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
             // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then enable
             // this event listener.
             return super.getEvents();
@@ -138,6 +169,12 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        // Early check if event should be processed.
+        if (this.remoteObservationManagerContext.isRemoteState() && !this.allowRemote) {
+            // Don't handle remote events to avoid duplicated processing.
+            return;
+        }
+
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 

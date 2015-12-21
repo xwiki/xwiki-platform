@@ -45,7 +45,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <type>pom</type>
-      <version>7.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

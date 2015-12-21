@@ -1,4 +1,4 @@
-## TODO: use the xwiki select widget: http://jira.xwiki.org/browse/XWIKI-12503
+/* TODO: use the xwiki select widget: http://jira.xwiki.org/browse/XWIKI-12503 */
 #template('colorThemeInit.vm')
 
 .xwiki-flavor-picker {

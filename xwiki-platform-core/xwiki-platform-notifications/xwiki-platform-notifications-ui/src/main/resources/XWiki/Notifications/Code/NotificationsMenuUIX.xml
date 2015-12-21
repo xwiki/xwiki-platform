@@ -152,7 +152,7 @@
       <name>org.xwiki.plaftorm.notifications.ui</name>
     </property>
     <property>
-      <parameters>order=30000</parameters>
+      <parameters>order=20000</parameters>
     </property>
     <property>
       <scope>wiki</scope>

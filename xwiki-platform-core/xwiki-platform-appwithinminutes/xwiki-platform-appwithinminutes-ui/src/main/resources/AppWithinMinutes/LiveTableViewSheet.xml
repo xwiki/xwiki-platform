@@ -121,10 +121,16 @@
   ## Display the live table only if it was generated.
   #if($doc.content.length() &gt; 0)
     = $services.localization.render('platform.appwithinminutes.appLiveTableHeading') =
-
-    ## The empty reference is resolved relative to the current document and thus produces the current document
-    ## reference, which means we are including the content of the current document.
-    {{include reference="" /}}
+    ## We don't use the Include macro (with empty reference) because we want the content to be executed with the rights
+    ## of the current document rather than the rights of the sheet. This is important because the user can modify the
+    ## content of the application home page which means we could execute untrusted content with the rights of the sheet.
+    ## Ideally we should use the Display macro with a parameter to disable the sheet, but we don't have this parameter.
+    ## We don't clean the HTML content because getRenderedContent() should produce clean HTML, unless the user has 
+    ## disabled the HTML cleaning, in which case he will get what he asked for. Note that one good reason to disable
+    ## HTML cleaning is to preserve the whitespaces in the attribute values.
+    ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
+    {{html clean="false"}}$doc.getRenderedContent($doc.content,
+      $doc.syntax.toIdString()).replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
   #end
 #end
 {{/velocity}}</content>

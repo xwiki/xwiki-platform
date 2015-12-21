@@ -20,27 +20,35 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="XWiki.AdminPageAndChildrenRightsSheet" locale="">
   <web>XWiki</web>
-  <name>AdminRightsSheet</name>
+  <name>AdminPageAndChildrenRightsSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1211801338000</creationDate>
+  <creationDate>1450720610000</creationDate>
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1213904460000</date>
-  <contentUpdateDate>1213904460000</contentUpdateDate>
+  <date>1450720688000</date>
+  <contentUpdateDate>1450720688000</contentUpdateDate>
   <version>1.1</version>
-  <title>AdminRightsSheet</title>
+  <title>AdminPageAndChildrenRightsSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-## Administrate the rights in a wiki globally.
+{{info}}
+  #set($webHomeRef = $services.model.resolveDocument('WebHome'))
+  ## For the children link, we do not use 'viewer=children' because the WebHome might not exist and the viewer shows a 
+  ## 404 error in that case. Instead, we use 'xpage=children' because it always works, and because children document
+  ## could exist even if the parent document does not.
+  $services.localization.render('admin.pageandchildrenrights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
+{{/info}}
+
+### Administrate the rights in a space (page + children = space).
 {{html}}
 #template('rightsUI.vm')
 {{/html}}

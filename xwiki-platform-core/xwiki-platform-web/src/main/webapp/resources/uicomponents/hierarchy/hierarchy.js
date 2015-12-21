@@ -23,9 +23,9 @@
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
   'use strict';
-  
+
   $(document).ready(function() {
-    
+
     /**
      * Function that expand a breadcumb on some events.
      */
@@ -52,7 +52,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
           ellipsis.removeClass('loading');
         });
     };
-  
+
    /**
     * Add a link to expand breadcrumbs.
     */
@@ -67,14 +67,14 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         }
       });
     };
-    
+
     addExpandLinkToBreadcrumbs();
-    
+
     // Initialize breadcrumbs on livetable refresh (because now livetables could have breadcrumbs to display locations)
     $(document).on('xwiki:livetable:displayComplete', addExpandLinkToBreadcrumbs);
-    
+
   });
-  
+
 });
 
 /**
@@ -82,11 +82,6 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
  */
 require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
   require(['tree', 'bootstrap'], function($) {
-    $('ol.breadcrumb > li.dropdown > .dropdown-menu').click(function(event) {
-      // Prevent the drop-down from closing when the user expands the tree nodes.
-      event.stopPropagation();
-    });
-
     var enhanceBreadcrumb = function(breadcrumb) {
       breadcrumb.children('li.dropdown').on('shown.bs.dropdown', function(event) {
         $(this).find('.dropdown-menu > .breadcrumb-tree').each(function() {
@@ -99,6 +94,9 @@ require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar'
             });
           }
         });
+      }).children('.dropdown-menu').click(function(event) {
+        // Prevent the drop-down from closing when the user expands the tree nodes.
+        event.stopPropagation();
       });
     };
 

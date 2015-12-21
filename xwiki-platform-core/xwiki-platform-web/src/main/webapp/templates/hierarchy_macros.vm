@@ -171,8 +171,10 @@
     #if ($index > 0 && $openTo.type != 'WIKI')
       #set ($root = $pathData.get($mathtool.sub($index, 1)).reference)
       #if ($root.type == 'ellipsis')
-        #set ($root = $openTo.parent)
-      #elseif ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+        ## $openTo may have been converted to a document reference above so we take the parent from its initial value.
+        #set ($root = $pathData.get($openToIndex).reference.parent)
+      #end
+      #if ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
         ## The tree shows nested documents.
         #set ($root = $services.model.resolveDocument('', 'default', $root))
       #end

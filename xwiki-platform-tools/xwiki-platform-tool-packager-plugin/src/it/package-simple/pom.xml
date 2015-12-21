@@ -28,7 +28,7 @@
     <artifactId>xwiki-platform-tools</artifactId>
     <version>@project.version@</version>
   </parent>
-  <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-package-simple</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Tools - Packager - Test - Simple</name>
   <description>XWiki Platform - Tools - Packager - Test - Simple</description>

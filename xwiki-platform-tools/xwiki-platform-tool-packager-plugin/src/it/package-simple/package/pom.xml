@@ -25,10 +25,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tool-packager-plugin-it-simple</artifactId>
+    <artifactId>xwiki-platform-tool-packager-plugin-it-package-simple</artifactId>
     <version>@project.version@</version>
   </parent>
-  <artifactId>xwiki-platform-tool-packager-plugin-it-simple-package</artifactId>
+  <artifactId>xwiki-platform-tool-packager-plugin-it-package-simple-package</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Tools - Packager - Test - Simple - Package</name>
   <description>XWiki Platform - Tools - Packager - Test - Simple - Package</description>
@@ -36,7 +36,7 @@
     <!-- This XAR will be installed in the packaged XWiki -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tool-packager-plugin-it-simple-dependency</artifactId>
+      <artifactId>xwiki-platform-tool-packager-plugin-it-package-simple-dependency</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

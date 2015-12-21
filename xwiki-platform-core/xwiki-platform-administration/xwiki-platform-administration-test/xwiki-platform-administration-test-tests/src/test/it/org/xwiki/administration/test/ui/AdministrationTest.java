@@ -81,8 +81,8 @@ public class AdministrationTest extends AbstractTest
 
         Assert.assertTrue(spaceAdministrationPage.hasSection("Presentation"));
         Assert.assertTrue(spaceAdministrationPage.hasSection("Elements"));
-        Assert.assertTrue(spaceAdministrationPage.hasSection("Rights: Page & Children"));
-        Assert.assertTrue(spaceAdministrationPage.hasSection("Rights: Page"));
+        Assert.assertTrue(spaceAdministrationPage.hasSection("PageAndChildrenRights"));
+        Assert.assertTrue(spaceAdministrationPage.hasSection("PageRights"));
 
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Editing"));

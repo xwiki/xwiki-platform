@@ -1413,6 +1413,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .xform select, .xform textarea {
   width: 99%;
 }
+/* Don't resize inputs which size has been "hardcoded" as element attribute */
+.xform input[type="text"][size], .xform input[type="password"][size] {
+  width:auto;
+}
+
 .xform textarea {
   resize: vertical;
 }

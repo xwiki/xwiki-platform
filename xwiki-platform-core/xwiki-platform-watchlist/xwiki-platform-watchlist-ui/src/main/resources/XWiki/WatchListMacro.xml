@@ -151,7 +151,7 @@ span.wikiWatchlistType {
 }
 
 span.spaceWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat;
+  background: url("$xwiki.getSkinFile('icons/silk/sitemap.png')") no-repeat;
 }
 
 span.documentWatchlistType {
@@ -291,12 +291,11 @@ span.documentWatchlistType {
 $xwiki.ssx.use("XWiki.WatchListMacro")
 {{html wiki="true"}}
 &lt;div class="watchlistContainer"&gt;
-  #set($collist = ["type", "wiki","space", "document", "actions"])
+  #set($collist = ['type', 'location', 'scope', 'actions'])
   #set($colprops = { 
       "type": { "sortable":false },
-      "wiki": { "sortable":false },
-      "space": { "sortable":false },
-      "document": { "sortable":false },
+      "location": { "sortable":false },
+      "scope": { "sortable":false },
       "actions": { "sortable":false }
   })
   #set($options = { "resultPage" : "XWiki.XWikiUserWatchListLiveTableResults",
@@ -305,22 +304,15 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
       "translationPrefix": "watchlist.table.",
       "callback": "function (row, i, table) {
                       var tr = new Element('tr');
-                      tr.insert(new Element('td').insert(new Element('span').addClassName(row.type + 'WatchlistType')));
-                      if (row.wikiUrl) {
-                        tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
-                      } else {
-                        tr.insert(new Element('td').update(row.wikiName));
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.type')))'}).insert(new Element('span').addClassName(row.type + 'WatchlistType')));
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.location')))'}).update(row.location));
+                      var scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.pageandchildren')))';
+                      if (row.type == 'document') {
+                        scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.pageonly')))';
+                      } else if (row.type == 'wiki') {
+                        scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.wiki')))';
                       }
-                      if (row.spaceUrl) {
-                        tr.insert(new Element('td').insert(new Element('a', { href : row.spaceUrl}).update(row.spaceName)));
-                      } else {
-                        tr.insert(new Element('td').update(row.spaceName));
-                      }
-                      if (row.pageUrl) {
-                        tr.insert(new Element('td').insert(new Element('a', { href : row.pageUrl}).update(row.pageName)));
-                      } else {
-                        tr.insert(new Element('td').update(row.pageName));
-                      }
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope')))'}).update(scope));
                       var deleteLink = new Element('a', {
                          href : row.deleteUrl,
                          title : '$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))'
@@ -349,7 +341,7 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
                           window.location = row.deleteUrl + separator + 'xredirect=' + window.location;
                         }
                       }.bind(this));
-                      tr.insert(new Element('td').insert(deleteLink));
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.actions')))'}).insert(deleteLink));
                       return tr;
                    }" })
 

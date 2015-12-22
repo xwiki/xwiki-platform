@@ -40,6 +40,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity wiki="false"}}
+#template('hierarchy_macros.vm')
 #if ($xcontext.action == 'get')
 ##
 #macro (getWikiPrettyName $wikiName)
@@ -57,59 +58,19 @@
 #if ($pageDocument &amp;&amp; !$pageDocument.isNew())${pageDocument.plainTitle}#else${pageReference.name}#end
 #end
 ##
-#macro(addElement $type $wiki $spaceRef $pageRef)
-  #if ("$!pageRef" == '')
-    #set ($pageName = "$!services.localization.render('watchlist.table.alldocuments')")
-    #set ($pageURL = '')
-  #else
-    #set ($pageName = "#getPagePrettyName($pageRef)")
-    #set ($pageURL = "$!xwiki.getURL($pageRef)")
-  #end
-
-  #if ("$!spaceRef" == '' &amp;&amp; "$!pageRef" == '')
-    #set ($spaceName = "$!services.localization.render('watchlist.table.allspaces')")
-    #set ($spaceURL = '')
-  #else
-    #if ("$!spaceRef" == '')
-      #set ($spaceRef = $pageRef.lastSpaceReference)
-    #end
-    #set ($spaceName = "$!services.model.serialize($spaceRef, 'local')")
-    #set ($spaceURL = "$!xwiki.getURL($spaceRef)")
-  #end
-
-  #if ("$!wiki" == '')
-    #if ("$!spaceRef" == '')
-      #set ($wiki = $pageRef.wikiReference.name)
-    #else
-      #set ($wiki = $spaceRef.wikiReference.name)
-    #end
-  #end
-  #set ($wikiName = "#getWikiPrettyName($wiki)")
-  #set ($wikiDescriptor = $services.wiki.getById($wiki))
-  #if ($wikiDescriptor)
-    #set ($wikiHomeDocRef = $wikiDescriptor.mainPageReference)
-    #set ($wikiURL = $xwiki.getURL($wikiHomeDocRef))
-  #else
-    #set ($wikiURL = '')
-  #end
-
+#macro(addElement $type $reference)
   #if ($type == 'wiki')
     #set ($id = $wiki)
   #elseif ($type == 'space')
-    #set ($id = $services.model.serialize($spaceRef, 'default'))
+    #set ($id = $services.model.serialize($reference, 'default'))
   #elseif ($type == 'document')
-    #set ($id = $services.model.serialize($pageRef, 'default'))
+    #set ($id = $services.model.serialize($reference, 'default'))
   #end
-
+  #set($location = "#hierarchy($reference, {'limit': 5, 'plain': false, 'local': false, 'displayTitle': false})")
   #set ($discard = $elements.add({
     'id'        : $id,
     'type'      : $type,
-    'wikiName'  : $wikiName,
-    'wikiUrl'   : $wikiURL,
-    'spaceName' : $spaceName,
-    'spaceUrl'  : $spaceURL,
-    'pageName'  : $pageName,
-    'pageUrl'   : $pageURL,
+    'location'  : $location,
     'deleteUrl' : $doc.getURL('view', "xpage=watch&amp;do=remove${type}&amp;reference=${escapetool.url($id)}")
   }))
 #end
@@ -123,21 +84,21 @@
 ## Wikis
 #foreach ($wiki in $wikis)
   #if ("$!wiki" != '')
-    #addElement('wiki', $wiki, '', '')
+    #addElement('wiki', $services.model.createWikiReference($wiki))
   #end
 #end
 ## Spaces
 #foreach ($space in $spaces)
   #if ("$!space" != '')
     #set ($spaceRef = $services.model.resolveSpace($space))
-    #addElement('space', '', $spaceRef, '')
+    #addElement('space', $spaceRef)
   #end
 #end
 ## Documents
 #foreach ($document in $documents)
   #if ("$!document" != '')
     #set ($documentRef = $services.model.resolveDocument($document))
-    #addElement('document', '', '', $documentRef)
+    #addElement('document', $documentRef)
   #end
 #end
 ##

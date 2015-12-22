@@ -112,27 +112,32 @@
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #submenuitem()
   ##
-  ## Get the annotation configuration
+  ## The annotation feature can only work on the default view page. So display the button only if no viewer is used.
   ##
-  #set($config               = 'AnnotationCode.AnnotationConfig')
-  #set($configObj            = $xwiki.getDocument($config).getObject($config))
-  #set($annotationsActivated = "$!configObj.getValue('activated')" == '1')
-  #set($exceptionSpaces      = $configObj.getValue('exceptionSpaces'))
-  ##
-  ## The annotations UIX is displayed if:
-  ## * the annotations are activated, and the current space is not an exception of this rule
-  ## OR
-  ## * the annotations are displayed globally, but the current space is an exception of this rule
-  #if (($annotationsActivated &amp;&amp; !$exceptionSpaces.contains($doc.space)) || (!$annotationsActivated &amp;&amp; $exceptionSpaces.contains($doc.space)))
-    #template('menus_macros.vm')
+  #if ($xcontext.action == 'view' &amp;&amp; ("$!request.viewer" == '' || "$!request.viewer" == 'content'))
     ##
-    ## Display the annotations activator link
+    ## Get the annotation configuration
     ##
-    #set ($linkURL = '#Annotations')
-    #if ("$!configObj.getValue('annotationClass')" == 'XWiki.XWikiComments')
-      #set ($linkURL = '#Comments')
+    #set($config               = 'AnnotationCode.AnnotationConfig')
+    #set($configObj            = $xwiki.getDocument($config).getObject($config))
+    #set($annotationsActivated = "$!configObj.getValue('activated')" == '1')
+    #set($exceptionSpaces      = $configObj.getValue('exceptionSpaces'))
+    ##
+    ## The annotations UIX is displayed if:
+    ## * the annotations are activated, and the current space is not an exception of this rule
+    ## OR
+    ## * the annotations are displayed globally, but the current space is an exception of this rule
+    #if (($annotationsActivated &amp;&amp; !$exceptionSpaces.contains($doc.space)) || (!$annotationsActivated &amp;&amp; $exceptionSpaces.contains($doc.space)))
+      #template('menus_macros.vm')
+      ##
+      ## Display the annotations activator link
+      ##
+      #set ($linkURL = '#Annotations')
+      #if ("$!configObj.getValue('annotationClass')" == 'XWiki.XWikiComments')
+        #set ($linkURL = '#Comments')
+      #end
+      #submenuitem($linkURL, $services.localization.render('annotations.title'), 'tmAnnotationsTrigger', 'tme', 'edit')
     #end
-    #submenuitem($linkURL, $services.localization.render('annotations.title'), 'tmAnnotationsTrigger', 'tme', 'edit')
   #end
 {{/html}}{{/velocity}}
 </content>

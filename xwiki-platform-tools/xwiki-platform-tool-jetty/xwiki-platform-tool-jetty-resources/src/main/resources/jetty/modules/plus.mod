@@ -18,15 +18,18 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+#
+# Jetty Plus module
+#
+
 [depend]
-ext
-resources
 server
-logging
-http
-annotations
-deploy
-requestlog
+security
+jndi
+webapp
+
+[lib]
+lib/jetty-plus-${jetty.version}.jar
 
 [xml]
-etc/jetty-notify-ready.xml
+etc/jetty-plus.xml

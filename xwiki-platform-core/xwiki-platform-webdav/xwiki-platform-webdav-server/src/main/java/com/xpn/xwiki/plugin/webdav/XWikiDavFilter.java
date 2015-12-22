@@ -27,16 +27,19 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.webdav.DavMethods;
 
 /**
- * The filter used to bypass the DefaultServlet of the servlet container.
- * 
+ * The filter used to bypass the DefaultServlet of the servlet container (we steal the webdav requests made to the
+ * application root).
+ *
  * @version $Id$
  */
+@WebFilter(filterName = "webdavfilter", displayName = "WebDAV Filter", urlPatterns = { "/*" })
 public class XWikiDavFilter implements Filter
 {
     @Override

@@ -83,12 +83,6 @@
     <filter-class>org.xwiki.wysiwyg.server.filter.ConversionFilter</filter-class>
   </filter>
 
-  <!-- Filter used to 'steal' webdav requests made to the application root -->
-  <filter>
-    <filter-name>DavFilter</filter-name>
-    <filter-class>com.xpn.xwiki.plugin.webdav.XWikiDavFilter</filter-class>
-  </filter>
-
   <!-- A filter that dispatches requests to the right action depending on the button pressed in the editing form. This
        is needed when javascript is disabled, since the browser cannot send the form data to different URLs depending on
        the button pressed. -->
@@ -174,11 +168,6 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>
-
-  <filter-mapping>
-    <filter-name>DavFilter</filter-name>
-    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <filter-mapping>
@@ -304,12 +293,6 @@
     <servlet-class>com.xpn.xwiki.gwt.api.server.XWikiServiceImpl</servlet-class>
   </servlet>
 
-  <!-- WebDAV servlet -->
-  <servlet>
-   <servlet-name>webdav</servlet-name>
-   <servlet-class>com.xpn.xwiki.plugin.webdav.XWikiDavServlet</servlet-class>
-  </servlet>
-
   <!-- RESTful API Restlet servlet -->
   <servlet>
     <servlet-name>RestletServlet</servlet-name>
@@ -357,11 +340,6 @@
   <servlet-mapping>
     <servlet-name>XWikiService</servlet-name>
     <url-pattern>/XWikiService</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-   <servlet-name>webdav</servlet-name>
-   <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
   <!-- We override the mime type definition for javascript and css files, as some containers don't

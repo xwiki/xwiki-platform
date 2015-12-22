@@ -41,11 +41,13 @@
              since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
              tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
 
-        <!-- Prevent any JAR scanning for tlds, etc, in order to improve startup speed. Seems it makes us win about
-             10% on startup time. -->
+        <!-- Prevent JAR scanning for tlds, annotations, etc, in order to improve startup speed. Seems it makes us win
+             about 10% on startup time. -->
         <Call name="setContextAttribute">
           <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-          <Arg>somethingnotmatching.jar</Arg>
+          <!-- Since we've moved WebDAV Servlet/Filter configuration to Servlet 3.0 annotations, we need to tell Jetty
+               to scan the XWiki WebDAV JAR -->
+          <Arg>.*xwiki-platform-webdav-server-.*\.jar</Arg>
         </Call>
 
         <Call name="addAppProvider">

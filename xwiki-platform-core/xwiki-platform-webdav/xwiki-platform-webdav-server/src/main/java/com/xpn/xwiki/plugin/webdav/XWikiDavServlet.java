@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.webdav;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,6 +55,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
+@WebServlet(name = "webdav", displayName = "WebDAV", urlPatterns = { "/webdav/*" })
 public class XWikiDavServlet extends AbstractWebdavServlet
 {
     /**

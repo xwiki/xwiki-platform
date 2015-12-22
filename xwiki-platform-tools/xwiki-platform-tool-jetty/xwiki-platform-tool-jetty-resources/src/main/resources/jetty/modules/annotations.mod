@@ -18,15 +18,21 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+#
+# Jetty Annotation Scanning Module
+#
+
 [depend]
-ext
-resources
-server
-logging
-http
-annotations
-deploy
-requestlog
+# Annotations needs plus, and jndi features
+plus
+
+[lib]
+# Annotations needs jetty annotation jars
+lib/jetty-annotations-${jetty.version}.jar
+# Need annotation processing jars too
+lib/asm-*.jar
+lib/javax.annotation-api-*.jar
 
 [xml]
-etc/jetty-notify-ready.xml
+# Enable annotation scanning webapp configurations
+etc/jetty-annotations.xml

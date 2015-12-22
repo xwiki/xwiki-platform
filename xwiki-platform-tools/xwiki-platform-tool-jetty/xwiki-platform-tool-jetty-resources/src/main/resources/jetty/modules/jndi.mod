@@ -18,15 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-[depend]
-ext
-resources
-server
-logging
-http
-annotations
-deploy
-requestlog
+#
+# JNDI Support
+#
 
-[xml]
-etc/jetty-notify-ready.xml
+[depend]
+server
+
+[lib]
+lib/jetty-jndi-${jetty.version}.jar
+lib/javax.mail*.jar
+lib/javax.transaction*.jar

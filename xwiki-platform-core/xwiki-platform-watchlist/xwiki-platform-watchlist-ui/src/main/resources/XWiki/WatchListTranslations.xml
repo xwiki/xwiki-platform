@@ -56,6 +56,13 @@ watchlist.notifications.icons.tooltip.page=Watch this page
 watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and children
 watchlist.notifications.icons.tooltip.wiki=Watch this wiki
 watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
+
+### Watchlist livetable (in the macro)
+watchlist.table.scope.wiki=All pages of the wiki
+watchlist.table.scope.pageandchildren=Page + Children
+watchlist.table.scope.pageonly=Page Only
+watchlist.table.location=Location
+watchlist.table.scope=Scope
   </content>
   <object>
     <name>XWiki.WatchListTranslations</name>

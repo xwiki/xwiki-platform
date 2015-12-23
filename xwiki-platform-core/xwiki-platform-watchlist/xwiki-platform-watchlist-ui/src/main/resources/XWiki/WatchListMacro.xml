@@ -304,14 +304,20 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
       "translationPrefix": "watchlist.table.",
       "callback": "function (row, i, table) {
                       var tr = new Element('tr');
-                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.type')))'}).insert(new Element('span').addClassName(row.type + 'WatchlistType')));
-                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.location')))'}).update(row.location));
-                      var scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.pageandchildren')))';
+                      var typeIcon = '';
+                      var scope = '';
                       if (row.type == 'document') {
+                        typeIcon = '$escapetool.javascript($services.icon.renderHTML('page'))';
                         scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.pageonly')))';
-                      } else if (row.type == 'wiki') {
+                      } else if (row.type == 'space') {
+                        typeIcon = '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))';
+                        scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.pageandchildren')))';  
+                      } else if (row.type == 'wiki') {
+                        typeIcon = '$escapetool.javascript($services.icon.renderHTML('wiki'))';
                         scope = '$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope.wiki')))';
                       }
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.type')))'}).update(typeIcon));
+                      tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.location')))'}).update(row.location));
                       tr.insert(new Element('td', {'data-title':'$escapetool.javascript($escapetool.xml($services.localization.render('watchlist.table.scope')))'}).update(scope));
                       var deleteLink = new Element('a', {
                          href : row.deleteUrl,

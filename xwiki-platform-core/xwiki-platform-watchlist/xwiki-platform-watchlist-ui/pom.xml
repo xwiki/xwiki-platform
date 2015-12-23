@@ -75,6 +75,13 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Needed to have nice icons in the Watchlist livetable -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Needed to have a nice toggle buttons on watchlist notifications area. -->
     <dependency>
       <groupId>org.webjars</groupId>

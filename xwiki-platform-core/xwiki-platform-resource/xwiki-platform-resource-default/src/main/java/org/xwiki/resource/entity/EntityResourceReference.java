@@ -27,7 +27,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class EntityResourceReference extends AbstractResourceReference
 {
     /**

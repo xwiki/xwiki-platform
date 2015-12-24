@@ -20,7 +20,6 @@
 package org.xwiki.lesscss.resources;
 
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.stability.Unstable;
 
 /**
  * A reference to a LESS resource.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M2
  * @version $Id$
  */
-@Unstable
 public interface LESSResourceReference
 {
     @Override

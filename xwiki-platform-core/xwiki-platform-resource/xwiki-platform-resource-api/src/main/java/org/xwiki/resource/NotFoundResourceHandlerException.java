@@ -19,15 +19,12 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Whenever a Resource Handler doesn't exist for handling a given Resource Reference.
  *
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class NotFoundResourceHandlerException extends ResourceReferenceHandlerException
 {
     /**

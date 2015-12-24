@@ -21,7 +21,6 @@ package org.xwiki.security.authorization;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * This API is for checking the access rights of current user in the current context. It replaces
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1RC1
  */
 @Role
-@Unstable
 public interface ContextualAuthorizationManager
 {
     /**

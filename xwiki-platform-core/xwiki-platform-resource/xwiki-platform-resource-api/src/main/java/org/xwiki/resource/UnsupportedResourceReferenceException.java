@@ -19,15 +19,12 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Means the Resource Reference is of a type for which we don't have an implementation for.
  *
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class UnsupportedResourceReferenceException extends Exception
 {
     /**

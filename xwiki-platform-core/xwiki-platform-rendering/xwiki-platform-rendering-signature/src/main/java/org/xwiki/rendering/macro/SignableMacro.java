@@ -23,7 +23,6 @@ import org.xwiki.crypto.pkix.CertificateProvider;
 import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Mixin interface providing additional signature functionality to a macro.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public interface SignableMacro
 {
     /**

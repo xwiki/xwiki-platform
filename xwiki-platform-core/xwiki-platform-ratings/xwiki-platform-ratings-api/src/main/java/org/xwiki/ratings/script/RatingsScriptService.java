@@ -36,7 +36,6 @@ import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -50,7 +49,6 @@ import com.xpn.xwiki.api.Document;
 @Component
 @Singleton
 @Named("ratings")
-@Unstable
 public class RatingsScriptService implements ScriptService
 {
     @Inject

@@ -19,9 +19,8 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.filter.FilterException;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Used to indicate that the parsed entity should be skipped.
@@ -29,7 +28,6 @@ import org.xwiki.filter.FilterException;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public class SkipEntityException extends FilterException
 {
     /**

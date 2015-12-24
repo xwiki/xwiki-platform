@@ -22,7 +22,6 @@ package org.xwiki.ratings;
 import java.util.Date;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -33,7 +32,6 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 6.4M3
  */
-@Unstable
 public interface Rating
 {
     /**

@@ -19,15 +19,12 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a problem when handling a {@link org.xwiki.resource.ResourceReference}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class ResourceReferenceHandlerException extends Exception
 {
     /**

@@ -22,7 +22,6 @@ package org.xwiki.resource;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Transforms some representation of an XWiki Resource Reference (aka a URI) into a {@link ResourceReference} instance.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface ResourceReferenceResolver<T>
 {
     /**

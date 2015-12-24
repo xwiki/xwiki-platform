@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +42,6 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 @Component
 @Singleton
-@Unstable
 // TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<RatingsManager>
 {

@@ -23,7 +23,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Send mails.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface MailSender
 {
     /**

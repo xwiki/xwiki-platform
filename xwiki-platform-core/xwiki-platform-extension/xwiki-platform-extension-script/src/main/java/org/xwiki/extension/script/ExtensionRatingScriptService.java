@@ -19,11 +19,11 @@
  */
 package org.xwiki.extension.script;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import java.util.Collection;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
@@ -33,7 +33,6 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.rating.Ratable;
 import org.xwiki.extension.version.Version;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various script APIs related to ratable extensions.
@@ -44,7 +43,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionRatingScriptService.ID)
 @Singleton
-@Unstable
 public class ExtensionRatingScriptService extends AbstractExtensionScriptService
 {
     /**

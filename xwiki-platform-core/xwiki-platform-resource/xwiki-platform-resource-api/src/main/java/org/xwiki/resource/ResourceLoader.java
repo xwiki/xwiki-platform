@@ -22,7 +22,6 @@ package org.xwiki.resource;
 import java.io.InputStream;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Load Resources pointed to by Resource Reference as a Input Stream.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface ResourceLoader<T extends ResourceReference>
 {
     /**

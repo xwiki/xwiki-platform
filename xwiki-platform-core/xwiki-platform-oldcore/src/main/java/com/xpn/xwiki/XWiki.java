@@ -151,7 +151,6 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.velocity.VelocityManager;
@@ -1608,7 +1607,6 @@ public class XWiki implements EventListener
      *
      * @since 5.0M1
      */
-    @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
         return getDocument(getCurrentGetDocumentResolver().resolve(reference), context);
@@ -6733,7 +6731,6 @@ public class XWiki implements EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
-    @Unstable
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -6792,7 +6789,6 @@ public class XWiki implements EventListener
      * @see #searchAttachments(String, boolean, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
-    @Unstable
     public int countAttachments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {

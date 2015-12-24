@@ -21,7 +21,6 @@ package org.xwiki.lesscss.internal.skin;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 /**
  * A specialized implementation of {@link SkinReference} for any skin stored as a document in the wiki.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M2
  * @version $Id$
  */
-@Unstable
 public class DocumentSkinReference implements SkinReference
 {
     private DocumentReference skinDocument;

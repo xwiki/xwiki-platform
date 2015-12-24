@@ -19,15 +19,12 @@
  */
 package org.xwiki.icon;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception relating to icon manipulations.
  *
  * @since 6.2M1
  * @version $Id$
  */
-@Unstable
 public class IconException extends Exception
 {
     /**

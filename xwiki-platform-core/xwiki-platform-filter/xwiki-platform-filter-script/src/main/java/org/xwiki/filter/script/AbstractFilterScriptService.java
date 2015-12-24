@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import org.xwiki.context.Execution;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all FilterStream related script services.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public abstract class AbstractFilterScriptService implements ScriptService
 {
     /**

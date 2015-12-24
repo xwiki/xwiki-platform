@@ -22,8 +22,6 @@ package org.xwiki.mail;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * XWiki Java Mail Authenticator taking the user name and password from a
  * {@link org.xwiki.mail.MailSenderConfiguration} instance.
@@ -31,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class XWikiAuthenticator extends Authenticator
 {
     private String username;

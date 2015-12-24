@@ -22,7 +22,6 @@ package org.xwiki.icon;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to get the icon sets from the Wiki instance (from the WAR of from a wiki page).
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface IconSetManager
 {
     /**

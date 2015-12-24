@@ -21,7 +21,6 @@ package org.xwiki.icon;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A cache to store the already loaded icon sets.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface IconSetCache
 {
     /**

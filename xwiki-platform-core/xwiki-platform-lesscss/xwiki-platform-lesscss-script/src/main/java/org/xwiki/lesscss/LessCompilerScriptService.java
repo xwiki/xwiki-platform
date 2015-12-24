@@ -40,7 +40,6 @@ import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -53,7 +52,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("lesscss")
 @Singleton
-@Unstable
 public class LessCompilerScriptService implements ScriptService
 {
     @Inject

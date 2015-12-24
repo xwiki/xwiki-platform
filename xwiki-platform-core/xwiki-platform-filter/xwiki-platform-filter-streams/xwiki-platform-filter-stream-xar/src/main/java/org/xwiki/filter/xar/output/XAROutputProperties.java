@@ -22,7 +22,6 @@ package org.xwiki.filter.xar.output;
 import org.xwiki.filter.xml.output.XMLOutputProperties;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.stability.Unstable;
 
 /**
  * XAR output properties.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public class XAROutputProperties extends XMLOutputProperties
 {
     /**

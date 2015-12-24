@@ -23,7 +23,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Save, load and delete mail content.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M3
  */
 @Role
-@Unstable
 public interface MailContentStore
 {
     /**

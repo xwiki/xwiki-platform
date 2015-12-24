@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for a signable macro which does not support any parameter.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public abstract class AbstractNoParameterSignableMacro extends AbstractSignableMacro<Object>
 {
     /**

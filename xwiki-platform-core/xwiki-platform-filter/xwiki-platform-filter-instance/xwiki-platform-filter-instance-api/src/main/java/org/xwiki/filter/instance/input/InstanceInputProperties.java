@@ -27,7 +27,6 @@ import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.stability.Unstable;
 
 /**
  * The properties passed to the instance input wiki stream.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public class InstanceInputProperties extends HashMap<String, Object> implements RawProperties, FilterStreamProperties
 {
     private static final String PROPNAME_ENTITIES = "entities";

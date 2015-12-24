@@ -19,8 +19,6 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Helper to implement Resource Handlers, providing some default implementation. We recommend Handler writers to extend
  * this class.
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public abstract class AbstractResourceReferenceHandler<T> implements ResourceReferenceHandler<T>
 {
     /**

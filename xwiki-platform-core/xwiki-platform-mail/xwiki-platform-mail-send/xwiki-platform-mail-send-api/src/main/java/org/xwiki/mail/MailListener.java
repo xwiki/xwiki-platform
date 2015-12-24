@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allows listening to Mail sending results.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface MailListener
 {
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.resource;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow getting the {@link ResourceReference} object from the Execution Context.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface ResourceReferenceManager
 {
     /**

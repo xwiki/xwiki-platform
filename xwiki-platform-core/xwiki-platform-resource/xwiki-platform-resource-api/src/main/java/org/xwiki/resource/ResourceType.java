@@ -21,7 +21,6 @@ package org.xwiki.resource;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents the type of Resource (eg Entity, Temporary, etc).
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class ResourceType
 {
     /**

@@ -20,7 +20,6 @@
 package org.xwiki.resource;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The Resource Handler Manager's goal is to locate the right {@link ResourceReferenceHandler}
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface ResourceReferenceHandlerManager<T>
 {
     /**

@@ -30,7 +30,6 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <E>
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventGenerator<E>, Initializable
 {
     @Inject

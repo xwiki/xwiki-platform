@@ -20,7 +20,6 @@
 package org.xwiki.resource;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Transforms a Resource Reference into some other representation (eg URL).
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @param <U> the return type (e.g. a URL, a String, etc)
  */
 @Role
-@Unstable
 public interface ResourceReferenceSerializer<T extends ResourceReference, U>
 {
     /**

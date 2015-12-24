@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.crypto.pkix.CertificateProvider;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Verify signature of a {@link org.xwiki.rendering.block.Block}.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface BlockSignatureVerifier
 {
     /**

@@ -19,8 +19,6 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Allows calling the next {@link ResourceReferenceHandler} in the chain. An instance of this class is passed
  * to {@link ResourceReferenceHandler#handle(ResourceReference, ResourceReferenceHandlerChain)} and it's up to the
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public interface ResourceReferenceHandlerChain
 {
     /**

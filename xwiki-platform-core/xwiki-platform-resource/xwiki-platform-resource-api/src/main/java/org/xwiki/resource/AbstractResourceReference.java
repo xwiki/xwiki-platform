@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -39,7 +38,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public abstract class AbstractResourceReference implements ResourceReference
 {
     /**

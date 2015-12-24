@@ -32,8 +32,8 @@
   $criteria.setRange($range)
   #set ($versions = $tdoc.getRevisions($criteria))
   #set ($discard = $collectionstool.reverse($versions))
-  #if ($tdoc.realLanguage != '')
-    #set ($lang = "&amp;language=${tdoc.realLanguage}")
+  #if ("$tdoc.realLocale" != '')
+    #set ($lang = "&amp;language=${tdoc.realLocale}")
   #else
     #set ($lang = '')
   #end

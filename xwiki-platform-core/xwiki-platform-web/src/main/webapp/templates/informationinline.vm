@@ -5,8 +5,8 @@
 <div id="_information">
   <div id="informationleft" class="half column">
     <dl>
-      #if($tdoc.realLanguage != $doc.realLanguage)
-        <dt>$services.localization.render('core.viewers.information.translationCreation', [$tdoc.realLanguage])</dt>
+      #if($tdoc.realLocale != $doc.realLocale)
+        <dt>$services.localization.render('core.viewers.information.translationCreation', [$tdoc.realLocale])</dt>
         <dd>$services.localization.render('core.viewers.information.translationCreationData', [$xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])</dd>
       #end
       <dt>$services.localization.render('core.viewers.information.includedPages')</dt>

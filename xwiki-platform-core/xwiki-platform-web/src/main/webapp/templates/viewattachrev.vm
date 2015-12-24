@@ -2,8 +2,8 @@
 <div class="main layoutsubsection">
 <div id="mainContentArea">
 <h3>$services.localization.render("core.viewers.attachments.revisions", [$attachment.filename])</h3>
-#if ($tdoc.realLanguage!="")
-#set($lang = "&language=${tdoc.realLanguage}")
+#if ("$tdoc.realLocale" != '')
+#set($lang = "&language=${tdoc.realLocale}")
 #else
 #set($lang = "")
 #end

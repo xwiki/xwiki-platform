@@ -9,8 +9,8 @@
 #if ($type == '')
   #set($type = 'html')
 #end
-#if ($tdoc.realLanguage != '')
-  #set ($lang = "&amp;language=${tdoc.realLanguage}")
+#if ("$tdoc.realLocale" != '')
+  #set ($lang = "&amp;language=${tdoc.realLocale}")
 #else
   #set($lang = '')
 #end

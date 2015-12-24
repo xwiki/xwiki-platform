@@ -12,7 +12,7 @@
 #end
 <input type="hidden" name="xcontinue" value="$xcontinue"/>
 <input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="language" value="$!tdoc.realLanguage" />
+<input type="hidden" name="language" value="$!tdoc.realLocale" />
 </div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">

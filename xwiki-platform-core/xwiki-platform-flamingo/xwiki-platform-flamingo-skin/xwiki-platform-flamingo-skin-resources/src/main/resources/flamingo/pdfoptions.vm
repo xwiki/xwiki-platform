@@ -45,7 +45,7 @@
             #set($discard =  $languages.add($defaultLanguage))
             #foreach($lang in $languages)
               ## By default, we suggest that the export is done for current language set
-              #if($lang == $tdoc.realLanguage)
+              #if($lang == "$tdoc.realLocale")
                 <option value="$lang" selected="selected">$lang $services.localization.render('core.export.pdf.options.currentLanguage')</option>
               #else
                 <option value="$lang">$lang</option>

@@ -6025,16 +6025,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getTranslatedContent(language, context);
     }
 
-    public String getTranslatedContent(String language, XWikiContext context) throws XWikiException
+    public String getTranslatedContent(String locale, XWikiContext context) throws XWikiException
     {
-        XWikiDocument tdoc = getTranslatedDocument(language, context);
+        XWikiDocument tdoc = getTranslatedDocument(locale, context);
         return tdoc.getContent();
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException
     {
-        String language = context.getWiki().getLanguagePreference(context);
-        return getTranslatedDocument(language, context);
+        String locale = context.getWiki().getLanguagePreference(context);
+        return getTranslatedDocument(locale, context);
     }
 
     /**

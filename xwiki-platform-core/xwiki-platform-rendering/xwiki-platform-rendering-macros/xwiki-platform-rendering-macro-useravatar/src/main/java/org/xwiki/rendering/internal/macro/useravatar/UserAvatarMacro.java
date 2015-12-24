@@ -144,7 +144,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
 
         // Initialize with the default avatar.
         ResourceReference imageReference =
-            new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
+            new ResourceReference(this.skinAccessBridge.getSkinFile("icons/xwiki/noavatar.png"), ResourceType.URL);
 
         // Try to use the configured avatar.
         if (!StringUtils.isBlank(fileName)) {

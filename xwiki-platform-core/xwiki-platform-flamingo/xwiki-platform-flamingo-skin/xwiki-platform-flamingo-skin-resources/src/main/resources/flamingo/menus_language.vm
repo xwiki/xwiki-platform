@@ -2,8 +2,8 @@
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
-  #set($currentLanguage = "$!{tdoc.realLanguage}")
-  #set($originalLanguage = "$!{doc.realLanguage}")
+  #set($currentLanguage = "$!{tdoc.realLocale}")
+  #set($originalLanguage = "$!{doc.realLocale}")
   #set ($availtrans = $doc.translationList)
   #set ($discard = $availtrans.add($originalLanguage))
   #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))

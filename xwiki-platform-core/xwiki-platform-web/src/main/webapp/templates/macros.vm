@@ -334,6 +334,10 @@ $xwiki.getUserName("xwiki:${username}")
           #break
         #end
       #end
+    #else
+      ## This ensures that $avatarAttachment is always set before the following "if" is called, preventing a previous
+      ## call to this macro from leaking...
+      #set ($avatarAttachment = $NULL)
     #end
     #if ($avatarAttachment && $avatarAttachment.isImage())
       #set ($queryString = '')

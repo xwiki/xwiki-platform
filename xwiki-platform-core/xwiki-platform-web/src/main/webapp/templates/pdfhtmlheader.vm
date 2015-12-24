@@ -25,7 +25,7 @@
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=${xwiki.encoding}" />
-<meta name="language" content="$!{xcontext.language}" />
+<meta name="language" content="$!{xcontext.locale}" />
 </head>
 <body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
 <div class="pdfheader">

@@ -126,7 +126,7 @@
         </div>
         #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/upload.js', {
           'forceSkinAction': true,
-          'language': $xcontext.language
+          'language': $xcontext.locale
         }))
         #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css', true))
         <form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"

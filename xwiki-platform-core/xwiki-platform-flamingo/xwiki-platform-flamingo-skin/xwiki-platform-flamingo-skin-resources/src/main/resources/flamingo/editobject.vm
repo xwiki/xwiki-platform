@@ -250,7 +250,7 @@
   $xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
   $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   ## Insert JS and CSS needed for the fullscreen edit feature
-  $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
+  $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
   $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   ## Some parameters
   #set ($formname = 'update')

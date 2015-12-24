@@ -31,7 +31,7 @@
             <select size="1" id="language" name="language">
             #set($defaultLanguage = "$!doc.defaultLanguage")
             #if($defaultLanguage == '')
-              #set($defaultLanguage = "$!doc.language")
+              #set($defaultLanguage = "$!doc.locale")
               #if($defaultLanguage == '')
                 #set($defaultLanguage = 'default')
               #end

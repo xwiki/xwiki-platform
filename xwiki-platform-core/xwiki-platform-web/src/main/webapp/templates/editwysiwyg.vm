@@ -55,7 +55,7 @@ if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) 
 //]]>
 </script>
 ## Insert JS and CSS needed for the fullscreen edit feature
-$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)
 #else ## doc.syntax.toIdString() != "xwiki/1.0"
 #template("editwysiwygnew.vm")

@@ -309,9 +309,9 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 ###    useravatar
 ###
-### Display the avatar of a user, or a standard image if the user has no avatar
+### Display the avatar of a user or a group, or a default image if the user/group has no avatar
 ###
-### @param username The name of the user whose avatar will be displayed
+### @param username The name of the user or group whose avatar will be displayed
 ###
 #macro(getUserAvatarURL $userName $return $size)
   #set ($specified = false)

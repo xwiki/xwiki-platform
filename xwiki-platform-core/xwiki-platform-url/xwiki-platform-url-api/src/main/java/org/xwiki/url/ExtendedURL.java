@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.tools.EscapeTool;
 
 /**
@@ -45,7 +44,6 @@ import org.xwiki.velocity.tools.EscapeTool;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class ExtendedURL implements Cloneable
 {
     /**

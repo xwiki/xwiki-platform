@@ -1,0 +1,2 @@
+org.xwiki.platform.svg.internal.DefaultSVGUtils
+org.xwiki.platform.svg.script.SVGScriptService

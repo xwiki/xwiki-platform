@@ -19,6 +19,12 @@
  */
 package org.xwiki.platform.svg.script;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.svg.SVGUtils;
@@ -27,12 +33,6 @@ import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.slf4j.Logger;
 
 /**
  * Utilities for working with SVG images.
@@ -84,7 +84,8 @@ public class SVGScriptService implements ScriptService
         try {
             return this.serializer.serialize(this.component.rasterizeToTemporaryResource(content, width, height));
         } catch (Exception ex) {
-            this.logger.warn("Failed to rasterize SVG image to temporary resource: {}", ex.getMessage());
+            this.logger.warn("Failed to rasterize SVG image to temporary resource: {}",
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return null;
     }
@@ -123,7 +124,7 @@ public class SVGScriptService implements ScriptService
             return result;
         } catch (Exception ex) {
             this.logger.warn("Failed to rasterize SVG image to temporary resource in context [{}]: {}", targetContext,
-                ex.getMessage());
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return null;
     }
@@ -157,7 +158,7 @@ public class SVGScriptService implements ScriptService
             this.component.rasterizeToResponse(content, width, height);
             return true;
         } catch (Exception ex) {
-            this.logger.warn("Failed to rasterize SVG image to response: {}", ex.getMessage());
+            this.logger.warn("Failed to rasterize SVG image to response: {}", ExceptionUtils.getRootCauseMessage(ex));
         }
         return false;
     }

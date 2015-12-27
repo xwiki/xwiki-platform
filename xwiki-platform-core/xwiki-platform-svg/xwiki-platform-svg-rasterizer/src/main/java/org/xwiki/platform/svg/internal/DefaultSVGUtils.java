@@ -19,16 +19,6 @@
  */
 package org.xwiki.platform.svg.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletResponse;
-import org.xwiki.environment.Environment;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.platform.svg.SVGUtils;
-import org.xwiki.resource.temporary.TemporaryResourceReference;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,7 +36,17 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.environment.Environment;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.platform.svg.SVGUtils;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
 
 /**
  * The straight-forward implementation of the {@link SVGUtils} role.
@@ -149,7 +149,7 @@ public class DefaultSVGUtils implements SVGUtils
         try {
             transcoder.transcode(input, output);
         } catch (TranscoderException ex) {
-            this.logger.warn("Failed to rasterize SVG image: {}", ex.getMessage());
+            this.logger.warn("Failed to rasterize SVG image: {}", ExceptionUtils.getRootCauseMessage(ex));
         }
     }
 
@@ -173,7 +173,7 @@ public class DefaultSVGUtils implements SVGUtils
         try {
             tempDir.mkdirs();
         } catch (Exception ex) {
-            this.logger.warn("Cannot create temporary files", ex);
+            this.logger.warn("Cannot create temporary files: {}", ExceptionUtils.getRootCauseMessage(ex));
         }
 
         return tempDir;

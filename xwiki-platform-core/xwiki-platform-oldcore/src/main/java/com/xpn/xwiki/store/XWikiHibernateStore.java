@@ -1663,7 +1663,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             List<XWikiAttachment> list = doc.getAttachmentList();
             for (XWikiAttachment attachment : list) {
-                attachment.setDoc(doc);
                 saveAttachment(attachment, false, context, false);
             }
 

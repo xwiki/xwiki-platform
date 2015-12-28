@@ -248,11 +248,10 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
-     * Set the content of the attachment by writing to a provided OutputStream.
-     * Content is *not* appended, this method clears the content and creates new content.
-     * If you want to append content, you can call {@link #getContentInputStream()} and copy
-     * the content of that into the provided OutputStream. Before closing this OutputStream
-     * the content will remain the old content prior to the change.
+     * Set the content of the attachment by writing to a provided OutputStream. Content is *not* appended, this method
+     * clears the content and creates new content. If you want to append content, you can call
+     * {@link #getContentInputStream()} and copy the content of that into the provided OutputStream. Before closing this
+     * OutputStream the content will remain the old content prior to the change.
      *
      * @return an OutputStream into which the caller can set the content of the attachments.
      * @since 4.2M3
@@ -330,9 +329,11 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
-        if (this.isContentDirty && ownerDocument != null) {
-            ownerDocument.setMetaDataDirty(true);
+        if (this.ownerDocument != ownerDocument) {
+            this.ownerDocument = ownerDocument;
+            if (this.isContentDirty && ownerDocument != null) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 }

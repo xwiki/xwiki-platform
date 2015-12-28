@@ -51,6 +51,7 @@ panels.children.title=Pages enfants
 panels.description=Description
 panels.emptyvalue=\ 
 panels.name=Nom
+panels.siblings.title=Pages sœurs
 panels.type=Type
 </content>
 </xwikidoc>

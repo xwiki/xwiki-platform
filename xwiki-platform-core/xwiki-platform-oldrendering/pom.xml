@@ -35,6 +35,9 @@
     <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Old XWiki 1.0 syntax renderer</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

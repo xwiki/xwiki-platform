@@ -56,7 +56,7 @@ import org.xwiki.resource.temporary.TemporaryResourceReference;
  */
 @Component
 @Singleton
-public class DefaultSVGRasterizer implements SVGRasterizer
+public class BatikSVGRasterizer implements SVGRasterizer
 {
     private static final String TEMP_DIR_NAME = "svg";
 

@@ -499,7 +499,7 @@ public class PackageMojo extends AbstractMojo
 
         // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.2.9", "", "jar");
+            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.3.3", "", "jar");
         }
 
         if (hsqldbArtifact != null) {

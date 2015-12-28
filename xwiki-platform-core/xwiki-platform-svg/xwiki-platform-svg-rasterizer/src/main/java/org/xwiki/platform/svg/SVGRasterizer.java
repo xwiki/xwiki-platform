@@ -35,7 +35,7 @@ import java.io.IOException;
  */
 @Unstable("New API introduced in 8.0")
 @Role
-public interface SVGUtils
+public interface SVGRasterizer
 {
     /**
      * Rasterize an image as PNG into a temporary file.

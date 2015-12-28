@@ -27,7 +27,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.platform.svg.SVGUtils;
+import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.script.service.ScriptService;
@@ -50,7 +50,7 @@ public class SVGScriptService implements ScriptService
     private Logger logger;
 
     @Inject
-    private SVGUtils component;
+    private SVGRasterizer component;
 
     @Inject
     @Named("standard/tmp")

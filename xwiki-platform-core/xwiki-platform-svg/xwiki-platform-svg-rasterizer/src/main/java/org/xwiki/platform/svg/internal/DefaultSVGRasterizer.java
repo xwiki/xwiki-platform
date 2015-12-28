@@ -45,18 +45,18 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.platform.svg.SVGUtils;
+import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 
 /**
- * The straight-forward implementation of the {@link SVGUtils} role.
+ * The straight-forward implementation of the {@link SVGRasterizer} role.
  *
  * @version $Id$
  * @since 8.0M1
  */
 @Component
 @Singleton
-public class DefaultSVGUtils implements SVGUtils
+public class DefaultSVGRasterizer implements SVGRasterizer
 {
     private static final String TEMP_DIR_NAME = "svg";
 

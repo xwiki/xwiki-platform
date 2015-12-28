@@ -120,7 +120,7 @@ $response.setContentType('application/json')
      "deleter" : "$escapetool.javascript($ddoc.deleter)",
      "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
      "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))",
-     "language" : "$escapetool.javascript($ddoc.language)"
+     "language" : "$ddoc.locale"
    }
 #end
 ]}

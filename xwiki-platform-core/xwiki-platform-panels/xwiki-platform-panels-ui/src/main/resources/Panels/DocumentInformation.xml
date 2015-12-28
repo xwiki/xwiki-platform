@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro(convertDocument $targetDoc $error $oldSyntaxId $newSyntaxId)
-  #if ($targetDoc.realLanguage == $xwiki.languagePreference)
+  #if ($targetDoc.realLocale == $xwiki.localePreference)
     #if ($request.content)
       ## Use the content received from the client if the target document is the edited one (could be also a translation of the edited document).
       #set ($void = $targetDoc.setContent($request.content))
@@ -75,7 +75,7 @@
     #foreach ($language in $languages)
       #if (!$error)
         #set ($translatedDoc = $targetDoc.getTranslatedDocument($language))
-        #if ($translatedDoc.language != $targetDoc.language)
+        #if ($translatedDoc.locale != $targetDoc.locale)
           #convertDocument($translatedDoc $error $oldSyntaxId $newSyntaxId)
         #end
       #end
@@ -180,7 +180,7 @@
 $xwiki.ssx.use('Panels.DocumentInformation')##
 #set ($pages = $tdoc.includedPages)
 #largepanelheader($services.localization.render('panels.documentInformation.title'))
-#if ($tdoc.language == '' &amp;&amp; $xwiki.isMultiLingual())
+#if ("$tdoc.locale" == '' &amp;&amp; $xwiki.isMultiLingual())
 ; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
 : {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;{{/html}}
 #end

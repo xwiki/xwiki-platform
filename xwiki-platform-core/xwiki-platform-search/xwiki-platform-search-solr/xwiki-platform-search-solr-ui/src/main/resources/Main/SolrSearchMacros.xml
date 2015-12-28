@@ -478,7 +478,7 @@
 #end
 
 #macro (displaySearchResultTitle)
-  #set ($showLocale = $searchResult.locale != '' &amp;&amp; $searchResult.locale != $xcontext.language)
+  #set ($showLocale = $searchResult.locale != '' &amp;&amp; $searchResult.locale != "$xcontext.locale")
   #set ($titleURL = $xwiki.getURL($searchResultReference))
   #if ($showLocale)
     #set ($titleURL = $xwiki.getURL($searchResultReference, 'view', "language=$searchResult.locale"))
@@ -677,7 +677,7 @@ $services.localization.render('core.users.unknownUser')##
     ## * the "xx" translation if the current locale "xx_YY" doesn't have a translation available
     ##   (e.g. "pt" when "pt_BR" is not available)
     ## See the discussion on XWIKI-9977.
-    ##set ($discard = $filters.put('locales', [$xcontext.language]))
+    ##set ($discard = $filters.put('locales', ["$xcontext.locale"]))
     #if (!$xcontext.isMainWiki())
       ## Subwikis search by default in their content only.
       #set ($discard = $filters.put('wiki', [$xcontext.database]))
@@ -871,7 +871,7 @@ $value##
   #set ($title = $services.localization.render('search.rss', ["[$text]"]))
   #set ($discard = $feed.setTitle($title))
   #set ($discard = $feed.setDescription($title))
-  #set ($discard = $feed.setLanguage($xcontext.language))
+  #set ($discard = $feed.setLanguage("$xcontext.locale"))
   #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
   ##
   ## Output the feed.

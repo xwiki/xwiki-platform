@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-tree</artifactId>
-    <version>7.4-SNAPSHOT</version>
+    <version>7.4</version>
   </parent>
   <artifactId>xwiki-platform-index-tree-test</artifactId>
   <name>XWiki Platform - Index - Tree - Tests - Parent POM</name>

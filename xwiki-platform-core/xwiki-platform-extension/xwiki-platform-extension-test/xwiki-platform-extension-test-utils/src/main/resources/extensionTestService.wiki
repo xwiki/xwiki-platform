@@ -1,0 +1,55 @@
+{{groovy}}
+import java.util.Arrays;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import org.xwiki.extension.ExtensionManager;
+import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.JobStatusStore;
+import org.xwiki.logging.LogLevel;
+
+def job = null;
+if (request.action == 'uninstall') {
+  if (services.extension.installed.getInstalledExtension(request.extensionId, 'wiki:xwiki') != null) {
+    def uninstallRequest = services.extension.createUninstallRequest(request.extensionId, 'wiki:xwiki')
+    uninstallRequest.setInteractive(false)
+    job = services.extension.uninstall(uninstallRequest)
+    job.join()
+  }
+  if (!Boolean.valueOf(request.keepLocalCache)) {
+    // Remove the extension (with all its versions) from the local repository.
+    def localRepo = services.component.getInstance(ExtensionManager.class).getRepository('local')
+    for (extension in new ArrayList(localRepo.getLocalExtensionVersions(request.extensionId))) {
+      localRepo.removeExtension(extension)
+    }
+    // Remove the extension job logs.
+    def jobStatusStore = services.component.getInstance(JobStatusStore.class)
+    jobStatusStore.remove(Arrays.asList('extension', 'action', request.extensionId, 'wiki:xwiki'))
+    jobStatusStore.remove(Arrays.asList('extension', 'plan', request.extensionId, 'wiki:xwiki'))
+  }
+
+} else if (request.action == 'install') {
+  def installRequest = services.extension.createInstallRequest(request.extensionId, request.extensionVersion, 'wiki:xwiki')
+  installRequest.setInteractive(false)
+  job = services.extension.install(installRequest)
+  job.join()
+
+} else if (request.action == 'finish') {
+  def currentJob = services.extension.getCurrentJob()
+  if (currentJob != null && currentJob.getStatus().getState() == JobStatus.State.WAITING) {
+    currentJob.getRequest().setInteractive(false)
+    currentJob.getStatus().answered()
+    currentJob.join()
+  }
+}
+
+if (job == null || job.getStatus().getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+  print 'Done!'
+} else {
+  print 'Failed!'
+  def error = job.getStatus().getLog().getLogs(LogLevel.ERROR).get(0)
+  if (error.getThrowable() != null) {
+    print ' ' + ExceptionUtils.getRootCauseMessage(error.getThrowable())
+  }
+}
+{{/groovy}}

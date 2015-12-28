@@ -238,7 +238,7 @@ public class TestUtils
         TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
 
-    protected XWikiWebDriver getDriver()
+    public XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }

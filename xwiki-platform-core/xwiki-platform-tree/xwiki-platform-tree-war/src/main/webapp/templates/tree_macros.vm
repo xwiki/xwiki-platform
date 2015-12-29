@@ -49,7 +49,7 @@
     #if ($reference.startsWith('path:'))
       ## URL/Path reference
       #set ($resourceURL = $reference.substring(5))
-      #set ($resourceURL = "$resourceURL#if ($resourceURL.indexOf('?') < 0)?#else&#end$escapetool.url($resourceParams)")
+      #set ($resourceURL = "$resourceURL#if ($resourceURL.indexOf('?') < 0)?#else&amp;#end$escapetool.url($resourceParams)")
     #else
       ## Document reference
       #if ($reference.startsWith('doc:'))

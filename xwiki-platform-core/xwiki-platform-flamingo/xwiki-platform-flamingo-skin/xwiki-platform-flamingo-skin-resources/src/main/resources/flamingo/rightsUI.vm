@@ -184,6 +184,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
             $services.localization.render('authenticate_view')
           </label>
+          <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
         </dt>
         #set ($auth_edit = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
         #if ("$!auth_edit" == '1')
@@ -198,6 +199,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
             $services.localization.render('authenticate_edit')
           </label>
+          <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
         </dt>
       #end
       #if ($guest_comment_captcha_prop)
@@ -221,6 +223,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
           </label>
         </dt>
+        <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
       #end
     </dl>
   #end

@@ -50,7 +50,7 @@
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
             <div class="package-upload">
                <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
-               <input id="xwikiuploadfile" type="file" name="filepath" value="" size="30" class="uploadFileInput"/>
+               <input id="xwikiuploadfile" type="file" name="filepath" size="30" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
                </span>

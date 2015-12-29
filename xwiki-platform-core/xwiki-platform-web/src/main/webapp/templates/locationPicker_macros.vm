@@ -24,6 +24,7 @@
           class="location-title-field" placeholder="$!services.localization.render($titleField.placeholder)" />
       </dd>
     #elseif ($titleField)
+      <dt class="hidden"></dt>
       <dd class="hidden">
         <input type="hidden" name="$titleField.name" value="$!escapetool.xml($titleField.value)"
           class="location-title-field" />
@@ -94,6 +95,7 @@
           </select>
         </dd>
       #elseif ($wikiField)
+        <dt class="hidden"></dt>
         <dt class="hidden">
           <input type="hidden" name="$wikiField.name" class="location-wiki-field"
             value="$!escapetool.xml($wikiField.value)" />
@@ -139,11 +141,13 @@
             placeholder="$!services.localization.render($nameField.placeholder)" />
         </dd>
       #elseif ($nameField)
+        <dt class="hidden"></dt>
         <dd class="hidden">
           <input type="hidden" name="$nameField.name" class="location-name-field"
             value="$!escapetool.xml($nameField.value)" />
         </dd>
       #end
+    </dl>
   </div>
 #end
 

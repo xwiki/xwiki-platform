@@ -68,7 +68,7 @@
 &lt;div id="xwikieditcontent"&gt;
   &lt;table id="groupstable" class="xwiki-livetable"&gt;
     &lt;tr&gt;
-      &lt;td class="xwiki-livetable-pagination" colspan="2"&gt;
+      &lt;td class="xwiki-livetable-pagination"&gt;
         &lt;span id="groupstable-limits" class="xwiki-livetable-limits"&gt;&lt;/span&gt;
         &lt;span id="groupstable-ajax-loader" class="xwiki-livetable-loader"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" /&gt;$services.localization.render('platform.livetable.loading')&lt;/span&gt;
         &lt;span class="pagination"&gt;

@@ -256,7 +256,7 @@
   #end
   #displayPreviewPanel()
   ## Special data for computing URLs
-  &lt;span type="hidden" id="attachmentsURL" data-value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
+  &lt;span class="hidden" id="attachmentsURL" data-value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
 {{/html}}
 )))
 {{/velocity}}

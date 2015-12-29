@@ -3,7 +3,7 @@
 ## Display the drawer
 ##
 <div class="drawer-main drawer-default" id="tmDrawer">
-  <nav class="drawer-nav" role="navigation">
+  <nav class="drawer-nav">
   
     ##
     ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)

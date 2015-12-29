@@ -75,30 +75,27 @@
         'placeholder': 'admin.templates.createprovider.defaultdocname'
       }
     })
-    &lt;dl&gt;
-
-      &lt;dt&gt;
-      #if ($isAdvancedUser || $isSuperAdmin)
-        &lt;label for="terminal"&gt;
-          &lt;input type="checkbox" id="terminal" name="tocreate" value="terminal" checked="checked" /&gt;
-          $services.localization.render('core.create.terminal.label')
-        &lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('core.create.terminal.hint')&lt;/span&gt;
-      #else
-        &lt;input type="hidden" id="terminal" name="tocreate" value="terminal" /&gt;
-      #end
-      &lt;/dt&gt;
-
-      &lt;dt&gt;
-        &lt;div class="buttons"&gt;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-          &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
-          &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
-          &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/dt&gt;
-
-    &lt;/dl&gt;
+    #if ($isAdvancedUser || $isSuperAdmin)
+      &lt;dl&gt;
+        &lt;dt&gt;
+          &lt;label for="terminal"&gt;
+            &lt;input type="checkbox" id="terminal" name="tocreate" value="terminal" checked="checked" /&gt;
+            $services.localization.render('core.create.terminal.label')
+          &lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('core.create.terminal.hint')&lt;/span&gt;
+        &lt;/dd&gt;
+      &lt;/dl&gt;
+    #else
+      &lt;input type="hidden" id="terminal" name="tocreate" value="terminal" /&gt;
+    #end
+    &lt;div class="buttons"&gt;
+      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="parent" value="XWiki.TemplateProviderClass"/&gt;
+      &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
+    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
 )))

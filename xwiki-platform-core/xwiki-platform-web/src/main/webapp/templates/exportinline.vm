@@ -11,7 +11,9 @@
   <dt><label for="version">$services.localization.render('export_version')</label></dt>
   <dd><input type="text" name="version" id="version" value=""/></dd>
   <dt><label for="history"><input type="checkbox" name="history" id="history" value="true"/> $services.localization.render('export_addhistory')</label></dt>
+  <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
   <dt><label for="backup"><input type="checkbox" name="backup" id="backup" value="true"/> $services.localization.render('export_backuppack') ($services.localization.render('export_authorpreserved'))</label></dt>
+  <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
 </dl>
 <div class="buttons">
 <span class="buttonwrapper"><input type="submit" value="$services.localization.render('export')" class="button"/></span>

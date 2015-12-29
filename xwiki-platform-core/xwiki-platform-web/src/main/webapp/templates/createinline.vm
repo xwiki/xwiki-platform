@@ -214,6 +214,7 @@
 
       ## Display the location picker.
       <div class='col-xs-12 col-lg-6'>
+        #set ($isNotAdvancedUser = !$isAdvancedUser)
         #template('locationPicker_macros.vm')
         #locationPicker({
           'id': 'target',
@@ -241,7 +242,8 @@
             'name': 'name',
             'value': $name,
             'placeholder': 'core.create.name.placeholder'
-          }
+          },
+          'disableAdvancedEditing' : $isNotAdvancedUser
         })
       </div>
     #else

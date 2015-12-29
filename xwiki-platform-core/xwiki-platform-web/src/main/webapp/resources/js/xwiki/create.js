@@ -24,6 +24,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var nameField = form.find('input.location-name-field');
     var parentReferenceField = form.find('input.location-parent-field');
     var terminalCheckbox = form.find('input[name="tocreate"]');
+    var isAdvancedUser = $('.location-action-edit').length > 0;
 
     /**
      * Compute the page name of the target
@@ -140,6 +141,29 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
         var type = $('input[name="type"]:checked');
         updateTerminalCheckboxFromTemplateProviderInput(type);
+      });
+    }
+    
+    /**
+     * Add a validation rule on the title.
+     *
+     * When the user is not advanced, the advanced location editor (with the parent and the name fields) is not 
+     * displayed, and so the validation rules of that editor are not neither.
+     * In that case, we need to add a validation rule on the title field.
+     */
+    if (!isAdvancedUser) {
+      var titleField = form.find('input[name="title"]');
+      var titleValidator = new LiveValidation(titleField[0], {
+          validMessage: "$services.localization.render('core.validation.valid.message')"
+      });
+      // We use a custom validation in order to handle the default value on browsers that don't support the placeholder
+      // attribute.
+      titleValidator.displayMessageWhenEmpty = true;
+      titleValidator.add(Validate.Custom, {
+        failureMessage: "$services.localization.render('core.validation.required.message')",
+        against: function(value) {
+          return !titleField.hasClass('empty') && typeof value === 'string' && value.strip().length > 0;
+        }
       });
     }
 

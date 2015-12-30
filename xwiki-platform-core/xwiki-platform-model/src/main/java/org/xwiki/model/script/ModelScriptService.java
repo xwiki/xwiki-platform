@@ -553,7 +553,9 @@ public class ModelScriptService implements ScriptService
      *            entity, like {@code 'SPACE'}
      * @return the current value for the requested entity type
      * @since 4.3M1
+     * @deprecated since 7.4.1/8.0M1, use {@link #getEntityReference(EntityType)}
      */
+    @Deprecated
     public String getEntityReferenceValue(EntityType type)
     {
         return getEntityReferenceValue(type, DEFAULT_RESOLVER_HINT);
@@ -570,7 +572,7 @@ public class ModelScriptService implements ScriptService
      * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
      *         for the default space homepage
      * @since 4.3M1
-     * @deprecated since 7.2M1, use 
+     * @deprecated since 7.2M1, use {@link #getEntityReference(EntityType, String)}
      */
     @Deprecated
     public String getEntityReferenceValue(EntityType type, String hint)
@@ -589,13 +591,28 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * Get the current reference configured for a specific entity type, like the space reference or wiki reference. This
+     * doesn't return a full entity reference, but just the part that should be used for that type of entity.
+     * 
+     * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
+     *            entity, like {@code 'SPACE'}
+     * @return the current reference for the requested entity type, for example "Main" for the default space or
+     *         "WebHome" for the default space homepage
+     * @since 7.2M1
+     */
+    public EntityReference getEntityReference(EntityType type)
+    {
+        return getEntityReference(type, DEFAULT_RESOLVER_HINT);
+    }
+
+    /**
      * Get the reference configured for a specific entity type, like the space reference or wiki reference. This doesn't
      * return a full entity reference, but just the part that should be used for that type of entity.
      * 
      * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
      *            entity, like {@code 'SPACE'}
-     * @param hint the hint of the value provider to use (valid hints are for example "default", "current" and
-     *            "currentmixed")
+     * @param hint the hint of the {@link EntityReferenceProvider} to use (valid hints are for example "default",
+     *            "current" and "currentmixed")
      * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
      *         for the default space homepage
      * @since 7.2M1

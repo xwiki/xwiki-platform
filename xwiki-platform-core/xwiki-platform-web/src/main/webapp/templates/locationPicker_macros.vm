@@ -42,7 +42,7 @@
     <dd>
       #if ($isDocumentTreeAvailable)
         #documentPickerModal($options)
-        #locationPickerActions($options)
+        #locationPickerActions
       #end
       ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
       #hierarchy($options.parent.reference)
@@ -56,17 +56,15 @@
   </dl>
 #end
 
-#macro (locationPickerActions $options)
+#macro (locationPickerActions)
   <div class="location-actions">
     ## Tree picker toggle
     <a href="#" class="location-action location-action-pick" title="Select a new location">
       $services.icon.renderHTML('chart-organisation')</a>
-    #if ("$!options.disableAdvancedEditing" != 'true')
-      ## Location advanced edit button.
-      <a href="#" class="location-action location-action-edit">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    #end
+    ## Location advanced edit button.
+    <a href="#" class="location-action location-action-edit">
+      <span class="glyphicon glyphicon-pencil"></span>
+    </a>
   </div>
 #end
 

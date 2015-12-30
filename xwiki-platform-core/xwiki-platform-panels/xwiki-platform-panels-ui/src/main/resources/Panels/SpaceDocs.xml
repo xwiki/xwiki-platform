@@ -127,7 +127,7 @@
 #if ($hasAdmin)
   {{warning}}Deprecated: Replace with [[Children&gt;&gt;Panels.Children]] or [[Siblings&gt;&gt;Panels.Siblings]] Panels{{/warning}}
 #end
-#foreach ($docName in $xwiki.getSpaceDocsName($doc.space))
+#foreach ($docName in $services.query.xwql('where doc.space = :space order by doc.fullName').bindValue('space', $doc.space).addFilter('hidden').addFilter('unique').execute())
   * [[$docName]]
 #end
 #panelfooter()

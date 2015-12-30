@@ -88,7 +88,7 @@
     'id' : 'content',
     'children': [
        {'id' : 'Import', 'action' : 'import', 'order' : 100},
-       {'id' : 'Export', 'action' : 'export', 'order' : 200},
+       {'id' : 'Export', 'order' : 200},
        {'id' : 'Templates', 'order' : 300}
     ]
   },

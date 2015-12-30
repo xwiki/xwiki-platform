@@ -30,13 +30,13 @@
   <artifactId>xwiki-platform-vfs-api</artifactId>
   <name>XWiki Platform - VFS - API</name>
   <packaging>jar</packaging>
-  <description>VFS API</description>
+  <description>Access content of archives (Zip, Tar, Jar, GZip, etc)</description>
   <properties>
     <truevfs.version>0.11.0</truevfs.version>
     <truecommons.version>2.5.0</truecommons.version>
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Access content of archives (Zip, Tar, Jar, GZip, etc)</xwiki.extension.name>
+    <xwiki.extension.name>VFS API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

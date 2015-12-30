@@ -66,13 +66,10 @@
       #end
       &lt;/select&gt;
     &lt;/dd&gt;
-
-    &lt;dt&gt;
-      &lt;span class='buttonwrapper'&gt;
-        &lt;input value="$services.localization.render('search.admin.configuration.button')" class='button' type='submit'&gt;
-      &lt;/span&gt;
-    &lt;/dt&gt;
   &lt;/dl&gt;
+  &lt;div class='buttonwrapper'&gt;
+    &lt;input value="$services.localization.render('search.admin.configuration.button')" class='button' type='submit'&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
 

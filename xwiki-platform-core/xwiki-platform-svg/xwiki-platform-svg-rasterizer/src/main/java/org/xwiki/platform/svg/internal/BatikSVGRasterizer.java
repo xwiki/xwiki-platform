@@ -82,8 +82,10 @@ public class BatikSVGRasterizer implements SVGRasterizer
     public File rasterizeToTemporaryFile(String content, int width, int height) throws IOException
     {
         File out = getTempFile(content.hashCode());
-        rasterizeToFile(content, out, width, height);
-        return out;
+        if (rasterizeToFile(content, out, width, height)) {
+            return out;
+        }
+        return null;
     }
 
     @Override
@@ -98,8 +100,10 @@ public class BatikSVGRasterizer implements SVGRasterizer
         DocumentReference targetContext) throws IOException
     {
         File out = getContextTempFile(content.hashCode(), targetContext);
-        rasterizeToFile(content, out, width, height);
-        return new TemporaryResourceReference(TEMP_DIR_NAME, out.getName(), targetContext);
+        if (rasterizeToFile(content, out, width, height)) {
+            return new TemporaryResourceReference(TEMP_DIR_NAME, out.getName(), targetContext);
+        }
+        return null;
     }
 
     @Override
@@ -110,6 +114,9 @@ public class BatikSVGRasterizer implements SVGRasterizer
         }
         HttpServletResponse response = ((ServletResponse) this.container.getResponse()).getHttpServletResponse();
         File result = rasterizeToTemporaryFile(content, width, height);
+        if (result == null) {
+            return;
+        }
         response.setContentLength((int) result.length());
         response.setContentType("image/png");
         OutputStream os = response.getOutputStream();
@@ -117,21 +124,26 @@ public class BatikSVGRasterizer implements SVGRasterizer
         os.flush();
     }
 
-    private void rasterizeToFile(String content, File out, int width, int height) throws IOException
+    private boolean rasterizeToFile(String content, File out, int width, int height) throws IOException
     {
+        boolean result = true;
         if (out.exists()) {
             this.logger.debug("Reusing existing temporary raster image: {}", out.getAbsolutePath());
-            return;
+            return result;
         }
         try (OutputStream fout = new FileOutputStream(out)) {
             this.logger.debug("Rasterizing to temp file: {}", out.getAbsolutePath());
             TranscoderInput input = new TranscoderInput(new StringReader(content));
             TranscoderOutput output = new TranscoderOutput(fout);
-            rasterize(input, output, width, height);
+            result = rasterize(input, output, width, height);
         }
+        if (!result) {
+            out.delete();
+        }
+        return result;
     }
 
-    private void rasterize(TranscoderInput input, TranscoderOutput output, int width, int height)
+    private boolean rasterize(TranscoderInput input, TranscoderOutput output, int width, int height)
     {
         PNGTranscoder transcoder = new PNGTranscoder();
 
@@ -148,9 +160,11 @@ public class BatikSVGRasterizer implements SVGRasterizer
 
         try {
             transcoder.transcode(input, output);
+            return true;
         } catch (TranscoderException ex) {
             this.logger.warn("Failed to rasterize SVG image: {}", ExceptionUtils.getRootCauseMessage(ex));
         }
+        return false;
     }
 
     private File getTempFile(int hashcode)
@@ -182,6 +196,12 @@ public class BatikSVGRasterizer implements SVGRasterizer
     private File getBaseTempDir()
     {
         File tempDir = new File(new File(this.environment.getTemporaryDirectory(), "temp"), TEMP_DIR_NAME);
+
+        try {
+            tempDir.mkdirs();
+        } catch (Exception ex) {
+            this.logger.warn("Cannot create temporary directory: {}", ExceptionUtils.getRootCauseMessage(ex));
+        }
 
         return tempDir;
     }

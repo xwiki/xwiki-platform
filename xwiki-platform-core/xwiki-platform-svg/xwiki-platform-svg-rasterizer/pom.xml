@@ -31,6 +31,10 @@
   <name>XWiki Platform - SVG Tools - SVG Rasterizer</name>
   <description>Java code and script service for rasterizing SVG images.</description>
 
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>

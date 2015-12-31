@@ -31,6 +31,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
@@ -62,25 +63,24 @@ public class RepositoryTestUtils
             .add(property(XWikiRepositoryModel.PROP_EXTENSION_ID, extension.getId().getId()));
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_TYPE, extension.getType()));
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName()));
-        extensionObject.getProperties().add(
-            property(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary()));
+        extensionObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary()));
         if (!extension.getLicenses().isEmpty()) {
-            extensionObject.getProperties().add(
-                property(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, extension.getLicenses().iterator().next()
-                    .getName()));
+            extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME,
+                extension.getLicenses().iterator().next().getName()));
         }
-        extensionObject.getProperties().add(
-            property(XWikiRepositoryModel.PROP_EXTENSION_FEATURES, extension.getFeatures()));
+        extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
+            ExtensionIdConverter.toStringList(extension.getExtensionFeatures())));
         List<String> authors = new ArrayList<String>();
         for (ExtensionAuthor author : extension.getAuthors()) {
             authors.add(author.getName());
         }
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, authors));
-        extensionObject.getProperties().add(
-            property(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite()));
+        extensionObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite()));
         if (extension.getScm() != null) {
-            extensionObject.getProperties().add(
-                property(XWikiRepositoryModel.PROP_EXTENSION_SCMURL, extension.getScm().getUrl()));
+            extensionObject.getProperties()
+                .add(property(XWikiRepositoryModel.PROP_EXTENSION_SCMURL, extension.getScm().getUrl()));
         }
         return extensionObject;
     }
@@ -142,8 +142,8 @@ public class RepositoryTestUtils
     {
         org.xwiki.rest.model.jaxb.Object dependencyObject = object(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
 
-        dependencyObject.getProperties().add(
-            property(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT, dependency.getVersionConstraint()));
+        dependencyObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT, dependency.getVersionConstraint()));
 
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version));
 
@@ -290,8 +290,8 @@ public class RepositoryTestUtils
     {
         InputStream is = extension.getFile().openStream();
         try {
-            this.testUtils.attachFile(getExtensionPageReference(extension), extension.getId().getId() + "-"
-                + extension.getId().getVersion() + "." + extension.getType(), is, true);
+            this.testUtils.attachFile(getExtensionPageReference(extension),
+                extension.getId().getId() + "-" + extension.getId().getVersion() + "." + extension.getType(), is, true);
         } finally {
             is.close();
         }

@@ -783,6 +783,10 @@ public class RepositoryManager implements Initializable, Disposable
         // Features
         needSave |= updateFeatures(extensionObject, extension.getExtensionFeatures());
 
+        // Allowed namespaces
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES,
+            extension.getAllowedNamespaces());
+
         // Properties
         needSave |= updateProperties(extensionObject, extension.getProperties());
 

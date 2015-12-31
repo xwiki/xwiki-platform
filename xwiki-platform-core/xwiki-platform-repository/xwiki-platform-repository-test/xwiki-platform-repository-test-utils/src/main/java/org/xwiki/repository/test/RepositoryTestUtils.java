@@ -78,6 +78,10 @@ public class RepositoryTestUtils
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, authors));
         extensionObject.getProperties()
             .add(property(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite()));
+        if (extension.getAllowedNamespaces() != null) {
+            extensionObject.getProperties()
+                .add(property(XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES, extension.getAllowedNamespaces()));
+        }
         if (extension.getScm() != null) {
             extensionObject.getProperties()
                 .add(property(XWikiRepositoryModel.PROP_EXTENSION_SCMURL, extension.getScm().getUrl()));

@@ -98,6 +98,8 @@ public class XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_CATEGORY = "category";
 
+    public static final String PROP_EXTENSION_ALLOWEDNAMESPACES = "allowednamespaces";
+
     public static final String PROP_EXTENSION_SCMURL = "source";
 
     public static final String PROP_EXTENSION_SCMCONNECTION = "scmconnection";
@@ -241,6 +243,8 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL, new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
             null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_ALLOWEDNAMESPACE));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
 
         // Rating

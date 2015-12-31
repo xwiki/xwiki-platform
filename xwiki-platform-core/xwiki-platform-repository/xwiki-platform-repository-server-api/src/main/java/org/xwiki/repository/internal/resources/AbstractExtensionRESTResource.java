@@ -56,6 +56,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.License;
+import org.xwiki.extension.repository.xwiki.model.jaxb.Namespaces;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Property;
 import org.xwiki.model.reference.DocumentReference;
@@ -373,6 +374,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extension.getExtensionFeatures().add(extensionFeature);
         }
 
+        // Allowed namespaces
+        List<String> namespaces =
+            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
+        if (namespaces != null && !namespaces.isEmpty()) {
+            Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
+            restNamespaces.withNamespaces(namespaces);
+            extension.setAllowedNamespaces(restNamespaces);
+        }
+
         // Repositories
         if (extensionVersionObject != null) {
             List<String> repositories =
@@ -605,6 +615,16 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extension.getExtensionFeatures().add(extensionFeature);
         }
 
+        // Allowed namespaces
+        String namespacesString =
+            this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
+        if (!StringUtils.isEmpty(namespacesString)) {
+            List<String> namespaces = ListClass.getListFromString(namespacesString, "|", false);
+            Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
+            restNamespaces.withNamespaces(namespaces);
+            extension.setAllowedNamespaces(restNamespaces);
+        }
+
         // License
         License license = this.extensionObjectFactory.createLicense();
         license.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
@@ -691,6 +711,14 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             License license = this.extensionObjectFactory.createLicense();
             license.setName(licenseName);
             extension.getLicenses().add(license);
+        }
+
+        // Allowed namespaces
+        Collection<String> namespaces = this.<String>getSolrValues(document, Extension.FIELD_ALLOWEDNAMESPACES);
+        if (namespaces != null && !namespaces.isEmpty()) {
+            Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
+            restNamespaces.withNamespaces(namespaces);
+            extension.setAllowedNamespaces(restNamespaces);
         }
 
         // Version

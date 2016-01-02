@@ -45,8 +45,10 @@
              about 10% on startup time. -->
         <Call name="setContextAttribute">
           <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-          <!-- Since we've moved WebDAV Servlet/Filter configuration to Servlet 3.0 annotations, we need to tell Jetty
-               to scan the XWiki WebDAV JAR -->
+          <!-- Starting with XWiki 8.0 we've removed WebDAV by default and we've made it installable through Servlet
+               3.0 annotations. In order to make the standalone distribution installation-friendly for WebDAV we're
+               configuring Jetty to parse the WebDAV JAR by default in order to find the annotations. We need to do this
+               since we've disabled JAR parsing by default to increase startup speed. -->
           <Arg>.*xwiki-platform-webdav-server-.*\.jar</Arg>
         </Call>
 

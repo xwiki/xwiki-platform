@@ -31,9 +31,6 @@
   <packaging>jar</packaging>
   <name>XWiki Platform - WebDAV - Server</name>
   <description>Service for accessing XWiki through WebDAV</description>
-  <properties>
-    <jackrabbit.version>1.4</jackrabbit.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

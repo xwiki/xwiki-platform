@@ -28,8 +28,19 @@
   <artifactId>xwiki-platform-webdav</artifactId>
   <name>XWiki Platform - WebDAV - Parent POM</name>
   <packaging>pom</packaging>
+  <properties>
+    <jackrabbit.version>1.4</jackrabbit.version>
+  </properties>
   <modules>
     <module>xwiki-platform-webdav-server</module>
     <module>xwiki-platform-webdav-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-webdav-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

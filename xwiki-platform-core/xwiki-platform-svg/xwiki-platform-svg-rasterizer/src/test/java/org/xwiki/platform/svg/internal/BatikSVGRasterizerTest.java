@@ -33,12 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -62,23 +61,19 @@ import static org.mockito.Mockito.when;
  */
 public class BatikSVGRasterizerTest
 {
-    private static final String SVG =
+    private static final String VALID_SVG =
         "<svg xmlns='http://www.w3.org/2000/svg'><ellipse cx='50' cy='100' rx='25' ry='50'/></svg>";
 
-    private static final String RASTER_FILE_NAME = Math.abs(SVG.hashCode()) + ".png";
+    private static final String INVALID_SVG = "<bad>svg!";
 
-    private static final File RASTER_FILE =
-        new File(System.getProperty("java.io.tmpdir") + "/temp/svg/wiki/Space/Document/" + RASTER_FILE_NAME);
-
-    private static final File TEMPORARY_FILE =
-        new File(System.getProperty("java.io.tmpdir") + "/temp/svg/" + RASTER_FILE_NAME);
-
-    private static final String TEMPORARY_FILE_PATH =
-        TEMPORARY_FILE.getAbsolutePath();
+    private static final String RASTER_FILE_NAME = Math.abs(VALID_SVG.hashCode()) + ".png";
 
     @Rule
     public final MockitoComponentMockingRule<SVGRasterizer> mocker =
         new MockitoComponentMockingRule<SVGRasterizer>(BatikSVGRasterizer.class);
+
+    @Rule
+    public final TemporaryFolder baseDirectory = new TemporaryFolder();
 
     private DocumentReference dref = new DocumentReference("wiki", "Space", "Document");
 
@@ -94,16 +89,22 @@ public class BatikSVGRasterizerTest
     @Mock
     private HttpServletResponse hsresponse;
 
+    private File rasterFile;
+
+    private File temporaryFile;
+
+    private String temporaryFilePath;
+
     @Before
     public void setup() throws Exception
     {
         MockitoAnnotations.initMocks(this);
-
-        FileUtils.deleteQuietly(RASTER_FILE);
-        FileUtils.deleteQuietly(TEMPORARY_FILE);
+        this.rasterFile = new File(this.baseDirectory.getRoot() + "/temp/svg/wiki/Space/Document/" + RASTER_FILE_NAME);
+        this.temporaryFile = new File(this.baseDirectory.getRoot() + "/temp/svg/" + RASTER_FILE_NAME);
+        this.temporaryFilePath = this.temporaryFile.getAbsolutePath();
 
         this.environment = this.mocker.getInstance(Environment.class);
-        when(this.environment.getTemporaryDirectory()).thenReturn(new File(System.getProperty("java.io.tmpdir")));
+        when(this.environment.getTemporaryDirectory()).thenReturn(this.baseDirectory.getRoot());
 
         this.resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         when(this.resolver.resolve("")).thenReturn(this.dref);
@@ -117,8 +118,8 @@ public class BatikSVGRasterizerTest
     public void rasterizeToTemporaryFileCreatesTemporaryFile() throws Exception
     {
         File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(SVG, 100, 200);
-        Assert.assertEquals(TEMPORARY_FILE_PATH, tfile.getAbsolutePath());
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        Assert.assertEquals(this.temporaryFilePath, tfile.getAbsolutePath());
         Assert.assertTrue(tfile.exists());
         Assert.assertTrue(isPNG(tfile));
     }
@@ -126,10 +127,10 @@ public class BatikSVGRasterizerTest
     @Test
     public void rasterizeToTemporaryFileReusesFile() throws Exception
     {
-        writeTestFile(TEMPORARY_FILE);
+        writeTestFile(this.temporaryFile);
         File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(SVG, 100, 200);
-        Assert.assertEquals(TEMPORARY_FILE_PATH, tfile.getAbsolutePath());
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        Assert.assertEquals(this.temporaryFilePath, tfile.getAbsolutePath());
         Assert.assertTrue(tfile.exists());
         Assert.assertTrue(isTestFile(tfile));
     }
@@ -138,7 +139,7 @@ public class BatikSVGRasterizerTest
     public void rasterizeToTemporaryFileReturnsNullOnExceptions() throws Exception
     {
         File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile("<bad>svg!", 0, 0);
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(INVALID_SVG, 0, 0);
         Assert.assertNull(tfile);
     }
 
@@ -146,7 +147,7 @@ public class BatikSVGRasterizerTest
     public void rasterizeToTemporaryResourceUsesContextDocument() throws Exception
     {
         TemporaryResourceReference tref =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(SVG, 100, 200);
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(VALID_SVG, 100, 200);
         Assert.assertEquals("svg", tref.getModuleId());
         Assert.assertTrue(tref.getParameters().isEmpty());
         Assert.assertEquals(this.dref, tref.getOwningEntityReference());
@@ -156,21 +157,21 @@ public class BatikSVGRasterizerTest
     @Test
     public void rasterizeToTemporaryResourceReusesFile() throws Exception
     {
-        writeTestFile(RASTER_FILE);
+        writeTestFile(this.rasterFile);
         TemporaryResourceReference tref =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(SVG, 100, 200);
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(VALID_SVG, 100, 200);
         Assert.assertEquals("svg", tref.getModuleId());
         Assert.assertTrue(tref.getParameters().isEmpty());
         Assert.assertEquals(this.dref, tref.getOwningEntityReference());
-        Assert.assertEquals(Math.abs(SVG.hashCode()) + ".png", tref.getResourceName());
-        Assert.assertTrue(isTestFile(RASTER_FILE));
+        Assert.assertEquals(Math.abs(VALID_SVG.hashCode()) + ".png", tref.getResourceName());
+        Assert.assertTrue(isTestFile(this.rasterFile));
     }
 
     @Test
     public void rasterizeToTemporaryResourceReturnsNullOnExceptions() throws Exception
     {
         TemporaryResourceReference tref =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource("<bad>svg!", 0, 0);
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(INVALID_SVG, 0, 0);
         Assert.assertNull(tref);
     }
 
@@ -179,7 +180,7 @@ public class BatikSVGRasterizerTest
     {
         CapturingOutputStream out = new CapturingOutputStream();
         when(this.hsresponse.getOutputStream()).thenReturn(out);
-        this.mocker.getComponentUnderTest().rasterizeToResponse(SVG, 100, 200);
+        this.mocker.getComponentUnderTest().rasterizeToResponse(VALID_SVG, 100, 200);
         Assert.assertTrue(out.out.size() > 0);
         Assert.assertArrayEquals("PNG".getBytes("UTF-8"), Arrays.copyOfRange(out.out.toByteArray(), 1, 4));
     }
@@ -189,7 +190,7 @@ public class BatikSVGRasterizerTest
     {
         Response r = Mockito.mock(Response.class);
         when(this.container.getResponse()).thenReturn(r);
-        this.mocker.getComponentUnderTest().rasterizeToResponse(SVG, 100, 200);
+        this.mocker.getComponentUnderTest().rasterizeToResponse(VALID_SVG, 100, 200);
         Mockito.verifyZeroInteractions(r);
     }
 
@@ -198,21 +199,8 @@ public class BatikSVGRasterizerTest
     {
         CapturingOutputStream out = new CapturingOutputStream();
         when(this.hsresponse.getOutputStream()).thenReturn(out);
-        this.mocker.getComponentUnderTest().rasterizeToResponse("<bad>svg!", 0, 0);
+        this.mocker.getComponentUnderTest().rasterizeToResponse(INVALID_SVG, 0, 0);
         Assert.assertEquals(0, out.out.size());
-    }
-
-    @After
-    public void cleanup()
-    {
-        FileUtils.deleteQuietly(RASTER_FILE);
-        FileUtils.deleteQuietly(TEMPORARY_FILE);
-    }
-
-    @AfterClass
-    public static void cleanupTempDir() throws IOException
-    {
-        FileUtils.forceDelete(TEMPORARY_FILE.getParentFile().getParentFile());
     }
 
     private boolean isPNG(File file)

@@ -144,6 +144,16 @@ public class BatikSVGRasterizerTest
     }
 
     @Test
+    public void rasterizeToTemporaryFileReturnsNullWhenFileCannotBeCreated() throws Exception
+    {
+        this.baseDirectory.getRoot().mkdirs();
+        writeTestFile(new File(this.baseDirectory.getRoot(), "temp"));
+        File tfile =
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        Assert.assertNull(tfile);
+    }
+
+    @Test
     public void rasterizeToTemporaryResourceUsesContextDocument() throws Exception
     {
         TemporaryResourceReference tref =
@@ -172,6 +182,27 @@ public class BatikSVGRasterizerTest
     {
         TemporaryResourceReference tref =
             this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(INVALID_SVG, 0, 0);
+        Assert.assertNull(tref);
+    }
+
+    @Test
+    public void rasterizeToTemporaryResourceReturnsNullWhenBaseTempDirCannotBeCreated() throws Exception
+    {
+        this.baseDirectory.getRoot().mkdirs();
+        writeTestFile(new File(this.baseDirectory.getRoot(), "temp"));
+        TemporaryResourceReference tref =
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(VALID_SVG, 100, 200);
+        Assert.assertNull(tref);
+    }
+
+    @Test
+    public void rasterizeToTemporaryResourceReturnsNullWhenContextTempDirCannotBeCreated() throws Exception
+    {
+        this.baseDirectory.getRoot().mkdirs();
+        writeTestFile(
+            new File(new File(new File(new File(this.baseDirectory.getRoot(), "temp"), "svg"), "wiki"), "Space"));
+        TemporaryResourceReference tref =
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryResource(VALID_SVG, 100, 200);
         Assert.assertNull(tref);
     }
 

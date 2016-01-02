@@ -82,7 +82,7 @@ public class BatikSVGRasterizer implements SVGRasterizer
     public File rasterizeToTemporaryFile(String content, int width, int height) throws IOException
     {
         File out = getTempFile(content.hashCode());
-        if (rasterizeToFile(content, out, width, height)) {
+        if (out != null && rasterizeToFile(content, out, width, height)) {
             return out;
         }
         return null;
@@ -100,7 +100,7 @@ public class BatikSVGRasterizer implements SVGRasterizer
         DocumentReference targetContext) throws IOException
     {
         File out = getContextTempFile(content.hashCode(), targetContext);
-        if (rasterizeToFile(content, out, width, height)) {
+        if (out != null && rasterizeToFile(content, out, width, height)) {
             return new TemporaryResourceReference(TEMP_DIR_NAME, out.getName(), targetContext);
         }
         return null;
@@ -169,25 +169,36 @@ public class BatikSVGRasterizer implements SVGRasterizer
 
     private File getTempFile(int hashcode)
     {
-        return new File(getBaseTempDir(), Math.abs(hashcode) + RASTER_FILE_EXTENSION);
+        File parent = getBaseTempDir();
+        if (parent == null) {
+            return null;
+        }
+        return new File(parent, Math.abs(hashcode) + RASTER_FILE_EXTENSION);
     }
 
     private File getContextTempFile(int hashcode, DocumentReference targetContext)
     {
-        return new File(getTempDir(targetContext), Math.abs(hashcode) + RASTER_FILE_EXTENSION);
+        File parent = getTempDir(targetContext);
+        if (parent == null) {
+            return null;
+        }
+        return new File(parent, Math.abs(hashcode) + RASTER_FILE_EXTENSION);
     }
 
     private File getTempDir(DocumentReference targetContext)
     {
         File tempDir = getBaseTempDir();
+        if (tempDir == null) {
+            return null;
+        }
         for (EntityReference ref : targetContext.getReversedReferenceChain()) {
             tempDir = new File(tempDir, ref.getName());
         }
 
-        try {
-            tempDir.mkdirs();
-        } catch (Exception ex) {
-            this.logger.warn("Cannot create temporary files: {}", ExceptionUtils.getRootCauseMessage(ex));
+        if (!tempDir.exists() && !tempDir.mkdirs()) {
+            this.logger.error("Cannot create temporary directory [{}] for context document [{}]", tempDir,
+                targetContext);
+            return null;
         }
 
         return tempDir;
@@ -197,10 +208,9 @@ public class BatikSVGRasterizer implements SVGRasterizer
     {
         File tempDir = new File(new File(this.environment.getTemporaryDirectory(), "temp"), TEMP_DIR_NAME);
 
-        try {
-            tempDir.mkdirs();
-        } catch (Exception ex) {
-            this.logger.warn("Cannot create temporary directory: {}", ExceptionUtils.getRootCauseMessage(ex));
+        if (!tempDir.exists() && !tempDir.mkdirs()) {
+            this.logger.error("Cannot create temporary directory [{}]", tempDir);
+            return null;
         }
 
         return tempDir;

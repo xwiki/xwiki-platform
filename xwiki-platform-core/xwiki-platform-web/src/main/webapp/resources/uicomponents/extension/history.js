@@ -239,13 +239,12 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   // Extension History Replay Status
   //
 
-  var enhanceReplayStatus = function(container, uiState) {
-    container.find('.extension-history-replay-log .xHint').click(function() {
-      $(this).closest('.extension-history-replay-log').toggleClass('opened');
-    });
-
-    uiState = uiState || {};
-    container.find('.extension-history-replay-log').toggleClass('opened', !!uiState.logOpened);
+  var enhanceReplayStatus = function(container, oldUIState) {
+    oldUIState = oldUIState || {};
+    var newUIState = getReplayStatusUIState(container);
+    if (!!oldUIState.logOpened !== newUIState.logOpened) {
+      container.find('.extension-history-replay-log .collapse-toggle').click();
+    }
 
     var jobState = container.attr('data-jobState');
     if (jobState == 'WAITING') {
@@ -261,7 +260,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
   var getReplayStatusUIState = function(container) {
     return {
-      'logOpened': container.find('.extension-history-replay-log.opened').size() > 0
+      'logOpened': container.find('.log.hidden').size() === 0
     };
   };
 

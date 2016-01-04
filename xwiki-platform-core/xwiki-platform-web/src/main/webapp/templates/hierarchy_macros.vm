@@ -105,6 +105,7 @@
  * @param $options various display options; default values are {
  *   id: null, // the value of the id attribute to set on the container element
  *   excludeSelf: false, // whether the target reference has been excluded from the path
+ *   selfIsActive: true, // whether the target reference should be marked as active or not
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
@@ -137,7 +138,7 @@
       ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
       #set ($closingTag = '</li><li')
       #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
-        #if (!$options.excludeSelf)
+        #if (!$options.excludeSelf && "$!options.selfIsActive" != 'false')
           #set ($discard = $classNames.add('active'))
         #end
         #set ($closingTag = '')

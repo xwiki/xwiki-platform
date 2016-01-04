@@ -1,36 +1,36 @@
 ###
 ### Rename document template
 ###
-#if(!$xwiki.checkAccess($doc.fullName, 'delete'))
+#if (!$xwiki.checkAccess($doc.fullName, 'delete'))
   #template("accessdenied.vm")
-#elseif($doc.isNew())
-  $response.setStatus(404)
-  #template("startpage.vm")
-  <div class="main layoutsubsection"><div id="mainContentArea">
-    #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div></div>
-  #template("endpage.vm")
+#elseif ($xcontext.action == 'get' && "$!request.renameId" != '')
+  ## AJAX request for rename status update.
+  #template("renameStatus.vm")
 #else
   #template("startpage.vm")
-  ## TODO: Improve the interface, splitting the operation into more steps.
-  #if("$!{step}" == '')
-    #set($step = "$!{request.getParameter('step')}")
+  #if ("$!step" == '')
+    #set ($step = "$!request.step")
+    #if ("$!step" == '')
+      #set ($step = '1')
+    #end
   #end
-  #if("$!{step}" == '')
-    #set($step = '1')
-  #end
-  #set($step = $mathtool.toInteger("$step"))
   <div class="main layoutsubsection">
   <div id="mainContentArea">
-    #if($step == 1)
+    #if ("$!request.renameId" != '')
+      ## Display the rename status
+      #template("renameStatus.vm")
+    #elseif ($doc.isNew())
+      $response.setStatus(404)
+      #error($services.localization.render('core.rename.nonexistingDocument'))
+    #elseif ($step == 1)
       ## Display the rename form
       #template("renameStep1.vm")
-    #elseif(!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+    #elseif (!$services.csrf.isTokenValid($request.form_token))
       ## CSRF protection
-      $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
+      $response.sendRedirect("$!services.csrf.resubmissionURL")
     #else
       ## Do the rename. It's the form in renameStep1.vm page that calls this page with step=2.
-      #if("$!{request.newPageName.trim()}" == '')
+      #if ("$!request.newPageName.trim()" == '')
         $response.setStatus(400)
         #error($services.localization.render('core.rename.emptyName'))
         #template("renameStep1.vm")
@@ -41,18 +41,17 @@
         #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL $terminal
           $newDocReference)
         #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
-        #if($xwiki.exists($newDocReference))
+        #if ($xwiki.exists($newDocReference))
           $response.setStatus(409)
           #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)},
             $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
-        #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
+        #elseif (!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
           $response.setStatus(403)
           #error($services.localization.render('core.rename.targetNotWritable',
             [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
-          #set ($success = false)
           #set ($renameRequest = $services.refactoring.createRenameRequest($doc.documentReference, $newDocReference))
           ## We can't rename the children if the new page is terminal.
           #set ($deep = $request.deep == 'true' && !$terminal)
@@ -62,29 +61,20 @@
           #set ($autoRedirect = $request.autoRedirect == 'true')
           #set ($discard = $renameRequest.setAutoRedirect($autoRedirect))
           #set ($renameJob = $services.refactoring.rename($renameRequest))
-          #try()
-            #set ($discard = $renameJob.join())
-            #set ($renameJobStatus = $services.job.getJobStatus($renameJob.request.id))
-            #set ($success = $renameJobStatus.log.getLogs('ERROR').isEmpty())
+          #if ($request.async != 'true')
+            #try()
+              #set ($discard = $renameJob.join())
+            #end
           #end
-          #if ($success)
-            #set ($message = $services.localization.render('core.rename.success', [
-              $escapetool.xml($doc.name),
-              $escapetool.xml($newDocReference.name),
-              $xwiki.getURL($newDocReference),
-              $escapetool.xml($doc.space),
-              $escapetool.xml($services.model.serialize($newDocReference.parent))
-            ]))
-          #else
-            #set ($message = $services.localization.render('core.rename.targetNotWritable'))
-          #end
-          #xwikimessageboxstart($services.localization.render('notice') $message)
-          #xwikimessageboxend()
+          $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
+            'xpage': 'rename',
+            'renameId': $renameRequest.id.get($mathtool.sub($renameRequest.id.size(), 1))
+          })))
         #end
       #end
     #end
-<div class="clearfloats"></div>
-</div>## mainContentArea
-</div>## main
-#template("endpage.vm")
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
 #end

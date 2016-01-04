@@ -594,6 +594,37 @@
               <method>void ajc$interFieldInit$com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$xmlRpcServer(com.xpn.xwiki.XWikiContext)</method>
               <justification>Impossible to implement it without dependeing on XMLRPC module</justification>
             </difference>
+
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/refactoring/script/RefactoringScriptService</className>
+              <method>org.xwiki.refactoring.job.EntityJobStatus getCopyAsJobStatus(java.lang.String)</method>
+              <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/refactoring/script/RefactoringScriptService</className>
+              <method>org.xwiki.refactoring.job.EntityJobStatus getCopyJobStatus(java.lang.String)</method>
+              <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/refactoring/script/RefactoringScriptService</className>
+              <method>org.xwiki.refactoring.job.EntityJobStatus getDeleteJobStatus(java.lang.String)</method>
+              <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/refactoring/script/RefactoringScriptService</className>
+              <method>org.xwiki.refactoring.job.EntityJobStatus getMoveJobStatus(java.lang.String)</method>
+              <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/refactoring/script/RefactoringScriptService</className>
+              <method>org.xwiki.refactoring.job.EntityJobStatus getRenameJobStatus(java.lang.String)</method>
+              <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

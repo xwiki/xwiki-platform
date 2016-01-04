@@ -40,7 +40,6 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CreateRequest;
-import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -238,28 +237,6 @@ public class RefactoringScriptServiceTest
         assertEquals(RefactoringJobs.CREATE, request.getValue().getJobType());
         assertEquals(Arrays.asList(documentReference), request.getValue().getEntityReferences());
         assertTrue(request.getValue().isDeep());
-    }
-
-    @Test
-    public void getJobStatus() throws Exception
-    {
-        EntityJobStatus<MoveRequest> moveStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> renameStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> copyStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> copyAsStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<EntityRequest> deleteStatus = new EntityJobStatus<>(null, null, null, null);
-
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "move", "id"))).thenReturn(moveStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "rename", "id"))).thenReturn(renameStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "copy", "id"))).thenReturn(copyStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "copyAs", "id"))).thenReturn(copyAsStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "delete", "id"))).thenReturn(deleteStatus);
-
-        assertSame(moveStatus, getService().getMoveJobStatus("id"));
-        assertSame(renameStatus, getService().getRenameJobStatus("id"));
-        assertSame(copyStatus, getService().getCopyJobStatus("id"));
-        assertSame(copyAsStatus, getService().getCopyAsJobStatus("id"));
-        assertSame(deleteStatus, getService().getDeleteJobStatus("id"));
     }
 
     @Test

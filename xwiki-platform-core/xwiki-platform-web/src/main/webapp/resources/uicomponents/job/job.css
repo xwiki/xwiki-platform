@@ -1,15 +1,22 @@
 #template('colorThemeInit.vm')
-.xform label.collapsible {
-  cursor: pointer;
-}
-.xform label.collapsible:before {
+.collapse-toggle {
   color: $theme.textSecondaryColor;
-  content: "\25BC";
-  margin: 0 .5em 0 -1.5em;
+  cursor: pointer;
+  font-size: smaller;
 }
-.xform label.collapsible:hover:before {
-  color: $theme.textColor;
+.collapse-toggle .icon-closed,
+.collapse-toggle .icon-opened {
+  width: 10px;
 }
-.xform label.collapsible.collapsed:before {
-  content: "\25B6";
+.collapse-toggle .icon-closed {
+  display: none;
+}
+.collapse-toggle .icon-opened {
+  display: inline-block;
+}
+.collapse-toggle.collapsed .icon-closed {
+  display: inline-block;
+}
+.collapse-toggle.collapsed .icon-opened {
+  display: none;
 }

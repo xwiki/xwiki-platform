@@ -37,14 +37,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.job.script.JobScriptService;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.CreateRequest;
-import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -93,10 +91,6 @@ public class RefactoringScriptService implements ScriptService
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    @Named("job")
-    private ScriptService jobScriptService;
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -580,67 +574,6 @@ public class RefactoringScriptService implements ScriptService
     {
         request.setCheckRights(true);
         request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
-    }
-
-    /**
-     * Retrieve the status of a move job.
-     *
-     * @param id the id of a move job
-     * @return the status of the specified job
-     */
-    public EntityJobStatus<MoveRequest> getMoveJobStatus(String id)
-    {
-        return getJobStatus(getJobId(RefactoringJobs.MOVE, id));
-    }
-
-    /**
-     * Retrieve the status of a rename job.
-     *
-     * @param id the id of a rename job
-     * @return the status of the specified job
-     */
-    public EntityJobStatus<MoveRequest> getRenameJobStatus(String id)
-    {
-        return getJobStatus(getJobId(RefactoringJobs.RENAME, id));
-    }
-
-    /**
-     * Retrieve the status of a copy job.
-     *
-     * @param id the id of a copy job
-     * @return the status of the specified job
-     */
-    public EntityJobStatus<MoveRequest> getCopyJobStatus(String id)
-    {
-        return getJobStatus(getJobId(RefactoringJobs.COPY, id));
-    }
-
-    /**
-     * Retrieve the status of a copy-as job.
-     *
-     * @param id the id of a copy-as job
-     * @return the status of the specified job
-     */
-    public EntityJobStatus<MoveRequest> getCopyAsJobStatus(String id)
-    {
-        return getJobStatus(getJobId(RefactoringJobs.COPY_AS, id));
-    }
-
-    /**
-     * Retrieve the status of a delete job.
-     *
-     * @param id the id of a delete job
-     * @return the status of the specified job
-     */
-    public EntityJobStatus<EntityRequest> getDeleteJobStatus(String id)
-    {
-        return getJobStatus(getJobId(RefactoringJobs.DELETE, id));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends EntityRequest> EntityJobStatus<T> getJobStatus(List<String> jobId)
-    {
-        return (EntityJobStatus<T>) ((JobScriptService) jobScriptService).getJobStatus(jobId);
     }
 
     /**

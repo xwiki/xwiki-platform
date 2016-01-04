@@ -1,0 +1,96 @@
+#template('hierarchy_macros.vm')
+#template('job_macros.vm')
+
+#macro (displayLocations $label $hint $entityReferences)
+  <dt>
+    <label>$services.localization.render($label)</label>
+    <span class="xHint">$services.localization.render($hint)</span>
+  </dt>
+  <dd>
+    #foreach ($entityReference in $entityReferences)
+      #hierarchy($entityReference {
+        'treeNavigation': false,
+        'selfIsActive': false,
+        'limit': 5
+      })
+    #end
+  </dd>
+#end
+
+#macro (displayBooleanConfigParam $label $hint $value)
+  <dt>
+    <label>
+      ## 'application' icon is not semantically correct but it is mapped to the right Font Awesome icon (square).
+      ## We also tried 'cross' but it is confusing when none of the configuration options are checked (because in real
+      ## life we often check items by putting a cross in front of them).
+      $services.icon.renderHTML("#if ($value)check#{else}application#end")
+      $services.localization.render($label)
+    </label>
+    <span class="xHint">$services.localization.render($hint)</span>
+  </dt>
+#end
+
+#macro (displayRenameJobRequest $renameJobRequest)
+  <div class="refactoring-job-request row xform">
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.rename.source.label' 'core.rename.source.hint' $renameJobRequest.entityReferences)
+        #displayBooleanConfigParam('core.rename.children.labelWithoutParams', 'core.rename.children.hint'
+          $renameJobRequest.isDeep())
+        #displayBooleanConfigParam('core.rename.links.labelWithoutParams', 'core.rename.links.hint'
+          $renameJobRequest.isUpdateLinks())
+        #displayBooleanConfigParam('core.rename.autoRedirect.label', 'core.rename.autoRedirect.hint'
+          $renameJobRequest.isAutoRedirect())
+      </dl>
+    </div>
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.rename.target.location.label' 'core.rename.target.location.hint'
+          [$renameJobRequest.destination])
+        #if ($isAdvancedUser || $isSuperAdmin)
+          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+          #set ($terminal = $renameJobRequest.destination.type == 'DOCUMENT'
+            && $renameJobRequest.destination.name != $defaultDocumentName)
+          #displayBooleanConfigParam('core.rename.target.terminal.label', 'core.rename.target.terminal.hint' $terminal)
+        #end
+      </dl>
+    </div>
+  </div>
+#end
+
+#macro (displayRenameJobStatus $renameJobStatus)
+  #set ($renameJobState = $renameJobStatus.state)
+  #set ($finished = $renameJobState == 'FINISHED')
+  #set ($success = $finished && $renameJobStatus.log.getLogs('ERROR').isEmpty())
+  <div class="job-status">
+    <h2>$services.localization.render('core.rename.status.label')</h2>
+    #set ($renameJobRequest = $renameJobStatus.request)
+    <p class="text-muted small">$services.localization.render('core.rename.status.hint',
+      [$xwiki.getUserName($renameJobRequest.userReference), $xwiki.formatDate($renameJobStatus.startDate)])</p>
+    #displayRenameJobRequest($renameJobRequest)
+    #if (!$finished)
+      #displayJobProgressBar($renameJobStatus)
+    #elseif ($success)
+      <div class="box successmessage">
+        $services.localization.render('core.rename.status.success')
+      </div>
+    #else
+      <div class="box errormessage">
+        $services.localization.render('core.rename.status.failure')
+      </div>
+    #end
+    #if ($isAdvancedUser || $isSuperAdmin)
+      #displayJobStatusLog($renameJobStatus true)
+    #end
+  </div>
+#end
+
+#set ($renameJobStatus = $services.job.getJobStatus(['refactoring', 'rename', $request.renameId]))
+#if ($renameJobStatus)
+  #displayRenameJobStatus($renameJobStatus)
+#else
+  $response.setStatus(404)
+  <div class="box errormessage">
+    $services.localization.render('core.rename.status.notFound')
+  </div>
+#end

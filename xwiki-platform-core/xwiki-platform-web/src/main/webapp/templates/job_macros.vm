@@ -28,7 +28,10 @@ $services.template.execute('logging_macros.vm')
   <dl class="xform">
     ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
     <dt>
-      <label class="collapsible#if ($collapsed || $status.state == 'WAITING') collapsed#end">
+      <label class="collapse-toggle#if ($collapsed || $status.state == 'WAITING') collapsed#end"
+          data-target-xpath="parent::*/following-sibling::*">
+        <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
+        <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
         #set ($jobType = $status.request.getProperty('job.type'))
         #set ($translationKey = "job.log.label.$jobType")
         #if (!$services.localization.get($translationKey))

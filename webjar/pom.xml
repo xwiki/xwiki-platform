@@ -36,7 +36,7 @@
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <ckeditor.version>4.4.7</ckeditor.version>
+    <ckeditor.version>4.5.6</ckeditor.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
@@ -52,7 +52,7 @@
       <!-- Checkout the CKEditor sources for the version (tag) we want to use. -->
       <plugin>
         <artifactId>maven-scm-plugin</artifactId>
-        <version>1.9.2</version>
+        <version>1.9.4</version>
         <executions>
           <execution>
             <id>checkout-ckeditor-sources</id>

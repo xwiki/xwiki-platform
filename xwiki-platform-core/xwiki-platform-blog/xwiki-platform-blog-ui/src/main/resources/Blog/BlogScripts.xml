@@ -131,19 +131,19 @@ if(typeof(XWiki) == 'undefined') {
 XWiki.Blog = {
   blogToolsValues: {
     show: {
-      title: "This blog post is not visible to other users. Make it visible",
+      title: "$services.localization.render('xe.blog.code.makevisible')",
       imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.png')",
       imageAlt: "show",
-      comment: "Made%20entry%20visible"
+      comment: "$services.localization.render('xe.blog.code.madevisible')"
     },
     hide: {
-      title: "Hide this blog post from other users",
+      title: "$services.localization.render('xe.blog.code.hide')",
       imageSrc: "$xwiki.getSkinFile('icons/silk/lock.png')",
       imageAlt: "hide",
-      comment: "Hidden%20entry"
+      comment: "$services.localization.render('xe.blog.code.hid')"
     },
     loading: {
-      title: "Loading...",
+      title: "$services.localization.render('xe.blog.code.loading')",
       imageSrc: "$xwiki.getSkinFile('icons/xwiki/spinner.gif')",
       imageAlt: "loading"
     }
@@ -178,9 +178,9 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.onEntryMadeInvisible.bind(this),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on403: function() {alert("You are not allowed to perform this action")},
-      on401: function() {alert("You have been logged out, please login")},
-      onFailure: function() {alert("Failed to change blog post visibility")}
+      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
+      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
+      onFailure: function() {alert("$services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility')")}
     });
   },
   makeEntryVisible : function(event) {
@@ -190,9 +190,9 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.onEntryMadeVisible.bind(this),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on403: function() {alert("You are not allowed to perform this action")},
-      on401: function() {alert("You have been logged out, please login")},
-      onFailure: function() {alert("Failed to change blog post visibility")}
+      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
+      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
+      onFailure: function() {alert("$services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility')")}
     });
   },
   onEntryMadeVisible : function() {
@@ -224,7 +224,7 @@ XWiki.Blog = {
         var label = document.createElement("span").addClassName("messagetype");
         label.appendChild(document.createTextNode("Warning: "));
         wrapper.appendChild(label);
-        wrapper.appendChild(document.createTextNode("This blog post is hidden."));
+        wrapper.appendChild(document.createTextNode("'xe.blog.code.hidden'"));
         content.up().insertBefore(wrapper, content);
       }
     });
@@ -234,7 +234,7 @@ XWiki.Blog = {
     button.title = resources.title;
     button.down("img").src = resources.imageSrc;
     button.down("img").alt = resources.alt;
-    button.href = button.href.replace(/&amp;comment=(.*?)(&amp;|$)/, "&amp;comment=" + resources.comment + "$2");
+    button.href = button.href.replace(/&amp;comment=(.*?)(&amp;|$)/, "&amp;comment=" + encodeURIComponent(resources.comment) + "$2");
     if (button.href.match(/_hidden=1/)) {
       button.href = button.href.replace(/_hidden=1/, "_hidden=0");
     } else {
@@ -270,10 +270,10 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.updateCategoryTree.bindAsEventListener(this, name, parentCategory, parentSpace),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on409: function() {alert("This category already exists")},
-      on403: function() {alert("You are not allowed to perform this action")},
-      on401: function() {alert("You have been logged out, please login")},
-      onFailure: function() {alert("Failed to add category")}
+      on409: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.categoryAlreadyExists')")},
+      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
+      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
+      onFailure: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.failed')")}
     });
   },
 

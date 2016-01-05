@@ -589,10 +589,24 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #isHidden($entryObj $isHidden)
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
+    #set ($queryString = {
+      'xredirect'  : $thisURL, 
+      'form_token' : $services.csrf.getToken()
+      })
     #if ($isHidden)
-      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;comment=${escapetool.url($services.localization.render('xe.blog.code.madevisible'))}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]##
+      #set ($discard = $queryString.putAll({
+        "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 0,
+        'comment' : $services.localization.render('xe.blog.code.madevisible')
+        }))
+      #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
+      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]
     #else
-      [[#toolImage('lock', 'hide ')&gt;&gt;path:$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;comment=${escapetool.url($services.localization.render('xe.blog.code.hid'))}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]##
+      #set ($discard = $queryString.putAll({
+        "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 1,
+        'comment' : $services.localization.render('xe.blog.code.hid')
+        }))
+      #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
+      [[#toolImage('lock', 'hide ')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]
     #end
   #end
 #end

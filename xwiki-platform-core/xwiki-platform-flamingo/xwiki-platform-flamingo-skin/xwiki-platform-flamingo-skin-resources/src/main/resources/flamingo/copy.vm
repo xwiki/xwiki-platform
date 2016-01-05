@@ -1,23 +1,108 @@
 ###
 ### Copy document template
 ###
-#if(!$xwiki.hasAccessLevel("edit"))
-  #template("accessdenied.vm")
-#elseif($doc.isNew())
-  $response.setStatus(404)
-  #template("startpage.vm")
-  <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div>## mainContentArea
-  </div>## main
-  #template("endpage.vm")
-#else
-  #template("startpage.vm")
-  #template('refactoring_macros.vm')
-  <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    <div class="xcontent">
+
+#macro (displayCopyForm)
+  <form action="$xwiki.relativeRequestURL" id="copy" class="xform">
+    <div class="hidden">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="xpage" value="copy" />
+      ## Perform the copy asynchronously.
+      <input type="hidden" name="async" value="true" />
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-lg-6">
+        <dl>
+          ##------------
+          ## Source Page
+          ##------------
+          #displaySourceDocument({
+            'label': 'core.copy.source.label',
+            'hint': 'core.copy.source.hint'
+          })
+          ##------------------
+          ## Translation field
+          ##------------------
+          #displayTranslationSelector({
+            'hint': 'core.copy.language.hint'
+          })
+          ##---------------
+          ## Children field
+          ##---------------
+          #displayChildrenCheckbox({
+            'label': 'core.copy.children.label',
+            'hint': 'core.copy.children.hint'
+          })
+        </dl>
+      </div>
+      <div class="col-xs-12 col-lg-6">
+        ##------------
+        ## Target Page
+        ##------------
+        #template('locationPicker_macros.vm')
+        #set ($parentReference = $doc.documentReference.parent)
+        #set ($name = $doc.name)
+        #if ($doc.name == $defaultDocumentName)
+          #set ($name = $parentReference.name)
+          #set ($parentReference = $parentReference.parent)
+        #end
+        #locationPicker({
+          'id': 'target',
+          'title': {
+            'label': 'core.copy.target.title.label',
+            'hint': 'core.copy.target.title.hint',
+            'name': 'targetPageTitle',
+            'value': $doc.plainTitle,
+            'placeholder': 'core.create.name.placeholder'
+          },
+          'preview': {
+            'label': 'core.copy.target.location.label',
+            'hint': 'core.copy.target.location.hint'
+          },
+          'wiki': {
+            'label': 'core.copy.target.wiki.label',
+            'hint': 'core.copy.target.wiki.hint',
+            'name': 'targetWikiName',
+            'value': $doc.wiki
+          },
+          'parent': {
+            'label': 'core.copy.target.parent.label',
+            'hint': 'core.copy.target.parent.hint',
+            'name': 'targetSpaceName',
+            'reference': $parentReference,
+            'placeholder': 'core.create.spaceReference.placeholder'
+          },
+          'name': {
+            'label': 'core.copy.target.name.label',
+            'hint': 'core.copy.target.name.hint',
+            'name': 'targetPageName',
+            'value': $name,
+            'placeholder': 'core.create.name.placeholder'
+          }
+        })
+        ## -------------------------------------
+        ## Target Page Type (for advanced users)
+        ## -------------------------------------
+        #maybeDisplayTerminalCheckbox({
+          'label': 'core.copy.target.terminal.label',
+          'hint': 'core.copy.target.terminal.hint'
+        })
+      </div>
+    </div>
+    <div class="buttons">
+      <span class="buttonwrapper">
+        <input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/>
+      </span>
+      <span class="buttonwrapper">
+        <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
+      </span>
+    </div>
+  </form>
+#end
+
+#macro (handleCopyRequest)
+  <div class="xcontent">
     #set ($titleToDisplay = $services.localization.render('core.copy.title',
       [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
     #template('contentheader.vm')
@@ -39,9 +124,9 @@
     ##------------------------------------------------
     ## Get which translated pages we need to copy
     ##------------------------------------------------
-    #if("$!request.language" != "" && "$!{request.language}" != 'ALL')
-      #set($language = "$!{request.language}")
-      #set($escapedLanguage = "$!{escapetool.xml($request.language)}")
+    #if ("$!request.language" != "" && "$!{request.language}" != 'ALL')
+      #set ($language = "$!{request.language}")
+      #set ($escapedLanguage = "$!{escapetool.xml($request.language)}")
     #end
     ##------------------------------------------------
     ## Determine if the child pages should be copied
@@ -60,7 +145,7 @@
       ##-----------------------------------------------------------
       ## If the target document already exists, warn the user
       ##-----------------------------------------------------------
-      #if($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
+      #if ($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
         #warning($services.localization.render('core.copy.alreadyExists',
           [$services.model.serialize($targetDocReference, 'compactwiki')]))
         <form action="$xwiki.relativeRequestURL" id="copy" class="xform third" method="post">
@@ -82,132 +167,124 @@
         </form>
       #else
         ## TODO: We should set the title specified on the request.
-        #set ($success = false)
         #set ($copyAsRequest = $services.refactoring.createCopyAsRequest($sourceDocReference, $targetDocReference))
         #set ($discard = $copyAsRequest.setDeep($deep))
         #set ($copyAsJob = $services.refactoring.copyAs($copyAsRequest))
-        #try()
-          #set ($discard = $copyAsJob.join())
-          #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
-          #set ($success = $copyAsJobStatus.log.getLogs('ERROR').isEmpty())
-        #end
-        #if ($success)
-          #if($escapedLanguage)
-            #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
-            #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
-          #else
-            #set($fromurl = $xwiki.getURL($sourceDocReference))
-            #set($tourl = $xwiki.getURL($targetDocReference))
+        #if ($request.async != 'true')
+          #try()
+            #set ($discard = $copyAsJob.join())
           #end
-          #set ($sourceDocTitle = $xwiki.getDocument($sourceDocReference).plainTitle)
-          #set($sourcelink = "<a href='${fromurl}'>$!escapetool.xml($sourceDocTitle)
-            #if($escapedLanguage)($escapedLanguage)#end</a>")
-          #set ($targetDocTitle = $xwiki.getDocument($targetDocReference).plainTitle)
-          #set($targetlink = "<a href='${tourl}'>$!escapetool.xml($targetDocTitle)</a>")
-          #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
-        #else
-          #error($services.localization.render('core.rename.targetNotWritable'))
         #end
+        $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
+          'xpage': 'copy',
+          'copyId': $copyAsRequest.id.get($mathtool.sub($copyAsRequest.id.size(), 1))
+        })))
       #end
     #else
-    <form action="$xwiki.relativeRequestURL" id="copy" class="xform">
-      <div class="hidden">
-        ## CSRF prevention
-        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-        <input type="hidden" name="xpage" value="copy" />
-      </div>
-      <div class="row">
-        <div class="col-xs-12 col-lg-6">
-          <dl>
-            ##------------
-            ## Source Page
-            ##------------
-            #displaySourceDocument({
-              'label': 'core.copy.source.label',
-              'hint': 'core.copy.source.hint'
-            })
-            ##------------------
-            ## Translation field
-            ##------------------
-            #displayTranslationSelector({
-              'hint': 'core.copy.language.hint'
-            })
-            ##---------------
-            ## Children field
-            ##---------------
-            #displayChildrenCheckbox({
-              'label': 'core.copy.children.label',
-              'hint': 'core.copy.children.hint'
-            })
-          </dl>
-        </div>
-        <div class="col-xs-12 col-lg-6">
-          ##------------
-          ## Target Page
-          ##------------
-          #template('locationPicker_macros.vm')
-          #set ($parentReference = $doc.documentReference.parent)
-          #set ($name = $doc.name)
-          #if ($doc.name == $defaultDocumentName)
-            #set ($name = $parentReference.name)
-            #set ($parentReference = $parentReference.parent)
-          #end
-          #locationPicker({
-            'id': 'target',
-            'title': {
-              'label': 'core.copy.target.title.label',
-              'hint': 'core.copy.target.title.hint',
-              'name': 'targetPageTitle',
-              'value': $doc.plainTitle,
-              'placeholder': 'core.create.name.placeholder'
-            },
-            'preview': {
-              'label': 'core.copy.target.location.label',
-              'hint': 'core.copy.target.location.hint'
-            },
-            'wiki': {
-              'label': 'core.copy.target.wiki.label',
-              'hint': 'core.copy.target.wiki.hint',
-              'name': 'targetWikiName',
-              'value': $doc.wiki
-            },
-            'parent': {
-              'label': 'core.copy.target.parent.label',
-              'hint': 'core.copy.target.parent.hint',
-              'name': 'targetSpaceName',
-              'reference': $parentReference,
-              'placeholder': 'core.create.spaceReference.placeholder'
-            },
-            'name': {
-              'label': 'core.copy.target.name.label',
-              'hint': 'core.copy.target.name.hint',
-              'name': 'targetPageName',
-              'value': $name,
-              'placeholder': 'core.create.name.placeholder'
-            }
-          })
-          ## -------------------------------------
-          ## Target Page Type (for advanced users)
-          ## -------------------------------------
-          #maybeDisplayTerminalCheckbox({
-            'label': 'core.copy.target.terminal.label',
-            'hint': 'core.copy.target.terminal.hint'
-          })
-        </div>
-      </div>
-      <div class="buttons">
-        <span class="buttonwrapper">
-          <input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/>
-        </span>
-        <span class="buttonwrapper">
-          <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
-        </span>
-      </div>
-    </form>
+      #displayCopyForm
     #end
-    <div class="clearfloats"></div>
   </div>
+  <div class="clearfloats"></div>
+#end
+
+#macro (displayCopyJobFinishedMessage $copyJobStatus)
+  #displayRefactoringJobFinishedMessage($copyJobStatus 'core.rename.status.success' 'core.rename.status.failure')
+#end
+
+#macro (outputCopyJobStatusJSON $copyJobStatus)
+  #getJobStatusJSON($copyJobStatus $json)
+  #set ($json.message = "#displayCopyJobFinishedMessage($copyJobStatus)")
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
+#macro (displayCopyJobRequest $copyJobRequest)
+  <div class="refactoring-job-request row xform">
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.copy.source.label' 'core.copy.source.hint' $copyJobRequest.entityReferences)
+        #displayBooleanConfigParam('core.rename.children.labelWithoutParams', 'core.copy.children.hint'
+          $copyJobRequest.isDeep())
+      </dl>
+    </div>
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.copy.target.location.label' 'core.copy.target.location.hint'
+          [$copyJobRequest.destination])
+        #if ($isAdvancedUser || $isSuperAdmin)
+          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+          #set ($terminal = $copyJobRequest.destination.type == 'DOCUMENT'
+            && $copyJobRequest.destination.name != $defaultDocumentName)
+          #displayBooleanConfigParam('core.copy.target.terminal.label', 'core.copy.target.terminal.hint' $terminal)
+        #end
+      </dl>
+    </div>
+  </div>
+#end
+
+#macro (displayCopyJobStatus $copyJobStatus)
+  ##set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($copyJobState = $copyJobStatus.state)
+  #set ($finished = $copyJobState == 'FINISHED')
+  #set ($copyJobRequest = $copyJobStatus.request)
+  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+    'xpage': 'copy',
+    'outputSyntax': 'plain',
+    'copyId': $copyJobRequest.id.get($mathtool.sub($copyJobRequest.id.size(), 1))
+  })))
+  <div class="xcontent job-status" data-url="$jobStatusURL">
+    <h2>$services.localization.render('core.copy.status.label')</h2>
+    <p class="text-muted small">$services.localization.render('core.copy.status.hint',
+      [$xwiki.getUserName($copyJobRequest.userReference), $xwiki.formatDate($copyJobStatus.startDate)])</p>
+    #displayCopyJobRequest($copyJobRequest)
+    #if (!$finished)
+      #displayJobProgressBar($copyJobStatus)
+    #else
+      #displayCopyJobFinishedMessage($copyJobStatus)
+    #end
+    #if ($isAdvancedUser || $isSuperAdmin)
+      #displayJobStatusLog($copyJobStatus true)
+    #end
+  </div>
+#end
+
+#macro (handleCopyStatusRequest)
+  #template('refactoringStatus_macros.vm')
+  #set ($copyJobStatus = $services.job.getJobStatus(['refactoring', 'copyAs', $request.copyId]))
+  #if ($copyJobStatus)
+    #if ($xcontext.action == 'get')
+      #outputCopyJobStatusJSON($copyJobStatus)
+    #else
+      #displayCopyJobStatus($copyJobStatus)
+    #end
+  #else
+    $response.setStatus(404)
+    <div class="box errormessage">
+      $services.localization.render('core.copy.status.notFound')
+    </div>
+  #end
+#end
+
+#if (!$xwiki.hasAccessLevel("edit"))
+  #template('accessdenied.vm')
+#elseif ($xcontext.action == 'get' && "$!request.copyId" != '')
+  ## AJAX request for copy status update.
+  #handleCopyStatusRequest
+#else
+  #template('startpage.vm')
+  #template('refactoring_macros.vm')
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #if ("$!request.copyId" != '')
+      ## Display the copy status
+      #handleCopyStatusRequest
+    #elseif ($doc.isNew())
+      $response.setStatus(404)
+      #error($services.localization.render('core.rename.nonexistingDocument'))
+    #else
+      #handleCopyRequest
+    #end
   </div>## mainContentArea
   </div>## main
-#template("endpage.vm")
+  #template('endpage.vm')
 #end

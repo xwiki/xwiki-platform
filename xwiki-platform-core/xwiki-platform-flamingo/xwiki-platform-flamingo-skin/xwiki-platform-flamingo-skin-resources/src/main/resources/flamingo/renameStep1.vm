@@ -2,10 +2,9 @@
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
 ## TODO: check if this information should be displayed?
-<div id="mainContentArea">
-  #set($titleToDisplay = $services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
-  <div class="xcontent">
-  #template('contentheader.vm')
+#set($titleToDisplay = $services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
+<div class="xcontent">
+#template('contentheader.vm')
 #template('refactoring_macros.vm')
 #template('locationPicker_macros.vm')
 #set ($sourcePageIsTerminal = $doc.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
@@ -13,6 +12,8 @@
   <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+    ## Perform the rename asynchronously.
+    <input type="hidden" name="async" value="true" />
   </div>
   <div class="row">
     <div class="col-xs-12 col-lg-6">
@@ -109,5 +110,4 @@
     </span>
   </div>
 </form>
-</div>
 </div>

@@ -50,3 +50,33 @@ $services.template.execute('logging_macros.vm')
   #end
   #printLogs($status.log $loading)
 #end
+
+#macro (getJobStatusJSON $status $json)
+  #set ($logOffset = $mathtool.toInteger($request.logOffset))
+  #if (!$logOffset)
+    #set ($logOffset = 0)
+  #else
+    #set ($logOffset = $mathtool.max($logOffset, 0))
+  #end
+  #set ($log = [])
+  #foreach ($logEvent in $status.log)
+    #if ($foreach.index >= $logOffset)
+      #set ($discard = $log.add({
+        'level': $logEvent.level.toString().toLowerCase(),
+        'renderedMessage': "#printLog($logEvent)"
+      }))
+    #end
+  #end
+  #set ($json = $NULL)
+  #setVariable("$json" {
+    'id': $status.request.id,
+    'state': $status.state,
+    'progress': {
+      'offset': $status.progress.offset
+    },
+    'log': {
+      'offset': $logOffset,
+      'items': $log
+    }
+  })
+#end

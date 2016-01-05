@@ -1,34 +1,4 @@
-#template('hierarchy_macros.vm')
-#template('job_macros.vm')
-
-#macro (displayLocations $label $hint $entityReferences)
-  <dt>
-    <label>$services.localization.render($label)</label>
-    <span class="xHint">$services.localization.render($hint)</span>
-  </dt>
-  <dd>
-    #foreach ($entityReference in $entityReferences)
-      #hierarchy($entityReference {
-        'treeNavigation': false,
-        'selfIsActive': false,
-        'limit': 5
-      })
-    #end
-  </dd>
-#end
-
-#macro (displayBooleanConfigParam $label $hint $value)
-  <dt>
-    <label>
-      ## 'application' icon is not semantically correct but it is mapped to the right Font Awesome icon (square).
-      ## We also tried 'cross' but it is confusing when none of the configuration options are checked (because in real
-      ## life we often check items by putting a cross in front of them).
-      $services.icon.renderHTML("#if ($value)check#{else}application#end")
-      $services.localization.render($label)
-    </label>
-    <span class="xHint">$services.localization.render($hint)</span>
-  </dt>
-#end
+#template('refactoringStatus_macros.vm')
 
 #macro (displayRenameJobRequest $renameJobRequest)
   <div class="refactoring-job-request row xform">
@@ -58,26 +28,29 @@
   </div>
 #end
 
+#macro (displayRenameJobFinishedMessage $renameJobStatus)
+  #displayRefactoringJobFinishedMessage($renameJobStatus 'core.rename.status.success' 'core.rename.status.failure')
+#end
+
 #macro (displayRenameJobStatus $renameJobStatus)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
   #set ($renameJobState = $renameJobStatus.state)
   #set ($finished = $renameJobState == 'FINISHED')
-  #set ($success = $finished && $renameJobStatus.log.getLogs('ERROR').isEmpty())
-  <div class="job-status">
+  #set ($renameJobRequest = $renameJobStatus.request)
+  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+    'xpage': 'rename',
+    'outputSyntax': 'plain',
+    'renameId': $renameJobRequest.id.get($mathtool.sub($renameJobRequest.id.size(), 1))
+  })))
+  <div class="xcontent job-status" data-url="$jobStatusURL">
     <h2>$services.localization.render('core.rename.status.label')</h2>
-    #set ($renameJobRequest = $renameJobStatus.request)
     <p class="text-muted small">$services.localization.render('core.rename.status.hint',
       [$xwiki.getUserName($renameJobRequest.userReference), $xwiki.formatDate($renameJobStatus.startDate)])</p>
     #displayRenameJobRequest($renameJobRequest)
     #if (!$finished)
       #displayJobProgressBar($renameJobStatus)
-    #elseif ($success)
-      <div class="box successmessage">
-        $services.localization.render('core.rename.status.success')
-      </div>
     #else
-      <div class="box errormessage">
-        $services.localization.render('core.rename.status.failure')
-      </div>
+      #displayRenameJobFinishedMessage($renameJobStatus)
     #end
     #if ($isAdvancedUser || $isSuperAdmin)
       #displayJobStatusLog($renameJobStatus true)
@@ -85,9 +58,20 @@
   </div>
 #end
 
+#macro (outputRenameJobStatusJSON $renameJobStatus)
+  #getJobStatusJSON($renameJobStatus $json)
+  #set ($json.message = "#displayRenameJobFinishedMessage($renameJobStatus)")
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
 #set ($renameJobStatus = $services.job.getJobStatus(['refactoring', 'rename', $request.renameId]))
 #if ($renameJobStatus)
-  #displayRenameJobStatus($renameJobStatus)
+  #if ($xcontext.action == 'get')
+    #outputRenameJobStatusJSON($renameJobStatus)
+  #else
+    #displayRenameJobStatus($renameJobStatus)
+  #end
 #else
   $response.setStatus(404)
   <div class="box errormessage">

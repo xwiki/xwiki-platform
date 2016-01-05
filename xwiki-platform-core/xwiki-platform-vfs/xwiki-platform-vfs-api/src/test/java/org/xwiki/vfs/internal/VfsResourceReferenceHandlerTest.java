@@ -50,11 +50,15 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
+import org.xwiki.vfs.internal.attach.AttachDriver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TConfig;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -129,6 +133,13 @@ public class VfsResourceReferenceHandlerTest
 
         this.baos = new ByteArrayOutputStream();
         when(response.getOutputStream()).thenReturn(this.baos);
+
+        // Register our custom Attach Driver in TrueVFS
+        TConfig config = TConfig.current();
+        // Note: Make sure we add our own Archive Detector to the existing Detector so that all archive formats
+        // supported by TrueVFS are handled properly.
+        config.setArchiveDetector(new TArchiveDetector(config.getArchiveDetector(), "attach",
+            new AttachDriver(this.mocker)));
     }
 
     @Test

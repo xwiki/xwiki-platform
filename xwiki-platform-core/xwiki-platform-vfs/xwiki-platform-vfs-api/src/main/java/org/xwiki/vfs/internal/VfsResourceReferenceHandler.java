@@ -33,8 +33,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
@@ -44,10 +42,7 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
-import org.xwiki.vfs.internal.attach.AttachDriver;
 
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TPath;
 
 /**
@@ -62,7 +57,6 @@ import net.java.truevfs.access.TPath;
 @Named("vfs")
 @Singleton
 public class VfsResourceReferenceHandler extends AbstractContentResourceReferenceHandler
-    implements Initializable
 {
     @Inject
     @Named("context")
@@ -80,17 +74,6 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
     public List<ResourceType> getSupportedResourceReferences()
     {
         return Arrays.asList(VfsResourceReference.TYPE);
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        // Register our Attach VFS Driver and inject a Component Manager in it.
-        TConfig config = TConfig.current();
-        // Note: Make sure we add our own Archive Detector to the existing Detector so that all archive formats
-        // supported by TrueVFS are handled properly.
-        config.setArchiveDetector(new TArchiveDetector(config.getArchiveDetector(), "attach",
-            new AttachDriver(this.componentManagerProvider.get())));
     }
 
     @Override

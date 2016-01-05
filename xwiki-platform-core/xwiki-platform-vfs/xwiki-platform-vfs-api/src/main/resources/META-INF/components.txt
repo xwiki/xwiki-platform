@@ -1,4 +1,5 @@
 org.xwiki.vfs.script.VfsScriptService
+org.xwiki.vfs.internal.VfsAttachDriverRegistrationListener
 org.xwiki.vfs.internal.VfsResourceReferenceResolver
 org.xwiki.vfs.internal.VfsResourceReferenceSerializer
 org.xwiki.vfs.internal.VfsResourceReferenceHandler

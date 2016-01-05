@@ -224,7 +224,7 @@ XWiki.Blog = {
         var label = document.createElement("span").addClassName("messagetype");
         label.appendChild(document.createTextNode("Warning: "));
         wrapper.appendChild(label);
-        wrapper.appendChild(document.createTextNode("'xe.blog.code.hidden'"));
+        wrapper.appendChild(document.createTextNode("$services.localization.render('xe.blog.code.hidden')"));
         content.up().insertBefore(wrapper, content);
       }
     });

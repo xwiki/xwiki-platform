@@ -696,13 +696,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Features
         Collection<String> features = this.<String>getSolrValues(document, Extension.FIELD_FEATURES);
-        extension.withFeatures(features);
-        for (String feature : features) {
-            org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
-            ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
-            extensionFeature.setId(extensionId.getId());
-            extensionFeature.setVersion(extensionId.getVersion().getValue());
-            extension.getExtensionFeatures().add(extensionFeature);
+        if (features != null) {
+            extension.withFeatures(features);
+            for (String feature : features) {
+                org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
+                ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
+                extensionFeature.setId(extensionId.getId());
+                extensionFeature.setVersion(extensionId.getVersion().getValue());
+                extension.getExtensionFeatures().add(extensionFeature);
+            }
         }
 
         // License

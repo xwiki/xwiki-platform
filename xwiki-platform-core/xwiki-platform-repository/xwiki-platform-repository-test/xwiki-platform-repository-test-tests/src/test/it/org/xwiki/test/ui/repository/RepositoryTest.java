@@ -391,7 +391,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("summary2\n      some more details", extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
-        Assert.assertEquals(Arrays.asList("maven:oldextension"), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList("maven:oldextension/2.0"), extension.getFeatures());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,
@@ -409,7 +409,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("summary2\n      some more details", extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
-        Assert.assertEquals(Arrays.asList("maven:oldextension"), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList("maven:oldextension/1.0"), extension.getFeatures());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(FileUtils.sizeOf(emptyExtension.getFile().getFile()),
@@ -427,7 +427,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals("summary2\n      some more details", extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
-        Assert.assertEquals(Arrays.asList("maven:oldextension"), extension.getFeatures());
+        Assert.assertEquals(Arrays.asList("maven:oldextension/0.9"), extension.getFeatures());
         Assert.assertEquals("GNU Lesser General Public License 2.1", extension.getLicenses().get(0).getName());
 
         Assert.assertEquals(fileSize,

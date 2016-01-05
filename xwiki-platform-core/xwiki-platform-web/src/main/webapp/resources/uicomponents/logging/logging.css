@@ -24,10 +24,6 @@ ul.log li:hover {
 .log-item {
   background-position: left .3em;
 }
-.log-item-loading {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-  color: $theme.notificationInfoColor;
-}
 .log-item-trace {
   background-image: url("$xwiki.getSkinFile('icons/silk/bug.png')");
   color: $theme.notificationInfoColor;
@@ -47,6 +43,10 @@ ul.log li:hover {
 .log-item-error {
   background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
   color: $theme.notificationErrorColor;
+}
+.log-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  color: $theme.notificationInfoColor;
 }
 .log-item .stacktrace {
   white-space: pre-wrap;

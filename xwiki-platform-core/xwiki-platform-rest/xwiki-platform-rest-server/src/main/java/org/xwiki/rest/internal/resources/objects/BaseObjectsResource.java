@@ -22,9 +22,7 @@ package org.xwiki.rest.internal.resources.objects;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;

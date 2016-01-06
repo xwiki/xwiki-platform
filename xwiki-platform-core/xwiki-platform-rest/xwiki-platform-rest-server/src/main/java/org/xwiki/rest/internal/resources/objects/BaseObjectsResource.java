@@ -56,12 +56,8 @@ public class BaseObjectsResource extends XWikiResource
             Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                 Utils.getXWikiContext(componentManager));
 
-        Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();
-        for (DocumentReference classReference : classToObjectsMap.keySet()) {
-            List<BaseObject> xwikiObjects = classToObjectsMap.get(classReference);
-            for (BaseObject object : xwikiObjects) {
-                objectList.add(object);
-            }
+        for (List<BaseObject> xwikiObjects : xwikiDocument.getXObjects().values()) {
+            objectList.addAll(xwikiObjects);
         }
 
         return objectList;

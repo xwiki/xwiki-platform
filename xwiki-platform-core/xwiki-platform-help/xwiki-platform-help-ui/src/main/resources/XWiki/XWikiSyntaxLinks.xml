@@ -158,7 +158,7 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 |Link with XWiki Syntax in the label|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;bold label&lt;/strong&gt;&lt;/a&gt;}}}|[[**bold label**&gt;&gt;WebHome]]
 |Link to a page with the space specified|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
 |Link to a subwiki|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
-|Link that opens in a new window|{{{[label&gt;WebHome&gt;_blank]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link that opens in a new window|{{{[label&gt;WebHome&gt;_blank]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
 |Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
 |Link to a URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
 |Link to a URL with a label|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
@@ -212,7 +212,7 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 |Link with XWiki Syntax in the label|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]
 |Link to a page with the space specified|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Link to a subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
-|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||rel="__blank"]]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||target="_blank"]]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
 |Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
 |Link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
 |Link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
@@ -253,7 +253,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
-* **##parameters##**: An optional list of parameters passed to the link. Example: ##rel="~_~_blank"## (open in new window)
+* **##parameters##**: An optional list of parameters passed to the link. Example: ##target="~_blank"## (open in new window)
 
 === 2.1 Links ===
 
@@ -266,7 +266,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 |Link with XWiki Syntax in the label|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]
 |Link to a page with the space specified|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Link to a subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
-|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||rel="__blank"]]}}}|[[label&gt;&gt;WebHome||rel="__blank"]]
+|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||target="_blank"]]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
 |Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
 |Link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
 |Link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
@@ -315,8 +315,8 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 ** **UNC (Windows Explorer)** reference in the form **##unc: (path)##**. The link is rendered as a ##file:~/~/## link. Examples: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
 *** **##unc:##** A required string identifying the resource as a UNC (Windows Explorer) path.
 *** **##path##**: A required string containing the local path of resource accessible by the user. Examples: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
-* **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" rel="~_~_blank"##
+* **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
 ** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
-** **##rel##**: An optional parameter that allows to open link target in new window. Example: ##rel="~_~_blank"##</content>
+** **##target##**: An optional parameter that allows to open link target in new window. Example: ##target="~_blank"##</content>
 </xwikidoc>

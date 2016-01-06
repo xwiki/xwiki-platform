@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.objects;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -68,19 +69,12 @@ public class BaseObjectsResource extends XWikiResource
 
     protected List<BaseObject> getBaseObjects(Document doc, String className) throws XWikiException
     {
-        List<BaseObject> objectList = new ArrayList<BaseObject>();
-
         XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
             Utils.getXWikiContext(componentManager));
 
-        Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();
+        List<BaseObject> xwikiObjects = xwikiDocument.getXObjects(xwikiDocument.resolveClassReference(className));
 
-        List<BaseObject> xwikiObjects =
-            classToObjectsMap.get(this.currentMixedDocumentReferenceResolver.resolve(className));
-        for (BaseObject object : xwikiObjects) {
-            objectList.add(object);
-        }
-
-        return objectList;
+        // XWikiDocument#getXObjects return internal list so we make sure to return a safe one
+        return xwikiObjects != null ? new ArrayList<BaseObject>(xwikiObjects) : Collections.<BaseObject>emptyList();
     }
 }

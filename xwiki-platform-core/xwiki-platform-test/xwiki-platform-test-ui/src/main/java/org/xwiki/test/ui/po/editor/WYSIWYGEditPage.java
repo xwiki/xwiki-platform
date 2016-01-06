@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;

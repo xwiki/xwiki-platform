@@ -241,15 +241,15 @@
     <dt>$services.localization.render('extensions.info.id')</dt>
     <dd>$extension.id.id</dd>
 
-    #if ($extension.features.size() > 0)
-      <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
+    #if ($extension.extensionFeatures.size() > 0)
+      <dt>$services.localization.render('extensions.info.features', [$extension.extensionFeatures.size()])</dt>
       <dd>
-      #if ($extension.features.size() == 1)
-        $escapetool.xml($extension.features.iterator().next())
+      #if ($extension.extensionFeatures.size() == 1)
+        $escapetool.xml($extension.extensionFeatures.iterator().next().id)
       #else
         <ul>
-          #foreach ($feature in $extension.features)
-            <li>$escapetool.xml($feature)</li>
+          #foreach ($feature in $extension.extensionFeatures)
+            <li>$escapetool.xml($feature.id)</li>
           #end
         </ul>
       #end
@@ -1220,13 +1220,13 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
 #macro (getInstalledExtension $_extension $namespace $installedExtension)
   #set ($features = [])
   #if ($_extension)
-    #set ($discard = $features.addAll($_extension.features))
-    #set ($discard = $features.add($_extension.id.id))
+    #set ($discard = $features.addAll($_extension.extensionFeatures))
+    #set ($discard = $features.add($_extension.id))
   #end
   #set ($discard = $collectionstool.reverse($features))
   #set ($return = $NULL)
   #foreach ($feature in $features)
-    #set ($return = $services.extension.installed.getInstalledExtension($feature, $namespace))
+    #set ($return = $services.extension.installed.getInstalledExtension($feature.id, $namespace))
     #if ($return)
       #break
     #end

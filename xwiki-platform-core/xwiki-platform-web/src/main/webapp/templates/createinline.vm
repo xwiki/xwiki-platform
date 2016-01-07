@@ -273,8 +273,10 @@
               ## Hidden input used to ensure that an unchecked terminal checkbox means non-terminal and that the default is not used by mistake.
               <input type="hidden" name="tocreate" value="nonterminal" />
             </label>
-            <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
           </dt>
+          <dd>
+            <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
+          </dd>
         #end
       </dl>
     </div>

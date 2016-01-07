@@ -45,13 +45,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- We have a test verifying that Annotations are not displayed when XWiki Syntax 1.0 is used so we need to
-         bundle a 1.0 parser -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -560,7 +560,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
+      <artifactId>xwiki-rendering-syntax-html</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

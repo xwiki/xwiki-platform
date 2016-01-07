@@ -532,12 +532,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testConvertSyntax() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
-        this.baseObject.setLargeStringValue("area", "object content not in section\n"
-            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
-        this.baseObject.setLargeStringValue("puretextarea", "object content not in section\n"
-            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
+        this.document.setSyntax(Syntax.HTML_4_01);
+        this.document.setContent("<p>content not in section</p>"
+            + "<h1>header 1</h1><p>header 1 content</p>"
+            + "<h2>header 2</h2><p>header 2 content</p>");
+        this.baseObject.setLargeStringValue("area", "<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>");
+        this.baseObject.setLargeStringValue("puretextarea", "<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>");
 
         this.document.convertSyntax("xwiki/2.0", getContext());
 
@@ -545,8 +549,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             + "== header 2 ==\n\nheader 2 content", this.document.getContent());
         assertEquals("object content not in section\n\n" + "= object header 1 =\n\nobject header 1 content\n\n"
             + "== object header 2 ==\n\nobject header 2 content", this.baseObject.getStringValue("area"));
-        assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"
-            + "1.1 object header 2\nobject header 2 content", this.baseObject.getStringValue("puretextarea"));
+        assertEquals("<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>", this.baseObject.getStringValue("puretextarea"));
         assertEquals("xwiki/2.0", this.document.getSyntaxId());
     }
 

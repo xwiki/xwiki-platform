@@ -58,11 +58,11 @@
   #if($newFullName.trim().equals(''))
     #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
   #elseif(!$xwiki.exists($request.category))
-    #blog__actionResponseError(404, 'thispagedoesnotexist', [])
+    #blog__actionResponseError(404, 'xe.blog.manageCategories.create.error.notExists', [])
   #elseif($xwiki.exists($newFullName))
-    #blog__actionResponseError(409, 'core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])
+    #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])
   #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
-    #blog__actionResponseError(403, 'core.rename.targetNotWritable', [$newFullName])
+    #blog__actionResponseError(403, 'xe.blog.manageCategories.create.error.targetNotWritable', [$newFullName])
   #else
     #renameCategory($request.category, $newFullName)
   #end
@@ -258,7 +258,7 @@ XWiki.blog.Categories = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               parent.disabled = true;
-              parent.notification = new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.fetchingForm')", "inprogress");
+              parent.notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.fetchingForm'))", "inprogress");
             },
             onSuccess : function (response) {
               var container = new Element("div");
@@ -268,7 +268,7 @@ XWiki.blog.Categories = Class.create({
               this.insertRenameForm(item, parent._x_rename_form);
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || "$services.localization.render('core.widgets.ajaxRequest.error.noServer')", "error");
+              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer'))", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {
@@ -306,7 +306,7 @@ XWiki.blog.Categories = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               form.disable();
-              form.notification = new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.rename.inProgress')", "inprogress");
+              form.notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.rename.inProgress'))", "inprogress");
             },
             onSuccess : function (response) {
               $$(".blog-categories-list").first().replace(response.responseText);
@@ -314,20 +314,20 @@ XWiki.blog.Categories = Class.create({
               form.reset();
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || "$services.localization.render('core.widgets.ajaxRequest.error.noServer')", "error");
+              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer'))", "error");
             },
             onComplete : function () {
               form.enable();
               form.notification.hide();
             },
             on403 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.rename.error.403')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.rename.error.403'))", "error");
             },
             on404 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.rename.error.404')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.rename.error.404'))", "error");
             },
             on409 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.rename.error.409')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.rename.error.409'))", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {
@@ -399,7 +399,7 @@ XWiki.blog.Categories = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               parent.disabled = true;
-              parent.notification = new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.fetchingForm')", "inprogress");
+              parent.notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.fetchingForm'))", "inprogress");
             },
             onSuccess : function (response) {
               var container = new Element("div");
@@ -409,7 +409,7 @@ XWiki.blog.Categories = Class.create({
               this.insertAddForm(item, parent._x_add_form);
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || "$services.localization.render('core.widgets.ajaxRequest.error.noServer')", "error");
+              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer')", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {
@@ -467,7 +467,7 @@ XWiki.blog.Categories = Class.create({
             onCreate : function () {
               // ignore "cascade" clicks
               form.disable();
-              form.notification = new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.add.inProgress')", "inprogress");
+              form.notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.inProgress'))", "inprogress");
             },
             onSuccess : function (response) {
               /* var reference = form._x_item.up('.blog-category-level');
@@ -497,20 +497,20 @@ XWiki.blog.Categories = Class.create({
               });
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || "$services.localization.render('core.widgets.ajaxRequest.error.noServer')", "error");
+              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer'))", "error");
             },
             onComplete : function () {
               form.enable();
               form.notification.hide();
             },
             on401 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.add.error.401')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.401'))", "error");
             },
             on403 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.add.error.403')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.403'))", "error");
             },
             on409 : function(response) {
-              new XWiki.widgets.Notification("$services.localization.render('xe.blog.manageCategories.js.add.error.409')", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.409'))$escapetool.javascript(", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {
@@ -569,10 +569,10 @@ XWiki.blog.Categories = Class.create({
             },
             /* Interaction parameters */
             {
-               confirmationText: "$services.localization.render('xe.blog.manageCategories.js.delete.confirm')",
-               progressMessageText : "$services.localization.render('xe.blog.manageCategories.js.delete.inProgress')",
-               successMessageText : "$services.localization.render('xe.blog.manageCategories.js.delete.done')",
-               failureMessageText : "$services.localization.render('xe.blog.manageCategories.js.delete.failed')"
+               confirmationText: "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.delete.confirm'))",
+               progressMessageText : "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.delete.inProgress'))",
+               successMessageText : "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.delete.done'))",
+               failureMessageText : "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.delete.failed'))"
             }
           );
         }

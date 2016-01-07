@@ -131,19 +131,19 @@ if(typeof(XWiki) == 'undefined') {
 XWiki.Blog = {
   blogToolsValues: {
     show: {
-      title: "$services.localization.render('xe.blog.code.makevisible')",
+      title: "$escapetool.javascript($services.localization.render('xe.blog.code.makevisible'))",
       imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.png')",
       imageAlt: "show",
-      comment: "$services.localization.render('xe.blog.code.madevisible')"
+      comment: "$escapetool.javascript($services.localization.render('xe.blog.code.madevisible'))"
     },
     hide: {
-      title: "$services.localization.render('xe.blog.code.hide')",
+      title: "$escapetool.javascript($services.localization.render('xe.blog.code.hide'))",
       imageSrc: "$xwiki.getSkinFile('icons/silk/lock.png')",
       imageAlt: "hide",
-      comment: "$services.localization.render('xe.blog.code.hid')"
+      comment: "$escapetool.javascript($services.localization.render('xe.blog.code.hid'))"
     },
     loading: {
-      title: "$services.localization.render('xe.blog.code.loading')",
+      title: "$escapetool.javascript($services.localization.render('xe.blog.code.loading'))",
       imageSrc: "$xwiki.getSkinFile('icons/xwiki/spinner.gif')",
       imageAlt: "loading"
     }
@@ -178,9 +178,9 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.onEntryMadeInvisible.bind(this),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
-      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
-      onFailure: function() {alert("$services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility')")}
+      on403: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.403'))")},
+      on401: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.401'))")},
+      onFailure: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility'))")}
     });
   },
   makeEntryVisible : function(event) {
@@ -190,9 +190,9 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.onEntryMadeVisible.bind(this),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
-      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
-      onFailure: function() {alert("$services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility')")}
+      on403: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.403'))")},
+      on401: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.401'))")},
+      onFailure: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.code.failedToChangeBlogPostVisibility'))")}
     });
   },
   onEntryMadeVisible : function() {
@@ -222,9 +222,9 @@ XWiki.Blog = {
         // &lt;div class="warningmessage"&gt;&lt;span class="messagetype"&gt;Warning: &lt;/span&gt;This blog post is hidden.&lt;/div&gt;
         var wrapper = document.createElement("div").addClassName("warningmessage");
         var label = document.createElement("span").addClassName("messagetype");
-        label.appendChild(document.createTextNode("Warning: "));
+        label.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('xe.blog.code.warning'))"));
         wrapper.appendChild(label);
-        wrapper.appendChild(document.createTextNode("$services.localization.render('xe.blog.code.hidden')"));
+        wrapper.appendChild(document.createTextNode("$escapetool.javascript($services.localization.render('xe.blog.code.hidden'))"));
         content.up().insertBefore(wrapper, content);
       }
     });
@@ -270,10 +270,10 @@ XWiki.Blog = {
       method: "get",
       onSuccess: XWiki.Blog.updateCategoryTree.bindAsEventListener(this, name, parentCategory, parentSpace),
       on1223: function(response) {response.request.options.onSuccess(response)},
-      on409: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.categoryAlreadyExists')")},
-      on403: function() {alert("$services.localization.render('platform.core.profile.passwd.notAllowed')")},
-      on401: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.error.401')")},
-      onFailure: function() {alert("$services.localization.render('xe.blog.manageCategories.js.add.failed')")}
+      on409: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.409'))")},
+      on403: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.403'))")},
+      on401: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.401'))")},
+      onFailure: function() {alert("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.failed'))")}
     });
   },
 

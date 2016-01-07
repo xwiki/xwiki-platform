@@ -102,7 +102,7 @@
 {{/velocity}}
 
 {{velocity}}
-#set ($rssMode = $xcontext.action == 'get')
+#set ($rssMode = $xcontext.action == 'get' || "$!request.xpage" == 'plain')
 #if (!$rssMode)
   #set ($discard = $xwiki.ssfx.use('uicomponents/search/search.css', true))
   ## Disable the document extra data: comments, attachments, history...

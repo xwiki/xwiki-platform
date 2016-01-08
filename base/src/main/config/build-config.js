@@ -20,6 +20,7 @@
 var CKBUILDER_CONFIG = {
   skin: 'moono',
   ignore: [
+    'CHANGES.md',
     'bender.js',
     '.bender',
     'bender-err.log',
@@ -34,15 +35,13 @@ var CKBUILDER_CONFIG = {
     '.jscsrc',
     '.jshintignore',
     '.jshintrc',
+    'LICENSE.md',
     '.mailmap',
     'node_modules',
     'package.json',
     'README.md',
-    'tests',
-    // Additional ignores for the XWiki WebJar.
     'samples',
-    'CHANGES.md',
-    'LICENSE.md'
+    'tests'
   ],
   plugins: {
     a11yhelp: 1,
@@ -84,7 +83,7 @@ var CKBUILDER_CONFIG = {
     tabletools: 1,
     toolbar: 1,
     undo: 1,
-    wikiMacro: 1,
+    widget: 1,
     wysiwygarea: 1
   }
 };

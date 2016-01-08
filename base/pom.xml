@@ -28,18 +28,14 @@
     <version>1.2-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
-  <artifactId>application-ckeditor-webjar</artifactId>
-  <name>CKEditor Integration WebJar</name>
-  <description>Packages CKEditor and our custom plugins in a single WebJar.</description>
+  <artifactId>application-ckeditor-base</artifactId>
+  <name>CKEditor Integration Base</name>
+  <description>A WebJar that packages the standard CKEditor with the default skin and a set of default plugins. This is mainly used for testing custom CKEditor plugins.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
+    <xwiki.extension.name>CKEditor Base</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
-    <webjars.unpack.contentDirectory>
-      ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
-    </webjars.unpack.contentDirectory>
   </properties>
   <build>
     <plugins>
@@ -47,52 +43,12 @@
       <plugin>
         <artifactId>maven-scm-plugin</artifactId>
       </plugin>
-      <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-plugins-webjar</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.contrib</groupId>
-                  <artifactId>application-ckeditor-plugins</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- Copy the build configuration to the CKEditor sources. -->
           <execution>
-            <!-- Copy the build configuration to the CKEditor sources. -->
             <id>copy-ckeditor-build-config</id>
-          </execution>
-          <execution>
-            <!-- Copy the custom plugins to the CKEditor sources so that they are included in the build. -->
-            <id>copy-custom-plugins</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${ckeditor.plugins.path}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${webjars.unpack.contentDirectory}</directory>
-                </resource>
-              </resources>
-            </configuration>
           </execution>
           <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
           <execution>

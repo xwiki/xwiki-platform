@@ -59,11 +59,107 @@
     </repository>
   </distributionManagement>
   <properties>
+    <ckeditor.version>4.5.6</ckeditor.version>
+    <!-- The path to the folder where we clone the CKEditor sources. -->
+    <ckeditor.path>${project.build.directory}/ckeditor-dev</ckeditor.path>
+    <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
+    <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
     <!-- Follow the specifications regarding the WebJar content path.
       (this property is defined in platform-core pom; remove this when the CKEditor is integrated in platform)-->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <!-- Where to unpack the WebJars. -->
+    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
   </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-scm-plugin</artifactId>
+          <version>1.9.4</version>
+          <executions>
+            <!-- Checkout the CKEditor sources for the version (tag) we want to use. -->
+            <execution>
+              <id>checkout-ckeditor-sources</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>checkout</goal>
+              </goals>
+              <configuration>
+                <checkoutDirectory>${ckeditor.path}</checkoutDirectory>
+                <connectionUrl>scm:git:git://github.com/ckeditor/ckeditor-dev.git</connectionUrl>
+                <scmVersion>${ckeditor.version}</scmVersion>
+                <scmVersionType>tag</scmVersionType>
+                <skipCheckoutIfExists>true</skipCheckoutIfExists>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <!-- Copy the build configuration to the CKEditor sources. -->
+            <execution>
+              <id>copy-ckeditor-build-config</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${ckeditor.builder.path}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/main/config</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+            <execution>
+              <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
+              <id>copy-ckeditor-resources</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${ckeditor.builder.path}/release/ckeditor</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+          <configuration>
+            <overwrite>true</overwrite>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <executions>
+            <!-- Build the CKEditor. -->
+            <execution>
+              <id>build-ckeditor</id>
+              <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+              <phase>process-classes</phase>
+              <goals>
+                <goal>exec</goal>
+              </goals>
+              <configuration>
+                <executable>${ckeditor.builder.path}/build.sh</executable>
+                <arguments>
+                  <argument>-s</argument>
+                </arguments>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <modules>
+    <module>base</module>
     <module>plugins</module>
     <module>ui</module>
     <module>webjar</module>

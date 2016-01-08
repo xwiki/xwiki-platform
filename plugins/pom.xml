@@ -36,6 +36,10 @@
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- The place where the CKEditor base WebJar has been unpacked. -->
+    <ckeditor.base.path>
+      ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-base/${project.version}
+    </ckeditor.base.path>
   </properties>
   <build>
     <plugins>
@@ -52,6 +56,54 @@
         </executions>
         <configuration>
           <globals>CKEDITOR</globals>
+        </configuration>
+      </plugin>
+      <!-- Unpack the WebJar with the base CKEditor to be able to use it in tests. -->
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-base-ckeditor-webjar</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.contrib</groupId>
+                  <artifactId>application-ckeditor-base</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <!-- We want a more recent version of Jasmine and we want to use the PhantomJS driver-->
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <phantomjs>
+            <!-- There is no version 2.0 available for linux.. -->
+            <version>1.9.8</version>
+          </phantomjs>
+          <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
+          <jsTestSrcDir>${project.basedir}/src/test/resources</jsTestSrcDir>
+          <preloadSources>
+            <source>${ckeditor.base.path}/ckeditor.js</source>
+          </preloadSources>
         </configuration>
       </plugin>
       <plugin>

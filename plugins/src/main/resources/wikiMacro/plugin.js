@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 CKEDITOR.plugins.add('wikiMacro', {
   requires: 'widget',
   init : function(editor) {
@@ -61,6 +80,19 @@ CKEDITOR.plugins.add('wikiMacro', {
       return macro;
     };
 
+    // content: CKEDITOR.htmlParser.fragment
+    var getMacroOutputComments = function(content) {
+      var macroOutputMarkers = [];
+      // Note that forEach is iterating a live list, meaning that the list is updated if we remove a node from the DOM.
+      // That's why we have to collect the macro output markers first and then process them.
+      content.forEach(function(comment) {
+        if (comment.value.substring(0, 11) === 'startmacro:' || comment.value === 'stopmacro') {
+          macroOutputMarkers.push(comment);
+        }
+      }, CKEDITOR.NODE_COMMENT, true);
+      return macroOutputMarkers;
+    };
+
     // We didn't use the editor.dataProcessor.dataFilter because it is executed with priority 10, so after the widgets
     // are upcasted (priority 8). Only element nodes can be upcasted and wiki macro output is marked with comment nodes
     // so we need to add the macro output wrapper before the upcast takes place.
@@ -69,7 +101,7 @@ CKEDITOR.plugins.add('wikiMacro', {
     // See http://docs.ckeditor.com/#!/api/CKEDITOR.htmlParser.filter
     editor.on('toHtml', function(event) {
       // dataValue is a CKEDITOR.htmlParser.fragment instance.
-      event.data.dataValue.forEach(maybeWrapMacroOutput, CKEDITOR.NODE_COMMENT, true);
+      getMacroOutputComments(event.data.dataValue).forEach(maybeWrapMacroOutput);
     }, null, null, 7);
 
     // See http://docs.ckeditor.com/#!/api/CKEDITOR.plugins.widget.definition

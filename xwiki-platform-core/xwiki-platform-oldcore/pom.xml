@@ -705,8 +705,6 @@
               **/pdf/impl/PdfURLFactory.java,
               **/plugin/image/ImagePlugin.java,
               **/plugin/autotag/FrenchStemmer.java,
-              **/plugin/diff/DiffPluginApi.java,
-              **/plugin/diff/DiffPlugin.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,

@@ -372,14 +372,12 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
-     * @param documentName the Skin Extension's document name
+     * @param documentReference the Skin Extension's document reference
      * @param context the XWiki Context
      * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
      */
-    protected boolean isAccessible(String documentName, XWikiContext context)
+    protected boolean isAccessible(DocumentReference documentReference, XWikiContext context)
     {
-        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
-
         if (!Utils.getComponent(ContextualAuthorizationManager.class).hasAccess(Right.VIEW, documentReference)) {
             LOGGER.debug("[{}] The current user [{}] does not have 'view' rights on the Skin Extension document [{}]",
                 getName(), context.getUserReference(), documentReference);
@@ -388,5 +386,33 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         }
 
         return true;
+    }
+
+    /**
+     * @param documentReference the Skin Extension's document reference
+     * @param context the XWiki Context
+     * @return the version of the document
+     */
+    protected String getDocVersion(DocumentReference documentReference, XWikiContext context)
+    {
+        try {
+            return context.getWiki().getDocument(documentReference, context).getVersion();
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to load document [{}].", documentReference);
+        }
+        return "";
+    }
+
+    /**
+     * Return the query string part with the version of the document, to add to the URL of a resource. The objective is
+     * to generate an URL specific to this version to avoid browsers using an outdated version from their cache.
+     *  
+     * @param documentReference the Skin Extension's document reference
+     * @param context the XWiki Context
+     * @return the query string part handling the version of the document
+     */
+    protected String getDocVersionQueryString(DocumentReference documentReference, XWikiContext context)
+    {
+        return "&amp;docVersion=" + sanitize(getDocVersion(documentReference, context));
     }
 }

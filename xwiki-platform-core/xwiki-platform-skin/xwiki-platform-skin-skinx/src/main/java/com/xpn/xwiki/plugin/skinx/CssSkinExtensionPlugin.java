@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -75,7 +76,8 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        if (!isAccessible(documentName, context)) {
+        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
+        if (!isAccessible(documentReference, context)) {
             // No access to view the Skin Extension's document. Don`t generate any link to avoid a useless network
             // request always leading to a 403 Error.
             return "";
@@ -83,7 +85,8 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 
         return "<link rel='stylesheet' type='text/css' href='"
             + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context),
+                "language=" + sanitize(context.getLanguage()) + getDocVersionQueryString(documentReference, context)
+                        + parametersAsQueryString(documentName, context),
                 context) + "'/>";
     }
 

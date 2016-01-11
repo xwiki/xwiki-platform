@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -372,9 +373,20 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
+     * @param documentName the Skin Extension's document name
+     * @param context the XWiki Context
+     * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
+     */
+    protected boolean isAccessible(String documentName, XWikiContext context)
+    {
+        return isAccessible(getCurrentDocumentReferenceResolver().resolve(documentName), context);
+    }
+
+    /**
      * @param documentReference the Skin Extension's document reference
      * @param context the XWiki Context
      * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
+     * @since 7.4.1
      */
     protected boolean isAccessible(DocumentReference documentReference, XWikiContext context)
     {
@@ -393,12 +405,12 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * @param context the XWiki Context
      * @return the version of the document
      */
-    protected String getDocVersion(DocumentReference documentReference, XWikiContext context)
+    private String getDocumentVersion(DocumentReference documentReference, XWikiContext context)
     {
         try {
             return context.getWiki().getDocument(documentReference, context).getVersion();
         } catch (XWikiException e) {
-            LOGGER.error("Failed to load document [{}].", documentReference);
+            LOGGER.error("Failed to load document [{}].", documentReference, e);
         }
         return "";
     }
@@ -411,8 +423,47 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      * @param context the XWiki Context
      * @return the query string part handling the version of the document
      */
-    protected String getDocVersionQueryString(DocumentReference documentReference, XWikiContext context)
+    private String getDocumentVersionQueryString(DocumentReference documentReference, XWikiContext context)
     {
-        return "&amp;docVersion=" + sanitize(getDocVersion(documentReference, context));
+        return "docVersion=" + sanitize(getDocumentVersion(documentReference, context));
     }
+
+    /**
+     * Return the query string part with the language of the document (if any).
+     *  
+     * @param context the XWiki Context
+     * @return the query string handling the language of the document
+     */
+    private String getLanguageQueryString(XWikiContext context)
+    {
+        Locale locale = context.getLocale();
+        if (locale != null) {
+            return "language=" + sanitize(locale.toString());
+        }
+        return "";
+    }
+
+    /**
+     * Return the URL to a document skin extension.
+     *
+     * @param documentReference the Skin Extension's document reference
+     * @param documentName the Skin Extension's document name
+     * @param pluginName the name of the plugin
+     * @param context the XWiki Context
+     * @return the URL to the document skin extension.
+     *
+     * @since 7.4.1 
+     */
+    protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
+            String pluginName, XWikiContext context)
+    {
+        String queryString = String.format("%s&amp;%s%s",
+                getLanguageQueryString(context),
+                getDocumentVersionQueryString(documentReference, context),
+                parametersAsQueryString(documentName, context));
+
+        return context.getWiki().getURL(documentReference, pluginName, queryString, "", context);
+    }
+    
+    
 }

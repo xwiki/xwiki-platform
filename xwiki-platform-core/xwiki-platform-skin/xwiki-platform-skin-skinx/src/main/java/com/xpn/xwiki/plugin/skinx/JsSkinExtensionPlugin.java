@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.skinx;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -83,7 +84,8 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        if (!isAccessible(documentName, context)) {
+        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
+        if (!isAccessible(documentReference, context)) {
             // No access to view the Skin Extension's document. Don`t generate any link to avoid a useless network
             // request always leading to a 403 Error.
             return "";
@@ -91,7 +93,8 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
         result.append(context.getWiki().getURL(documentName, PLUGIN_NAME,
-            "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context), context));
+            "language=" + sanitize(context.getLanguage()) + getDocVersionQueryString(documentReference, context)
+                + parametersAsQueryString(documentName, context), context));
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;

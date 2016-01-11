@@ -625,6 +625,17 @@
               <method>org.xwiki.refactoring.job.EntityJobStatus getRenameJobStatus(java.lang.String)</method>
               <justification>We can get the job status in a generic way using the job script service. This method is part of an unstable (young) API and it wasn't working anyway, as it was throwing a ClassCastException.</justification>
             </difference>
+
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/diff/DiffPlugin</className>
+              <justification>Not really a breackage. Just moved to its own module.</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/diff/DiffPluginApi</className>
+              <justification>Not really a breackage. Just moved to its own module.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

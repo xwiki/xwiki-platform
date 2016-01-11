@@ -92,9 +92,7 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         }
 
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
-        result.append(context.getWiki().getURL(documentName, PLUGIN_NAME,
-            "language=" + sanitize(context.getLanguage()) + getDocVersionQueryString(documentReference, context)
-                + parametersAsQueryString(documentName, context), context));
+        result.append(getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;

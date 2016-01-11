@@ -83,11 +83,8 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
             return "";
         }
 
-        return "<link rel='stylesheet' type='text/css' href='"
-            + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                "language=" + sanitize(context.getLanguage()) + getDocVersionQueryString(documentReference, context)
-                        + parametersAsQueryString(documentName, context),
-                context) + "'/>";
+        return String.format("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />",
+                getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
     }
 
     @Override

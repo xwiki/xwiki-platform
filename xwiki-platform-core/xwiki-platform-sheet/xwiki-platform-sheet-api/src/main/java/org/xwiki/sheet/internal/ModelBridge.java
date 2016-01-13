@@ -60,9 +60,14 @@ public interface ModelBridge
     String getCurrentAction();
 
     /**
-     * @return the current document from the XWiki context
+     * Checks if the given document is the current document on the execution context. If the passed document is a
+     * translation then it is compared with the current document translation.
+     * 
+     * @param document the document to check
+     * @return {@code true} if the given document is the current document or its current translation, {@code false}
+     *         otherwise
      */
-    DocumentModelBridge getCurrentDocument();
+    boolean isCurrentDocument(DocumentModelBridge document);
 
     /**
      * Unlike {@link org.xwiki.bridge.DocumentAccessBridge#pushDocumentInContext(Map, DocumentReference)} which puts on

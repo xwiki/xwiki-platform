@@ -52,7 +52,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Default implementation of {@link DocumentSplitter}.
- * 
+ *
  * @version $Id$
  * @since 1.9M1
  */
@@ -80,7 +80,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
 
     /**
      * A recursive method for traversing the xdom of the root document and splitting it into sub documents.
-     * 
+     *
      * @param parentDoc the parent {@link WikiDocument} under which the given list of children reside.
      * @param children current list of blocks being traversed.
      * @param depth the depth from the root xdom to current list of children.
@@ -118,7 +118,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
 
     /**
      * Creates a {@link LinkBlock} suitable to be placed in the parent document.
-     * 
+     *
      * @param block the {@link Block} that has just been split into a separate document.
      * @param target name of the target wiki document.
      * @return a {@link LinkBlock} representing the link from the parent document to new document.
@@ -131,6 +131,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             // Clone the header block and remove any unwanted stuff
             Block clonedHeaderBlock = firstBlock.clone(new BlockFilter()
             {
+                @Override
                 public List<Block> filter(Block block)
                 {
                     List<Block> blocks = new ArrayList<Block>();
@@ -154,7 +155,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
      * Update the links to internal document fragments after those fragments have been moved as a result of the split.
      * For instance the "#Chapter1" anchor will be updated to "ChildDocument#Chapter1" if the document fragment
      * identified by "Chapter1" has been moved to "ChildDocument" as a result of the split.
-     * 
+     *
      * @param documents the list of documents whose anchors to update
      */
     private void updateAnchors(List<WikiDocument> documents)
@@ -167,8 +168,10 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
                 Axes.DESCENDANT)) {
                 ResourceReference reference = linkBlock.getReference();
+                ResourceType resoureceType = reference.getType();
                 String fragment = null;
-                if (reference.getType() == ResourceType.DOCUMENT && StringUtils.isEmpty(reference.getReference())) {
+                if ((ResourceType.DOCUMENT.equals(resoureceType) || ResourceType.SPACE.equals(resoureceType))
+                    && StringUtils.isEmpty(reference.getReference())) {
                     fragment = reference.getParameter(ANCHOR_PARAMETER);
                 } else if (StringUtils.startsWith(reference.getReference(), "#")
                     && (reference.getType() == ResourceType.PATH || reference.getType() == ResourceType.URL)) {
@@ -189,7 +192,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     /**
      * Looks for document fragments in the given documents. A document fragment is identified by an {@link IdBlock} for
      * instance.
-     * 
+     *
      * @param documents the list of documents whose fragments to collect
      * @return the collection of document fragments mapped to the document that contains them
      */

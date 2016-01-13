@@ -103,6 +103,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -117,7 +118,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
@@ -305,6 +305,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
     }
 
+    /**
+     * Used to resolve a string into a proper Space Reference using the current space's reference to fill the blanks.
+     */
+    private static SpaceReferenceResolver<String> getDefaultStringSpaceReferenceResolver()
+    {
+        return Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
+    }
+
+    /**
+     * Used to resolve a string into a proper Space Reference using the default model configuration to fill the blanks.
+     */
+    private static SpaceReferenceResolver<String> getCurrentSpaceReferenceResolver()
+    {
+        return Utils.getComponent(SpaceReferenceResolver.TYPE_STRING, "current");
+    }
+
     private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
     {
         return Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
@@ -326,6 +342,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
     {
         return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+    }
+
+    /**
+     * Used to normalize references to default values.
+     */
+    private static DocumentReferenceResolver<EntityReference> getDefaultReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
     }
 
     /**
@@ -1604,6 +1628,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @since 3.0M3
      */
+    @Override
     public DocumentReference getContentAuthorReference()
     {
         return this.contentAuthorReference;
@@ -2520,7 +2545,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Get an xobject with the passed xclass at the passed location.
      * <p>
      * If <code>create</code> is true and the is no xobject at the passed located, it's created.
-     * 
+     *
      * @param classReference the xlcass of the object to retrieve
      * @param number the location of the xobject
      * @param create if true the xobject is created when it does not exist
@@ -3631,14 +3656,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *       "users": ["XWiki.Admin"]
      *     }
      *   ],
-     *   "XWiki.XWikiUsers": 
+     *   "XWiki.XWikiUsers":
      *     "1": {
      *       "name": ["Spirou"]
      *     }
      *   ]
      * }
      * </pre></code>
-     * 
+     *
      * @param request is the input HTTP request that provides the parameters
      * @param context
      * @return a map containing ordered data
@@ -3700,7 +3725,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * existing number of objects. For example, if the document already has 2 objects of type 'Space.Class', then it
      * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
      * 'Space.Class_42_prop=foobar' for example, will be ignore.
-     * 
+     *
      * @param eform is form information that contains all the query parameters
      * @param context
      * @throws XWikiException
@@ -5187,26 +5212,37 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                 for (LinkBlock linkBlock : linkBlocks) {
                     ResourceReference reference = linkBlock.getReference();
-                    if (reference.getType().equals(ResourceType.DOCUMENT)) {
-                        // If the reference is empty, the link is an autolink
-                        if (!StringUtils.isEmpty(reference.getReference())
-                            || (StringUtils.isEmpty(reference.getParameter(DocumentResourceReference.ANCHOR)) && StringUtils
-                                .isEmpty(reference.getParameter(DocumentResourceReference.QUERY_STRING)))) {
-                            // The reference may not have the space or even document specified (in case of an empty
-                            // string)
-                            // Thus we need to find the fully qualified document name
-                            DocumentReference documentReference =
-                                getCurrentDocumentReferenceResolver().resolve(reference.getReference());
+                    ResourceType resourceType = reference.getType();
+                    if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
+                        // If the reference is empty, the link is an autolink and we don`t include it.
+                        if (StringUtils.isEmpty(reference.getReference())) {
+                            continue;
+                        }
 
-                            // Verify that the link is not an autolink (i.e. a link to the current document)
-                            if (!documentReference.equals(currentDocumentReference)) {
-                                // Since this method is used for saving backlinks and since backlinks must be
-                                // saved with the space and page name but without the wiki part, we remove the wiki
-                                // part before serializing.
-                                // This is a bit of a hack since the default serializer should theoretically fail
-                                // if it's passed an invalid reference.
-                                pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
-                            }
+                        // The reference may not have the space or even document specified (in case of an empty
+                        // string)
+                        // Thus we need to find the fully qualified document name
+                        DocumentReference documentReference = null;
+                        if (ResourceType.DOCUMENT.equals(resourceType)) {
+                            // Resolve the document reference as it is.
+                            documentReference = getCurrentDocumentReferenceResolver().resolve(reference.getReference());
+                        } else {
+                            // Resolve the space reference first
+                            SpaceReference spaceReferencere =
+                                getCurrentSpaceReferenceResolver().resolve(reference.getReference());
+                            // Resolve and use the space's homepage.
+                            documentReference =
+                                getDefaultReferenceDocumentReferenceResolver().resolve(spaceReferencere);
+                        }
+
+                        // Verify that the link is not an autolink (i.e. a link to the current document)
+                        if (!documentReference.equals(currentDocumentReference)) {
+                            // Since this method is used for saving backlinks and since backlinks must be
+                            // saved with the space and page name but without the wiki part, we remove the wiki
+                            // part before serializing.
+                            // This is a bit of a hack since the default serializer should theoretically fail
+                            // if it's passed an invalid reference.
+                            pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
                         }
                     }
                 }
@@ -6569,33 +6605,57 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Get new document
         XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
 
-        // Step 4: Refactor the links contained in the document
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
         if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
             XDOM newDocumentXDOM = newDocument.getXDOM();
             List<LinkBlock> linkBlockList =
                 newDocumentXDOM.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
 
+            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
+            // xwiki-platform-refactoring-default
             boolean modified = false;
             for (LinkBlock linkBlock : linkBlockList) {
                 ResourceReference linkReference = linkBlock.getReference();
-                if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                    DocumentReference currentLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                            getDocumentReference());
+                ResourceType resourceType = linkReference.getType();
+                if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
+                    EntityReference oldLinkReference = null;
+                    EntityReference newLinkReference = null;
+                    if (ResourceType.DOCUMENT.equals(resourceType)) {
+                        // current link, use the old document's reference to fill in blanks.
+                        oldLinkReference =
+                            getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
+                                getDocumentReference());
 
-                    DocumentReference newLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                            newDocument.getDocumentReference());
+                        // new link, use the new document's reference to fill in blanks.
+                        newLinkReference =
+                            getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
+                                newDocument.getDocumentReference());
+                    } else {
+                        // current link, use the old document's reference to fill in blanks.
+                        oldLinkReference =
+                            getDefaultStringSpaceReferenceResolver().resolve(linkReference.getReference(),
+                                getDocumentReference());
 
-                    if (!newLinkReference.equals(currentLinkReference)) {
+                        // new link, use the new document's reference to fill in blanks.
+                        newLinkReference =
+                            getDefaultStringSpaceReferenceResolver().resolve(linkReference.getReference(),
+                                newDocument.getDocumentReference());
+                    }
+
+                    if (!newLinkReference.equals(oldLinkReference)) {
                         modified = true;
-                        linkReference.setReference(getCompactWikiEntityReferenceSerializer().serialize(
-                            currentLinkReference, newDocument.getDocumentReference()));
+
+                        // Serialize the old (original) link relative to the new document's location, in compact form.
+                        String serializedLinkReference =
+                            getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
+
+                        linkReference.setReference(serializedLinkReference);
                     }
                 }
             }
-            // Set new content and save document if needed
+            // Set the new content and save document if needed
             if (modified) {
                 newDocument.setContent(newDocumentXDOM);
                 newDocument.setAuthorReference(context.getUserReference());
@@ -6617,6 +6677,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldLink, DocumentReference newLink,
         XWikiContext context) throws XWikiException
     {
+        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
+        // xwiki-platform-refactoring-default
         getOldRendering().renameLinks(backlinkDocument, oldLink, newLink, context);
 
         // Save if content changed
@@ -6680,7 +6742,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Avoid the technical "WebHome" name.
-     * 
+     *
      * @param documentReference a document reference
      * @return the last space name if the document is the home of a space, the document name otherwise
      */

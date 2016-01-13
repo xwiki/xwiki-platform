@@ -35,7 +35,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -47,6 +50,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,7 +61,7 @@ import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 /**
  * Default implementation of {@link OldRendering} that try as much as possible to do something that makes sense without
  * using old rendering engine.
- * 
+ *
  * @version $Id$
  * @since 7.1M1
  */
@@ -81,6 +85,12 @@ public class DefaultOldRendering implements OldRendering
     protected DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
     @Inject
+    protected SpaceReferenceResolver<String> spaceReferenceResolver;
+
+    @Inject
+    protected DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
+
+    @Inject
     protected Provider<VelocityManager> velocityManagerProvider;
 
     @Inject
@@ -93,6 +103,9 @@ public class DefaultOldRendering implements OldRendering
     public void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldReference,
         DocumentReference newReference, XWikiContext context) throws XWikiException
     {
+        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
+        // xwiki-platform-refactoring-default
+
         if (this.contextComponentManagerProvider.get().hasComponent(BlockRenderer.class,
             backlinkDocument.getSyntax().toIdString())) {
             refactorDocumentLinks(backlinkDocument, oldReference, newReference, context);
@@ -111,20 +124,55 @@ public class DefaultOldRendering implements OldRendering
     private void refactorDocumentLinks(XWikiDocument document, DocumentReference oldDocumentReference,
         DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
+        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
+        // xwiki-platform-refactoring-default
+
+        DocumentReference currentDocumentReference = document.getDocumentReference();
+
         XDOM xdom = document.getXDOM();
 
         List<LinkBlock> linkBlockList = xdom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
 
         for (LinkBlock linkBlock : linkBlockList) {
             ResourceReference linkReference = linkBlock.getReference();
-            if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                DocumentReference documentReference =
-                    this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
-                        document.getDocumentReference());
+            ResourceType resourceType = linkReference.getType();
+            if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
+                DocumentReference linkTargetDocumentReference = null;
 
-                if (documentReference.equals(oldDocumentReference)) {
-                    linkReference.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference,
-                        document.getDocumentReference()));
+                EntityReference newTargetReference = newDocumentReference;
+                ResourceType newResourceType = ResourceType.DOCUMENT;
+
+                if (ResourceType.DOCUMENT.equals(resourceType)) {
+                    // Resolve the document reference and use it directly when comparing document references below.
+                    linkTargetDocumentReference =
+                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
+                            currentDocumentReference);
+                } else {
+                    SpaceReference spaceReference =
+                        spaceReferenceResolver.resolve(linkReference.getReference(), currentDocumentReference);
+
+                    // Resolve the space's homepage and use that when comparing document references below.
+                    linkTargetDocumentReference = defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
+
+                    if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newDocumentReference.getName())) {
+                        // The space reference will be serialized in the renamed link.
+                        newTargetReference = spaceReference;
+                    } else {
+                        // If the new target is a non-terminal document, we can not use a "space:" resource type to
+                        // access it anymore. To fix it, we need to change the resource type of the link reference
+                        // "doc:".
+                        newResourceType = ResourceType.DOCUMENT;
+                    }
+                }
+
+                // If the link targets the old (renamed) document reference, we must update it.
+                if (linkTargetDocumentReference.equals(oldDocumentReference)) {
+                    String newLinkReferenceString =
+                        this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
+
+                    // Update the link reference.
+                    linkReference.setReference(newLinkReferenceString);
+                    linkReference.setType(newResourceType);
                 }
             }
         }

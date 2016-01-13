@@ -26,11 +26,15 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 
 /**
@@ -52,7 +56,14 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
 
     @Inject
     @Named("current")
+    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
+
+    @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    @Inject
+    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
 
     /**
      * {@inheritDoc}
@@ -64,7 +75,15 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         String result;
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(reference.getReference());
+        DocumentReference documentReference = null;
+        ResourceType resourceType = reference.getType();
+        if (ResourceType.DOCUMENT.equals(resourceType)) {
+            documentReference = this.currentDocumentReferenceResolver.resolve(reference.getReference());
+        } else if (ResourceType.SPACE.equals(resourceType)) {
+            // Extract the space's homepage.
+            SpaceReference spaceReference = this.currentSpaceReferenceResolver.resolve(reference.getReference());
+            documentReference = this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
+        }
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

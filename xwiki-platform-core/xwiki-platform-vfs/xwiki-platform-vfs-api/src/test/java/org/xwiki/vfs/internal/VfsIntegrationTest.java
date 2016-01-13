@@ -33,6 +33,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -92,7 +93,10 @@ public class VfsIntegrationTest
             is = Files.newInputStream(path);
             fail("IOException should have been raised here");
         } catch (IOException expected) {
-            assertEquals("xxx", expected.getMessage());
+            assertEquals("Failed to get attachment content for attachment [test.zip] in URI "
+                + "[attach://wiki:space.page/test.zip]", expected.getMessage());
+            assertEquals("IOException: No View permission for document [wiki:space.page]",
+                ExceptionUtils.getRootCauseMessage(expected));
         }
         assertNotNull(is);
     }

@@ -37,6 +37,11 @@
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>VFS API</xwiki.extension.name>
+    <!-- This extension needs to be installed at the farm level (ie in the root namespace) to work fine.
+         This is because is contributes a new URL Resource Handler and those need to be installed in the
+         root Component Manager (since they're executed before the wiki is extracted from the URL during
+         the URL parsing process). -->
+    <xwiki.extension.namespaces>&lt;root&gt;</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

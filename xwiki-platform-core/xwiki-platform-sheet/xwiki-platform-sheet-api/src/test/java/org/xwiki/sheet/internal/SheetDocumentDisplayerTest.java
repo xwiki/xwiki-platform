@@ -115,7 +115,7 @@ public class SheetDocumentDisplayerTest
     {
         DocumentReference documentReference = document.getDocumentReference();
         when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
-        when(this.modelBridge.getCurrentDocument()).thenReturn(document);
+        when(this.modelBridge.isCurrentDocument(document)).thenReturn(true);
     }
 
     /**

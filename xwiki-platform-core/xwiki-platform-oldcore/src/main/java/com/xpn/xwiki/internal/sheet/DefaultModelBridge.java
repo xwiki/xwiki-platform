@@ -101,9 +101,13 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public DocumentModelBridge getCurrentDocument()
+    public boolean isCurrentDocument(DocumentModelBridge document)
     {
-        return this.xcontextProvider.get().getDoc();
+        if (((XWikiDocument) document).getTranslation() == 0) {
+            return document == this.xcontextProvider.get().getDoc();
+        } else {
+            return document == this.xcontextProvider.get().get("tdoc");
+        }
     }
 
     @Override

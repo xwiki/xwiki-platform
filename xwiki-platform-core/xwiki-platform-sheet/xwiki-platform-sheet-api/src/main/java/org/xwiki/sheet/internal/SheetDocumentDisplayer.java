@@ -96,7 +96,7 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                 // It is very important to determine the sheet in a new, isolated, execution context, if the given
                 // document is not the currently on the execution context. Put the given document in the context only if
                 // it's not already there.
-                if (document != modelBridge.getCurrentDocument()) {
+                if (!modelBridge.isCurrentDocument(document)) {
                     backupObjects = modelBridge.pushDocumentInContext(document);
                 }
                 xdom = maybeDisplayWithSheet(document, parameters);

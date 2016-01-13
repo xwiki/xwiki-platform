@@ -158,8 +158,8 @@ public class VfsResourceReferenceHandlerTest
         } catch (ResourceReferenceHandlerException expected) {
             assertEquals("Failed to extract resource [uri = [attach:wiki2:space2.page2@test.zip], path = [test.txt], "
                 + "parameters = []]", expected.getMessage());
-            // TODO: Find a better place to perform the permission check so that the error reported is better
-            assertEquals("NoSuchFileException: test.zip", ExceptionUtils.getRootCauseMessage(expected));
+            assertEquals("IOException: No View permission for document [wiki2:space2.page2]",
+                ExceptionUtils.getRootCauseMessage(expected));
         }
     }
 

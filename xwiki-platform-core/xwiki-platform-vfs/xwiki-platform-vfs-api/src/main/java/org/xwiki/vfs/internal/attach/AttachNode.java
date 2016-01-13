@@ -105,11 +105,7 @@ public class AttachNode extends FsAbstractNode implements IoEntry<AttachNode>
     {
         // All Attach Driver Nodes are of type File, except if the Node doesn't exist, in which case we should return
         // NO_TYPES
-        try {
-            return this.xwikiModelNode.getAttachment() != null ? FILE_TYPE : NO_TYPES;
-        } catch (IOException e) {
-            return NO_TYPES;
-        }
+        return this.xwikiModelNode.hasAttachment() ? FILE_TYPE : NO_TYPES;
     }
 
     @Override

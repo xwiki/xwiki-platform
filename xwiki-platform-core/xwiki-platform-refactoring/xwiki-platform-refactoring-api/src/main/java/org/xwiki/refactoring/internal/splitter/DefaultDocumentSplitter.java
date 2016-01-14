@@ -165,26 +165,35 @@ public class DefaultDocumentSplitter implements DocumentSplitter
 
         // Update the anchors.
         for (WikiDocument document : documents) {
-            for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
-                Axes.DESCENDANT)) {
-                ResourceReference reference = linkBlock.getReference();
-                ResourceType resoureceType = reference.getType();
-                String fragment = null;
-                if ((ResourceType.DOCUMENT.equals(resoureceType) || ResourceType.SPACE.equals(resoureceType))
-                    && StringUtils.isEmpty(reference.getReference())) {
-                    fragment = reference.getParameter(ANCHOR_PARAMETER);
-                } else if (StringUtils.startsWith(reference.getReference(), "#")
-                    && (reference.getType() == ResourceType.PATH || reference.getType() == ResourceType.URL)) {
-                    fragment = reference.getReference().substring(1);
-                }
+            updateAnchors(document, fragments);
+        }
+    }
 
-                String targetDocument = fragments.get(fragment);
-                if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
-                    // The fragment has been moved so we need to update the link.
-                    reference.setType(ResourceType.DOCUMENT);
-                    reference.setReference(targetDocument);
-                    reference.setParameter(ANCHOR_PARAMETER, fragment);
-                }
+    /**
+     * @param document the document whose anchors to update
+     * @param fragments see {@link #collectDocumentFragments(List)}
+     */
+    private void updateAnchors(WikiDocument document, Map<String, String> fragments)
+    {
+        for (LinkBlock linkBlock : document.getXdom().<LinkBlock> getBlocks(new ClassBlockMatcher(LinkBlock.class),
+            Axes.DESCENDANT)) {
+            ResourceReference reference = linkBlock.getReference();
+            ResourceType resoureceType = reference.getType();
+            String fragment = null;
+            if ((ResourceType.DOCUMENT.equals(resoureceType) || ResourceType.SPACE.equals(resoureceType))
+                && StringUtils.isEmpty(reference.getReference())) {
+                fragment = reference.getParameter(ANCHOR_PARAMETER);
+            } else if (StringUtils.startsWith(reference.getReference(), "#")
+                && (ResourceType.PATH.equals(resoureceType) || ResourceType.URL.equals(resoureceType))) {
+                fragment = reference.getReference().substring(1);
+            }
+
+            String targetDocument = fragments.get(fragment);
+            if (targetDocument != null && !targetDocument.equals(document.getFullName())) {
+                // The fragment has been moved so we need to update the link.
+                reference.setType(ResourceType.DOCUMENT);
+                reference.setReference(targetDocument);
+                reference.setParameter(ANCHOR_PARAMETER, fragment);
             }
         }
     }

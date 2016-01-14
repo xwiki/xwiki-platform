@@ -55,7 +55,10 @@
       &lt;link type="text/css" rel="stylesheet" href="$xwiki.getURL('CKEditor.ContentSheet', 'ssx')" /&gt;
     &lt;/head&gt;
     &lt;body id="body" class="skin-flamingo wiki-${xcontext.database} space-${escapetool.xml($doc.space.replaceAll(' ', '_'))} viewbody main"&gt;
-      $doc.getRenderedContent($tdoc.content, $tdoc.syntax.toIdString(), 'annotatedxhtml/1.0')
+      #if (!$source)
+        #set ($source = $tdoc)
+      #end
+      $doc.getRenderedContent($source.content, $source.syntax.toIdString(), 'annotatedxhtml/1.0')
     &lt;/body&gt;
   &lt;/html&gt;
   {{/html}}

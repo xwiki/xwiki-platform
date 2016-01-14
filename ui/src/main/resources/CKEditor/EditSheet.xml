@@ -47,9 +47,8 @@
   #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
   (% class="xform" %)(((
     ; $services.localization.render('core.editors.content.contentField.label')
-    #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
-    #set ($content = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
     : {{html}}
+      #set ($content = $services.wysiwyg.render('CKEditor.ContentSheet'))
       &lt;textarea name="content" class="ckeditor-textarea"&gt;$escapetool.xml($content)&lt;/textarea&gt;
       &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;
       &lt;input value="$doc.syntax.toIdString()" name="content_syntax" type="hidden"/&gt;

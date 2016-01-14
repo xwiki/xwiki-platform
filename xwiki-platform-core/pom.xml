@@ -636,6 +636,13 @@
               <className>com/xpn/xwiki/plugin/diff/DiffPluginApi</className>
               <justification>Not really a breackage. Just moved to its own module.</justification>
             </difference>
+
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/wysiwyg/server/WysiwygEditorScriptService</className>
+              <method>java.lang.String render(org.xwiki.model.reference.DocumentReference)</method>
+              <justification>New method that is useful for any WYSIWYG editor that accepts as input a full HTML page (with style sheets includes).</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

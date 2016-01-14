@@ -108,6 +108,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -116,6 +117,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -5204,46 +5206,75 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 XDOM dom = getXDOM();
 
-                List<LinkBlock> linkBlocks =
-                    dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
-                pageNames = new LinkedHashSet<String>(linkBlocks.size());
+                // @formatter:off
+                List<AbstractBlock> blocks = dom.getBlocks(
+                    new CompositeBlockMatcher(
+                        new ClassBlockMatcher(LinkBlock.class),
+                        new MacroBlockMatcher("include"),
+                        new MacroBlockMatcher("display")
+                    ), Block.Axes.DESCENDANT);
+                // @formatter:on
+                pageNames = new LinkedHashSet<String>(blocks.size());
 
                 DocumentReference currentDocumentReference = getDocumentReference();
 
-                for (LinkBlock linkBlock : linkBlocks) {
-                    ResourceReference reference = linkBlock.getReference();
-                    ResourceType resourceType = reference.getType();
-                    if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
-                        // If the reference is empty, the link is an autolink and we don`t include it.
-                        if (StringUtils.isEmpty(reference.getReference())) {
+                for (AbstractBlock block : blocks) {
+                    // Determine the reference string and reference type for each block type.
+                    String referenceString = null;
+                    ResourceType resourceType = null;
+                    if (block instanceof LinkBlock) {
+                        LinkBlock linkBlock = (LinkBlock) block;
+                        ResourceReference reference = linkBlock.getReference();
+
+                        referenceString = reference.getReference();
+                        resourceType = reference.getType();
+                    } else if (block instanceof MacroBlock) {
+                        referenceString = block.getParameter("reference");
+                        if (StringUtils.isBlank(referenceString)) {
+                            referenceString = block.getParameter("document");
+                        }
+
+                        if (StringUtils.isBlank(referenceString)) {
+                            // If the reference is not set or is empty, we have a recursive include which is not valid
+                            // anyway. Skip it.
                             continue;
                         }
 
-                        // The reference may not have the space or even document specified (in case of an empty
-                        // string)
-                        // Thus we need to find the fully qualified document name
-                        DocumentReference documentReference = null;
-                        if (ResourceType.DOCUMENT.equals(resourceType)) {
-                            // Resolve the document reference as it is.
-                            documentReference = getCurrentDocumentReferenceResolver().resolve(reference.getReference());
-                        } else {
-                            // Resolve the space reference first
-                            SpaceReference spaceReferencere =
-                                getCurrentSpaceReferenceResolver().resolve(reference.getReference());
-                            // Resolve and use the space's homepage.
-                            documentReference =
-                                getDefaultReferenceDocumentReferenceResolver().resolve(spaceReferencere);
-                        }
+                        // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
+                        resourceType = ResourceType.DOCUMENT;
+                    }
 
-                        // Verify that the link is not an autolink (i.e. a link to the current document)
-                        if (!documentReference.equals(currentDocumentReference)) {
-                            // Since this method is used for saving backlinks and since backlinks must be
-                            // saved with the space and page name but without the wiki part, we remove the wiki
-                            // part before serializing.
-                            // This is a bit of a hack since the default serializer should theoretically fail
-                            // if it's passed an invalid reference.
-                            pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
-                        }
+                    if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                        // We are only interested in Document or Space references.
+                        continue;
+                    }
+
+                    // If the reference is empty, the link is an autolink and we don`t include it.
+                    if (StringUtils.isEmpty(referenceString)) {
+                        continue;
+                    }
+
+                    // The reference may not have the space or even document specified (in case of an empty string)
+                    // Thus we need to find the fully qualified document name
+                    DocumentReference documentReference = null;
+                    if (ResourceType.DOCUMENT.equals(resourceType)) {
+                        // Resolve the document reference as it is.
+                        documentReference = getCurrentDocumentReferenceResolver().resolve(referenceString);
+                    } else {
+                        // Resolve the space reference first
+                        SpaceReference spaceReferencere = getCurrentSpaceReferenceResolver().resolve(referenceString);
+                        // Resolve and use the space's homepage.
+                        documentReference = getDefaultReferenceDocumentReferenceResolver().resolve(spaceReferencere);
+                    }
+
+                    // Verify that the link is not an autolink (i.e. a link to the current document)
+                    if (!documentReference.equals(currentDocumentReference)) {
+                        // Since this method is used for saving backlinks and since backlinks must be
+                        // saved with the space and page name but without the wiki part, we remove the wiki
+                        // part before serializing.
+                        // This is a bit of a hack since the default serializer should theoretically fail
+                        // if it's passed an invalid reference.
+                        pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
                     }
                 }
             }
@@ -6608,53 +6639,93 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
         // document's location.
         if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
+            DocumentReference oldDocumentReference = getDocumentReference();
+
             // Only support syntax for which a renderer is provided
             XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<LinkBlock> linkBlockList =
-                newDocumentXDOM.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+            // @formatter:off
+            List<AbstractBlock> blocks = newDocumentXDOM.getBlocks(
+                new CompositeBlockMatcher(
+                    new ClassBlockMatcher(LinkBlock.class),
+                    new MacroBlockMatcher("include"),
+                    new MacroBlockMatcher("display")
+                ), Block.Axes.DESCENDANT);
+            // @formatter:on
 
             // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
             // xwiki-platform-refactoring-default
             boolean modified = false;
-            for (LinkBlock linkBlock : linkBlockList) {
-                ResourceReference linkReference = linkBlock.getReference();
-                ResourceType resourceType = linkReference.getType();
-                if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
-                    EntityReference oldLinkReference = null;
-                    EntityReference newLinkReference = null;
-                    if (ResourceType.DOCUMENT.equals(resourceType)) {
-                        // current link, use the old document's reference to fill in blanks.
-                        oldLinkReference =
-                            getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                                getDocumentReference());
+            for (AbstractBlock block : blocks) {
+                // Determine the reference string and reference type for each block type.
+                String referenceString = null;
+                ResourceType resourceType = null;
+                if (block instanceof LinkBlock) {
+                    LinkBlock linkBlock = (LinkBlock) block;
+                    ResourceReference linkReference = linkBlock.getReference();
 
-                        // new link, use the new document's reference to fill in blanks.
-                        newLinkReference =
-                            getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                                newDocument.getDocumentReference());
-                    } else {
-                        // current link, use the old document's reference to fill in blanks.
-                        oldLinkReference =
-                            getDefaultStringSpaceReferenceResolver().resolve(linkReference.getReference(),
-                                getDocumentReference());
-
-                        // new link, use the new document's reference to fill in blanks.
-                        newLinkReference =
-                            getDefaultStringSpaceReferenceResolver().resolve(linkReference.getReference(),
-                                newDocument.getDocumentReference());
+                    referenceString = linkReference.getReference();
+                    resourceType = linkReference.getType();
+                } else if (block instanceof MacroBlock) {
+                    referenceString = block.getParameter("reference");
+                    if (StringUtils.isBlank(referenceString)) {
+                        referenceString = block.getParameter("document");
                     }
 
-                    if (!newLinkReference.equals(oldLinkReference)) {
-                        modified = true;
+                    if (StringUtils.isBlank(referenceString)) {
+                        // If the reference is not set or is empty, we have a recursive include which is not valid
+                        // anyway. Skip it.
+                        continue;
+                    }
 
-                        // Serialize the old (original) link relative to the new document's location, in compact form.
-                        String serializedLinkReference =
-                            getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
+                    // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
+                    resourceType = ResourceType.DOCUMENT;
+                }
+
+                if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                    // We are only interested in Document or Space references.
+                    continue;
+                }
+
+                EntityReference oldLinkReference = null;
+                EntityReference newLinkReference = null;
+                if (ResourceType.DOCUMENT.equals(resourceType)) {
+                    // current link, use the old document's reference to fill in blanks.
+                    oldLinkReference =
+                        getExplicitDocumentReferenceResolver().resolve(referenceString, oldDocumentReference);
+
+                    // new link, use the new document's reference to fill in blanks.
+                    newLinkReference =
+                        getExplicitDocumentReferenceResolver().resolve(referenceString, newDocumentReference);
+                } else {
+                    // current link, use the old document's reference to fill in blanks.
+                    oldLinkReference =
+                        getDefaultStringSpaceReferenceResolver().resolve(referenceString, oldDocumentReference);
+
+                    // new link, use the new document's reference to fill in blanks.
+                    newLinkReference =
+                        getDefaultStringSpaceReferenceResolver().resolve(referenceString, newDocumentReference);
+                }
+
+                // If the new and old link references don`t match, then we must update the relative link.
+                if (!newLinkReference.equals(oldLinkReference)) {
+                    modified = true;
+
+                    // Serialize the old (original) link relative to the new document's location, in compact form.
+                    String serializedLinkReference =
+                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
+
+                    // Update the reference in the XDOM.
+                    if (block instanceof LinkBlock) {
+                        LinkBlock linkBlock = (LinkBlock) block;
+                        ResourceReference linkReference = linkBlock.getReference();
 
                         linkReference.setReference(serializedLinkReference);
+                    } else if (block instanceof MacroBlock) {
+                        block.setParameter("reference", serializedLinkReference);
                     }
                 }
             }
+
             // Set the new content and save document if needed
             if (modified) {
                 newDocument.setContent(newDocumentXDOM);

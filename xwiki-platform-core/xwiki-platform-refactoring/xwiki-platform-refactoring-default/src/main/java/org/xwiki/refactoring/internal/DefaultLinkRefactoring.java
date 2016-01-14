@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,10 +38,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.CompositeBlockMatcher;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -156,50 +161,86 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
 
         XDOM xdom = document.getXDOM();
-        List<LinkBlock> linkBlockList = xdom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+        // @formatter:off
+        List<AbstractBlock> blocks = xdom.getBlocks(
+            new CompositeBlockMatcher(
+                new ClassBlockMatcher(LinkBlock.class),
+                new MacroBlockMatcher("include"),
+                new MacroBlockMatcher("display")
+            ), Block.Axes.DESCENDANT);
+        // @formatter:on
 
         boolean modified = false;
-        for (LinkBlock linkBlock : linkBlockList) {
-            ResourceReference linkReference = linkBlock.getReference();
-            ResourceType resourceType = linkReference.getType();
-            if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
-                DocumentReference linkTargetDocumentReference = null;
+        for (AbstractBlock block : blocks) {
+            // Determine the reference string and reference type for each block type.
+            String referenceString = null;
+            ResourceType resourceType = null;
+            if (block instanceof LinkBlock) {
+                LinkBlock linkBlock = (LinkBlock) block;
+                ResourceReference linkReference = linkBlock.getReference();
 
-                EntityReference newTargetReference = newTarget;
-                ResourceType newResourceType = linkReference.getType();
-
-                if (ResourceType.DOCUMENT.equals(resourceType)) {
-                    // Resolve the document reference and use it directly when comparing document references below.
-                    linkTargetDocumentReference =
-                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
-                            currentDocumentReference);
-                } else {
-                    SpaceReference spaceReference =
-                        spaceReferenceResolver.resolve(linkReference.getReference(), currentDocumentReference);
-
-                    // Resolve the space's homepage and use that when comparing document references below.
-                    linkTargetDocumentReference = defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
-
-                    if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newTarget.getName())) {
-                        // The space reference will be serialized in the renamed link.
-                        newTargetReference = spaceReference;
-                    } else {
-                        // If the new target is a non-terminal document, we can not use a "space:" resource type to
-                        // access it anymore. To fix it, we need to change the resource type of the link reference
-                        // "doc:".
-                        newResourceType = ResourceType.DOCUMENT;
-                    }
+                referenceString = linkReference.getReference();
+                resourceType = linkReference.getType();
+            } else if (block instanceof MacroBlock) {
+                referenceString = block.getParameter("reference");
+                if (StringUtils.isBlank(referenceString)) {
+                    referenceString = block.getParameter("document");
                 }
 
-                // If the link targets the old (renamed) document reference, we must update it.
-                if (linkTargetDocumentReference.equals(oldTarget)) {
-                    modified = true;
-                    String newLinkReferenceString =
-                        this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
+                if (StringUtils.isBlank(referenceString)) {
+                    // If the reference is not set or is empty, we have a recursive include which is not valid anyway. Skip it.
+                    continue;
+                }
 
-                    // Update the link reference.
-                    linkReference.setReference(newLinkReferenceString);
+                // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
+                resourceType = ResourceType.DOCUMENT;
+            }
+
+            if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                // We are only interested in Document or Space references.
+                continue;
+            }
+
+            DocumentReference linkTargetDocumentReference = null;
+            EntityReference newTargetReference = newTarget;
+            ResourceType newResourceType = resourceType;
+
+            if (ResourceType.DOCUMENT.equals(resourceType)) {
+                // Resolve the document reference and use it directly when comparing document references below.
+                linkTargetDocumentReference =
+                    this.explicitDocumentReferenceResolver.resolve(referenceString, currentDocumentReference);
+            } else {
+                SpaceReference spaceReference =
+                    spaceReferenceResolver.resolve(referenceString, currentDocumentReference);
+
+                // Resolve the space's homepage and use that when comparing document references below.
+                linkTargetDocumentReference = defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
+
+                if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newTarget.getName())) {
+                    // The space reference will be serialized in the renamed link.
+                    newTargetReference = spaceReference;
+                } else {
+                    // If the new target is a non-terminal document, we can not use a "space:" resource type to access
+                    // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
+                    newResourceType = ResourceType.DOCUMENT;
+                }
+            }
+
+            // If the link targets the old (renamed) document reference, we must update it.
+            if (linkTargetDocumentReference.equals(oldTarget)) {
+                modified = true;
+                String newReferenceString =
+                    this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
+
+                // Update the reference in the XDOM.
+                if (block instanceof LinkBlock) {
+                    LinkBlock linkBlock = (LinkBlock) block;
+                    ResourceReference linkReference = linkBlock.getReference();
+
+                    linkReference.setReference(newReferenceString);
                     linkReference.setType(newResourceType);
+                } else if (block instanceof MacroBlock) {
+                    block.setParameter("reference", newReferenceString);
                 }
             }
         }
@@ -242,43 +283,81 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         DocumentReference newDocumentReference = document.getDocumentReference();
 
         XDOM xdom = document.getXDOM();
-        List<LinkBlock> linkBlockList = xdom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+        // @formatter:off
+        List<AbstractBlock> blocks = xdom.getBlocks(
+            new CompositeBlockMatcher(
+                new ClassBlockMatcher(LinkBlock.class),
+                new MacroBlockMatcher("include"),
+                new MacroBlockMatcher("display")
+            ), Block.Axes.DESCENDANT);
+        // @formatter:on
 
         boolean modified = false;
-        for (LinkBlock linkBlock : linkBlockList) {
-            ResourceReference linkReference = linkBlock.getReference();
-            ResourceType resourceType = linkReference.getType();
-            if (ResourceType.DOCUMENT.equals(resourceType) || ResourceType.SPACE.equals(resourceType)) {
-                EntityReference oldLinkReference = null;
-                EntityReference newLinkReference = null;
-                if (ResourceType.DOCUMENT.equals(resourceType)) {
-                    // current link, use the old document's reference to fill in blanks.
-                    oldLinkReference =
-                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
-                            oldDocumentReference);
+        for (AbstractBlock block : blocks) {
+            // Determine the reference string and reference type for each block type.
+            String referenceString = null;
+            ResourceType resourceType = null;
+            if (block instanceof LinkBlock) {
+                LinkBlock linkBlock = (LinkBlock) block;
+                ResourceReference linkReference = linkBlock.getReference();
 
-                    // new link, use the new document's reference to fill in blanks.
-                    newLinkReference =
-                        this.explicitDocumentReferenceResolver.resolve(linkReference.getReference(),
-                            newDocumentReference);
-                } else {
-                    // current link, use the old document's reference to fill in blanks.
-                    oldLinkReference =
-                        this.spaceReferenceResolver.resolve(linkReference.getReference(), oldDocumentReference);
-
-                    // new link, use the new document's reference to fill in blanks.
-                    newLinkReference =
-                        this.spaceReferenceResolver.resolve(linkReference.getReference(), newDocumentReference);
+                referenceString = linkReference.getReference();
+                resourceType = linkReference.getType();
+            } else if (block instanceof MacroBlock) {
+                referenceString = block.getParameter("reference");
+                if (StringUtils.isBlank(referenceString)) {
+                    referenceString = block.getParameter("document");
                 }
 
-                if (!newLinkReference.equals(oldLinkReference)) {
-                    modified = true;
+                if (StringUtils.isBlank(referenceString)) {
+                    // If the reference is not set or is empty, we have a recursive include which is not valid anyway.
+                    // Skip it.
+                    continue;
+                }
 
-                    // Serialize the old (original) link relative to the new document's location, in compact form.
-                    String serializedLinkReference =
-                        this.compactEntityReferenceSerializer.serialize(oldLinkReference, newDocumentReference);
+                // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
+                resourceType = ResourceType.DOCUMENT;
+            }
+
+            if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                // We are only interested in Document or Space references.
+                continue;
+            }
+
+            EntityReference oldLinkReference = null;
+            EntityReference newLinkReference = null;
+            if (ResourceType.DOCUMENT.equals(resourceType)) {
+                // current link, use the old document's reference to fill in blanks.
+                oldLinkReference =
+                    this.explicitDocumentReferenceResolver.resolve(referenceString, oldDocumentReference);
+
+                // new link, use the new document's reference to fill in blanks.
+                newLinkReference =
+                    this.explicitDocumentReferenceResolver.resolve(referenceString, newDocumentReference);
+            } else {
+                // current link, use the old document's reference to fill in blanks.
+                oldLinkReference = this.spaceReferenceResolver.resolve(referenceString, oldDocumentReference);
+
+                // new link, use the new document's reference to fill in blanks.
+                newLinkReference = this.spaceReferenceResolver.resolve(referenceString, newDocumentReference);
+            }
+
+            // If the new and old link references don`t match, then we must update the relative link.
+            if (!newLinkReference.equals(oldLinkReference)) {
+                modified = true;
+
+                // Serialize the old (original) link relative to the new document's location, in compact form.
+                String serializedLinkReference =
+                    this.compactEntityReferenceSerializer.serialize(oldLinkReference, newDocumentReference);
+
+                // Update the reference in the XDOM.
+                if (block instanceof LinkBlock) {
+                    LinkBlock linkBlock = (LinkBlock) block;
+                    ResourceReference linkReference = linkBlock.getReference();
 
                     linkReference.setReference(serializedLinkReference);
+                } else if (block instanceof MacroBlock) {
+                    block.setParameter("reference", serializedLinkReference);
                 }
             }
         }

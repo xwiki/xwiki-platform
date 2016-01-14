@@ -41,9 +41,6 @@
     <property name="show_sql">false</property>
     <property name="use_outer_join">true</property>
 
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
-
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
     <property name="jdbc.use_scrollable_resultset">false</property>
 

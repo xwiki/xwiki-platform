@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -30,13 +31,17 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
  * Convert all document event to remote events and back to local events.
@@ -87,9 +92,14 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
 
             try {
                 if (xcontext != null) {
-                    localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
                     localEvent.setData(xcontext);
                     localEvent.setEvent((Event) remoteEvent.getEvent());
+
+                    if (remoteEvent.getEvent() instanceof DocumentDeletedEvent) {
+                        localEvent.setSource(unserializeDeletdDocument(remoteEvent.getSource(), xcontext));
+                    } else {
+                        localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+                    }
                 }
             } catch (XWikiException e) {
                 this.logger.error("Failed to convert remote event [{}]", remoteEvent, e);
@@ -99,5 +109,30 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         }
 
         return false;
+    }
+
+    private XWikiDocument unserializeDeletdDocument(Serializable remoteData, XWikiContext xcontext)
+        throws XWikiException
+    {
+        Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
+
+        DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
+
+        XWikiDocument doc = new XWikiDocument(docReference);
+
+        XWikiDocument origDoc = new XWikiDocument(docReference);
+
+        // We have to get deleted document from the trash (hoping it is in the trash...)
+        XWiki xwiki = xcontext.getWiki();
+        XWikiRecycleBinStoreInterface store = xwiki.getRecycleBinStore();
+        XWikiDeletedDocument[] deletedDocuments = store.getAllDeletedDocuments(origDoc, xcontext, true);
+        if (deletedDocuments != null && deletedDocuments.length > 0) {
+            long index = deletedDocuments[0].getId();
+            origDoc = store.restoreFromRecycleBin(doc, index, xcontext, true);
+        }
+
+        doc.setOriginalDocument(origDoc);
+
+        return doc;
     }
 }

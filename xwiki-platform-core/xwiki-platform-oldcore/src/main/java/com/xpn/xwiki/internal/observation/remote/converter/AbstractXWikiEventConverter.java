@@ -44,19 +44,19 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  */
 public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
 {
-    private static final String CONTEXT_WIKI = "contextwiki";
+    protected static final String CONTEXT_WIKI = "contextwiki";
 
-    private static final String CONTEXT_USER = "contextuser";
+    protected static final String CONTEXT_USER = "contextuser";
 
-    private static final String DOC_NAME = "docname";
+    protected static final String DOC_NAME = "docname";
 
-    private static final String DOC_VERSION = "docversion";
+    protected static final String DOC_VERSION = "docversion";
 
-    private static final String DOC_LANGUAGE = "doclanguage";
+    protected static final String DOC_LANGUAGE = "doclanguage";
 
-    private static final String ORIGDOC_VERSION = "origdocversion";
+    protected static final String ORIGDOC_VERSION = "origdocversion";
 
-    private static final String ORIGDOC_LANGUAGE = "origdoclanguage";
+    protected static final String ORIGDOC_LANGUAGE = "origdoclanguage";
 
     /**
      * The logger to log.

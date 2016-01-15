@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2055,8 +2056,26 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // necessary to blank links from doc
             context.remove("links");
 
-            // Extract and save links
-            Set<XWikiLink> links = this.oldRenderingProvider.get().extractLinks(doc, context);
+            // Extract the links.
+            Set<XWikiLink> links = new LinkedHashSet<XWikiLink>();
+
+            // Add wiki syntax links.
+            // FIXME: replace with doc.getUniqueWikiLinkedPages(context) when OldRendering is dropped.
+            links.addAll(this.oldRenderingProvider.get().extractLinks(doc, context));
+
+            // Add included pages.
+            List<String> includedPages = doc.getIncludedPages(context);
+            for (String includedPage : includedPages) {
+                XWikiLink wikiLink = new XWikiLink();
+
+                wikiLink.setDocId(doc.getId());
+                wikiLink.setFullName(this.localEntityReferenceSerializer.serialize(doc.getDocumentReference()));
+                wikiLink.setLink(includedPage);
+
+                links.add(wikiLink);
+            }
+
+            // Save the links.
             for (XWikiLink wikiLink : links) {
                 session.save(wikiLink);
             }

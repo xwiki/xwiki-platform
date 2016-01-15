@@ -5206,43 +5206,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 XDOM dom = getXDOM();
 
-                // @formatter:off
-                List<AbstractBlock> blocks = dom.getBlocks(
-                    new OrBlockMatcher(
-                        new ClassBlockMatcher(LinkBlock.class),
-                        new MacroBlockMatcher("include"),
-                        new MacroBlockMatcher("display")
-                    ), Block.Axes.DESCENDANT);
-                // @formatter:on
-                pageNames = new LinkedHashSet<String>(blocks.size());
+                List<LinkBlock> linkBlocks =
+                    dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+                pageNames = new LinkedHashSet<String>(linkBlocks.size());
 
                 DocumentReference currentDocumentReference = getDocumentReference();
 
-                for (AbstractBlock block : blocks) {
-                    // Determine the reference string and reference type for each block type.
-                    String referenceString = null;
-                    ResourceType resourceType = null;
-                    if (block instanceof LinkBlock) {
-                        LinkBlock linkBlock = (LinkBlock) block;
-                        ResourceReference reference = linkBlock.getReference();
-
-                        referenceString = reference.getReference();
-                        resourceType = reference.getType();
-                    } else if (block instanceof MacroBlock) {
-                        referenceString = block.getParameter("reference");
-                        if (StringUtils.isBlank(referenceString)) {
-                            referenceString = block.getParameter("document");
-                        }
-
-                        if (StringUtils.isBlank(referenceString)) {
-                            // If the reference is not set or is empty, we have a recursive include which is not valid
-                            // anyway. Skip it.
-                            continue;
-                        }
-
-                        // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
-                        resourceType = ResourceType.DOCUMENT;
-                    }
+                for (LinkBlock linkBlock : linkBlocks) {
+                    ResourceReference reference = linkBlock.getReference();
+                    String referenceString = reference.getReference();
+                    ResourceType resourceType = reference.getType();
 
                     if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
                         // We are only interested in Document or Space references.

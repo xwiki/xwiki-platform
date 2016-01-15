@@ -21,6 +21,8 @@ package org.xwiki.refactoring.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Provider;
 
@@ -37,17 +39,22 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -61,6 +68,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@ComponentList(DefaultLinkedResourceHelper.class)
 public class DefaultLinkRefactoringTest
 {
     @Rule
@@ -309,6 +317,86 @@ public class DefaultLinkRefactoringTest
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         assertEquals("X.Y", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, spaceLinkBlock.getReference().getType());
+        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+    }
+
+    @Test
+    public void renameLinksFromMacros() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        this.mocker.registerMockComponent(BlockRenderer.class, Syntax.XWIKI_2_1.toIdString());
+
+        // From a terminal document to another terminal document.
+        DocumentReference oldLinkTarget = new DocumentReference("wiki", "A", "B");
+        DocumentReference newLinkTarget = new DocumentReference("wiki", "X", "Y");
+
+        XDOM xdom = mock(XDOM.class);
+        when(document.getXDOM()).thenReturn(xdom);
+
+        Map<String, String> includeParameters = new HashMap<String, String>();
+        includeParameters.put("reference", "A.B");
+        MacroBlock includeMacroBlock1 = new MacroBlock("include", includeParameters, false);
+
+        Map<String, String> includeOldParameters = new HashMap<String, String>();
+        includeOldParameters.put("document", "A.B");
+        MacroBlock includeMacroBlock2 = new MacroBlock("include", includeOldParameters, false);
+
+        Map<String, String> displayParameters = new HashMap<String, String>();
+        displayParameters.put("reference", "A.B");
+        MacroBlock displayMacroBlock = new MacroBlock("display", displayParameters, false);
+
+        when(xdom.getBlocks(any(MacroBlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
+            Arrays.<Block>asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
+
+        when(this.explicitDocumentReferenceResolver.resolve("A.B", documentReference)).thenReturn(oldLinkTarget);
+        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+
+        this.mocker.getComponentUnderTest().renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+
+        assertEquals("X.Y", includeMacroBlock1.getParameter("reference"));
+        assertEquals("X.Y", includeMacroBlock2.getParameter("document"));
+        assertEquals("X.Y", displayMacroBlock.getParameter("reference"));
+        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+    }
+
+    @Test
+    public void renameLinksFromLinksAndMacros() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        this.mocker.registerMockComponent(BlockRenderer.class, Syntax.XWIKI_2_1.toIdString());
+
+        // From a terminal document to another terminal document.
+        DocumentReference oldLinkTarget = new DocumentReference("wiki", "A", "B");
+        DocumentReference newLinkTarget = new DocumentReference("wiki", "X", "Y");
+
+        XDOM xdom = mock(XDOM.class);
+        when(document.getXDOM()).thenReturn(xdom);
+
+        Map<String, String> includeParameters = new HashMap<String, String>();
+        includeParameters.put("reference", "A.B");
+        MacroBlock includeMacroBlock = new MacroBlock("include", includeParameters, false);
+        LinkBlock documentLinkBlock =
+            new LinkBlock(Collections.<Block>emptyList(), new ResourceReference("A.B", ResourceType.DOCUMENT), false);
+
+        when(xdom.getBlocks(any(BlockMatcher.class), eq(Block.Axes.DESCENDANT))).thenReturn(
+            Arrays.<Block>asList(includeMacroBlock, documentLinkBlock));
+
+        when(this.explicitDocumentReferenceResolver.resolve("A.B", documentReference)).thenReturn(oldLinkTarget);
+        when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+
+        this.mocker.getComponentUnderTest().renameLinks(documentReference, oldLinkTarget, newLinkTarget);
+
+        assertEquals("X.Y", includeMacroBlock.getParameter("reference"));
+        assertEquals("X.Y", documentLinkBlock.getReference().getReference());
+        assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
     }
 }

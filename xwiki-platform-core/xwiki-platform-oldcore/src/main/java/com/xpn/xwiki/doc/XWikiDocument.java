@@ -108,7 +108,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -118,7 +117,6 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.block.match.OrBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -156,6 +154,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
@@ -6618,47 +6617,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
         // document's location.
         if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
+            // Only support syntax for which a renderer is provided
+
+            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
+
             DocumentReference oldDocumentReference = getDocumentReference();
 
-            // Only support syntax for which a renderer is provided
             XDOM newDocumentXDOM = newDocument.getXDOM();
-            // @formatter:off
-            List<AbstractBlock> blocks = newDocumentXDOM.getBlocks(
-                new OrBlockMatcher(
-                    new ClassBlockMatcher(LinkBlock.class),
-                    new MacroBlockMatcher("include"),
-                    new MacroBlockMatcher("display")
-                ), Block.Axes.DESCENDANT);
-            // @formatter:on
+            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
 
             // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
             // xwiki-platform-refactoring-default
             boolean modified = false;
-            for (AbstractBlock block : blocks) {
+            for (Block block : blocks) {
                 // Determine the reference string and reference type for each block type.
-                String referenceString = null;
-                ResourceType resourceType = null;
-                if (block instanceof LinkBlock) {
-                    LinkBlock linkBlock = (LinkBlock) block;
-                    ResourceReference linkReference = linkBlock.getReference();
-
-                    referenceString = linkReference.getReference();
-                    resourceType = linkReference.getType();
-                } else if (block instanceof MacroBlock) {
-                    referenceString = block.getParameter("reference");
-                    if (StringUtils.isBlank(referenceString)) {
-                        referenceString = block.getParameter("document");
-                    }
-
-                    if (StringUtils.isBlank(referenceString)) {
-                        // If the reference is not set or is empty, we have a recursive include which is not valid
-                        // anyway. Skip it.
-                        continue;
-                    }
-
-                    // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
-                    resourceType = ResourceType.DOCUMENT;
+                String referenceString = linkedResourceHelper.getResourceReferenceString(block);
+                if (referenceString == null) {
+                    // Skip invalid blocks.
+                    continue;
                 }
+                ResourceType resourceType = linkedResourceHelper.getResourceType(block);
 
                 if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
                     // We are only interested in Document or Space references.
@@ -6694,14 +6672,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
 
                     // Update the reference in the XDOM.
-                    if (block instanceof LinkBlock) {
-                        LinkBlock linkBlock = (LinkBlock) block;
-                        ResourceReference linkReference = linkBlock.getReference();
-
-                        linkReference.setReference(serializedLinkReference);
-                    } else if (block instanceof MacroBlock) {
-                        block.setParameter("reference", serializedLinkReference);
-                    }
+                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
                 }
             }
 

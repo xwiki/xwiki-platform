@@ -20,17 +20,6 @@
 describe('Wiki Macro Plugin for CKEditor', function() {
   var editor;
 
-  var getWikiMacroWidgets = function(editor) {
-    var wikiMacroWidgets = [];
-    for (var widgetId in editor.widgets.instances) {
-      var widget = editor.widgets.instances[widgetId];
-      if (widget.name === 'wikiMacro') {
-        wikiMacroWidgets.push(widget);
-      }
-    }
-    return wikiMacroWidgets;
-  };
-
   beforeEach(function(done) {
     editor = CKEDITOR.appendTo(document.body, {
       customConfig: '',
@@ -43,6 +32,17 @@ describe('Wiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  var getWikiMacroWidgets = function(editor) {
+    var wikiMacroWidgets = [];
+    for (var widgetId in editor.widgets.instances) {
+      var widget = editor.widgets.instances[widgetId];
+      if (widget.name === 'wikiMacro') {
+        wikiMacroWidgets.push(widget);
+      }
+    }
+    return wikiMacroWidgets;
+  };
+
   it('converts wiki macro output into a widget', function(done) {
     editor.setData('<p>before</p>' +
       '<!--startmacro:warning|-||-|warning--><div class="box warningmessage">warning</div><!--stopmacro-->' +
@@ -53,9 +53,11 @@ describe('Wiki Macro Plugin for CKEditor', function() {
         expect(wikiMacroWidgets.length).toBe(2);
 
         var warning = wikiMacroWidgets[1];
+        expect(warning.pathName).toBe('macro:warning');
         expect(warning.element.getAttribute('data-macro')).toBe('startmacro:warning|-||-|warning');
 
         var info = wikiMacroWidgets[0];
+        expect(info.pathName).toBe('macro:info');
         expect(info.element.getAttribute('data-macro')).toBe('startmacro:info|-||-|info');
 
         expect(editor.getData()).toBe('<p>before</p>' +
@@ -64,6 +66,75 @@ describe('Wiki Macro Plugin for CKEditor', function() {
           '<p>after</p>');
 
         done();
+      }
+    });
+  });
+
+  var serializeAndParseMacroCall = function(macroCall) {
+    var wikiMacroPlugin = CKEDITOR.plugins.get('wikiMacro');
+    var serializedMacroCall = wikiMacroPlugin.serializeMacroCall(macroCall);
+    var container = document.createElement('span');
+    container.innerHTML = '<!--' + serializedMacroCall + '-->';
+    var parsedMacroCall = wikiMacroPlugin.parseMacroCall(container.firstChild.nodeValue);
+    expect(parsedMacroCall.name).toBe(macroCall.name);
+    expect(parsedMacroCall.content).toBe(macroCall.content);
+    expect(Object.keys(parsedMacroCall.parameters || {}).length).toBe(Object.keys(macroCall.parameters || {}).length);
+    for (var parameterId in parsedMacroCall.parameters) {
+      var parsedParameter = parsedMacroCall.parameters[parameterId];
+      var parameter = (macroCall.parameters || {})[parameterId];
+      expect(parsedParameter.name).toBe(parameter.name);
+      expect(parsedParameter.value).toBe(parameter.value);
+    }
+  };
+
+  var createMacroCall = function(text) {
+    var macroCall = {
+      name: text,
+      content: text,
+      parameters: {}
+    };
+    macroCall.parameters[text] = {name: text, value: text};
+    return macroCall;
+  };
+
+  it('serializes and parses wiki macro calls', function() {
+    // Tests if the start macro comment is parsed correctly when macro content and macro parameter values contain
+    // special symbols like " and \ or the separator |-|.
+    serializeAndParseMacroCall({
+      name: 'html',
+      content: '="|-|\\',
+      parameters: {
+        a: {name: 'a', value: '1"2|-|3=\\"4\\'},
+        b: {name: 'b', value: ''}
+      }
+    });
+
+    // Tests if the start macro comment is parsed correctly when it contains the '--' sequence.
+    serializeAndParseMacroCall(createMacroCall('a--b\\c\\\\d-'));
+    serializeAndParseMacroCall(createMacroCall('a--b-c\\\\d\\'));
+
+    // Tests if the case used in parameter names is kept.
+    expect(CKEDITOR.plugins.get('wikiMacro').serializeMacroCall({
+      name: 'box',
+      content: '',
+      parameters: {
+        'start': {name: 'sTaRt', value: '2'}
+      }
+    })).toBe('startmacro:box|-|sTaRt="2" |-|');
+
+    // Differentiate macros with empty content from macros without content.
+    // No content and no parameters.
+    serializeAndParseMacroCall({name: 'x'});
+    // Empty content and no parameters.
+    serializeAndParseMacroCall({name: 'y', content: ''});
+    // No content but with parameters.
+    serializeAndParseMacroCall({name: 'z', parameters: {c: {name: 'c', value: '1|-|2'}}});
+    // Empty content with parameters.
+    serializeAndParseMacroCall({
+      name: 'w',
+      content: '',
+      parameters: {
+        c: {name: 'c', value: '1|-|2'}
       }
     });
   });

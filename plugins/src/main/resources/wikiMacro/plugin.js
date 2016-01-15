@@ -114,5 +114,136 @@ CKEDITOR.plugins.add('wikiMacro', {
       downcast: unWrapMacroOutput,
       pathName: 'macro'
     });
+
+    var macroPlugin = this;
+    editor.widgets.onWidget('wikiMacro', 'ready', function(event) {
+      var macroCall = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
+      this.pathName += ':' + macroCall.name;
+      // The elementspath plugin takes the path name from the 'data-cke-display-name' attribute which is already set by
+      // the widget plugin when this event is fired.
+      this.wrapper.data('cke-display-name', this.pathName);
+    });
+  },
+
+  parseMacroCall: function(startMacroComment) {
+    /**
+     * Unescapes characters escaped with the specified escape character.
+     * 
+     * @param text the text to be unescaped
+     * @param escapeChar the character that was used for escaping
+     * @return the unescaped text
+     */
+    var unescape = function(text, escapeChar) {
+      if (typeof text !== 'string' || text.length === 0) {
+        return text;
+      }
+      var result = [];
+      var escaped = false;
+      for (var i = 0; i < text.length; i++) {
+        var c = text.charAt(i);
+        if (!escaped && c === escapeChar) {
+          escaped = true;
+          continue;
+        }
+        result.push(c);
+        escaped = false;
+      }
+      return result.join('');
+    };
+
+    // Unescape the text of the start macro comment.
+    var text = unescape(startMacroComment, '\\');
+
+    // Extract macro name.
+    var separator = '|-|';
+    var start = 'startmacro:'.length;
+    var end = text.indexOf(separator, start);
+    var macroCall = {
+      name: text.substring(start, end),
+      parameters: {}
+    };
+
+    // Extract the macro parameters.
+    // Look for the first parameter.
+    start = end + separator.length;
+    var equalIndex = text.indexOf('=', start);
+    var separatorIndex = text.indexOf(separator, start);
+    var parameters = {};
+    while (equalIndex > 0 && (separatorIndex < 0 || equalIndex < separatorIndex)) {
+      var parameterName = text.substring(start, equalIndex).trim();
+
+      // Opening quote.
+      start = text.indexOf('"', equalIndex + 1) + 1;
+      // Look for the closing quote.
+      end = start;
+      var escaped = false;
+      while (escaped || text.charAt(end) !== '"') {
+        escaped = !escaped && '\\' == text.charAt(end);
+        end++;
+      }
+
+      macroCall.parameters[parameterName.toLowerCase()] = {
+        name: parameterName,
+        value: unescape(text.substring(start, end), '\\')
+      };
+
+      // Look for the next parameter.
+      start = end + 1;
+      equalIndex = text.indexOf('=', start);
+      separatorIndex = text.indexOf(separator, start);
+    }
+
+    // Extract the macro content, if specified.
+    if (separatorIndex >= 0) {
+      macroCall.content = text.substring(separatorIndex + separator.length);
+    }
+
+    return macroCall;
+  },
+
+  serializeMacroCall: function(macroCall) {
+    /**
+     * Escapes the {@code --} sequence before setting the text of a comment DOM node.
+     * 
+     * @param text the text that needs to be put in a comment node
+     * @return the escaped text, which will be put in a comment node
+     */
+    var escapeComment = function(text) {
+      if (typeof text !== 'string' || text.length === 0) {
+        return text;
+      }
+      var result = [];
+      var lastChar = 0;
+      for (var i = 0; i < text.length; i++) {
+        var c = text.charAt(i);
+        if (c === '\\') {
+          // Escape the backslash (the escaping character).
+          result.push('\\');
+        } else if (c === '-' && lastChar === '-') {
+          // Escape the second short dash.
+          result.push('\\');
+        }
+        result.push(c);
+        lastChar = c;
+      }
+      if (lastChar === '-') {
+          // If the comment data ends with a short dash, add an escaping character.
+          result.push('\\');
+      }
+      return result.join('');
+    };
+
+    var separator = '|-|';
+    var output = ['startmacro:', macroCall.name, separator];
+    for (var parameterId in macroCall.parameters) {
+      var parameter = macroCall.parameters[parameterId];
+      // Escapes the quotes inside a macro parameter value.
+      var escapedMacroParameterValue = parameter.value.replace(/([\\\"])/g, '\\$1');
+      output.push(parameter.name, '="', escapedMacroParameterValue, '" ');
+    }
+    if (typeof macroCall.content === 'string') {
+      output.push(separator, macroCall.content);
+    }
+    return escapeComment(output.join(''));
   }
 });

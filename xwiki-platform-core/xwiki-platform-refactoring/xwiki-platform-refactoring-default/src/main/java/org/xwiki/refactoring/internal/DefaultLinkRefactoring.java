@@ -44,8 +44,8 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.block.match.OrBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -163,7 +163,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         XDOM xdom = document.getXDOM();
         // @formatter:off
         List<AbstractBlock> blocks = xdom.getBlocks(
-            new CompositeBlockMatcher(
+            new OrBlockMatcher(
                 new ClassBlockMatcher(LinkBlock.class),
                 new MacroBlockMatcher("include"),
                 new MacroBlockMatcher("display")
@@ -285,7 +285,7 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         XDOM xdom = document.getXDOM();
         // @formatter:off
         List<AbstractBlock> blocks = xdom.getBlocks(
-            new CompositeBlockMatcher(
+            new OrBlockMatcher(
                 new ClassBlockMatcher(LinkBlock.class),
                 new MacroBlockMatcher("include"),
                 new MacroBlockMatcher("display")

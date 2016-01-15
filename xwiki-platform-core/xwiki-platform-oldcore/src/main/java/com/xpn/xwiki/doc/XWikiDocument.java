@@ -117,8 +117,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.block.match.OrBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -5208,7 +5208,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                 // @formatter:off
                 List<AbstractBlock> blocks = dom.getBlocks(
-                    new CompositeBlockMatcher(
+                    new OrBlockMatcher(
                         new ClassBlockMatcher(LinkBlock.class),
                         new MacroBlockMatcher("include"),
                         new MacroBlockMatcher("display")
@@ -5516,8 +5516,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 // - Also add all the included pages found in the velocity macro when using the deprecated #include*
                 // macros
                 // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
-                // play
-                // nice with people migrating from 1.0 to 2.0 syntax
+                // play nice with people migrating from 1.0 to 2.0 syntax
 
                 if (macroBlock.getId().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("reference");
@@ -6652,7 +6651,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             XDOM newDocumentXDOM = newDocument.getXDOM();
             // @formatter:off
             List<AbstractBlock> blocks = newDocumentXDOM.getBlocks(
-                new CompositeBlockMatcher(
+                new OrBlockMatcher(
                     new ClassBlockMatcher(LinkBlock.class),
                     new MacroBlockMatcher("include"),
                     new MacroBlockMatcher("display")

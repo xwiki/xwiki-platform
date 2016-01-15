@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase

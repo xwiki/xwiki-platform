@@ -39,15 +39,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
-import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.LinkBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.block.match.OrBlockMatcher;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.velocity.VelocityEngine;
@@ -103,6 +96,9 @@ public class DefaultOldRendering implements OldRendering
     @Inject
     protected Logger logger;
 
+    @Inject
+    protected LinkedResourceHelper linkedResourceHelper;
+
     @Override
     public void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldReference,
         DocumentReference newReference, XWikiContext context) throws XWikiException
@@ -134,41 +130,16 @@ public class DefaultOldRendering implements OldRendering
         DocumentReference currentDocumentReference = document.getDocumentReference();
 
         XDOM xdom = document.getXDOM();
+        List<Block> blocks = linkedResourceHelper.getBlocks(xdom);
 
-        // @formatter:off
-        List<AbstractBlock> blocks = xdom.getBlocks(
-            new OrBlockMatcher(
-                new ClassBlockMatcher(LinkBlock.class),
-                new MacroBlockMatcher("include"),
-                new MacroBlockMatcher("display")
-            ), Block.Axes.DESCENDANT);
-        // @formatter:on
-
-        for (AbstractBlock block : blocks) {
+        for (Block block : blocks) {
             // Determine the reference string and reference type for each block type.
-            String referenceString = null;
-            ResourceType resourceType = null;
-            if (block instanceof LinkBlock) {
-                LinkBlock linkBlock = (LinkBlock) block;
-                ResourceReference linkReference = linkBlock.getReference();
-
-                referenceString = linkReference.getReference();
-                resourceType = linkReference.getType();
-            } else if (block instanceof MacroBlock) {
-                referenceString = block.getParameter("reference");
-                if (StringUtils.isBlank(referenceString)) {
-                    referenceString = block.getParameter("document");
-                }
-
-                if (StringUtils.isBlank(referenceString)) {
-                    // If the reference is not set or is empty, we have a recursive include which is not valid anyway.
-                    // Skip it.
-                    continue;
-                }
-
-                // FIXME: this may be SPACE once we start hiding "WebHome" from macro reference parameters.
-                resourceType = ResourceType.DOCUMENT;
+            String referenceString = linkedResourceHelper.getResourceReferenceString(block);
+            if (referenceString == null) {
+                // Skip invalid blocks.
+                continue;
             }
+            ResourceType resourceType = linkedResourceHelper.getResourceType(block);
 
             if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
                 // We are only interested in Document or Space references.
@@ -206,15 +177,8 @@ public class DefaultOldRendering implements OldRendering
                     this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
 
                 // Update the reference in the XDOM.
-                if (block instanceof LinkBlock) {
-                    LinkBlock linkBlock = (LinkBlock) block;
-                    ResourceReference linkReference = linkBlock.getReference();
-
-                    linkReference.setReference(newReferenceString);
-                    linkReference.setType(newResourceType);
-                } else if (block instanceof MacroBlock) {
-                    block.setParameter("reference", newReferenceString);
-                }
+                linkedResourceHelper.setResourceReferenceString(block, newReferenceString);
+                linkedResourceHelper.setResourceType(block, newResourceType);
             }
         }
 

@@ -698,6 +698,15 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("good {{include reference=\"One.Two\"/}}");
         assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
+
+        this.document.setContent("bad recursive {{include reference=\"\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad recursive {{include reference=\"" + DOCNAME + "\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad recursive {{include reference=\"" + DOCSPACE + "." + DOCNAME + "\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
     }
 
     /**

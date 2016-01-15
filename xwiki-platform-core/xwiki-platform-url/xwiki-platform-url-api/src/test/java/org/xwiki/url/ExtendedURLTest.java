@@ -28,9 +28,7 @@ import org.xwiki.resource.CreateResourceReferenceException;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link ExtendedURL}.
@@ -61,6 +59,16 @@ public class ExtendedURLTest
     }
 
     @Test
+    public void withPrefixAndNoSlashAfter() throws Exception
+    {
+        URL url = new URL("http://localhost:8080/xwiki");
+        ExtendedURL extendedURL = new ExtendedURL(url, "xwiki");
+        assertEquals(new URI("http://localhost:8080/xwiki"), extendedURL.getURI());
+        assertEquals(0, extendedURL.getSegments().size());
+        assertTrue(extendedURL.getSegments().isEmpty());
+    }
+
+    @Test
     public void withPrefixStartingWithSlash() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki/path");
@@ -68,6 +76,16 @@ public class ExtendedURLTest
         assertEquals(new URI("http://localhost:8080/xwiki/path"), extendedURL.getURI());
         assertEquals(1, extendedURL.getSegments().size());
         assertThat(extendedURL.getSegments(), hasItems("path"));
+    }
+
+    @Test
+    public void withPrefixStartingWithSlashAndNoSlashAfter() throws Exception
+    {
+        URL url = new URL("http://localhost:8080/xwiki");
+        ExtendedURL extendedURL = new ExtendedURL(url, "/xwiki");
+        assertEquals(new URI("http://localhost:8080/xwiki"), extendedURL.getURI());
+        assertEquals(0, extendedURL.getSegments().size());
+        assertTrue(extendedURL.getSegments().isEmpty());
     }
 
     @Test

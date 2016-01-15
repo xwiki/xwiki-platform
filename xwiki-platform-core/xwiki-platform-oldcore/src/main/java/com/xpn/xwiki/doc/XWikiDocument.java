@@ -5527,9 +5527,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             continue;
                         }
                     }
-                    if (documentName.indexOf('.') == -1) {
-                        documentName = getSpace() + "." + documentName;
+
+                    DocumentReference documentReference =
+                        getExplicitDocumentReferenceResolver().resolve(documentName, getDocumentReference());
+                    if (this.getDocumentReference().equals(documentReference)) {
+                        // Skip auto-includes since they are not allowed anyway.
+                        continue;
                     }
+
+                    documentName = LOCAL_REFERENCE_SERIALIZER.serialize(documentReference);
+
                     result.add(documentName);
                 } else if (macroBlock.getId().equalsIgnoreCase("velocity")
                     && !StringUtils.isEmpty(macroBlock.getContent())) {

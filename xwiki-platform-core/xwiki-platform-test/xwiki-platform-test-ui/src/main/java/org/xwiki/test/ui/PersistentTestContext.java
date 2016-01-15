@@ -19,7 +19,9 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.test.integration.XWikiExecutor;
@@ -39,7 +41,7 @@ public class PersistentTestContext
     private static final String BROWSER_NAME_SYSTEM_PROPERTY = System.getProperty("browser", "*firefox");
 
     /** This starts and stops the wiki engine. */
-    private final XWikiExecutor executor;
+    private final List<XWikiExecutor> executors;
 
     private final XWikiWebDriver driver;
 
@@ -55,17 +57,17 @@ public class PersistentTestContext
      */
     public PersistentTestContext() throws Exception
     {
-        this(new XWikiExecutor(0));
+        this(Arrays.asList(new XWikiExecutor(0)));
     }
 
     /**
      * Don't start an XWiki instance, instead use an existing started instance.
      */
-    public PersistentTestContext(XWikiExecutor executor) throws Exception
+    public PersistentTestContext(List<XWikiExecutor> executors) throws Exception
     {
-        this.executor = executor;
+        this.executors = executors;
 
-        this.util.setExecutor(executor);
+        this.util.setExecutors(executors);
 
         // Note: If you wish to make Selenium use your default Firefox profile (for example to use your installed
         // extensions such as Firebug), simply uncomment the following line:
@@ -75,7 +77,7 @@ public class PersistentTestContext
 
     public PersistentTestContext(PersistentTestContext toClone)
     {
-        this.executor = toClone.executor;
+        this.executors = toClone.executors;
         this.driver = toClone.driver;
         this.properties.putAll(toClone.properties);
     }
@@ -85,9 +87,9 @@ public class PersistentTestContext
         return this.driver;
     }
 
-    public XWikiExecutor getExecutor()
+    public List<XWikiExecutor> getExecutors()
     {
-        return this.executor;
+        return executors;
     }
 
     /**
@@ -98,10 +100,19 @@ public class PersistentTestContext
         return this.util;
     }
 
+    public void start() throws Exception
+    {
+        for (XWikiExecutor executor : this.executors) {
+            executor.start();
+        }
+    }
+
     public void shutdown() throws Exception
     {
         this.driver.quit();
-        this.executor.stop();
+        for (XWikiExecutor executor : this.executors) {
+            executor.stop();
+        }
     }
 
     public Map<String, Object> getProperties()

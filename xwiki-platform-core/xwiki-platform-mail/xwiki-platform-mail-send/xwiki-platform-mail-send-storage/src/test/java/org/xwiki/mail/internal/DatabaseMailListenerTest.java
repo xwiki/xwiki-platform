@@ -42,6 +42,7 @@ import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.test.AllLogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -71,11 +72,15 @@ public class DatabaseMailListenerTest
     public MockitoComponentMockingRule<DatabaseMailListener> mocker =
         new MockitoComponentMockingRule<>(DatabaseMailListener.class, Arrays.asList(Logger.class));
 
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
+
     private MimeMessage message;
 
     private String batchId = UUID.randomUUID().toString();
 
-    private String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
+    private String mimeMessageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
+
+    private String messageId;
 
     @Before
     public void setUp() throws Exception
@@ -84,7 +89,8 @@ public class DatabaseMailListenerTest
         this.message = new MimeMessage(session);
         this.message.setHeader("X-MailType", "type");
         this.message.saveChanges();
-        this.message.setHeader("Message-ID", messageId);
+        this.message.setHeader("Message-ID", mimeMessageId);
+        this.messageId = messageIdComputer.compute(this.message);
 
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = Mockito.mock(ExecutionContext.class);
@@ -131,7 +137,7 @@ public class DatabaseMailListenerTest
         ArgumentCaptor<MailStatus> statusCapture = ArgumentCaptor.forClass(MailStatus.class);
         verify(mailStatusStore).save(statusCapture.capture(), anyMap());
 
-        assertEquals("Failed to save mail status [messageId = [" + this.messageId.toString() + "], batchId = ["
+        assertEquals("Failed to save mail status [messageId = [" + this.messageId + "], batchId = ["
             + this.batchId + "], state = [prepare_success], date = [" + statusCapture.getValue().getDate() + "], "
             + "recipients = [<null>], type = [type], wiki = [mywiki]] to the database", this.logRule.getMessage(0));
     }
@@ -191,7 +197,7 @@ public class DatabaseMailListenerTest
         listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
         listener.onSendMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
-        assertEquals("Failed to remove previously failing message [" + this.messageId.toString() + "] (batch id ["
+        assertEquals("Failed to remove previously failing message [" + this.messageId + "] (batch id ["
                 + this.batchId + "]) from the file system. Reason [MailStoreException: error].",
             this.logRule.getMessage(0));
     }

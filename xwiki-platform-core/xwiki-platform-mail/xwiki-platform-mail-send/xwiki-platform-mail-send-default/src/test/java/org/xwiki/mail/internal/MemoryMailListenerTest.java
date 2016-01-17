@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -48,6 +49,8 @@ public class MemoryMailListenerTest
     @Rule
     public MockitoComponentMockingRule<MemoryMailListener> mocker =
         new MockitoComponentMockingRule<>(MemoryMailListener.class);
+
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     @Test
     public void onErrorAndGetMailStatusResult() throws Exception
@@ -74,14 +77,14 @@ public class MemoryMailListenerTest
         assertEquals("Exception: error1", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error1"));
         assertEquals(batchId, status.getBatchId());
-        assertEquals(message1.getMessageID(), status.getMessageId());
+        assertEquals(messageIdComputer.compute(message1), status.getMessageId());
         assertEquals("mailtype1", status.getType());
 
         status = results.next();
         assertEquals("Exception: error2", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error2"));
         assertEquals(batchId, status.getBatchId());
-        assertEquals(message2.getMessageID(), status.getMessageId());
+        assertEquals(messageIdComputer.compute(message2), status.getMessageId());
         assertEquals("mailtype2", status.getType());
 
         assertFalse(results.hasNext());

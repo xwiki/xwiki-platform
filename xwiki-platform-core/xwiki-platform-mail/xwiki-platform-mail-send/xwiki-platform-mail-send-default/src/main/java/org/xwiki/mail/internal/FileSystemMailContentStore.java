@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
@@ -40,6 +39,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.MessageIdComputer;
 
 /**
  * Stores mail content on the file system.
@@ -59,6 +59,8 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
 
     private File rootDirectory;
 
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
+
     @Inject
     private Environment environment;
 
@@ -74,16 +76,18 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         String messageId = null;
         File messageFile = null;
         try {
-            messageId = getMessageId(message);
+            messageId = messageIdComputer.compute(message);
             messageFile = getMessageFile(batchId, messageId);
             OutputStream os = new FileOutputStream(messageFile);
+
+            String mimeMessageId = message.getMessageID();
             message.writeTo(os);
             // Since message#writeTo() may call message#updateMessageID() before serializing in some cases,
             // we ensure that the messageId is unchanged after the serialization process.
-            if (!messageId.equals(message.getMessageID())) {
+            if (!mimeMessageId.equals(message.getMessageID())) {
                 // If the messageId has changed, we move the serialized file to the new identifier
                 File oldMessageFile = messageFile;
-                messageId = message.getMessageID();
+                messageId = messageIdComputer.compute(message);
                 messageFile = getMessageFile(batchId, messageId);
                 if (!oldMessageFile.renameTo(messageFile)) {
                     throw new MailStoreException(String.format(
@@ -138,17 +142,6 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
 
     private File getMessageFile(String batchId, String messageId) {
         return new File(getBatchDirectory(batchId), getURLEncoded(messageId));
-    }
-
-    private String getMessageId(MimeMessage message) throws MessagingException
-    {
-        String messageId = message.getMessageID();
-        if (messageId == null) {
-            message.saveChanges();
-            messageId = message.getMessageID();
-        }
-
-        return messageId;
     }
 
     private static String getURLEncoded(final String toEncode)

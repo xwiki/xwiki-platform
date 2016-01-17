@@ -103,7 +103,7 @@ public class MailStatus
     public MailStatus(String batchId, MimeMessage message, MailState state)
     {
         try {
-            setMessageId(getMessageId(message));
+            setMessageId(new MessageIdComputer().compute(message));
             setBatchId(batchId);
             setType(message.getHeader("X-MailType", null));
             setRecipients(InternetAddress.toString(message.getAllRecipients()));
@@ -120,7 +120,10 @@ public class MailStatus
     }
 
     /**
-     * @return the MimeMessage ID
+     * @return the unique message ID used for identifying the mime message matching this status. Between XWiki 7.1rc1
+     * and 7.4, this identifier is equivalent to the message-id header, but you should not rely on this fact. Since
+     * XWiki 7.4.1, to compute the message identifier used here from an given {@link MimeMessage}, you may use
+     * {@link MessageIdComputer#compute(MimeMessage)}.
      */
     public String getMessageId()
     {
@@ -336,16 +339,5 @@ public class MailStatus
             builder.append("wiki", getWiki());
         }
         return builder.toString();
-    }
-
-    private String getMessageId(MimeMessage message) throws MessagingException
-    {
-        String id = message.getMessageID();
-        if (id == null) {
-            message.saveChanges();
-            id = message.getMessageID();
-        }
-
-        return id;
     }
 }

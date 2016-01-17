@@ -22,11 +22,11 @@ package org.xwiki.mail.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MessageIdComputer;
 
 /**
  * Helper for implementation of {@Link MailListener}.
@@ -40,26 +40,11 @@ public abstract class AbstractMailListener implements MailListener
 
     private String batchId;
 
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
+
     protected String getBatchId()
     {
         return batchId;
-    }
-
-    protected String getMessageId(MimeMessage message)
-    {
-        try {
-            String messageId = message.getMessageID();
-            // Ensure that a messageId is generated if the caller have omitted calling saveChanges()
-            if (messageId == null) {
-                message.saveChanges();
-                messageId = message.getMessageID();
-            }
-            return messageId;
-        } catch (MessagingException e) {
-            // This cannot happen in practice since the implementation never throws any exception!
-            logger.error("Failed to retrieve messageID from the message.", e);
-            return null;
-        }
     }
 
     @Override
@@ -79,8 +64,8 @@ public abstract class AbstractMailListener implements MailListener
     public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation succeed for message [{}] of batch [{}].", getMessageId(message),
-                batchId);
+            logger.debug("Mail preparation succeed for message [{}] of batch [{}].",
+                messageIdComputer.compute(message), batchId);
         }
     }
 
@@ -88,8 +73,8 @@ public abstract class AbstractMailListener implements MailListener
     public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation failed for message [{}] of batch [{}].", getMessageId(message), batchId,
-                exception);
+            logger.debug("Mail preparation failed for message [{}] of batch [{}].",
+                messageIdComputer.compute(message), batchId, exception);
         }
     }
 
@@ -109,7 +94,8 @@ public abstract class AbstractMailListener implements MailListener
     public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail sent successfully for message [{}] of batch [{}].", getMessageId(message), batchId);
+            logger.debug("Mail sent successfully for message [{}] of batch [{}].",
+                messageIdComputer.compute(message), batchId);
         }
     }
 
@@ -117,8 +103,8 @@ public abstract class AbstractMailListener implements MailListener
     public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail sending failed for message [{}] of batch [{}].", getMessageId(message), batchId,
-                exception);
+            logger.debug("Mail sending failed for message [{}] of batch [{}].",
+                messageIdComputer.compute(message), batchId, exception);
         }
     }
 

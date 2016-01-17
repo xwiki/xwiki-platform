@@ -62,7 +62,7 @@ public class MailStatusTest
         Date date = new Date();
         status.setDate(date);
 
-        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+        assertEquals("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], state = [prepare_success], date = ["
             + date.toString() + "], recipients = [john@doe.com], type = [type]", status.toString());
     }
 
@@ -80,7 +80,7 @@ public class MailStatusTest
         status.setDate(date);
         status.setError(new Exception("outer", new Exception("inner")));
 
-        assertTrue(status.toString().startsWith("messageId = [<local@domain>], batchId = [batchid], "
+        assertTrue(status.toString().startsWith("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], "
             + "state = [prepare_success], date = [" + date.toString() + "], recipients = [john@doe.com], "
             + "type = [type], errorSummary = [Exception: inner], errorDescription = ["));
     }
@@ -99,7 +99,7 @@ public class MailStatusTest
         status.setDate(date);
         status.setWiki("wiki");
 
-        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+        assertEquals("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], state = [prepare_success], date = ["
             + date.toString() + "], recipients = [john@doe.com], type = [type], wiki = [wiki]", status.toString());
     }
 }

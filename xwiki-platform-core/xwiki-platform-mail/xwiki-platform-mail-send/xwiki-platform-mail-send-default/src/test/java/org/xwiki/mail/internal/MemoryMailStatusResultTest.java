@@ -28,6 +28,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Test;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MessageIdComputer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -48,6 +49,8 @@ public class MemoryMailStatusResultTest
     private static final String MAIL_ID3 = "<mail3@domain>";
     private static final String MAIL_ID4 = "<mail4@domain>";
     private static final String MAIL_ID5 = "<mail5@domain>";
+
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     @Test
     public void getAllErrorTest() throws Exception
@@ -77,7 +80,8 @@ public class MemoryMailStatusResultTest
             allErrorIds.add(it.next().getMessageId());
         }
 
-        assertThat(allErrorIds, containsInAnyOrder(MAIL_ID2, MAIL_ID4, MAIL_ID5));
+        assertThat(allErrorIds, containsInAnyOrder(messageIdComputer.compute(message2),
+            messageIdComputer.compute(message4), messageIdComputer.compute(message5)));
         assertThat(allErrorIds.size(), equalTo(3));
     }
 }

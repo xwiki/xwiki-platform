@@ -39,6 +39,7 @@ import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.MessageIdComputer;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -66,6 +67,8 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
 
     @Inject
     private MailStorageConfiguration configuration;
+
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     private DatabaseMailStatusResult mailStatusResult;
 
@@ -122,7 +125,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     {
         super.onSendMessageSuccess(message, parameters);
 
-        String messageId = getMessageId(message);
+        String messageId = messageIdComputer.compute(message);
         MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_SUCCESS);
 
         if (status != null) {
@@ -170,7 +173,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     {
         super.onSendMessageError(message, exception, parameters);
 
-        String messageId = getMessageId(message);
+        String messageId = messageIdComputer.compute(message);
         MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_ERROR);
 
         if (status != null) {

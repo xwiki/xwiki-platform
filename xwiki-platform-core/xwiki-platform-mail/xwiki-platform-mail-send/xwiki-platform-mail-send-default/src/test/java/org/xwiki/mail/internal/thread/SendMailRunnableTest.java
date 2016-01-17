@@ -39,6 +39,7 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 import org.xwiki.test.annotation.ComponentList;
@@ -66,6 +67,8 @@ public class SendMailRunnableTest
     public MockitoComponentMockingRule<SendMailRunnable> mocker =
         new MockitoComponentMockingRule<>(SendMailRunnable.class);
 
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
+
     @Before
     public void setUp() throws Exception
     {
@@ -85,13 +88,13 @@ public class SendMailRunnableTest
         message1.setSubject("subject1");
         message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
         message1.saveChanges();
-        String id1 = message1.getMessageID();
+        String id1 = messageIdComputer.compute(message1);
 
         MimeMessage message2 = new MimeMessage(session);
         message2.setSubject("subject2");
         message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
         message2.saveChanges();
-        String id2 = message2.getMessageID();
+        String id2 = messageIdComputer.compute(message2);
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
@@ -152,10 +155,10 @@ public class SendMailRunnableTest
 
         MimeMessage message1 = new MimeMessage(session);
         message1.saveChanges();
-        String id1 = message1.getMessageID();
+        String id1 = messageIdComputer.compute(message1);
         MimeMessage message2 = new MimeMessage(session);
         message2.saveChanges();
-        String id2 = message2.getMessageID();
+        String id2 = messageIdComputer.compute(message2);
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();

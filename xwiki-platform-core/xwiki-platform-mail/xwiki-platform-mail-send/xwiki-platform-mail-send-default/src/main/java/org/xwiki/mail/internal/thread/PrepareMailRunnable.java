@@ -36,6 +36,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailStatusResult;
+import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 
 /**
@@ -59,6 +60,8 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
+
+    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     @Override
     public void run()
@@ -166,7 +169,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
             // Note: Message identifier is stabilized at this step by the serialization process
             this.mailContentStore.save(item.getBatchId(), message);
             // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
-            this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getMessageID(),
+            this.sendMailQueueManager.addToQueue(new SendMailQueueItem(messageIdComputer.compute(message),
                 item.getSession(), listener, item.getBatchId()));
             // Step 4: Notify the user that the MimeMessage is prepared
             if (listener != null) {

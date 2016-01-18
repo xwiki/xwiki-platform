@@ -55,10 +55,13 @@ public class ObjectsForClassNameResourceImpl extends BaseObjectsResource impleme
                     new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
 
             for (com.xpn.xwiki.objects.BaseObject object : ri) {
-                objects.getObjectSummaries().add(DomainObjectFactory
-                        .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                                componentManager), doc, object, false, Utils.getXWikiApi(componentManager),
-                                withPrettyNames));
+                // By deleting objects, some of them might become null, so we must check for this
+                if (object != null) {
+                    objects.getObjectSummaries()
+                        .add(DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(),
+                            Utils.getXWikiContext(componentManager), doc, object, false,
+                            Utils.getXWikiApi(componentManager), withPrettyNames));
+                }
             }
 
             return objects;

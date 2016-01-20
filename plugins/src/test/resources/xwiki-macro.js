@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-describe('Wiki Macro Plugin for CKEditor', function() {
+describe('XWiki Macro Plugin for CKEditor', function() {
   var editor;
 
   beforeEach(function(done) {
     editor = CKEDITOR.appendTo(document.body, {
       customConfig: '',
       // Basic plugins, as per http://docs.ckeditor.com/#!/guide/dev_tests-section-test-requirements .
-      plugins: 'wysiwygarea,toolbar,undo,basicstyles,wikiMacro',
+      plugins: 'wysiwygarea,toolbar,undo,basicstyles,xwiki-macro',
       skin: 'moono'
     });
     editor.on('instanceReady', function() {
@@ -36,7 +36,7 @@ describe('Wiki Macro Plugin for CKEditor', function() {
     var wikiMacroWidgets = [];
     for (var widgetId in editor.widgets.instances) {
       var widget = editor.widgets.instances[widgetId];
-      if (widget.name === 'wikiMacro') {
+      if (widget.name === 'xwiki-macro') {
         wikiMacroWidgets.push(widget);
       }
     }
@@ -71,7 +71,7 @@ describe('Wiki Macro Plugin for CKEditor', function() {
   });
 
   var serializeAndParseMacroCall = function(macroCall) {
-    var wikiMacroPlugin = CKEDITOR.plugins.get('wikiMacro');
+    var wikiMacroPlugin = CKEDITOR.plugins.get('xwiki-macro');
     var serializedMacroCall = wikiMacroPlugin.serializeMacroCall(macroCall);
     var container = document.createElement('span');
     container.innerHTML = '<!--' + serializedMacroCall + '-->';
@@ -114,7 +114,7 @@ describe('Wiki Macro Plugin for CKEditor', function() {
     serializeAndParseMacroCall(createMacroCall('a--b-c\\\\d\\'));
 
     // Tests if the case used in parameter names is kept.
-    expect(CKEDITOR.plugins.get('wikiMacro').serializeMacroCall({
+    expect(CKEDITOR.plugins.get('xwiki-macro').serializeMacroCall({
       name: 'box',
       content: '',
       parameters: {

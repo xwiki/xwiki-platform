@@ -150,14 +150,16 @@
 require(['jquery'], function($) {
   window.CKEDITOR_BASEPATH = "$!services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', '')";
   require(['ckeditor'], function(ckeditor) {
-    ckeditor.plugins.addExternal('wikiSource', new XWiki.Document('WikiSourcePlugin', 'CKEditor').getURL('jsx'), '');
+    ckeditor.plugins.addExternal('xwiki-source', new XWiki.Document('WikiSourcePlugin', 'CKEditor').getURL('jsx', 'minify=false'), '');
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
-        extraPlugins: 'wikiSource,wikiMacro',
+        extraPlugins: 'xwiki-source,xwiki-macro',
         fullPage: true,
         height: 500,
-        htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain'),
+        'xwiki-source': {
+          htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+        },
         removeButtons: 'Find,Anchor',
         removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',
         toolbarGroups: [

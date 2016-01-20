@@ -84,7 +84,7 @@ var CKBUILDER_CONFIG = {
     tabletools: 1,
     toolbar: 1,
     undo: 1,
-    wikiMacro: 1,
+    'xwiki-macro': 1,
     wysiwygarea: 1
   }
 };

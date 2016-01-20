@@ -120,7 +120,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>CKEDITOR.plugins.add('wikiSource', {
+      <code>CKEDITOR.plugins.add('xwiki-source', {
   init: function(editor) {
     editor.on('mode', jQuery.proxy(function(event) {
       if (editor.mode === 'wysiwyg' &amp;&amp; editor._.previousMode === 'source') {
@@ -142,7 +142,8 @@
     editable.setReadOnly(true);
     var sourceButton = editor.container.findOne('.cke_button__source_icon');
     sourceButton.addClass('loading');
-    jQuery.post(editor.config.htmlConverter, {
+    var config = editor.config['xwiki-source'] || {};
+    jQuery.post(config.htmlConverter, {
       convert: convert,
       text: editor._.previousModeData
     }, function(data) {

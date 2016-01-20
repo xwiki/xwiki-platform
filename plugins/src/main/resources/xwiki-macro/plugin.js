@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-CKEDITOR.plugins.add('wikiMacro', {
+CKEDITOR.plugins.add('xwiki-macro', {
   requires: 'widget',
   init : function(editor) {
     // startMacroComment: CKEDITOR.htmlParser.comment
@@ -105,7 +105,7 @@ CKEDITOR.plugins.add('wikiMacro', {
     }, null, null, 7);
 
     // See http://docs.ckeditor.com/#!/api/CKEDITOR.plugins.widget.definition
-    editor.widgets.add('wikiMacro', {
+    editor.widgets.add('xwiki-macro', {
       requiredContent: 'div(macro)[data-macro]; span(macro)[data-macro]',
       upcast: function(element) {
         return (element.name == 'div' || element.name == 'span') &&
@@ -116,7 +116,7 @@ CKEDITOR.plugins.add('wikiMacro', {
     });
 
     var macroPlugin = this;
-    editor.widgets.onWidget('wikiMacro', 'ready', function(event) {
+    editor.widgets.onWidget('xwiki-macro', 'ready', function(event) {
       var macroCall = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
       this.pathName += ':' + macroCall.name;
       // The elementspath plugin takes the path name from the 'data-cke-display-name' attribute which is already set by

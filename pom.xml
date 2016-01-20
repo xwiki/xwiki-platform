@@ -57,6 +57,14 @@
    <!-- Don't run CLIRR here since there's no Java code. -->
    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-tour</artifactId>
+      <version>0.10.2</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
   <build>
     <extensions>
       <extension>

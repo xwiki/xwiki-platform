@@ -22,6 +22,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
 
   beforeEach(function(done) {
     editor = CKEDITOR.appendTo(document.body, {
+      allowedContent: true,
       customConfig: '',
       // Basic plugins, as per http://docs.ckeditor.com/#!/guide/dev_tests-section-test-requirements .
       plugins: 'wysiwygarea,toolbar,undo,basicstyles,xwiki-macro',
@@ -63,6 +64,12 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         expect(editor.getData()).toBe('<p>before</p>' +
           '<!--startmacro:warning|-||-|warning--><!--stopmacro-->' +
           '<!--startmacro:info|-||-|info--><!--stopmacro-->' +
+          '<p>after</p>');
+
+        editor.config.fullData = true;
+        expect(editor.getData()).toBe('<p>before</p>' +
+          '<!--startmacro:warning|-||-|warning--><div class="box warningmessage">warning</div><!--stopmacro-->' +
+          '<!--startmacro:info|-||-|info--><div class="box infomessage">info</div><!--stopmacro-->' +
           '<p>after</p>');
 
         done();

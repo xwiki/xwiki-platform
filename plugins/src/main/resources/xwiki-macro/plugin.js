@@ -76,6 +76,11 @@ CKEDITOR.plugins.add('xwiki-macro', {
       var stopMacroComment = new CKEDITOR.htmlParser.comment('stopmacro');
       var macro = new CKEDITOR.htmlParser.fragment();
       macro.add(startMacroComment);
+      if (editor.config.fullData) {
+        macroOutputWrapper.children.forEach(function(child) {
+          macro.add(child);
+        });
+      }
       macro.add(stopMacroComment);
       return macro;
     };

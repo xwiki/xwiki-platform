@@ -121,37 +121,80 @@
     </property>
     <property>
       <code>CKEDITOR.plugins.add('xwiki-source', {
+  requires: 'sourcearea',
   init: function(editor) {
-    editor.on('mode', jQuery.proxy(function(event) {
-      if (editor.mode === 'wysiwyg' &amp;&amp; editor._.previousMode === 'source') {
-        // Convert from wiki syntax to HTML.
-        this.convertHTML(editor, true);
-      } else if (editor.mode === 'source' &amp;&amp; editor._.previousMode === 'wysiwyg') {
-        // Convert from HTML to wiki syntax.
-        this.convertHTML(editor, false);
-      }
+    editor.on('beforeModeUnload', jQuery.proxy(this.onBeforeModeUnload, this));
+    editor.on('mode', jQuery.proxy(this.onMode, this));
+  },
+
+  onBeforeModeUnload: function(event) {
+    var editor = event.editor;
+    var mode = editor._.modes[editor.mode];
+    var oldData = mode.data;
+    var newData = this.getFullData(editor);
+    mode.dirty = oldData !== newData;
+    mode.data = newData;
+  },
+
+  getFullData: function(editor) {
+    var isFullData = editor.config.fullData;
+    editor.config.fullData = true;
+    var fullData = editor.getData();
+    editor.config.fullData = isFullData;
+    return fullData;
+  },
+
+  onMode: function(event) {
+    var editor = event.editor;
+    if (editor.mode === 'wysiwyg' &amp;&amp; editor._.previousMode === 'source') {
+      // Convert from wiki syntax to HTML.
+      this.maybeConvertHTML(editor, true);
+    } else if (editor.mode === 'source' &amp;&amp; editor._.previousMode === 'wysiwyg') {
+      // Convert from HTML to wiki syntax.
+      this.maybeConvertHTML(editor, false);
+    }
+  },
+
+  maybeConvertHTML: function(editor, toHTML) {
+    var oldMode = editor._.modes[editor._.previousMode];
+    var newMode = editor._.modes[editor.mode];
+    if (oldMode.dirty || typeof newMode.data !== 'string') {
+      this.convertHTML(editor, toHTML);
+    } else {
+      editor.setData(newMode.data);
+    }
+  },
+
+  convertHTML: function(editor, toHTML) {
+    this.setLoading(editor, true);
+    var config = editor.config['xwiki-source'] || {};
+    jQuery.post(config.htmlConverter, {
+      convert: toHTML,
+      text: editor._.previousModeData
+    }, jQuery.proxy(function(data) {
+      editor.setData(data, {
+        callback: jQuery.proxy(function() {
+          // Take a snapshot after the data has been set, in order to be able to detect changes.
+          editor._.modes[editor.mode].data = this.getFullData(editor);
+          this.setLoading(editor, false);
+        }, this)
+      });
     }, this));
   },
 
-  convertHTML: function(editor, convert) {
-    // Disable the switch while the conversion takes place.
-    setTimeout(function() {
-      editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
-    }, 0);
-    var editable = editor.editable();
-    editable.setReadOnly(true);
+  setLoading: function(editor, loading) {
+    editor.setReadOnly(loading);
     var sourceButton = editor.container.findOne('.cke_button__source_icon');
-    sourceButton.addClass('loading');
-    var config = editor.config['xwiki-source'] || {};
-    jQuery.post(config.htmlConverter, {
-      convert: convert,
-      text: editor._.previousModeData
-    }, function(data) {
-      editable.setData(data);
+    if (loading) {
+      sourceButton.addClass('loading');
+      // Disable the switch while the conversion takes place.
+      setTimeout(function() {
+        editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
+      }, 0);
+    } else {
       sourceButton.removeClass('loading');
-      editable.setReadOnly(false);
-      editor.getCommand('source').setState(convert ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
-    });
+      editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
+    }
   }
 });</code>
     </property>

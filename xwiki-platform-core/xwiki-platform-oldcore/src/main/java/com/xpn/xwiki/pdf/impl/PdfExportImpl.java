@@ -547,7 +547,8 @@ public class PdfExportImpl implements PdfExport
             } catch (IOException e) {
                 // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
                 // exist in the JVM.
-                LOGGER.error("Invalid or not existing encoding [{}]", context.getWiki().getEncoding(), e);
+                LOGGER.error("Couldn't get XSLT for PDF exporting. Invalid or not existing encoding [{}]",
+                    context.getWiki().getEncoding(), e);
             }
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);

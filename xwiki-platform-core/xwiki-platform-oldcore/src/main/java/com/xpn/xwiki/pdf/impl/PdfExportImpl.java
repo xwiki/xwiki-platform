@@ -533,7 +533,8 @@ public class PdfExportImpl implements PdfExport
      *                     See {@link #getPDFTemplateProperty(String, XWikiContext)} for details on how this property
      *                     is resolved. If the property doesn't point to any XSLT file then the fallback file parameter
      *                     is used instead
-     * @param fallbackFile the name of a resource file to use when the PDFTemplate does not contain an override
+     * @param fallbackFile the name of a resource file to use when no XSLT content was found using the passed
+     *                     {@code propertyName}
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */

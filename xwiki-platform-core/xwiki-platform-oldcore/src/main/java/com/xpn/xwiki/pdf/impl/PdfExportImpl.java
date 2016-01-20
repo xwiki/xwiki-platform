@@ -544,8 +544,10 @@ public class PdfExportImpl implements PdfExport
         if (!StringUtils.isBlank(xsl)) {
             try {
                 return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
-            } catch (IOException ex) {
-                // This really shouldn't happen
+            } catch (IOException e) {
+                // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
+                // exist in the JVM.
+                LOGGER.error("Invalid or not existing encoding [{}]", context.getWiki().getEncoding());
             }
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);

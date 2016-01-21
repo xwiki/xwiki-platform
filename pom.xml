@@ -34,10 +34,19 @@
   <packaging>xar</packaging>
   <name>Tour Application</name>
   <description>Let users create tour guides for any page</description>
+  <properties>
+    <platform.version>${commons.version}</platform.version>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <developers>
     <developer>
       <id>gabrielasmeria</id>
       <name>Gabriela Smeria</name>
+    </developer>
+    <developer>
+      <id>gdelhumeau</id>
+      <name>Guillaume Delhumeau</name>
     </developer>
   </developers>
   <scm>
@@ -53,19 +62,25 @@
      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
    </repository>
   </distributionManagement>
-  <properties>
-   <!-- Don't run CLIRR here since there's no Java code. -->
-   <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
+    <!-- Library used by this application to create tours integrated with bootstrap -->
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap-tour</artifactId>
       <version>0.10.2</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- The app has been created by Application Within Minutes -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
+      <version>${platform.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
+    <!-- Needed to add support for the XAR packaging -->
     <extensions>
       <extension>
         <groupId>org.xwiki.commons</groupId>

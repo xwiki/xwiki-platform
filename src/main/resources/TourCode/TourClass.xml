@@ -39,13 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-## Replace the default space with the space where you want your documents to be created.
-## Replace the default parent with the one of your choice and save the document.
-##
-#set($defaultSpace = 'TourCode')
-#set($defaultParent = 'TourCode.WebHome')
-{{/velocity}}</content>
+  <content/>
   <class>
     <name>TourCode.TourClass</name>
     <customClass/>
@@ -55,51 +49,137 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <backdrop>
+    <description>
       <customDisplay/>
       <disabled>0</disabled>
-      <name>backdrop</name>
-      <number>3</number>
-      <picker>0</picker>
-      <prettyName>backdrop</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </backdrop>
-    <storage>
-      <customDisplay/>
-      <disabled>0</disabled>
-      <name>storage</name>
-      <number>2</number>
-      <picker>0</picker>
-      <prettyName>storage</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </storage>
-    <target>
-      <customDisplay/>
-      <disabled>0</disabled>
-      <name>target</name>
+      <editor>---</editor>
+      <name>description</name>
       <number>1</number>
       <picker>0</picker>
-      <prettyName>target</prettyName>
-      <size>30</size>
+      <prettyName>Description</prettyName>
+      <rows>5</rows>
+      <size>40</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </target>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </description>
+    <isActive>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>isActive</name>
+      <number>2</number>
+      <prettyName>Active</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </isActive>
   </class>
   <object>
     <name>TourCode.TourClass</name>
     <number>0</number>
+    <className>AppWithinMinutes.MetadataClass</className>
+    <guid>2d535d05-dd90-4cc2-99e6-099610946b22</guid>
+    <class>
+      <name>AppWithinMinutes.MetadataClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <dataSpaceName>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dataSpaceName</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Data Space Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dataSpaceName>
+    </class>
+    <property>
+      <dataSpaceName>Tour</dataSpaceName>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>71bc910b-4173-43f9-9859-01f3819a480e</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>TourSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourClass</name>
+    <number>0</number>
     <className>XWiki.DocumentSheetBinding</className>
-    <guid>5749588c-6858-4703-bd38-f755984357da</guid>
+    <guid>1c99f267-dd49-4e6f-ad15-232a05492c7b</guid>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>AppWithinMinutes.ClassEditSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>TourCode.TourClass</name>
+    <number>1</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>baa15451-303f-4beb-a296-225e3a29d63b</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>

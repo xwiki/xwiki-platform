@@ -141,8 +141,8 @@ interface StringReferenceSeparators
     };
 
     /**
-     * Map<current entity, Map<parent separator, parent type>>.
-     * 
+     * Map&lt;current entity, Map&lt;parent separator, parent type&gt;&gt;.
+     *
      * @since 7.2M1
      */
     Map<EntityType, Map<Character, EntityType>> REFERENCE_SETUP = new HashMap<EntityType, Map<Character, EntityType>>()

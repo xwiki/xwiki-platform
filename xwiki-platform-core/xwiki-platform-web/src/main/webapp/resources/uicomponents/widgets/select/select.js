@@ -18,12 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery'], function($) {
+  'use strict';
 
   /**
    * Represents an XWiki Select Widget.
    * @since 7.4.1
    */
-  var xwikiSelectWidget = function(htmlElement) {
+  var XWikiSelectWidget = function(htmlElement) {
     // ----------------------
     // Init fields
     // ----------------------
@@ -81,7 +82,12 @@ require(['jquery'], function($) {
     self.init();
   };
   
-  
+  /**
+   * A map storing all select widgets that have been created. 
+   * Storing the objects here is cleaner than polluting the DOM.
+   */
+  var widgets = new Map();
+    
   /**
    * Define a jQuery plugin about the select widget.
    * @since 7.4.1
@@ -94,17 +100,17 @@ require(['jquery'], function($) {
       // Handle each object separately
       for (var i = 0; i < this.length; ++i) {
         var htmlElement = this[i];
-        var selectWidget = new xwikiSelectWidget(htmlElement);
-        htmlElement.xwikiSelectWidget = selectWidget;
+        var selectWidget = new XWikiSelectWidget(htmlElement);
+        widgets.set(htmlElement, selectWidget);
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately
       for (var i = 0; i < this.length; ++i) {
-        this[i].xwikiSelectWidget.clearSelection();
+        widgets.get(this[i]).clearSelection();
       }
     } else if (action == 'getValue') {
       // In such a case, there is no possible chaining
-      return this[0].xwikiSelectWidget.getValue();
+      return widgets.get(this[0]).getValue();
     }
     
     // Enable chaining
@@ -114,13 +120,7 @@ require(['jquery'], function($) {
   /**
    * Initializer called when the DOM is ready
    */
-  var init = function() {
-    // Register a callback when an option is clicked
+  $(document).ready(function() {
     $('.xwiki-select').xwikiSelectWidget();
-  };
-
-  $(window).ready(init);
+  });
 });
-
-
-

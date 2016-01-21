@@ -56,7 +56,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        Map<Character, EntityType> typeSetup = REFERENCE_SETUP.get(type);
+        Map<Character, EntityType> typeSetup = getTypeSetup(type);
 
         // Check if the type require anything specific
         if (typeSetup == null) {
@@ -116,13 +116,26 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                 currentType = typeSetup.values().iterator().next();
             }
 
-            typeSetup = REFERENCE_SETUP.get(currentType);
+            typeSetup = getTypeSetup(currentType);
         } while (typeSetup != null);
 
         // Handle last entity reference's name
         reference = appendNewReference(reference, getEscapedReference(representation, currentType, parameters));
 
         return reference;
+    }
+
+    /**
+     * The default is to read from {@link StringReferenceSeparators#REFERENCE_SETUP}, but extending classes can override
+     * it.
+     *
+     * @param type the type for which to get the setup
+     * @return the reference setup map for the requested type, consisting of &lt;parent separator, parent type&gt; pairs
+     * @since 7.4.1, 8.0M1
+     */
+    protected Map<Character, EntityType> getTypeSetup(EntityType type)
+    {
+        return REFERENCE_SETUP.get(type);
     }
 
     private EntityReference getEscapedReference(CharSequence representation, EntityType type, Object... parameters)

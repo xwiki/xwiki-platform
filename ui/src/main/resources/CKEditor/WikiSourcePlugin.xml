@@ -121,7 +121,7 @@
     </property>
     <property>
       <code>CKEDITOR.plugins.add('xwiki-source', {
-  requires: 'sourcearea',
+  requires: 'sourcearea,notification',
   init: function(editor) {
     editor.on('beforeModeUnload', jQuery.proxy(this.onBeforeModeUnload, this));
     editor.on('mode', jQuery.proxy(this.onMode, this));
@@ -130,10 +130,16 @@
   onBeforeModeUnload: function(event) {
     var editor = event.editor;
     var mode = editor._.modes[editor.mode];
-    var oldData = mode.data;
-    var newData = this.getFullData(editor);
-    mode.dirty = oldData !== newData;
-    mode.data = newData;
+    if (mode.failed) {
+      mode.dirty = mode.failed = false;
+      // Make sure we retry the conversion on the next mode switch.
+      delete mode.data;
+    } else {
+      var oldData = mode.data;
+      var newData = this.getFullData(editor);
+      mode.dirty = oldData !== newData;
+      mode.data = newData;
+    }
   },
 
   getFullData: function(editor) {
@@ -167,19 +173,27 @@
 
   convertHTML: function(editor, toHTML) {
     this.setLoading(editor, true);
+    var thisPlugin = this;
     var config = editor.config['xwiki-source'] || {};
     jQuery.post(config.htmlConverter, {
       convert: toHTML,
       text: editor._.previousModeData
-    }, jQuery.proxy(function(data) {
+    }).done(function(data) {
       editor.setData(data, {
-        callback: jQuery.proxy(function() {
+        callback: function() {
           // Take a snapshot after the data has been set, in order to be able to detect changes.
-          editor._.modes[editor.mode].data = this.getFullData(editor);
-          this.setLoading(editor, false);
-        }, this)
+          editor._.modes[editor.mode].data = thisPlugin.getFullData(editor);
+          thisPlugin.setLoading(editor, false);
+        }
       });
-    }, this));
+    }).fail(function() {
+      // Switch back to the previous edit mode without performing a conversion.
+      editor._.modes[editor.mode].failed = true;
+      editor.setMode(editor._.previousMode, function() {
+        thisPlugin.setLoading(editor, false);
+        editor.showNotification('Failed to perform the conversion.', 'warning');
+      });
+    });
   },
 
   setLoading: function(editor, loading) {

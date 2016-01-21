@@ -44,9 +44,16 @@
   #if ($toHTML)
     #set ($discard = $doc.setContent($text))
     #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
-    $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString())
+    #set ($output = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
   #else
-    $services.rendering.render($services.rendering.parse($text, 'xhtml/1.0'), $doc.syntax.toIdString())
+    #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
+    #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))
+  #end
+  #if ("$!output" != '' || $output == '')
+    $output
+  #else
+    ## The output is null so an exception must have been thrown.
+    $response.sendError(500)
   #end
 #end
 {{/velocity}}

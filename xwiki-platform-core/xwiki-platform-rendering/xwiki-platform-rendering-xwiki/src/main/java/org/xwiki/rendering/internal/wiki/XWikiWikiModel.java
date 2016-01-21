@@ -105,11 +105,20 @@ public class XWikiWikiModel implements WikiModel
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
-     * Convert an Attachment Reference from a String into an Attachment object.
+     * Convert an Attachment Reference from a String (specified using the document reference format) into an Attachment
+     * object.
      */
     @Inject
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    /**
+     * Convert an Attachment Reference from a String (specified using the space reference format) into an Attachment
+     * object.
+     */
+    @Inject
+    @Named("currentspace")
+    private AttachmentReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
 
     /**
      * Used to resolve a Resource Reference into a proper Document Reference.
@@ -324,17 +333,24 @@ public class XWikiWikiModel implements WikiModel
      */
     private AttachmentReference resolveAttachmentReference(ResourceReference attachmentResourceReference)
     {
+        String stringReference = attachmentResourceReference.getReference();
+
         AttachmentReference attachmentReference;
         if (!attachmentResourceReference.getBaseReferences().isEmpty()) {
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
             // normally be absolute but who knows what the API caller has specified...)
             DocumentReference baseReference =
                 resolveBaseReference(attachmentResourceReference.getBaseReferences(), ResourceType.DOCUMENT);
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
-                attachmentResourceReference.getReference(), baseReference);
+            attachmentReference = this.currentAttachmentReferenceResolver.resolve(stringReference, baseReference);
         } else {
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
-                attachmentResourceReference.getReference());
+            attachmentReference = this.currentAttachmentReferenceResolver.resolve(stringReference);
+        }
+
+        // See if the resolved (terminal or WebHome) document exists and, if so, use it.
+        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        if (!documentAccessBridge.exists(documentReference)) {
+            // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
+            attachmentReference = this.currentSpaceAttachmentReferenceResolver.resolve(stringReference);
         }
 
         return attachmentReference;

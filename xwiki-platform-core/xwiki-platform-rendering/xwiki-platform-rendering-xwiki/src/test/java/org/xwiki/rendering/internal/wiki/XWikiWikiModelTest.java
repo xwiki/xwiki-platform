@@ -367,6 +367,8 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
                 will(returnValue(attachmentReference));
                 oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, expectedQueryString, false);
                 will(returnValue("?" + expectedQueryString));
+                oneOf(documentAccessBridge).exists(attachmentReference.getDocumentReference());
+                will(returnValue(true));
             }
         });
 

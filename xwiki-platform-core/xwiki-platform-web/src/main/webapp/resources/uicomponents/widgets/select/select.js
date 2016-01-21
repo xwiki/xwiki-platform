@@ -21,15 +21,15 @@ require(['jquery'], function($) {
   'use strict';
 
   /**
-   * Represents an XWiki Select Widget.
-   * @since 7.4.1
+   * Represents an XWiki Select Widget (for internal use only). External scripts must use the jQuery plugin defined
+   * below instead.
    */
-  var XWikiSelectWidget = function(htmlElement) {
+  var XWikiSelectWidget = function(domElement) {
     // ----------------------
     // Init fields
     // ----------------------
     var self = this;
-    self.selectWidget = $(htmlElement);
+    self.selectWidget = $(domElement);
     
     /**
      * Send an event to say that the selection have changed
@@ -99,9 +99,12 @@ require(['jquery'], function($) {
     if (!action || action == 'init') {
       // Handle each object separately
       for (var i = 0; i < this.length; ++i) {
-        var htmlElement = this[i];
-        var selectWidget = new XWikiSelectWidget(htmlElement);
-        widgets.set(htmlElement, selectWidget);
+        var domElement = this[i];
+        // This widget might have already been created
+        if (widgets.get(domElement)) {
+          continue;
+        }
+        widgets.set(domElement, new XWikiSelectWidget(domElement));
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately

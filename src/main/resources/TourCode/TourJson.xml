@@ -40,28 +40,23 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-$response.setContentType('application/json')
-  #set($discard = $doc.use('TourCode.StepClass'))
-  #set($tourDoc = $xwiki.getDocument($request.tourDoc))
-  #set($objects = $tourDoc.getObjects('TourCode.StepClass'))
-  { "steps" : [
-  #foreach($object in $objects)
-    #set($element = $object.getProperty('element').value)
-    #set($title = $object.getProperty('title').value)
-    #set($content = $object.getProperty('content').value)
-    #set($placement = $object.getProperty('placement').value)
-    #set($order = $object.getProperty('order').value)
-    {
-     "element": "$escapetool.json($element)",
-     "title" : "$escapetool.json($title)",
-     "placement" : "$escapetool.json($placement)",
-     "content": "$escapetool.json($content)",
-     "order": "$escapetool.json($order)"
-    }##
-    #if($velocityHasNext)
-    ,
-    #end
+#if ($xcontext.action == 'get')
+  #set ($discard = $response.setContentType('application/json'))
+  #set ($discard = $doc.use('TourCode.StepClass'))
+  #set ($tourDoc = $xwiki.getDocument($request.tourDoc))
+  #set ($steps = [])
+  #foreach($object in $tourDoc.getObjects('TourCode.StepClass'))
+    #set ($backdrop = $object.getProperty('backdrop').value == '1')
+    #set ($step = { 'element'  : $object.getProperty('element').value,
+                    'title'    : $object.getProperty('title').value,
+                    'content'  : $object.getProperty('content').value,
+                    'placement': $object.getProperty('placement').value,
+                    'order'    : $object.getProperty('order').value,
+                    'backdrop' : $backdrop })
+    #set ($discard = $steps.add($step))
   #end
-  ]}
-{{/velocity}}</content>
+  $jsontool.serialize({'steps': $steps})
+#end
+{{/velocity}}
+</content>
 </xwikidoc>

@@ -55,6 +55,20 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <backdrop>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>backdrop</name>
+      <number>6</number>
+      <prettyName>Backdrop</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </backdrop>
     <content>
       <customDisplay/>
       <disabled>0</disabled>
@@ -62,7 +76,7 @@
       <name>content</name>
       <number>3</number>
       <picker>0</picker>
-      <prettyName>content</prettyName>
+      <prettyName>Content</prettyName>
       <rows>5</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -76,7 +90,7 @@
       <name>element</name>
       <number>1</number>
       <picker>0</picker>
-      <prettyName>element</prettyName>
+      <prettyName>Element (CSS selector that identify an element)</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -89,7 +103,7 @@
       <name>order</name>
       <number>5</number>
       <numberType>long</numberType>
-      <prettyName>order</prettyName>
+      <prettyName>Order</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -102,7 +116,7 @@
       <name>placement</name>
       <number>4</number>
       <picker>0</picker>
-      <prettyName>placement</prettyName>
+      <prettyName>Placement</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -115,7 +129,7 @@
       <name>title</name>
       <number>2</number>
       <picker>0</picker>
-      <prettyName>title</prettyName>
+      <prettyName>Title</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

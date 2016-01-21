@@ -151,7 +151,6 @@ define(["bootstrap-tour", "jquery"], function(Tour, $) {
           var jsonData = response;
           var i, n     = jsonData.steps.length;
           var tour     = new Tour({
-            backdrop: true,
             storage : false
           });
           for (var i = 0; i &lt; n; i++) {
@@ -159,7 +158,8 @@ define(["bootstrap-tour", "jquery"], function(Tour, $) {
               element   : jsonData.steps[i].element,
               title     : jsonData.steps[i].title,
               content   : jsonData.steps[i].content,
-              placement : jsonData.steps[i].placement
+              placement : jsonData.steps[i].placement,
+              backdrop  : jsonData.steps[i].backdrop
             });
           }
           tour.init();

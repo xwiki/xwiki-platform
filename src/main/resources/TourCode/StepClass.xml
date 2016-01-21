@@ -111,17 +111,25 @@
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </order>
     <placement>
+      <cache>0</cache>
       <customDisplay/>
       <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
       <name>placement</name>
       <number>4</number>
       <picker>0</picker>
-      <prettyName>Placement</prettyName>
-      <size>30</size>
+      <prettyName>placement</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators> ,|</separators>
+      <size>1</size>
+      <sort>none</sort>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      <values>top|left|right|bottom</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </placement>
     <title>
       <customDisplay/>

@@ -145,7 +145,7 @@ define(["bootstrap-tour", "jquery"], function(Tour, $) {
   return {
     createTour : function (doc) {
       var ajaxOptions = {
-        url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plan&amp;tourDoc=' + doc),
+        url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain&amp;tourDoc=' + doc),
         dataType    : 'json',
         success     : function (response) {
           var jsonData = response;

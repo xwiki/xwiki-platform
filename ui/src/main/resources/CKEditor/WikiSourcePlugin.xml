@@ -123,12 +123,26 @@
       <code>CKEDITOR.plugins.add('xwiki-source', {
   requires: 'sourcearea,notification',
   init: function(editor) {
+    editor.on('beforeSetMode', jQuery.proxy(this.onBeforeSetMode, this));
     editor.on('beforeModeUnload', jQuery.proxy(this.onBeforeModeUnload, this));
     editor.on('mode', jQuery.proxy(this.onMode, this));
   },
 
+  onBeforeSetMode: function(event) {
+    if (this.isModeSupported(event.data)) {
+      this.setLoading(event.editor, true);
+    }
+  },
+
+  isModeSupported: function(mode) {
+    return mode === 'wysiwyg' || mode === 'source';
+  },
+
   onBeforeModeUnload: function(event) {
     var editor = event.editor;
+    if (!this.isModeSupported(editor.mode)) {
+      return;
+    }
     var mode = editor._.modes[editor.mode];
     if (mode.failed) {
       mode.dirty = mode.failed = false;
@@ -158,6 +172,8 @@
     } else if (editor.mode === 'source' &amp;&amp; editor._.previousMode === 'wysiwyg') {
       // Convert from HTML to wiki syntax.
       this.maybeConvertHTML(editor, false);
+    } else if (this.isModeSupported(editor.mode)) {
+      this.setLoading(editor, false);
     }
   },
 
@@ -167,12 +183,13 @@
     if (oldMode.dirty || typeof newMode.data !== 'string') {
       this.convertHTML(editor, toHTML);
     } else {
-      editor.setData(newMode.data);
+      editor.setData(newMode.data, {
+        callback: jQuery.proxy(this.setLoading, this, editor, false)
+      });
     }
   },
 
   convertHTML: function(editor, toHTML) {
-    this.setLoading(editor, true);
     var thisPlugin = this;
     var config = editor.config['xwiki-source'] || {};
     jQuery.post(config.htmlConverter, {
@@ -197,16 +214,21 @@
   },
 
   setLoading: function(editor, loading) {
-    editor.setReadOnly(loading);
-    var sourceButton = editor.container.findOne('.cke_button__source_icon');
+    var sourceButton, editable = editor.editable();
+    if (editable) {
+      editor.setReadOnly(loading);
+      sourceButton = editor.container.findOne('.cke_button__source_icon');
+    }
     if (loading) {
-      sourceButton.addClass('loading');
+      editor.ui.space('contents').setStyle('visibility', 'hidden');
+      sourceButton &amp;&amp; sourceButton.addClass('loading');
       // Disable the switch while the conversion takes place.
       setTimeout(function() {
         editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
       }, 0);
     } else {
-      sourceButton.removeClass('loading');
+      editor.ui.space('contents').removeStyle('visibility');
+      sourceButton &amp;&amp; sourceButton.removeClass('loading');
       editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
     }
   }

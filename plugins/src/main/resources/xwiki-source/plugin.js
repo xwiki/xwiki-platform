@@ -121,14 +121,18 @@
       }
       if (loading) {
         editor.ui.space('contents').setStyle('visibility', 'hidden');
-        sourceButton && sourceButton.addClass('loading');
+        if (sourceButton) {
+          sourceButton.addClass('loading');
+        }
         // Disable the switch while the conversion takes place.
         setTimeout(function() {
           editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
         }, 0);
       } else {
         editor.ui.space('contents').removeStyle('visibility');
-        sourceButton && sourceButton.removeClass('loading');
+        if (sourceButton) {
+          sourceButton.removeClass('loading');
+        }
         editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       }
     }

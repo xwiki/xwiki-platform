@@ -36,8 +36,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -199,17 +199,6 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         } catch (Exception e) {
             setError(e);
         }
-    }
-
-    /**
-     * Specifies what type of email is being sent. This is useful for applications to sepcify a type when they send
-     * mail. This allows (for example) to filter these emails in the Mail Sender Status Admin UI.
-     *
-     * @param mailType the type of mail being sent (e.g "Watchlist", "Reset Password", "Send Page by Mail", etc)
-     */
-    public void setType(String mailType)
-    {
-        addHeader("X-MailType", mailType);
     }
 
     private void setError(Exception e)

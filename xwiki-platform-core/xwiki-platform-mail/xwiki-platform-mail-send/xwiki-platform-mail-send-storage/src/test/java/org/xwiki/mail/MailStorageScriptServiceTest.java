@@ -27,7 +27,6 @@ import java.util.UUID;
 
 import javax.inject.Provider;
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,8 +45,12 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.when;
 
 /**
@@ -110,7 +113,7 @@ public class MailStorageScriptServiceTest
         this.mocker.registerComponent(MailListener.class, "database", memoryMailListener);
 
         Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
         String batchId = UUID.randomUUID().toString();
 
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");

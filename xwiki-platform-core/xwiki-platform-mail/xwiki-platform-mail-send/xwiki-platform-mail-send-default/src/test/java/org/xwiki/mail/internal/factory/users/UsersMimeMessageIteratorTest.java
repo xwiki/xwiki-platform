@@ -35,6 +35,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -70,7 +71,7 @@ public class UsersMimeMessageIteratorTest
             @Override public MimeMessage createMessage(Object source, Map parameters)
                 throws MessagingException
             {
-                return new MimeMessage((Session) null);
+                return new ExtendedMimeMessage();
             }
         };
 

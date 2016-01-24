@@ -89,12 +89,12 @@ public class MemoryMailStatusResult extends AbstractMailStatusResult
     /**
      * Retrieve the status for the given message identifier.
      *
-     * @param messageId the message-ID of the message.
+     * @param uniqueMessageId the unique id of the message.
      * @return the mail status for the given message, or null if none were found.
      */
-    public MailStatus getStatus(String messageId)
+    public MailStatus getStatus(String uniqueMessageId)
     {
-        return this.statusMap.get(messageId);
+        return this.statusMap.get(uniqueMessageId);
     }
 
     /**

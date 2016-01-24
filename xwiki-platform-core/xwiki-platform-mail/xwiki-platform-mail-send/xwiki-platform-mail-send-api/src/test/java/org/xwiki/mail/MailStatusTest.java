@@ -20,15 +20,13 @@
 package org.xwiki.mail;
 
 import java.util.Date;
-import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link MailStatus}.
@@ -52,27 +50,25 @@ public class MailStatusTest
     @Test
     public void verifyToStringWhenStatusHasNoError() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");
-        message.setHeader("X-MailType", "type");
+        message.setType("type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
         MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
         Date date = new Date();
         status.setDate(date);
 
-        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+        assertEquals("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], state = [prepare_success], date = ["
             + date.toString() + "], recipients = [john@doe.com], type = [type]", status.toString());
     }
 
     @Test
     public void verifyToStringWhenStatusHasError() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");
-        message.setHeader("X-MailType", "type");
+        message.setType("type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
         MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
@@ -80,7 +76,7 @@ public class MailStatusTest
         status.setDate(date);
         status.setError(new Exception("outer", new Exception("inner")));
 
-        assertTrue(status.toString().startsWith("messageId = [<local@domain>], batchId = [batchid], "
+        assertTrue(status.toString().startsWith("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], "
             + "state = [prepare_success], date = [" + date.toString() + "], recipients = [john@doe.com], "
             + "type = [type], errorSummary = [Exception: inner], errorDescription = ["));
     }
@@ -88,10 +84,9 @@ public class MailStatusTest
     @Test
     public void verifyToStringWhenWiki() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
         message.setHeader("Message-ID", "<local@domain>");
-        message.setHeader("X-MailType", "type");
+        message.setType("type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
         MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
@@ -99,7 +94,7 @@ public class MailStatusTest
         status.setDate(date);
         status.setWiki("wiki");
 
-        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+        assertEquals("messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batchid], state = [prepare_success], date = ["
             + date.toString() + "], recipients = [john@doe.com], type = [type], wiki = [wiki]", status.toString());
     }
 }

@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -85,7 +84,7 @@ public class MessageMimeMessageFactoryTest
     }
 
     @Test
-    public void ensureMessageReceiveDifferentMessageID() throws Exception
+    public void ensureMessageReceiveSameMessageID() throws Exception
     {
         MimeMessage source = new MimeMessage(Session.getInstance(new Properties()));
         source.setText("Content");
@@ -96,7 +95,7 @@ public class MessageMimeMessageFactoryTest
         // Ensure second message is similar to source, and not to modified first
         assertThat(first.getMessageID(), notNullValue());
         assertThat(second.getMessageID(), notNullValue());
-        assertThat(first.getMessageID(), not(equalTo(second.getMessageID())));
+        assertThat(first.getMessageID(), equalTo(second.getMessageID()));
     }
 
     private void assertEqualMimeMessage(MimeMessage message1, MimeMessage message2) throws Exception

@@ -47,7 +47,7 @@ public class MailStatusResultSerializerTest
         status1.setBatchId("batch1");
         status1.setState("prepare_error");
         status1.setDate(date);
-        status1.setMessageId("<local@domain>");
+        status1.setMessageId("6ys1BeC6gnKA7srO/vs06XBZKZM=");
         status1.setRecipients("john@doe.com");
         status1.setErrorSummary("errorsummary1");
         status1.setErrorDescription("errordescription1");
@@ -55,17 +55,17 @@ public class MailStatusResultSerializerTest
         status2.setBatchId("batch2");
         status2.setState("send_error");
         status2.setDate(date);
-        status2.setMessageId("<local@domain>");
+        status2.setMessageId("6ys1BeC6gnKA7srO/vs06XBZKZM=");
         status2.setRecipients("jane@doe.com");
         status2.setErrorSummary("errorsummary2");
         status2.setErrorDescription("errordescription2");
         when(statusResult.getAllErrors()).thenReturn(Arrays.asList(status1, status2).iterator());
 
         assertEquals("Some messages have failed to be sent: "
-            + "[[messageId = [<local@domain>], batchId = [batch1], state = [prepare_error], "
+            + "[[messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], batchId = [batch1], state = [prepare_error], "
             + "date = [" + date.toString() + "], recipients = [john@doe.com], errorSummary = [errorsummary1], "
-            + "errorDescription = [errordescription1]][messageId = [<local@domain>], batchId = [batch2], "
-            + "state = [send_error], date = [" + date.toString() + "], recipients = [jane@doe.com], "
+            + "errorDescription = [errordescription1]][messageId = [6ys1BeC6gnKA7srO/vs06XBZKZM=], "
+            + "batchId = [batch2], state = [send_error], date = [" + date.toString() + "], recipients = [jane@doe.com], "
             + "errorSummary = [errorsummary2], errorDescription = [errordescription2]]]",
             MailStatusResultSerializer.serializeErrors(statusResult));
     }

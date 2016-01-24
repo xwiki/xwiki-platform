@@ -93,10 +93,10 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public MailStatus load(String messageId) throws MailStoreException
+    public MailStatus load(String uniqueMessageId) throws MailStoreException
     {
-        List<MailStatus> statuses = load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, messageId), 0, 0,
-            null, false);
+        List<MailStatus> statuses = load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, uniqueMessageId),
+            0, 0, null, false);
         if (statuses.isEmpty()) {
             return null;
         }
@@ -182,7 +182,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public void delete(final String messageId, Map<String, Object> parameters) throws MailStoreException
+    public void delete(final String uniqueMessageId, Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
@@ -199,13 +199,13 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 {
                     // Delete the message
                     String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
-                    session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, messageId).executeUpdate();
+                    session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, uniqueMessageId).executeUpdate();
                     return null;
                 }
             });
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to delete mail status (message id [%s]) "
-                + "from the database.", messageId), e);
+                + "from the database.", uniqueMessageId), e);
         } finally {
             xwikiContext.setWikiId(currentWiki);
         }

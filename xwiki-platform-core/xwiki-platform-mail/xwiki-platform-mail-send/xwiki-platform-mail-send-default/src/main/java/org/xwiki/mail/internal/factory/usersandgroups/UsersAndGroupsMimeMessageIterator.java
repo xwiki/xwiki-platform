@@ -28,6 +28,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.context.Execution;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
@@ -94,7 +95,7 @@ public class UsersAndGroupsMimeMessageIterator implements Iterator<MimeMessage>,
             // Set the Message Type if passed in parameters
             String type = (String) this.parameters.get("type");
             if (type != null) {
-                message.addHeader("X-MailType", type);
+                ExtendedMimeMessage.wrap(message).setType(type);
             }
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to create Mime Message for recipient " + address, e);

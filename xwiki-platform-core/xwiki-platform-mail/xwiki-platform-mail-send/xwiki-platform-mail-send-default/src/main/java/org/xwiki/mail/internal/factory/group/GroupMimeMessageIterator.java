@@ -31,6 +31,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.factory.AbstractMessageIterator;
 import org.xwiki.model.EntityType;
@@ -95,9 +96,9 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
     }
 
     @Override
-    protected MimeMessage createMessageInternal() throws MessagingException
+    protected ExtendedMimeMessage createMessageInternal() throws MessagingException
     {
-        MimeMessage mimeMessage;
+        ExtendedMimeMessage mimeMessage;
 
         DocumentReference groupsClassReference = this.stringResolver.resolve(USER_SPACE + ".XWikiGroups");
 
@@ -114,7 +115,8 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
 
             Map<String, Object> parameters = (Map<String, Object>) this.parameters.get("parameters");
 
-            mimeMessage = this.factory.createMessage(this.parameters.get("source"), parameters);
+            mimeMessage =
+                ExtendedMimeMessage.wrap(this.factory.createMessage(this.parameters.get("source"), parameters));
             mimeMessage.addRecipients(Message.RecipientType.TO, email);
         } else {
             getLogger().warn("User [{}] has no email defined. Email has not been sent to that user.", userReference);

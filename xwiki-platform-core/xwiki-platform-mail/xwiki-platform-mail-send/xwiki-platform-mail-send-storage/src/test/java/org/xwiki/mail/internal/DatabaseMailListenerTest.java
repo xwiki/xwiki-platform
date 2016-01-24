@@ -21,11 +21,7 @@ package org.xwiki.mail.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.UUID;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,13 +32,13 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
-import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.test.AllLogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -72,9 +68,7 @@ public class DatabaseMailListenerTest
     public MockitoComponentMockingRule<DatabaseMailListener> mocker =
         new MockitoComponentMockingRule<>(DatabaseMailListener.class, Arrays.asList(Logger.class));
 
-    private MessageIdComputer messageIdComputer = new MessageIdComputer();
-
-    private MimeMessage message;
+    private ExtendedMimeMessage message;
 
     private String batchId = UUID.randomUUID().toString();
 
@@ -85,12 +79,11 @@ public class DatabaseMailListenerTest
     @Before
     public void setUp() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        this.message = new MimeMessage(session);
-        this.message.setHeader("X-MailType", "type");
+        this.message = new ExtendedMimeMessage();
+        this.message.setType("type");
         this.message.saveChanges();
         this.message.setHeader("Message-ID", mimeMessageId);
-        this.messageId = messageIdComputer.compute(this.message);
+        this.messageId = message.getUniqueMessageId();
 
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = Mockito.mock(ExecutionContext.class);

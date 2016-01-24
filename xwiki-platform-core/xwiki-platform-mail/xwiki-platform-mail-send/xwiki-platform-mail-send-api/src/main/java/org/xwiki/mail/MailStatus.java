@@ -23,7 +23,6 @@ import java.util.Date;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -40,7 +39,7 @@ public class MailStatus
     /**
      * @see #getMessageId()
      */
-    private String messageId;
+    private String uniqueMessageId;
 
     /*
      * @see #getState()
@@ -98,14 +97,14 @@ public class MailStatus
      * @param batchId the identifier of the batch sending the message
      * @param message the message for which to construct a status
      * @param state the state of the referenced mail (ready, failed to send, success)
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    public MailStatus(String batchId, MimeMessage message, MailState state)
+    public MailStatus(String batchId, ExtendedMimeMessage message, MailState state)
     {
         try {
-            setMessageId(new MessageIdComputer().compute(message));
+            setMessageId(message.getUniqueMessageId());
             setBatchId(batchId);
-            setType(message.getHeader("X-MailType", null));
+            setType(message.getType());
             setRecipients(InternetAddress.toString(message.getAllRecipients()));
             setState(state);
             setDate(new Date());
@@ -122,12 +121,11 @@ public class MailStatus
     /**
      * @return the unique message ID used for identifying the mime message matching this status. Between XWiki 7.1rc1
      * and 7.4, this identifier is equivalent to the message-id header, but you should not rely on this fact. Since
-     * XWiki 7.4.1, to compute the message identifier used here from an given {@link MimeMessage}, you may use
-     * {@link MessageIdComputer#compute(MimeMessage)}.
+     * XWiki 7.4.1, this value is equivalent to {@link ExtendedMimeMessage#getUniqueMessageId()}.
      */
     public String getMessageId()
     {
-        return this.messageId;
+        return this.uniqueMessageId;
     }
 
     /**
@@ -135,7 +133,7 @@ public class MailStatus
      */
     public void setMessageId(String messageId)
     {
-        this.messageId = messageId;
+        this.uniqueMessageId = messageId;
     }
 
     /**

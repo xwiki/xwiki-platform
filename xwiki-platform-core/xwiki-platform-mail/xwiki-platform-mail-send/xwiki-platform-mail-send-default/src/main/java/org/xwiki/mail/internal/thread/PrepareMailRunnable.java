@@ -27,16 +27,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailStatusResult;
-import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 
 /**
@@ -60,8 +61,6 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
-
-    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     @Override
     public void run()
@@ -159,56 +158,94 @@ public class PrepareMailRunnable extends AbstractMailRunnable
 
     private void prepareSingleMail(MimeMessage mimeMessage, PrepareMailQueueItem item)
     {
-        MimeMessage message = mimeMessage;
         MailListener listener = item.getListener();
 
+        // Step 1: Try to complete message with From and Bcc from configuration if needed
+        completeMessage(mimeMessage);
+
+        // Ensure mimeMessage to be extended
+        ExtendedMimeMessage message = ExtendedMimeMessage.wrap(mimeMessage);
+
+        // Step 2: Persist the MimeMessage
+        // Note: Message identifier is stabilized at this step by the serialization process
         try {
-            // Step 1: Complete message with From and Bcc from configuration if needed
-            message = initializeMessage(mimeMessage);
-            // Step 2: Persist the MimeMessage
-            // Note: Message identifier is stabilized at this step by the serialization process
             this.mailContentStore.save(item.getBatchId(), message);
-            // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
-            this.sendMailQueueManager.addToQueue(new SendMailQueueItem(messageIdComputer.compute(message),
-                item.getSession(), listener, item.getBatchId()));
-            // Step 4: Notify the user that the MimeMessage is prepared
-            if (listener != null) {
-                listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
-            }
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
                 listener.onPrepareMessageError(message, e, Collections.<String, Object>emptyMap());
             }
+            return;
         }
+
+        // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
+        this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getUniqueMessageId(),
+            item.getSession(), listener, item.getBatchId()));
+
+        // Step 4: Notify the user that the MimeMessage is prepared
+        if (listener != null) {
+            listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
+        }
+
     }
 
-    private MimeMessage initializeMessage(MimeMessage mimeMessage)
-        throws Exception
+    private void completeMessage(MimeMessage mimeMessage)
     {
         // Note: We don't cache the default From and BCC addresses because they can be modified at runtime
         // (from the Admin UI for example) and we need to always get the latest configured values.
 
-        // If the user has not set the From header then use the default value from configuration and if it's not
-        // set then raise an error since a message must have a from set!
-        // Perform some basic verification to avoid NPEs in JavaMail
-        if (mimeMessage.getFrom() == null) {
+        // If the user has not set the From header then try to use the default value from configuration
+        tryToEnsureFrom(mimeMessage);
+        // Else JavaMail won't be able to send the mail but we'll get the error in the status.
+
+        // If the user has not set the BCC header then use the default value from configuration
+        tryToAddDefaultBccIfNeeded(mimeMessage);
+    }
+
+    private void tryToEnsureFrom(MimeMessage mimeMessage)
+    {
+        if (getFrom(mimeMessage) == null) {
             // Try using the From address in the Session
             String from = this.configuration.getFromAddress();
             if (from != null) {
-                mimeMessage.setFrom(new InternetAddress(from));
+                try {
+                    mimeMessage.setFrom(new InternetAddress(from));
+                } catch (MessagingException e) {
+                    // ignored
+                }
             }
-            // Else JavaMail won't be able to send the mail but we'll get the error in the status.
         }
+    }
 
-        // If the user has not set the BCC header then use the default value from configuration
-        Address[] bccAddresses = mimeMessage.getRecipients(Message.RecipientType.BCC);
+    private void tryToAddDefaultBccIfNeeded(MimeMessage mimeMessage)
+    {
+        Address[] bccAddresses = getBccRecipients(mimeMessage);
         if (bccAddresses == null || bccAddresses.length == 0) {
             for (String address : this.configuration.getBCCAddresses()) {
-                mimeMessage.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
+                try {
+                    mimeMessage.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
+                } catch (MessagingException e) {
+                    // ignored
+                }
             }
         }
+    }
 
-        return mimeMessage;
+    private Address[] getFrom(MimeMessage mimeMessage)
+    {
+        try {
+            return mimeMessage.getFrom();
+        } catch (MessagingException e) {
+            return null;
+        }
+    }
+
+    private Address[] getBccRecipients(MimeMessage mimeMessage)
+    {
+        try {
+            return mimeMessage.getRecipients(Message.RecipientType.BCC);
+        } catch (MessagingException e) {
+            return null;
+        }
     }
 }

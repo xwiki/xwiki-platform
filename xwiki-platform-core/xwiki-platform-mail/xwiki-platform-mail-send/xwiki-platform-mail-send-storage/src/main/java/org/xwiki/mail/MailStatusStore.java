@@ -46,12 +46,12 @@ public interface MailStatusStore
     /**
      * Load message status for the message matching the given message Id.
      *
-     * @param messageId the identifier of the message.
+     * @param uniqueMessageId the unique identifier of the message.
      * @return the status of the message, or null if no status was found.
      * @throws MailStoreException when an error occurs while loading the data
      * @since 7.1M2
      */
-    MailStatus load(String messageId) throws MailStoreException;
+    MailStatus load(String uniqueMessageId) throws MailStoreException;
 
     /**
      * Loads all message statuses matching the passed filters.
@@ -80,10 +80,10 @@ public interface MailStatusStore
     /**
      * Delete a message.
      *
-     * @param messageId the id of the message to delete
+     * @param uniqueMessageId the id of the message to delete
      * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
      *        the {@code wiki} key)
      * @throws MailStoreException when an error occurs deleting the message
      */
-    void delete(String messageId, Map<String, Object> parameters) throws MailStoreException;
+    void delete(String uniqueMessageId, Map<String, Object> parameters) throws MailStoreException;
 }

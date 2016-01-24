@@ -27,6 +27,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
 
 /**
@@ -70,6 +71,6 @@ public class MessageMimeMessageFactory extends AbstractMimeMessageFactory<MimeMe
                 String.format("Failed to create mime message from source [%s]", source.getClass()));
         }
 
-        return new MimeMessage((MimeMessage) source);
+        return new ExtendedMimeMessage((MimeMessage) source);
     }
 }

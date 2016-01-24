@@ -20,7 +20,6 @@
 package org.xwiki.mail;
 
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
 
@@ -39,27 +38,28 @@ public interface MailContentStore
      * @param batchId the batch id of the message to be saved
      * @param message the message to serialize in the store
      * @throws MailStoreException when an error occurs when saving the message to the store
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void save(String batchId, MimeMessage message) throws MailStoreException;
+    void save(String batchId, ExtendedMimeMessage message) throws MailStoreException;
 
     /**
      * Load message from the store.
      *
      * @param session the JavaMail session used to send the mail
      * @param batchId the batch id of the message that was originally saved
-     * @param messageId the id of the message that was originally saved
+     * @param uniqueMessageId the unique id of the message that was originally saved
      * @return the MimeMessage instance deserialized from the store
      * @throws MailStoreException when an error occurs when loading the message from the store
+     * @since 7.4.1
      */
-    MimeMessage load(Session session, String batchId, String messageId) throws MailStoreException;
+    ExtendedMimeMessage load(Session session, String batchId, String uniqueMessageId) throws MailStoreException;
 
     /**
      * Remove a message from the store.
      *
      * @param batchId the batch id of the message that was originally saved
-     * @param messageId the id of the message that was originally saved
+     * @param uniqueMessageId the unique id of the message that was originally saved
      * @throws MailStoreException when an error occurs when deleting the message from the store
      */
-    void delete(String batchId, String messageId) throws MailStoreException;
+    void delete(String batchId, String uniqueMessageId) throws MailStoreException;
 }

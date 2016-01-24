@@ -84,10 +84,10 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * Resend the serialized MimeMessage synchronously.
      *
      * @param batchId the name of the directory that contains serialized MimeMessage
-     * @param messageId the name of the serialized MimeMessage
+     * @param uniqueMessageId the unique id of the serialized MimeMessage
      * @return the result and status of the send batch
      */
-    public ScriptMailResult resend(String batchId, String messageId)
+    public ScriptMailResult resend(String batchId, String uniqueMessageId)
     {
         // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
         // to be able to call this method and for it to have any effect.
@@ -107,7 +107,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
             // Set the batch id so that no new batch id is generated when re-sending the mail
             Session session = this.sessionFactory.create(Collections.singletonMap(SESSION_BATCHID_KEY, batchId));
 
-            message = loadMessage(session, batchId, messageId);
+            message = loadMessage(session, batchId, uniqueMessageId);
 
             ScriptMailResult scriptMailResult = new ScriptMailResult(this.mailSender.sendAsynchronously(
                 Arrays.asList(message), session, listener), listener.getMailStatusResult());
@@ -126,17 +126,17 @@ public class MailStorageScriptService extends AbstractMailScriptService
     /**
      * Load message status for the message matching the given message Id.
      *
-     * @param messageId the identifier of the message.
+     * @param uniqueMessageId the unique identifier of the message.
      * @return the loaded {@link org.xwiki.mail.MailStatus} or null if not allowed or an error happens
      * @since 7.1M2
      */
-    public MailStatus load(String messageId)
+    public MailStatus load(String uniqueMessageId)
     {
         // Note: We don't need to check permissions since the caller already needs to know the message id
         // to be able to call this method and for it to have any effect.
 
         try {
-            return this.mailStatusStore.load(messageId);
+            return this.mailStatusStore.load(uniqueMessageId);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -223,18 +223,18 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * Delete a message (both the status in the database and the serialized messages on the file system).
      *
      * @param batchId the id of the batch for the message to delete
-     * @param messageId the id of the message to delete
+     * @param uniqueMessageId the unique id of the message to delete
      */
-    public void delete(String batchId, String messageId)
+    public void delete(String batchId, String uniqueMessageId)
     {
         // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
         // to be able to call this method and for it to have any effect.
 
         try {
             // Step 1: Delete mail status from store
-            this.mailStatusStore.delete(messageId, Collections.<String, Object>emptyMap());
+            this.mailStatusStore.delete(uniqueMessageId, Collections.<String, Object>emptyMap());
             // Step 2: Delete any matching serialized mail
-            this.mailContentStore.delete(batchId, messageId);
+            this.mailContentStore.delete(batchId, uniqueMessageId);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);

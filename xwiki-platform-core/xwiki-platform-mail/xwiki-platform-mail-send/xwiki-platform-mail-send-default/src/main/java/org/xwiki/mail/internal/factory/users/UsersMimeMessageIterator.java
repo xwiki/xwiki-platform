@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.factory.AbstractMessageIterator;
 import org.xwiki.model.reference.DocumentReference;
@@ -85,9 +86,9 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
     }
 
     @Override
-    protected MimeMessage createMessageInternal() throws MessagingException
+    protected ExtendedMimeMessage createMessageInternal() throws MessagingException
     {
-        MimeMessage mimeMessage;
+        ExtendedMimeMessage mimeMessage;
 
         DocumentReference userReference = users.get(this.position);
 
@@ -99,7 +100,8 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
 
             Map<String, Object> parameters = (Map<String, Object>) this.parameters.get("parameters");
 
-            mimeMessage = this.factory.createMessage(this.parameters.get("source"), parameters);
+            mimeMessage =
+                ExtendedMimeMessage.wrap(this.factory.createMessage(this.parameters.get("source"), parameters));
             mimeMessage.addRecipient(Message.RecipientType.TO, InternetAddress.parse(email)[0]);
         } else {
             getLogger().warn("User [{}] has no email defined. Email has not been sent to that user.", userReference);

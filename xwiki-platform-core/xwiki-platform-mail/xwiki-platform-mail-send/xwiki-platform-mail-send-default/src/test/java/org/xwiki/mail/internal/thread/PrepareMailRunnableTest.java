@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import javax.inject.Provider;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
@@ -37,6 +36,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -90,12 +90,10 @@ public class PrepareMailRunnableTest
         Session session = Session.getDefaultInstance(properties);
 
         MimeMessage message1 = new MimeMessage(session);
-        message1.setSubject("subject1");
-        message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
+        message1.setText("Content1");
 
         MimeMessage message2 = new MimeMessage(session);
-        message2.setSubject("subject2");
-        message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
+        message2.setText("Content2");
 
         String batchId1 = UUID.randomUUID().toString();
         String batchId2 = UUID.randomUUID().toString();
@@ -123,7 +121,7 @@ public class PrepareMailRunnableTest
 
         // Make the content store save fail
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        doThrow(new MailStoreException("error")).when(contentStore).save(any(String.class), any(MimeMessage.class));
+        doThrow(new MailStoreException("error")).when(contentStore).save(any(String.class), any(ExtendedMimeMessage.class));
 
         // Prepare 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
@@ -165,12 +163,10 @@ public class PrepareMailRunnableTest
         Session session = Session.getDefaultInstance(properties);
 
         final MimeMessage message1 = new MimeMessage(session);
-        message1.setSubject("subject1");
-        message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
+        message1.setText("Content1");
 
         MimeMessage message2 = new MimeMessage(session);
-        message2.setSubject("subject2");
-        message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
+        message2.setText("Content2");
 
         String batchId1 = UUID.randomUUID().toString();
         String batchId2 = UUID.randomUUID().toString();
@@ -242,7 +238,7 @@ public class PrepareMailRunnableTest
                 message.saveChanges();
                 return null;
             }
-        }).when(contentStore).save(any(String.class), any(MimeMessage.class));
+        }).when(contentStore).save(any(String.class), any(ExtendedMimeMessage.class));
 
         doAnswer(new Answer<Object>()
         {

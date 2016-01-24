@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
@@ -32,6 +31,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
@@ -39,7 +39,6 @@ import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
-import org.xwiki.mail.MessageIdComputer;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -68,8 +67,6 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     @Inject
     private MailStorageConfiguration configuration;
 
-    private MessageIdComputer messageIdComputer = new MessageIdComputer();
-
     private DatabaseMailStatusResult mailStatusResult;
 
     @Override
@@ -86,7 +83,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     }
 
     @Override
-    public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         super.onPrepareMessageSuccess(message, parameters);
 
@@ -97,7 +94,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     }
 
     @Override
-    public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onPrepareMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         super.onPrepareMessageError(message, exception, parameters);
 
@@ -121,18 +118,18 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     }
 
     @Override
-    public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         super.onSendMessageSuccess(message, parameters);
 
-        String messageId = messageIdComputer.compute(message);
-        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_SUCCESS);
+        String uniqueMessageId = message.getUniqueMessageId();
+        MailStatus status = retrieveExistingMailStatus(uniqueMessageId, MailState.SEND_SUCCESS);
 
         if (status != null) {
             status.setState(MailState.SEND_SUCCESS);
         } else {
             this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_success state.",
-                messageId, getBatchId());
+                uniqueMessageId, getBatchId());
             status = new MailStatus(getBatchId(), message, MailState.SEND_SUCCESS);
         }
 
@@ -150,11 +147,11 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
     }
 
     @Override
-    public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageFatalError(String uniqueMessageId, Exception exception, Map<String, Object> parameters)
     {
-        super.onSendMessageFatalError(messageId, exception, parameters);
+        super.onSendMessageFatalError(uniqueMessageId, exception, parameters);
 
-        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_FATAL_ERROR);
+        MailStatus status = retrieveExistingMailStatus(uniqueMessageId, MailState.SEND_FATAL_ERROR);
 
         if (status != null) {
             status.setState(MailState.SEND_FATAL_ERROR);
@@ -162,25 +159,25 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
             saveStatus(status, parameters);
         } else {
             this.logger.error("Unable to report the fatal error encountered during mail sending for message [{}] "
-                    + "of batch [{}].", messageId, getBatchId(), exception);
+                    + "of batch [{}].", uniqueMessageId, getBatchId(), exception);
         }
 
         this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
-    public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         super.onSendMessageError(message, exception, parameters);
 
-        String messageId = messageIdComputer.compute(message);
-        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_ERROR);
+        String uniqueMessageId = message.getUniqueMessageId();
+        MailStatus status = retrieveExistingMailStatus(uniqueMessageId, MailState.SEND_ERROR);
 
         if (status != null) {
             status.setState(MailState.SEND_ERROR);
         } else {
             this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_error state.",
-                messageId, getBatchId());
+                uniqueMessageId, getBatchId());
             status = new MailStatus(getBatchId(), message, MailState.SEND_ERROR);
         }
         status.setError(exception);
@@ -189,20 +186,20 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
         this.mailStatusResult.incrementCurrentSize();
     }
 
-    private MailStatus retrieveExistingMailStatus(String messageId, MailState state)
+    private MailStatus retrieveExistingMailStatus(String uniqueMessageId, MailState state)
     {
         MailStatus status;
         try {
-            status = mailStatusStore.load(messageId);
+            status = mailStatusStore.load(uniqueMessageId);
             if (status == null) {
                 // It's not normal to have no status in the mail status store since onPrepare should have been called
                 // before.
                 this.logger.error("Failed to find a previous mail status for message [{}] of batch [{}].",
-                    messageId, getBatchId(), state);
+                    uniqueMessageId, getBatchId(), state);
             }
         } catch (MailStoreException e) {
             this.logger.error("Error when looking for a previous mail status for message [{}] of batch [{}].",
-                messageId, getBatchId(), state, e);
+                uniqueMessageId, getBatchId(), state, e);
             status = null;
         }
         return status;

@@ -27,13 +27,13 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 
@@ -129,13 +129,13 @@ public class SendMailRunnable extends AbstractMailRunnable
     {
         MailListener listener = item.getListener();
 
-        MimeMessage message;
+        ExtendedMimeMessage message;
         try {
             // Step 1: Load the message from the filesystem store
-            message = this.mailContentStore.load(item.getSession(), item.getBatchId(), item.getMessageId());
+            message = this.mailContentStore.load(item.getSession(), item.getBatchId(), item.getUniqueMessageId());
         } catch (Exception e) {
             if (listener != null) {
-                listener.onSendMessageFatalError(item.getMessageId(), e, Collections.<String, Object>emptyMap());
+                listener.onSendMessageFatalError(item.getUniqueMessageId(), e, Collections.<String, Object>emptyMap());
             }
             return;
         }

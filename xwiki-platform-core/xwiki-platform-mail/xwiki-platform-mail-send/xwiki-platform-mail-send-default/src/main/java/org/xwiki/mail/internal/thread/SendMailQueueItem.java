@@ -31,31 +31,31 @@ import org.xwiki.mail.MailListener;
  */
 public class SendMailQueueItem extends AbstractMailQueueItem
 {
-    private String messageId;
+    private String uniqueMessageId;
 
     /**
-     * @param messageId see {@link #getMessageId()}
+     * @param uniqueMessageId see {@link #getUniqueMessageId()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
      */
-    public SendMailQueueItem(String messageId, Session session, MailListener listener, String batchId)
+    public SendMailQueueItem(String uniqueMessageId, Session session, MailListener listener, String batchId)
     {
         super(session, listener, batchId);
-        this.messageId = messageId;
+        this.uniqueMessageId = uniqueMessageId;
     }
 
     /**
      * @return the unique id of the MimeMessage to send
      */
-    public String getMessageId()
+    public String getUniqueMessageId()
     {
-        return this.messageId;
+        return this.uniqueMessageId;
     }
 
     @Override
     public String toString()
     {
-        return prepareToString().append("messageId", getMessageId()).toString();
+        return prepareToString().append("messageId", getUniqueMessageId()).toString();
     }
 }

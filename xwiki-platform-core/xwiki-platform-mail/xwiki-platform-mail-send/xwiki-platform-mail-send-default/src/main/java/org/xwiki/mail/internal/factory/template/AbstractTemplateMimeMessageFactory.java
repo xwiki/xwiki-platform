@@ -31,8 +31,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.ConverterManager;
@@ -69,7 +69,7 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
 
         // Note: We don't create a Session here ATM since it's not required. The returned MimeMessage will be
         // given a valid Session when it's deserialized from the mail content store for sending.
-        MimeMessage message = new ExtendedMimeMessage();
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
 
         // Handle optional "from" address.
         Address from = this.converterManager.convert(Address.class, parameters.get("from"));
@@ -86,7 +86,7 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
         // Set the Message type if passed in parameters
         String type = (String) parameters.get("type");
         if (type != null) {
-            message.addHeader("X-MailType", type);
+            message.setType(type);
         }
 
         // Handle the subject. Get it from the template

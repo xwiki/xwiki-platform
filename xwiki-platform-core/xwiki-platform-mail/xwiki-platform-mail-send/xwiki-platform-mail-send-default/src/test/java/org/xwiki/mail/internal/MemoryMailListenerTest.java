@@ -23,13 +23,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
-import javax.mail.internet.MimeMessage;
-
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MessageIdComputer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -46,11 +44,12 @@ import static org.mockito.Mockito.when;
  */
 public class MemoryMailListenerTest
 {
+    private static final String UNIQUE_MESSAGE_ID1 = "ar1vm0Wca42E/dDn3dsH8ogs3/s=";
+    private static final String UNIQUE_MESSAGE_ID2 = "6ys1BeC6gnKA7srO/vs06XBZKZM=";
+
     @Rule
     public MockitoComponentMockingRule<MemoryMailListener> mocker =
         new MockitoComponentMockingRule<>(MemoryMailListener.class);
-
-    private MessageIdComputer messageIdComputer = new MessageIdComputer();
 
     @Test
     public void onErrorAndGetMailStatusResult() throws Exception
@@ -60,14 +59,14 @@ public class MemoryMailListenerTest
         String batchId = UUID.randomUUID().toString();
         listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
 
-        MimeMessage message1 = mock(MimeMessage.class);
-        when(message1.getMessageID()).thenReturn("<1128820400.1.1419205781342.JavaMail.contact@xwiki.org>");
-        when(message1.getHeader("X-MailType", null)).thenReturn("mailtype1");
+        ExtendedMimeMessage message1 = mock(ExtendedMimeMessage.class);
+        when(message1.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID1);
+        when(message1.getType()).thenReturn("mailtype1");
         listener.onPrepareMessageError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
 
-        MimeMessage message2 = mock(MimeMessage.class);
-        when(message2.getMessageID()).thenReturn("<1128820400.2.1419205781342.JavaMail.contact@xwiki.org>");
-        when(message2.getHeader("X-MailType", null)).thenReturn("mailtype2");
+        ExtendedMimeMessage message2 = mock(ExtendedMimeMessage.class);
+        when(message2.getUniqueMessageId()).thenReturn(UNIQUE_MESSAGE_ID2);
+        when(message2.getType()).thenReturn("mailtype2");
         listener.onPrepareMessageError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
 
         Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.PREPARE_ERROR);
@@ -77,14 +76,14 @@ public class MemoryMailListenerTest
         assertEquals("Exception: error1", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error1"));
         assertEquals(batchId, status.getBatchId());
-        assertEquals(messageIdComputer.compute(message1), status.getMessageId());
+        assertEquals(UNIQUE_MESSAGE_ID1, status.getMessageId());
         assertEquals("mailtype1", status.getType());
 
         status = results.next();
         assertEquals("Exception: error2", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error2"));
         assertEquals(batchId, status.getBatchId());
-        assertEquals(messageIdComputer.compute(message2), status.getMessageId());
+        assertEquals(UNIQUE_MESSAGE_ID2, status.getMessageId());
         assertEquals("mailtype2", status.getType());
 
         assertFalse(results.hasNext());

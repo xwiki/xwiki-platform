@@ -21,8 +21,6 @@ package org.xwiki.mail;
 
 import java.util.Map;
 
-import javax.mail.internet.MimeMessage;
-
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -48,9 +46,9 @@ public interface MailListener
      *
      * @param message the message to be sent
      * @param parameters some parameters specifying addition context data
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters);
+    void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters);
 
     /**
      * Called when a mail has failed to be prepared.
@@ -58,9 +56,9 @@ public interface MailListener
      * @param message the message that was tried to be prepared
      * @param e the exception explaining why the message couldn't be sent
      * @param parameters some parameters specifying addition context data
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void onPrepareMessageError(MimeMessage message, Exception e, Map<String, Object> parameters);
+    void onPrepareMessageError(ExtendedMimeMessage message, Exception e, Map<String, Object> parameters);
 
     /**
      * Called when the preparation phase has encounter a fatal error.
@@ -85,9 +83,9 @@ public interface MailListener
      *
      * @param message the message sent
      * @param parameters some parameters specifying addition context data
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters);
+    void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters);
 
     /**
      * Called when a mail has failed to be sent.
@@ -95,19 +93,19 @@ public interface MailListener
      * @param message the message that was tried to be sent
      * @param exception the exception explaining why the message couldn't be sent
      * @param parameters some parameters specifying addition context data
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters);
+    void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters);
 
     /**
      * Called when a message could not be retrieve for sending.
      *
-     * @param messageId the message identifier that was tried to be load for sending
+     * @param uniqueMessageId the unique message identifier that was tried to be load for sending
      * @param exception the exception explaining why the message couldn't be sent
      * @param parameters some parameters specifying addition context data
-     * @since 7.1RC1
+     * @since 7.4.1
      */
-    void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters);
+    void onSendMessageFatalError(String uniqueMessageId, Exception exception, Map<String, Object> parameters);
 
     /**
      * @return the status of all the mails from the batch (whether they were sent successfully, failed to be sent,

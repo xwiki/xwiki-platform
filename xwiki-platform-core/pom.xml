@@ -643,6 +643,45 @@
               <method>java.lang.String render(org.xwiki.model.reference.DocumentReference)</method>
               <justification>New method that is useful for any WYSIWYG editor that accepts as input a full HTML page (with style sheets includes).</justification>
             </difference>
+
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/MailContentStore</className>
+              <method>javax.mail.internet.MimeMessage load(javax.mail.Session, java.lang.String, java.lang.String)</method>
+              <to>org.xwiki.mail.ExtendedMimeMessage</to>
+              <justification>Young API, the MailContentStore now takes and returns ExtendedMimeMessage</justification>
+            </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/MailContentStore</className>
+              <method>void save(java.lang.String, javax.mail.internet.MimeMessage)</method>
+              <to>void save(java.lang.String, org.xwiki.mail.ExtendedMimeMessage)</to>
+              <justification>Young API, the MailContentStore now takes and returns ExtendedMimeMessage</justification>
+            </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/MailListener</className>
+              <method>void on*</method>
+              <to>void on*</to>
+              <justification>Young API, all MailListener now receive ExtendedMimeMessage as arguments, so they
+              can build MailStatus which as changed its constructor, and log message using the new
+              unique message identifier</justification>
+            </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/MailStatus</className>
+              <method>MailStatus(java.lang.String, javax.mail.internet.MimeMessage, org.xwiki.mail.MailState)</method>
+              <to>MailStatus(java.lang.String, org.xwiki.mail.ExtendedMimeMessage, org.xwiki.mail.MailState)</to>
+              <justification>Young API, the MailStatus is now constructed based on ExtendedMimeMessage to use
+              the new unique message identifier</justification>
+            </difference>
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/mail/script/ScriptMimeMessage</className>
+              <to>org/xwiki/mail/internal/ExtendedMimeMessage</to>
+              <justification>Superclass is no more internal</justification>
+            </difference>
+
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -49,7 +49,7 @@
     ; $services.localization.render('core.editors.content.contentField.label')
     : {{html}}
       #set ($content = $services.wysiwyg.render('CKEditor.ContentSheet'))
-      &lt;textarea name="content" class="ckeditor-textarea"&gt;$escapetool.xml($content)&lt;/textarea&gt;
+      &lt;textarea name="content" class="ckeditor-textarea loading" spellcheck="false"&gt;$escapetool.xml($content)&lt;/textarea&gt;
       &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;
       &lt;input value="$doc.syntax.toIdString()" name="content_syntax" type="hidden"/&gt;
     {{/html}}
@@ -396,6 +396,15 @@ require(['jquery'], function($) {
 .fullScreenEditLinkContainer {
   /* See XWIKI-5864 (Possibility to not add the maximize button for some certain textareas). */
   display: none;
+}
+
+.ckeditor-textarea.loading {
+  border: 0 none;
+  box-shadow: none;
+  color: white;
+  cursor: wait;
+  overflow: hidden;
+  resize: none;
 }</code>
     </property>
     <property>

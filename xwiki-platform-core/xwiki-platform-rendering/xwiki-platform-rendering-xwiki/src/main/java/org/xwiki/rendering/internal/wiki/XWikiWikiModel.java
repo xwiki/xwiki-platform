@@ -36,11 +36,13 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
@@ -139,6 +141,9 @@ public class XWikiWikiModel implements WikiModel
     @Inject
     @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
+
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
 
     /**
      * Provides logging for this class.
@@ -349,8 +354,13 @@ public class XWikiWikiModel implements WikiModel
         // See if the resolved (terminal or WebHome) document exists and, if so, use it.
         DocumentReference documentReference = attachmentReference.getDocumentReference();
         if (!documentAccessBridge.exists(documentReference)) {
-            // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
-            attachmentReference = this.currentSpaceAttachmentReferenceResolver.resolve(stringReference);
+            // Also consider explicit "WebHome" references (i.e. the ones ending in "WebHome").
+            String defaultDocumentName =
+                defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+            if (!documentReference.getName().equals(defaultDocumentName)) {
+                // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
+                attachmentReference = this.currentSpaceAttachmentReferenceResolver.resolve(stringReference);
+            }
         }
 
         return attachmentReference;

@@ -122,4 +122,34 @@ public class CurrentSpaceAttachmentStringEntityReferenceResolverTest
         Assert.assertEquals(DEFAULT_DOCUMENT_NAME, result.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("file.ext", result.getName());
     }
+
+    @Test
+    public void testResolveSpaceNamedWebHome() throws Exception
+    {
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+
+        EntityReference result = mocker.getComponentUnderTest().resolve("WebHome@file.ext", EntityType.ATTACHMENT);
+
+        Assert.assertEquals(CURRENT_WIKI, result.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("WebHome", result.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals(DEFAULT_DOCUMENT_NAME, result.extractReference(EntityType.DOCUMENT).getName());
+        Assert.assertEquals("file.ext", result.getName());
+    }
+
+    @Test
+    public void testResolveNestedSpaceNamedWebHome() throws Exception
+    {
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+
+        EntityReference result =
+            mocker.getComponentUnderTest().resolve("Space.WebHome@file.ext", EntityType.ATTACHMENT);
+
+        Assert.assertEquals(CURRENT_WIKI, result.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("WebHome", result.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("Space", result.extractReference(EntityType.SPACE).getParent().getName());
+        Assert.assertEquals(DEFAULT_DOCUMENT_NAME, result.extractReference(EntityType.DOCUMENT).getName());
+        Assert.assertEquals("file.ext", result.getName());
+    }
 }

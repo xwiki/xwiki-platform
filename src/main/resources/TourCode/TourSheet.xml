@@ -53,6 +53,8 @@
     ; &lt;label for="TourCode.TourClass_0_isActive"&gt;$escapetool.xml($doc.displayPrettyName('isActive', false, false))&lt;/label&gt;
     : $doc.display('isActive')
   #end
+  ; &lt;label for="TourCode.TourClass_0_targetPage"&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
+  : $doc.display('targetPage')
 )))
 {{/html}}
 

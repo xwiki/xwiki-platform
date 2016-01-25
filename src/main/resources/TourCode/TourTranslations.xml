@@ -42,6 +42,7 @@
   <content># Class fields
 TourCode.TourClass_description=Description
 TourCode.TourClass_isActive=Active
+TourCode.TourClass_targetPage=Target Page
 
 # Live table generic keys
 tour.livetable.doc.title=Page title
@@ -62,7 +63,8 @@ tour.livetable.emptyvalue=-
 
 # Live table specific keys
 tour.livetable.description=Description
-tour.livetable.isActive=Active</content>
+tour.livetable.isActive=Active
+tour.livetable.targetPage=Target Page</content>
   <object>
     <name>TourCode.TourTranslations</name>
     <number>0</number>

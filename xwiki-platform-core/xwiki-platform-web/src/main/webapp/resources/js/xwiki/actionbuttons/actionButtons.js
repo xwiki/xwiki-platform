@@ -36,13 +36,13 @@ actionButtons.EditActions = Class.create({
       item.observe('click', this.onCancel.bindAsEventListener(this));
     }.bind(this));
     $$('input[name=action_preview]').each(function(item) {
-      item.observe('click', this.onPreview.bindAsEventListener(this));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'preview'));
     }.bind(this));
     $$('input[name=action_save]').each(function(item) {
-      item.observe('click', this.onSave.bindAsEventListener(this, false));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
     }.bind(this));
     $$('input[name=action_saveandcontinue]').each(function(item) {
-      item.observe('click', this.onSave.bindAsEventListener(this, true));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'save', true));
     }.bind(this));
   },
   addShortcuts : function() {
@@ -137,18 +137,11 @@ actionButtons.EditActions = Class.create({
     // Call the cancel URL directly instead of submitting the form. (optimisation)
     window.location = location + cancelActionParameter + xredirectParameter + fragmentId;
   },
-  onPreview : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      // Notify others
-      this.notify(event, "preview");
-    }
-  },
-  onSave: function(event, continueEditing) {
-    if (this.notify(event, 'beforeSave', {'continue': continueEditing})) {
+  onSubmit: function(event, action, continueEditing) {
+    var beforeAction = 'before' + action.substr(0, 1).toUpperCase() + action.substr(1);
+    if (this.notify(event, beforeAction, {'continue': continueEditing})) {
       if (this.validateForm(event.element().form)) {
-        this.notify(event, "save", {"continue" : continueEditing});
+        this.notify(event, action, {'continue' : continueEditing});
       } else {
         event.stop();
       }

@@ -807,7 +807,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                             <fo:conditional-page-master-reference page-position="rest" master-reference="rest"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <fo:conditional-page-master-reference page-position="all" master-reference="rest"/>
+                            <fo:conditional-page-master-reference page-position="any" master-reference="rest"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </fo:repeatable-page-master-alternatives>

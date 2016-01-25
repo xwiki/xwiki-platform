@@ -44,6 +44,7 @@
 #set ($columnsProperties = {
   'doc.name': {"type":"text","size":10,"link":"view"},
   'isActive': {"type":"text","size":10},
+  'targetPage': {"type":"text","size":10},
   'doc.date': {"type":"text","size":10},
   'doc.author': {"type":"text","size":10,"link":"author"},
   '_actions': {"sortable":false,"filterable":false,"html":true,"actions":["edit","delete"]}
@@ -58,7 +59,7 @@
   'selectedColumn': 'doc.name',
   'defaultOrder': 'asc'
 })
-#set ($columns = ['doc.name', 'isActive', 'doc.date', 'doc.author', '_actions'])
+#set ($columns = ['doc.name', 'isActive', 'targetPage', 'doc.date', 'doc.author', '_actions'])
 #livetable('tour' $columns $columnsProperties $options)
 {{/velocity}}</content>
   <object>
@@ -121,7 +122,7 @@
       <class>TourCode.TourClass</class>
     </property>
     <property>
-      <columns>doc.name isActive doc.date doc.author _actions</columns>
+      <columns>doc.name isActive targetPage doc.date doc.author _actions</columns>
     </property>
     <property>
       <description>This application provides the ability to create tours for any page.</description>

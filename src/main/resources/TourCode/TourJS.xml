@@ -123,7 +123,7 @@
       <code>//----------------------------------
 // RequireJS configuration
 //----------------------------------
-requirejs.config({
+require.config({
   paths: {
     #if ("$!request.minify" == 'false')
       'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.js')"
@@ -139,39 +139,54 @@ requirejs.config({
   }
 });
 //----------------------------------
-// Create a bootstrap tour module
+// Display a tour if needed
 //----------------------------------
-define(["bootstrap-tour", "jquery"], function(Tour, $) {
-  return {
-    createTour : function (doc) {
-      var ajaxOptions = {
-        url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain&amp;tourDoc=' + doc),
-        dataType    : 'json',
-        success     : function (response) {
-          var jsonData = response;
-          var i, n     = jsonData.steps.length;
-          var tour     = new Tour({
-            storage : false
-          });
-          for (var i = 0; i &lt; n; i++) {
-            tour.addStep({
-              element   : jsonData.steps[i].element,
-              title     : jsonData.steps[i].title,
-              content   : jsonData.steps[i].content,
-              placement : jsonData.steps[i].placement,
-              backdrop  : jsonData.steps[i].backdrop
-            });
-          }
-          tour.init();
-          tour.restart();
-        }
-      };
-      var executeAjax = function(doc) {
-        $.ajax(ajaxOptions);
-      };
-      executeAjax(doc);
-    }
+require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
+  
+  /**
+   * Create a tour from a JSON file
+   */
+  var createTour = function (jsonData) {
+    // Add stylesheet only when needed
+    var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css')";
+    $('&lt;link&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
+    
+    // Require 'bootstrap-tour' only when needed
+    require(['bootstrap-tour'], function(Tour) {
+      var i, n     = jsonData.steps.length;
+      var tour     = new Tour({
+        storage : false
+      });
+      for (var i = 0; i &lt; n; i++) {
+        tour.addStep({
+          element   : jsonData.steps[i].element,
+          title     : jsonData.steps[i].title,
+          content   : jsonData.steps[i].content,
+          placement : jsonData.steps[i].placement,
+          backdrop  : jsonData.steps[i].backdrop
+        });
+      }
+      tour.init();
+      tour.restart();
+    });
   };
+  
+  // Load asynchronously the list of steps concerning the current page.
+  // It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
+  // everywhere.
+  $(document).ready(function () {
+    var ajaxOptions = {
+      url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain'),
+      dataType    : 'json',
+      data        : { tourDoc: xm.document }
+    };
+    $.ajax(ajaxOptions).success( function(json) {
+      if (json.steps.length &gt; 0) {
+        createTour(json);
+      }
+    });
+  });
 });
 </code>
     </property>
@@ -182,118 +197,7 @@ define(["bootstrap-tour", "jquery"], function(Tour, $) {
       <parse>1</parse>
     </property>
     <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>TourCode.TourJS</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8b8d3d89-81c5-4225-8056-6d24aaca3de8</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>@import "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css')";</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
+      <use>always</use>
     </property>
   </object>
 </xwikidoc>

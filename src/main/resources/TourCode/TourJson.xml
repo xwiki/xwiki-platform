@@ -41,20 +41,38 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #if ($xcontext.action == 'get')
-  #set ($discard = $response.setContentType('application/json'))
-  #set ($discard = $doc.use('TourCode.StepClass'))
-  #set ($tourDoc = $xwiki.getDocument($request.tourDoc))
+  ##--------------------------------------------------------
+  ## Get the tour steps corresponding to the target page
+  ##--------------------------------------------------------
   #set ($steps = [])
-  #foreach($object in $tourDoc.getObjects('TourCode.StepClass'))
-    #set ($backdrop = $object.getProperty('backdrop').value == '1')
-    #set ($step = { 'element'  : $object.getProperty('element').value,
-                    'title'    : $object.getProperty('title').value,
-                    'content'  : $object.getProperty('content').value,
-                    'placement': $object.getProperty('placement').value,
-                    'order'    : $object.getProperty('order').value,
-                    'backdrop' : $backdrop })
-    #set ($discard = $steps.add($step))
+  #if ("$!request.tourDoc" != '')
+    #set ($query = $services.query.xwql('from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage)').bindValue('targetPage', $request.tourDoc).addFilter('unique'))
+    #set ($targetRef = $services.model.resolveDocument($request.tourDoc))
+    #foreach ($tourRef in $query.execute())
+      #set ($tourDoc = $xwiki.getDocument($tourRef))
+      ## Verify that the user who has saved this tour has the edit right on the target page
+      #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))
+        #foreach($stepObj in $tourDoc.getObjects('TourCode.StepClass'))
+          #set ($backdrop = $tourDoc.getValue('backdrop', $stepObj) == 1)
+          #set ($step = { 'element'  : $tourDoc.getValue('element', $stepObj),
+                          'title'    : $tourDoc.getValue('title', $stepObj),
+                          'content'  : $tourDoc.getValue('content', $stepObj),
+                          'placement': $tourDoc.getValue('placement', $stepObj),
+                          'order'    : $tourDoc.getValue('order', $stepObj),
+                          'backdrop' : $backdrop })
+          #set ($discard = $steps.add($step))
+        #end
+      #end
+    #end
   #end
+  ##--------------------------------------------------------
+  ## Sort the steps
+  ##--------------------------------------------------------
+  #set ($steps = $sorttool.sort($steps, 'order'))
+  ##--------------------------------------------------------
+  ## Display the results as JSON
+  ##--------------------------------------------------------
+  #set ($discard = $response.setContentType('application/json'))
   $jsontool.serialize({'steps': $steps})
 #end
 {{/velocity}}

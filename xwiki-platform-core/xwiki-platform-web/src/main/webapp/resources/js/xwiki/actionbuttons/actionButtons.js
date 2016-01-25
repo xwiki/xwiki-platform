@@ -39,10 +39,10 @@ actionButtons.EditActions = Class.create({
       item.observe('click', this.onPreview.bindAsEventListener(this));
     }.bind(this));
     $$('input[name=action_save]').each(function(item) {
-      item.observe('click', this.onSaveAndView.bindAsEventListener(this));
+      item.observe('click', this.onSave.bindAsEventListener(this, false));
     }.bind(this));
     $$('input[name=action_saveandcontinue]').each(function(item) {
-      item.observe('click', this.onSaveAndContinue.bindAsEventListener(this));
+      item.observe('click', this.onSave.bindAsEventListener(this, true));
     }.bind(this));
   },
   addShortcuts : function() {
@@ -145,18 +145,13 @@ actionButtons.EditActions = Class.create({
       this.notify(event, "preview");
     }
   },
-  onSaveAndView : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      this.notify(event, "save", {"continue" : false});
-    }
-  },
-  onSaveAndContinue : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      this.notify(event, "save", {"continue" : true});
+  onSave: function(event, continueEditing) {
+    if (this.notify(event, 'beforeSave', {'continue': continueEditing})) {
+      if (this.validateForm(event.element().form)) {
+        this.notify(event, "save", {"continue" : continueEditing});
+      } else {
+        event.stop();
+      }
     }
   },
   notify : function(event, action, params) {
@@ -165,6 +160,7 @@ actionButtons.EditActions = Class.create({
     if (event.stopped) {
       event.stop();
     }
+    return !event.stopped;
   }
 });
 

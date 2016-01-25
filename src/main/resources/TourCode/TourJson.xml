@@ -44,7 +44,7 @@
   ##--------------------------------------------------------
   ## Get the tour steps corresponding to the target page
   ##--------------------------------------------------------
-  #set ($steps = [])
+  #set ($tours = [])
   #if ("$!request.tourDoc" != '')
     #set ($query = $services.query.xwql('from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage)').bindValue('targetPage', $request.tourDoc).addFilter('unique'))
     #set ($targetRef = $services.model.resolveDocument($request.tourDoc))
@@ -52,6 +52,8 @@
       #set ($tourDoc = $xwiki.getDocument($tourRef))
       ## Verify that the user who has saved this tour has the edit right on the target page
       #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))
+        #set ($tour = { 'name': $tourRef, 'steps': [] })
+        #set ($discard = $tours.add($tour))
         #foreach($stepObj in $tourDoc.getObjects('TourCode.StepClass'))
           #set ($backdrop = $tourDoc.getValue('backdrop', $stepObj) == 1)
           #set ($step = { 'element'  : $tourDoc.getValue('element', $stepObj),
@@ -60,20 +62,20 @@
                           'placement': $tourDoc.getValue('placement', $stepObj),
                           'order'    : $tourDoc.getValue('order', $stepObj),
                           'backdrop' : $backdrop })
-          #set ($discard = $steps.add($step))
+          #set ($discard = $tour.steps.add($step))
         #end
+        ##--------------------------------------------------------
+        ## Sort the steps
+        ##--------------------------------------------------------
+        #set ($tour.steps = $sorttool.sort($tour.steps, 'order'))
       #end
     #end
   #end
   ##--------------------------------------------------------
-  ## Sort the steps
-  ##--------------------------------------------------------
-  #set ($steps = $sorttool.sort($steps, 'order'))
-  ##--------------------------------------------------------
   ## Display the results as JSON
   ##--------------------------------------------------------
   #set ($discard = $response.setContentType('application/json'))
-  $jsontool.serialize({'steps': $steps})
+  $jsontool.serialize({'tours': $tours})
 #end
 {{/velocity}}
 </content>

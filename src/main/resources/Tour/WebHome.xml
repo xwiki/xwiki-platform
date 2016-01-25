@@ -42,11 +42,9 @@
   <content>{{velocity}}
 #set ($discard = $services.localization.use('document', 'TourCode.TourTranslations'))
 #set ($columnsProperties = {
-  'doc.name': {"type":"text","size":10,"link":"view"},
-  'isActive': {"type":"text","size":10},
+  'doc.name': {"type": "text", "size":10,"link":"view"},
+  'isActive': {"type": "text", "size":10, "sortable":true, "filterable": false},
   'targetPage': {"type":"text","size":10},
-  'doc.date': {"type":"text","size":10},
-  'doc.author': {"type":"text","size":10,"link":"author"},
   '_actions': {"sortable":false,"filterable":false,"html":true,"actions":["edit","delete"]}
 })
 #set ($options = {
@@ -59,7 +57,7 @@
   'selectedColumn': 'doc.name',
   'defaultOrder': 'asc'
 })
-#set ($columns = ['doc.name', 'isActive', 'targetPage', 'doc.date', 'doc.author', '_actions'])
+#set ($columns = ['doc.name', 'isActive', 'targetPage', '_actions'])
 #livetable('tour' $columns $columnsProperties $options)
 {{/velocity}}</content>
   <object>
@@ -122,10 +120,151 @@
       <class>TourCode.TourClass</class>
     </property>
     <property>
-      <columns>doc.name isActive targetPage doc.date doc.author _actions</columns>
+      <columns>doc.name isActive targetPage _actions</columns>
     </property>
     <property>
       <description>This application provides the ability to create tours for any page.</description>
+    </property>
+  </object>
+  <object>
+    <name>Tour.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f9aece44-0fa5-42d9-b0ab-8cd3f09a051b</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function ($) {
+  'use strict';
+  
+  /**
+   * Add a 'launch tour' button into the 'actions' columns.
+   */
+  var addLaunchButton = function (row) {
+    var targetPage = XWiki.Model.resolve(row.find('.targetPage').text(), XWiki.EntityType.DOCUMENT);
+    var targetPageDocument;
+    // Two behaviours depending of the handling of the Nested Pages feature.
+    if (XWiki.Document.initializeFromReference) {
+      targetPageDocument = new XWiki.Document(targetPage);
+    } else {
+      targetPageDocument = new XWiki.Document(targetPage.name,
+        targetPage.extractReferenceValue(XWiki.EntityType.SPACE));
+    }
+    
+    // Add a launch tour link to the actions column.
+    if (row.find('.actionLaunch').length == 0) {
+      $('&lt;a class="action actionLaunch"&gt;$services.icon.renderHTML("play") Launch&lt;/a&gt;')
+        .attr('href', targetPageDocument.getURL('view', 'startTour=true'))
+        .css('padding-left', '1px').appendTo(row.find('.actions'));
+    }
+  }
+  
+  /**
+   * Add the launch button into each livetable raw.
+   */
+  var initLivetableResults = function () {
+    $('#tour tr').each( function() {
+      addLaunchButton($(this));
+    });
+  }
+  $(document).on('xwiki:livetable:ready', initLivetableResults);
+  $(document).ready(initLivetableResults);
+  
+  /**
+   * Add the launch button into each new livetable raw.
+   */
+  $(document).on('xwiki:livetable:newrow', function (event, data) {
+    // It only concerns the 'tour' livetable
+    if (data.tableId != 'tour') {
+      // This is to be extra sure, but there should not be other livetables in that page...
+      return;
+    }
+    addLaunchButton($(data.row));
+  });
+  
+});
+</code>
+    </property>
+    <property>
+      <name>Add Tour specific code</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
     </property>
   </object>
   <object>

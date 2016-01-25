@@ -145,6 +145,18 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
   
   /**
+   * Escape strings so they respect the Tour API constraints.
+   */
+  var escapeTourName = function (tourName) {
+    // The Tour API says tour name must contain only alphanumerics, underscores and hyphens.
+    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to 
+    // avoid collisions).
+    return tourName.replace(/[^a-zA-Z0-9\-]/g, function(character) {
+      return '_'+character.charCodeAt(0)+'_';
+    });
+  };
+  
+  /**
    * Create a tour from a JSON file
    */
   var createTour = function (jsonData) {
@@ -154,10 +166,31 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     
     // Require 'bootstrap-tour' only when needed
     require(['bootstrap-tour'], function(Tour) {
-      var i, n     = jsonData.steps.length;
+    
+      /**
+       * Add a resume button to start the tour again when it has been closed
+       */
+      var createResumeButton = function (tour) {
+        var button = $('&lt;button class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") Show tour&lt;/button&gt;').appendTo($(document.body));
+        button.hide();
+        button.fadeIn();
+        button.click(function () {
+          tour.start(true);
+          button.remove();
+        });
+      }
+      
+      // Create the tour
+      var tourName = escapeTourName('tour_' + jsonData.name);
       var tour     = new Tour({
-        storage : false
+        name    : tourName,
+        storage : window.localStorage,
+        onEnd   : createResumeButton,
+        orphan  : true
       });
+      
+      // Create the steps
+      var i, n     = jsonData.steps.length;
       for (var i = 0; i &lt; n; i++) {
         tour.addStep({
           element   : jsonData.steps[i].element,
@@ -167,14 +200,34 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
           backdrop  : jsonData.steps[i].backdrop
         });
       }
+      
+      // Look if the tour should be started regardless of its status on the local storage
+      var getQueryStringParameterByName = function (name) {
+        var match = RegExp('[?&amp;]' + name + '=([^&amp;]*)').exec(window.location.search);
+        return match &amp;&amp; decodeURIComponent(match[1].replace(/\+/g, ' '));
+      }
+      var forceStart = getQueryStringParameterByName('startTour') == 'true';
+      
+      // Launch the tour
       tour.init();
-      tour.restart();
+      if (forceStart) {
+        tour.restart();
+      } else {
+        tour.start();
+      }
+      
+      // Create a resume button if the tour has already been closed by the user in the past
+      if (window.localStorage.getItem(tourName + '_end') == 'yes') {
+        createResumeButton(tour);
+      }
     });
   };
   
-  // Load asynchronously the list of steps concerning the current page.
-  // It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
-  // everywhere.
+  /**
+   * Load asynchronously the list of steps concerning the current page.
+   * It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
+   * everywhere.
+   */ 
   $(document).ready(function () {
     var ajaxOptions = {
       url         : new XWiki.Document('TourJson', 'TourCode').getURL('get', 'xpage=plain&amp;outputSyntax=plain'),
@@ -182,8 +235,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       data        : { tourDoc: xm.document }
     };
     $.ajax(ajaxOptions).success( function(json) {
-      if (json.steps.length &gt; 0) {
-        createTour(json);
+      for (var i = 0; i &lt; json.tours.length; ++i) {
+        var tour = json.tours[i];
+        if (tour.steps.length &gt; 0) {
+          createTour(tour);
+        }
       }
     });
   });

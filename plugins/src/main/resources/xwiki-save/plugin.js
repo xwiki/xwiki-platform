@@ -23,6 +23,13 @@
   CKEDITOR.plugins.add('xwiki-save', {
     editors: [],
 
+    beforeInit: function(editor) {
+      // Make sure we restore the previous editing mode when the page is loaded from cache.
+      if (this.getContentTypeField(editor).prop('disabled')) {
+        editor.config.startupMode = 'source';
+      }
+    },
+
     init: function(editor) {
       this.editors.push(editor);
       editor.on('destroy', $.proxy(function(event) {
@@ -53,38 +60,66 @@
     },
 
     onLoad: function() {
-      var thisPlugin = this;
-      $(document).on('xwiki:actions:beforeSave', function(event) {
-        thisPlugin.editors.forEach(function(editor) {
-          editor.updateElement();
-          thisPlugin.updateContentType(editor);
-        });
-      });
+      // We need to update the form fields before the form is validated (for Preview, Save and Save & Continue).
+      $(document).on('xwiki:actions:beforePreview xwiki:actions:beforeSave', $.proxy(this.updateFormFields, this));
+
+      var submitInProgress = false;
+      // Disable the leave confirmation when the form action buttons are used.
       $(document).on('xwiki:actions:cancel xwiki:actions:preview xwiki:actions:save xwiki:document:saved',
-        function(event, data) {
+        $.proxy(function(event, data) {
           // We reset the dirty field on 'xwiki:actions:save' only if it's not a Save & Continue. Otherwise we wait for
           // 'xwiki:document:saved' to be sure the document was saved.
           if (!data || !data.continue) {
-            thisPlugin.editors.forEach(function(editor) {
+            submitInProgress = event.type === 'xwiki:actions:preview' || event.type === 'xwiki:actions:save';
+            this.editors.forEach(function(editor) {
               editor.resetDirty();
             });
           }
-        });
-      $(window).on('beforeunload', function(event) {
-        if (thisPlugin.checkDirty()) {
+        }, this));
+
+      $(window).on('beforeunload', $.proxy(function(event) {
+        // Update the form fields before the page is unloaded in order to allow the browser to cache their values
+        // (Back-Forward and Soft Reload cache). The form fields have already been updated (for validation) if a submit
+        // is currently in progress.
+        if (!submitInProgress) {
+          // Cache the full data (including wiki macro output).
+          this.updateFormFields(true);
+        } else {
+          submitInProgress = false;
+        }
+        // Display the leave confirmation if there are unsaved changes.
+        if (this.checkDirty()) {
           event.returnValue = 'There are unsaved changes. Do you want to discard them?';
           return event.returnValue;
         }
-      });
+      }, this));
+    },
+
+    updateFormFields: function(fullData) {
+      fullData = fullData === true;
+      this.editors.forEach(function(editor) {
+        var oldFullData;
+        if (fullData) {
+          oldFullData = editor.config.fullData;
+          editor.config.fullData = true;
+        }
+        editor.updateElement();
+        if (fullData) {
+          editor.config.fullData = oldFullData;
+        }
+        this.updateContentType(editor);
+      }, this);
     },
 
     updateContentType: function(editor) {
+      this.getContentTypeField(editor).prop('disabled', editor.mode === 'source');
+    },
+
+    getContentTypeField: function(editor) {
       var fieldName = editor.element && editor.element.getNameAtt();
-      if (typeof fieldName === 'string') {
-        $('input[type=hidden][name=RequiresHTMLConversion]').filter(function() {
-          return $(this).val() === fieldName;
-        }).prop('disabled', editor.mode === 'source');
-      }
+      return $('input[type=hidden][name=RequiresHTMLConversion]').filter(function() {
+        return $(this).val() === fieldName;
+      });
     },
 
     checkDirty: function() {

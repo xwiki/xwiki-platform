@@ -161,6 +161,7 @@ public class DefaultModelBridgeTest
 
         this.mocker.getComponentUnderTest().createRedirect(oldReference, newReference);
 
+        verify(oldDocument).setHidden(true);
         verify(this.xcontext.getWiki()).saveDocument(oldDocument, "Create automatic redirect.", this.xcontext);
         verify(this.mocker.getMockedLogger()).info("Created automatic redirect from [{}] to [{}].", oldReference,
             newReference);

@@ -426,7 +426,8 @@ public class PdfExportImpl implements PdfExport
         if (style != null) {
             css += style;
         }
-        return applyCSS(html, css, context);
+        // Don't apply CSS if there's no CSS to apply!
+        return StringUtils.isBlank(css) ? html : applyCSS(html, css, context);
     }
 
     /**

@@ -90,7 +90,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.DOM4JCSSStyleSheet;
 import info.informatica.doc.dom4j.XHTMLDocument;
 import info.informatica.doc.dom4j.XHTMLDocumentFactory;
 import info.informatica.doc.xml.dtd.DefaultEntityResolver;
@@ -142,13 +141,6 @@ public class PdfExportImpl implements PdfExport
 
     // Fields initialization
     static {
-        // ----------------------------------------------------------------------
-        // CSS4J configuration
-        // ----------------------------------------------------------------------
-        XHTMLDocumentFactory xdf = (XHTMLDocumentFactory) XHTMLDocumentFactory.getInstance();
-        // Override the default stylesheet with an empty one
-        xdf.setUserAgentStyleSheet((DOM4JCSSStyleSheet) xdf.getCSSStyleSheetFactory().createStyleSheet());
-
         // ----------------------------------------------------------------------
         // FOP configuration
         // ----------------------------------------------------------------------
@@ -443,6 +435,8 @@ public class PdfExportImpl implements PdfExport
     {
         LOGGER.debug("Applying the following CSS:\n{}", css);
         try {
+            //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
+
             // Prepare the input
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);

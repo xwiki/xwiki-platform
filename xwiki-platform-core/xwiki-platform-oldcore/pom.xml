@@ -64,7 +64,7 @@
     <dependency>
       <groupId>info.informatica</groupId>
       <artifactId>css4j</artifactId>
-      <version>0.13</version>
+      <version>0.20</version>
       <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
       <exclusions>
         <exclusion>
@@ -562,6 +562,12 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-html</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

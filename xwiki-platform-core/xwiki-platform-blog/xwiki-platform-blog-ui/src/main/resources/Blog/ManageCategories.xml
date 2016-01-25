@@ -409,7 +409,7 @@ XWiki.blog.Categories = Class.create({
               this.insertAddForm(item, parent._x_add_form);
             }.bind(this),
             onFailure : function (response) {
-              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer')", "error");
+              new XWiki.widgets.Notification(response.responseText || "$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.error.noServer'))", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {

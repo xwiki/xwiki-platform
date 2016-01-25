@@ -120,7 +120,8 @@ public class CreatePageTest extends AbstractTest
 
         // Verify that clicking on the wanted link pops up a box to choose the template.
         EntityReference wantedLinkReference =
-            getUtil().resolveDocumentReference(getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".NewPage");
+            getUtil().resolveDocumentReference(
+                getTestClassName() + "." + TEMPLATE_NAME + "Instance" + ".NewPage.WebHome");
         vp.clickWantedLink(wantedLinkReference, true);
         // TODO: a page object should be better here
         List<WebElement> templates =

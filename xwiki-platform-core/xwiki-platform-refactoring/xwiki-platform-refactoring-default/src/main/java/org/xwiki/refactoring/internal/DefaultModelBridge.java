@@ -211,6 +211,7 @@ public class DefaultModelBridge implements ModelBridge
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
                 String location = this.compactEntityReferenceSerializer.serialize(newReference, oldReference);
                 oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
+                oldDocument.setHidden(true);
                 xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
                 this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
             } catch (XWikiException e) {

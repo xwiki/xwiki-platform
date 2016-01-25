@@ -153,12 +153,9 @@ require(['jquery'], function($) {
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
-        extraPlugins: 'xwiki-source,xwiki-macro',
+        extraPlugins: 'xwiki-macro,xwiki-save,xwiki-source',
         fullPage: true,
         height: 500,
-        'xwiki-source': {
-          htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
-        },
         removeButtons: 'Find,Anchor',
         removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',
         toolbarGroups: [
@@ -176,7 +173,13 @@ require(['jquery'], function($) {
           {name: 'tools'},
           {name: 'others'},
           {name: 'about'}
-        ]
+        ],
+        'xwiki-save': {
+          leaveConfirmation: true
+        },
+        'xwiki-source': {
+          htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+        }
       });
     });
   });

@@ -87,6 +87,7 @@ var CKBUILDER_CONFIG = {
     undo: 1,
     wysiwygarea: 1,
     'xwiki-macro': 1,
+    'xwiki-save': 1,
     'xwiki-source': 1
   }
 };

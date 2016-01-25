@@ -40,7 +40,18 @@
     <ckeditor.base.path>
       ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-base/${project.version}
     </ckeditor.base.path>
+    <!-- The place where the jQuery WebJar has been unpacked. -->
+    <jquery.version>1.11.3</jquery.version>
+    <jquery.path>${webjars.unpack.directory}/META-INF/resources/webjars/jquery/${jquery.version}</jquery.path>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <version>${jquery.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
@@ -58,7 +69,7 @@
           <globals>CKEDITOR</globals>
         </configuration>
       </plugin>
-      <!-- Unpack the WebJar with the base CKEditor to be able to use it in tests. -->
+      <!-- Unpack the WebJar dependencies (CKEditor base, jQuery) to be able to use them in tests. -->
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -75,12 +86,19 @@
                   <artifactId>application-ckeditor-base</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>jquery</artifactId>
+                  <type>jar</type>
                 </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <outputDirectory>${webjars.unpack.directory}</outputDirectory>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>com.github.searls</groupId>
@@ -102,6 +120,7 @@
           <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
           <jsTestSrcDir>${project.basedir}/src/test/resources</jsTestSrcDir>
           <preloadSources>
+            <source>${jquery.path}/jquery.min.js</source>
             <source>${ckeditor.base.path}/ckeditor.js</source>
           </preloadSources>
         </configuration>

@@ -5,6 +5,9 @@ This application provides for the users a possibility to create bootstrap-tours 
 * Bug Tracker: http://jira.xwiki.org/browse/TOUR.
 * License: LGPL 2.1+.
 
+## Status
+[![Build Status](https://api.travis-ci.org/xwiki-contrib/application-tour.svg)](https://travis-ci.org/xwiki-contrib/application-wikiflavor)
+
 ## Translations
 You can contribute to translate this application in various languages on http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication.
 

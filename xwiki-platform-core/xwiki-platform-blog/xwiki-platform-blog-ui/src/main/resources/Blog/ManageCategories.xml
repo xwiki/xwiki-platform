@@ -510,7 +510,7 @@ XWiki.blog.Categories = Class.create({
               new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.403'))", "error");
             },
             on409 : function(response) {
-              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.409'))$escapetool.javascript(", "error");
+              new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('xe.blog.manageCategories.js.add.error.409'))", "error");
             },
             // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
             on0 : function(response) {

@@ -23,7 +23,7 @@
 <xwikidoc version="1.1">
   <web>TourCode</web>
   <name>TourTranslations</name>
-  <language>en</language>
+  <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
@@ -39,7 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content># Class fields
+  <content># App name
+tour.app.name=Tour
+    
+# Class fields
 TourCode.TourClass_description=Description
 TourCode.TourClass_isActive=Active
 TourCode.TourClass_targetPage=Target Page
@@ -49,7 +52,6 @@ tour.livetable.doc.name=Tour name
 tour.livetable._actions=Actions
 tour.livetable._actions.edit=Edit
 tour.livetable._actions.delete=Delete
-tour.livetable._actions.launch=Launch
 tour.livetable.emptyvalue=-
 
 # Live table specific keys

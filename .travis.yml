@@ -1,0 +1,8 @@
+language: java
+sudo: false
+
+install:
+    - mvn clean install -U -Pquality --settings maven-settings.xml
+
+script:
+    - mvn test -Pquality --settings maven-settings.xml

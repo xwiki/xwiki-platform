@@ -1,4 +1,4 @@
-# application-tour
+# Tour Application
 This application provides for the users a possibility to create bootstrap-tours for every page they want.
 
 * Extension Page: http://extensions.xwiki.org/xwiki/bin/view/Extension/Tour+Application.

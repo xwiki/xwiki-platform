@@ -23,8 +23,8 @@
 <xwikidoc version="1.1">
   <web>TourCode</web>
   <name>TourTranslations</name>
-  <language/>
-  <defaultLanguage/>
+  <language>en</language>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1432625750000</creationDate>
@@ -45,26 +45,23 @@ TourCode.TourClass_isActive=Active
 TourCode.TourClass_targetPage=Target Page
 
 # Live table generic keys
-tour.livetable.doc.title=Page title
-tour.livetable.doc.name=Page name
-tour.livetable.doc.space=Space
-tour.livetable.doc.fullname=Page full name
-tour.livetable.doc.author=Last Author
-tour.livetable.doc.creator=Creator
-tour.livetable.doc.date=Update date
-tour.livetable.doc.creationDate=Creation date
-tour.livetable._avatar=Avatar
-tour.livetable._images=Images
-tour.livetable._attachments=Attachments
+tour.livetable.doc.name=Tour name
 tour.livetable._actions=Actions
 tour.livetable._actions.edit=Edit
 tour.livetable._actions.delete=Delete
+tour.livetable._actions.launch=Launch
 tour.livetable.emptyvalue=-
 
 # Live table specific keys
 tour.livetable.description=Description
 tour.livetable.isActive=Active
-tour.livetable.targetPage=Target Page</content>
+tour.livetable.targetPage=Target Page
+
+# Tour popover
+tour.popover.previous=« Prev
+tour.popover.next=Next »
+tour.popover.end=End tour
+tour.popover.show=Show tour</content>
   <object>
     <name>TourCode.TourTranslations</name>
     <number>0</number>

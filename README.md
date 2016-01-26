@@ -5,20 +5,19 @@ This application provides for the users a possibility to create bootstrap-tours 
 * Bug Tracker: http://jira.xwiki.org/browse/TOUR.
 * License: LGPL 2.1+.
 
-Translations
-==
+## Translations
 You can contribute to translate this application in various languages on http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication.
 
 You don't need to have technical knowledge to contribute to the translations, feel free to do it!
 
-How to build
-==
+## Developers
+
+### How to build
 ```
 mvn clean install -Pquality --settings maven-settings.xml
 ```
 
-Developers: commit new translations
-==
+### Commit new translations
 To get the translations done on the [l10n.xwiki.org](http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication) website and commit them into the application, you need to execute the `get-translations.sh` command:
 
 ```

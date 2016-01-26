@@ -20,46 +20,45 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>TourCode</web>
   <name>TourTranslations</name>
   <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1453815903000</creationDate>
   <parent>TourCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1453815903000</date>
-  <contentUpdateDate>1453815903000</contentUpdateDate>
+  <creationDate>1432625750000</creationDate>
+  <date>1432626839000</date>
+  <contentUpdateDate>1432626835000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content># Class fields
+  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 TourCode.TourClass_description=Description
 TourCode.TourClass_isActive=Actif
 TourCode.TourClass_targetPage=Page cible
-
-# Live table generic keys
-tour.livetable.doc.name=Nom
 tour.livetable._actions=Actions
-tour.livetable._actions.edit=Modifier
 tour.livetable._actions.delete=Supprimer
+tour.livetable._actions.edit=Modifier
 tour.livetable._actions.launch=Lancer
-tour.livetable.emptyvalue=-
-
-# Live table specific keys
 tour.livetable.description=Description
+tour.livetable.doc.name=Nom
+tour.livetable.emptyvalue=-
 tour.livetable.isActive=Actif
 tour.livetable.targetPage=Page cible
-
-# Tour popover
-tour.popover.previous=« Précédent
-tour.popover.next=Suivante »
 tour.popover.end=Terminer
-tour.popover.show=Lancer la visite guidée</content>
+tour.popover.next=Suivant »
+tour.popover.previous=« Précédent
+tour.popover.show=Lancer la visite guidée
+</content>
 </xwikidoc>

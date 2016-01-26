@@ -157,6 +157,55 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   };
   
   /**
+   * Add a resume button to start the tour again when it has been closed
+   */
+  var createResumeButton = function (tour) {
+    var button = $('&lt;button class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") Show tour&lt;/button&gt;').appendTo($(document.body));
+    button.hide();
+    button.fadeIn();
+    button.click(function () {
+      tour.start(true);
+      button.remove();
+    });
+  }
+  
+  /**
+   * Add a close button on the top right of the step.
+   */
+  var addCloseButton = function (tour) {
+    var button = $('&lt;button class="btn btn-xs btn-default" data-role="end" style="position: absolute; top: 3px; right: 5px;"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/button&gt;').appendTo($('.tour'));
+    // Avoid having the close button on top of the title
+    $('.tour .popover-title').css('padding-right', button.outerWidth() + 10 + 'px');
+  }
+  
+  /**
+   * The template to display a step.
+   */
+  var getTemplate = function (index, step) {
+    var template = '&lt;div class="popover tour" style="min-width: 300px;"&gt;\n'
+                 + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
+                 + '  &lt;h3 class="popover-title"&gt;&lt;/h3&gt;\n'
+                 + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
+                 + '  &lt;div class="popover-navigation row"&gt;\n'
+                 + '    &lt;div class="col-xs-6 text-left"&gt;\n';
+    if (step.prev &gt; -1) {
+      template  += '      &lt;button class="btn btn-default btn-sm" data-role="prev"&gt;« Prev&lt;/button&gt;\n';
+    }
+    template    += '    &lt;/div&gt;\n'
+                 + '    &lt;div class="col-xs-6 text-right"&gt;\n';
+    if (step.next &gt; -1) {
+      template  += '      &lt;button class="btn btn-primary btn-sm" data-role="next"&gt;Next »&lt;/button&gt;\n';
+    } else {
+      template  += '      &lt;button class="btn btn-success btn-sm" data-role="end"&gt;End tour&lt;/button&gt;\n'
+    }
+    template    += '    &lt;/div&gt;\n'
+    template    += '    &lt;div class="clearfix"&gt;&lt;/div&gt;\n';
+                 + '  &lt;/div&gt;'
+                 + '&lt;/div&gt;';
+    return template;
+  }
+      
+  /**
    * Create a tour from a JSON file
    */
   var createTour = function (jsonData) {
@@ -166,19 +215,6 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     
     // Require 'bootstrap-tour' only when needed
     require(['bootstrap-tour'], function(Tour) {
-    
-      /**
-       * Add a resume button to start the tour again when it has been closed
-       */
-      var createResumeButton = function (tour) {
-        var button = $('&lt;button class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") Show tour&lt;/button&gt;').appendTo($(document.body));
-        button.hide();
-        button.fadeIn();
-        button.click(function () {
-          tour.start(true);
-          button.remove();
-        });
-      }
       
       // Create the tour
       var tourName = escapeTourName('tour_' + jsonData.name);
@@ -186,7 +222,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         name    : tourName,
         storage : window.localStorage,
         onEnd   : createResumeButton,
-        orphan  : true
+        onShown : addCloseButton,
+        orphan  : true,
+        template: getTemplate
       });
       
       // Create the steps

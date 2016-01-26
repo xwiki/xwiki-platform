@@ -379,7 +379,9 @@
   #set ($escapedParentLocalSpaceRef = $parentLocalSpaceRef.replaceAll("'", "''"))
   #set ($selectEntityName = "case when space.parent = '$escapedParentLocalSpaceRef' then space.name else doc.name end")
   #set ($selectEntityType = "case when space.parent = '$escapedParentLocalSpaceRef' then 0 else 1 end")
-  #set ($selectClause = "select distinct $selectEntityName as name, $selectEntityType as type")
+  ## We select the lower case version of the entity name in order to be able to sort on it. PostgreSQL complains that
+  ## "ORDER BY expressions must appear in select list" otherwise (when 'select distinct' is used). See XWIKI-13025.
+  #set ($selectClause = "select distinct $selectEntityName, $selectEntityType, lower($selectEntityName)")
   #set ($fromClause = 'from XWikiDocument doc, XWikiSpace space')
   #set ($isChildDocument = [
     'doc.space = :parentSpaceRef',
@@ -409,11 +411,12 @@
   ## We cannot call the lower() function with an alias because:
   ## * MySql throws com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'name' in 'order clause'
   ## * HSQLDB throws org.hsqldb.HsqlException: user lacks privilege or object not found: NAME
-  ## We have to duplicate the CASE expression in the ORDER BY clause.
-  #set ($orderByClause = "order by type, lower($selectEntityName), $selectEntityName")
+  ## We cannot duplicate the CASE expression in the ORDER BY clause either because PostgreSQL complains that "ORDER BY
+  ## expressions must appear in select list". We specify the output columns to sort on using their ordinal.
+  #set ($orderByClause = "order by 2, 3, 1")
   #if (!$docTreeConfig.showSpaces)
     ## Mix terminal and non-terminal documents in nested documents mode.
-    #set ($orderByClause = "order by lower($selectEntityName), $selectEntityName")
+    #set ($orderByClause = "order by 3, 1")
   #end
   #set ($statement = "$selectClause $fromClause $whereClause $orderByClause")
   #set ($_query = $services.query.hql($statement))

@@ -52,6 +52,7 @@ tour.livetable.doc.name=Tour name
 tour.livetable._actions=Actions
 tour.livetable._actions.edit=Edit
 tour.livetable._actions.delete=Delete
+tour.livetable._actions.launch=Launch
 tour.livetable.emptyvalue=-
 
 # Live table specific keys

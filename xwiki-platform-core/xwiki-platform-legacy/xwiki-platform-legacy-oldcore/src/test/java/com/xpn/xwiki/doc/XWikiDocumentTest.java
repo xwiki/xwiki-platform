@@ -50,7 +50,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
@@ -186,6 +186,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
         velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 // Output the given text without changes.
@@ -268,7 +269,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
 
         assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
-            + "Page" + "</span></a></span>", this.document.extractTitle());
+            + "WebHome" + "</span></a></span>", this.document.extractTitle());
 
         this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");

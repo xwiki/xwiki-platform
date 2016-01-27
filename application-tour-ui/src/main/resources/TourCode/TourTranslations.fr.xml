@@ -51,6 +51,7 @@ tour.app.name=Visites guidées
 tour.livetable._actions=Actions
 tour.livetable._actions.delete=Supprimer
 tour.livetable._actions.edit=Modifier
+tour.livetable._actions.launch=Lancer
 tour.livetable.description=Description
 tour.livetable.doc.name=Nom
 tour.livetable.emptyvalue=-

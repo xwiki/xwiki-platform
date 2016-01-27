@@ -10,8 +10,8 @@ function fix_author() {
 
 function format_xar() {
     ## due to https://github.com/mycila/license-maven-plugin/issues/37 we need to perform "mvn xar:format" twice.
-    mvn xar:format --settings maven-settings.xml
-    mvn xar:format --settings maven-settings.xml
+    mvn xar:format --settings ${PROJECT_TRUNKS}/maven-settings.xml
+    mvn xar:format --settings ${PROJECT_TRUNKS}/maven-settings.xml
 }
 
 function download_translations() {
@@ -40,6 +40,7 @@ function read_user_and_password() {
 ## Note: it is the responsability of the developer to actually commit them.
 ##
 read_user_and_password
-cd ${PROJECT_TRUNKS}/src/main/resources/  || exit -1
+cd ${PROJECT_TRUNKS}/application-tour-ui/src/main/resources/  || exit -1
 download_translations 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Contrib.TourApplication&app=Contrib'
-cd ${PROJECT_TRUNKS} && format_xar
+cd ${PROJECT_TRUNKS}/application-tour-ui && format_xar
+cd ${PROJECT_TRUNKS}

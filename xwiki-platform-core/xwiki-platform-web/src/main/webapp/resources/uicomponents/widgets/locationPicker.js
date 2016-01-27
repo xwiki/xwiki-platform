@@ -286,14 +286,23 @@ require(['jquery'], function($) {
   //
   // Generic Validation
   //
+  var isSimplePicker = function(picker) {
+    return picker.find('.location-actions').length > 0 && picker.find('.location-action-edit').length == 0;
+  };
+
   var createPageValidator = function(picker) {
     var pageInput = picker.find('input.location-name-field');
     if (pageInput.length === 0) {
       return null;
     }
 
+    var titleInput = picker.find('input.location-title-field');
+    // The advanced location edit fields are not accessible to simple users.
+    var isSimpleUser = titleInput.length > 0 && isSimplePicker(picker);
     var pageValidator = new LiveValidation(pageInput[0], {
-      validMessage: "$services.localization.render('core.validation.valid.message')"
+      validMessage: "$services.localization.render('core.validation.valid.message')",
+      // Show the validation message after the title input for simple users because they can't access the page input.
+      insertAfterWhatNode: isSimpleUser ? titleInput[0] : pageInput[0]
     });
     // We use a custom validation in order to handle the default value on browsers that don't support the placeholder
     // attribute.
@@ -307,7 +316,7 @@ require(['jquery'], function($) {
 
     // The page input is filled automatically when the user types in the title input so we should validate the page
     // input at the same time.
-    picker.find('input.location-title-field').on('input', function() {
+    titleInput.on('input', function() {
       // Validate after the value of the page input is set.
       setTimeout(function() {
         pageValidator.validate();
@@ -320,12 +329,16 @@ require(['jquery'], function($) {
   var createSpaceValidator = function(picker) {
     var spaceReferenceInput = picker.find('input.location-parent-field');
     if (spaceReferenceInput.length > 0) {
+      var breadcrumbContainer = picker.find('.breadcrumb-container');
+      // The advanced location edit fields are not accessible to simple users.
+      var isSimpleUser = breadcrumbContainer.length > 0 && isSimplePicker(picker);
       var spaceValidator = new LiveValidation(spaceReferenceInput[0], {
         validMessage: "$services.localization.render('core.validation.valid.message')",
         // Validating automatically only on submit to avoid double validation caused by jQuery-PrototypeJS event
         // triggering incompatibilities when setting the space reference with the tree picker. We are calling validate
         // manually in the 'input' handler to achieve the same behavior as if 'onlyOnBlur' was false.
-        onlyOnBlur: true
+        onlyOnBlur: true,
+        insertAfterWhatNode: isSimpleUser ? breadcrumbContainer[0] : spaceReferenceInput[0]
       });
       spaceValidator.displayMessageWhenEmpty = true;
       return spaceValidator;
@@ -350,9 +363,6 @@ require(['jquery'], function($) {
       };
       validator.add(Validate.Inclusion, validator._inclusionParams);
     }
-
-    // Validate using the new configuration.
-    validator.validate();
   };
 
   var addTerminalPageValidation = function(spaceValidator, terminalCheckbox) {
@@ -450,6 +460,8 @@ require(['jquery'], function($) {
       // data-type='template'), we still need to clear any previously set validations. The upside of this is that we
       // are also allowing these page types to specify 'allowed spaces', should they need it at some point.
       updateSpaceValidatorFromTemplateProviderInput(type);
+      // Validate using the new configuration.
+      spaceValidator.validate();
     });
 
     // Make sure the spaceValidator is properly initialized when loading the page.
@@ -489,13 +501,5 @@ require(['jquery'], function($) {
         });
       }
     });
-  });
-
-  //
-  // Initial validation on page load.
-  //
-  $.each(validators, function() {
-    // TODO: Ensure that this is called after the location fields are initialized.
-    this.validate();
   });
 });

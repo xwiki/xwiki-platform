@@ -44,8 +44,13 @@
         #documentPickerModal($options)
         #locationPickerActions
       #end
-      ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
-      #hierarchy($options.parent.reference)
+      ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
+      ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
+      ## this, we wrap the breadcrumb element in a DIV that remains the same.
+      <div class="breadcrumb-container">
+        ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
+        #hierarchy($options.parent.reference)
+      </div>
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Location advanced edit
@@ -62,9 +67,11 @@
     <a href="#" class="location-action location-action-pick" title="Select a new location">
       $services.icon.renderHTML('chart-organisation')</a>
     ## Location advanced edit button.
-    <a href="#" class="location-action location-action-edit">
-      <span class="glyphicon glyphicon-pencil"></span>
-    </a>
+    #if ($isAdvancedUser)
+      <a href="#" class="location-action location-action-edit">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    #end
   </div>
 #end
 

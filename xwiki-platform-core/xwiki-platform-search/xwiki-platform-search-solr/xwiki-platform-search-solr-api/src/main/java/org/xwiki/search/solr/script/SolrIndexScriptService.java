@@ -183,6 +183,7 @@ public class SolrIndexScriptService implements ScriptService
 
     /**
      * @return the size of the index/delete queue
+     * @since 5.1RC1
      */
     public int getQueueSize()
     {
@@ -196,6 +197,7 @@ public class SolrIndexScriptService implements ScriptService
      * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
      *            missing)
      * @return the reference to the document associated with the given {@link SolrDocument}
+     * @since 7.2RC1
      */
     public DocumentReference resolveDocument(SolrDocument document, Object... parameters)
     {
@@ -212,6 +214,7 @@ public class SolrIndexScriptService implements ScriptService
      * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
      *            missing)
      * @return the reference to the entity associated with the given {@link SolrDocument}
+     * @since 7.2RC1
      */
     public EntityReference resolve(SolrDocument document, Object... parameters)
     {
@@ -236,6 +239,7 @@ public class SolrIndexScriptService implements ScriptService
      * @param parameters the parameters to pass to the reference resolver (e.g. in case some reference components are
      *            missing)
      * @return the reference to the entity associated with the given {@link SolrDocument}
+     * @since 7.2RC1
      */
     public EntityReference resolve(SolrDocument document, EntityType type, Object... parameters)
     {

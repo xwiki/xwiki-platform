@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,30 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.contrib.tour.test.ui;
 
-<xwikidoc version="1.1">
-  <web>TourCode</web>
-  <name>TourLiveTableResults</name>
-  <language/>
-  <defaultLanguage/>
-  <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1453394234000</creationDate>
-  <parent>WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1453394234000</date>
-  <contentUpdateDate>1453394234000</contentUpdateDate>
-  <version>1.1</version>
-  <title/>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-$services.localization.use('document', 'TourCode.TourTranslations')
-{{/velocity}}
+import org.junit.runner.RunWith;
+import org.xwiki.test.ui.PageObjectSuite;
 
-{{include reference="XWiki.LiveTableResults" /}}</content>
-</xwikidoc>
+/**
+ * Runs all functional tests found in the classpath.
+ *
+ * @version $Id: $
+ * @since 0.2
+ */
+@RunWith(PageObjectSuite.class)
+public class AllTests
+{
+}

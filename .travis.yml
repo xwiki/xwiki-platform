@@ -1,8 +1,13 @@
 language: java
 sudo: false
 
+before_script:
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - sleep 3 # give xvfb some time to start
+
 install:
-    - mvn clean install -U -Pquality --settings maven-settings.xml
+    - mvn clean package-U -Pquality,integration-tests -DskipTests=true --settings maven-settings.xml
 
 script:
-    - mvn test -Pquality --settings maven-settings.xml
+    - mvn clean test -Pquality,integration-tests --settings maven-settings.xml

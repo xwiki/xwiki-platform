@@ -96,7 +96,7 @@ tour.popover.show=Show tour</content>
       </scope>
     </class>
     <property>
-      <scope>ON_DEMAND</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
 </xwikidoc>

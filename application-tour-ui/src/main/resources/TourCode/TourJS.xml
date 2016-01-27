@@ -121,9 +121,8 @@
     </property>
     <property>
       <code>##----------------------------------
-## Load translations
+## Manage translations
 ##----------------------------------
-#set ($discard = $services.localization.use('document', 'TourCode.TourTranslations'))
 #**
  * Used to display a rendered translation with proper escapes.
  *#
@@ -168,7 +167,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    * Add a resume button to start the tour again when it has been closed
    */
   var createResumeButton = function (tour) {
-    var button = $('&lt;button class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo($(document.body));
+    var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo($(document.body));
     button.hide();
     button.fadeIn();
     button.click(function () {

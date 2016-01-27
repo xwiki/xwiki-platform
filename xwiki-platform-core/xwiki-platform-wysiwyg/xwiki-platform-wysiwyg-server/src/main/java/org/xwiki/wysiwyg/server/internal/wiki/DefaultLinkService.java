@@ -291,8 +291,9 @@ public class DefaultLinkService implements LinkService
             String defaultDocumentName =
                 defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
-            if (!documentAccessBridge.exists(documentReference)
-                && !documentReference.getName().equals(defaultDocumentName)) {
+            if (!documentReference.equals(baseServerEntityReference)
+                && !documentReference.getName().equals(defaultDocumentName)
+                && !documentAccessBridge.exists(documentReference)) {
                 // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
                 result =
                     this.currentSpaceAttachmentReferenceResolver.resolve(stringEntityReference, EntityType.ATTACHMENT,

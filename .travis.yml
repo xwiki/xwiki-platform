@@ -7,7 +7,7 @@ before_script:
     - sleep 3 # give xvfb some time to start
 
 install:
-    - mvn clean package-U -Pquality,integration-tests -DskipTests=true --settings maven-settings.xml
+    - mvn clean package -U -Pquality,integration-tests -DskipTests=true --settings maven-settings.xml
 
 script:
     - mvn clean test -Pquality,integration-tests --settings maven-settings.xml

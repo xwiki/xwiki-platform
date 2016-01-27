@@ -46,6 +46,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.display.DisplayMacro;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.display.DisplayMacroParameters;
@@ -63,7 +64,7 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 
 /**
  * Unit tests for {@link DisplayMacro}.
- * 
+ *
  * @version $Id$
  */
 public class DisplayMacroTest extends AbstractComponentTestCase
@@ -167,6 +168,13 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
         final DocumentReference displayedDocumentReference =
             new DocumentReference("displayedWiki", "displayedSpace", "displayedPage");
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockSetup.wikiModel).isDocumentAvailable(with(any(ResourceReference.class)));
+                will(returnValue(true));
+            }
+        });
         setUpDocumentMock("displayedWiki:displayedSpace.displayedPage", displayedDocumentReference,
             "[[page]] [[attach:test.png]] image:test.png");
         getMockery().checking(new Expectations()

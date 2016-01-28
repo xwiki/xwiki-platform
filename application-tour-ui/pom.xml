@@ -46,6 +46,18 @@
     <url>https://github.com/xwiki-contrib/application-tour</url>
     <tag>HEAD</tag>
   </scm>
+  <dependencyManagement>
+    <!-- Allow XWiki to have an other version of bootstrap than the one required by the bootstrap-tour webjar. Oherwise
+         the application will not be installable with EM .-->
+    <dependencies>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <!-- Minimal version of bootstrap targeted -->
+        <version>3.3.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <!-- Library used by this application to create tours integrated with bootstrap -->
     <dependency>
@@ -53,14 +65,6 @@
       <artifactId>bootstrap-tour</artifactId>
       <version>0.10.2</version>
       <scope>runtime</scope>
-      <exclusions>
-        <!-- Let XWiki provides its own version of Bootstrap, otherwise the application will not be installable if it
-             does not match the exact same version of Bootstrap (or a newer). -->
-        <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>bootstrap</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- The app has been created by Application Within Minutes -->
     <dependency>

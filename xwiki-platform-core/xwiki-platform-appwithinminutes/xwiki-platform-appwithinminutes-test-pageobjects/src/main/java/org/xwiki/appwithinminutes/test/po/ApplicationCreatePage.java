@@ -111,6 +111,15 @@ public class ApplicationCreatePage extends ViewPage
     }
 
     /**
+     * @return the application location picker
+     * @since 7.4.1, 8.0M1
+     */
+    public DocumentPicker getLocationPicker()
+    {
+        return this.locationPicker;
+    }
+
+    /**
      * Clicks on the Next Step button.
      *
      * @return the page that represents the next step of the App Within Minutes wizard

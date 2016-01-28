@@ -143,10 +143,10 @@ public class CopyPage extends ViewPage
      *
      * @return the confirmation page
      */
-    public CopyConfirmationPage clickCopyButton()
+    public CopyStatusPage clickCopyButton()
     {
         this.copyButton.submit();
-        return new CopyConfirmationPage();
+        return new CopyStatusPage();
     }
 
     /**

@@ -41,6 +41,7 @@ import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
@@ -74,9 +75,10 @@ public class SolrIndexAvailableLocalesListener implements EventListener
     /**
      * The events to listen to that trigger the index update.
      */
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentUpdatedEvent(new RegexEventFilter(
-        PREFERENCEDOCUMENT_REGEX)), new DocumentUpdatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
-        new ApplicationReadyEvent(), new WikiReadyEvent(), new ApplicationReadyEvent());
+    private static final List<Event> EVENTS =
+        Arrays.<Event>asList(new DocumentUpdatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
+            new DocumentCreatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)), new ApplicationReadyEvent(),
+            new WikiReadyEvent(), new ApplicationReadyEvent());
 
     /**
      * The currently available locales for each running wiki.

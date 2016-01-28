@@ -19,25 +19,38 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents the common actions possible after a Page has been copied.
+ * Represents the page that displays the status of a copy operation. This page is normally loaded after the user clicks
+ * on the Copy button (i.e. after the copy parameters have been submitted).
  * 
  * @version $Id$
- * @since 3.2M3
+ * @since 7.4.1, 8.0M1
  */
-public class CopyConfirmationPage extends ViewPage
+public class CopyStatusPage extends BasePage
 {
-    @FindBy(xpath = "//div[@class='infomessage']/a[1]")
+    @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
     private WebElement oldPage;
 
-    @FindBy(xpath = "//div[@class='infomessage']/a[2]")
+    @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
     private WebElement newPage;
 
-    @FindBy(className = "infomessage")
-    private WebElement infoMessage;
+    @FindBy(css = ".box.successmessage, .box.errormessage")
+    private WebElement message;
+
+    /**
+     * Wait until the copy operation finishes.
+     * 
+     * @return this page
+     */
+    public CopyStatusPage waitUntilFinished()
+    {
+        getDriver().waitUntilElementDisappears(By.cssSelector(".job-status .ui-progress"));
+        return this;
+    }
 
     public ViewPage gotoOriginalPage()
     {
@@ -45,7 +58,7 @@ public class CopyConfirmationPage extends ViewPage
         return new ViewPage();
     }
 
-    public ViewPage goToNewPage()
+    public ViewPage gotoNewPage()
     {
         this.newPage.click();
         return new ViewPage();
@@ -53,6 +66,6 @@ public class CopyConfirmationPage extends ViewPage
 
     public String getInfoMessage()
     {
-        return this.infoMessage.getText();
+        return this.message.getText();
     }
 }

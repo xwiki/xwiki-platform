@@ -6,7 +6,7 @@ This application provides for the users a possibility to create bootstrap-tours 
 * License: LGPL 2.1+.
 
 ## Status
-[![Build Status](https://api.travis-ci.org/xwiki-contrib/application-tour.svg)](https://travis-ci.org/xwiki-contrib/application-tour)
+[![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib%20-%20Tour%20Application&style=plastic)](http://ci.xwiki.org/job/Contrib%20-%20Tour%20Application/)
 
 ## Translations
 You can contribute to translate this application in various languages on http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication.

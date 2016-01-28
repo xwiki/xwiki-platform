@@ -53,6 +53,14 @@
       <artifactId>bootstrap-tour</artifactId>
       <version>0.10.2</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Let XWiki provides its own version of Bootstrap, otherwise the application will not be installable if it
+             does not match the exact same version of Bootstrap (or a newer). -->
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>bootstrap</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- The app has been created by Application Within Minutes -->
     <dependency>

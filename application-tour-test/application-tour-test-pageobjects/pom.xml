@@ -33,7 +33,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-test</artifactId>
       <version>${platform.version}</version>
     </dependency>
   </dependencies>

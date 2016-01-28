@@ -115,15 +115,17 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForIt()
     {
+        // Wait for the loading animation container. This element is generated from JavaScript when the tree is
+        // being initialized, so its presence guarantees that the tree initialization has started.
+        getDriver().waitUntilElementIsVisible(this.element, By.cssSelector(".jstree-container-ul"));
+        // Wait for the root node to be loaded.
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
             {
-                // We are ready when the DOM element is marked as ready (not busy) and when the jQuery plugin is
-                // properly registered (otherwise we can not interact with it).
-                return !Boolean.valueOf(element.getAttribute("aria-busy"))
-                    && Boolean.TRUE.equals(getDriver().executeJavascript("return jQuery.jstree != null"));
+                // The tree element is marked as busy while the tree nodes are being loaded.
+                return !Boolean.valueOf(element.getAttribute("aria-busy"));
             }
         });
         return this;

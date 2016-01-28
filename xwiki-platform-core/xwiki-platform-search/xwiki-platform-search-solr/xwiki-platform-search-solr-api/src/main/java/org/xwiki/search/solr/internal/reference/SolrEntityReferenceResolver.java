@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexableField;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -184,6 +185,8 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
         if (field instanceof Field) {
             return ((Field) field).stringValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).stringValue();
         }
 
         return field != null ? field.toString() : null;
@@ -195,6 +198,8 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
         if (field instanceof Field) {
             return ((Field) field).stringValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).stringValue();
         }
 
         return field != null ? field.toString() : null;
@@ -206,6 +211,8 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
         if (field instanceof Field) {
             return ((Field) field).numericValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).numericValue();
         }
 
         return field != null ? (Number) field : null;

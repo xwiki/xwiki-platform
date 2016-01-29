@@ -239,7 +239,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
         assertEquals(
-            new LinkedHashSet<String>(Arrays.asList("TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
+            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
                 "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
     }
 

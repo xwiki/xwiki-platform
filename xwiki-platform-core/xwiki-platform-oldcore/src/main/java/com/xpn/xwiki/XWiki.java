@@ -129,6 +129,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -1543,10 +1544,20 @@ public class XWiki implements EventListener
             // an XWikiDocument as source and an XWikiContext as data.
 
             if (om != null) {
+                CancelableEvent documentEvent;
                 if (originalDocument.isNew()) {
-                    om.notify(new DocumentCreatingEvent(document.getDocumentReference()), document, context);
+                    documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
                 } else {
-                    om.notify(new DocumentUpdatingEvent(document.getDocumentReference()), document, context);
+                    documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
+                }
+                om.notify(documentEvent, document, context);
+
+                // If the action has been canceled by the user then don't perform any save and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
+                        String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
+                            document.getDocumentReference(), documentEvent.getReason()));
                 }
             }
 

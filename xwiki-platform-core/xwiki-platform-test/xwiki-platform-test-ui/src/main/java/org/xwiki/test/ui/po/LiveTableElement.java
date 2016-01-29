@@ -21,6 +21,7 @@ package org.xwiki.test.ui.po;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
@@ -51,7 +52,7 @@ public class LiveTableElement extends BaseElement
     public boolean isReady()
     {
         Object result = getDriver().executeJavascript("return Element.hasClassName('"
-            + livetableId + "-ajax-loader','hidden')");
+            + StringEscapeUtils.escapeEcmaScript(livetableId) + "-ajax-loader','hidden')");
         return result instanceof Boolean ? (Boolean) result : false;
     }
 
@@ -87,7 +88,8 @@ public class LiveTableElement extends BaseElement
     public void filterColumn(String inputId, String filterValue)
     {
         // Make extra sure Selenium can't go quicker than the live table status by forcing it before filtering.
-        getDriver().executeJavascript("return $('" + livetableId + "-ajax-loader').removeClassName('hidden')");
+        getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
+            + "-ajax-loader').removeClassName('hidden')");
 
         WebElement element = getDriver().findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {

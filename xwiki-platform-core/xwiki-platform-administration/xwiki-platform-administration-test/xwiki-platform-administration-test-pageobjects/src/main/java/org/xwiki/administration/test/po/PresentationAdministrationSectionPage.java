@@ -136,6 +136,8 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
      */
     public void clickOnCustomize()
     {
+        getDriver().waitUntilElementIsVisible(
+                By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
         customizeButton.click();
     }
 

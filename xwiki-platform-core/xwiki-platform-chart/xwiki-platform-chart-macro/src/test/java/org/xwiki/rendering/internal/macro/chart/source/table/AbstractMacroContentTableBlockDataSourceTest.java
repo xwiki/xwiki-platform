@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.chart.source.DataSource;
 import org.xwiki.rendering.internal.parser.reference.XWikiUntypedLinkReferenceParser;
@@ -71,7 +72,8 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
     DefaultModelConfiguration.class,
     DocumentResourceReferenceTypeParser.class,
     SpaceResourceReferenceTypeParser.class,
-    AttachmentResourceReferenceTypeParser.class
+    AttachmentResourceReferenceTypeParser.class,
+    RelativeStringEntityReferenceResolver.class
 })
 //@formatter:on
 @MockingRequirement(value = MacroContentTableBlockDataSource.class,

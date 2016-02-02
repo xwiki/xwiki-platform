@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.wiki;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -41,10 +40,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
@@ -130,12 +127,6 @@ public class XWikiWikiModel implements WikiModel
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
-     * Used to resolve a DocumentReference from a SpaceReference, i.e. the space's homepage.
-     */
-    @Inject
-    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
-
-    /**
      * Used to resolve a Resource Reference into a Space Reference.
      */
     @Inject
@@ -143,7 +134,7 @@ public class XWikiWikiModel implements WikiModel
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
     @Inject
-    private EntityReferenceProvider defaultEntityReferenceProvider;
+    private EntityReferenceResolver<ResourceReference> resourceReferenceEntityReferenceResolver;
 
     /**
      * Provides logging for this class.
@@ -171,7 +162,15 @@ public class XWikiWikiModel implements WikiModel
     public String getLinkURL(ResourceReference linkReference)
     {
         // Note that we don't ask for a full URL because links should be relative as much as possible
-        return this.documentAccessBridge.getAttachmentURL(resolveAttachmentReference(linkReference),
+        AttachmentReference attachmentReference =
+            (AttachmentReference) resourceReferenceEntityReferenceResolver
+                .resolve(linkReference, EntityType.ATTACHMENT);
+
+        if (attachmentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(attachmentReference));
+        }
+
+        return this.documentAccessBridge.getAttachmentURL(attachmentReference,
             linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), false);
     }
 
@@ -210,14 +209,29 @@ public class XWikiWikiModel implements WikiModel
     @Override
     public boolean isDocumentAvailable(ResourceReference resourceReference)
     {
-        DocumentReference documentReference = resolveDocumentReference(resourceReference);
+        DocumentReference documentReference =
+            (DocumentReference) resourceReferenceEntityReferenceResolver
+                .resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
         return this.documentAccessBridge.exists(documentReference);
+
     }
 
     @Override
     public String getDocumentViewURL(ResourceReference resourceReference)
     {
-        DocumentReference documentReference = resolveDocumentReference(resourceReference);
+        DocumentReference documentReference =
+            (DocumentReference) resourceReferenceEntityReferenceResolver
+                .resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
         return this.documentAccessBridge.getDocumentURL(documentReference, "view",
             resourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
             resourceReference.getParameter(DocumentResourceReference.ANCHOR));
@@ -255,115 +269,16 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        DocumentReference documentReference = resolveDocumentReference(resourceReference);
+        DocumentReference documentReference =
+            (DocumentReference) resourceReferenceEntityReferenceResolver
+                .resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
         return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
             resourceReference.getParameter(DocumentResourceReference.ANCHOR));
-    }
-
-    /**
-     * Resolve the reference passed as a String into a DocumentReference object.
-     *
-     * @param resourceReference the resource to transform into a {@link DocumentReference} object
-     * @return the reference resolved using the base resource reference if any
-     */
-    private DocumentReference resolveDocumentReference(ResourceReference resourceReference)
-    {
-        DocumentReference baseReference = null;
-        if (!resourceReference.getBaseReferences().isEmpty()) {
-            // If the passed reference has a base reference, resolve it first with a current resolver (it should
-            // normally be absolute but who knows what the API caller has specified...)
-            baseReference = resolveBaseReference(resourceReference.getBaseReferences(), resourceReference.getType());
-        }
-
-        DocumentReference documentReference =
-            resolveReferenceWithBase(resourceReference.getReference(), resourceReference.getType(), baseReference);
-
-        return documentReference;
-    }
-
-    /**
-     * Resolve the list of base references taking the first element in the list, resolving it and then resolving the
-     * other elements based on the previous resolving.
-     *
-     * @param baseReferences the list of base references to resolve
-     * @param resourceType the type of resources you are resolving
-     * @return the resolved base reference against which to resolve the target resource reference
-     */
-    private DocumentReference resolveBaseReference(List<String> baseReferences, ResourceType resourceType)
-    {
-        DocumentReference resolvedBaseReference = null;
-        for (String baseReference : baseReferences) {
-            resolvedBaseReference = resolveReferenceWithBase(baseReference, resourceType, resolvedBaseReference);
-        }
-        return resolvedBaseReference;
-    }
-
-    /**
-     * @param resourceReference string reference
-     * @param resourceType type of reference to resolve
-     * @param resolvedBaseReference a previously resolved base reference to use when resolving the current one, or
-     *            {@code null} if none is available
-     * @return the resolved DocumentReference
-     */
-    private DocumentReference resolveReferenceWithBase(String resourceReference, ResourceType resourceType,
-        DocumentReference resolvedBaseReference)
-    {
-        // Use any previously resolved base reference when resolving the current one.
-        Object[] resolveParameters = null;
-        if (resolvedBaseReference != null) {
-            resolveParameters = new Object[] {resolvedBaseReference};
-        } else {
-            resolveParameters = new Object[0];
-        }
-
-        DocumentReference result = null;
-        // Resolve the current reference.
-        if (ResourceType.DOCUMENT.equals(resourceType)) {
-            result = this.currentDocumentReferenceResolver.resolve(resourceReference, resolveParameters);
-        } else if (ResourceType.SPACE.equals(resourceType)) {
-            // Extract the space's homepage.
-            SpaceReference spaceReference =
-                this.currentSpaceReferenceResolver.resolve(resourceReference, resolveParameters);
-            result = this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
-        }
-
-        return result;
-    }
-
-    /**
-     * Resolve the reference passed as a String into an AttachmentReference object.
-     *
-     * @param attachmentResourceReference the resource to transform into a {@link AttachmentReference} object
-     * @return the resolved reference resolved using the base resource reference if any
-     */
-    private AttachmentReference resolveAttachmentReference(ResourceReference attachmentResourceReference)
-    {
-        String stringReference = attachmentResourceReference.getReference();
-
-        AttachmentReference attachmentReference;
-        if (!attachmentResourceReference.getBaseReferences().isEmpty()) {
-            // If the passed reference has a base reference, resolve it first with a current resolver (it should
-            // normally be absolute but who knows what the API caller has specified...)
-            DocumentReference baseReference =
-                resolveBaseReference(attachmentResourceReference.getBaseReferences(), ResourceType.DOCUMENT);
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(stringReference, baseReference);
-        } else {
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(stringReference);
-        }
-
-        // See if the resolved (terminal or WebHome) document exists and, if so, use it.
-        DocumentReference documentReference = attachmentReference.getDocumentReference();
-        if (!documentAccessBridge.exists(documentReference)) {
-            // Also consider explicit "WebHome" references (i.e. the ones ending in "WebHome").
-            String defaultDocumentName =
-                defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-            if (!documentReference.getName().equals(defaultDocumentName)) {
-                // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
-                attachmentReference = this.currentSpaceAttachmentReferenceResolver.resolve(stringReference);
-            }
-        }
-
-        return attachmentReference;
     }
 
     /**

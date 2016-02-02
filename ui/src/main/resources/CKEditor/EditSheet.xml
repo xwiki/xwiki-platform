@@ -149,11 +149,10 @@
 
 require(['jquery'], function($) {
   window.CKEDITOR_BASEPATH = "$!services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', '')";
-  require(['ckeditor'], function(ckeditor) {
+  require(['ckeditor', 'xwiki-meta'], function(ckeditor, xwikiMeta) {
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
-        extraPlugins: 'xwiki-macro,xwiki-save,xwiki-source',
         fullPage: true,
         height: 500,
         removeButtons: 'Find,Anchor',
@@ -174,6 +173,8 @@ require(['jquery'], function($) {
           {name: 'others'},
           {name: 'about'}
         ],
+        uploadUrl: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.FileUploader&amp;outputSyntax=plain&amp;form_token='
+          + xwikiMeta.form_token),
         'xwiki-save': {
           leaveConfirmation: true
         },

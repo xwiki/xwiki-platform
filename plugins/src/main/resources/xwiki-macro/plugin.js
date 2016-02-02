@@ -20,7 +20,7 @@
 (function() {
   'use strict';
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget',
+    requires: 'widget,xwiki-marker',
     init : function(editor) {
       // startMacroComment: CKEDITOR.htmlParser.comment
       var getMacroOutput = function(startMacroComment) {
@@ -63,14 +63,9 @@
         startMacroComment.replaceWith(wrapper);
       };
 
-      // comment: CKEDITOR.htmlParser.comment
-      var maybeWrapMacroOutput = function(comment) {
-        if (comment.value.substring(0, 11) === 'startmacro:') {
-          wrapMacroOutput(comment);
-        } else if (comment.value === 'stopmacro') {
-          comment.remove();
-        }
-      };
+      editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'macro', {
+        toHtml: wrapMacroOutput
+      });
 
       // macroOutputWrapper: CKEDITOR.htmlParser.element
       var unWrapMacroOutput = function(macroOutputWrapper) {
@@ -85,31 +80,7 @@
         }
         macro.add(stopMacroComment);
         return macro;
-      };
-
-      // content: CKEDITOR.htmlParser.fragment
-      var getMacroOutputComments = function(content) {
-        var macroOutputMarkers = [];
-        // Note that forEach is iterating a live list, meaning that the list is updated if we remove a node from the
-        // DOM. That's why we have to collect the macro output markers first and then process them.
-        content.forEach(function(comment) {
-          if (comment.value.substring(0, 11) === 'startmacro:' || comment.value === 'stopmacro') {
-            macroOutputMarkers.push(comment);
-          }
-        }, CKEDITOR.NODE_COMMENT, true);
-        return macroOutputMarkers;
-      };
-
-      // We didn't use the editor.dataProcessor.dataFilter because it is executed with priority 10, so after the widgets
-      // are upcasted (priority 8). Only element nodes can be upcasted and wiki macro output is marked with comment
-      // nodes so we need to add the macro output wrapper before the upcast takes place.
-      // See http://docs.ckeditor.com/#!/api/CKEDITOR.editor-event-toHtml
-      // See http://docs.ckeditor.com/#!/api/CKEDITOR.htmlDataProcessor
-      // See http://docs.ckeditor.com/#!/api/CKEDITOR.htmlParser.filter
-      editor.on('toHtml', function(event) {
-        // dataValue is a CKEDITOR.htmlParser.fragment instance.
-        getMacroOutputComments(event.data.dataValue).forEach(maybeWrapMacroOutput);
-      }, null, null, 7);
+      };      
 
       // See http://docs.ckeditor.com/#!/api/CKEDITOR.plugins.widget.definition
       editor.widgets.add('xwiki-macro', {
@@ -133,33 +104,8 @@
     },
 
     parseMacroCall: function(startMacroComment) {
-      /**
-       * Unescapes characters escaped with the specified escape character.
-       * 
-       * @param text the text to be unescaped
-       * @param escapeChar the character that was used for escaping
-       * @return the unescaped text
-       */
-      var unescape = function(text, escapeChar) {
-        if (typeof text !== 'string' || text.length === 0) {
-          return text;
-        }
-        var result = [];
-        var escaped = false;
-        for (var i = 0; i < text.length; i++) {
-          var c = text.charAt(i);
-          if (!escaped && c === escapeChar) {
-            escaped = true;
-            continue;
-          }
-          result.push(c);
-          escaped = false;
-        }
-        return result.join('');
-      };
-
       // Unescape the text of the start macro comment.
-      var text = unescape(startMacroComment, '\\');
+      var text = CKEDITOR.tools.unescapeComment(startMacroComment);
 
       // Extract macro name.
       var separator = '|-|';
@@ -191,7 +137,7 @@
 
         macroCall.parameters[parameterName.toLowerCase()] = {
           name: parameterName,
-          value: unescape(text.substring(start, end), '\\')
+          value: CKEDITOR.tools.unescape(text.substring(start, end), '\\')
         };
 
         // Look for the next parameter.
@@ -209,37 +155,6 @@
     },
 
     serializeMacroCall: function(macroCall) {
-      /**
-       * Escapes the {@code --} sequence before setting the text of a comment DOM node.
-       * 
-       * @param text the text that needs to be put in a comment node
-       * @return the escaped text, which will be put in a comment node
-       */
-      var escapeComment = function(text) {
-        if (typeof text !== 'string' || text.length === 0) {
-          return text;
-        }
-        var result = [];
-        var lastChar = 0;
-        for (var i = 0; i < text.length; i++) {
-          var c = text.charAt(i);
-          if (c === '\\') {
-            // Escape the backslash (the escaping character).
-            result.push('\\');
-          } else if (c === '-' && lastChar === '-') {
-            // Escape the second short dash.
-            result.push('\\');
-          }
-          result.push(c);
-          lastChar = c;
-        }
-        if (lastChar === '-') {
-            // If the comment data ends with a short dash, add an escaping character.
-            result.push('\\');
-        }
-        return result.join('');
-      };
-
       var separator = '|-|';
       var output = ['startmacro:', macroCall.name, separator];
       for (var parameterId in macroCall.parameters) {
@@ -251,7 +166,7 @@
       if (typeof macroCall.content === 'string') {
         output.push(separator, macroCall.content);
       }
-      return escapeComment(output.join(''));
+      return CKEDITOR.tools.escapeComment(output.join(''));
     }
   });
 })();

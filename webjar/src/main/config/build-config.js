@@ -86,6 +86,7 @@ var CKBUILDER_CONFIG = {
     toolbar: 1,
     undo: 1,
     wysiwygarea: 1,
+    'xwiki-image': 1,
     'xwiki-macro': 1,
     'xwiki-save': 1,
     'xwiki-source': 1

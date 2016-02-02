@@ -48,7 +48,7 @@ public class DefaultResourceReferenceEntityReferenceResolver implements EntityRe
     /**
      * Type instance for EntityReferenceResolver<ResourceReference>.
      */
-    public ParameterizedType TYPE_RESOURCEREFERENCE =
+    public static final ParameterizedType TYPE_RESOURCEREFERENCE =
         new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class);
 
     @Inject

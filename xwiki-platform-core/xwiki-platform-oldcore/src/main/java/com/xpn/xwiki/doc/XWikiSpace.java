@@ -56,7 +56,7 @@ public class XWikiSpace
     private boolean hidden;
 
     /**
-     * @see getReference()
+     * @see #getReference()
      */
     private SpaceReference reference;
 

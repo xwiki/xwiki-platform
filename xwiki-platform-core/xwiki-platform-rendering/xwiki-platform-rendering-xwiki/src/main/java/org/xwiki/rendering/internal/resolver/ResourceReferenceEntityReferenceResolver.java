@@ -40,7 +40,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.parser.ResourceReferenceTypeParser;
 
 @Component
 @Singleton
@@ -48,20 +47,6 @@ public class ResourceReferenceEntityReferenceResolver implements EntityReference
 {
     @Inject
     private EntityReferenceProvider defaultReferenceProvider;
-
-    /**
-     * Parser to parse link references pointing to documents.
-     */
-    @Inject
-    @Named("doc")
-    private ResourceReferenceTypeParser documentResourceReferenceTypeParser;
-
-    /**
-     * Parser to parse link references pointing to spaces.
-     */
-    @Inject
-    @Named("space")
-    private ResourceReferenceTypeParser spaceResourceReferenceTypeParser;
 
     @Inject
     @Named("current")
@@ -73,19 +58,14 @@ public class ResourceReferenceEntityReferenceResolver implements EntityReference
 
     @Inject
     @Named("current")
-    private DocumentReferenceResolver<EntityReference> currentEntityDocumentReferenceResolver;
-
-    @Inject
-    @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
-
-    @Inject
-    @Named("relative")
-    private EntityReferenceResolver<String> relativeReferenceResolver;
 
     @Inject
     @Named("currentspace")
     private AttachmentReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<EntityReference> defaultEntityReferenceResolver;
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -109,10 +89,16 @@ public class ResourceReferenceEntityReferenceResolver implements EntityReference
 
         EntityReference entityReference;
 
+        // Get the corresponding entity reference
         if (resourceReference.isTyped()) {
             entityReference = resolveTyped(resourceReference, baseReference);
         } else {
             entityReference = resolveUntyped(resourceReference, baseReference);
+        }
+
+        // Convert the entity reference if needed
+        if (entityReference != null && type != null && entityReference.getType() != type) {
+            entityReference = this.defaultEntityReferenceResolver.resolve(entityReference, type);
         }
 
         return entityReference;
@@ -213,15 +199,18 @@ public class ResourceReferenceEntityReferenceResolver implements EntityReference
 
         // It can be a link to an existing terminal document
         if (!this.documentAccessBridge.exists((DocumentReference) reference)) {
-            // It does not exist, make it a space home page. If the space does not exist, it will be
-            // a wanted link.
-            SpaceReference spaceReference =
-                new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
-
-            // Return a DocumentReference by default since a DOCUMENTresource reference was provided
             String defaultDocumentName =
                 this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-            reference = new DocumentReference(defaultDocumentName, spaceReference);
+
+            if (!reference.getName().equals(defaultDocumentName)) {
+                // It does not exist, make it a space home page. If the space does not exist, it will be
+                // a wanted link.
+                SpaceReference spaceReference =
+                    new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
+
+                // Return a DocumentReference by default since a DOCUMENTresource reference was provided
+                reference = new DocumentReference(defaultDocumentName, spaceReference);
+            }
         }
 
         return reference;

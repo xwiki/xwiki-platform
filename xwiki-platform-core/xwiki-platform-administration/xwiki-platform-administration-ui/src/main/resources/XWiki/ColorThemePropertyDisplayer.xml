@@ -52,7 +52,7 @@
 ## Display lines for a skin
 ################################
 #macro(displaySkinLines $themes $name)
-  #if(!$themes.empty())
+  #if(!$themes.isEmpty())
     &lt;optgroup label="$name"&gt;
     #foreach($theme in $themes)
       #displayLine($theme)

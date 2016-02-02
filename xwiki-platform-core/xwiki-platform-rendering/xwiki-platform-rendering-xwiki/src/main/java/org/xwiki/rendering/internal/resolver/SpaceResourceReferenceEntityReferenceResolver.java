@@ -31,12 +31,12 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Convert space resource reference into entity reference.
- * 
+ *
  * @version $Id$
  * @since 7.4.1
  */
 @Component
-@Named("doc")
+@Named("space")
 @Singleton
 public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {

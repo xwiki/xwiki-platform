@@ -31,14 +31,15 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 
@@ -75,19 +76,6 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     private JobProgressManager progressManager;
 
     /**
-     * Used to resolve document link references.
-     */
-    @Inject
-    @Named("explicit")
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
-
-    /**
-     * Used to resolve space link references.
-     */
-    @Inject
-    private SpaceReferenceResolver<String> spaceReferenceResolver;
-
-    /**
      * Used to serialize link references.
      *
      * @see #updateRelativeLinks(XWikiDocument, DocumentReference)
@@ -98,6 +86,9 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
     @Inject
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
 
     /**
      * Used to get a {@link BlockRenderer} dynamically.
@@ -186,36 +177,36 @@ public class DefaultLinkRefactoring implements LinkRefactoring
     {
         boolean modified = false;
 
-        // Determine the reference string and reference type for each block type.
-        String referenceString = linkedResourceHelper.getResourceReferenceString(block);
-        if (referenceString == null) {
+        ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
+        if (resourceReference == null) {
             // Skip invalid blocks.
             throw new InvalidArgumentException();
         }
-        ResourceType resourceType = linkedResourceHelper.getResourceType(block);
 
+        ResourceType resourceType = resourceReference.getType();
+
+        // TODO: support ATTACHMENT as well.
         if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-            // We are only interested in Document or Space references.
+            // We are currently only interested in Document or Space references.
             throw new InvalidArgumentException();
         }
 
-        DocumentReference linkTargetDocumentReference = null;
+        // Resolve the resource reference.
+        EntityReference linkEntityReference =
+            resourceReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+        // Resolve the document of the reference.
+        DocumentReference linkTargetDocumentReference =
+            defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newTarget;
         ResourceType newResourceType = resourceType;
 
-        if (ResourceType.DOCUMENT.equals(resourceType)) {
-            // Resolve the document reference and use it directly when comparing document references below.
-            linkTargetDocumentReference =
-                this.explicitDocumentReferenceResolver.resolve(referenceString, currentDocumentReference);
-        } else {
-            SpaceReference spaceReference = spaceReferenceResolver.resolve(referenceString, currentDocumentReference);
-
-            // Resolve the space's homepage and use that when comparing document references below.
-            linkTargetDocumentReference = defaultReferenceDocumentReferenceResolver.resolve(spaceReference);
-
+        // If the link was resolved to a space...
+        if (EntityType.SPACE.equals(linkEntityReference.getType())) {
             if (XWiki.DEFAULT_SPACE_HOMEPAGE.equals(newTarget.getName())) {
-                // The space reference will be serialized in the renamed link.
-                newTargetReference = spaceReference;
+                // If the new document reference is also a space (non-terminal doc), be careful to keep it
+                // serialized as a space still (i.e. without ".WebHome") and not serialize it as a doc by mistake
+                // (i.e. with ".WebHome").
+                newTargetReference = newTarget.getLastSpaceReference();
             } else {
                 // If the new target is a non-terminal document, we can not use a "space:" resource type to access
                 // it anymore. To fix it, we need to change the resource type of the link reference "doc:".
@@ -267,36 +258,26 @@ public class DefaultLinkRefactoring implements LinkRefactoring
 
         boolean modified = false;
         for (Block block : blocks) {
-            // Determine the reference string and reference type for each block type.
-            String referenceString = linkedResourceHelper.getResourceReferenceString(block);
-            if (referenceString == null) {
+            ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
+            if (resourceReference == null) {
                 // Skip invalid blocks.
                 continue;
             }
-            ResourceType resourceType = linkedResourceHelper.getResourceType(block);
 
+            ResourceType resourceType = resourceReference.getType();
+
+            // TODO: support ATTACHMENT as well.
             if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-                // We are only interested in Document or Space references.
+                // We are currently only interested in Document or Space references.
                 continue;
             }
 
-            EntityReference oldLinkReference = null;
-            EntityReference newLinkReference = null;
-            if (ResourceType.DOCUMENT.equals(resourceType)) {
-                // current link, use the old document's reference to fill in blanks.
-                oldLinkReference =
-                    this.explicitDocumentReferenceResolver.resolve(referenceString, oldDocumentReference);
-
-                // new link, use the new document's reference to fill in blanks.
-                newLinkReference =
-                    this.explicitDocumentReferenceResolver.resolve(referenceString, newDocumentReference);
-            } else {
-                // current link, use the old document's reference to fill in blanks.
-                oldLinkReference = this.spaceReferenceResolver.resolve(referenceString, oldDocumentReference);
-
-                // new link, use the new document's reference to fill in blanks.
-                newLinkReference = this.spaceReferenceResolver.resolve(referenceString, newDocumentReference);
-            }
+            // current link, use the old document's reference to fill in blanks.
+            EntityReference oldLinkReference =
+                this.resourceReferenceResolver.resolve(resourceReference, null, oldDocumentReference);
+            // new link, use the new document's reference to fill in blanks.
+            EntityReference newLinkReference =
+                this.resourceReferenceResolver.resolve(resourceReference, null, newDocumentReference);
 
             // If the new and old link references don`t match, then we must update the relative link.
             if (!newLinkReference.equals(oldLinkReference)) {

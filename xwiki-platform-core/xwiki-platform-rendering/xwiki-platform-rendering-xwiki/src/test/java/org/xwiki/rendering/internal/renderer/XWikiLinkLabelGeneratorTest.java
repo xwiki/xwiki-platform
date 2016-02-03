@@ -27,15 +27,16 @@ import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Unit tests for {@link XWikiLinkLabelGenerator}.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -49,7 +50,7 @@ public class XWikiLinkLabelGeneratorTest
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    private DocumentReferenceResolver mockDocumentReferenceResolver;
+    private EntityReferenceResolver<ResourceReference> mockResourceReferenceResolver;
 
     @Before
     public void setUp()
@@ -62,30 +63,38 @@ public class XWikiLinkLabelGeneratorTest
         final RenderingConfiguration mockRenderingConfiguration = mockery.mock(RenderingConfiguration.class);
         ReflectionUtils.setFieldValue(this.generator, "renderingConfiguration", mockRenderingConfiguration);
 
-        this.mockDocumentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
-        ReflectionUtils.setFieldValue(this.generator, "currentDocumentReferenceResolver",
-            this.mockDocumentReferenceResolver);
+        this.mockResourceReferenceResolver = mockery.mock(EntityReferenceResolver.class);
+        ReflectionUtils.setFieldValue(this.generator, "resourceReferenceResolver", this.mockResourceReferenceResolver);
 
         this.mockDocumentModelBridge = mockery.mock(DocumentModelBridge.class);
 
-        mockery.checking(new Expectations() {{
-            allowing(mockRenderingConfiguration).getLinkLabelFormat();
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockRenderingConfiguration).getLinkLabelFormat();
                 will(returnValue("[%w:%s.%p] %P (%t) [%w:%s.%p] %P (%t)"));
-        }});
+            }
+        });
     }
 
     @Test
     public void testGenerate() throws Exception
     {
-        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "HelloWorld");
 
-        mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
-                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
-            allowing(mockDocumentModelBridge).getTitle(); will(returnValue("My title"));
-            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockResourceReferenceResolver).resolve(with(equal(resourceReference)),
+                    with(equal(EntityType.DOCUMENT)), with(equal(new Object[0])));
+                will(returnValue(documentReference));
+                allowing(mockDocumentModelBridge).getTitle();
+                will(returnValue("My title"));
+                allowing(mockDocumentAccessBridge).getDocument(with(equal(documentReference)));
                 will(returnValue(mockDocumentModelBridge));
-        }});
+            }
+        });
 
         Assert.assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World "
             + "(My title)", this.generator.generate(resourceReference));
@@ -94,14 +103,19 @@ public class XWikiLinkLabelGeneratorTest
     @Test
     public void testGenerateWhenDocumentFailsToLoad() throws Exception
     {
-        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "HelloWorld");
 
-        mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
-                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
-            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockResourceReferenceResolver).resolve(with(equal(resourceReference)),
+                    with(equal(EntityType.DOCUMENT)), with(equal(new Object[0])));
+                will(returnValue(documentReference));
+                allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
                 will(throwException(new Exception("error")));
-        }});
+            }
+        });
 
         Assert.assertEquals("HelloWorld", this.generator.generate(resourceReference));
     }
@@ -109,15 +123,21 @@ public class XWikiLinkLabelGeneratorTest
     @Test
     public void testGenerateWhenDocumentTitleIsNull() throws Exception
     {
-        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "HelloWorld");
 
-        mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
-                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
-            allowing(mockDocumentModelBridge).getTitle(); will(returnValue(null));
-            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockResourceReferenceResolver).resolve(with(equal(resourceReference)),
+                    with(equal(EntityType.DOCUMENT)), with(equal(new Object[0])));
+                will(returnValue(documentReference));
+                allowing(mockDocumentModelBridge).getTitle();
+                will(returnValue(null));
+                allowing(mockDocumentAccessBridge).getDocument(with(equal(documentReference)));
                 will(returnValue(mockDocumentModelBridge));
-        }});
+            }
+        });
 
         Assert.assertEquals("HelloWorld", this.generator.generate(resourceReference));
     }
@@ -125,16 +145,21 @@ public class XWikiLinkLabelGeneratorTest
     @Test
     public void testGenerateWhithRegexpSyntax() throws Exception
     {
-        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        final DocumentReference documentReference = new DocumentReference("$0", "\\", "$0");
 
-        mockery.checking(new Expectations() {{
-            allowing(mockDocumentModelBridge).getTitle(); will(returnValue("$0"));
-            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockResourceReferenceResolver).resolve(with(equal(resourceReference)),
+                    with(equal(EntityType.DOCUMENT)), with(equal(new Object[0])));
+                will(returnValue(documentReference));
+                allowing(mockDocumentModelBridge).getTitle();
+                will(returnValue("$0"));
+                allowing(mockDocumentAccessBridge).getDocument(with(equal(documentReference)));
                 will(returnValue(mockDocumentModelBridge));
-            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)), with(any(Object[].class)));
-                will(returnValue(new DocumentReference("$0", "\\", "$0")));
-
-        }});
+            }
+        });
 
         Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(resourceReference));
     }

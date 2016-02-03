@@ -27,7 +27,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -120,6 +119,9 @@ public class DefaultLinkService implements LinkService
     @Inject
     @Named("currentspaceattachment")
     private EntityReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
 
     @Override
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
@@ -257,48 +259,14 @@ public class DefaultLinkService implements LinkService
 
         EntityReference baseServerEntityReference = entityReferenceConverter.convert(baseReference);
 
-        String stringEntityReference = resourceReference.getReference();
-        ResourceType resourceType = resourceReference.getType();
+        result = resourceReferenceResolver.resolve(resourceReference, null, baseServerEntityReference);
 
-        // Resolve the resource reference based on its type. This might be enough in some cases.
-        EntityType serverEntityType = null;
-        if (ResourceType.DOCUMENT.equals(resourceType)) {
-            serverEntityType = EntityType.DOCUMENT;
-        } else if (ResourceType.SPACE.equals(resourceType)) {
-            serverEntityType = EntityType.SPACE;
-        } else if (ResourceType.ATTACHMENT.equals(resourceType)) {
-            serverEntityType = EntityType.ATTACHMENT;
-        } else {
-            return null;
-        }
-        result =
-            explicitStringEntityReferenceResolver.resolve(stringEntityReference, serverEntityType,
-                baseServerEntityReference);
+        ResourceType resourceType = resourceReference.getType();
 
         // Depending on the resource type, additional work might be needed to resolve the reference.
         if (ResourceType.SPACE.equals(resourceType)) {
-            // The rendering side already took care of identifying the type of resource, both in the case of typed
-            // or untyped (when document existence needs to be checked) resources. We just need to make sure we
-            // return a supported type (in this case, the space's home document).
+            // Make sure to return the space's WebHome since space links are mapped to documents for now.
             result = defaultReferenceDocumentReferenceResolver.resolve(result);
-        } else if (ResourceType.ATTACHMENT.equals(resourceType)) {
-            // In this case, the rendering produces the correct URL but does not expose the resource type ("space"
-            // or document attachment). We need to resolve it ourselves.
-
-            // See if the resolved (terminal or "WebHome") document exists and, if so, use it.
-            DocumentReference documentReference = new DocumentReference(result.extractReference(EntityType.DOCUMENT));
-            // Also consider explicit "WebHome" references (i.e. the ones ending in "WebHome").
-            String defaultDocumentName =
-                defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-
-            if (!documentReference.equals(baseServerEntityReference)
-                && !documentReference.getName().equals(defaultDocumentName)
-                && !documentAccessBridge.exists(documentReference)) {
-                // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
-                result =
-                    this.currentSpaceAttachmentReferenceResolver.resolve(stringEntityReference, EntityType.ATTACHMENT,
-                        baseServerEntityReference);
-            }
         }
 
         return result;

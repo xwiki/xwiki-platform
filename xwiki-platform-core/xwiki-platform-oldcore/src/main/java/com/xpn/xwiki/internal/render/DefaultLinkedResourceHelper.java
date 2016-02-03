@@ -150,4 +150,25 @@ public class DefaultLinkedResourceHelper implements LinkedResourceHelper
             // N/A yet.
         }
     }
+
+    @Override
+    public ResourceReference getResourceReference(Block block)
+    {
+        ResourceReference result = null;
+
+        if (block instanceof LinkBlock) {
+            result = ((LinkBlock) block).getReference();
+        } else if (block instanceof MacroBlock) {
+            // Wrap it up as a ResourceReference.
+            String referenceString = getResourceReferenceString(block);
+            if (referenceString != null) {
+                // FIXME: At some point we might want to allow space references too, so the resource reference might
+                // need to become untyped.
+                result = new ResourceReference(referenceString, ResourceType.DOCUMENT);
+                result.setTyped(true);
+            }
+        }
+
+        return result;
+    }
 }

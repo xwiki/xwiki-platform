@@ -46,7 +46,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     @Inject
     protected EntityReferenceResolver<EntityReference> defaultEntityReferenceResolver;
 
-    protected ResourceType type;
+    protected ResourceType resourceType;
 
     public AbstractResourceReferenceEntityReferenceResolver()
     {
@@ -54,19 +54,19 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     public AbstractResourceReferenceEntityReferenceResolver(ResourceType type)
     {
-        this.type = type;
+        this.resourceType = type;
     }
 
     @Override
-    public EntityReference resolve(ResourceReference resourceReference, EntityType type, Object... parameters)
+    public EntityReference resolve(ResourceReference resourceReference, EntityType entityType, Object... parameters)
     {
         if (resourceReference == null) {
             return null;
         }
 
-        if (type != null && !resourceReference.getType().equals(type)) {
+        if (this.resourceType != null && !resourceReference.getType().equals(this.resourceType)) {
             throw new IllegalArgumentException(String
-                .format("You must pass a resource reference of type [%s]. [%s] was passed", type, resourceReference));
+                .format("You must pass a resource reference of type [%s]. [%s] was passed", this.resourceType, resourceReference));
         }
 
         EntityReference baseReference = getBaseReference(resourceReference, parameters);
@@ -79,7 +79,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             entityReference = resolveUntyped(resourceReference, baseReference);
         }
 
-        return convertReference(entityReference, type);
+        return convertReference(entityReference, entityType);
     }
 
     protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference)
@@ -116,11 +116,11 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         return resolvedBaseReference;
     }
 
-    protected EntityReference convertReference(EntityReference entityReference, EntityType type)
+    protected EntityReference convertReference(EntityReference entityReference, EntityType entityType)
     {
         // Convert the entity reference if needed
-        if (entityReference != null && type != null && entityReference.getType() != type) {
-            return this.defaultEntityReferenceResolver.resolve(entityReference, type);
+        if (entityReference != null && entityType != null && entityReference.getType() != entityType) {
+            return this.defaultEntityReferenceResolver.resolve(entityReference, entityType);
         }
 
         return entityReference;

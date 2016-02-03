@@ -31,6 +31,7 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -76,10 +77,16 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
             // Also consider explicit "WebHome" references (i.e. the ones ending in "WebHome").
             String defaultDocumentName =
                 this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+
             if (!documentReference.getName().equals(defaultDocumentName)) {
+                // It does not exist, make it an attachment located on a space home page
+                SpaceReference spaceReference =
+                    new SpaceReference(documentReference.getName(), (SpaceReference) documentReference.getParent());
+
+                documentReference = new DocumentReference(defaultDocumentName, spaceReference);
+
                 // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
-                attachmentReference =
-                    this.currentSpaceAttachmentReferenceResolver.resolve(resourceReference.getReference());
+                attachmentReference = new AttachmentReference(attachmentReference.getName(), documentReference);
             }
         }
 

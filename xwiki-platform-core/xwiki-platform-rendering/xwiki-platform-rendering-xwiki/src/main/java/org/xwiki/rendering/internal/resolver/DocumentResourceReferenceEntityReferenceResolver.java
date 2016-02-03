@@ -76,11 +76,11 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
         }
 
         // Get the full document reference
-        EntityReference reference =
+        DocumentReference reference =
             this.currentDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
 
         // It can be a link to an existing terminal document
-        if (!this.documentAccessBridge.exists((DocumentReference) reference)) {
+        if (!this.documentAccessBridge.exists(reference)) {
             String defaultDocumentName =
                 this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 

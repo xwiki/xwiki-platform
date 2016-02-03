@@ -52,7 +52,7 @@
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-tour.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/application-tour</url>
+    <url>https://github.com/xwiki-contrib/application-tour/tree/master</url>
     <tag>HEAD</tag>
   </scm>
   <distributionManagement>

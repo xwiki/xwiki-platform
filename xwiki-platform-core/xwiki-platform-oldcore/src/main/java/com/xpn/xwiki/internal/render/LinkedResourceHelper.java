@@ -26,6 +26,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
@@ -67,4 +68,11 @@ public interface LinkedResourceHelper
      * @param newResourceType the new type of resource that the block should point to
      */
     void setResourceType(Block block, ResourceType newResourceType);
+
+    /**
+     * @param block the block to extract from
+     * @return the resource reference corresponding to the given block or {@code null} if none was found or if the block
+     *         type is unsupported
+     */
+    ResourceReference getResourceReference(Block block);
 }

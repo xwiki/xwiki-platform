@@ -103,7 +103,6 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -118,6 +117,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
@@ -307,19 +307,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Used to resolve a string into a proper Space Reference using the current space's reference to fill the blanks.
+     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
      */
-    private static SpaceReferenceResolver<String> getDefaultStringSpaceReferenceResolver()
+    private static EntityReferenceResolver<ResourceReference> getResourceReferenceEntityReferenceResolver()
     {
-        return Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
-    }
-
-    /**
-     * Used to resolve a string into a proper Space Reference using the default model configuration to fill the blanks.
-     */
-    private static SpaceReferenceResolver<String> getCurrentSpaceReferenceResolver()
-    {
-        return Utils.getComponent(SpaceReferenceResolver.TYPE_STRING, "current");
+        return Utils.getComponent(DefaultResourceReferenceEntityReferenceResolver.TYPE_RESOURCEREFERENCE);
     }
 
     private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
@@ -343,14 +335,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
     {
         return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-    }
-
-    /**
-     * Used to normalize references to default values.
-     */
-    private static DocumentReferenceResolver<EntityReference> getDefaultReferenceDocumentReferenceResolver()
-    {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
     }
 
     /**
@@ -5205,6 +5189,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 XDOM dom = getXDOM();
 
+                // TODO: Add support for macro as well.
                 List<LinkBlock> linkBlocks =
                     dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
                 pageNames = new LinkedHashSet<String>(linkBlocks.size());
@@ -5216,30 +5201,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     String referenceString = reference.getReference();
                     ResourceType resourceType = reference.getType();
 
+                    // TODO: Add support for ATTACHMENT as well.
                     if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
                         // We are only interested in Document or Space references.
                         continue;
                     }
 
-                    // If the reference is empty, the link is an autolink and we don`t include it.
+                    // Optimisation: If the reference is empty, the link is an autolink and we don`t include it.
                     if (StringUtils.isEmpty(referenceString)) {
                         continue;
                     }
 
-                    // The reference may not have the space or even document specified (in case of an empty string)
-                    // Thus we need to find the fully qualified document name
-                    DocumentReference documentReference = null;
-                    if (ResourceType.DOCUMENT.equals(resourceType)) {
-                        // Resolve the document reference as it is.
-                        documentReference = getCurrentDocumentReferenceResolver().resolve(referenceString);
-                    } else {
-                        // Resolve the space reference first
-                        SpaceReference spaceReferencere = getCurrentSpaceReferenceResolver().resolve(referenceString);
-                        // Resolve and use the space's homepage.
-                        documentReference = getDefaultReferenceDocumentReferenceResolver().resolve(spaceReferencere);
-                    }
+                    // FIXME?: pass this.getDocumentReference as parameter to the resolve so that relative references
+                    // get resolved relative to this and not to the context document.
+                    DocumentReference documentReference =
+                        (DocumentReference) getResourceReferenceEntityReferenceResolver().resolve(reference,
+                            EntityType.DOCUMENT);
 
-                    // Verify that the link is not an autolink (i.e. a link to the current document)
+                    // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
                     if (!documentReference.equals(currentDocumentReference)) {
                         // Since this method is used for saving backlinks and since backlinks must be
                         // saved with the space and page name but without the wiki part, we remove the wiki
@@ -6630,38 +6609,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // xwiki-platform-refactoring-default
             boolean modified = false;
             for (Block block : blocks) {
-                // Determine the reference string and reference type for each block type.
-                String referenceString = linkedResourceHelper.getResourceReferenceString(block);
-                if (referenceString == null) {
+                ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
+                if (resourceReference == null) {
                     // Skip invalid blocks.
                     continue;
                 }
-                ResourceType resourceType = linkedResourceHelper.getResourceType(block);
 
+                ResourceType resourceType = resourceReference.getType();
+
+                // TODO: support ATTACHMENT as well.
                 if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-                    // We are only interested in Document or Space references.
+                    // We are currently only interested in Document or Space references.
                     continue;
                 }
 
-                EntityReference oldLinkReference = null;
-                EntityReference newLinkReference = null;
-                if (ResourceType.DOCUMENT.equals(resourceType)) {
-                    // current link, use the old document's reference to fill in blanks.
-                    oldLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(referenceString, oldDocumentReference);
-
-                    // new link, use the new document's reference to fill in blanks.
-                    newLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(referenceString, newDocumentReference);
-                } else {
-                    // current link, use the old document's reference to fill in blanks.
-                    oldLinkReference =
-                        getDefaultStringSpaceReferenceResolver().resolve(referenceString, oldDocumentReference);
-
-                    // new link, use the new document's reference to fill in blanks.
-                    newLinkReference =
-                        getDefaultStringSpaceReferenceResolver().resolve(referenceString, newDocumentReference);
-                }
+                // current link, use the old document's reference to fill in blanks.
+                EntityReference oldLinkReference =
+                    getResourceReferenceEntityReferenceResolver()
+                        .resolve(resourceReference, null, oldDocumentReference);
+                // new link, use the new document's reference to fill in blanks.
+                EntityReference newLinkReference =
+                    getResourceReferenceEntityReferenceResolver()
+                        .resolve(resourceReference, null, newDocumentReference);
 
                 // If the new and old link references don`t match, then we must update the relative link.
                 if (!newLinkReference.equals(oldLinkReference)) {

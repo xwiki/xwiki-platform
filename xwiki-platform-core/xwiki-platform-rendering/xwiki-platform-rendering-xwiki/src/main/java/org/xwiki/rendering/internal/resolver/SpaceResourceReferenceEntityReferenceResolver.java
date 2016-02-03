@@ -44,6 +44,9 @@ public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResou
     @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
+    /**
+     * Default constructor.
+     */
     public SpaceResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.SPACE);

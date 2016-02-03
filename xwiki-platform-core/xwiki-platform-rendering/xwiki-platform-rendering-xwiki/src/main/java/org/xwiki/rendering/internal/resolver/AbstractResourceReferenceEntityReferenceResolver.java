@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Base class helper for EntityReferenceResolver<ResourceReference> implementations.
- * 
+ *
  * @version $Id$
  * @since 7.4.1
  */
@@ -48,10 +48,16 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     protected ResourceType resourceType;
 
+    /**
+     * Default constructor with an unset resourceType.
+     */
     public AbstractResourceReferenceEntityReferenceResolver()
     {
     }
 
+    /**
+     * @param type the resource type that this resolver will support
+     */
     public AbstractResourceReferenceEntityReferenceResolver(ResourceType type)
     {
         this.resourceType = type;

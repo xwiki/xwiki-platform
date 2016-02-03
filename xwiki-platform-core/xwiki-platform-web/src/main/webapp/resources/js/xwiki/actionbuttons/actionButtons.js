@@ -195,7 +195,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     }
 
     // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-    var isCustomForm = !this.form.action.indexOf("/preview/");
+    var isCustomForm = (this.form.action.indexOf("/preview/") >= 0);
 
     // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
     var isAsync = (this.form.async && this.form.async.value === 'true');

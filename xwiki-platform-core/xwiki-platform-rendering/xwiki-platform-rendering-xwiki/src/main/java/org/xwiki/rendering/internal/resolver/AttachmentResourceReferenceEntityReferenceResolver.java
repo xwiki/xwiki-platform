@@ -54,10 +54,6 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Inject
-    @Named("currentspace")
-    private AttachmentReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
-
-    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     public AttachmentResourceReferenceEntityReferenceResolver()

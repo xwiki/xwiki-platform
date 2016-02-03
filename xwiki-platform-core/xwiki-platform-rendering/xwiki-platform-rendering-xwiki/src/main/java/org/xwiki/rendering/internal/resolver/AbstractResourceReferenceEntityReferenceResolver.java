@@ -65,8 +65,9 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         }
 
         if (this.resourceType != null && !resourceReference.getType().equals(this.resourceType)) {
-            throw new IllegalArgumentException(String
-                .format("You must pass a resource reference of type [%s]. [%s] was passed", this.resourceType, resourceReference));
+            throw new IllegalArgumentException(
+                String.format("You must pass a resource reference of type [%s]. [%s] was passed", this.resourceType,
+                    resourceReference));
         }
 
         EntityReference baseReference = getBaseReference(resourceReference, parameters);
@@ -97,15 +98,13 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         if (!resourceReference.getBaseReferences().isEmpty()) {
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
             // normally be absolute but who knows what the API caller has specified...)
-            baseReference =
-                resolveBaseReference(resourceReference.getBaseReferences(), resourceReference.getType(), baseReference);
+            baseReference = resolveBaseReference(resourceReference.getBaseReferences(), baseReference);
         }
 
         return baseReference;
     }
 
-    protected EntityReference resolveBaseReference(List<String> baseReferences, ResourceType resourceType,
-        EntityReference defaultBaseReference)
+    protected EntityReference resolveBaseReference(List<String> baseReferences, EntityReference defaultBaseReference)
     {
         EntityReference resolvedBaseReference = defaultBaseReference;
         for (String baseReference : baseReferences) {

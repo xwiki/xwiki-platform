@@ -46,7 +46,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -209,13 +208,6 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         final DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockSetup.wikiModel).isDocumentAvailable(with(any(ResourceReference.class)));
-                will(returnValue(true));
-            }
-        });
         setUpDocumentMock("includedWiki:includedSpace.includedPage", includedDocumentReference,
             "[[page]] [[attach:test.png]] image:test.png");
         getMockery().checking(new Expectations()

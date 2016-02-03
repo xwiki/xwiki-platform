@@ -31,7 +31,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.chart.source.DataSource;
-import org.xwiki.rendering.internal.parser.reference.XWikiUntypedLinkReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
@@ -63,11 +63,11 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
     PlainTextRendererFactory.class,
     XWiki20Parser.class,
     XWiki20LinkReferenceParser.class,
+    DefaultUntypedLinkReferenceParser.class,
     URLResourceReferenceTypeParser.class,
     XWiki20ImageReferenceParser.class,
     PlainTextRenderer.class,
     DefaultLinkLabelGenerator.class,
-    XWikiUntypedLinkReferenceParser.class,
     DefaultEntityReferenceProvider.class,
     DefaultModelConfiguration.class,
     DocumentResourceReferenceTypeParser.class,

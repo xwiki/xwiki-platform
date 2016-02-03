@@ -37,7 +37,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Convert attachment resource reference into entity reference.
- * 
+ *
  * @version $Id$
  * @since 7.4.1
  */
@@ -56,6 +56,9 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Default constructor.
+     */
     public AttachmentResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.ATTACHMENT);

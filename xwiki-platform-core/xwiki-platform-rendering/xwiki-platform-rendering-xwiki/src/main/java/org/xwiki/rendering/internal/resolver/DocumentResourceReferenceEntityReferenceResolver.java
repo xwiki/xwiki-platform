@@ -37,7 +37,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Convert document resource reference into entity reference.
- * 
+ *
  * @version $Id$
  * @since 7.4.1
  */
@@ -56,6 +56,9 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
+    /**
+     * Default constructor.
+     */
     public DocumentResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.DOCUMENT);

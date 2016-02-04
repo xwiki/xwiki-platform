@@ -31,7 +31,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -108,17 +107,6 @@ public class DefaultLinkService implements LinkService
      */
     @Inject
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
-
-    @Inject
-    private EntityReferenceProvider defaultEntityReferenceProvider;
-
-    /**
-     * Convert an Attachment Reference from a String (specified using the space reference format) into an Attachment
-     * object.
-     */
-    @Inject
-    @Named("currentspaceattachment")
-    private EntityReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
 
     @Inject
     private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;

@@ -69,7 +69,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         if (resolvedReference == null) {
             throw new IllegalArgumentException(String.valueOf(reference));
         }
-        DocumentReference documentReference = (DocumentReference) resolvedReference;
+        DocumentReference documentReference = new DocumentReference(resolvedReference);
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

@@ -31,6 +31,10 @@
   <packaging>jar</packaging>
   <name>XWiki Platform - WebDAV - Server</name>
   <description>Service for accessing XWiki through WebDAV</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WebDAV Server</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

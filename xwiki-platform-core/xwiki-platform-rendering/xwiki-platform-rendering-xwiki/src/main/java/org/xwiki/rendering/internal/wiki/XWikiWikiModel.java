@@ -40,6 +40,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReferenceResolver;
@@ -154,15 +155,14 @@ public class XWikiWikiModel implements WikiModel
     public String getLinkURL(ResourceReference linkReference)
     {
         // Note that we don't ask for a full URL because links should be relative as much as possible
-        AttachmentReference attachmentReference =
-            (AttachmentReference) resourceReferenceEntityReferenceResolver
-                .resolve(linkReference, EntityType.ATTACHMENT);
+        EntityReference attachmentReference =
+            resourceReferenceEntityReferenceResolver.resolve(linkReference, EntityType.ATTACHMENT);
 
         if (attachmentReference == null) {
             throw new IllegalArgumentException(String.valueOf(attachmentReference));
         }
 
-        return this.documentAccessBridge.getAttachmentURL(attachmentReference,
+        return this.documentAccessBridge.getAttachmentURL(new AttachmentReference(attachmentReference),
             linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), false);
     }
 
@@ -201,30 +201,27 @@ public class XWikiWikiModel implements WikiModel
     @Override
     public boolean isDocumentAvailable(ResourceReference resourceReference)
     {
-        DocumentReference documentReference =
-            (DocumentReference) resourceReferenceEntityReferenceResolver
-                .resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.exists(documentReference);
-
+        return this.documentAccessBridge.exists(new DocumentReference(documentReference));
     }
 
     @Override
     public String getDocumentViewURL(ResourceReference resourceReference)
     {
-        DocumentReference documentReference =
-            (DocumentReference) resourceReferenceEntityReferenceResolver
-                .resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.getDocumentURL(documentReference, "view",
+        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "view",
             resourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
             resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
@@ -261,16 +258,15 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        DocumentReference documentReference =
-            (DocumentReference) resourceReferenceEntityReferenceResolver
-                .resolve(resourceReference, EntityType.DOCUMENT);
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
         if (documentReference == null) {
             throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
-            resourceReference.getParameter(DocumentResourceReference.ANCHOR));
+        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "create",
+            modifiedQueryString, resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**

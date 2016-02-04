@@ -5214,9 +5214,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                     // FIXME?: pass this.getDocumentReference as parameter to the resolve so that relative references
                     // get resolved relative to this and not to the context document.
-                    DocumentReference documentReference =
-                        (DocumentReference) getResourceReferenceEntityReferenceResolver().resolve(reference,
-                            EntityType.DOCUMENT);
+                    EntityReference documentReference =
+                        getResourceReferenceEntityReferenceResolver().resolve(reference, EntityType.DOCUMENT);
 
                     // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
                     if (!documentReference.equals(currentDocumentReference)) {

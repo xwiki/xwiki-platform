@@ -33,6 +33,8 @@
   <description>Service for accessing XWiki through WebDAV</description>
   <properties>
     <jackrabbit.version>1.4</jackrabbit.version>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WebDAV Server</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

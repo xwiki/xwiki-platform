@@ -30,8 +30,10 @@
   <artifactId>xwiki-platform-webdav-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - WebDAV - UI</name>
-  <description>Holds utility functions required for WebDAV UI integration.</description>
+  <description>Displays a WebDAV link to edit attachments</description>
   <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WebDAV Application</xwiki.extension.name>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>

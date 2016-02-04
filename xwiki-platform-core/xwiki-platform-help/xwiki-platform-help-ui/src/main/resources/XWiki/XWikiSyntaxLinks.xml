@@ -85,10 +85,10 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 * **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
 ** **##reference##**: The link reference. This can be either
 *** **A URI** in the form **##protocol:path##** (examples: ##http:~/~/xwiki.org##, ##mailto~:john@smith.com##), or
-*** **A wiki page** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+*** **A wiki page** reference in the form **##~[~[wikiName:] spaceNameList.] (pageName)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
 **** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
-**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
-**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+**** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
+**** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
 * **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). This is only valid for wiki page names. Example: ##wikipedia##
@@ -132,16 +132,16 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 * **##resource##**: The full link reference using the following syntax: **##(reference) [?queryString] [#anchor]##**
 ** **##reference##**: The link reference in one of the following forms:
 *** **URL**: Any URL in the form of **##protocol:~/~/path##**. Examples: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
-*** **Wiki page name** reference in the form **##~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+*** **Wiki page** reference in the form **##~[~[wikiName:] spaceNameList.] (pageName)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
 **** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
-**** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
-**** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
+**** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
+**** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
 *** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
-**** **##attach~:##**: A required string identifying the resource as attachment.
-**** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
+**** **##attach~:##** A required string identifying the resource as attachment.
+**** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page" above.
 **** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
 *** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
-**** **##mailto~:##**: A required string identifying the resource as email.
+**** **##mailto~:##** A required string identifying the resource as email.
 **** **##emailAddress##**: Targeted email address. Example: "##john@smith.com##"
 ** **##queryString##**: An optional query string for specifying parameters that will be used in the rendered URL. Example: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##HTableOfContents##
@@ -186,21 +186,25 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 * **##resource##**: A required string with the link reference in one of the following forms
 ** **URL**: Any URL in the form of **##[url:] (protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** An optional string identifying the resource as an URL.
-** **Wiki page name** reference in the form **##[doc:] ~[~[wikiName:] space.] (page)##**. Examples: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
-*** **##doc:##** An optional string identifying the resource as an XWiki document.
-*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. Example: ##mywiki##
-*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: ##Main##
-*** **##page##**: A required string containing the name of the linked wiki page. Example: ##WebHome##
-** **InterWiki page name** reference in the form **##interwiki: {{{(interWikiAlias:)}}} (page)##**. Example: ##interwiki:wikipedia:XWiki##
+** **Wiki page** reference in the form **##(doc: ) ~[~[wikiName:] spaceNameList.] (pageName)##**. Examples: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##
+*** **##doc:##** A required string identifying the resource as an XWiki terminal document. A non-terminal document can also be referenced this way, but it must append its ##.WebHome## part (e.g. ##doc:Sandbox.WebHome##).
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
+*** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: A required string containing the name of the linked wiki page. Example: ##Welcome##
+** **Wiki space** {{info}}Since 7.4.1{{/info}} reference in the form **##(space: ) [wikiName:] (spaceNameList)##**. Examples: ##space:Main##, ##space:mywiki:Main##, ##space:A.B.C##
+*** **##space:##** A required string identifying the resource as an XWiki non-terminal document (or space).
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The link will point to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##
+*** **##spaceNameList##**: A required list of dot-separated wiki Space names pointing to the final linked wiki Space (or non-terminal page). Examples: ##Main##, ##A.B##, ##A.B.C##
+** **InterWiki page** reference in the form **##interwiki: (interWikiAlias: ) (pageName)##**. Example: ##interwiki:wikipedia:XWiki##
 *** **##interwiki:##** A required string identifying the resource as an InterWiki link.
 *** **##interWikiAlias##**: An optional [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] alias as defined in the InterWiki Map (see the [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Example: ##wikipedia##
-*** **##page##**: A required string containing the name of the linked page. Example: ##XWiki##
-** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
-*** **##attach~:##**: A required string identifying the resource as attachment.
-*** **##wikiPageName##**: An optional string referencing the document that holds the attachment, see "Wiki page name" above.
-*** **##attachmentName##**: Name of the attachment as it is stored in the wiki.
+*** **##pageName##**: A required string containing the name of the linked page. Example: ##XWiki##
+** **Attachment** reference in the form **##attach~: [wikiPageName@] (attachmentName)##**. Examples: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##, ##attach~:mywiki:Main@img.png##
+*** **##attach~:##** A required string identifying the resource as attachment.
+*** **##wikiPageName##**: An optional string referencing the (terminal or non-terminal) document that holds the attachment. This is resolved identically to "Untyped", below.
+*** **##attachmentName##**: Name of the attachment as it is stored in the wiki. Example: ##photo.png##
 ** **Email address** in the form **##mailto~: (emailAddress)##** (###anchor## is not valid). Example: ##mailto~:john@smith.com##
-*** **##mailto~:##**: A required string identifying the resource as email.
+*** **##mailto~:##** A required string identifying the resource as email.
 *** **##emailAddress##**: Targeted email address. Example: ##john@smith.com##
 ** **Relative path** reference on the server in the form **##path: (relPath)##**. Example: ##path:$doc.getURL('reset')## produces target address ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## where ##/xwiki/bin/reset/Space/Page## is produced by ##$doc.getURL('reset')##.
 *** **##path:##** A required string identifying the resource as a relative path.
@@ -208,6 +212,11 @@ The full format of a link is **##[label&gt;&gt;] (resource) [||parameters]##**
 ** **UNC (Windows Explorer)** reference in the form **##unc: (path)##**. The link is rendered as a ##file:~/~/## link. Examples: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
 *** **##unc:##** A required string identifying the resource as a UNC (Windows Explorer) path.
 *** **##path##**: A required string containing the local path of resource accessible by the user. Examples: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
+** **Untyped**: If none of the above mentioned resource types are specified (i.e. no ##type:## resource prefix), then the link will be treated as a link to an XWiki terminal or non-terminal document using the following algorithm:
+*** **##Terminal document##** in the current space, //only// if it exists. Example: ##~[~[A]]## is resolved to the equivalent of ##~[~[doc:currentSpace.A]]##
+*** **##Non-terminal document##** {{info}}Since 7.4.1{{/info}} in the current space, regardless if it exists or not. Example: ##~[~[A]]## is resolved to the equivalent of ##~[~[space:currentSpace.A]]##, which is the equivalent of ##~[~[doc:currentSpace.A.WebHome]]##
+*** //Note1 - Absolute links//: {{info}}Since 7.4.1{{/info}} If the untyped link has 2 or more dot-separated components specified (i.e. that look like a space name and a page name), the above algorithm will resolve the document relative to the current wiki, and not the current space. Example: ##~[~[A.B]]## can be resolved to either ##~[~[doc:currentWiki:A.B]]## (if it exists) or to ##~[~[space:currentWiki:A.B]##] (equivalent of ##~[~[doc:currentWiki:A.B.WebHome]]##) and not to ##~[~[doc:currentWiki:currentSpace.A.B]]## or ##~[~[doc:currentWiki:currentSpace.A.B.WebHome]]##.
+*** //Note2 - Special handling of ##.WebHome##//: {{info}}Since 7.4.1{{/info}} If the untyped link ends in ##.WebHome##, it will //always// be handled as a terminal document. Example: ##~[~[A.WebHome]]## will always be resolved to the equivalent of ##~[~[doc:A.WebHome]]## and not to ##~[~[doc:A.WebHome.WebHome]]##.
 * **##parameters##**: An optional list of space-separated parameters passed to the link. Example: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
 ** **##queryString##**: An optional query string for specifying parameters that will be appended to the link target address and used in the rendered URL. Example: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## produces target address ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
 ** **##anchor##**: An optional anchor name pointing to an anchor defined in the referenced link. Note that in XWiki anchors are automatically created for headings. Example: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##

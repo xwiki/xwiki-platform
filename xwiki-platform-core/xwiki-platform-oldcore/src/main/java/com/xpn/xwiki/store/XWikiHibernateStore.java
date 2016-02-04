@@ -731,6 +731,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         XWikiSpace space = loadXWikiSpace(spaceReference, session);
 
+        // The space is supposed to exist
+        if (space == null) {
+            this.logger.warn(
+                "Space [{}] does not exist. Usually means the spaces table is not in sync with the documents table.",
+                spaceReference);
+
+            return;
+        }
+
         // If the space is already hidden return
         if (space.isHidden()) {
             return;

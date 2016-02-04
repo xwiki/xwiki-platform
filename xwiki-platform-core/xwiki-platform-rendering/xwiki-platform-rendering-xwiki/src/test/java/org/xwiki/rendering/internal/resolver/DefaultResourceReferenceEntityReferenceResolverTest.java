@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DefaultResourceReferenceEntityReferenceResolver}.
- * 
+ *
  * @version $Id$
  */
 @ComponentList({DefaultResourceReferenceEntityReferenceResolver.class,
@@ -90,8 +90,6 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
 
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
-    private AttachmentReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
-
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -113,9 +111,6 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
             .thenReturn(new SpaceReference(WIKI, SPACE));
         when(this.currentSpaceReferenceResolver.resolve(SPACE, (Object) null))
             .thenReturn(new SpaceReference(CURRENT_WIKI, SPACE));
-
-        this.currentSpaceAttachmentReferenceResolver =
-            this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "currentspace");
 
         this.currentAttachmentReferenceResolver =
             this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");

@@ -112,14 +112,6 @@ public class XWikiWikiModel implements WikiModel
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
     /**
-     * Convert an Attachment Reference from a String (specified using the space reference format) into an Attachment
-     * object.
-     */
-    @Inject
-    @Named("currentspace")
-    private AttachmentReferenceResolver<String> currentSpaceAttachmentReferenceResolver;
-
-    /**
      * Used to resolve a Resource Reference into a proper Document Reference.
      */
     @Inject

@@ -54,7 +54,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for the {@link PatientDataScriptService} component.
+ * Tests for the {@link BatikSVGRasterizer} component.
  *
  * @version $Id$
  * @since 1.0M1

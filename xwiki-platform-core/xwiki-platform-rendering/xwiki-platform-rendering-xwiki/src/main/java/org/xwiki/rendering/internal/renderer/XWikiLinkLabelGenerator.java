@@ -28,6 +28,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -63,8 +64,12 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         String result;
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference =
-            (DocumentReference) resourceReferenceResolver.resolve(reference, EntityType.DOCUMENT);
+
+        EntityReference resolvedReference = resourceReferenceResolver.resolve(reference, EntityType.DOCUMENT);
+        if (resolvedReference == null) {
+            throw new IllegalArgumentException(String.valueOf(reference));
+        }
+        DocumentReference documentReference = (DocumentReference) resolvedReference;
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

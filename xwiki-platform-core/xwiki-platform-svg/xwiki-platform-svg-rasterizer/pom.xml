@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-svg-rasterizer</artifactId>
   <name>XWiki Platform - SVG Tools - SVG Rasterizer</name>
-  <description>Rasterize SVG images</description>
+  <description>APIs to rasterize SVG images</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->

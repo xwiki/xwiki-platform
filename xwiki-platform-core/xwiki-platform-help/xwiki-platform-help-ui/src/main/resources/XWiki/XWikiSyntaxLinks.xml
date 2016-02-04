@@ -171,6 +171,12 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 |Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page||anchor="anchor"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
 |Link to a Heading in a page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
 |Link to an Anchor in the current page|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;||anchor="anchor"]]
+|Link to a top level nested page|{{{[[space:Main]]}}} or {{{[[:Main]]}}}|[[space:Main]] or [[:Main]]
+|Link to an existing child terminal page (i.e. in the current space)|{{{[[XWikiSyntaxLinks]]}}}|[[XWikiSyntaxLinks]]
+|Link to a child non-terminal page|{{{[[A]]}}}|[[A]]
+|Link to a wiki-relative (space-absolute) non-terminal page|{{{[[A.B]]}}}|[[A.B]]
+|Link to a child nested non-terminal page|{{{[[.A.B]]}}}|[[.A.B]]
+|Link to a terminal page ending in ##.WebHome##|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 
 {{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
 

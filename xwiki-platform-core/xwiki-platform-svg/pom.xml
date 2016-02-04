@@ -30,8 +30,7 @@
   <artifactId>xwiki-platform-svg</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - SVG tools</name>
-  <description>Various SVG manipulation tools.</description>
-
+  <description>Various SVG manipulation tools</description>
   <modules>
     <module>xwiki-platform-svg-rasterizer</module>
   </modules>

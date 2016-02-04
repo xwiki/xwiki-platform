@@ -29,12 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-svg-rasterizer</artifactId>
   <name>XWiki Platform - SVG Tools - SVG Rasterizer</name>
-  <description>Java code and script service for rasterizing SVG images.</description>
-
+  <description>Rasterize SVG images</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>SVG Rasterizing API</xwiki.extension.name>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>

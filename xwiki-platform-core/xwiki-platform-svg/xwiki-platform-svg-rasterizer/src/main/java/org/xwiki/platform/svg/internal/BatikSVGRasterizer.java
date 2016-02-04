@@ -49,7 +49,7 @@ import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 
 /**
- * The straight-forward implementation of the {@link SVGRasterizer} role.
+ * The straight-forward implementation of the {@link SVGRasterizer} role using Batik.
  *
  * @version $Id$
  * @since 8.0M1

@@ -33,8 +33,8 @@ import java.io.IOException;
  * @version $Id$
  * @since 8.0M1
  */
-@Unstable("New API introduced in 8.0")
 @Role
+@Unstable("New API introduced in 8.0")
 public interface SVGRasterizer
 {
     /**

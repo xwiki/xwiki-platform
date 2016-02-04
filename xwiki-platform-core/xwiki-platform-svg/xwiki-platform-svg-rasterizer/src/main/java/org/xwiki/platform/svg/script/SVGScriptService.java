@@ -40,10 +40,10 @@ import org.xwiki.url.ExtendedURL;
  * @version $Id$
  * @since 8.0M1
  */
-@Unstable("New API introduced in 8.0")
 @Component
 @Named("svg")
 @Singleton
+@Unstable("New API introduced in 8.0")
 public class SVGScriptService implements ScriptService
 {
     @Inject

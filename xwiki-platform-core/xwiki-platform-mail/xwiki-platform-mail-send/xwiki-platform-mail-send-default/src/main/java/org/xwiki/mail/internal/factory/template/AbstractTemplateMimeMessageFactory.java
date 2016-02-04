@@ -91,8 +91,7 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
 
         // Handle the subject. Get it from the template
         Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
-        String language = (String) parameters.get("language");
-        Locale locale = LocaleUtils.toLocale(language);
+        Locale locale = getLocale(parameters.get("language"));
         String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, locale);
         message.setSubject(subject);
 
@@ -102,6 +101,19 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
         message.setContent(multipart);
 
         return message;
+    }
+
+    private Locale getLocale(Object languageValue)
+    {
+        Locale locale;
+        // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first version
+        // of this API only supported String and we've moved to support Locale).
+        if (languageValue instanceof Locale) {
+            locale = (Locale) languageValue;
+        } else {
+            locale = LocaleUtils.toLocale(languageValue.toString());
+        }
+        return locale;
     }
 
     private void setRecipient(MimeMessage message, Message.RecipientType type, Object value)

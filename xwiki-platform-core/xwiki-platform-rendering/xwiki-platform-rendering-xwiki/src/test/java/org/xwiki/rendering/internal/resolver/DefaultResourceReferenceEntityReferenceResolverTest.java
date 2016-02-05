@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -61,10 +64,10 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList({DefaultResourceReferenceEntityReferenceResolver.class,
+@ComponentList({ DefaultResourceReferenceEntityReferenceResolver.class,
     AttachmentResourceReferenceEntityReferenceResolver.class, DocumentResourceReferenceEntityReferenceResolver.class,
     SpaceResourceReferenceEntityReferenceResolver.class, DefaultReferenceEntityReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class, ContextComponentManagerProvider.class})
+    DefaultStringEntityReferenceResolver.class, ContextComponentManagerProvider.class })
 public class DefaultResourceReferenceEntityReferenceResolverTest
 {
     private static final String DEFAULT_PAGE = "defaultpage";
@@ -95,6 +98,8 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
+
+    private Provider<DocumentReference> currentDocumentProvider;
 
     private DocumentAccessBridge bridge;
 
@@ -141,6 +146,9 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
 
         this.currentEntityReferenceResolver =
             this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "current");
+
+        this.currentDocumentProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, DocumentReference.class), "current");
 
         this.bridge = this.mocker.registerMockComponent(DocumentAccessBridge.class);
         when(this.bridge.exists(any(DocumentReference.class))).then(new Answer<Boolean>()

@@ -49,7 +49,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     protected EntityReferenceResolver<EntityReference> defaultEntityReferenceResolver;
 
     @Inject
-    @Named("context")
+    @Named("current")
     protected Provider<DocumentReference> currentDocumentProvider;
 
     protected ResourceType resourceType;

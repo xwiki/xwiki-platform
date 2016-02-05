@@ -23,19 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-
-import com.google.common.base.Objects;
 
 /**
  * Convert attachment resource reference into entity reference.
@@ -51,12 +45,6 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
     @Inject
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
-
-    @Inject
-    private EntityReferenceProvider defaultEntityReferenceProvider;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Default constructor.
@@ -74,24 +62,11 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
 
         // See if the resolved (terminal or WebHome) document exists and, if so, use it.
         DocumentReference documentReference = attachmentReference.getDocumentReference();
-        if (!this.documentAccessBridge.exists(documentReference)) {
-            // Also consider explicit "WebHome" references (i.e. the ones ending in "WebHome").
-            String defaultDocumentName =
-                this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
-            // If already a space home page, no fallback
-            // If same as current page, no fallback
-            if (!documentReference.getName().equals(defaultDocumentName)
-                && !Objects.equal(documentReference, baseReference)) {
-                // It does not exist, make it an attachment located on a space home page
-                SpaceReference spaceReference =
-                    new SpaceReference(documentReference.getName(), (SpaceReference) documentReference.getParent());
-
-                documentReference = new DocumentReference(defaultDocumentName, spaceReference);
-
-                // Otherwise, handle it as a space reference for both cases when it exists or when it doesn't exist.
-                attachmentReference = new AttachmentReference(attachmentReference.getName(), documentReference);
-            }
+        // Take care of fallback if needed
+        DocumentReference finalDocumentReference = resolveDocumentReference(documentReference, baseReference);
+        if (finalDocumentReference != documentReference) {
+            attachmentReference = new AttachmentReference(attachmentReference.getName(), finalDocumentReference);
         }
 
         return attachmentReference;

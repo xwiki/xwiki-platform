@@ -20,15 +20,19 @@
 package org.xwiki.rendering.internal.resolver;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -51,6 +55,12 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     @Inject
     @Named("current")
     protected Provider<DocumentReference> currentDocumentProvider;
+
+    @Inject
+    protected EntityReferenceProvider defaultReferenceProvider;
+
+    @Inject
+    protected DocumentAccessBridge documentAccessBridge;
 
     protected ResourceType resourceType;
 
@@ -139,5 +149,27 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         }
 
         return entityReference;
+    }
+
+    protected DocumentReference resolveDocumentReference(DocumentReference reference, EntityReference baseReference)
+    {
+        DocumentReference finalReference = reference;
+
+        // If already a space home page, no fallback
+        // If same as current page, no fallback
+        String defaultDocumentName = this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+        if (!reference.getName().equals(defaultDocumentName) && !Objects.equals(reference, baseReference)) {
+            if (!this.documentAccessBridge.exists(reference)) {
+                // It does not exist, make it a space home page. If the space does not exist, it will be
+                // a wanted link.
+                SpaceReference spaceReference =
+                    new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
+
+                // Return a DocumentReference by default since a DOCUMENTresource reference was provided
+                finalReference = new DocumentReference(defaultDocumentName, spaceReference);
+            }
+        }
+
+        return finalReference;
     }
 }

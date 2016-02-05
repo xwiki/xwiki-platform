@@ -24,18 +24,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-
-import com.google.common.base.Objects;
 
 /**
  * Convert document resource reference into entity reference.
@@ -48,12 +42,6 @@ import com.google.common.base.Objects;
 @Singleton
 public class DocumentResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {
-    @Inject
-    private EntityReferenceProvider defaultReferenceProvider;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -84,23 +72,8 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
         DocumentReference reference =
             this.currentDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
 
-        // It can be a link to an existing terminal document
-        if (!this.documentAccessBridge.exists(reference)) {
-            String defaultDocumentName =
-                this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-
-            // If already a space home page, no fallback
-            // If same as current page, no fallback
-            if (!reference.getName().equals(defaultDocumentName) && !Objects.equal(reference, baseReference)) {
-                // It does not exist, make it a space home page. If the space does not exist, it will be
-                // a wanted link.
-                SpaceReference spaceReference =
-                    new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
-
-                // Return a DocumentReference by default since a DOCUMENTresource reference was provided
-                reference = new DocumentReference(defaultDocumentName, spaceReference);
-            }
-        }
+        // Take care of fallback if needed
+        reference = resolveDocumentReference(reference, baseReference);
 
         return reference;
     }

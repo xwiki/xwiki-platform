@@ -225,7 +225,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
 
         assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
-            + "WebHome" + "</span></a></span>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+            + "Page" + "</span></a></span>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
         this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");

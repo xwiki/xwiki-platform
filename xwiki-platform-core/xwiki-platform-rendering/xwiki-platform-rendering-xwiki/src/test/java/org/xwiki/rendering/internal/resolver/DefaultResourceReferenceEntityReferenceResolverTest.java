@@ -86,6 +86,9 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
 
     private static final String ATTACHMENT = "file.ext";
 
+    private static final DocumentReference CURRENT_DOCUMENT_REFERENCE =
+        new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE);
+
     @Rule
     public MockitoComponentMockingRule<EntityReferenceResolver<ResourceReference>> mocker =
         new MockitoComponentMockingRule<EntityReferenceResolver<ResourceReference>>(
@@ -112,43 +115,51 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
     {
         this.currentSpaceReferenceResolver =
             this.mocker.registerMockComponent(SpaceReferenceResolver.TYPE_STRING, "current");
-        when(this.currentSpaceReferenceResolver.resolve(WIKI + ':' + SPACE, (Object) null))
+        when(this.currentSpaceReferenceResolver.resolve(WIKI + ':' + SPACE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new SpaceReference(WIKI, SPACE));
-        when(this.currentSpaceReferenceResolver.resolve(SPACE, (Object) null))
+        when(this.currentSpaceReferenceResolver.resolve(SPACE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new SpaceReference(CURRENT_WIKI, SPACE));
 
         this.currentAttachmentReferenceResolver =
             this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
         this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         when(this.currentAttachmentReferenceResolver.resolve(WIKI + ':' + SPACE + '.' + PAGE + '@' + ATTACHMENT,
-            (Object) null)).thenReturn(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)));
-        when(this.currentAttachmentReferenceResolver.resolve(SPACE + '.' + PAGE + '@' + ATTACHMENT, (Object) null))
-            .thenReturn(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, SPACE, PAGE)));
-        when(this.currentAttachmentReferenceResolver.resolve(PAGE + '@' + ATTACHMENT, (Object) null))
+            CURRENT_DOCUMENT_REFERENCE))
+                .thenReturn(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)));
+        when(this.currentAttachmentReferenceResolver.resolve(SPACE + '.' + PAGE + '@' + ATTACHMENT,
+            CURRENT_DOCUMENT_REFERENCE))
+                .thenReturn(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, SPACE, PAGE)));
+        when(this.currentAttachmentReferenceResolver.resolve(PAGE + '@' + ATTACHMENT, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE)));
-        when(this.currentAttachmentReferenceResolver.resolve(ATTACHMENT, (Object) null)).thenReturn(
+        when(this.currentAttachmentReferenceResolver.resolve(ATTACHMENT, CURRENT_DOCUMENT_REFERENCE)).thenReturn(
             new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         this.currentDocumentReferenceResolver =
             this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        when(this.currentDocumentReferenceResolver.resolve(WIKI + ':' + SPACE + '.' + PAGE, (Object) null))
+        when(this.currentDocumentReferenceResolver.resolve(WIKI + ':' + SPACE + '.' + PAGE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new DocumentReference(WIKI, SPACE, PAGE));
-        when(this.currentDocumentReferenceResolver.resolve(SPACE + '.' + PAGE, (Object) null))
+        when(this.currentDocumentReferenceResolver.resolve(SPACE + '.' + PAGE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new DocumentReference(CURRENT_WIKI, SPACE, PAGE));
-        when(this.currentDocumentReferenceResolver.resolve(PAGE, (Object) null))
+        when(this.currentDocumentReferenceResolver.resolve(PAGE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
-        when(this.currentDocumentReferenceResolver.resolve(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE, (Object) null))
-            .thenReturn(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE));
-        when(this.currentDocumentReferenceResolver.resolve(SPACE + '.' + DEFAULT_PAGE, (Object) null))
+        when(this.currentDocumentReferenceResolver.resolve(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE,
+            CURRENT_DOCUMENT_REFERENCE)).thenReturn(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE));
+        when(this.currentDocumentReferenceResolver.resolve(SPACE + '.' + DEFAULT_PAGE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new DocumentReference(CURRENT_WIKI, SPACE, DEFAULT_PAGE));
-        when(this.currentDocumentReferenceResolver.resolve(DEFAULT_PAGE, (Object) null))
+        when(this.currentDocumentReferenceResolver.resolve(DEFAULT_PAGE, CURRENT_DOCUMENT_REFERENCE))
             .thenReturn(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE));
+        when(this.currentDocumentReferenceResolver.resolve(CURRENT_PAGE, CURRENT_DOCUMENT_REFERENCE))
+            .thenReturn(CURRENT_DOCUMENT_REFERENCE);
+        when(this.currentDocumentReferenceResolver.resolve("", CURRENT_DOCUMENT_REFERENCE))
+            .thenReturn(CURRENT_DOCUMENT_REFERENCE);
 
         this.currentEntityReferenceResolver =
             this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "current");
 
         this.currentDocumentProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, DocumentReference.class), "current");
+        when(this.currentDocumentProvider.get())
+            .thenReturn(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
         this.bridge = this.mocker.registerMockComponent(DocumentAccessBridge.class);
         when(this.bridge.exists(any(DocumentReference.class))).then(new Answer<Boolean>()
@@ -217,40 +228,35 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
     public void resolveUntypeDocument() throws ComponentLookupException
     {
         // When the page does not exist
+        /*
+         * assertEquals(new DocumentReference(WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE), this.mocker
+         * .getComponentUnderTest().resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
+         * assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
+         * assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null)); // Already ends with
+         * default page name assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE),
+         * this.mocker.getComponentUnderTest() .resolve(documentResource(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE,
+         * false), null)); assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, DEFAULT_PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + DEFAULT_PAGE, false), null));
+         * assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(DEFAULT_PAGE, false), null)); // When the page
+         * exist this.existingDocuments.add(new DocumentReference(WIKI, SPACE, PAGE)); assertEquals(new
+         * DocumentReference(WIKI, SPACE, PAGE), this.mocker.getComponentUnderTest() .resolve(documentResource(WIKI +
+         * ':' + SPACE + '.' + PAGE, false), null)); this.existingDocuments.add(new DocumentReference(CURRENT_WIKI,
+         * SPACE, PAGE)); assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
+         * this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE)); assertEquals(new
+         * DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
+         * this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
+         */
+        // When the page is current page
 
-        assertEquals(new DocumentReference(WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE), this.mocker
-            .getComponentUnderTest().resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
+        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
+            this.mocker.getComponentUnderTest().resolve(documentResource(CURRENT_PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
-
-        // Already ends with default page name
-
-        assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE), this.mocker.getComponentUnderTest()
-            .resolve(documentResource(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE, false), null));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + DEFAULT_PAGE, false), null));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(DEFAULT_PAGE, false), null));
-
-        // When the page exist
-
-        this.existingDocuments.add(new DocumentReference(WIKI, SPACE, PAGE));
-        assertEquals(new DocumentReference(WIKI, SPACE, PAGE), this.mocker.getComponentUnderTest()
-            .resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
-
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, SPACE, PAGE));
-        assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
-
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
+        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
+            this.mocker.getComponentUnderTest().resolve(documentResource("", false), null));
     }
 
     @Test
@@ -267,6 +273,7 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
     public void resolveTypeAttachment() throws ComponentLookupException
     {
         // When the page does not exist
+
         assertEquals(
             new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE)),
             this.mocker.getComponentUnderTest()
@@ -283,12 +290,8 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
                 new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE)),
             this.mocker.getComponentUnderTest().resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null));
 
-        assertEquals(
-            new AttachmentReference(ATTACHMENT,
-                new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, CURRENT_PAGE), DEFAULT_PAGE)),
-            this.mocker.getComponentUnderTest().resolve(attachmentResource(ATTACHMENT, true), null));
-
         // When the page exist
+
         this.existingDocuments.add(new DocumentReference(WIKI, SPACE, PAGE));
         assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)),
             this.mocker.getComponentUnderTest()
@@ -301,6 +304,12 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
         assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE)),
             this.mocker.getComponentUnderTest().resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null));
+
+        // When page is current page
+
+        assertEquals(
+            new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)),
+            this.mocker.getComponentUnderTest().resolve(attachmentResource(ATTACHMENT, true), null));
 
         this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
         assertEquals(

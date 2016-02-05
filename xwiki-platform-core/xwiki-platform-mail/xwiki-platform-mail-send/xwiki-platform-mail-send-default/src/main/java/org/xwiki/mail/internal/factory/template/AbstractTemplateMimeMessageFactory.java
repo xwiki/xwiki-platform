@@ -106,12 +106,17 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
     private Locale getLocale(Object languageValue)
     {
         Locale locale;
-        // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first version
-        // of this API only supported String and we've moved to support Locale).
-        if (languageValue instanceof Locale) {
-            locale = (Locale) languageValue;
+
+        if (languageValue == null) {
+            locale = Locale.ROOT;
         } else {
-            locale = LocaleUtils.toLocale(languageValue.toString());
+            // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first
+            // version of this API only supported String and we've moved to support Locale).
+            if (languageValue instanceof Locale) {
+                locale = (Locale) languageValue;
+            } else {
+                locale = LocaleUtils.toLocale(languageValue.toString());
+            }
         }
         return locale;
     }

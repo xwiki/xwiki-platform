@@ -781,7 +781,8 @@ public class RepositoryManager implements Initializable, Disposable
         needSave |= updateAuthors(extensionObject, extension.getAuthors());
 
         // Features
-        needSave |= updateFeatures(extensionObject, extension.getExtensionFeatures());
+        needSave |= updateFeatures(XWikiRepositoryModel.PROP_EXTENSION_FEATURES, extensionObject,
+            extension.getExtensionFeatures());
 
         // Allowed namespaces
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES,
@@ -845,7 +846,7 @@ public class RepositoryManager implements Initializable, Disposable
         return update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, authorIds);
     }
 
-    private boolean updateFeatures(BaseObject extensionObject, Collection<ExtensionId> features)
+    private boolean updateFeatures(String fieldName, BaseObject extensionObject, Collection<ExtensionId> features)
     {
         List<String> featureStrings = new ArrayList<String>(features.size());
 
@@ -853,7 +854,7 @@ public class RepositoryManager implements Initializable, Disposable
             featureStrings.add(ExtensionIdConverter.toString(feature));
         }
 
-        return update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES, featureStrings);
+        return update(extensionObject, fieldName, featureStrings);
     }
 
     private String resolveAuthorId(String authorName)
@@ -1010,6 +1011,10 @@ public class RepositoryManager implements Initializable, Disposable
 
         // Id
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_ID, extension.getId().getId());
+
+        // Features
+        needSave |= updateFeatures(XWikiRepositoryModel.PROP_VERSION_FEATURES, versionObject,
+            extension.getExtensionFeatures());
 
         // Repositories
         List<String> repositories = XWikiRepositoryModel.toStringList(extension.getRepositories());

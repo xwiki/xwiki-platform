@@ -364,7 +364,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         // Features
-        List<String> features = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
+        List<String> features =
+            (List<String>) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_FEATURES);
         extension.withFeatures(features);
         for (String feature : features) {
             org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);

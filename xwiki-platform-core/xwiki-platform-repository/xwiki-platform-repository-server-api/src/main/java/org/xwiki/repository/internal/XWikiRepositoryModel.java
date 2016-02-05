@@ -127,6 +127,11 @@ public class XWikiRepositoryModel
     /**
      * @since 7.3M1
      */
+    public static final String PROP_VERSION_FEATURES = "features";
+
+    /**
+     * @since 7.3M1
+     */
     public static final String PROP_VERSION_REPOSITORIES = "repositories";
 
     public static final String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";

@@ -94,8 +94,13 @@ public class RepositoryTestUtils
      */
     public static org.xwiki.rest.model.jaxb.Object extensionVersionObject(Extension extension)
     {
-        return extensionVersionObject(extension.getId().getVersion(), null,
-            XWikiRepositoryModel.toStringList(extension.getRepositories()));
+        org.xwiki.rest.model.jaxb.Object extensionVersionObject = extensionVersionObject(extension.getId().getVersion(),
+            null, XWikiRepositoryModel.toStringList(extension.getRepositories()));
+
+        extensionVersionObject.getProperties().add(property(XWikiRepositoryModel.PROP_VERSION_FEATURES,
+            ExtensionIdConverter.toStringList(extension.getExtensionFeatures())));
+
+        return extensionVersionObject;
     }
 
     /**

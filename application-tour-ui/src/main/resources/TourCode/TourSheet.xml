@@ -57,7 +57,9 @@
 )))
 {{/html}}
 
-Please edit this page with the object editor to add tour steps.
-## TODO: add a step editor (see http://jira.xwiki.org/browse/TOUR-12)
+## Display tour's steps
+{{html wiki="true"}}&lt;label&gt; Steps&lt;/label&gt;{{/html}}
+#set($pageMode = $xcontext.action)
+{{include reference="TourCode.StepsListing" /}}
 {{/velocity}}</content>
 </xwikidoc>

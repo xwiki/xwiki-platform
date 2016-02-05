@@ -35,6 +35,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
+import com.google.common.base.Objects;
+
 /**
  * Convert document resource reference into entity reference.
  *
@@ -87,7 +89,9 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
             String defaultDocumentName =
                 this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
-            if (!reference.getName().equals(defaultDocumentName)) {
+            // If already a space home page, no fallback
+            // If same as current page, no fallback
+            if (!reference.getName().equals(defaultDocumentName) && !Objects.equal(reference, baseReference)) {
                 // It does not exist, make it a space home page. If the space does not exist, it will be
                 // a wanted link.
                 SpaceReference spaceReference =

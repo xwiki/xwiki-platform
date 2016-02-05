@@ -35,6 +35,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
+import com.google.common.base.Objects;
+
 /**
  * Convert attachment resource reference into entity reference.
  *
@@ -77,7 +79,10 @@ public class AttachmentResourceReferenceEntityReferenceResolver extends Abstract
             String defaultDocumentName =
                 this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
 
-            if (!documentReference.getName().equals(defaultDocumentName)) {
+            // If already a space home page, no fallback
+            // If same as current page, no fallback
+            if (!documentReference.getName().equals(defaultDocumentName)
+                && !Objects.equal(documentReference, baseReference)) {
                 // It does not exist, make it an attachment located on a space home page
                 SpaceReference spaceReference =
                     new SpaceReference(documentReference.getName(), (SpaceReference) documentReference.getParent());

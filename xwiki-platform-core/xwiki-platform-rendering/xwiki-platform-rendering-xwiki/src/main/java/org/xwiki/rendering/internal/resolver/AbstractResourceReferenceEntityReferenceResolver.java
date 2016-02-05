@@ -23,8 +23,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -45,6 +47,9 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     @Inject
     protected EntityReferenceResolver<EntityReference> defaultEntityReferenceResolver;
+
+    @Inject
+    protected Provider<DocumentReference> currentDocumentProvider;
 
     protected ResourceType resourceType;
 
@@ -105,6 +110,10 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
             // normally be absolute but who knows what the API caller has specified...)
             baseReference = resolveBaseReference(resourceReference.getBaseReferences(), baseReference);
+        }
+
+        if (baseReference == null) {
+            baseReference = this.currentDocumentProvider.get();
         }
 
         return baseReference;

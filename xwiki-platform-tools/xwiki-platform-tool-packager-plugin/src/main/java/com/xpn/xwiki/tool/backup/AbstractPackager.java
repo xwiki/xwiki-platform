@@ -49,14 +49,14 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 public abstract class AbstractPackager
 {
     /**
-     * @param databaseName some database name (TODO: find out what this name is really)
+     * @param wikiId id of the wiki for which to prepare the XWiki Context (e.g. {@code xwiki})
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
      *            password, etc)
      * @return a valid XWikiContext using the passed Hibernate configuration and passed database name
      * @throws Exception failed to initialize context.
      * @todo Replace the Hibernate config file with a list of parameters required for the packaging operation
      */
-    public XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
+    public XWikiContext createXWikiContext(String wikiId, File hibernateConfig) throws Exception
     {
         // Initialize the Component Manager and Environment
         ComponentManager cm = org.xwiki.environment.System.initialize();
@@ -78,8 +78,8 @@ public abstract class AbstractPackager
             throw new Exception("Failed to initialize Execution Context.", e);
         }
 
-        xcontext.setWikiId(databaseName);
-        xcontext.setMainXWiki(databaseName);
+        xcontext.setWikiId(wikiId);
+        xcontext.setMainXWiki(wikiId);
 
         // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
         // Factory and any code requiring those objects will work.
@@ -93,7 +93,7 @@ public abstract class AbstractPackager
         // Set a dummy Document in the context to act as the current document since when a document containing
         // objects is imported it'll generate Object diff events and the algorithm to compute an object diff
         // currently requires rendering object properties, which requires a current document in the context.
-        xcontext.setDoc(new XWikiDocument(new DocumentReference(databaseName, "dummySpace", "dummyPage")));
+        xcontext.setDoc(new XWikiDocument(new DocumentReference(wikiId, "dummySpace", "dummyPage")));
 
         XWikiConfig config = new XWikiConfig();
         config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");

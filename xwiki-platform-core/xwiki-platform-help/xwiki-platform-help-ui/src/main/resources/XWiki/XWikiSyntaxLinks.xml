@@ -153,7 +153,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 |=Feature|=XWiki Syntax 2.1|=Result
 |Absolute link to page ##PageB## located in ##PageA##|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]]
 |Relative link to page ##PageA## from the current page|{{{[[PageA]]}}} or {{{[[.PageA]]}}}|[[PageA&gt;&gt;]]
-|Relative link to page ##PageA.PageB## from the current page|{{{[[.PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Relative link to page ##PageB## in ##PageA## from the current page|{{{[[.PageA.PageB]]}}}|[[PageB&gt;&gt;]]
 |Link with a label|(((
 {{{[[label&gt;&gt;PageA]]}}}
 

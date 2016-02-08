@@ -91,8 +91,7 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 
 |=Feature|=XWiki Syntax 2.1|=Result
 |Image from attachment on current page|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image from attachment on another page|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
-|Image from attachment on non-terminal page|{{{image:Sandbox@XWikiLogo.png}}}|[[image:Sandbox@XWikiLogo.png||width="52" height="52"]]
+|Image from attachment on another page|{{{image:PageA.PageB@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Image with parameters|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
 |Images located at URL|{{{image:http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Prepackaged Icons|{{{image:icon:accept}}}|image:icon:accept
@@ -108,11 +107,11 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 * **##image~:##** A required string identifying the resource as image.
 * **##reference##**: The reference to the image that shall be displayed in one of the following forms:
 ** **URL**: Any URL to an image in the form of **##protocol:~/~/path/imageName##**. Example: ##http:~/~/domain.org/path/img.png##
-** **Attachment** reference in the form **##~{~{~{wikiName:} space.} page@} (imageName)##**
-*** **##wikiName##**: An optional string containing the name of a virtual wiki. The image reference will point to an image attached to a page inside that virtual wiki. Example: mywiki
-*** **##space##**: An optional wiki Space name. If no space is specified the current space is used. Example: Main
-*** **##page##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: WebHome
-*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki.
+** **Attachment** reference in the form **##~{~{~{wikiName:} spaceNameList.} pageName@} (imageName)##**
+*** **##wikiName##**: An optional string containing the name of a virtual wiki. The image reference will point to an image attached to a page inside that virtual wiki. If no wiki is specified, the current wiki is used. Example: ##mywiki##.
+*** **##spaceNameList##**: An optional dot-separated list of wiki Space names. If no space is specified the current space is used. Examples: ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: An optional string containing the name of the wiki page to which the referenced image is attached. Example: ##Welcome##
+*** **##imageName##**: A required string containing the name of the image attached to a page as it is stored in the wiki. Example: ##myImage.png##
 ** **Icon** reference in the form **##{{{(icon:)}}} (iconName)##**. Example: **##icon:accept##**
 *** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
 *** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##

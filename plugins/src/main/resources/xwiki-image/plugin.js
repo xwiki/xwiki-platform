@@ -120,7 +120,7 @@
     var dialogDefinition = event.data.definition;
     if (dialogName === 'image2') {
       CKEDITOR.plugins.get('xwiki-resource').replaceWithResourcePicker(dialogDefinition, 'src', {
-        resourceTypes: ['attach', 'icon', 'url'],
+        resourceTypes: (event.editor.config['xwiki-image'] || {}).resourceTypes || ['attach', 'icon', 'url'],
         setup: function(widget) {
           this.setValue(widget.data.resourceReference);
         },

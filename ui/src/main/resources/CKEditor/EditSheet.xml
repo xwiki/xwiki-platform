@@ -175,6 +175,9 @@ require(['jquery'], function($) {
           {name: 'others'},
           {name: 'about'}
         ],
+        'xwiki-resource': {
+          dispatcher: new XWiki.Document('ResourceDispatcher', 'CKEditor').getURL('get')
+        },
         'xwiki-save': {
           leaveConfirmation: true
         },

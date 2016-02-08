@@ -75,19 +75,51 @@
       icon: 'glyphicon glyphicon-paperclip',
       placeholder: 'Path.To.Page@attachment.png'
     },
+    data: {
+      label: 'Data URI',
+      icon: 'glyphicon glyphicon-briefcase',
+      placeholder: 'image/png;base64,AAAAAElFTkSuQmCC'
+    },
+    doc: {
+      label: 'Page',
+      icon: 'glyphicon glyphicon-file',
+      placeholder: 'Path.To.Page',
+      allowEmptyReference: true
+    },
     icon: {
       label: 'Icon',
       icon: 'glyphicon glyphicon-flag',
       placeholder: 'help'
     },
+    mailto: {
+      label: 'Mail',
+      icon: 'glyphicon glyphicon-envelope',
+      placeholder: 'user@example.org'
+    },
+    path: {
+      label: 'Path',
+      icon: 'glyphicon glyphicon-road',
+      placeholder: '/path/to/file'
+    },
+    unc: {
+      label: 'UNC Path',
+      icon: 'glyphicon glyphicon-hdd',
+      placeholder: '//server/share/path/to/file'
+    },
     unknown: {
       label: 'Unknown',
       icon: 'glyphicon glyphicon-question-sign',
+      placeholder: ''
     },
     url: {
       label: 'URL',
       icon: 'glyphicon glyphicon-globe',
       placeholder: 'http://www.example.org/image.png'
+    },
+    user: {
+      label: 'User',
+      icon: 'glyphicon glyphicon-user',
+      placeholder: 'alias'
     }
   };
 
@@ -210,17 +242,14 @@
   var hideParentAndInsertAfter = function(dialogDefinition, elementId, newElementDefinition) {
     var path = getUIElementPath(elementId, dialogDefinition.contents);
     if (path && path.length > 2) {
-      // Override the commit function of the replaced element.
+      // Override the commit and validate functions of the replaced element.
       var tabId = path[path.length - 1].element.id;
       var oldCommit = path[0].element.commit;
+      // We validate the resource reference.
+      delete path[0].element.validate;
       path[0].element.commit = function() {
         var resourceReference = this.getDialog().getValueOf(tabId, newElementDefinition.id);
-        if (resourceReference.type === 'url' || resourceReference.type === 'path') {
-          this.setValue(resourceReference.reference);
-        } else {
-          // TODO: Make this URL configurable.
-          this.setValue(new XWiki.Document('ResourceDispatcher', 'CKEditor').getURL('get', $.param(resourceReference)));
-        }
+        this.setValue(getResourceURL(resourceReference, this.getDialog().getParentEditor()));
         if (typeof oldCommit === 'function') {
           oldCommit.apply(this, arguments);
         }
@@ -249,5 +278,17 @@
       }
     }
     return null;
+  };
+
+  var getResourceURL = function(resourceReference, editor) {
+    if (['url', 'path', 'unc', 'unknown'].indexOf(resourceReference.type) >= 0) {
+      return resourceReference.reference;
+    } else if (['mailto', 'data'].indexOf(resourceReference.type) >= 0) {
+      return resourceReference.type + ':' + resourceReference.reference;
+    } else {
+      var dispatcherURL = editor.config['xwiki-resource'].dispatcher;
+      dispatcherURL += dispatcherURL.indexOf('?') < 0 ? '?' : '&';
+      return dispatcherURL + $.param(resourceReference);
+    }
   };
 })();

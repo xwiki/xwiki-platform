@@ -161,7 +161,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 )))|[[label&gt;&gt;]]
 |Link with wiki syntax in the label|{{{[[**bold label**&gt;&gt;PageA]]}}}|[[**bold label**&gt;&gt;]]
 |Link on an image|{{{[[image:PageA@img.png&gt;&gt;PageA]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;]]
-|Absolute link to page ##PageB## located in ##PageA## in wiki ##WikiA##|{{{[[wikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Absolute link to page ##PageB## located in ##PageA## in wiki ##WikiA##|{{{[[WikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;]]
 |Link that opens in a new window|{{{[[PageA||target="_blank"]]}}}|[[PageA&gt;&gt;]]
 |Implicit link to a URL|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
 |Explicit link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]

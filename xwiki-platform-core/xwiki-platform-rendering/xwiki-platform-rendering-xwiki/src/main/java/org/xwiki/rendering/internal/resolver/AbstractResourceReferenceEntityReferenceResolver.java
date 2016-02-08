@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -159,14 +160,36 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         // If same as current page, no fallback
         String defaultDocumentName = this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
         if (!reference.getName().equals(defaultDocumentName) && !Objects.equals(reference, baseReference)) {
-            if (!this.documentAccessBridge.exists(reference)) {
-                // It does not exist, make it a space home page. If the space does not exist, it will be
-                // a wanted link.
-                SpaceReference spaceReference =
-                    new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
+            finalReference = resolveDocumentReference(finalReference, baseReference, true, defaultDocumentName);
+        }
 
-                // Return a DocumentReference by default since a DOCUMENTresource reference was provided
-                finalReference = new DocumentReference(defaultDocumentName, spaceReference);
+        return finalReference;
+    }
+
+    protected DocumentReference resolveDocumentReference(DocumentReference reference, EntityReference baseReference,
+        boolean trySpaceSibling, String defaultDocumentName)
+    {
+        DocumentReference finalReference = reference;
+
+        if (!this.documentAccessBridge.exists(reference)) {
+            // It does not exist, make it a space home page.
+            SpaceReference spaceReference =
+                new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
+            finalReference = new DocumentReference(defaultDocumentName, spaceReference);
+
+            if (trySpaceSibling && baseReference != null && baseReference.getName().equals(defaultDocumentName)
+                && !this.documentAccessBridge.exists(finalReference)) {
+                // It does not exist, make it a space sibling.
+                EntityReference parentReference = reference.getParent().getParent();
+                if (parentReference instanceof SpaceReference) {
+                    finalReference = new DocumentReference(reference.getName(), (SpaceReference) parentReference);
+
+                    finalReference =
+                        resolveDocumentReference(finalReference, baseReference, false, defaultDocumentName);
+                } else {
+                    spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
+                    finalReference = new DocumentReference(defaultDocumentName, spaceReference);
+                }
             }
         }
 

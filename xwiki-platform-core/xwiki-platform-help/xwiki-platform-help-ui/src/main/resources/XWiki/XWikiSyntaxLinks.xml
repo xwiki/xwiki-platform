@@ -27,12 +27,12 @@
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1300895617000</creationDate>
   <parent>XWiki.XWikiSyntax</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1300895617000</creationDate>
-  <date>1301497904000</date>
-  <contentUpdateDate>1301497904000</contentUpdateDate>
+  <date>1454940903000</date>
+  <contentUpdateDate>1454940903000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxLinks</title>
   <comment/>
@@ -151,35 +151,33 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 === 2.1 Links ===
 
 |=Feature|=XWiki Syntax 2.1|=Result
-|Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
+|Absolute link to page ##PageB## located in ##PageA##|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Relative link to page ##PageA## from the current page|{{{[[PageA]]}}} or {{{[[.PageA]]}}}|[[PageA&gt;&gt;]]
+|Relative link to page ##PageA.PageB## from the current page|{{{[[.PageA.PageB]]}}}|[[PageB&gt;&gt;]]
 |Link with a label|(((
-{{{[[label&gt;&gt;WebHome]]}}}
+{{{[[label&gt;&gt;PageA]]}}}
+
 {{info}}XWiki Syntax is supported inside link labels.{{/info}}
-)))|[[label&gt;&gt;WebHome]]
-|Link with XWiki Syntax in the label|{{{[[**bold label**&gt;&gt;WebHome]]}}}|[[**bold label**&gt;&gt;WebHome]]
-|Link to a page with the space specified|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
-|Link to a subwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
-|Link that opens in a new window|{{{[[label&gt;&gt;WebHome||target="_blank"]]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
-|Link to a URL directly in the text|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
-|Link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+)))|[[label&gt;&gt;]]
+|Link with wiki syntax in the label|{{{[[**bold label**&gt;&gt;PageA]]}}}|[[**bold label**&gt;&gt;]]
+|Link on an image|{{{[[image:PageA@img.png&gt;&gt;PageA]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;]]
+|Absolute link to page ##PageB## located in ##PageA## in wiki ##WikiA##|{{{[[wikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Link that opens in a new window|{{{[[PageA||target="_blank"]]}}}|[[PageA&gt;&gt;]]
+|Implicit link to a URL|{{{This is a URL: http://xwiki.org}}}|This is a URL: http://xwiki.org
+|Explicit link to a URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Explicit link to a URL with a label|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
 |Link to an email address|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
-|Image Link|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
-|Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
-|Link to an attachment on the current page|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
-|Link to an attachment in a different page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
-|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page||anchor="anchor"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
-|Link to a Heading in a page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
-|Link to an Anchor in the current page|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;||anchor="anchor"]]
-|Link to a top level nested page|{{{[[space:Main]]}}}, {{{[[:Main.WebHome]]}}} or {{{[[:Main.]]}}} (from a non-terminal page)|[[space:Main]], [[:Main.WebHome]], [[:Main.WebHome]]
-|Link to an existing child terminal page (i.e. in the current space)|{{{[[XWikiSyntaxLinks]]}}}|[[XWikiSyntaxLinks]]
-|Link to a child non-terminal page (i.e. in the current space)|{{{[[A]]}}}|[[A]]
-|Link to a wiki-relative (space-absolute) non-terminal page|{{{[[A.B]]}}}|[[A.B]]
-|Link to a child nested non-terminal page|{{{[[.A.B]]}}}|[[.A.B]]
-|Link to a terminal page ending in ##.WebHome##|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
-|Link to an existing terminal page|{{{[[XWiki.XWikiSyntax]]}}}|[[XWiki.XWikiSyntax]]
+|Link to an attachment on the current page|{{{[[attach:img.png]]}}}|[[img.png&gt;&gt;]]
+|Link to an attachment in a different page|{{{[[attach:PageA.PageB@img.png]]}}}|[[img.png&gt;&gt;]]
+|Link to an Anchor in a page|{{{[[PageA.PageB||anchor="anchor"]]}}}|[[PageB&gt;&gt;]]
+|Link to a Heading in a page|(((
+{{{[[PageA.PageB||anchor="HMyheading"]]}}}
 
 {{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
+)))|[[PageB&gt;&gt;]]
+|Link to an anchor in the current page|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;]]
+|Link to a page with a query string|{{{[[PageA.PageB||queryString="param1=value1&amp;param2=value2"]]}}}|[[PageB&gt;&gt;]]
+|Link to the current page with a query string|{{{[[label&gt;&gt;||queryString="param1=value1&amp;param2=value2"]]}}}|[[label&gt;&gt;]]
 
 {{velocity}}$subHeading XWiki Syntax 2.1 Link Specification $subHeading{{/velocity}}
 

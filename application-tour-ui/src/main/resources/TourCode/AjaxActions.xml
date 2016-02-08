@@ -450,7 +450,9 @@
       <title>jxcx</title>
     </property>
   </object>
-  <content>{{velocity}}
+  <content>{{include reference="TourCode.Macros" /}}
+
+{{velocity}}
 #**
 * Ajax Actions
 *
@@ -511,20 +513,16 @@
          #set($discard = $bootstrapTourDoc.removeObject($stepObj))
          #set($discard = $bootstrapTourDoc.save())
          ## Update other steps order
-         #set($hql = "select distinct step.order from Document doc, doc.object(TourCode.StepClass) as step where doc.fullName='$docRef' order by step.order")
-         #set($stepsOrders = $services.query.xwql($hql).execute())
-         #if ($stepsOrders.size() &gt; 0)
-            #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
-            #set($x = 0)
-            #foreach($order in $stepsOrders)
-               #set($sObj = $bootstrapTourDoc.getObject("TourCode.StepClass", "order", "$order"))
-               #if ($sObj)
-                  #set($discard = $sObj.set("order", $x.longValue()))
-               #end
-               #set($x = $x + 1)
-            #end
-            #set($discard = $bootstrapTourDoc.save())
+         #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
+         #set($x = 0)
+         #set($steps = $bootstrapTourDoc.getObjects("TourCode.StepClass"))
+         #set ($sortedSteps = [])
+         #sortXWikiObjectsList($steps, 'order', $sortedSteps)
+         #foreach($step in $sortedSteps)
+            #set($discard = $step.set("order", $x.longValue()))
+            #set($x = $x + 1)
          #end
+         #set($discard = $bootstrapTourDoc.save())
       #end
       #set($BSTDocRef = $docRef)
       #set($pageMode = "edit")

@@ -42,14 +42,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include reference="TourCode.Macros" /}}
+
+{{velocity}}
 {{html}}
 #set($vdoc = $doc)
 #if (!$BSTDocRef)
    #set($BSTDocRef = $doc.getFullName())
 #end
-#set($hql = "select distinct step.order, step.element, step.title, step.backdrop, step.placement, step.targetPage from Document doc, doc.object(TourCode.StepClass) as step where doc.fullName='$BSTDocRef' order by step.order")
-#set($steps = $services.query.xwql($hql).execute())
+#set($vdoc = $xwiki.getDocument($BSTDocRef))
+#set($steps = $vdoc.getObjects("TourCode.StepClass"))
+#set ($sortedSteps = [])
+#sortXWikiObjectsList($steps, 'order', $sortedSteps)
 #set($nbsteps = 0)
 #set($discard = $xwiki.ssx.use("TourCode.StepSheet"))
 #set($discard = $xwiki.jsx.use("TourCode.StepSheet"))
@@ -70,16 +74,16 @@
                &lt;th style="text-align:right"&gt;Actions&lt;/th&gt;
             #end
          &lt;/tr&gt;
-         #if ($steps &amp;&amp; $steps.size() &gt; 0)
-            #set($nbsteps = $steps.size())
+         #if ($sortedSteps &amp;&amp; $sortedSteps.size() &gt; 0)
+            #set($nbsteps = $sortedSteps.size())
             #set($x = 0)
-            #foreach($step in $steps)
-               #set($order = $step[0])
-               #set($element = $step[1])
-               #set($title = $step[2])
-               #set($backdrop = $step[3])
-               #set($placement = $step[4])
-               #set($targetPage = $step[5]) 
+            #foreach($step in $sortedSteps)
+               #set($order = $step.getValue("order"))
+               #set($element = $step.getValue("element"))
+               #set($title = $step.getValue("title"))
+               #set($backdrop = $step.getValue("backdrop"))
+               #set($placement = $step.getValue("placement"))
+               #set($targetPage = $step.getValue("targetPage"))
                &lt;tr #if($x%2 != 0) class="tr1" #end&gt;
                   &lt;td&gt;$!mathtool.add($order,1)&lt;/td&gt;
                   &lt;td&gt;$!element&lt;/td&gt;

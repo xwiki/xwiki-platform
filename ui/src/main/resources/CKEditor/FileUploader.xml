@@ -55,11 +55,7 @@
     #end
     #set ($discard = $document.addAttachment($fileName, $bytes))
     #set ($discard = $document.save($services.localization.render('core.comment.uploadAttachmentComment', [$fileName])))
-    $jsontool.serialize({
-      'uploaded': 1,
-      'fileName': $fileName,
-      'url': $document.getAttachmentURL($fileName)
-    })
+    #sendSuccess($document $fileName)
   #else
     ## Forbidden
     #sendError(403 'You are not allowed to perform this action.')
@@ -67,7 +63,6 @@
 #end
 
 #macro (handleUploadRequest)
-  #set ($discard = $response.setContentType('application/json'))
   #set ($fileName = $xwiki.fileupload.getFileName('upload'))
   #if ("$!fileName" != '')
     #if ($services.csrf.isTokenValid($request.form_token))
@@ -81,19 +76,54 @@
   #end
 #end
 
-#macro (sendError $code $message)
-  ## The editor doesn't display the proper message if we call sendError() or setStatus() on the response.
-  $jsontool.serialize({
-    'uploaded': 0,
-    'error': {
-      'number': $code,
-      'message': $message
-    }
+#macro (sendSuccess $document $fileName)
+  #set ($url = $document.getAttachmentURL($fileName))
+  #set ($attachmentReference = $services.model.createAttachmentReference($document.documentReference, $fileName))
+  #set ($resourceReference = {
+    'type': 'attach',
+    'reference': $services.model.serialize($attachmentReference, $document.documentReference)
   })
+  #if ("$!request.CKEditorFuncNum" != '')
+    #set ($discard = $response.setContentType('text/html'))
+    &lt;script type="text/javascript"&gt;
+    window.parent.CKEDITOR.tools.callFunction($request.CKEditorFuncNum, '$escapetool.javascript($url)',
+      $jsontool.serialize({
+        'resourceReference': $resourceReference
+    }));
+    &lt;/script&gt;
+  #else
+    #set ($discard = $response.setContentType('application/json'))
+    $jsontool.serialize({
+      'uploaded': 1,
+      'fileName': $fileName,
+      'url': $url,
+      'resourceReference': $resourceReference
+    })
+  #end
+#end
+
+#macro (sendError $code $message)
+  #if ("$!request.CKEditorFuncNum" != '')
+    #set ($discard = $response.setContentType('text/html'))
+    #set ($discard = $response.setStatus($code))
+    &lt;script type="text/javascript"&gt;
+    window.parent.CKEDITOR.tools.callFunction($request.CKEditorFuncNum, null, '$escapetool.javascript($message)');
+    &lt;/script&gt;
+  #else
+    #set ($discard = $response.setContentType('application/json'))
+    ## The editor doesn't display the proper message if we call sendError() or setStatus() on the response.
+    $jsontool.serialize({
+      'uploaded': 0,
+      'error': {
+        'number': $code,
+        'message': $message
+      }
+    })
+  #end
 #end
 {{/velocity}}
 
-{{velocity}}
+{{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
   #handleUploadRequest
 #end

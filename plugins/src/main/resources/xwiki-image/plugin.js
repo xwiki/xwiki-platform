@@ -20,7 +20,7 @@
 (function (){
   'use strict';
   CKEDITOR.plugins.add('xwiki-image', {
-    requires: 'uploadimage,xwiki-marker',
+    requires: 'xwiki-marker,xwiki-resource',
 
     init: function(editor) {
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'image', {
@@ -48,15 +48,29 @@
     },
 
     afterInit: function(editor) {
-      // Override the 'uploadimage' widget definition to include the image markers.
-      var originalOnUploaded = editor.widgets.registered.uploadimage.onUploaded;
-      editor.widgets.registered.uploadimage.onUploaded = function(upload) {
-        this.parts.img.setAttribute('data-reference', 'false|-|attach|-|' + upload.fileName);
+      this.overrideUploadImageWidget(editor);
+      this.overrideImageWidget(editor);
+    },
+
+    /**
+     * Overrides the Upload Image widget definition to include the image markers.
+     */
+    overrideUploadImageWidget: function(editor) {
+      var uploadImageWidget = editor.widgets.registered.uploadimage;
+      if (!uploadImageWidget) {
+        return;
+      }
+
+      var originalOnUploaded = uploadImageWidget.onUploaded;
+      uploadImageWidget.onUploaded = function(upload) {
+        var response = JSON.parse(upload.xhr.responseText);
+        this.parts.img.setAttribute('data-reference', CKEDITOR.plugins.get('xwiki-resource')
+          .serializeResourceReference(response.resourceReference));
         originalOnUploaded.call(this, upload);
       };
 
-      var originalReplaceWith = editor.widgets.registered.uploadimage.replaceWith;
-      editor.widgets.registered.uploadimage.replaceWith = function(data, mode) {
+      var originalReplaceWith = uploadImageWidget.replaceWith;
+      uploadImageWidget.replaceWith = function(data, mode) {
         var reference = this.parts.img.getAttribute('data-reference');
         if (typeof reference === 'string') {
           var startImageMarker = '<!--startimage:' + CKEDITOR.tools.escapeComment(reference) + '-->';
@@ -65,6 +79,64 @@
         }
         originalReplaceWith.call(this, data, mode);
       };
+    },
+
+    overrideImageWidget: function(editor) {
+      var imageWidget = editor.widgets.registered.image;
+      if (!imageWidget) {
+        return;
+      }
+
+      var originalInit = imageWidget.init;
+      imageWidget.init = function() {
+        originalInit.call(this);
+        var serializedResourceReference = this.parts.image.getAttribute('data-reference');
+        if (serializedResourceReference) {
+          this.setData('resourceReference', CKEDITOR.plugins.get('xwiki-resource')
+            .parseResourceReference(serializedResourceReference));
+        }
+      };
+
+      var originalData = imageWidget.data;
+      imageWidget.data = function() {
+        var resourceReference = this.data.resourceReference;
+        if (resourceReference) {
+          this.parts.image.setAttribute('data-reference', CKEDITOR.plugins.get('xwiki-resource')
+            .serializeResourceReference(resourceReference));
+        }
+        originalData.call(this);
+      };
+    },
+  });
+
+  CKEDITOR.on('dialogDefinition', function(event) {
+    // Make sure we affect only the editors that load this plugin.
+    if (!event.editor.plugins['xwiki-image']) {
+      return;
+    }
+
+    // Take the dialog window name and its definition from the event data.
+    var dialogName = event.data.name;
+    var dialogDefinition = event.data.definition;
+    if (dialogName === 'image2') {
+      CKEDITOR.plugins.get('xwiki-resource').replaceWithResourcePicker(dialogDefinition, 'src', {
+        resourceTypes: ['attach', 'icon', 'url'],
+        setup: function(widget) {
+          this.setValue(widget.data.resourceReference);
+        },
+        commit: function(widget) {
+          var oldResourceReference = widget.data.resourceReference || {};
+          var newResourceReference = this.getValue();
+          if (oldResourceReference.type !== newResourceReference.type ||
+              oldResourceReference.reference !== newResourceReference.reference) {
+            newResourceReference.typed = newResourceReference.type !== 'attach' &&
+              (newResourceReference.type !== 'url' || newResourceReference.reference.indexOf('://') < 0);
+            widget.setData('resourceReference', CKEDITOR.tools.extend(newResourceReference, oldResourceReference));
+          }
+        }
+      });
+      CKEDITOR.plugins.get('xwiki-resource').updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+        ['info', 'resourceReference'], ['Upload', 'uploadButton']);
     }
   });
 })();

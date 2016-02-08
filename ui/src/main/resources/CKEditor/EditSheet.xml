@@ -153,6 +153,8 @@ require(['jquery'], function($) {
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
+        filebrowserUploadUrl: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.FileUploader&amp;outputSyntax=plain&amp;form_token='
+          + xwikiMeta.form_token),
         fullPage: true,
         height: 500,
         removeButtons: 'Find,Anchor',
@@ -173,8 +175,6 @@ require(['jquery'], function($) {
           {name: 'others'},
           {name: 'about'}
         ],
-        uploadUrl: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.FileUploader&amp;outputSyntax=plain&amp;form_token='
-          + xwikiMeta.form_token),
         'xwiki-save': {
           leaveConfirmation: true
         },
@@ -406,6 +406,81 @@ require(['jquery'], function($) {
   cursor: wait;
   overflow: hidden;
   resize: none;
+}
+
+/**
+ * Resource Picker Styles
+ * We duplicate a couple of Bootstrap styles because CKEditor resets the styles of all the dialog elements.
+ */
+.resourcePicker.input-group {
+  border-collapse: separate;
+  position: relative;
+}
+
+.resourcePicker input[type="text"] {
+  box-sizing: border-box;
+}
+
+.resourcePicker .input-group-btn {
+  font-size: 0;
+  position: relative;
+  vertical-align: middle;
+  width: 1%;
+}
+
+.resourcePicker .btn-default {
+  color: #333;
+  cursor: pointer;
+  border: 1px solid #CCC;
+  font-size: 14px;
+  line-height: 1.428571429;
+  padding: 6px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.resourcePicker .btn-default:hover,
+.resourcePicker .btn-default:focus {
+  background-color: #E6E6E6;
+  background-image: none;
+}
+
+.resourcePicker .btn-default[disabled] {
+  cursor: default;
+}
+
+.resourcePicker .glyphicon {
+  font-family: 'Glyphicons Halflings';
+}
+
+.resourcePicker .icon {
+  vertical-align: middle;
+}
+
+.resourcePicker .caret {
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-top: 4px dashed;
+  border-top: 4px solid;
+  height: 0;
+  vertical-align: middle;
+  width: 0;
+}
+
+.resourcePicker .dropdown-toggle {
+  padding: 6px;
+}
+
+.resourcePicker .dropdown-menu {
+  background-clip: padding-box;
+  background-color: white;
+  border: 1px solid #CCC;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  float: left;
+  font-size: 14px;
+  margin: 2px 0 0;
+  padding: 5px 0;
+  position: absolute;
 }</code>
     </property>
     <property>

@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,7 +29,6 @@ import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
@@ -91,8 +89,8 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
 
         // Handle the subject. Get it from the template
         Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
-        Locale locale = getLocale(parameters.get("language"));
-        String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, locale);
+        Object localeValue = parameters.get("language");
+        String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, localeValue);
         message.setSubject(subject);
 
         // Add a default body part taken from the template.
@@ -101,24 +99,6 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
         message.setContent(multipart);
 
         return message;
-    }
-
-    private Locale getLocale(Object languageValue)
-    {
-        Locale locale;
-
-        if (languageValue == null) {
-            locale = Locale.ROOT;
-        } else {
-            // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first
-            // version of this API only supported String and we've moved to support Locale).
-            if (languageValue instanceof Locale) {
-                locale = (Locale) languageValue;
-            } else {
-                locale = LocaleUtils.toLocale(languageValue.toString());
-            }
-        }
-        return locale;
     }
 
     private void setRecipient(MimeMessage message, Message.RecipientType type, Object value)

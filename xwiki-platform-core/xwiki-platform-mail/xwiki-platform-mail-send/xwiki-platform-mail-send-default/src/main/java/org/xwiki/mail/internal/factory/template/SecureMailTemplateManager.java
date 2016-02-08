@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -56,8 +55,7 @@ public class SecureMailTemplateManager implements MailTemplateManager
 
     @Override
     public String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
-        Locale language)
-        throws MessagingException
+        Object localeValue) throws MessagingException
     {
         // Verify that the current user has the view right on the Template document
         if (!this.authorizationManager.hasAccess(
@@ -68,7 +66,7 @@ public class SecureMailTemplateManager implements MailTemplateManager
                     this.documentBridge.getCurrentUserReference(), templateReference));
         }
 
-        return this.templateManager.evaluate(templateReference, property, velocityVariables, language);
+        return this.templateManager.evaluate(templateReference, property, velocityVariables, localeValue);
     }
 
     @Override

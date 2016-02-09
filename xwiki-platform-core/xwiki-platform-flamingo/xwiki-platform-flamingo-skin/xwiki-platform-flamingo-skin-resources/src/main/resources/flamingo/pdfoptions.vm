@@ -72,6 +72,24 @@
           </label>
           <span class="xHint">$services.localization.render('core.export.pdf.options.toc.hint')</span>
         </dt>
+        ## Header
+        <dt>
+          <label for="pdfheader">
+            <input id="pdfheader" name="pdfheader" type="checkbox" checked="checked" value="1" />
+            <input name="pdfheader" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.header')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.header.hint')</span>
+        </dt>
+        ## Footer
+        <dt>
+          <label for="pdffooter">
+            <input id="pdffooter" name="pdffooter" type="checkbox" checked="checked" value="1" />
+            <input name="pdffooter" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.footer')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.footer.hint')</span>
+        </dt>
         ## Comments
         <dt>
           <label for="comments">

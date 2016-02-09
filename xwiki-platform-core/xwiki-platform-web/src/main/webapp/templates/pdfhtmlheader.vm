@@ -8,6 +8,16 @@
 #else
   #set ($displayPdfToc = 0)
 #end
+#if ("$!request.pdffooter" != '0')
+  #set ($displayPdfFooter = 1)
+#else
+  #set ($displayPdfFooter = 0)
+#end
+#if ("$!request.pdfheader" != '0')
+  #set ($displayPdfHeader = 1)
+#else
+  #set ($displayPdfHeader = 0)
+#end
 <?xml version="1.0" encoding="${xwiki.encoding}" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -28,22 +38,26 @@
 <meta name="language" content="$!{xcontext.locale}" />
 </head>
 <body id="body" class="${xcontext.action}body" pdfcover="${displayPdfCover}" pdftoc="${displayPdfToc}">
-<div class="pdfheader">
-#set ($pdfheader = $tdoc.display('header', 'rendered', '', $pdfobj))
-#if ($pdfheader == '')
-  #template("pdfheader.vm")
-#else
-  $pdfheader
+#if ($displayPdfHeader == 1)
+  <div class="pdfheader">
+  #set ($pdfheader = $tdoc.display('header', 'rendered', '', $pdfobj))
+  #if ($pdfheader == '')
+    #template("pdfheader.vm")
+  #else
+    $pdfheader
+  #end
+  </div>
 #end
-</div>
-<div class="pdffooter">
-#set ($pdffooter = $tdoc.display('footer', 'rendered', '', $pdfobj))
-#if ($pdffooter == '')
-  #template("pdffooter.vm")
-#else
-  $pdffooter
+#if ($displayPdfFooter == 1)
+  <div class="pdffooter">
+  #set ($pdffooter = $tdoc.display('footer', 'rendered', '', $pdfobj))
+  #if ($pdffooter == '')
+    #template("pdffooter.vm")
+  #else
+    $pdffooter
+  #end
+  </div>
 #end
-</div>
 #if ($displayPdfCover == 1)
   <div class="pdfcover">
   #set ($pdfcover = $tdoc.display('cover', 'rendered', '', $pdfobj))

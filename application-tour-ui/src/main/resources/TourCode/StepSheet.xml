@@ -129,6 +129,7 @@ require(['jquery'], function ($) {
    // Initialize add new step button
    $("#addStep").click(function() {
       var BSTDocRef = $("#BSTDocRef").val();
+      $('.xdialog-modal-container').remove();
       new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + BSTDocRef});
    });
 
@@ -139,13 +140,14 @@ require(['jquery'], function ($) {
       var prefix = "TourCode.StepClass_";
       var BSTDocRef = $("#BSTDocRef",parent).val();
       var element = $("input[id^='" + prefix + "'][id$='_element']", parent).val();
-      var title = $("input[id^='" + prefix + "'][id$='_title']", content).val();
+      var title = $("input[id^='" + prefix + "'][id$='_title']", parent).val();
       var backdrop = $("input[id^='" + prefix + "'][id$='_backdrop']", parent).is(":checked");
       var content = $("textarea[id^='" + prefix + "'][id$='_content']", parent).val();
       var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
       var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
+      var stepOrder = $("#stepOrderSelect").val();
       var nbSteps = $("#nbsteps").val();
-      var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepID: stepID, action:"editStep", xpage:"plain"};
+      var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), stepOrder:(stepOrder? stepOrder: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepID: stepID, action:"editStep", xpage:"plain"};
       $.ajax({
 	 url:"$xwiki.getURL('TourCode.AjaxActions')",
 	 type:'POST',
@@ -165,6 +167,7 @@ require(['jquery'], function ($) {
       $('.xdialog-modal-container').remove();
       var BSTDocRef = $("#BSTDocRef").val();
       var stepID = $(this).attr("rel");
+      $('.xdialog-modal-container').remove();
       new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepID=' + encodeURIComponent(stepID)});
    });
    
@@ -487,8 +490,10 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
 #set($isNewStep = true)
 #set($bSTDocRef = $request.BSTDocRef)
 #set($stepID = $request.stepID)
+#set($nbSteps = 0)
 #if ($bSTDocRef &amp;&amp; $bSTDocRef != "" &amp;&amp; $xwiki.exists($bSTDocRef))
    #set($bSTDoc = $xwiki.getDocument($bSTDocRef))
+   #set($nbSteps = $bSTDoc.getObjects("TourCode.StepClass").size())
    #if($stepID &amp;&amp; $stepID != "")
       #set($stepObj = $bSTDoc.getObject("TourCode.StepClass", $mathtool.toInteger($stepID)))
       #if($stepObj)
@@ -511,7 +516,19 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
 #end
 &lt;div id="stepForm"&gt;
  #foreach($prop in $class.properties)
-    #if(!$prop.getName().equals("order"))
+    #if($prop.getName().equals("order"))
+       ; $prop.prettyName
+       &lt;dd&gt;
+       &lt;select id="stepOrderSelect"&gt;
+          #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
+             &lt;option value="$i" #if ($vobj.getProperty("order").value == $i) selected #end &gt;$mathtool.add($i, 1)&lt;/option&gt;
+          #end
+          #if ($isNewStep)
+             &lt;option value="$nbSteps" selected &gt;$mathtool.add($nbSteps, 1)&lt;/option&gt;
+          #end
+       &lt;/select&gt;
+       &lt;/dd&gt;
+    #else
        ; $prop.prettyName
        : $vobj.get($prop.getName())
     #end

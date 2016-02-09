@@ -475,12 +475,15 @@
         #set($placement = $request.getParameter("placement"))
         #set($targetPage = $request.getParameter("targetPage"))
         #set($nbSteps = $request.getParameter("nbSteps"))
+        #set($stepOrder = $request.getParameter("stepOrder"))
+        #set($prevStepOrder = $nbSteps)
         #set($stepID = $mathtool.toInteger($request.getParameter("stepID")))
         #set($isNewStep = true)
         #if ("$!stepID" != '') ## Edit
             #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", $stepID))
             #if($stepObj)
-               #set($isNewStep = false)                
+               #set($isNewStep = false)
+               #set($prevStepOrder = $stepObj.getValue("order"))
             #end
         #end
         #if ($isNewStep)
@@ -494,8 +497,18 @@
         #set($discard = $stepObj.set('targetPage', $targetPage))
         #set($discard = $stepObj.set('backdrop', $backdrop))
         #set($discard = $stepObj.set('content', $content))
-        #if ($isNewStep)
-           #set($discard = $stepObj.set('order', $nbSteps))
+        #if($prevStepOrder != $stepOrder)
+           ## Update the step objects
+           #set($stepObj2 = $bootstrapTourDoc.getObject("TourCode.StepClass", "order", "$stepOrder"))
+           #if("$!stepObj2" != "")
+              #set($discard = $stepObj2.set('order', $prevStepOrder))
+              #set($discard = $bootstrapTourDoc.save())
+           #end
+           #set($discard = $stepObj.set('order', $stepOrder))
+        #else
+           #if ($isNewStep)
+              #set($discard = $stepObj.set('order', $nbSteps))
+           #end
         #end
         #set($discard = $bootstrapTourDoc.save())
         #set($BSTDocRef = $bootstrapTourDoc)

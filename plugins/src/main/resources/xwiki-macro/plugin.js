@@ -22,21 +22,6 @@
   CKEDITOR.plugins.add('xwiki-macro', {
     requires: 'widget,xwiki-marker',
     init : function(editor) {
-      // startMacroComment: CKEDITOR.htmlParser.comment
-      var getMacroOutput = function(startMacroComment) {
-        var output = [];
-        var parent = startMacroComment.parent;
-        for (var i = startMacroComment.getIndex() + 1; i < parent.children.length; i++) {
-          var child = parent.children[i];
-          if (child.type === CKEDITOR.NODE_COMMENT && child.value === 'stopmacro') {
-            break;
-          } else {
-            output.push(child);
-          }
-        }
-        return output;
-      };
-
       // nodes: CKEDITOR.htmlParser.node[]
       var isInline = function(nodes) {
         for (var i = 0; i < nodes.length; i++) {
@@ -49,8 +34,8 @@
       };
 
       // startMacroComment: CKEDITOR.htmlParser.comment
-      var wrapMacroOutput = function(startMacroComment) {
-        var output = getMacroOutput(startMacroComment);
+      // output: CKEDITOR.htmlParser.node[]
+      var wrapMacroOutput = function(startMacroComment, output) {
         var wrapperName = isInline(output) ? 'span' : 'div';
         var wrapper = new CKEDITOR.htmlParser.element(wrapperName, {
           'class': 'macro',

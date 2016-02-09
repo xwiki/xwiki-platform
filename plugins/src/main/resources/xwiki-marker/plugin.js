@@ -21,31 +21,8 @@
   'use strict';
   CKEDITOR.plugins.add('xwiki-marker', {
     addMarkerHandler: function(editor, type, handler) {
-      // comment: CKEDITOR.htmlParser.comment
-      var toHtml = function(comment) {
-        if (comment.value.substring(0, 5) === 'start') {
-          handler.toHtml(comment);
-        }
-        if (comment.parent) {
-          comment.remove();
-        }
-      };
-
-      // content: CKEDITOR.htmlParser.fragment
-      var getMarkers = function(content, type) {
-        var markers = [];
-        var startMarkerPrefix = 'start' + type + ':';
-        var stopMarker = 'stop' + type;
-        // Note that forEach is iterating a live list, meaning that the list is updated if we remove a node from the
-        // DOM. That's why we have to collect the markers first and then process them.
-        content.forEach(function(comment) {
-          if (comment.value.substring(0, startMarkerPrefix.length) === startMarkerPrefix ||
-              comment.value === stopMarker) {
-            markers.push(comment);
-          }
-        }, CKEDITOR.NODE_COMMENT, true);
-        return markers;
-      };
+      var startMarkerPrefix = 'start' + type + ':';
+      var stopMarker = 'stop' + type;
 
       // We didn't use the editor.dataProcessor.dataFilter because it is executed with priority 10, so after the widgets
       // are upcasted (priority 8). Only element nodes can be upcasted so we need to handle the markers (which are
@@ -61,6 +38,53 @@
       }
 
       // content: CKEDITOR.htmlParser.fragment
+      var getMarkers = function(content, type) {
+        var markers = [];
+        // Note that forEach is iterating a live list, meaning that the list is updated if we remove a node from the
+        // DOM. That's why we have to collect the markers first and then process them.
+        content.forEach(function(comment) {
+          if (comment.value.substring(0, startMarkerPrefix.length) === startMarkerPrefix) {
+            markers.push(getMarker(comment));
+          }
+        }, CKEDITOR.NODE_COMMENT, true);
+        return markers;
+      };
+
+      // startComment: CKEDITOR.htmlParser.comment
+      var getMarker = function(startComment) {
+        var content = [];
+        var nextSibling = startComment.next;
+        while (nextSibling && (nextSibling.type !== CKEDITOR.NODE_COMMENT || nextSibling.value !== stopMarker)) {
+          content.push(nextSibling);
+          nextSibling = nextSibling.next;
+        }
+        return {
+          startComment: startComment,
+          content: content,
+          stopComment: nextSibling
+        };
+      };
+
+      var toHtml = function(marker) {
+        var remove = handler.toHtml(marker.startComment, marker.content);
+        if (remove !== false) {
+          if (marker.startComment.parent) {
+            marker.startComment.remove();
+          }
+          if (marker.stopComment && marker.stopComment.parent) {
+            marker.stopComment.remove();
+          }
+        }
+      };
+
+      if (typeof handler.toDataFormat === 'function' && typeof handler.isMarked === 'function') {
+        editor.on('toDataFormat', function(event) {
+          // dataValue is a CKEDITOR.htmlParser.fragment instance.
+          getMarkedElements(event.data.dataValue).forEach(handler.toDataFormat);
+        }, null, null, 14);
+      }
+
+      // content: CKEDITOR.htmlParser.fragment
       var getMarkedElements = function(content) {
         var markedElements = [];
         // Note that forEach is iterating a live list, meaning that the list is updated if we remove a node from the
@@ -72,13 +96,6 @@
         }, CKEDITOR.NODE_ELEMENT, true);
         return markedElements;
       };
-
-      if (typeof handler.toDataFormat === 'function' && typeof handler.isMarked === 'function') {
-        editor.on('toDataFormat', function(event) {
-          // dataValue is a CKEDITOR.htmlParser.fragment instance.
-          getMarkedElements(event.data.dataValue).forEach(handler.toDataFormat);
-        }, null, null, 14);
-      }
     }
   });
 

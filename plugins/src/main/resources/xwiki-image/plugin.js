@@ -24,11 +24,15 @@
 
     init: function(editor) {
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'image', {
-        // comment: CKEDITOR.htmlParser.comment
-        toHtml: function(comment) {
-          if (comment.next && comment.next.name === 'img') {
-            var reference = comment.value.substring('startimage:'.length);
-            comment.next.attributes['data-reference'] = CKEDITOR.tools.unescapeComment(reference);
+        // startImageComment: CKEDITOR.htmlParser.comment
+        // content: CKEDITOR.htmlParser.node[]
+        toHtml: function(startImageComment, content) {
+          if (content.length === 1 && content[0].name === 'img') {
+            var reference = startImageComment.value.substring('startimage:'.length);
+            content[0].attributes['data-reference'] = CKEDITOR.tools.unescapeComment(reference);
+          } else {
+            // Unexpected HTML structure inside image markers. Keep the markers.
+            return false;
           }
         },
         // element: CKEDITOR.htmlParser.element

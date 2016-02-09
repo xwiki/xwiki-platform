@@ -20,6 +20,13 @@
 (function (){
   'use strict';
   var wikiLinkClassPattern =  /\bwiki(\w*)link\b/i;
+  var resourceTypeToLinkType = {
+    attach: 'attachment',
+    mailto: 'external',
+    unc: 'external',
+    url: 'external'
+  };
+
   CKEDITOR.plugins.add('xwiki-link', {
     requires: 'xwiki-marker,xwiki-resource',
 
@@ -95,6 +102,68 @@
           delete link.attributes['data-freestanding'];
         }
       });
+    },
+
+    onLoad: function() {
+      overrideLinkPlugin();
+    }
+  });
+
+  var overrideLinkPlugin = function() {
+    var linkPlugin = CKEDITOR.plugins.link;
+    if (!linkPlugin) {
+      return;
+    }
+    if (typeof linkPlugin.parseLinkAttributes === 'function') {
+      var oldParseLinkAttributes = linkPlugin.parseLinkAttributes;
+      linkPlugin.parseLinkAttributes = function(editor, element) {
+        var data = oldParseLinkAttributes.call(linkPlugin, editor, element);
+        var serializedResourceReference = element && element.getAttribute('data-reference');
+        if (serializedResourceReference) {
+          data.resourceReference = CKEDITOR.plugins.get('xwiki-resource')
+            .parseResourceReference(serializedResourceReference);
+        }
+        return data;
+      };
+    }
+    if (typeof linkPlugin.getLinkAttributes === 'function') {
+      var oldGetLinkAttributes = linkPlugin.getLinkAttributes;
+      linkPlugin.getLinkAttributes = function(editor, data) {
+        var attributes = oldGetLinkAttributes.call(linkPlugin, editor, data);
+        var resourceReference = data.resourceReference;
+        if (resourceReference) {
+          attributes.set['data-reference'] = CKEDITOR.plugins.get('xwiki-resource')
+            .serializeResourceReference(resourceReference);
+          attributes.set['data-linktype'] = resourceTypeToLinkType[resourceReference.type] || '';
+        }
+        return attributes;
+      };
+    }
+  };
+
+  CKEDITOR.on('dialogDefinition', function(event) {
+    // Make sure we affect only the editors that load this plugin.
+    if (!event.editor.plugins['xwiki-link']) {
+      return;
+    }
+
+    // Take the dialog window name and its definition from the event data.
+    var dialogName = event.data.name;
+    var dialogDefinition = event.data.definition;
+    if (dialogName === 'link') {
+      CKEDITOR.plugins.get('xwiki-resource').replaceWithResourcePicker(dialogDefinition, 'url', {
+        resourceTypes: (event.editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
+        setup: function(data) {
+          this.setValue(data.resourceReference);
+        },
+        commit: function(data) {
+          data.resourceReference = this.getValue();
+          data.resourceReference.typed = data.resourceReference.type !== 'doc' &&
+            (data.resourceReference.type !== 'url' || data.resourceReference.reference.indexOf('://') < 0);
+        }
+      });
+      CKEDITOR.plugins.get('xwiki-resource').updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+        ['info', 'resourceReference'], ['upload', 'uploadButton']);
     }
   });
 })();

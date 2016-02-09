@@ -75,6 +75,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * with <code>wiki:</code> which gives for the wiki <code>wiki1</code>: <code>wiki:wiki1</code>.
  * 
  * @version $Id$
+ * @since 2.5M2
  */
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT)

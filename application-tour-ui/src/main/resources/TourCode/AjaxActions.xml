@@ -475,10 +475,10 @@
         #set($placement = $request.getParameter("placement"))
         #set($targetPage = $request.getParameter("targetPage"))
         #set($nbSteps = $request.getParameter("nbSteps"))
-        #set($stepOrder = $request.getParameter("stepOrder"))
+        #set($stepID = $mathtool.toInteger($request.getParameter("stepID")))
         #set($isNewStep = true)
-        #if ("$!stepOrder" != '') ## Edit
-            #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", "order", "$stepOrder"))
+        #if ("$!stepID" != '') ## Edit
+            #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", $stepID))
             #if($stepObj)
                #set($isNewStep = false)                
             #end
@@ -503,12 +503,12 @@
         {{include reference="TourCode.StepsListing"}}
      #end
   #end
-#elseif ($action == "deleteStep" &amp;&amp; "$!request.getParameter('BSTDocRef')" != '' &amp;&amp; "$!request.getParameter('stepOrder')" != '')
+#elseif ($action == "deleteStep" &amp;&amp; "$!request.getParameter('BSTDocRef')" != '' &amp;&amp; "$!request.getParameter('stepID')" != '')
    #set($docRef = $request.getParameter('BSTDocRef'))
-   #set($stepOrder =  $mathtool.toInteger($request.getParameter('stepOrder')))
+   #set($stepID =  $mathtool.toInteger($request.getParameter('stepID')))
    #if ($xwiki.exists($docRef))
       #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
-      #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", "order", "$stepOrder"))
+      #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", $stepID))
       #if ($stepObj)
          #set($discard = $bootstrapTourDoc.removeObject($stepObj))
          #set($discard = $bootstrapTourDoc.save())

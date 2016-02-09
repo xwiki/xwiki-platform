@@ -135,8 +135,7 @@ require(['jquery'], function ($) {
    // Initialize save step button
    $( "body" ).on( "click", "#saveStepBtn", function() {
       var parent = $(this).parent().parent();
-      var stepOrder = $("#stepOrder", parent).val();
-      //var prefix = "TourCode.StepClass_" + (stepOrder ? stepOrder:"0") + "_";
+      var stepID = $("#stepID", parent).val();
       var prefix = "TourCode.StepClass_";
       var BSTDocRef = $("#BSTDocRef",parent).val();
       var element = $("input[id^='" + prefix + "'][id$='_element']", parent).val();
@@ -146,7 +145,7 @@ require(['jquery'], function ($) {
       var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
       var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
       var nbSteps = $("#nbsteps").val();
-      var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepOrder:stepOrder, action:"editStep", xpage:"plain"};
+      var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepID: stepID, action:"editStep", xpage:"plain"};
       $.ajax({
 	 url:"$xwiki.getURL('TourCode.AjaxActions')",
 	 type:'POST',
@@ -165,19 +164,19 @@ require(['jquery'], function ($) {
    $( "body" ).on( "click", ".editStep", function() {
       $('.xdialog-modal-container').remove();
       var BSTDocRef = $("#BSTDocRef").val();
-      var stepOrder = $(this).attr("rel");
-      new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepOrder=' + encodeURIComponent(stepOrder)});            
+      var stepID = $(this).attr("rel");
+      new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepID=' + encodeURIComponent(stepID)});
    });
    
    // Initialize step delete btns
    $( "body" ).on( "click", ".deleteStep", function() {
       $('.xdialog-modal-container').remove();
       var BSTDocRef = $("#BSTDocRef").val();
-      var stepOrder = $(this).attr("rel");
+      var stepID = $(this).attr("rel");
       new XWiki.widgets.ConfirmationBox({onYes: function() {
          new XWiki.widgets.Notification("Deleting step ...", 'inprogress');
          $.ajax({
-	    url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepOrder=" + encodeURIComponent(stepOrder),
+	    url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepID=" + encodeURIComponent(stepID),
             type: 'POST',
             success: function(rep, textStatus, jqXHR) {
                $('#stepsContainer').html(rep);
@@ -487,11 +486,11 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
 {{html wiki=true}}
 #set($isNewStep = true)
 #set($bSTDocRef = $request.BSTDocRef)
-#set($stepOrder = $request.stepOrder)
+#set($stepID = $request.stepID)
 #if ($bSTDocRef &amp;&amp; $bSTDocRef != "" &amp;&amp; $xwiki.exists($bSTDocRef))
    #set($bSTDoc = $xwiki.getDocument($bSTDocRef))
-   #if($stepOrder &amp;&amp; $stepOrder != "")
-      #set($stepObj = $bSTDoc.getObject("TourCode.StepClass","order",$stepOrder))
+   #if($stepID &amp;&amp; $stepID != "")
+      #set($stepObj = $bSTDoc.getObject("TourCode.StepClass", $mathtool.toInteger($stepID)))
       #if($stepObj)
          #set($isNewStep = false)
       #end
@@ -522,8 +521,8 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
    #if($request.BSTDocRef &amp;&amp; $request.BSTDocRef != "")
       &lt;input type="hidden" value="$request.BSTDocRef" id="BSTDocRef"/&gt;
    #end
-   #if ($request.stepOrder)
-      &lt;input type="hidden" value="$request.stepOrder" id="stepOrder"/&gt;   
+   #if ($request.stepID)
+      &lt;input type="hidden" value="$request.stepID" id="stepID"/&gt;
    #end
    #if ($isNewStep &amp;&amp; $isNewStep != "")
       &lt;input type="button" value="Add step" class="btn btn-primary" id="saveStepBtn"/&gt;

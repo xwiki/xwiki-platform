@@ -21,19 +21,19 @@
 -->
 
 <xwikidoc>
-  <web>Main</web>
-  <name>ActivityTranslations</name>
-  <language>fr</language>
+  <web>Panels</web>
+  <name>Translations</name>
+  <language>ru</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.Activity</parent>
+  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1390416042000</creationDate>
-  <date>1390416053000</date>
-  <contentUpdateDate>1390416047000</contentUpdateDate>
+  <creationDate>1393442253000</creationDate>
+  <date>1445241212000</date>
+  <contentUpdateDate>1445241212000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -41,15 +41,16 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-activity.link.title=Situé dans {0} » {1} » {2} 
-activity.page.link.title=Situé dans {0}
-activity.rss.feed.description=Flux RSS des documents modifiés
-activity.rss.feed.spaces.description=Flux RSS des documents modifiés pour les espaces "{0}"
-activity.rss.feed.tags.description=Flux RSS des documents modifiés et tagués avec "{0}"
-activity.rss.feed.tagsAndSpaces.description=Flux RSS des documents modifiés pour les espaces "{1}" et tagués avec "{0}"
-activity.rss.pages.modified=Flux RSS des documents modifiés
+  <content>## XWiki Translation for language ru generated from http://www.l10n.xwiki.org
+panels._actions=Действия
+panels.available=Доступные Панели
+panels.category=Категория
+panels.children.title=Дочерние Страницы
+panels.description=Описание
+panels.name=Название
+panels.siblings.title=\ Родственные Страницы
+panels.type=Тип
 </content>
 </xwikidoc>

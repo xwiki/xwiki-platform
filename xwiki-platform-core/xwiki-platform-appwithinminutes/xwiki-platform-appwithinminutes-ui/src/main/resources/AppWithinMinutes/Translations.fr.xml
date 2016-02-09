@@ -44,6 +44,14 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+appWithinMinutes.codeSpace.description=L'emplacement où le code de l'application est situé.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Les pages cachées sont également listées ici. Cela va à l'encontre de vos préférences utilisateur, mais sans cela aucune page de code ne serait visible puisqu'elles sont toutes cachées par défaut.
+appWithinMinutes.codeSpace.title=Code
+appWithinMinutes.createApp.location.hint=L'emplacement dans la hiérarchie des pages où l'application sera créée.
+appWithinMinutes.createApp.location.label=Emplacement
+appWithinMinutes.createApp.parent.hint=La page parente de la nouvelle application. Laisser vide si vous souhaitez créer une application de premier niveau.
+appWithinMinutes.createApp.parent.label=Page parente
+appWithinMinutes.createApp.parent.placeholder=Emplacent.Du.Parent
 platform.appwithinminutes.appHomePageActionsHeading=Actions
 platform.appwithinminutes.appHomePageAddEntryHint=Ajouter une nouvelle entrée
 platform.appwithinminutes.appHomePageAddEntryLabel=Ajouter

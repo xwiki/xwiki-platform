@@ -90,28 +90,9 @@ public class WatchListNotifier
             // Invalid email
             return;
         }
-        
-        List<String> modifiedDocuments = new ArrayList<String>();
-        for (WatchListEvent event : events) {
-            if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
-                modifiedDocuments.add(event.getPrefixedFullName());                
-            }
-        }
 
         // Prepare email template (wiki page) context
-        VelocityContext vcontext = new VelocityContext();
-        vcontext
-            .put(XWIKI_USER_CLASS_FIRST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_FIRST_NAME_PROP).getValue());
-        vcontext.put(XWIKI_USER_CLASS_LAST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_LAST_NAME_PROP).getValue());
-        vcontext.put("events", events);
-        vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
-        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
-        vcontext.put("msg", context.getMessageTool());
-        vcontext.put("modifiedDocuments", modifiedDocuments);
-        vcontext.put("previousFireTime", previousFireTime);
-        vcontext.put("context", new DeprecatedContext(context));
-        vcontext.put("xcontext", new Context(context));
-        vcontext.put("services", Utils.getComponent(ScriptServiceManager.class));
+        VelocityContext vcontext = setVelocityContext(userObj, events, context, previousFireTime, subscriber);
 
         // Get wiki's default language (default en)
         String language = context.getWiki().getXWikiPreference("default_language", "en", context);
@@ -147,5 +128,32 @@ public class WatchListNotifier
             from = "mailer@xwiki.localdomain.com";
         }
         return from;
+    }
+
+    private VelocityContext setVelocityContext(Object userObj, List<WatchListEvent> events, XWikiContext context,
+        Date previousFireTime, String subscriber)
+    {
+        List<String> modifiedDocuments = new ArrayList<String>();
+        for (WatchListEvent event : events) {
+            if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
+                modifiedDocuments.add(event.getPrefixedFullName());
+            }
+        }
+
+        VelocityContext vcontext = new VelocityContext();
+        vcontext
+            .put(XWIKI_USER_CLASS_FIRST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_FIRST_NAME_PROP).getValue());
+        vcontext.put(XWIKI_USER_CLASS_LAST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_LAST_NAME_PROP).getValue());
+        vcontext.put("events", events);
+        vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
+        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
+        vcontext.put("msg", context.getMessageTool());
+        vcontext.put("modifiedDocuments", modifiedDocuments);
+        vcontext.put("previousFireTime", previousFireTime);
+        vcontext.put("context", new DeprecatedContext(context));
+        vcontext.put("xcontext", new Context(context));
+        vcontext.put("services", Utils.getComponent(ScriptServiceManager.class));
+        vcontext.put("subscriber", subscriber);
+        return vcontext;
     }
 }

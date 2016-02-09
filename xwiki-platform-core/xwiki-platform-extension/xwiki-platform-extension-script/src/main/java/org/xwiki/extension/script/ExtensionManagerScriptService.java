@@ -232,6 +232,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param extensionDependency the extension dependency to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
      *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     * @since 3.4M1
      * @deprecated since 5.3M1, use {@link #resolve(ExtensionDependency, String)} instead
      */
     @Deprecated
@@ -803,6 +804,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param version the string to parse
      * @return the {@link Version} instance
+     * @since 3.4M1
      */
     public Version parseVersion(String version)
     {
@@ -812,6 +814,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param versionRange the string to parse
      * @return the {@link VersionRange} instance
+     * @since 3.4M1
      */
     public VersionRange parseVersionRange(String versionRange)
     {
@@ -829,6 +832,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param versionConstraint the string to parse
      * @return the {@link VersionConstraint} instance
+     * @since 3.4M1
      */
     public VersionConstraint parseVersionConstraint(String versionConstraint)
     {

@@ -161,7 +161,10 @@
         // Populate the Resource Type drop down.
         this.resourceTypes.forEach(this.addResourceType, this);
         // Add the JavaScript behaviour.
-        addResourcePickerBehaviour($(this.getElement().$));
+        var domElement = $(this.getElement().$);
+        addResourcePickerBehaviour(domElement);
+        // Listen to resource type changes (in order to be able to show different options for different resource types).
+        domElement.on('change.resourceType', $.proxy(this, 'onResourceTypeChange'));
         // Select the default resource type.
         this.selectResourceType(this.resourceTypes[0]);
       },
@@ -220,6 +223,9 @@
         resourceType.id = resourceTypeId;
         var dropDownMenu = this.getElement().findOne('.dropdown-menu');
         dropDownMenu.appendHtml(this.dropDownItemTemplate.output(resourceType));
+      },
+      onResourceTypeChange: function(event, data) {
+        // Do nothing by default.
       }
     });
   };
@@ -232,10 +238,16 @@
       event.preventDefault();
       var selectedResourceType = $(event.target);
       resourceReferenceInput.attr('placeholder', selectedResourceType.attr('data-placeholder'));
-      resourceTypeButton.val(selectedResourceType.attr('data-id'));
+      var oldValue = resourceTypeButton.val();
+      var newValue = selectedResourceType.attr('data-id');
+      resourceTypeButton.val(newValue);
       resourceTypeButton.attr('title', selectedResourceType.text().trim());
       resourceTypeButton.prop('disabled', selectedResourceType.attr('href') === '#');
       resourceTypeIcon.attr('class', selectedResourceType.find('.icon').attr('class'));
+      // Fire the change event after all click listeners are called.
+      setTimeout(function() {
+        picker.trigger('change.resourceType', {oldValue: oldValue, newValue: newValue});
+      }, 0);
     });
   };
 

@@ -68,7 +68,7 @@
       var originalOnUploaded = uploadImageWidget.onUploaded;
       uploadImageWidget.onUploaded = function(upload) {
         var response = JSON.parse(upload.xhr.responseText);
-        this.parts.img.setAttribute('data-reference', CKEDITOR.plugins.get('xwiki-resource')
+        this.parts.img.setAttribute('data-reference', CKEDITOR.plugins.xwikiResource
           .serializeResourceReference(response.resourceReference));
         originalOnUploaded.call(this, upload);
       };
@@ -96,7 +96,7 @@
         originalInit.call(this);
         var serializedResourceReference = this.parts.image.getAttribute('data-reference');
         if (serializedResourceReference) {
-          this.setData('resourceReference', CKEDITOR.plugins.get('xwiki-resource')
+          this.setData('resourceReference', CKEDITOR.plugins.xwikiResource
             .parseResourceReference(serializedResourceReference));
         }
       };
@@ -105,7 +105,7 @@
       imageWidget.data = function() {
         var resourceReference = this.data.resourceReference;
         if (resourceReference) {
-          this.parts.image.setAttribute('data-reference', CKEDITOR.plugins.get('xwiki-resource')
+          this.parts.image.setAttribute('data-reference', CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(resourceReference));
         }
         originalData.call(this);
@@ -123,7 +123,7 @@
     var dialogName = event.data.name;
     var dialogDefinition = event.data.definition;
     if (dialogName === 'image2') {
-      CKEDITOR.plugins.get('xwiki-resource').replaceWithResourcePicker(dialogDefinition, 'src', {
+      CKEDITOR.plugins.xwikiResource.replaceWithResourcePicker(dialogDefinition, 'src', {
         resourceTypes: (event.editor.config['xwiki-image'] || {}).resourceTypes || ['attach', 'icon', 'url'],
         setup: function(widget) {
           this.setValue(widget.data.resourceReference);
@@ -139,7 +139,7 @@
           }
         }
       });
-      CKEDITOR.plugins.get('xwiki-resource').updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+      CKEDITOR.plugins.xwikiResource.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', 'resourceReference'], ['Upload', 'uploadButton']);
     }
   });

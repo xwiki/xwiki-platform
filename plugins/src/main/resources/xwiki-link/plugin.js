@@ -120,7 +120,7 @@
         var data = oldParseLinkAttributes.call(linkPlugin, editor, element);
         var serializedResourceReference = element && element.getAttribute('data-reference');
         if (serializedResourceReference) {
-          data.resourceReference = CKEDITOR.plugins.get('xwiki-resource')
+          data.resourceReference = CKEDITOR.plugins.xwikiResource
             .parseResourceReference(serializedResourceReference);
         }
         return data;
@@ -132,7 +132,7 @@
         var attributes = oldGetLinkAttributes.call(linkPlugin, editor, data);
         var resourceReference = data.resourceReference;
         if (resourceReference) {
-          attributes.set['data-reference'] = CKEDITOR.plugins.get('xwiki-resource')
+          attributes.set['data-reference'] = CKEDITOR.plugins.xwikiResource
             .serializeResourceReference(resourceReference);
           attributes.set['data-linktype'] = resourceTypeToLinkType[resourceReference.type] || '';
         }
@@ -151,7 +151,7 @@
     var dialogName = event.data.name;
     var dialogDefinition = event.data.definition;
     if (dialogName === 'link') {
-      CKEDITOR.plugins.get('xwiki-resource').replaceWithResourcePicker(dialogDefinition, 'url', {
+      CKEDITOR.plugins.xwikiResource.replaceWithResourcePicker(dialogDefinition, 'url', {
         resourceTypes: (event.editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
         setup: function(data) {
           this.setValue(data.resourceReference);
@@ -162,7 +162,7 @@
             (data.resourceReference.type !== 'url' || data.resourceReference.reference.indexOf('://') < 0);
         }
       });
-      CKEDITOR.plugins.get('xwiki-resource').updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+      CKEDITOR.plugins.xwikiResource.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', 'resourceReference'], ['upload', 'uploadButton']);
     }
   });

@@ -41,7 +41,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {
     @Inject
-    @Named("current")
     private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
     /**

@@ -43,9 +43,10 @@
   </properties>
   <build>
     <plugins>
-      <!-- Checkout the CKEditor sources for the version (tag) we want to use. -->
+      <!-- Download the CKEditor sources for the version (tag) we want to use. -->
       <plugin>
-        <artifactId>maven-scm-plugin</artifactId>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
       </plugin>
       <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
       <plugin>

@@ -152,22 +152,27 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         return entityReference;
     }
 
-    protected DocumentReference resolveDocumentReference(DocumentReference reference, EntityReference baseReference)
+    protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
+        EntityReference baseReference)
     {
         DocumentReference finalReference = reference;
 
-        // If already a space home page, no fallback
-        // If same as current page, no fallback
-        String defaultDocumentName = this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-        if (!reference.getName().equals(defaultDocumentName) && !Objects.equals(reference, baseReference)) {
-            finalReference = resolveDocumentReference(finalReference, baseReference, true, defaultDocumentName);
+        // If same as base reference, no fallback
+        if (!Objects.equals(reference, baseReference)) {
+            // If already a space home page, no fallback
+            String defaultDocumentName =
+                this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+            if (!reference.getName().equals(defaultDocumentName)) {
+                finalReference =
+                    resolveDocumentReference(sourceReference, finalReference, baseReference, true, defaultDocumentName);
+            }
         }
 
         return finalReference;
     }
 
-    protected DocumentReference resolveDocumentReference(DocumentReference reference, EntityReference baseReference,
-        boolean trySpaceSibling, String defaultDocumentName)
+    protected DocumentReference resolveDocumentReference(EntityReference sourceReference, DocumentReference reference,
+        EntityReference baseReference, boolean trySpaceSibling, String defaultDocumentName)
     {
         DocumentReference finalReference = reference;
 
@@ -177,15 +182,15 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
                 new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
             finalReference = new DocumentReference(defaultDocumentName, spaceReference);
 
-            if (trySpaceSibling && baseReference != null && baseReference.getName().equals(defaultDocumentName)
-                && !this.documentAccessBridge.exists(finalReference)) {
+            if (trySpaceSibling
+                && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName)) {
                 // It does not exist, make it a space sibling.
                 EntityReference parentReference = reference.getParent().getParent();
                 if (parentReference instanceof SpaceReference) {
                     finalReference = new DocumentReference(reference.getName(), (SpaceReference) parentReference);
 
-                    finalReference =
-                        resolveDocumentReference(finalReference, baseReference, false, defaultDocumentName);
+                    finalReference = resolveDocumentReference(sourceReference, finalReference, baseReference, false,
+                        defaultDocumentName);
                 } else {
                     spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
                     finalReference = new DocumentReference(defaultDocumentName, spaceReference);
@@ -194,5 +199,15 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         }
 
         return finalReference;
+    }
+
+    protected boolean trySpaceSiblingFallback(EntityReference sourceReference, DocumentReference finalReference,
+        EntityReference baseReference, String defaultDocumentName)
+    {
+        // If not relative, no space sibling fallback
+        // If base reference not a space home page, no space sibling fallback
+        // If finalReference exist, no space sibling fallback
+        return sourceReference.getParent() == null && baseReference != null
+            && baseReference.getName().equals(defaultDocumentName) && !this.documentAccessBridge.exists(finalReference);
     }
 }

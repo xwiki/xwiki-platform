@@ -25,9 +25,11 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -43,8 +45,14 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class DocumentResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    private DocumentReferenceResolver<EntityReference> defaultEntityDocumentReferenceResolver;
+
+    @Inject
+    private DocumentReferenceResolver<String> defaultStringDocumentReferenceResolver;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeReferenceResolver;
 
     /**
      * Default constructor.
@@ -57,7 +65,7 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
     {
-        return this.currentDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
+        return this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }
 
     @Override
@@ -68,12 +76,16 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
             return resolveTyped(resourceReference, baseReference);
         }
 
-        // Get the full document reference
+        // Get relative reference
+        EntityReference relativeReference =
+            this.relativeReferenceResolver.resolve(resourceReference.getReference(), EntityType.DOCUMENT);
+
+        // Resolve the full document reference
         DocumentReference reference =
-            this.currentDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
+            this.defaultEntityDocumentReferenceResolver.resolve(relativeReference, baseReference);
 
         // Take care of fallback if needed
-        reference = resolveDocumentReference(reference, baseReference);
+        reference = resolveDocumentReference(relativeReference, reference, baseReference);
 
         return reference;
     }

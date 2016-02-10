@@ -41,7 +41,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {
     @Inject
-    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
+    private SpaceReferenceResolver<String> defaultSpaceReferenceResolver;
 
     /**
      * Default constructor.
@@ -54,6 +54,6 @@ public class SpaceResourceReferenceEntityReferenceResolver extends AbstractResou
     @Override
     protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
     {
-        return this.currentSpaceReferenceResolver.resolve(resourceReference.getReference(), baseReference);
+        return this.defaultSpaceReferenceResolver.resolve(resourceReference.getReference(), baseReference);
     }
 }

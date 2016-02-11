@@ -157,9 +157,26 @@
       // Bind the value of the email address and url fields to the resource reference field.
       // Hide the email address, url and protocol fields because we're using the resource picker instead.
       var resourcePlugin = CKEDITOR.plugins.xwikiResource;
-      resourcePlugin.bindResourceReference(infoTab.get('emailAddress'), ['info', resourcePicker.id]);
-      resourcePlugin.bindResourceReference(infoTab.get('url'), ['info', resourcePicker.id]);
+      resourcePlugin.bindResourcePicker(infoTab.get('emailAddress'), ['info', resourcePicker.id], true);
+      resourcePlugin.bindResourcePicker(infoTab.get('url'), ['info', resourcePicker.id]);
       infoTab.get('protocol').hidden = true;
+      // Add page link options.
+      infoTab.add({
+        type: 'vbox',
+        id: 'docOptions',
+        children: [
+          createQueryStringField({id: 'docQueryString'}),
+          createAnchorField({id: 'docAnchor'})
+        ]
+      });
+      // Add attachment link options.
+      infoTab.add({
+        type: 'vbox',
+        id: 'attachOptions',
+        children: [
+          createQueryStringField({id: 'attachQueryString'})
+        ]
+      });
 
       resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', 'resourceReference'], ['upload', 'uploadButton']);
@@ -212,6 +229,35 @@
             }
           }
         });
+      }
+    });
+  };
+
+  var createAnchorField = function(definition) {
+    return createReferenceParameterField('anchor', CKEDITOR.tools.extend(definition || {}, {
+      label: 'Anchor'
+    }));
+  };
+
+  var createQueryStringField = function(definition) {
+    return createReferenceParameterField('queryString', CKEDITOR.tools.extend(definition || {}, {
+      label: 'Query String'
+    }));
+  };
+
+  var createReferenceParameterField = function(parameterName, definition) {
+    return CKEDITOR.tools.extend(definition || {}, {
+      type: 'text',
+      setup: function(data) {
+        var referenceParameters = (data.resourceReference || {}).parameters || {};
+        this.setValue(referenceParameters[parameterName] || '');
+      },
+      commit: function(data) {
+        var value = this.getValue().trim();
+        if (value !== '') {
+          data.resourceReference.parameters = data.resourceReference.parameters || {};
+          data.resourceReference.parameters[parameterName] = value;
+        }
       }
     });
   };

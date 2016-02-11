@@ -251,16 +251,17 @@
       }
     },
 
-    replaceWithResourcePicker: function(dialogDefinition, replacedElementId, pickerDefinition) {
-      hideParentAndInsertAfter(dialogDefinition, replacedElementId, this.createResourcePicker(pickerDefinition));
-    },
-
-    bindResourceReference: function(element, resourcePickerId) {
-      // Use the resource reference value on commit.
+    bindResourcePicker: function(element, resourcePickerId, onlyTheReferencePart) {
+      // Use the resource picker value when the given element is committed.
       var oldCommit = element.commit;
       element.commit = function() {
         var resourceReference = this.getDialog().getValueOf(resourcePickerId[0], resourcePickerId[1]);
-        this.setValue(resourceReference.reference);
+        if (onlyTheReferencePart  === true) {
+          this.setValue(resourceReference.reference);
+        } else {
+          this.setValue(CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
+            this.getDialog().getParentEditor()));
+        }
         if (typeof oldCommit === 'function') {
           oldCommit.apply(this, arguments);
         }
@@ -291,28 +292,5 @@
         picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
       }, 0);
     });
-  };
-
-  var hideParentAndInsertAfter = function(dialogDefinition, elementId, newElementDefinition) {
-    var path = CKEDITOR.plugins.xwikiDialog.getUIElementPath(elementId, dialogDefinition.contents);
-    if (path && path.length > 2) {
-      // Override the commit and validate functions of the replaced element.
-      var tabId = path[path.length - 1].element.id;
-      var oldCommit = path[0].element.commit;
-      // We validate the resource reference.
-      delete path[0].element.validate;
-      path[0].element.commit = function() {
-        var resourceReference = this.getDialog().getValueOf(tabId, newElementDefinition.id);
-        this.setValue(CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference,
-          this.getDialog().getParentEditor()));
-        if (typeof oldCommit === 'function') {
-          oldCommit.apply(this, arguments);
-        }
-      };
-      // Hide the parent.
-      path[1].element.hidden = true;
-      // Insert new element after the hidden parent.
-      path[2].element.children.splice(path[1].position, 0, newElementDefinition);
-    }
   };
 })();

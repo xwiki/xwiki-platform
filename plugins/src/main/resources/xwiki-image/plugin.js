@@ -123,7 +123,7 @@
     var dialogName = event.data.name;
     var dialogDefinition = event.data.definition;
     if (dialogName === 'image2') {
-      CKEDITOR.plugins.xwikiResource.replaceWithResourcePicker(dialogDefinition, 'src', {
+      replaceWithResourcePicker(dialogDefinition, 'src', {
         resourceTypes: (event.editor.config['xwiki-image'] || {}).resourceTypes || ['attach', 'icon', 'url'],
         setup: function(widget) {
           this.setValue(widget.data.resourceReference);
@@ -143,4 +143,18 @@
         ['info', 'resourceReference'], ['Upload', 'uploadButton']);
     }
   });
+
+  var replaceWithResourcePicker = function(dialogDefinition, replacedElementId, pickerDefinition) {
+    var path = CKEDITOR.plugins.xwikiDialog.getUIElementPath(replacedElementId, dialogDefinition.contents);
+    if (path && path.length > 2) {
+      pickerDefinition = CKEDITOR.plugins.xwikiResource.createResourcePicker(pickerDefinition);
+      // Bind the replaced element to the resource picker (in order to commit the resource picker value).
+      var tabId = path[path.length - 1].element.id;
+      CKEDITOR.plugins.xwikiResource.bindResourcePicker(path[0].element, [tabId, pickerDefinition.id]);
+      // Hide the parent.
+      path[1].element.hidden = true;
+      // Insert new element after the hidden parent.
+      path[2].element.children.splice(path[1].position, 0, pickerDefinition);
+    }
+  };
 })();

@@ -23,6 +23,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -41,10 +43,11 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,6 +57,8 @@ import static org.mockito.Mockito.when;
  */
 public class XWikiContextCopierTest
 {
+    private static final String HIBSESSION = "hibsession";
+
     @Rule
     public MockitoComponentMockingRule<XWikiContextCopier> mocker = new MockitoComponentMockingRule<>(
         XWikiContextCopier.class);
@@ -102,14 +107,24 @@ public class XWikiContextCopierTest
         original.setWiki(xwiki);
 
         // Store mock
+        // Simulate the existence of a hibernate session in context
+        original.put(HIBSESSION,"opened session");
         store = mock(XWikiStoreInterface.class);
+        // clean up will remove the session in the given context
+        doAnswer(new Answer<Void>() {
+            public Void answer(InvocationOnMock invocation) {
+                XWikiContext context = (XWikiContext) invocation.getArguments()[0];
+                context.put(HIBSESSION, null);
+                return null;
+            }
+        }).when(store).cleanUp(any(XWikiContext.class));
         when(xwiki.getStore()).thenReturn(store);
 
         // URL factory mock
         XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
 
         XWikiURLFactoryService urlFactoryService = mock(XWikiURLFactoryService.class);
-        when(urlFactoryService.createURLFactory(Matchers.anyInt(), Matchers.any(XWikiContext.class))).thenReturn(
+        when(urlFactoryService.createURLFactory(Matchers.anyInt(), any(XWikiContext.class))).thenReturn(
             urlFactory);
         when(xwiki.getURLFactoryService()).thenReturn(urlFactoryService);
     }
@@ -136,8 +151,9 @@ public class XWikiContextCopierTest
         // Some things are not cloned.
         assertSame(original.getWiki(), copy.getWiki());
 
-        // Verify that the store cache has been cleaned for the original context.
-        verify(store, times(1)).cleanUp(original);
+        // Verify that the store session has been cleaned for both context.
+        assertNull(original.get(HIBSESSION));
+        assertNull(copy.get(HIBSESSION));
 
         // Check that the URLFactory is cloned.
         assertNotNull(copy.getURLFactory());

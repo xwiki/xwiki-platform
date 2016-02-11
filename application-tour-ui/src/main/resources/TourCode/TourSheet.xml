@@ -54,13 +54,19 @@
   #end
   ; &lt;label for="TourCode.TourClass_0_targetPage"&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
   : $doc.display('targetPage')
-)))
 
 ## Display tour's steps
-&lt;label&gt; $services.localization.render('tour.steps')&lt;/label&gt;
-{{/html}}
+&lt;dl&gt;
+  &lt;dt&gt;
+    &lt;label&gt;$services.localization.render('tour.steps')&lt;/label&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    #set($pageMode = $xcontext.action)
+    {{include reference="TourCode.StepsListing" /}}
+  &lt;/dd&gt;
+&lt;/dl&gt;
 
-#set($pageMode = $xcontext.action)
-{{include reference="TourCode.StepsListing" /}}
+)))
+{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

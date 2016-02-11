@@ -443,29 +443,17 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
       <cache>long</cache>
     </property>
     <property>
-      <code>.actionBtn {
+      <code>.xdialog-box-my-modal-popup {
+  width: 800px;
+}
+
+.actionBtn {
    background: none no-repeat scroll 0 center transparent;
    display: block;
    font-size: .8em;
    padding: .3em .3em .3em 20px;
    text-transform: uppercase;
    float:right;
-}
-
-#stepsBlk {
-   background: beige;
-}
-
-#stepsTable td {
-   font-weight: normal;
-}
-
-#stepsTableH {
-   background: black;
-   color: white;
-}
-.tr1 {
-   background: white;
 }</code>
     </property>
     <property>
@@ -510,10 +498,10 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
 #else
    &lt;h3&gt;$services.localization.render('tour.steps.edit_step')&lt;/h3&gt;
 #end
-&lt;div id="stepForm"&gt;
+&lt;div id="stepForm" class="xform"&gt;
  #foreach($prop in $class.properties)
     #if($prop.getName().equals("order"))
-       ; $services.localization.render("${class.name}_${prop.name}")
+       ; &lt;label&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;
        &lt;dd&gt;
        &lt;select id="stepOrderSelect"&gt;
           #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
@@ -525,7 +513,7 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
        &lt;/select&gt;
        &lt;/dd&gt;
     #else
-       ; $services.localization.render("${class.name}_${prop.name}")
+       ; &lt;label for="TourCode.StepClass_0_${prop.name}"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;
        : $vobj.get($prop.getName())
     #end
  #end

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>TourCode</web>
+  <name>AjaxActions</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>TourCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1454453656000</creationDate>
+  <date>1454671493000</date>
+  <contentUpdateDate>1454671489000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="TourCode.Macros" /}}
+
+{{velocity}}
+#**
+* Ajax Actions
+*
+* Author: Mohamed BOUSSAA &lt;mohamed.boussa@xwiki.com&gt; 
+*#
+
+#set($action = $request.getParameter("action"))
+#if ("$!action" != '')
+#if ($action == "editStep" &amp;&amp; "$!request.getParameter('BSTDocRef')" != '')
+  #set($docRef = $request.getParameter("BSTDocRef"))
+  #if ("$!docRef" != '')
+     #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
+     #if ($bootstrapTourDoc)
+        ## Save step
+        #set($title = $request.getParameter("title"))
+        #set($path = $request.getParameter("path"))
+        #set($element = $request.getParameter("element"))
+        #set($backdrop = $request.getParameter("backdrop"))
+        #set($content = $request.getParameter("content"))
+        #set($placement = $request.getParameter("placement"))
+        #set($targetPage = $request.getParameter("targetPage"))
+        #set($nbSteps = $request.getParameter("nbSteps"))
+        #set($stepOrder = $request.getParameter("stepOrder"))
+        #set($prevStepOrder = $nbSteps)
+        #set($stepID = $mathtool.toInteger($request.getParameter("stepID")))
+        #set($isNewStep = true)
+        #if ("$!stepID" != '') ## Edit
+            #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", $stepID))
+            #if($stepObj)
+               #set($isNewStep = false)
+               #set($prevStepOrder = $stepObj.getValue("order"))
+            #end
+        #end
+        #if ($isNewStep)
+           ## New step
+           #set($stepObj = $bootstrapTourDoc.newObject('TourCode.StepClass'))
+        #end
+        #set($discard = $stepObj.set('path', $path))
+        #set($discard = $stepObj.set('element', $element))
+        #set($discard = $stepObj.set('title', $title))
+        #set($discard = $stepObj.set('placement', $placement))
+        #set($discard = $stepObj.set('targetPage', $targetPage))
+        #set($discard = $stepObj.set('backdrop', $backdrop))
+        #set($discard = $stepObj.set('content', $content))
+        #if($prevStepOrder != $stepOrder)
+           ## Update the step objects
+           #set($stepObj2 = $bootstrapTourDoc.getObject("TourCode.StepClass", "order", "$stepOrder"))
+           #if("$!stepObj2" != "")
+              #set($discard = $stepObj2.set('order', $prevStepOrder))
+              #set($discard = $bootstrapTourDoc.save())
+           #end
+           #set($discard = $stepObj.set('order', $stepOrder))
+        #else
+           #if ($isNewStep)
+              #set($discard = $stepObj.set('order', $nbSteps))
+           #end
+        #end
+        #set($discard = $bootstrapTourDoc.save())
+        #set($BSTDocRef = $bootstrapTourDoc)
+        #set($pageMode = "edit")
+        {{include reference="TourCode.StepsListing"}}
+     #end
+  #end
+#elseif ($action == "deleteStep" &amp;&amp; "$!request.getParameter('BSTDocRef')" != '' &amp;&amp; "$!request.getParameter('stepID')" != '')
+   #set($docRef = $request.getParameter('BSTDocRef'))
+   #set($stepID =  $mathtool.toInteger($request.getParameter('stepID')))
+   #if ($xwiki.exists($docRef))
+      #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
+      #set($stepObj = $bootstrapTourDoc.getObject("TourCode.StepClass", $stepID))
+      #if ($stepObj)
+         #set($discard = $bootstrapTourDoc.removeObject($stepObj))
+         #set($discard = $bootstrapTourDoc.save())
+         ## Update other steps order
+         #set($bootstrapTourDoc = $xwiki.getDocument($docRef))
+         #set($x = 0)
+         #set($steps = $bootstrapTourDoc.getObjects("TourCode.StepClass"))
+         #set ($sortedSteps = [])
+         #sortXWikiObjectsList($steps, 'order', $sortedSteps)
+         #foreach($step in $sortedSteps)
+            #set($discard = $step.set("order", $x.longValue()))
+            #set($x = $x + 1)
+         #end
+         #set($discard = $bootstrapTourDoc.save())
+      #end
+      #set($BSTDocRef = $docRef)
+      #set($pageMode = "edit")
+      {{include reference="TourCode.StepsListing"}}
+   #end
+#end
+#end
+{{/velocity}}</content>
+</xwikidoc>

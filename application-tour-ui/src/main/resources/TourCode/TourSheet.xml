@@ -55,9 +55,12 @@
   ; &lt;label for="TourCode.TourClass_0_targetPage"&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
   : $doc.display('targetPage')
 )))
+
+## Display tour's steps
+&lt;label&gt; $services.localization.render('tour.steps')&lt;/label&gt;
 {{/html}}
 
-Please edit this page with the object editor to add tour steps.
-## TODO: add a step editor (see http://jira.xwiki.org/browse/TOUR-12)
+#set($pageMode = $xcontext.action)
+{{include reference="TourCode.StepsListing" /}}
 {{/velocity}}</content>
 </xwikidoc>

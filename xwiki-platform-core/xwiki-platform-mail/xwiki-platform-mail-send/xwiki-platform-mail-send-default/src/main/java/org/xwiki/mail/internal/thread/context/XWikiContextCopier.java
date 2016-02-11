@@ -53,11 +53,13 @@ public class XWikiContextCopier implements Copier<XWikiContext>
     @Override
     public XWikiContext copy(XWikiContext originalXWikiContext)
     {
+        // Clean up the store session before cloning
+        originalXWikiContext.getWiki().getStore().cleanUp(originalXWikiContext);
+
         // This is still a shallow clone, but at least for stuff like wikiID and userReference it gets the job done.
         XWikiContext clonedXWikiContext = originalXWikiContext.clone();
 
         // lets now build the stub context
-        clonedXWikiContext.getWiki().getStore().cleanUp(originalXWikiContext);
 
         // Copy the request from the context.
         clonedXWikiContext.setRequest(this.xwikiRequestCloner.copy(originalXWikiContext.getRequest()));

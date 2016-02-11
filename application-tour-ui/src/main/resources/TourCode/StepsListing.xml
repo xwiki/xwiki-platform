@@ -58,7 +58,10 @@
 #set($discard = $xwiki.jsx.use("TourCode.StepSheet"))
 &lt;div id="stepsBlk"&gt;
    #if ($xcontext.action == 'edit')
-      &lt;a class="actionBtn addItemBtn" id="addStep" href="javascript:;" rel="$doc.getDocumentReference()"&gt;Add new step&lt;/a&gt;
+      &lt;a class="actionBtn" id="addStep" href="javascript:;" rel="$doc.getDocumentReference()"&gt;
+         $services.icon.renderHTML("add")
+         $services.localization.render("tour.steps.new_step")
+      &lt;/a&gt;
    #end
    &lt;div id="stepsContainer"&gt;
       &lt;table id="stepsTable"&gt;
@@ -103,8 +106,14 @@
                   &lt;/td&gt; 
                   #if ($xcontext.action == 'edit' || $pageMode == "edit")
                      &lt;td&gt;
-                        &lt;a href="javascript:;" class="actionBtn editItemBtn editStep" rel="$!stepID"&gt;$services.localization.render("tour.steps.edit")&lt;/a&gt;
-                        &lt;a href="javascript:;" class="actionBtn deleteItemBtn deleteStep" rel="$!stepID"&gt;$services.localization.render("tour.steps.delete")&lt;/a&gt;
+                        &lt;a href="javascript:;" class="actionBtn editStep" rel="$!stepID"&gt;
+                           $services.icon.renderHTML("pencil")
+                           $services.localization.render("tour.steps.edit")
+                        &lt;/a&gt;
+                        &lt;a href="javascript:;" class="actionBtn deleteStep" rel="$!stepID"&gt;
+                           $services.icon.renderHTML("delete")
+                           $services.localization.render("tour.steps.delete")
+                        &lt;/a&gt;
                      &lt;/td&gt;
                   #end
                &lt;/tr&gt;

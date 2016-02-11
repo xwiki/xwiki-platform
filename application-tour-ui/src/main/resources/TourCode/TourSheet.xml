@@ -55,10 +55,11 @@
   ; &lt;label for="TourCode.TourClass_0_targetPage"&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
   : $doc.display('targetPage')
 )))
-{{/html}}
 
 ## Display tour's steps
-{{html wiki="true"}}&lt;label&gt; $services.localization.render('tour.steps')&lt;/label&gt;{{/html}}
+&lt;label&gt; $services.localization.render('tour.steps')&lt;/label&gt;
+{{/html}}
+
 #set($pageMode = $xcontext.action)
 {{include reference="TourCode.StepsListing" /}}
 {{/velocity}}</content>

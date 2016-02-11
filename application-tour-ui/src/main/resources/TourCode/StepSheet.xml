@@ -451,15 +451,6 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
    text-transform: uppercase;
    float:right;
 }
-.addItemBtn {
-   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
-}
-.editItemBtn {
-   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')");
-}
-.deleteItemBtn {
-   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
 
 #stepsBlk {
    background: beige;

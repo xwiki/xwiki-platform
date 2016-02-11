@@ -63,12 +63,12 @@
    &lt;div id="stepsContainer"&gt;
       &lt;table id="stepsTable"&gt;
          &lt;tr id="stepsTableH"&gt;
-            &lt;th&gt;Order&lt;/th&gt;
-            &lt;th&gt;Element&lt;/th&gt;
-            &lt;th&gt;Title&lt;/th&gt;
-            &lt;th&gt;Backdrop&lt;/th&gt;
-            &lt;th&gt;Placement&lt;/th&gt;
-            &lt;th&gt;Target page&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_order")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_element")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_title")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_backdrop")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_placement")&lt;/th&gt;
+            &lt;th&gt;$services.localization.render("TourCode.StepClass_targetPage")&lt;/th&gt;
             #if ($xcontext.action == 'edit' || $pageMode == "edit")
                &lt;th style="text-align:right"&gt;Actions&lt;/th&gt;
             #end
@@ -90,9 +90,9 @@
                   &lt;td&gt;$!title&lt;/td&gt;
                   &lt;td&gt;
                   #if($backdrop == 0)
-                     No 
+                     $services.localization.render("tour.steps.no")
                   #else
-                     Yes 
+                     $services.localization.render("tour.steps.yes")
                   #end
                   &lt;/td&gt;
                   &lt;td&gt;
@@ -103,8 +103,8 @@
                   &lt;/td&gt; 
                   #if ($xcontext.action == 'edit' || $pageMode == "edit")
                      &lt;td&gt;
-                        &lt;a href="javascript:;" class="actionBtn editItemBtn editStep" rel="$!stepID" title="Edit step"&gt;Edit&lt;/a&gt;
-                        &lt;a href="javascript:;" class="actionBtn deleteItemBtn deleteStep" rel="$!stepID" title="Delete step"&gt;Delete&lt;/a&gt;
+                        &lt;a href="javascript:;" class="actionBtn editItemBtn editStep" rel="$!stepID"&gt;$services.localization.render("tour.steps.edit")&lt;/a&gt;
+                        &lt;a href="javascript:;" class="actionBtn deleteItemBtn deleteStep" rel="$!stepID"&gt;$services.localization.render("tour.steps.delete")&lt;/a&gt;
                      &lt;/td&gt;
                   #end
                &lt;/tr&gt;

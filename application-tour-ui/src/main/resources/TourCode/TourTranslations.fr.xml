@@ -61,5 +61,24 @@ tour.popover.end=Terminer
 tour.popover.next=Suivant »
 tour.popover.previous=« Précédent
 tour.popover.show=Lancer la visite guidée
-</content>
+
+# Steps
+TourCode.StepClass_order=Ordre
+TourCode.StepClass_element=Élément (Sélecteur CSS identifiant un élément)
+TourCode.StepClass_title=Titre
+TourCode.StepClass_content=Contenu
+TourCode.StepClass_backdrop=Backdrop
+TourCode.StepClass_placement=Emplacement
+TourCode.StepClass_targetPage=Page cible
+tour.steps=Étapes
+tour.steps.new_step=Nouvelle étape
+tour.steps.add_step=Ajouter l'étape
+tour.steps.edit_step=Modifier l'étape
+tour.steps.delete_confirm=Êtes-vous sûr de vouloir supprimer l'étape
+tour.steps.delete_done=Suppression de l'étape terminée
+tour.steps.deleting=Suppression de l'étape
+tour.steps.yes=Oui
+tour.steps.no=Non
+tour.steps.edit=Modifier
+tour.steps.delete=Supprimer</content>
 </xwikidoc>

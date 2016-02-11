@@ -58,7 +58,7 @@
 {{/html}}
 
 ## Display tour's steps
-{{html wiki="true"}}&lt;label&gt; Steps&lt;/label&gt;{{/html}}
+{{html wiki="true"}}&lt;label&gt; $services.localization.render('tour.steps')&lt;/label&gt;{{/html}}
 #set($pageMode = $xcontext.action)
 {{include reference="TourCode.StepsListing" /}}
 {{/velocity}}</content>

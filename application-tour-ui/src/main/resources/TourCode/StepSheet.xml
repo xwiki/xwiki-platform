@@ -124,6 +124,11 @@
     <property>
       <code>var bstStepURL = "$xwiki.getURL('TourCode.StepSheet','edit','editor=inline&amp;xpage=plain')";
 var actionsURL = "$xwiki.getURL('TourCode.AjaxActions','view','xpage=plain')";
+var messages = {
+                  deleting: "${escapetool.javascript($services.localization.render('tour.steps.deleting'))} ...",
+                  deleteConfirm: "${escapetool.javascript($services.localization.render('tour.steps.delete_confirm'))} ?",
+                  deleteDone: "${escapetool.javascript($services.localization.render('tour.steps.delete_done'))} !"
+               }
 
 require(['jquery'], function ($) {
    // Initialize add new step button
@@ -177,7 +182,7 @@ require(['jquery'], function ($) {
       var BSTDocRef = $("#BSTDocRef").val();
       var stepID = $(this).attr("rel");
       new XWiki.widgets.ConfirmationBox({onYes: function() {
-         new XWiki.widgets.Notification("Deleting step ...", 'inprogress');
+         new XWiki.widgets.Notification(messages.deleting, 'inprogress');
          $.ajax({
 	    url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepID=" + encodeURIComponent(stepID),
             type: 'POST',
@@ -186,10 +191,10 @@ require(['jquery'], function ($) {
             },
 	    complete: function(event, XMLHttpRequest, ajaxOptions) {
                $(".xnotification-inprogress").remove();
-               new XWiki.widgets.Notification("$services.localization.render('Delete step done!')","done");
+               new XWiki.widgets.Notification(messages.deleteDone, "done");
             }
 	 });
-      }}, {confirmationText:"Are you sure to delete the step ?"});   
+      }}, {confirmationText: messages.deleteConfirm});
    });
 });</code>
     </property>
@@ -510,14 +515,14 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
 #end
 #set($class = $vobj.xWikiClass)
 #if ($isNewStep &amp;&amp; $isNewStep != "")
-   &lt;h3&gt;New step&lt;/h3&gt;
+   &lt;h3&gt;$services.localization.render('tour.steps.new_step')&lt;/h3&gt;
 #else
-   &lt;h3&gt;Edit step&lt;/h3&gt;
+   &lt;h3&gt;$services.localization.render('tour.steps.edit_step')&lt;/h3&gt;
 #end
 &lt;div id="stepForm"&gt;
  #foreach($prop in $class.properties)
     #if($prop.getName().equals("order"))
-       ; $prop.prettyName
+       ; $services.localization.render("${class.name}_${prop.name}")
        &lt;dd&gt;
        &lt;select id="stepOrderSelect"&gt;
           #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
@@ -529,7 +534,7 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
        &lt;/select&gt;
        &lt;/dd&gt;
     #else
-       ; $prop.prettyName
+       ; $services.localization.render("${class.name}_${prop.name}")
        : $vobj.get($prop.getName())
     #end
  #end
@@ -542,9 +547,9 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
       &lt;input type="hidden" value="$request.stepID" id="stepID"/&gt;
    #end
    #if ($isNewStep &amp;&amp; $isNewStep != "")
-      &lt;input type="button" value="Add step" class="btn btn-primary" id="saveStepBtn"/&gt;
+      &lt;input type="button" value="$services.localization.render('tour.steps.add_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
    #else
-      &lt;input type="button" value="Edit step" class="btn btn-primary" id="saveStepBtn"/&gt;
+      &lt;input type="button" value="$services.localization.render('tour.steps.edit_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
    #end
 #end
 &lt;/div&gt;

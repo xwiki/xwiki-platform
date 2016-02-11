@@ -151,19 +151,68 @@
     var dialogName = event.data.name;
     var dialogDefinition = event.data.definition;
     if (dialogName === 'link') {
-      CKEDITOR.plugins.xwikiResource.replaceWithResourcePicker(dialogDefinition, 'url', {
-        resourceTypes: (event.editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
-        setup: function(data) {
-          this.setValue(data.resourceReference);
-        },
-        commit: function(data) {
-          data.resourceReference = this.getValue();
-          data.resourceReference.typed = data.resourceReference.type !== 'doc' &&
-            (data.resourceReference.type !== 'url' || data.resourceReference.reference.indexOf('://') < 0);
-        }
-      });
-      CKEDITOR.plugins.xwikiResource.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+      var resourcePicker = createResourcePicker(event.editor);
+      replaceLinkTypeSelect(dialogDefinition, resourcePicker);
+      var infoTab = dialogDefinition.getContents('info');
+      // Bind the value of the email address and url fields to the resource reference field.
+      // Hide the email address, url and protocol fields because we're using the resource picker instead.
+      var resourcePlugin = CKEDITOR.plugins.xwikiResource;
+      resourcePlugin.bindResourceReference(infoTab.get('emailAddress'), ['info', resourcePicker.id]);
+      resourcePlugin.bindResourceReference(infoTab.get('url'), ['info', resourcePicker.id]);
+      infoTab.get('protocol').hidden = true;
+
+      resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', 'resourceReference'], ['upload', 'uploadButton']);
     }
   });
+
+  var replaceLinkTypeSelect = function(dialogDefinition, newElementDefinition) {
+    var linkTypeDefinition = dialogDefinition.getContents('info').get('linkType');
+    CKEDITOR.plugins.xwikiDialog.replaceWith(dialogDefinition, 'linkType', {
+      type: 'vbox',
+      children: [newElementDefinition, linkTypeDefinition],
+      onLoad: function() {
+        this.getDialog().getContentElement('info', 'linkType').getElement().getParent().hide();
+      }
+    });
+  };
+
+  var createResourcePicker = function(editor) {
+    return CKEDITOR.plugins.xwikiResource.createResourcePicker({
+      resourceTypes: (editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
+      setup: function(data) {
+        this.setValue(data.resourceReference);
+      },
+      commit: function(data) {
+        data.resourceReference = this.getValue();
+        data.resourceReference.typed = data.resourceReference.type !== 'doc' &&
+          (data.resourceReference.type !== 'url' || data.resourceReference.reference.indexOf('://') < 0);
+      },
+      onResourceTypeChange: function(event, data) {
+        var dialog = this.getDialog();
+        // Update the value of the link type select because it is used internally by the link dialog. By default there
+        // are three link types available: url, anchor and email. We use only url and email because anchor has been
+        // merged with url (url links have the option to specify an anchor).
+        dialog.setValueOf('info', 'linkType', data.newValue === 'mailto' ? 'email' : 'url');
+        // Show the upload tab only for attachment resources.
+        if (data.newValue !== 'attach') {
+          dialog.hidePage('upload');
+        }
+        // Show the corresponding options (and hide the rest).
+        this.resourceTypes.forEach(function(resourceType) {
+          // We reuse the existing email options.
+          var optionsId = (resourceType === 'mailto' ? 'email' : resourceType) + 'Options';
+          var options = dialog.getContentElement('info', optionsId);
+          if (options) {
+            var container = options.getElement().getParent().getParent();
+            if (resourceType === data.newValue) {
+              container.show();
+            } else {
+              container.hide();
+            }
+          }
+        });
+      }
+    });
+  };
 })();

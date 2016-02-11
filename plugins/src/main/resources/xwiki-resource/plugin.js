@@ -144,7 +144,7 @@
           var domElement = $(this.getElement().$);
           addResourcePickerBehaviour(domElement);
           // Listen to resource type changes (in order to be able to show different options for different resource types).
-          domElement.on('change.resourceType', $.proxy(this, 'onResourceTypeChange'));
+          domElement.on('changeResourceType', $.proxy(this, 'onResourceTypeChange'));
           // Select the default resource type.
           this.selectResourceType(this.resourceTypes[0]);
         },
@@ -183,6 +183,10 @@
           return this.getElement().findOne('.resourceReference');
         },
         selectResourceType: function(resourceTypeId) {
+          if (resourceTypeId === this.getTypeInput().getValue()) {
+            // The specified resource type is already selected.
+            return;
+          }
           var resourceTypeAnchor = $(this.getElement().$).find('a').filter(function() {
             return $(this).attr('data-id') === resourceTypeId;
           });
@@ -249,6 +253,22 @@
 
     replaceWithResourcePicker: function(dialogDefinition, replacedElementId, pickerDefinition) {
       hideParentAndInsertAfter(dialogDefinition, replacedElementId, this.createResourcePicker(pickerDefinition));
+    },
+
+    bindResourceReference: function(element, resourcePickerId) {
+      // Use the resource reference value on commit.
+      var oldCommit = element.commit;
+      element.commit = function() {
+        var resourceReference = this.getDialog().getValueOf(resourcePickerId[0], resourcePickerId[1]);
+        this.setValue(resourceReference.reference);
+        if (typeof oldCommit === 'function') {
+          oldCommit.apply(this, arguments);
+        }
+      };
+      // We validate the resource reference instead.
+      delete element.validate;
+      // Hide the element. We show the resource picker instead.
+      element.hidden = true;
     }
   };
 
@@ -268,7 +288,7 @@
       resourceTypeIcon.attr('class', selectedResourceType.find('.icon').attr('class'));
       // Fire the change event after all click listeners are called.
       setTimeout(function() {
-        picker.trigger('change.resourceType', {oldValue: oldValue, newValue: newValue});
+        picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
       }, 0);
     });
   };

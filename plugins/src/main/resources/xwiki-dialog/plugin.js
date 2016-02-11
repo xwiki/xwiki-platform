@@ -40,6 +40,15 @@
         }
       }
       return null;
+    },
+
+    replaceWith: function(dialogDefinition, existingElementId, newElementDefinition) {
+      var path = this.getUIElementPath(existingElementId, dialogDefinition.contents);
+      if (path && path.length > 1) {
+        var existingElementPosition = path[0].position;
+        var parentElement = path[1].element;
+        (parentElement.children || parentElement.elements).splice(existingElementPosition, 1, newElementDefinition);
+      }
     }
   };
 })();

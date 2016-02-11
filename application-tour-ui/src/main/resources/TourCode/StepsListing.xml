@@ -50,22 +50,22 @@
    #set($BSTDocRef = $doc.getFullName())
 #end
 #set($vdoc = $xwiki.getDocument($BSTDocRef))
-#set($steps = $vdoc.getObjects("TourCode.StepClass"))
+#set($steps = $vdoc.getObjects('TourCode.StepClass'))
 #set ($sortedSteps = [])
 #sortXWikiObjectsList($steps, 'order', $sortedSteps)
 #set($nbsteps = 0)
-#set($discard = $xwiki.ssx.use("TourCode.StepSheet"))
-#set($discard = $xwiki.jsx.use("TourCode.StepSheet"))
+#set($discard = $xwiki.ssx.use('TourCode.StepSheet'))
+#set($discard = $xwiki.jsx.use('TourCode.StepSheet'))
 &lt;div id="stepsBlk"&gt;
    #if ($xcontext.action == 'edit')
-      &lt;a class="actionBtn" id="addStep" href="javascript:;" rel="$doc.getDocumentReference()"&gt;
+      &lt;a class="actionBtn" id="addStep" href="#" &gt;
          $services.icon.renderHTML("add")
          $services.localization.render("tour.steps.new_step")
       &lt;/a&gt;
    #end
    &lt;div id="stepsContainer"&gt;
-      &lt;table id="stepsTable"&gt;
-         &lt;tr id="stepsTableH"&gt;
+      &lt;table class="table-striped"&gt;
+         &lt;tr &gt;
             &lt;th&gt;$services.localization.render("TourCode.StepClass_order")&lt;/th&gt;
             &lt;th&gt;$services.localization.render("TourCode.StepClass_element")&lt;/th&gt;
             &lt;th&gt;$services.localization.render("TourCode.StepClass_title")&lt;/th&gt;
@@ -78,24 +78,23 @@
          &lt;/tr&gt;
          #if ($sortedSteps &amp;&amp; $sortedSteps.size() &gt; 0)
             #set($nbsteps = $sortedSteps.size())
-            #set($x = 0)
             #foreach($step in $sortedSteps)
-               #set($order = $step.getValue("order"))
-               #set($element = $step.getValue("element"))
-               #set($title = $step.getValue("title"))
-               #set($backdrop = $step.getValue("backdrop"))
-               #set($placement = $step.getValue("placement"))
-               #set($targetPage = $step.getValue("targetPage"))
-               #set($stepID = $step.getXWikiObject().getNumber())
-               &lt;tr #if($x%2 != 0) class="tr1" #end&gt;
-                  &lt;td&gt;$!mathtool.add($order,1)&lt;/td&gt;
+               #set($order      = $step.getValue('order'))
+               #set($element    = $step.getValue('element'))
+               #set($title      = $step.getValue('title'))
+               #set($backdrop   = $step.getValue('backdrop'))
+               #set($placement  = $step.getValue('placement'))
+               #set($targetPage = $step.getValue('targetPage'))
+               #set($stepID     = $step.getNumber())
+               &lt;tr&gt;
+                  &lt;td&gt;$!mathtool.add($order, 1)&lt;/td&gt;
                   &lt;td&gt;$!element&lt;/td&gt;
                   &lt;td&gt;$!title&lt;/td&gt;
                   &lt;td&gt;
                   #if($backdrop == 0)
-                     $services.localization.render("tour.steps.no")
+                     $services.localization.render('tour.steps.no')
                   #else
-                     $services.localization.render("tour.steps.yes")
+                     $services.localization.render('tour.steps.yes')
                   #end
                   &lt;/td&gt;
                   &lt;td&gt;
@@ -104,26 +103,25 @@
                   &lt;td&gt;
                      $!targetPage
                   &lt;/td&gt; 
-                  #if ($xcontext.action == 'edit' || $pageMode == "edit")
+                  #if ($xcontext.action == 'edit' || $pageMode == 'edit')
                      &lt;td&gt;
-                        &lt;a href="javascript:;" class="actionBtn editStep" rel="$!stepID"&gt;
+                        &lt;a href="#" class="actionBtn editStep" data-step-id="$!stepID"&gt;
                            $services.icon.renderHTML("pencil")
                            $services.localization.render("tour.steps.edit")
                         &lt;/a&gt;
-                        &lt;a href="javascript:;" class="actionBtn deleteStep" rel="$!stepID"&gt;
+                        &lt;a href="#" class="actionBtn deleteStep" data-step-id="$!stepID"&gt;
                            $services.icon.renderHTML("delete")
                            $services.localization.render("tour.steps.delete")
                         &lt;/a&gt;
                      &lt;/td&gt;
                   #end
                &lt;/tr&gt;
-               #set($x = $x + 1)       
             #end
          #end
       &lt;/table&gt;
       &lt;input type="hidden" value="$nbsteps" id="nbsteps"/&gt;
    &lt;/div&gt;
-   &lt;input type="hidden" value="$BSTDocRef" id="BSTDocRef"/&gt;
+   &lt;input type="hidden" value="$escapetool.xml($BSTDocRef)" id="BSTDocRef"/&gt;
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

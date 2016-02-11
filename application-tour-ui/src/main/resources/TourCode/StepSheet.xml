@@ -131,6 +131,8 @@ var messages = {
                }
 
 require(['jquery'], function ($) {
+   'use strict';
+
    // Initialize add new step button
    $("#addStep").click(function() {
       var BSTDocRef = $("#BSTDocRef").val();
@@ -139,7 +141,7 @@ require(['jquery'], function ($) {
    });
 
    // Initialize save step button
-   $( "body" ).on( "click", "#saveStepBtn", function() {
+   $("body").on("click", "#saveStepBtn", function() {
       var parent = $(this).parent().parent();
       var stepID = $("#stepID", parent).val();
       var prefix = "TourCode.StepClass_";
@@ -154,47 +156,54 @@ require(['jquery'], function ($) {
       var nbSteps = $("#nbsteps").val();
       var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), stepOrder:(stepOrder? stepOrder: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepID: stepID, action:"editStep", xpage:"plain"};
       $.ajax({
-	 url:"$xwiki.getURL('TourCode.AjaxActions')",
-	 type:'POST',
-	 data: step, 
-	 success: function(rep, textStatus, jqXHR) {
-            $('#stepsContainer').html(rep);
-         },
-         complete:function( jqXHR , textStatus ) {
-            // Close dialog box
-            $(".xdialog-close").click(); 
-         }
+	      url:"$xwiki.getURL('TourCode.AjaxActions')",
+	      type:'POST',
+	      data: step,
+	      success: function(rep) {
+          $('#stepsContainer').html(rep);
+        },
+        complete: function() {
+          // Close dialog box
+          $(".xdialog-close").click();
+        }
       });
    });
 
    // Initialize step edit btns
-   $( "body" ).on( "click", ".editStep", function() {
+   $("body").on("click", ".editStep", function() {
       $('.xdialog-modal-container').remove();
       var BSTDocRef = $("#BSTDocRef").val();
-      var stepID = $(this).attr("rel");
+      var stepID = $(this).attr("data-step-id");
       $('.xdialog-modal-container').remove();
-      new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepID=' + encodeURIComponent(stepID)});
+      new XWiki.widgets.StepPopup({
+        pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepID=' + encodeURIComponent(stepID)
+      });
    });
    
    // Initialize step delete btns
-   $( "body" ).on( "click", ".deleteStep", function() {
+   $("body").on("click", ".deleteStep", function() {
       $('.xdialog-modal-container').remove();
       var BSTDocRef = $("#BSTDocRef").val();
-      var stepID = $(this).attr("rel");
-      new XWiki.widgets.ConfirmationBox({onYes: function() {
-         new XWiki.widgets.Notification(messages.deleting, 'inprogress');
-         $.ajax({
-	    url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepID=" + encodeURIComponent(stepID),
+      var stepID = $(this).attr("data-step-id");
+      new XWiki.widgets.ConfirmationBox({
+        onYes: function() {
+          var notif = new XWiki.widgets.Notification(messages.deleting, 'inprogress');
+          $.ajax({
+	          url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepID=" + encodeURIComponent(stepID),
             type: 'POST',
-            success: function(rep, textStatus, jqXHR) {
-               $('#stepsContainer').html(rep);
+            success: function(rep) {
+              $('#stepsContainer').html(rep);
             },
-	    complete: function(event, XMLHttpRequest, ajaxOptions) {
-               $(".xnotification-inprogress").remove();
-               new XWiki.widgets.Notification(messages.deleteDone, "done");
+            complete: function() {
+              notif.replace(new XWiki.widgets.Notification(messages.deleteDone, "done"));
+              //TODO: add "on failure"
             }
-	 });
-      }}, {confirmationText: messages.deleteConfirm});
+	        });
+        }},
+        {
+          confirmationText: messages.deleteConfirm
+        }
+      );
    });
 });</code>
     </property>

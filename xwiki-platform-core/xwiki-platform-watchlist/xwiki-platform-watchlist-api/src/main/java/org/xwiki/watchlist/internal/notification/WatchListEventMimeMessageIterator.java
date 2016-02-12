@@ -62,6 +62,11 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
     public static final String XWIKI_USER_CLASS_LAST_NAME_PROP = "last_name";
 
     /**
+     * Subscriber reference.
+     */
+    public static final DocumentReference SUBSCRIBER_REFERENCE = "subscriberReference";
+
+    /**
      * Template factory "attachments" parameter.
      */
     public static final String TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER = "attachments";
@@ -176,6 +181,7 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
 
         velocityVariables.put(XWIKI_USER_CLASS_FIRST_NAME_PROP, watchListMessageData.getFirstName());
         velocityVariables.put(XWIKI_USER_CLASS_LAST_NAME_PROP, watchListMessageData.getLastName());
+        velocityVariables.put(SUBSCRIBER_REFERENCE, watchListMessageData.getUserReference());
 
         // Attach the avatars of the authors of the events we are notifying about.
         if (parameters.get(WatchListEventMimeMessageFactory.ATTACH_AUTHOR_AVATARS_PARAMETER) == Boolean.TRUE) {

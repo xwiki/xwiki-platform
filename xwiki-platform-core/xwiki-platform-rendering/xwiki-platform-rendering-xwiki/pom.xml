@@ -32,8 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
   <properties>
-    <!-- FIXME (Eduard): Temporarily lowered. Bring this back to at least 0.77 ASAP.  -->
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

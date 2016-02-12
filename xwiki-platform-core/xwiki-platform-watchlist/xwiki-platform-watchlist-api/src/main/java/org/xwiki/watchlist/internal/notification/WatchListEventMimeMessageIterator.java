@@ -64,7 +64,7 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
     /**
      * Subscriber reference.
      */
-    public static final DocumentReference SUBSCRIBER_REFERENCE = "subscriberReference";
+    public static final String SUBSCRIBER_REFERENCE = "subscriberReference";
 
     /**
      * Template factory "attachments" parameter.

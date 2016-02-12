@@ -22,9 +22,9 @@ package com.xpn.xwiki.doc.merge;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
-import org.xwiki.logging.event.LogEvent;
+import org.slf4j.event.Level;
+import org.xwiki.logging.LoggingEventMessage;
+import org.xwiki.logging.util.LoggingEventMessageQueue;
 
 /**
  * Report of what happen during merge.
@@ -42,7 +42,7 @@ public class MergeResult
     /**
      * @see #getLog()
      */
-    private LogQueue log = new LogQueue();
+    private LoggingEventMessageQueue log = new LoggingEventMessageQueue();
 
     /**
      * @param modified indicate that something has been modified during the merge
@@ -69,17 +69,26 @@ public class MergeResult
         return this.log;
     }
 
+    /**
+     * @return the log associated to the merge
+     * @since 8.0M2
+     */
+    public LoggingEventMessageQueue getLogs()
+    {
+        return this.log;
+    }
+
     // Deprecated
 
     /**
      * @param logLevel the level of the logs to return
      * @return the exceptions associated to the provided log level
      */
-    private List<Exception> getExceptions(LogLevel logLevel)
+    private List<Exception> getExceptions(Level logLevel)
     {
         List<Exception> exceptions = new LinkedList<Exception>();
 
-        for (LogEvent logEvent : getLog()) {
+        for (LoggingEventMessage logEvent : getLogs()) {
             if (logEvent.getLevel() == logLevel) {
                 if (logEvent.getThrowable() != null && logEvent.getThrowable() instanceof Exception) {
                     exceptions.add(new MergeException(logEvent.getFormattedMessage(), logEvent.getThrowable()));
@@ -103,7 +112,7 @@ public class MergeResult
     @Deprecated
     public List<Exception> getErrors()
     {
-        return getExceptions(LogLevel.ERROR);
+        return getExceptions(Level.ERROR);
     }
 
     /**
@@ -118,7 +127,7 @@ public class MergeResult
     @Deprecated
     public List<Exception> getWarnings()
     {
-        return getExceptions(LogLevel.WARN);
+        return getExceptions(Level.WARN);
     }
 
     /**
@@ -130,7 +139,7 @@ public class MergeResult
     @Deprecated
     public void error(Exception e)
     {
-        getLog().error("", e);
+        getLogs().error("", e);
     }
 
     /**
@@ -142,6 +151,6 @@ public class MergeResult
     @Deprecated
     public void warn(Exception e)
     {
-        getLog().warn("", e);
+        getLogs().warn("", e);
     }
 }

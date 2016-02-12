@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.extension.ExtensionId;
@@ -44,8 +45,7 @@ import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -175,7 +175,7 @@ public class XarExtensionHandlerTest
         Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
         installJob.join();
 
-        List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
+        List<LoggingEventMessage> errors = installJob.getStatus().getLogs().getLogsFrom(Level.WARN);
         if (!errors.isEmpty()) {
             if (errors.get(0).getThrowable() != null) {
                 throw errors.get(0).getThrowable();
@@ -199,7 +199,7 @@ public class XarExtensionHandlerTest
         Job uninstallJob = this.jobExecutor.execute(UninstallJob.JOBTYPE, uninstallRequest);
         uninstallJob.join();
 
-        List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
+        List<LoggingEventMessage> errors = uninstallJob.getStatus().getLogs().getLogsFrom(Level.WARN);
         if (!errors.isEmpty()) {
             if (errors.get(0).getThrowable() != null) {
                 throw errors.get(0).getThrowable();

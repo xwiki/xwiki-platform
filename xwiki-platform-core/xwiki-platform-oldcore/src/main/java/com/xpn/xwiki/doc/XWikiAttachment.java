@@ -1069,11 +1069,11 @@ public class XWikiAttachment implements Cloneable
             } else {
                 if (this.equals(nextAttachment)) {
                     // Already modified as expected in the DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Attachment [{}] already modified", getReference());
+                    mergeResult.getLogs().warn("Attachment [{}] already modified", getReference());
                 }
             }
         } catch (Exception e) {
-            mergeResult.getLog().error("Failed to merge attachment [{}]", this, e);
+            mergeResult.getLogs().error("Failed to merge attachment [{}]", this, e);
         }
     }
 

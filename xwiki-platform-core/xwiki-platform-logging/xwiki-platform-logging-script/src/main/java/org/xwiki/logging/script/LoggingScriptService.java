@@ -29,14 +29,15 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.LoggingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogTree;
-import org.xwiki.logging.LogUtils;
 import org.xwiki.logging.LoggerManager;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
+import org.xwiki.logging.util.LoggingEventTree;
+import org.xwiki.logging.util.LoggingUtils;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -127,12 +128,25 @@ public class LoggingScriptService implements ScriptService
      * @param logs the logs
      * @return the logs as a {@link LogTree}
      * @since 5.4RC1
+     * @deprecated since 8.0M2, use {@link #toLoggingEventMessageTree(Iterable)} instead
      */
+    @Deprecated
     public LogTree toLogTree(Iterable<LogEvent> logs)
     {
         LogTree logTree = new LogTree();
 
         for (LogEvent logEvent : logs) {
+            logTree.log(logEvent);
+        }
+
+        return logTree;
+    }
+
+    public LoggingEventTree toLoggingEventMessageTree(Iterable<? extends LoggingEvent> logs)
+    {
+        LoggingEventTree logTree = new LoggingEventTree();
+
+        for (LoggingEvent logEvent : logs) {
             logTree.log(logEvent);
         }
 
@@ -149,7 +163,9 @@ public class LoggingScriptService implements ScriptService
      * 
      * @param logEvent the {@link LogEvent} to translate
      * @return the translated version of the passed {@link LogEvent}
+     * @deprecated since 8.0M2, use {@link #translate(LoggingEvent)} instead
      */
+    @Deprecated
     public LogEvent translate(LogEvent logEvent)
     {
         if (logEvent.getTranslationKey() != null) {
@@ -157,6 +173,31 @@ public class LoggingScriptService implements ScriptService
 
             if (translation != null) {
                 return LogUtils.translate(logEvent, (String) translation.getRawSource());
+            }
+        }
+
+        return logEvent;
+    }
+
+    /**
+     * Translate the passed {@link LogEvent} based on the translation message corresponding to the translation key
+     * stored in the {@link LogEvent}.
+     * <p>
+     * The translation message pattern use the same syntax than standard message pattern except that it's optionally
+     * possible to provide a custom index as in <code>Some {1} translation {0} message</code> in order to modify the
+     * order of the argument which can be required depending on the language.
+     * 
+     * @param logEvent the {@link LogEvent} to translate
+     * @return the translated version of the passed {@link LogEvent}
+     */
+    public LoggingEvent translate(LoggingEvent logEvent)
+    {
+        String translationKey = LoggingEventMessage.getTranslationKey(logEvent);
+        if (translationKey != null) {
+            Translation translation = this.localization.getTranslation(translationKey);
+
+            if (translation != null) {
+                return LoggingUtils.translate(logEvent, (String) translation.getRawSource());
             }
         }
 

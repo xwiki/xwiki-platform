@@ -470,7 +470,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
                     propertyClass.mergeProperty((BaseProperty) currentElement, (BaseProperty) previousElement,
                         (BaseProperty) newElement, configuration, context, mergeResult);
                 } catch (Exception e) {
-                    mergeResult.getLog().error("Failed to merge field [{}]", currentElement.getName(), e);
+                    mergeResult.getLogs().error("Failed to merge field [{}]", currentElement.getName(), e);
                 }
 
                 return;

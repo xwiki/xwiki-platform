@@ -70,7 +70,7 @@ public final class MergeUtils
         try {
             result = DIFFMANAGER.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
 
-            mergeResult.getLog().addAll(result.getLog());
+            mergeResult.getLogs().addAll(result.getLogs());
 
             String resultStr = fromLines(result.getMerged());
 
@@ -80,7 +80,7 @@ public final class MergeUtils
 
             return resultStr;
         } catch (MergeException e) {
-            mergeResult.getLog().error("Failed to execute merge lines", e);
+            mergeResult.getLogs().error("Failed to execute merge lines", e);
         }
 
         return currentStr;
@@ -106,7 +106,7 @@ public final class MergeUtils
                 return currentObject;
             }
 
-            mergeResult.getLog().error("Failed to merge objects: previous=[{}] new=[{}] current=[{}]", previousObject,
+            mergeResult.getLogs().error("Failed to merge objects: previous=[{}] new=[{}] current=[{}]", previousObject,
                 newObject, currentObject);
         }
 
@@ -128,7 +128,7 @@ public final class MergeUtils
         try {
             result = DIFFMANAGER.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
 
-            mergeResult.getLog().addAll(result.getLog());
+            mergeResult.getLogs().addAll(result.getLogs());
 
             String resultStr = fromCharacters(result.getMerged());
 
@@ -138,7 +138,7 @@ public final class MergeUtils
 
             return resultStr;
         } catch (MergeException e) {
-            mergeResult.getLog().error("Failed to execute merge characters", e);
+            mergeResult.getLogs().error("Failed to execute merge characters", e);
         }
 
         return currentStr;
@@ -159,7 +159,7 @@ public final class MergeUtils
         try {
             result = DIFFMANAGER.merge(commonAncestor, next, current, null);
 
-            mergeResult.getLog().addAll(result.getLog());
+            mergeResult.getLogs().addAll(result.getLogs());
 
             List<T> merged = result.getMerged();
 
@@ -169,7 +169,7 @@ public final class MergeUtils
                 mergeResult.setModified(true);
             }
         } catch (MergeException e) {
-            mergeResult.getLog().error("Failed to execute merge lists", e);
+            mergeResult.getLogs().error("Failed to execute merge lists", e);
         }
     }
 

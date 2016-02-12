@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -319,10 +319,13 @@ public class DomainObjectFactory
         return progress;
     }
 
-    public static JobLog createLog(ObjectFactory objectFactory, URI self, Collection<LogEvent> logs)
+    /**
+     * @since 8.0M2
+     */
+    public static JobLog createLog(ObjectFactory objectFactory, URI self, Collection<LoggingEventMessage> logs)
     {
         JobLog log = objectFactory.createJobLog();
-        for (LogEvent logEvent : logs) {
+        for (LoggingEventMessage logEvent : logs) {
             org.xwiki.rest.model.jaxb.LogEvent event = objectFactory.createLogEvent();
             event.setLevel(logEvent.getLevel().name());
             Calendar calendarDate = Calendar.getInstance();

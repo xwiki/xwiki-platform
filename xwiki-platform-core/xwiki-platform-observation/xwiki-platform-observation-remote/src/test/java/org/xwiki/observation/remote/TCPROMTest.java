@@ -25,7 +25,7 @@ import org.jmock.Expectations;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.event.LoggingEventEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.remote.test.AbstractROMTestCase;
 import org.xwiki.observation.remote.test.TestEvent;
@@ -86,7 +86,7 @@ public class TCPROMTest extends AbstractROMTestCase
 
         getObservationManager1().notify(event, "some source", "some data");
         getObservationManager1().notify(event, unserializable, unserializable);
-        getObservationManager1().notify(new LogEvent(), "some source", "some data");
+        getObservationManager1().notify(new LoggingEventEvent(), "some source", "some data");
 
         // Make sure JGroups has enough time to send the message
         Thread.sleep(1000);

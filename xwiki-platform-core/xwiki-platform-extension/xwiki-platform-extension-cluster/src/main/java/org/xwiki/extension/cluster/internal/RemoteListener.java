@@ -27,12 +27,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
+import org.xwiki.logging.util.LoggingUtils;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -89,8 +90,8 @@ public class RemoteListener implements EventListener
         try {
             Job job = this.jobExecutor.execute(jobEvent.getJobType(), jobEvent.getRequest());
 
-            for (LogEvent log : job.getStatus().getLog(LogLevel.ERROR)) {
-                this.logger.error(log.getMessage(), log.getArgumentArray());
+            for (LoggingEventMessage log : job.getStatus().getLogs().getLogs(Level.ERROR)) {
+                LoggingUtils.log(log, this.logger);
             }
         } catch (JobException e) {
             this.logger.error("Failed to execute remote job [" + jobEvent + "]", e);

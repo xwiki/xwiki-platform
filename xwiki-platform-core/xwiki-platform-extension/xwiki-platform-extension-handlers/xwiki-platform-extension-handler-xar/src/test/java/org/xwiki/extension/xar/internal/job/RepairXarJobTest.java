@@ -19,19 +19,18 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.event.Level;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
-import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
-import org.xwiki.logging.LogLevel;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
@@ -47,7 +46,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
             this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
-    protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable
+    protected Job repair(ExtensionId extensionId, String[] namespaces, Level failFrom) throws Throwable
     {
         return install(RepairXarJob.JOBTYPE, extensionId, namespaces, failFrom);
     }
@@ -57,7 +56,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
-        repair(extensionId, null, LogLevel.WARN);
+        repair(extensionId, null, Level.WARN);
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
@@ -73,7 +72,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
-        repair(extensionId, new String[] {"wiki1"}, LogLevel.WARN);
+        repair(extensionId, new String[] {"wiki1"}, Level.WARN);
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 
@@ -89,7 +88,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     {
         ExtensionId extensionId = new ExtensionId("invalid", "1.0");
 
-        repair(extensionId, null, LogLevel.ERROR);
+        repair(extensionId, null, Level.ERROR);
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 

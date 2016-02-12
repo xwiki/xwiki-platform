@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 import org.xwiki.diff.internal.DefaultDiffManager;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
@@ -120,7 +120,7 @@ public class XWikiDocumentMergeTest
             this.currentDocument.merge(this.previousDocument, this.nextDocument, this.configuration,
                 this.oldcore.getXWikiContext());
 
-        List<LogEvent> exception = result.getLog().getLogs(LogLevel.ERROR);
+        List<LoggingEventMessage> exception = result.getLogs().getLogs(Level.ERROR);
         if (!exception.isEmpty()) {
             throw new MergeException(exception.get(0).getFormattedMessage(), exception.get(0).getThrowable());
         }

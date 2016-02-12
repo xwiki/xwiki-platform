@@ -808,7 +808,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
                     // collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
+                    mergeResult.getLogs().error("Collision found on property [{}]", newProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                 if (propertyResult != null) {
@@ -819,11 +819,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     } else {
                         // collision between DB and new: property to remove but not the same as previous
                         // version
-                        mergeResult.getLog().error("Collision found on property [{}]", previousProperty.getReference());
+                        mergeResult.getLogs().error("Collision found on property [{}]", previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
+                    mergeResult.getLogs().warn("Property [{}] already removed", previousProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                 if (propertyResult != null) {
@@ -839,7 +839,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 } else {
                     // collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
+                    mergeResult.getLogs().warn("Collision found on property [{}]", newProperty.getReference());
 
                     safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                         : newProperty.clone());

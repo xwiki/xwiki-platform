@@ -8771,7 +8771,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             mergeResult.setModified(true);
                         } else {
                             // collision between DB and new: object to add but already exists in the DB
-                            mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
+                            mergeResult.getLogs().error("Collision found on object [{}]", objectResult.getReference());
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
                         if (objectResult != null) {
@@ -8781,12 +8781,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             } else {
                                 // collision between DB and new: object to remove but not the same as previous
                                 // version
-                                mergeResult.getLog().error("Collision found on object [{}]",
+                                mergeResult.getLogs().error("Collision found on object [{}]",
                                     objectResult.getReference());
                             }
                         } else {
                             // Already removed from DB, lets assume the user is prescient
-                            mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
+                            mergeResult.getLogs().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     } else if (previousObject != null && newObject != null) {
                         if (objectResult != null) {
@@ -8796,7 +8796,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     mergeResult.setModified(true);
                                 } else {
                                     // collision between DB and new: property to add but already exists in the DB
-                                    mergeResult.getLog().error("Collision found on object property [{}]",
+                                    mergeResult.getLogs().error("Collision found on object property [{}]",
                                         propertyResult.getReference());
                                 }
                             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
@@ -8807,12 +8807,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     } else {
                                         // collision between DB and new: supposed to be removed but the DB version is
                                         // not the same as the previous version
-                                        mergeResult.getLog().error("Collision found on object property [{}]",
+                                        mergeResult.getLogs().error("Collision found on object property [{}]",
                                             propertyResult.getReference());
                                     }
                                 } else {
                                     // Already removed from DB, lets assume the user is prescient
-                                    mergeResult.getLog().warn("Object property [{}] already removed",
+                                    mergeResult.getLogs().warn("Object property [{}] already removed",
                                         previousProperty.getReference());
                                 }
                             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
@@ -8828,7 +8828,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 } else {
                                     // collision between DB and new: property to modify but does not exists in DB
                                     // Lets assume it's a mistake to fix
-                                    mergeResult.getLog()
+                                    mergeResult.getLogs()
                                         .warn("Object [{}] does not exists", newProperty.getReference());
 
                                     objectResult.safeput(diff.getPropName(), newProperty);
@@ -8837,7 +8837,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             }
                         } else {
                             // Object explitely removed from the DB, lets assume we don't care about the changes
-                            mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
+                            mergeResult.getLogs().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     }
                 }
@@ -8869,16 +8869,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     mergeResult.setModified(true);
                                 } else {
                                     // collision between DB and new: attachment modified by user
-                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                    mergeResult.getLogs().error("Collision found on attachment [{}]",
                                         attachment.getReference());
                                 }
                             } catch (XWikiException e) {
-                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                mergeResult.getLogs().error("Failed to compare attachments with reference [{}]",
                                     attachment.getReference());
                             }
                         } else {
                             // Already removed from DB, lets assume the user is prescient
-                            mergeResult.getLog().warn("Attachment [{}] already removed",
+                            mergeResult.getLogs().warn("Attachment [{}] already removed",
                                 previousAttachment.getReference());
                         }
                         break;
@@ -8888,15 +8888,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 if (!attachment.equalsData(nextAttachment, context)) {
                                     // collision between DB and new: attachment to add but a different one already
                                     // exists in the DB
-                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                    mergeResult.getLogs().error("Collision found on attachment [{}]",
                                         attachment.getReference());
                                 } else {
                                     // Already added to the DB, lets assume the user is prescient
-                                    mergeResult.getLog().warn("Attachment [{}] already added",
+                                    mergeResult.getLogs().warn("Attachment [{}] already added",
                                         previousAttachment.getReference());
                                 }
                             } catch (XWikiException e) {
-                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                mergeResult.getLogs().error("Failed to compare attachments with reference [{}]",
                                     attachment.getReference());
                             }
                         } else {
@@ -8910,7 +8910,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             attachment.merge(previousAttachment, nextAttachment, configuration, context, mergeResult);
                         } else {
                             // collision between DB and new: attachment modified but does not exist in the DB
-                            mergeResult.getLog().error("Collision found on attachment [{}]",
+                            mergeResult.getLogs().error("Collision found on attachment [{}]",
                                 previousAttachment.getReference());
                         }
                         break;

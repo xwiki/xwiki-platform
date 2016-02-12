@@ -225,7 +225,7 @@ public class DefaultDocumentMergeImporterTest
         this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
-        this.mergeResult.getLog().error("error");
+        this.mergeResult.getLogs().error("error");
 
         answerGlobalAction(GlobalAction.CURRENT, false);
 
@@ -249,7 +249,7 @@ public class DefaultDocumentMergeImporterTest
         this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
-        this.mergeResult.getLog().error("error");
+        this.mergeResult.getLogs().error("error");
 
         answerGlobalAction(GlobalAction.NEXT, false);
 
@@ -275,7 +275,7 @@ public class DefaultDocumentMergeImporterTest
         this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
-        this.mergeResult.getLog().error("error");
+        this.mergeResult.getLogs().error("error");
 
         answerGlobalAction(GlobalAction.MERGED, false);
 
@@ -301,7 +301,7 @@ public class DefaultDocumentMergeImporterTest
         this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
-        this.mergeResult.getLog().error("error");
+        this.mergeResult.getLogs().error("error");
 
         answerGlobalAction(GlobalAction.PREVIOUS, false);
 
@@ -327,7 +327,7 @@ public class DefaultDocumentMergeImporterTest
         this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
-        this.mergeResult.getLog().error("error");
+        this.mergeResult.getLogs().error("error");
 
         answerGlobalAction(GlobalAction.PREVIOUS, true);
 

@@ -24,8 +24,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
+import org.slf4j.event.Level;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -158,7 +158,7 @@ public class BaseObjectTest
         currentObject
             .merge(previousObject, nextObject, mergeConfiguration, this.oldcore.getXWikiContext(), mergeResult);
 
-        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.WARN);
+        List<LoggingEventMessage> errors = mergeResult.getLogs().getLogsFrom(Level.WARN);
         if (errors.size() > 0) {
             Assert.fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }

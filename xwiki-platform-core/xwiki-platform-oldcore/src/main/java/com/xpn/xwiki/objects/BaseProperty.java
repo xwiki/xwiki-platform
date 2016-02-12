@@ -243,7 +243,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                     setValue(newValue);
                 } else {
                     // collision between current and new
-                    mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
+                    mergeResult.getLogs().error("Collision found on property [{}] between from value [{}] and to [{}]",
                         getName(), getValue(), newValue);
                 }
             }
@@ -252,7 +252,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                 setValue(null);
             } else {
                 // collision between current and new
-                mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
+                mergeResult.getLogs().error("Collision found on property [{}] between from value [{}] and to [{}]",
                     getName(), getValue(), newValue);
             }
         } else {
@@ -260,7 +260,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                 setValue(newValue);
             } else if (previousValue.getClass() != newValue.getClass()) {
                 // collision between current and new
-                mergeResult.getLog().error("Collision found on property [{}] between from value [] and to []",
+                mergeResult.getLogs().error("Collision found on property [{}] between from value [] and to []",
                     getName(), getValue(), newValue);
             } else if (!Objects.equals(newValue, getValue())) {
                 mergeValue(previousValue, newValue, mergeResult);
@@ -279,7 +279,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
         // collision between current and new: don't know how to apply 3 way merge on unknown type
-        mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]", getName(),
+        mergeResult.getLogs().error("Collision found on property [{}] between from value [{}] and to [{}]", getName(),
             getValue(), newValue);
     }
 

@@ -23,9 +23,9 @@ import java.util.Collection;
 
 import javax.inject.Named;
 
+import org.slf4j.event.Level;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
@@ -34,7 +34,7 @@ import org.xwiki.rest.resources.job.JobLogResource;
 
 /**
  * @version $Id$
- * @since 7.2M3 
+ * @since 7.2M3
  */
 @Named("org.xwiki.rest.internal.resources.job.JobLogResourceImpl")
 public class JobLogResourceImpl extends XWikiJobResource implements JobLogResource
@@ -44,13 +44,13 @@ public class JobLogResourceImpl extends XWikiJobResource implements JobLogResour
     {
         JobStatus jobStatus = getRealJobStatus(jobId);
 
-        Collection<LogEvent> log;
+        Collection<LoggingEventMessage> log;
         if (level != null) {
-            log = jobStatus.getLog().getLogs(LogLevel.valueOf(level.toUpperCase()));
+            log = jobStatus.getLogs().getLogs(Level.valueOf(level.toUpperCase()));
         } else if (fromLevel != null) {
-            log = jobStatus.getLog().getLogsFrom(LogLevel.valueOf(fromLevel.toUpperCase()));
+            log = jobStatus.getLogs().getLogsFrom(Level.valueOf(fromLevel.toUpperCase()));
         } else {
-            log = jobStatus.getLog();
+            log = jobStatus.getLogs();
         }
         return DomainObjectFactory.createLog(objectFactory, uriInfo.getAbsolutePath(), log);
     }

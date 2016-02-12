@@ -26,11 +26,12 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
-import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.util.LoggingUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarEntry;
@@ -146,14 +147,14 @@ public class DocumentMergeImporter
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
             documentMergeResult = new MergeResult();
-            documentMergeResult.getLog().error(
-                "Unexpected exception thrown. Usually means there is a bug in the merge.", e);
+            documentMergeResult.getLogs()
+                .error("Unexpected exception thrown. Usually means there is a bug in the merge.", e);
             documentMergeResult.setModified(true);
         }
 
-        documentMergeResult.getLog().log(this.logger);
+        LoggingUtils.log(documentMergeResult.getLogs(), this.logger);
 
-        if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+        if (configuration.isInteractive() && !documentMergeResult.getLogs().getLogs(Level.ERROR).isEmpty()) {
             // Indicate future author to whoever is going to answer the question
             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
             mergedDocument.setCreatorReference(currentDocument.getCreatorReference());
@@ -183,8 +184,9 @@ public class DocumentMergeImporter
             saveDocument(mergedDocument, comment, false, configuration);
         }
 
-        return new XarEntryMergeResult(new XarEntry(new LocalDocumentReference(
-            mergedDocument.getDocumentReferenceWithLocale())), documentMergeResult);
+        return new XarEntryMergeResult(
+            new XarEntry(new LocalDocumentReference(mergedDocument.getDocumentReferenceWithLocale())),
+            documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -210,8 +212,8 @@ public class DocumentMergeImporter
     private GlobalAction getMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument)
     {
-        return (GlobalAction) this.execution.getContext().getProperty(
-            previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE);
+        return (GlobalAction) this.execution.getContext()
+            .getProperty(previousDocument != null ? PROP_ALWAYS_MERGE : PROP_ALWAYS_NOMERGE);
     }
 
     private void setMergeConflictAnswer(XWikiDocument currentDocument, XWikiDocument previousDocument,

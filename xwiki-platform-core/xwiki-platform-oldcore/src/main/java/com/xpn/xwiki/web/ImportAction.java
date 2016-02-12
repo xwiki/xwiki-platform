@@ -30,6 +30,7 @@ import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+import org.slf4j.event.Level;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.input.BeanInputFilterStream;
@@ -44,11 +45,11 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.LoggerManager;
-import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.LoggingEventMessage;
 import org.xwiki.logging.event.LoggerListener;
+import org.xwiki.logging.util.LoggingEventMessageQueue;
+import org.xwiki.logging.util.LoggingUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -255,8 +256,8 @@ public class ImportAction extends XWikiAction
 
                     String documentReference = getDocumentReference(pageEntry);
                     if (iAction == DocumentInfo.ACTION_OVERWRITE) {
-                        entities.includes(new LocalDocumentReference(resolver.resolve(documentReference, EntityType.DOCUMENT),
-                            LocaleUtils.toLocale(locale)));
+                        entities.includes(new LocalDocumentReference(
+                            resolver.resolve(documentReference, EntityType.DOCUMENT), LocaleUtils.toLocale(locale)));
                     }
                 }
             }
@@ -307,7 +308,7 @@ public class ImportAction extends XWikiAction
         instanceProperties.setVerbose(true);
         instanceProperties.setStoppedWhenSaveFail(false);
         LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
-        LogQueue logger = new LogQueue();
+        LoggingEventMessageQueue logger = new LoggingEventMessageQueue();
         if (loggerManager != null) {
             // Isolate log
             loggerManager.pushLogListener(new LoggerListener(UUID.randomUUID().toString(), logger));
@@ -328,7 +329,7 @@ public class ImportAction extends XWikiAction
 
             // Print the import log
             if (LOGGER.isDebugEnabled()) {
-                logger.log(LOGGER);
+                LoggingUtils.log(logger, LOGGER);
             }
 
             // Close the input source
@@ -340,29 +341,28 @@ public class ImportAction extends XWikiAction
         // Generate import report
         // Emulate old packager report (for retro compatibility)
         Package oldImporter = new Package();
-        if (logger.containLogsFrom(LogLevel.ERROR)) {
+        if (logger.containLogsFrom(Level.ERROR)) {
             context.put("install_status", DocumentInfo.INSTALL_ERROR);
         } else {
             context.put("install_status", DocumentInfo.INSTALL_OK);
         }
         EntityReferenceSerializer<String> serializer =
             Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        for (LogEvent log : logger) {
+        for (LoggingEventMessage log : logger) {
             Marker marker = log.getMarker();
             if (marker != null) {
                 if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
                     || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
-                    oldImporter.getInstalled(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getInstalled(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
-                    oldImporter.getSkipped(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getSkipped(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
                     Object entity = log.getArgumentArray()[0];
                     if (entity != null) {
-                        oldImporter.getErrors(context).add(
-                            entity instanceof EntityReference ? serializer.serialize((EntityReference) log
-                                .getArgumentArray()[0]) : entity.toString());
+                        oldImporter.getErrors(context).add(entity instanceof EntityReference
+                            ? serializer.serialize((EntityReference) log.getArgumentArray()[0]) : entity.toString());
                     }
                 }
             }

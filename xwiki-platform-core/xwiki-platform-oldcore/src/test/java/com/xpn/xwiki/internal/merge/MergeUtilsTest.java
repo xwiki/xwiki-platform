@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.internal.merge;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,13 +26,17 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 import org.xwiki.diff.internal.DefaultDiffManager;
-import org.xwiki.logging.LogLevel;
 import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.web.Utils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link MergeUtils}.
@@ -104,7 +104,7 @@ public class MergeUtilsTest
         assertEquals("old modified", MergeUtils.mergeOject("old", "new", "old modified", result));
         assertFalse(result.isModified());
         // conflicts are flagged as errors in the log 
-        assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        assertFalse(result.getLogs().getLogs(Level.ERROR).isEmpty());
     }
 
     @Test
@@ -137,6 +137,6 @@ public class MergeUtilsTest
         assertEquals(Arrays.asList("old modified1", "old modified2"), current);
         assertFalse(result.isModified());
         // conflicts are flagged as errors in the log 
-        assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        assertFalse(result.getLogs().getLogs(Level.ERROR).isEmpty());
     }    
 }

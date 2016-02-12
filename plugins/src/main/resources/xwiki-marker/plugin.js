@@ -164,4 +164,80 @@
   CKEDITOR.tools.unescapeComment = function(text) {
     return CKEDITOR.tools.unescape(text, '\\');
   };
+
+  CKEDITOR.plugins.xwikiMarker = {
+    /**
+     * Serializes the given parameters as a space separated list of key-value pairs:
+     *
+     *   param1="value1" param2="value2" ...
+     *
+     * The input must be an object that looks like this:
+     *
+     *   {param1: 'value1', param2: 'value2' ... }
+     *
+     * or like this:
+     *
+     *   {
+     *     param1: {name: 'Param1', value: 'value1'},
+     *     param2: {name: 'Param2', value: 'value2'},
+     *     ...
+     *   }
+     *
+     * @param parameters the parameters to serialize
+     */
+    serializeParameters: function(parameters) {
+      var output = [];
+      for (var key in parameters) {
+        if (parameters.hasOwnProperty(key)) {
+          var parameter = parameters[key];
+          if (parameter !== null && parameter !== undefined) {
+            var name = parameter.name || key;
+            var value = parameter;
+            if (parameter.value !== null && parameter.value !== undefined) {
+              value = parameter.value;
+            }
+            // Escape the quotes.
+            var escapedValue = value.toString().replace(/([\\"])/g, '\\$1');
+            output.push(name + '="' + escapedValue + '"');
+          }
+        }
+      }
+      return output.join(' ');
+    },
+
+    parseParameters: function(text, parameters, start, delimiter, ignoreCase) {
+      // Look for the first parameter.
+      var equalIndex = text.indexOf('=', start);
+      var delimiterIndex = text.indexOf(delimiter, start);
+      while (equalIndex > 0 && (delimiterIndex < 0 || equalIndex < delimiterIndex)) {
+        var parameterName = text.substring(start, equalIndex).trim();
+
+        // Opening quote.
+        start = text.indexOf('"', equalIndex + 1) + 1;
+        // Look for the closing quote.
+        var end = start;
+        var escaped = false;
+        while (end < text.length && (escaped || text.charAt(end) !== '"')) {
+          escaped = !escaped && '\\' == text.charAt(end);
+          end++;
+        }
+
+        var parameterValue = CKEDITOR.tools.unescape(text.substring(start, end), '\\');
+        if (ignoreCase === true) {
+          parameters[parameterName.toLowerCase()] = {
+            name: parameterName,
+            value: parameterValue
+          };
+        } else {
+          parameters[parameterName] = parameterValue;
+        }
+
+        // Look for the next parameter.
+        start = end + 1;
+        equalIndex = text.indexOf('=', start);
+        delimiterIndex = text.indexOf(delimiter, start);
+      }
+      return delimiterIndex;
+    }
+  };
 })();

@@ -77,30 +77,62 @@
 
   // Empty plugin required for dependency management.
   CKEDITOR.plugins.add('xwiki-resource', {
-    requires: 'xwiki-dialog'
+    requires: 'xwiki-marker,xwiki-dialog'
   });
 
   CKEDITOR.plugins.xwikiResource = {
     parseResourceReference: function(serializedResourceReference) {
-      // TODO: Add support for resource parameters.
-      var parts = serializedResourceReference.split('|-|', 3);
-      if (parts.length === 3) {
-        return {
-          typed: parts[0] === 'true',
-          type: parts[1],
-          reference: parts[2]
-        };
+      var parts = serializedResourceReference.split('|-|');
+      var resourceReference = {
+        typed: parts[0] === 'true',
+        type: parts[1],
+        reference: parts[2],
+        parameters: {}
+      };
+      if (parts.length > 3) {
+        var serializedParameters = parts.slice(3).join('|-|');
+        CKEDITOR.plugins.xwikiMarker.parseParameters(serializedParameters, resourceReference.parameters);
       }
-      return null;
+      if (resourceReference.type === 'mailto') {
+        // HACK: Add support for mailto parameters (e.g. subject and body).
+        var queryStringIndex = resourceReference.reference.lastIndexOf('?');
+        if (queryStringIndex >= 0) {
+          var queryString = resourceReference.reference.substr(queryStringIndex + 1);
+          resourceReference.reference = resourceReference.reference.substr(0, queryStringIndex);
+          CKEDITOR.tools.extend(resourceReference.parameters, parseQueryString(queryString), true);
+        }
+      }
+      return resourceReference;
     },
 
     serializeResourceReference: function(resourceReference) {
-      // TODO: Add support for resource parameters.
-      return [
+      var components = [
         !!resourceReference.typed,
         resourceReference.type,
         resourceReference.reference
-      ].join('|-|');
+      ];
+      var parameters = resourceReference.parameters;
+      if (resourceReference.type === 'mailto' && resourceReference.reference.indexOf('?') < 0) {
+        // HACK: Add support for mailto parameters (e.g. subject and body).
+        parameters = CKEDITOR.tools.extend({}, parameters);
+        var queryStringParameters = {};
+        ['subject', 'body'].forEach(function(id) {
+          var value = parameters[id];
+          if (value !== null && value !== undefined) {
+            queryStringParameters[id] = value;
+          }
+          delete parameters[id];
+        });
+        var queryString = $.param(queryStringParameters);
+        if (queryString.length > 0) {
+          components[2] += '?' + queryString;
+        }
+      }
+      var serializedParameters = CKEDITOR.plugins.xwikiMarker.serializeParameters(parameters);
+      if (serializedParameters) {
+        components.push(serializedParameters);
+      }
+      return components.join('|-|');
     },
 
     createResourcePicker: function(pickerDefinition) {
@@ -292,5 +324,17 @@
         picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
       }, 0);
     });
+  };
+
+  var parseQueryString = function(queryString) {
+    var parameters = {};
+    queryString.split('&').forEach(function(pair) {
+      var parts = pair.split('=');
+      var name = decodeURIComponent(parts[0]);
+      var value = parts.length > 1 ? decodeURIComponent(parts[1]) : '';
+      // We know the query string supports multiple parameter values but we don't have this need right now.
+      parameters[name] = value;
+    });
+    return parameters;
   };
 })();

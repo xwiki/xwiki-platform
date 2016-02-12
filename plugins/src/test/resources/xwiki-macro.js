@@ -127,7 +127,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       parameters: {
         'start': {name: 'sTaRt', value: '2'}
       }
-    })).toBe('startmacro:box|-|sTaRt="2" |-|');
+    })).toBe('startmacro:box|-|sTaRt="2"|-|');
 
     // Differentiate macros with empty content from macros without content.
     // No content and no parameters.

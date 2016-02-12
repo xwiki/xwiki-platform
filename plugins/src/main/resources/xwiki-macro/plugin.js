@@ -92,7 +92,7 @@
       // Unescape the text of the start macro comment.
       var text = CKEDITOR.tools.unescapeComment(startMacroComment);
 
-      // Extract macro name.
+      // Extract the macro name.
       var separator = '|-|';
       var start = 'startmacro:'.length;
       var end = text.indexOf(separator, start);
@@ -102,34 +102,9 @@
       };
 
       // Extract the macro parameters.
-      // Look for the first parameter.
       start = end + separator.length;
-      var equalIndex = text.indexOf('=', start);
-      var separatorIndex = text.indexOf(separator, start);
-      var parameters = {};
-      while (equalIndex > 0 && (separatorIndex < 0 || equalIndex < separatorIndex)) {
-        var parameterName = text.substring(start, equalIndex).trim();
-
-        // Opening quote.
-        start = text.indexOf('"', equalIndex + 1) + 1;
-        // Look for the closing quote.
-        end = start;
-        var escaped = false;
-        while (escaped || text.charAt(end) !== '"') {
-          escaped = !escaped && '\\' == text.charAt(end);
-          end++;
-        }
-
-        macroCall.parameters[parameterName.toLowerCase()] = {
-          name: parameterName,
-          value: CKEDITOR.tools.unescape(text.substring(start, end), '\\')
-        };
-
-        // Look for the next parameter.
-        start = end + 1;
-        equalIndex = text.indexOf('=', start);
-        separatorIndex = text.indexOf(separator, start);
-      }
+      var separatorIndex = CKEDITOR.plugins.xwikiMarker.parseParameters(text, macroCall.parameters,
+        start, separator, true);
 
       // Extract the macro content, if specified.
       if (separatorIndex >= 0) {
@@ -141,13 +116,8 @@
 
     serializeMacroCall: function(macroCall) {
       var separator = '|-|';
-      var output = ['startmacro:', macroCall.name, separator];
-      for (var parameterId in macroCall.parameters) {
-        var parameter = macroCall.parameters[parameterId];
-        // Escapes the quotes inside a macro parameter value.
-        var escapedMacroParameterValue = parameter.value.replace(/([\\\"])/g, '\\$1');
-        output.push(parameter.name, '="', escapedMacroParameterValue, '" ');
-      }
+      var output = ['startmacro:', macroCall.name, separator,
+        CKEDITOR.plugins.xwikiMarker.serializeParameters(macroCall.parameters)];
       if (typeof macroCall.content === 'string') {
         output.push(separator, macroCall.content);
       }

@@ -153,7 +153,7 @@
       CKEDITOR.plugins.xwikiResource.bindResourcePicker(path[0].element, [tabId, pickerDefinition.id]);
       // Hide the parent.
       path[1].element.hidden = true;
-      // Insert new element after the hidden parent.
+      // Insert the new element before the hidden parent.
       path[2].element.children.splice(path[1].position, 0, pickerDefinition);
     }
   };

@@ -165,8 +165,8 @@
         type: 'vbox',
         id: 'docOptions',
         children: [
-          createQueryStringField({id: 'docQueryString'}),
-          createAnchorField({id: 'docAnchor'})
+          createQueryStringField({id: 'docQueryString'}, 'doc'),
+          createAnchorField({id: 'docAnchor'}, 'doc')
         ]
       });
       // Add attachment link options.
@@ -174,12 +174,15 @@
         type: 'vbox',
         id: 'attachOptions',
         children: [
-          createQueryStringField({id: 'attachQueryString'})
+          createQueryStringField({id: 'attachQueryString'}, 'attach')
         ]
       });
+      // Bind the mail link options to the corresponding resource reference parameters.
+      bindToResourceParameter(infoTab.get('emailSubject'), 'subject', 'mailto');
+      bindToResourceParameter(infoTab.get('emailBody'), 'body', 'mailto');
 
       resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
-        ['info', 'resourceReference'], ['upload', 'uploadButton']);
+        ['info', resourcePicker.id], ['upload', 'uploadButton']);
     }
   });
 
@@ -233,32 +236,54 @@
     });
   };
 
-  var createAnchorField = function(definition) {
+  var createAnchorField = function(definition, resourceType) {
     return createReferenceParameterField('anchor', CKEDITOR.tools.extend(definition || {}, {
       label: 'Anchor'
-    }));
+    }), resourceType);
   };
 
-  var createQueryStringField = function(definition) {
+  var createQueryStringField = function(definition, resourceType) {
     return createReferenceParameterField('queryString', CKEDITOR.tools.extend(definition || {}, {
       label: 'Query String'
-    }));
+    }), resourceType);
   };
 
-  var createReferenceParameterField = function(parameterName, definition) {
+  var createReferenceParameterField = function(parameterName, definition, resourceType) {
     return CKEDITOR.tools.extend(definition || {}, {
       type: 'text',
-      setup: function(data) {
-        var referenceParameters = (data.resourceReference || {}).parameters || {};
-        this.setValue(referenceParameters[parameterName] || '');
-      },
-      commit: function(data) {
-        var value = this.getValue().trim();
-        if (value !== '') {
-          data.resourceReference.parameters = data.resourceReference.parameters || {};
-          data.resourceReference.parameters[parameterName] = value;
-        }
-      }
+      setup: setupFromResourceParameter(parameterName, resourceType),
+      commit: commitToResourceParameter(parameterName, resourceType)
     });
+  };
+
+  var setupFromResourceParameter = function(parameterName, resourceType, oldSetup) {
+    return function(data) {
+      if (typeof oldSetup === 'function') {
+        oldSetup.apply(this, arguments);
+      }
+      var resourceReference = data.resourceReference || {};
+      if (!resourceType || resourceType === resourceReference.type) {
+        var referenceParameters = resourceReference.parameters || {};
+        this.setValue(referenceParameters[parameterName] || '');
+      }
+    };
+  };
+
+  var commitToResourceParameter = function(parameterName, resourceType, oldCommit) {
+    return function(data) {
+      var value = this.getValue().trim();
+      if (value !== '' && (!resourceType || resourceType === data.resourceReference.type)) {
+        data.resourceReference.parameters = data.resourceReference.parameters || {};
+        data.resourceReference.parameters[parameterName] = value;
+      }
+      if (typeof oldCommit === 'function') {
+        oldCommit.apply(this, arguments);
+      }
+    };
+  };
+
+  var bindToResourceParameter = function(definition, parameterName, resourceType) {
+    definition.setup = setupFromResourceParameter(parameterName, resourceType, definition.setup);
+    definition.commit = commitToResourceParameter(parameterName, resourceType, definition.commit);
   };
 })();

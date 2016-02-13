@@ -57,7 +57,7 @@ describe('XWiki Resource Plugin for CKEditor', function() {
       typed: true,
       type: 'mailto',
       reference: 'user@example.org',
-      parameters: {subject: 'a=b&c=d', body: '?1=2#xyz'}
+      parameters: {subject: 'a=b+1&c=d e%20', body: '?1=2%203#x y+z'}
     });
   });
 });

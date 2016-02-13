@@ -186,7 +186,7 @@
             // Check if the selected resource type supports empty references.
             var resourceType = knownResourceTypes[this.getTypeInput().getValue()];
             if (resourceType.allowEmptyReference !== true) {
-              return 'The image location is not specified.';
+              return 'The location is not specified.';
             }
           }
           return true;
@@ -328,6 +328,8 @@
 
   var parseQueryString = function(queryString) {
     var parameters = {};
+    // Replace plus signs in the query string with spaces.
+    queryString = queryString.replace(/\+/g, ' ');
     queryString.split('&').forEach(function(pair) {
       var parts = pair.split('=');
       var name = decodeURIComponent(parts[0]);

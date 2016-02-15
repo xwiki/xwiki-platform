@@ -58,7 +58,7 @@ public class NewPagePanelTest extends AbstractTest
         WYSIWYGEditPage editPage = new WYSIWYGEditPage();
 
         Assert.assertEquals(getTestMethodName(), editPage.getDocumentTitle());
-        Assert.assertEquals(getTestMethodName(), editPage.getMetaDataValue("page"));
-        Assert.assertEquals(getTestClassName(), editPage.getMetaDataValue("space"));
+        Assert.assertEquals("WebHome", editPage.getMetaDataValue("page"));
+        Assert.assertEquals(getTestClassName() + "." + getTestMethodName(), editPage.getMetaDataValue("space"));
     }
 }

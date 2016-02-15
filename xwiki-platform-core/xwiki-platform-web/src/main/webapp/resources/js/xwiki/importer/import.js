@@ -450,9 +450,9 @@ var XWiki = (function(XWiki){
         /**
          * Adds a space to the package explorer.
          */
-        addSpace: function(spaceNode)
+        addSpace: function(spaceNodeMap)
         {
-            this.addSpaceToList(this.list, spaceNode);
+            this.addSpaceToList(this.list, spaceNodeMap[XWiki.EntityType.SPACE]);
         },
 
         /**
@@ -475,11 +475,14 @@ var XWiki = (function(XWiki){
             var self = this;
 
             // Add children
-            Object.values(spaceNode.children).each(function(childNode) {
-              if (childNode.reference.type === XWiki.EntityType.SPACE) {
-                self.addSpaceToList(list, childNode);
-              } else if (childNode.reference.type === XWiki.EntityType.DOCUMENT) {
-                self.addDocumentToList(list, childNode);
+            Object.values(spaceNode.children).each(function(childNodeMap) {
+              // Can be a space child.
+              if (childNodeMap.hasOwnProperty(XWiki.EntityType.SPACE)) {
+                self.addSpaceToList(list, childNodeMap[XWiki.EntityType.SPACE]);
+              }
+              // Can also be a document child, with the same name.
+              if (childNodeMap.hasOwnProperty(XWiki.EntityType.DOCUMENT)) {
+                self.addDocumentToList(list, childNodeMap[XWiki.EntityType.DOCUMENT]);
               }
             });
 

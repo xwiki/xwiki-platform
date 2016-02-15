@@ -232,7 +232,15 @@ XWiki.EntityReferenceTreeNode = Class.create({
     var node = new XWiki.EntityReferenceTreeNode();
     node._fromJSONObject(jsonNode);
 
-    this.children[node.reference.name] = node;
+    // For the reference name, you can have both a space and a document as children.
+    var childrenByType = this.children[node.reference.name];
+    if (typeof childrenByType == 'undefined') {
+      childrenByType = {};
+      this.children[node.reference.name] = childrenByType;
+    }
+
+    // Add the child node including its type.
+    childrenByType[node.reference.type] = node;
   },
 
   _localeFromJSONObject: function(jsonReference) {
@@ -254,7 +262,9 @@ XWiki.EntityReferenceTreeNode = Class.create({
   },
 
   /**
-   * @return the node associated to the passed reference
+   * Note: this method assumes the current node is the root of the tree.
+   *
+   * @return the node associated to the passed reference.
    */
   getChildByReference: function(reference) {
     if (typeof reference == "undefined") {

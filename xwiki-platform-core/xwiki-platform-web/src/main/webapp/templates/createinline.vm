@@ -1,7 +1,7 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## This template is called by the create action which binds some context variables as it executes, based on
 ## the request and the current document. These variables can be used in this template:
-## * $spaceReference - the space reference of the new document, read from the "spaceReference" paremeter
+## * $spaceReference - the space reference of the new document, read from the "spaceReference" parameter
 ## * $name - the name to use for the new document, read from the "name" parameter
 ## * $isSpace - true if we are creating a non-terminal document ($name is the space name), false if we are
 ##              creating a terminal document ($name is the document name). Determined by the create action

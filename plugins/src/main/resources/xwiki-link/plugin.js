@@ -153,13 +153,16 @@
     if (dialogName === 'link') {
       var resourcePicker = createResourcePicker(event.editor);
       replaceLinkTypeSelect(dialogDefinition, resourcePicker);
-      var infoTab = dialogDefinition.getContents('info');
+
       // Bind the value of the email address and url fields to the resource reference field.
       // Hide the email address, url and protocol fields because we're using the resource picker instead.
+      var infoTab = dialogDefinition.getContents('info');
       var resourcePlugin = CKEDITOR.plugins.xwikiResource;
       resourcePlugin.bindResourcePicker(infoTab.get('emailAddress'), ['info', resourcePicker.id], true);
-      resourcePlugin.bindResourcePicker(infoTab.get('url'), ['info', resourcePicker.id]);
+      var urlField = infoTab.get('url');
+      resourcePlugin.bindResourcePicker(urlField, ['info', resourcePicker.id]);
       infoTab.get('protocol').hidden = true;
+
       // Add page link options.
       infoTab.add({
         type: 'vbox',
@@ -169,6 +172,7 @@
           createAnchorField({id: 'docAnchor'}, 'doc')
         ]
       });
+
       // Add attachment link options.
       infoTab.add({
         type: 'vbox',
@@ -177,9 +181,14 @@
           createQueryStringField({id: 'attachQueryString'}, 'attach')
         ]
       });
+
       // Bind the mail link options to the corresponding resource reference parameters.
       bindToResourceParameter(infoTab.get('emailSubject'), 'subject', 'mailto');
       bindToResourceParameter(infoTab.get('emailBody'), 'body', 'mailto');
+
+      // Remove the custom focus handler set by the link dialog because we want the first input (which is the resource
+      // picker) to be focused when the dialog is opened.
+      delete dialogDefinition.onFocus;
 
       resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', resourcePicker.id], ['upload', 'uploadButton']);
@@ -188,6 +197,8 @@
 
   var replaceLinkTypeSelect = function(dialogDefinition, newElementDefinition) {
     var linkTypeDefinition = dialogDefinition.getContents('info').get('linkType');
+    // The resource picker takes care of setting the link type value when the resource type changes.
+    delete linkTypeDefinition.setup;
     CKEDITOR.plugins.xwikiDialog.replaceWith(dialogDefinition, 'linkType', {
       type: 'vbox',
       children: [newElementDefinition, linkTypeDefinition],

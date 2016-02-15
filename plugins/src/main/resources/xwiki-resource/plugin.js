@@ -157,15 +157,17 @@
                   '</div>' +
                 '</div>' +
               '</div>',
-        focus: function() {
-          this.getReferenceInput().focus();
-        },
         onLoad: function() {
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
-          this.getDialog().addFocusable(resourceTypeDropDownToggle, 0);
-          this.getDialog().addFocusable(this.getTypeInput(), 0);
-          this.getDialog().addFocusable(this.getReferenceInput(), 0);
+          [resourceTypeDropDownToggle, this.getTypeInput(), this.getReferenceInput()].forEach(function(field) {
+            var dialog = this;
+            dialog.addFocusable(field, 0);
+            field._focusable = dialog._.focusList[0];
+            field.on('focus', function() {
+              dialog._.currentFocusIndex = this._focusable.focusIndex;
+            });
+          }, this.getDialog());
           // Fix reference input id.
           var id = CKEDITOR.tools.getNextId();
           this.getReferenceInput().setAttribute('id', id);
@@ -177,8 +179,6 @@
           addResourcePickerBehaviour(domElement);
           // Listen to resource type changes (in order to be able to show different options for different resource types).
           domElement.on('changeResourceType', $.proxy(this, 'onResourceTypeChange'));
-          // Select the default resource type.
-          this.selectResourceType(this.resourceTypes[0]);
         },
         validate: function() {
           var reference = this.getReferenceInput().getValue();
@@ -317,12 +317,14 @@
       var newValue = selectedResourceType.attr('data-id');
       resourceTypeButton.val(newValue);
       resourceTypeButton.attr('title', selectedResourceType.text().trim());
-      resourceTypeButton.prop('disabled', selectedResourceType.attr('href') === '#');
+      var disabled = selectedResourceType.attr('href') === '#';
+      resourceTypeButton.prop('disabled', disabled);
+      if (disabled) {
+        // It seems that setting the property is not enough. CKEditor checks for a non-empty value.
+        resourceTypeButton.attr('disabled', 'disabled');
+      }
       resourceTypeIcon.attr('class', selectedResourceType.find('.icon').attr('class'));
-      // Fire the change event after all click listeners are called.
-      setTimeout(function() {
-        picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
-      }, 0);
+      picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
     });
   };
 

@@ -165,7 +165,7 @@ XWiki.EntityReference.fromJSONObject = function (object) {
   if (object.parent != null) {
     parent = XWiki.EntityReference.fromJSONObject(object.parent);
   } else {
-    parent = null;
+    parent = undefined;
   }
 
   return new XWiki.EntityReference(object.name, XWiki.EntityType.byName(object.type), parent, object.locale);
@@ -262,21 +262,28 @@ XWiki.EntityReferenceTreeNode = Class.create({
   },
 
   /**
-   * Note: this method assumes the current node is the root of the tree.
-   *
-   * @return the node associated to the passed reference.
+   * @param referencePath a path in the tree starting from this node, specified as an EntityReference
+   * @return the node associated to the specified path
    */
-  getChildByReference: function(reference) {
-    if (typeof reference == "undefined") {
+  getChildByReference: function(referencePath) {
+    if (typeof referencePath == "undefined") {
       return null;
     }
 
     var descendant = this;
-    var references = reference.getReversedReferenceChain();
-    for (i = 0; i < references.length; i++) {
+    var references = referencePath.getReversedReferenceChain();
+    for (var i = 0; i < references.length; i++) {
       var element = references[i];
-      descendant = descendant.children[element.name];
-      if (typeof descendant == "undefined" || descendant.reference.type != element.type) {
+
+      var descendantByType = descendant.children[element.name];
+      // Get the children with the same reference element name.
+      if (typeof descendantByType == 'undefined') {
+        return null;
+      }
+
+      // Get the child with the same reference element type.
+      descendant = descendantByType[element.type];
+      if (typeof descendant == "undefined") {
         return null;
       }
     }

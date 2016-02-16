@@ -246,3 +246,108 @@ describe('EntityReference', function() {
     });
   });
 });
+
+describe('EntityReferenceTree', function() {
+  // Input JSON data.
+  var jsonTree = {
+    "reference":{"name":"xwiki","parent":null,"type":"WIKI"},
+    "children":
+      [
+        {
+          "reference":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},
+          "children":
+            [
+              {
+                "reference":{"name":"Page","parent":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},"type":"SPACE"},
+                "children":
+                  [
+                    {
+                      "reference":{"name":"WebHome","parent":{"name":"Page","parent":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},"type":"SPACE"},"type":"DOCUMENT","locale":""},
+                      "children":[],
+                      "locales":[{"name":"WebHome","parent":{"name":"Page","parent":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},"type":"SPACE"},"type":"DOCUMENT","locale":""}]
+                    }
+                  ],
+               "locales":[]
+              },
+              {
+                "reference":{"name":"Page","parent":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},"type":"DOCUMENT","locale":""},
+                "children":[],
+                "locales":[{"name":"Page","parent":{"name":"Main","parent":{"name":"xwiki","parent":null,"type":"WIKI"},"type":"SPACE"},"type":"DOCUMENT","locale":""}]
+              }
+            ],
+          "locales":[]
+        }
+      ],
+    "locales":[]
+  };
+  it('fromJSONObject', function() {
+    var tree = XWiki.EntityReferenceTree.fromJSONObject(jsonTree);
+    expect('xwiki').toEqual(tree.reference.name);
+    expect(XWiki.EntityType.WIKI).toEqual(tree.reference.type);
+
+    // Main Space
+    expect(tree.children['Main']).not.toBe(null);
+    expect(tree.children['Main'][XWiki.EntityType.SPACE]).not.toBeUndefined();
+    expect(tree.children['Main'][XWiki.EntityType.WIKI]).toBeUndefined();
+    expect(tree.children['Main'][XWiki.EntityType.DOCUMENT]).toBeUndefined();
+    var mainSpaceNode = tree.children['Main'][XWiki.EntityType.SPACE];
+    expect('Main').toEqual(mainSpaceNode.reference.name);
+    expect(XWiki.EntityType.SPACE).toEqual(mainSpaceNode.reference.type);
+
+    // Page both Space and Document at the same level (i.e. siblings)
+    expect(mainSpaceNode.children['Page']).not.toBeUndefined();
+    expect(mainSpaceNode.children['Page'][XWiki.EntityType.DOCUMENT]).not.toBeUndefined();
+    expect(mainSpaceNode.children['Page'][XWiki.EntityType.SPACE]).not.toBeUndefined();
+    expect(mainSpaceNode.children['Page'][XWiki.EntityType.WIKI]).toBeUndefined();
+
+    var pageDocumentNode = mainSpaceNode.children['Page'][XWiki.EntityType.DOCUMENT];
+    expect('Page').toEqual(pageDocumentNode.reference.name);
+    expect(XWiki.EntityType.DOCUMENT).toEqual(pageDocumentNode.reference.type);
+
+    var pageSpaceNode = mainSpaceNode.children['Page'][XWiki.EntityType.SPACE];
+    expect('Page').toEqual(pageSpaceNode.reference.name);
+    expect(XWiki.EntityType.SPACE).toEqual(pageSpaceNode.reference.type);
+
+    // WebHome Document
+    expect(pageSpaceNode.children['WebHome']).not.toBeUndefined();
+    expect(pageSpaceNode.children['WebHome'][XWiki.EntityType.DOCUMENT]).not.toBeUndefined();
+    expect(pageSpaceNode.children['WebHome'][XWiki.EntityType.SPACE]).toBeUndefined();
+    expect(pageSpaceNode.children['WebHome'][XWiki.EntityType.WIKI]).toBeUndefined();
+
+    var webhomeDocumentNode = pageSpaceNode.children['WebHome'][XWiki.EntityType.DOCUMENT];
+    expect('WebHome').toEqual(webhomeDocumentNode.reference.name);
+    expect(XWiki.EntityType.DOCUMENT).toEqual(webhomeDocumentNode.reference.type);
+  });
+  it('getChildByReference', function() {
+    function execute(treeNode, stringReferencePath, referenceType, expectedNodeStringReference) {
+      var referencePath = XWiki.Model.resolve(stringReferencePath, referenceType);
+      var node = treeNode.getChildByReference(referencePath);
+      if (expectedNodeStringReference == null) {
+        expect(node).toBe(null);
+        return;
+      }
+
+      expect(node).not.toBe(null, 'No node was found for the path [' + stringReferencePath + '] starting from node [' + node.reference + ']');
+      var expectedNodeReference = XWiki.Model.resolve(expectedNodeStringReference, referenceType);
+      if (expectedNodeReference.type == XWiki.EntityType.DOCUMENT) {
+        // The resolver does not set any locale but the JSON specifies '' locales for documents.
+        expectedNodeReference.locale = '';
+      }
+      expect(node.reference).toEqual(expectedNodeReference);
+    }
+    var tree = XWiki.EntityReferenceTree.fromJSONObject(jsonTree);
+
+    // From the tree root.
+    execute(tree, 'Main', XWiki.EntityType.SPACE, 'xwiki:Main');
+    execute(tree, 'Main.Page', XWiki.EntityType.DOCUMENT, 'xwiki:Main.Page');
+    execute(tree, 'Main.Page', XWiki.EntityType.SPACE, 'xwiki:Main.Page');
+    execute(tree, 'Main.Page.WebHome', XWiki.EntityType.DOCUMENT, 'xwiki:Main.Page.WebHome');
+
+    // From the Main Space node.
+    var mainSpaceNode = tree.children['Main'][XWiki.EntityType.SPACE];
+    execute(mainSpaceNode, 'Page', XWiki.EntityType.DOCUMENT, 'xwiki:Main.Page');
+
+    // Node not found.
+    execute(tree, 'NotFound', XWiki.EntityType.SPACE, null);
+  })
+});

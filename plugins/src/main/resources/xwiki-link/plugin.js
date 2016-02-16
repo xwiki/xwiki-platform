@@ -211,6 +211,16 @@
   var createResourcePicker = function(editor) {
     return CKEDITOR.plugins.xwikiResource.createResourcePicker({
       resourceTypes: (editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
+      getValue: function() {
+        var data = {resourceReference: this.base.getValue.apply(this, arguments)};
+        // Collect the resource reference parameters.
+        this.getDialog().foreach(function(field) {
+          if (field.resourceReferenceParameter === true && typeof field.commit === 'function') {
+            field.commit(data);
+          }
+        });
+        return data.resourceReference;
+      },
       setup: function(data) {
         this.setValue(data.resourceReference);
       },
@@ -243,6 +253,7 @@
             }
           }
         });
+        dialog.layout();
       }
     });
   };
@@ -262,6 +273,7 @@
   var createReferenceParameterField = function(parameterName, definition, resourceType) {
     return CKEDITOR.tools.extend(definition || {}, {
       type: 'text',
+      resourceReferenceParameter: true,
       setup: setupFromResourceParameter(parameterName, resourceType),
       commit: commitToResourceParameter(parameterName, resourceType)
     });
@@ -294,6 +306,7 @@
   };
 
   var bindToResourceParameter = function(definition, parameterName, resourceType) {
+    definition.resourceReferenceParameter = true;
     definition.setup = setupFromResourceParameter(parameterName, resourceType, definition.setup);
     definition.commit = commitToResourceParameter(parameterName, resourceType, definition.commit);
   };

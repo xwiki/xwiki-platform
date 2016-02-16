@@ -57,7 +57,21 @@
 #end
 #if ("$!resourceType" != '')
   #if ($resourceURL)
-    $response.sendRedirect($resourceURL)
+    #set ($parts = $resourceURL.split('#', 2))
+    #set ($resourceURL = $parts.get(0))
+    #set ($anchor = "$!request.getParameter('parameters[anchor]')")
+    #if ($parts.size() == 2 &amp;&amp; $anchor == '')
+      ## Keep the original anchor.
+      #set ($anchor = $parts.get(1))
+    #end
+    #set ($parts = $resourceURL.split('\?', 2))
+    #set ($resourceURL = $parts.get(0))
+    #set ($queryString = "$!request.getParameter('parameters[queryString]')")
+    #if ($parts.size() == 2)
+      ## Insert the new query string before the original one so that the new parameter values take precedence.
+      #set ($queryString = "$queryString&amp;$parts.get(1)")
+    #end
+    $response.sendRedirect("$resourceURL?$queryString#$anchor")
   #else
     $response.sendError(404)
   #end

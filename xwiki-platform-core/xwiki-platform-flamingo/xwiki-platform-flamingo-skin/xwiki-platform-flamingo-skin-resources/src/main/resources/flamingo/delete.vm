@@ -91,8 +91,13 @@
     #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
     #set($childCount = $services.query.xwql($childCountXWQL).bindValue('space', "${doc.space}.%").bindValue('fullName', $doc.fullName).addFilter('unique').count())
     #if ($childCount > 0)
+      ## Check if we should propose by default to affect children when the only remaining children (after the delete) would be the WebPreferences document.
+      #set ($webPreferencesDocumentReference = $services.model.createDocumentReference('WebPreferences', $doc.documentReference.lastSpaceReference))
+      #if ($childCount == 1 && $xwiki.exists($webPreferencesDocumentReference))
+        #set ($forceAffectChildren = " checked='checked'")
+      #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" /><label for="affectChildren">Affect children</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">Affect children</label> ($childCount)
       #end
       #define($body)
         ##

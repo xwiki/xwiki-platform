@@ -75,9 +75,11 @@
     }
   };
 
-  // Empty plugin required for dependency management.
   CKEDITOR.plugins.add('xwiki-resource', {
-    requires: 'xwiki-marker,xwiki-dialog'
+    requires: 'xwiki-marker,xwiki-dialog',
+    init: function(editor) {
+      editor._.resourcePickers = {};
+    }
   });
 
   CKEDITOR.plugins.xwikiResource = {
@@ -179,6 +181,8 @@
           addResourcePickerBehaviour(domElement);
           // Listen to resource type changes (in order to be able to show different options for different resource types).
           domElement.on('changeResourceType', $.proxy(this, 'onResourceTypeChange'));
+          // Open the resource picker that corresponds to the selected resource type.
+          this.getTypeInput().on('click', $.proxy(this, 'openPicker'));
         },
         validate: function() {
           var reference = this.getReferenceInput().getValue();
@@ -206,7 +210,7 @@
         //
         // Custom fields
         //
-        dropDownItemTemplate: new CKEDITOR.template('<li><a href="#" data-id="{id}" ' +
+        dropDownItemTemplate: new CKEDITOR.template('<li><a href="#{picker}" data-id="{id}" ' +
           'data-placeholder="{placeholder}"><span class="icon {icon}"></span> {label}</a></li>'),
         getTypeInput: function() {
           return this.getElement().findOne('.resourceType');
@@ -237,11 +241,23 @@
             icon: 'glyphicon glyphicon-question-sign'
           };
           resourceType.id = resourceTypeId;
+          resourceType.picker = this.hasPicker(resourceTypeId) ? resourceTypeId : '';
           var dropDownMenu = this.getElement().findOne('.dropdown-menu');
           dropDownMenu.appendHtml(this.dropDownItemTemplate.output(resourceType));
         },
         onResourceTypeChange: function(event, data) {
           // Do nothing by default.
+        },
+        getPicker: function(resourceType) {
+          return this.getDialog().getParentEditor()._.resourcePickers[resourceType];
+        },
+        hasPicker: function(resourceType) {
+          return typeof this.getPicker(resourceType) === 'function';
+        },
+        openPicker: function() {
+          var resourceReference = this.getValue();
+          var picker = this.getPicker(resourceReference.type);
+          picker(resourceReference).done($.proxy(this, 'setValue'));
         }
       };
       pickerDefinition = pickerDefinition || {};

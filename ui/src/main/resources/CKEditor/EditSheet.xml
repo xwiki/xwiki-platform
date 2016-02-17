@@ -45,6 +45,11 @@
 #else
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
+  ## Tree styles needed for the document/attachment tree picker.
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   (% class="xform" %)(((
     ; $services.localization.render('core.editors.content.contentField.label')
     : {{html}}
@@ -147,14 +152,20 @@
   }
 });
 
-require(['jquery'], function($) {
+require([
+  'jquery',
+  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+], function($) {
   window.CKEDITOR_BASEPATH = "$!services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', '')";
-  require(['ckeditor', 'xwiki-meta'], function(ckeditor, xwikiMeta) {
+  require(['ckeditor', 'xwiki-meta', 'tree'], function(ckeditor, xwikiMeta) {
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
-        filebrowserUploadUrl: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.FileUploader&amp;outputSyntax=plain&amp;form_token='
-          + xwikiMeta.form_token),
+        filebrowserUploadUrl: XWiki.currentDocument.getURL('get', $.param({
+          sheet: 'CKEditor.FileUploader',
+          outputSyntax: 'plain',
+          form_token: xwikiMeta.form_token
+        })),
         fullPage: true,
         height: 500,
         removeButtons: 'Find,Anchor',
@@ -183,6 +194,19 @@ require(['jquery'], function($) {
         },
         'xwiki-source': {
           htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
+        },
+        'xwiki-tree': {
+          documentTreeURL: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
+            outputSyntax: 'plain',
+            showAttachments: false,
+            showTranslations: false,
+            showWikis: true
+          })),
+          attachmentTreeURL: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
+            outputSyntax: 'plain',
+            showTranslations: false,
+            showWikis: true
+          }))
         }
       });
     });
@@ -409,6 +433,14 @@ require(['jquery'], function($) {
   cursor: wait;
   overflow: hidden;
   resize: none;
+}
+
+/* Show the modal above the CKEditor dialogs */
+body &gt; .modal-backdrop {
+  z-index: 10040;
+}
+body &gt; .modal {
+  z-index: 10050;
 }
 
 /**

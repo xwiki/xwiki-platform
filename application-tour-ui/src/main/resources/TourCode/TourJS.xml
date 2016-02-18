@@ -166,14 +166,37 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   /**
    * Add a resume button to start the tour again when it has been closed
    */
-  var createResumeButton = function (tour) {
-    var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs" style="position: fixed; bottom: 0; right: 0; z-index: 2000;"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo($(document.body));
-    button.hide();
-    button.fadeIn();
+  var createResumeButton = function (tour, createPopover) {
+    // Create a container when the button will be displayed. This container will also contains the "popover", so the "popover" stay near the button when the page is resized.
+    // (see http://getbootstrap.com/javascript/#popovers-options 'container')
+    var buttonContainer = $('&lt;div id="tourResumeContainer" style="position: fixed; bottom: 0; right: 0; z-index: 2000; width: 300px; text-align: right;"&gt;&lt;/div&gt;').appendTo($(document.body));
+    // Create the button that will start the tour again
+    var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo(buttonContainer);
+    buttonContainer.hide();
+    buttonContainer.fadeIn();
     button.click(function () {
+      if (createPopover) {
+        button.popover('destroy');
+      }
       tour.start(true);
       button.remove();
     });
+    var popoverContent = "#tr('tour.popover.show.hint')";
+    if (createPopover) {
+      // Add a popover to introduce that button
+      button.popover({
+        animation: true,
+        content: popoverContent,
+        placement: 'top',
+        container: '#tourResumeContainer'
+      });
+      // Show it
+      button.popover('show');
+      // Hide it after 7 seconds
+      setTimeout(function() {
+        button.popover('destroy');
+      }, 7000);
+    }
   }
   
   /**
@@ -227,7 +250,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       var tour     = new Tour({
         name    : tourName,
         storage : window.localStorage,
-        onEnd   : createResumeButton,
+        onEnd   : function() { createResumeButton(tour, true) },
         onShown : addCloseButton,
         orphan  : true,
         template: getTemplate
@@ -262,7 +285,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       
       // Create a resume button if the tour has already been closed by the user in the past
       if (window.localStorage.getItem(tourName + '_end') == 'yes') {
-        createResumeButton(tour);
+        createResumeButton(tour, false);
       }
     });
   };

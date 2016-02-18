@@ -53,7 +53,16 @@ public class CurrentSpaceReferenceProvider implements Provider<SpaceReference>
     @Override
     public SpaceReference get()
     {
-        return new SpaceReference(new EntityReference(this.provider.getDefaultReference(EntityType.SPACE),
-            this.wikiReferenceProvider.get()));
+        EntityReference currentWiki = this.wikiReferenceProvider.get();
+        EntityReference currentSpace = this.provider.getDefaultReference(EntityType.SPACE);
+
+        // The provided space entity has no wiki parent set. Re-create the space reference chain and set the current
+        // wiki as the root.
+        EntityReference result = currentWiki;
+        for (EntityReference spaceReference : currentSpace.getReversedReferenceChain()) {
+            result = new SpaceReference(spaceReference.getName(), result);
+        }
+
+        return (SpaceReference) result;
     }
 }

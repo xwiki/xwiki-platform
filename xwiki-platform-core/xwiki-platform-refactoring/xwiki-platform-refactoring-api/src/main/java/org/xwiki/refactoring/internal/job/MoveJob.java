@@ -204,7 +204,19 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             // Step 4: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
-                this.modelBridge.delete(oldReference, this.request.getUserReference());
+                this.progressManager.pushLevelProgress(2, this);
+
+                try {
+                    this.progressManager.startStep(this);
+                    this.modelBridge.delete(oldReference, this.request.getUserReference());
+
+                    // (legacy) Preserve existing parent-child relationships by updating the parent field of documents
+                    // having the moved document as parent.
+                    this.progressManager.startStep(this);
+                    this.modelBridge.updateParentField(oldReference, newReference);
+                } finally {
+                    this.progressManager.popLevelProgress(this);
+                }
             }
 
             // Step 5: Create an automatic redirect.

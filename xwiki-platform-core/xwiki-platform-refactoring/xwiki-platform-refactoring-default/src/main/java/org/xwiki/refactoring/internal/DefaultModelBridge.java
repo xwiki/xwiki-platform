@@ -269,4 +269,37 @@ public class DefaultModelBridge implements ModelBridge
             return Collections.emptyList();
         }
     }
+
+    @Override
+    public boolean updateParentField(final DocumentReference oldParentReference,
+        final DocumentReference newParentReference)
+    {
+        XWikiContext context = xcontextProvider.get();
+        XWiki wiki = context.getWiki();
+
+        try {
+            // Note: This operation could have been done in Hibernate (using the Store API) in one single update query.
+            // However, due to XWiki's document cache, it`s better in the end to use the Document API and update each
+            // child document individually.
+            XWikiDocument oldParentDocument = wiki.getDocument(oldParentReference, context);
+
+            List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
+            for (DocumentReference childReference : childReferences) {
+                XWikiDocument childDocument = wiki.getDocument(childReference, context);
+                childDocument.setParentReference(newParentReference);
+                wiki.saveDocument(childDocument, "Updated parent field.", true, context);
+            }
+
+            if (childReferences.size() > 0) {
+                this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
+                    oldParentReference, newParentReference, childReferences.size());
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to update the document parent fields from [{}] to [{}].", oldParentReference,
+                newParentReference, e);
+            return false;
+        }
+
+        return true;
+    }
 }

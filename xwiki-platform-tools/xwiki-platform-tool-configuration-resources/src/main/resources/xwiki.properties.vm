@@ -724,5 +724,16 @@ extension.oldflavors=$oldFlavor.trim()
 #-# It's enabled by default which can make js/css hard to read.
 # debug.minify=false
 
+#-------------------------------------------------------------------------------------
+# LESS
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.4.2, 8.0M2]
+#-# The number of LESS compilations that can be performed simultaneously. Put a little number if your resources are
+#-# limited.
+#-#
+#-# The default is:
+# less.maximumSimultaneousCompilations = 4
+
 
 $!xwikiPropertiesAdditionalProperties

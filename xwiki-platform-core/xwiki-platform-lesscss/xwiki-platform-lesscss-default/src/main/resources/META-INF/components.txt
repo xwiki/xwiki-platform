@@ -15,4 +15,5 @@ org.xwiki.lesscss.internal.listeners.SkinListener
 org.xwiki.lesscss.internal.listeners.SSXListener
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReferenceFactory
 org.xwiki.lesscss.internal.skin.DefaultSkinReferenceFactory
+org.xwiki.lesscss.internal.LESSConfiguration
 org.xwiki.lesscss.internal.LESSContext

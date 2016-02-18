@@ -69,6 +69,8 @@ rendering.macro.tree.parameter.reference.description=La référence à la ressou
 rendering.macro.tree.parameter.reference.name=Référence
 rendering.macro.tree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les héritiers d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié.
 rendering.macro.tree.parameter.root.name=Racine
+rendering.macro.tree.parameter.showRoot.description=Affiche ou non la racine. Par défaut la racine est masquée car le contexte dans lequel est affichée l’arborescence donne suffisamment d'indications (par exemple présence d'un titre au dessus de l’arborescence).
+rendering.macro.tree.parameter.showRoot.name=Afficher la racine
 tree.macro.editModeWarning=Cet arbre ne peut pas être affiché en mode modification
 </content>
 </xwikidoc>

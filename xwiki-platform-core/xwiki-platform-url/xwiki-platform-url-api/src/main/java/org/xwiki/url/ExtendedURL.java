@@ -36,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.tools.EscapeTool;
 
 /**
@@ -45,7 +44,6 @@ import org.xwiki.velocity.tools.EscapeTool;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public class ExtendedURL implements Cloneable
 {
     /**
@@ -125,9 +123,9 @@ public class ExtendedURL implements Cloneable
         }
         this.uri = internalURI;
 
+        // Extract the path after the ignore prefix
         String rawPath = getURI().getRawPath();
         if (!StringUtils.isEmpty(ignorePrefix)) {
-
             // Allow the passed ignore prefix to not contain the leading "/"
             String normalizedIgnorePrefix = ignorePrefix;
             if (!ignorePrefix.startsWith(URL_SEPARATOR)) {
@@ -138,8 +136,7 @@ public class ExtendedURL implements Cloneable
                 throw new CreateResourceReferenceException(
                     String.format("URL Path [%s] doesn't start with [%s]", getURI().getPath(), ignorePrefix));
             }
-            // Note: We also remove the leading "/" after the context path.
-            rawPath = rawPath.substring(ignorePrefix.length() + 1);
+            rawPath = rawPath.substring(normalizedIgnorePrefix.length());
         }
 
         // Remove leading "/" if any
@@ -228,6 +225,10 @@ public class ExtendedURL implements Cloneable
     private List<String> extractPathSegments(String rawPath)
     {
         List<String> urlSegments = new ArrayList<String>();
+
+        if (StringUtils.isEmpty(rawPath)) {
+            return urlSegments;
+        }
 
         // Note that we use -1 in the call below in order to get empty segments too. This is needed since in our URL
         // scheme a tailing "/" can have a meaning (for example "bin/view/Page" can represent a Page while

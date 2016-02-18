@@ -1,0 +1,48 @@
+#template('hierarchy_macros.vm')
+#template('job_macros.vm')
+
+#macro (displayLocations $label $hint $entityReferences)
+  <dt>
+    <label>$services.localization.render($label)</label>
+    <span class="xHint">$services.localization.render($hint)</span>
+  </dt>
+  <dd>
+    #foreach ($entityReference in $entityReferences)
+      #hierarchy($entityReference {
+        'treeNavigation': false,
+        'selfIsActive': false,
+        'limit': 5
+      })
+    #end
+  </dd>
+#end
+
+#macro (displayBooleanConfigParam $label $hint $value)
+  <dt>
+    <label>
+      ## 'application' icon is not semantically correct but it is mapped to the right Font Awesome icon (square).
+      ## We also tried 'cross' but it is confusing when none of the configuration options are checked (because in real
+      ## life we often check items by putting a cross in front of them).
+      $services.icon.renderHTML("#if ($value)check#{else}application#end")
+      $services.localization.render($label)
+    </label>
+    <span class="xHint">$services.localization.render($hint)</span>
+  </dt>
+#end
+
+#macro (displayRefactoringJobFinishedMessage $refactoringJobStatus $successKey $errorKey)
+  #set ($refactoringJobState = $refactoringJobStatus.state)
+  #set ($finished = $refactoringJobState == 'FINISHED')
+  #set ($success = $finished && $refactoringJobStatus.log.getLogs('ERROR').isEmpty())
+  #if (!$finished)
+    ## No message.
+  #elseif ($success)
+    <div class="box successmessage">
+      $services.localization.render($successKey)
+    </div>
+  #else
+    <div class="box errormessage">
+      $services.localization.render($errorKey)
+    </div>
+  #end
+#end

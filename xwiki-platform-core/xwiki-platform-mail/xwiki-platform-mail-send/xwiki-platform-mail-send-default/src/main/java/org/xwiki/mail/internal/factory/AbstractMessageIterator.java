@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 
 /**
@@ -48,7 +49,7 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, 
      * @return the MimeMessage as the current element of Iterator.
      * @throws MessagingException  when an error occurs
      */
-    protected abstract MimeMessage createMessageInternal() throws MessagingException;
+    protected abstract ExtendedMimeMessage createMessageInternal() throws MessagingException;
 
     protected abstract Logger getLogger();
 
@@ -56,14 +57,14 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, 
      * @return the MimeMessage as the current element of Iterator.
      * @throws MessagingException  when an error occurs
      */
-    public MimeMessage createMessage() throws MessagingException
+    public ExtendedMimeMessage createMessage() throws MessagingException
     {
-        MimeMessage message = createMessageInternal();
+        ExtendedMimeMessage message = createMessageInternal();
 
         // Set the Message type if passed in parameters
         String type = (String) parameters.get("type");
         if (type != null) {
-            message.addHeader("X-MailType", type);
+            message.setType(type);
         }
 
         return message;

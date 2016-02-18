@@ -33,7 +33,7 @@
   #set($baseQueryString = "editor=$!{request.editor}&amp;section=$!{request.section}")
   $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##
   $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
-  $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})##
+  $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
   $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
   <div id="import" class="row">
     <div id="packagelist" class="col-xs-12 col-sm-6 col-md-6">
@@ -50,7 +50,7 @@
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
             <div class="package-upload">
                <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
-               <input id="xwikiuploadfile" type="file" name="filepath" value="" size="30" class="uploadFileInput"/>
+               <input id="xwikiuploadfile" type="file" name="filepath" size="30" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
                </span>

@@ -94,16 +94,12 @@ widgets.FullScreen = Class.create({
   addBehavior : function (item) {
     if (this.isWysiwyg20Content(item)) {
       this.addWysiwyg20ContentButton(item);
-    } else if (this.isWysiwyg10Content(item)) {
-      this.addWysiwyg10ContentButton(item);
     } else if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
     } else if (this.isWysiwyg20Field(item)) {
       this.addWysiwyg20FieldButton(item);
     } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
-    } else if (this.isWysiwyg10Field(item)) {
-      this.addWysiwyg10FieldButton(item);
     } else {
       // a div element with class maximazable
       this.addElementButton(item);
@@ -111,12 +107,6 @@ widgets.FullScreen = Class.create({
   },
   addWysiwygListeners : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
-    document.observe('xwiki:tinymce:created', this.wysiwyg10Created.bindAsEventListener(this));
-  },
-  wysiwyg10Created : function(event) {
-    var item = $(event.memo.instance);
-    this.removeTextareaLink(item);
-    this.addBehavior(item);
   },
   wysiwyg20Created : function(event) {
     var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
@@ -140,20 +130,12 @@ widgets.FullScreen = Class.create({
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.name == 'content' && textarea.visible();
   },
-  isWysiwyg10Content : function (textarea) {
-    // If the textarea is not visible, then the WYSIWYG editor is active.
-    // In IE, the WYSIWYG is placed before its textarea.
-    return textarea.name == 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
-  },
   isWysiwyg20Content : function (item) {
     return item.hasClassName("xRichTextEditor") && item.up("div[id^=content_container]");
   },
   isWikiField : function (textarea) {
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.visible();
-  },
-  isWysiwyg10Field : function (textarea) {
-    return !textarea.visible() && textarea.name != 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
   },
   isWysiwyg20Field : function (item) {
     return item.hasClassName("xRichTextEditor") && !item.up("div[id^=content_container]");
@@ -167,31 +149,6 @@ widgets.FullScreen = Class.create({
     } else {
       this.addWikiFieldButton(textarea);
     }
-  },
-  /** Adds the fullscreen button in the TinyMCE WYSIWYG editor toolbar. */
-  addWysiwyg10ContentButton : function (item) {
-    var container = (Prototype.Browser.IE ? item.previous(".mceEditorContainer") : item.next(".mceEditorContainer"));
-    if (!container) {
-      return false;
-    }
-    var toolbar = container.down(".mceToolbar");
-    if (!toolbar) {
-      return false;
-    }
-    // Create a tinymce-like internal toolbar to contain the fullscreen button
-    var newToolbar = new Element('span', {'class': 'mce_editor_fullscreentoolbar'});
-    var link = new Element('a', {'class' : 'mceButtonNormal'});
-    // Separator
-    newToolbar.insert(new Element('img', {
-       'class': 'mceSeparatorLine',
-       height: 15,
-       width: 1,
-       src: toolbar.down('img.mceSeparatorLine').src
-    }));
-    newToolbar.insert(link.insert(this.createOpenButton(container)));
-    toolbar.insert(newToolbar);
-    container._toolbar = toolbar;
-    return true;
   },
   /** Adds the fullscreen button in the GWT WYSIWYGR editor menu. */
   addWysiwyg20ContentButton : function (item) {
@@ -227,9 +184,6 @@ widgets.FullScreen = Class.create({
   },
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});
-  },
-  addWysiwyg10FieldButton : function (textarea) {
-    this.addWysiwyg10ContentButton(textarea);
   },
   addWysiwyg20FieldButton : function (textarea) {
     this.addWysiwyg20ContentButton(textarea);
@@ -354,17 +308,6 @@ widgets.FullScreen = Class.create({
         'width' : iframe.style['width'],
         'height' : iframe.style['height']
       };
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      var iframe = targetElement.down(".mceEditorIframe");
-      iframe._originalStyle = {
-        'width' : iframe.style['width'],
-        'height' : iframe.style['height']
-      };
-      var tframe = targetElement.down(".mceEditorSource");
-      tframe._originalStyle = {
-        'width' : tframe.style['width'],
-        'height' : tframe.style['height']
-      };
     }
     // All the elements between the targetElement and the root element are set to position: static, so that the offset
     // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
@@ -464,11 +407,6 @@ widgets.FullScreen = Class.create({
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
       iframe.setStyle(targetElement._richTextAreaOriginalStyle);
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      var iframe = targetElement.down(".mceEditorIframe");
-      iframe.setStyle(iframe._originalStyle);
-      var tframe = targetElement.down(".mceEditorSource");
-      tframe.setStyle(tframe._originalStyle);
     }
 
     // Restore the previous layout
@@ -552,9 +490,6 @@ widgets.FullScreen = Class.create({
     // Resize the WYSIWYGs
     if (targetElement.hasClassName("xRichTextEditor")) {
       targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
-      targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
     }
     document.fire("xwiki:fullscreen:resized", { "target" : targetElement });
   },

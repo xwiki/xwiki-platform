@@ -140,7 +140,7 @@ require.config({
 ///
 /// Start the real script
 ///
-require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
+require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function($, xm) {
   $(document).ready(function () {
   
     ///
@@ -176,8 +176,13 @@ require(['jquery', 'bootstrap', 'bootstrap-switch'], function($) {
       title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.page'))',
       placement: 'bottom'
     });
+    var watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))';
+    if (xm.documentReference.getName() != 'WebHome') {
+      // Adapt the tooltip when the current document is terminal
+      watchSpaceToolTip = '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.space'))';
+    }
     $('.bootstrap-switch-id-tmWatchSpace').tooltip({
-      title: '$escapetool.javascript($services.localization.render('watchlist.notifications.icons.tooltip.pageAndChildren'))',
+      title: watchSpaceToolTip,
       placement: 'bottom'
     });
     $('.bootstrap-switch-id-tmWatchWiki').tooltip({

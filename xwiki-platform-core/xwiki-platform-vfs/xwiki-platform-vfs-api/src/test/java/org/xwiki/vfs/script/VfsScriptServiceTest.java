@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsManager;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+platform.appwithinminutes.appHomePageActionsHeading=Handlinger
+platform.appwithinminutes.appHomePageAddEntryHint=Tilføj nyt element
+platform.appwithinminutes.appHomePageAddEntryLabel=Tilføj
+platform.appwithinminutes.appHomePageDeleteAppLabel=Slet anvendelse
+platform.appwithinminutes.appHomePageEditAppLabel=Ret elementets navn
+platform.appwithinminutes.appHomePageEntryNameLabel=Elementnavn\:
+platform.appwithinminutes.appHomePageTranslateAppLabel=Oversæt minut-app
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Slet
+platform.appwithinminutes.appLiveTableEditEntryActionName=Redigér
+platform.appwithinminutes.appLiveTableHeading=Anvendelser
+platform.appwithinminutes.appNameEmptyError=Giv Minut-app'en et navn
+platform.appwithinminutes.appNameHint=Navnet på Minut-app fastlægger hvilken URL startsiden for App'en får, hvilket område data gemmes i såvel som den klasse, der fastlægger Minut-app'ens struktur.
+platform.appwithinminutes.appNameIsUsedWarning=Minut-app findes allerede. Hvis du fortsætter ændrer du på den eksisterende klasse.
+platform.appwithinminutes.appNameLabel=Navn på Minut-app
+platform.appwithinminutes.appNamePageTitle=Opret Minut-app
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Minut-app'ens klasse
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Dataområde for Minut-app
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Startside for Minut-app
+platform.appwithinminutes.appPanelCreateEntry=Opret din egen\!
+platform.appwithinminutes.appsLiveTable._actions=Handlinger
+platform.appwithinminutes.appsLiveTable.doc.author=Senest ændret af
+platform.appwithinminutes.appsLiveTable.doc.date=Ændringsdato
+platform.appwithinminutes.appsLiveTable.doc.space=Minut-app navn
+platform.appwithinminutes.appsLiveTableHeading=Minut-apps
+platform.appwithinminutes.classEditorAdvancedCategoryName=Avanceret
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind klasse-formular
+platform.appwithinminutes.classEditorBooleanFieldName=Boolsk
+platform.appwithinminutes.classEditorCanvasHint=Træk felter fra paletten og slip dem i dette område.
+platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurér
+platform.appwithinminutes.classEditorContentFieldName=Indhold
+platform.appwithinminutes.classEditorDBListFieldName=Databaseliste
+platform.appwithinminutes.classEditorDateFieldName=Dato
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Slet
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=I dag
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nu
+platform.appwithinminutes.classEditorDeleteFieldLabel=Slet
+platform.appwithinminutes.classEditorDocumentCategoryName=Dokument
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Klassen har to felter med det samme navn\: {0}
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Standardværdi
+platform.appwithinminutes.classEditorGroupsFieldName=Gruppe
+platform.appwithinminutes.classEditorMoveFieldHint=Træk og slip for at ændre rækkefølge
+platform.appwithinminutes.classEditorMoveFieldLabel=Flyt
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Denne klasse har flere formularer.
+platform.appwithinminutes.classEditorNumberFieldName=Tal
+platform.appwithinminutes.classEditorPaletteHint=Træk og slip felter fra paletten til data feltet.
+platform.appwithinminutes.classEditorPaletteTitle=Felt-palette
+platform.appwithinminutes.classEditorPickersCategoryName=Udvælgere
+platform.appwithinminutes.classEditorPreviewFieldHint=Skjul forhåndsvisning og gem ændringer
+platform.appwithinminutes.classEditorPreviewFieldLabel=Forhåndsvis
+platform.appwithinminutes.classEditorSheetSaveComment=Opdater klasse-formular
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Tilføj
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Fjern
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Værdi
+platform.appwithinminutes.classEditorStaticListFieldName=Statisk liste
+platform.appwithinminutes.classEditorStringFieldName=Kort tekst
+platform.appwithinminutes.classEditorTemplateSaveComment=Opdaterer standard værdier
+platform.appwithinminutes.classEditorTextAreaFieldName=Lang tekst
+platform.appwithinminutes.classEditorTitleFieldName=Titel
+platform.appwithinminutes.classEditorTranslationsSaveComment=Opdatér oversættelser
+platform.appwithinminutes.classEditorUpdateSheetHint=Gendan standardformularen for skema-klasse ({0}).
+platform.appwithinminutes.classEditorUpdateSheetLabel=Opdater klasse-formular
+platform.appwithinminutes.classEditorUpdateTemplateHint=Gem standard værdier for skema-klasse ({0}).
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Opdater skema-klasse
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Opdatér oversættelse af feltnavne og listeværdier ({0}).
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Opdatér samlinger af klasse-oversættelser
+platform.appwithinminutes.classEditorUsersFieldName=Bruger
+platform.appwithinminutes.createAppButtonLabel=Opret Minut-app
+platform.appwithinminutes.description=Skab en fælles anvendelse på få minutter med XWikis avancerede håndtering af datastrukturer (AppWithinMinutes).
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Giv rettighed til at opdatere området.
+platform.appwithinminutes.homePageTitle=Minut-app
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Liste af handlinger, der kan udføres på avendelseslinien, f.eks. redigér eller slet.
+platform.appwithinminutes.liveTableEditorActionsColumnName=Handlinger
+platform.appwithinminutes.liveTableEditorAddColumnHint=Tilføj
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Særlig kolonne med henvisninger til bilag for anvendelsessiden.
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Bilag
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Særlig kolonne til at vise brugerlogo (avatar). Virker kun for klasser bundet til XWiki.Xwikiusers
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Logo
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Klassefelter
+platform.appwithinminutes.liveTableEditorColumnsHint=Vælg de kolonner du kunne tænke dig at se på Minut-app'ens startside.
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slet
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDescriptionHint=Beskrivelsen indeholder en kort introduktion til hvade Minut-app'en kan og hvilke data den kan arbejde på.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Den bruger, der sidst har ændret i siden.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Rettet af
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Tidspunktet for oprettelse
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Oprettet
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Den bruger, der har oprettet siden.
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Oprettet af
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Tidspunktet for den seneste ændring
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Ændret
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Navnet på siden, der indeholder funktion, med områdets navn foran.
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sidens fulde navn
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Viser navnet på den side, der indeholder funktionen
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Sidenavn
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Navn på det område, der indeholder funktionen
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Område
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Viser overskriften på den side, der indeholder funktionen.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sideoverskrift
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generiske kolonner
+platform.appwithinminutes.liveTableEditorHelpDescription=Generiske live-tabeller er uafhængige af din klasses struktur. De viser information om de sider, der indeholder fuktionerne.
+platform.appwithinminutes.liveTableEditorHelpTitle=Tip
+platform.appwithinminutes.liveTableEditorIcon=Ikon
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Særlig kolonne med henvisninger til billeder for funktionen.
+platform.appwithinminutes.liveTableEditorImagesColumnName=Billeder
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Træk og slip for at ændre rækkefølge
+platform.appwithinminutes.liveTableEditorSaveComment=Opdatér Live-tabeller
+platform.appwithinminutes.wizardStep1Description=Angiv et navn til denne Minut-app.
+platform.appwithinminutes.wizardStep1Name=Navn
+platform.appwithinminutes.wizardStep1Title=Navngiv din Minut-app
+platform.appwithinminutes.wizardStep2Description=Specificér strukturen for din Minut-app ved at angive hvilke datafelter den skal indeholde.
+platform.appwithinminutes.wizardStep2Name=Struktur
+platform.appwithinminutes.wizardStep2Title=Definér struktur for dine data
+platform.appwithinminutes.wizardStep3Description=Gør startsiden for din Minut-app personlig.
+platform.appwithinminutes.wizardStep3Name=Præsentation
+platform.appwithinminutes.wizardStep3Title=Design din Minut-apps startside
+platform.appwithinminutes.wizardStepFinishButtonLabel=Afslut
+platform.appwithinminutes.wizardStepFinishButtonTip=Gå til startsiden nu
+platform.appwithinminutes.wizardStepHeading=Trin {0} — {1}
+platform.appwithinminutes.wizardStepHelpDescription=Denne guide vil føre dig frem til din egen Minut-app. Trinene vil bestemme hvordan anvendelsen skal se ud og hvilken form for information, der skal være i den\:
+platform.appwithinminutes.wizardStepHelpTitle=Trin
+platform.appwithinminutes.wizardStepNextButtonLabel=Næste trin
+platform.appwithinminutes.wizardStepNextButtonTip=Gå til næste trin
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Forrige trin
+platform.appwithinminutes.wizardStepPreviousButtonTip=Forrige
+</content>
+</xwikidoc>

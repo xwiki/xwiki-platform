@@ -48,6 +48,11 @@ $response.setContentType("application/json")
   #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
     #set($orderDirection = 'desc')
   #end
+  ## Sorting by doc.location is not supported by the DB, since the location field does not exist.
+  #if ($order == 'doc.location')
+    ## So we filter on the document full name instead, which is the expected behavior.
+    #set ($order = 'doc.fullName')
+  #end
   ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
   #set ($orderQueryPart = "order by ${order} ${orderDirection}")
 #end

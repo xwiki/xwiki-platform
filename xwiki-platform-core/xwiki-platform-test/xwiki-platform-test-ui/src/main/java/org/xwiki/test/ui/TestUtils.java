@@ -189,9 +189,14 @@ public class TestUtils
     private HttpClient httpClient;
 
     /**
+     * @since 8.0M1
+     */
+    private List<XWikiExecutor> executors;
+
+    /**
      * @since 7.3M1
      */
-    private XWikiExecutor executor;
+    private int currentExecutorIndex;
 
     /**
      * @since 7.3M1
@@ -210,19 +215,28 @@ public class TestUtils
     }
 
     /**
-     * @since 7.3M1
+     * @since 8.0M1
      */
-    public XWikiExecutor getExecutor()
+    public XWikiExecutor getCurrentExecutor()
     {
-        return this.executor;
+        return this.executors != null && this.executors.size() > this.currentExecutorIndex
+            ? this.executors.get(this.currentExecutorIndex) : null;
     }
 
     /**
-     * @since 7.3M1
+     * @since 8.0M1
      */
-    public void setExecutor(XWikiExecutor executor)
+    public void switchExecutor(int index)
     {
-        this.executor = executor;
+        this.currentExecutorIndex = index;
+    }
+
+    /**
+     * @since 8.0M1
+     */
+    public void setExecutors(List<XWikiExecutor> executors)
+    {
+        this.executors = executors;
     }
 
     /** Used so that AllTests can set the persistent test context. */
@@ -238,7 +252,7 @@ public class TestUtils
         TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
 
-    protected XWikiWebDriver getDriver()
+    public XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -885,8 +899,8 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        return XWikiExecutor.URL + ":" + (this.executor != null ? this.executor.getPort() : XWikiExecutor.DEFAULT_PORT)
-            + "/xwiki/";
+        return XWikiExecutor.URL + ":"
+            + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT) + "/xwiki/";
     }
 
     /**
@@ -1179,10 +1193,9 @@ public class TestUtils
         gotoPage(space, page, "save", queryParameters);
     }
 
-    public ClassEditPage addClassProperty(String space, String page, String propertyName, String propertyType)
+    public void addClassProperty(String space, String page, String propertyName, String propertyType)
     {
         gotoPage(space, page, "propadd", "propname", propertyName, "proptype", propertyType);
-        return new ClassEditPage();
     }
 
     /**
@@ -1397,20 +1410,9 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    public void attachFile(EntityReference reference, InputStream is, boolean failIfExists) throws Exception
+    public void attachFile(EntityReference reference, Object is, boolean failIfExists) throws Exception
     {
-        // make sure the page exist
-        if (!rest().exists(reference.getParent())) {
-            rest().savePage(reference.getParent());
-        }
-
-        if (failIfExists) {
-            assertStatusCodes(rest().executePut(AttachmentResource.class, is, rest().toElements(reference)), true,
-                STATUS_CREATED);
-        } else {
-            assertStatusCodes(rest().executePut(AttachmentResource.class, is, rest().toElements(reference)), true,
-                STATUS_CREATED_ACCEPTED);
-        }
+        rest().attachFile(reference, is, failIfExists);
     }
 
     // FIXME: improve that with a REST API to directly import a XAR
@@ -1422,12 +1424,13 @@ public class TestUtils
         // import file
         executeGet(
             getBaseBinURL() + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
-                + escapeURL(file.getName()), Status.OK.getStatusCode());
+                + escapeURL(file.getName()),
+            Status.OK.getStatusCode());
     }
 
     /**
      * Delete the latest version from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @since 7.0M2
@@ -1439,7 +1442,7 @@ public class TestUtils
 
     /**
      * Delete a specific version from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param version the version to delete
@@ -1452,7 +1455,7 @@ public class TestUtils
 
     /**
      * Delete an interval of versions from the history of a page, using the {@code /deleteversions/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param v1 the starting version to delete
@@ -1466,7 +1469,7 @@ public class TestUtils
 
     /**
      * Roll back a page to the previous version, using the {@code /rollback/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @since 7.0M2
@@ -1478,7 +1481,7 @@ public class TestUtils
 
     /**
      * Roll back a page to the specified version, using the {@code /rollback/} action.
-     * 
+     *
      * @param space the space name of the page
      * @param page the name of the page
      * @param version the version to rollback to
@@ -1491,7 +1494,7 @@ public class TestUtils
 
     /**
      * Set the hierarchy mode used in the wiki
-     * 
+     *
      * @param mode the mode to use ("reference" or "parentchild")
      * @since 7.2M2
      */
@@ -1502,7 +1505,7 @@ public class TestUtils
 
     /**
      * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
-     * 
+     *
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
      * @param value value to set to the property
@@ -1732,7 +1735,6 @@ public class TestUtils
             }
 
             RESOURCES_MAP.put(EntityType.DOCUMENT, PageResource.class);
-            RESOURCES_MAP.put(EntityType.ATTACHMENT, AttachmentResource.class);
             RESOURCES_MAP.put(EntityType.OBJECT, ObjectResource.class);
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, ObjectPropertyResource.class);
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, ClassPropertyResource.class);
@@ -2072,6 +2074,25 @@ public class TestUtils
             delete(new LocalDocumentReference(space, page));
         }
 
+        /**
+         * @since 8.0M1
+         */
+        public void attachFile(EntityReference reference, Object is, boolean failIfExists) throws Exception
+        {
+            // make sure the page exist
+            if (!exists(reference.getParent())) {
+                savePage(reference.getParent());
+            }
+
+            if (failIfExists) {
+                assertStatusCodes(executePut(AttachmentResource.class, is, toElements(reference)), true,
+                    STATUS_CREATED);
+            } else {
+                assertStatusCodes(executePut(AttachmentResource.class, is, toElements(reference)), true,
+                    STATUS_CREATED_ACCEPTED);
+            }
+        }
+
         public boolean exists(EntityReference reference) throws Exception
         {
             GetMethod getMethod = executeGet(reference);
@@ -2082,11 +2103,54 @@ public class TestUtils
         }
 
         /**
+         * Return object model of the passed reference. Fail if none could be found.
+         * 
          * @since 7.3
          */
         public <T> T get(EntityReference reference) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(reference), false, STATUS_OK);
+            return get(reference, true);
+        }
+
+        /**
+         * Return object model of the passed reference or null if none could be found.
+         * 
+         * @since 8.0M1
+         */
+        public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
+        {
+            Class<?> resourceClass = RESOURCES_MAP.get(reference.getType());
+
+            if (resourceClass == null) {
+                throw new Exception("Unsuported type [" + reference.getType() + "]");
+            }
+
+            return get(resourceClass, reference, failIfNotFound);
+        }
+
+        /**
+         * Return object model of the passed reference with the passed resource URI. Fail if none could be found.
+         * 
+         * @since 8.0M1
+         */
+        public <T> T get(Object resourceURI, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, reference, true);
+        }
+
+        /**
+         * Return object model of the passed reference with the passed resource URI or null if none could be found.
+         * 
+         * @since 8.0M1
+         */
+        public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+                failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
+
+            if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
+                return null;
+            }
 
             try {
                 try (InputStream stream = getMethod.getResponseBodyAsStream()) {
@@ -2125,6 +2189,8 @@ public class TestUtils
             InputStream resourceStream;
             if (restObject instanceof InputStream) {
                 resourceStream = (InputStream) restObject;
+            } else if (restObject instanceof byte[]) {
+                resourceStream = new ByteArrayInputStream((byte[]) restObject);
             } else {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 marshaller.marshal(restObject, stream);
@@ -2145,7 +2211,15 @@ public class TestUtils
                 throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
 
-            return executeGet(resource, toElements(reference));
+            return executeGet(resource, reference);
+        }
+
+        /**
+         * @since 8.0M1
+         */
+        public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
+        {
+            return executeGet(resourceURI, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception
@@ -2210,6 +2284,10 @@ public class TestUtils
 
         public URI createUri(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
         {
+            if (resourceUri instanceof URI) {
+                return (URI) resourceUri;
+            }
+
             // Create URI builder
             UriBuilder builder = getUriBuilder(resourceUri, queryParams);
 

@@ -3,7 +3,7 @@
 #end
 #set($message = $xcontext.message)
 #if($message)
-  #xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message))
+  #xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message, $xcontext.messageParameters))
   #xwikimessageboxend()
 #else
   #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('problemoccured'))

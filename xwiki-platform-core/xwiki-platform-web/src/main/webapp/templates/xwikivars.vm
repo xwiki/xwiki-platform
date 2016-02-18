@@ -117,8 +117,8 @@
 #end
 ## Check language option
 #set ($languageparams = '')
-#if ($xwiki.isMultiLingual() && ("$!{tdoc.realLanguage}" != ''))
-  #set ($languageparams = "language=${tdoc.realLanguage}")
+#if ($xwiki.isMultiLingual() && ("$!{tdoc.realLocale}" != ''))
+  #set ($languageparams = "language=${tdoc.realLocale}")
 #end
 ## Check revision option
 #if ($request.rev)

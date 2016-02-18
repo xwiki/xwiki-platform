@@ -27,6 +27,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
 
 /**
@@ -49,6 +50,10 @@ import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
  * {{/velocity}}
  * </code>
  *
+ * Since 7.4.1, messages generated all receive the same MessageId header since these are clone of the same message.
+ * This behavior allow sending newsletter/mailing list message independently to many subscribers
+ * while allowing them to interact on the same thread of message, since all message are identified to be the same.
+ *
  * @version $Id$
  * @since 7.1M2
  */
@@ -66,10 +71,6 @@ public class MessageMimeMessageFactory extends AbstractMimeMessageFactory<MimeMe
                 String.format("Failed to create mime message from source [%s]", source.getClass()));
         }
 
-        MimeMessage message = new MimeMessage((MimeMessage) source);
-        // Update MessageId to distinct all generated messages properly
-        message.saveChanges();
-
-        return message;
+        return new ExtendedMimeMessage((MimeMessage) source);
     }
 }

@@ -19,15 +19,12 @@
  */
 package org.xwiki.crypto.store;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception thrown by the {@link org.xwiki.crypto.store.SignatureStore}.
  *
  * @version $Id$
  * @since 6.0
  */
-@Unstable
 public class SignatureStoreException extends Exception
 {
     /**

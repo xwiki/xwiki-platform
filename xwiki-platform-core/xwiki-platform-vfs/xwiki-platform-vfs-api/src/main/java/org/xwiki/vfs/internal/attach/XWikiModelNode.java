@@ -120,11 +120,34 @@ public class XWikiModelNode
      */
     public XWikiAttachment getAttachment() throws IOException
     {
+        return getAttachment(true);
+    }
+
+    /**
+     * @return true if the attachment exists or false otherwise
+     * @since 7.4.1, 8.0M1
+     */
+    public boolean hasAttachment()
+    {
+        boolean result;
+        try {
+            getAttachment(false);
+            result = true;
+        } catch (Exception e) {
+            result = false;
+        }
+        return result;
+    }
+
+    private XWikiAttachment getAttachment(boolean shouldCheckPermission) throws IOException
+    {
         if (this.attachment == null) {
             // Note that we check permission only once per Node for performance reason. As a consequence it's possible
             // that a user who had permission at point A, and who's been denied it may still access the Node for some
             // time.
-            checkViewPermission();
+            if (shouldCheckPermission) {
+                checkViewPermission();
+            }
             try {
                 XWikiDocument document = getXWikiContext().getWiki().getDocument(
                     getDocumentReference(), getXWikiContext());

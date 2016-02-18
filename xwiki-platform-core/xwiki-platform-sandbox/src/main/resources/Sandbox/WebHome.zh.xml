@@ -47,15 +47,15 @@
 
 {{info}}请不用担心您的修改会覆盖或者删除页面的原有内容，您总可以通过页面底部的”历史“标签页回滚到该页面的最初版本。{{/info}}
 
-如果您想查看当前页面的[[XWiki语法格式&amp;gt;&amp;gt;XWiki.XWikiSyntax]]，请选择”查看“菜单中的”Wiki代码“或者在编辑页面时选择”源代码“标签页。
+如果您想查看当前页面的[[XWiki语法格式&gt;&gt;XWiki.XWikiSyntax]]，请选择”查看“菜单中的”Wiki代码“或者在编辑页面时选择”源代码“标签页。
 
 下面是一系列你可以用来测试的页面：
 
-* [[沙箱测试页面1&amp;gt;&amp;gt;Sandbox.TestPage1]]
-* [[沙箱测试页面2&amp;gt;&amp;gt;Sandbox.TestPage2]]
-* [[沙箱测试页面3&amp;gt;&amp;gt;Sandbox.TestPage3]]
+* [[沙箱测试页面1&gt;&gt;Sandbox.TestPage1]]
+* [[沙箱测试页面2&gt;&gt;Sandbox.TestPage2]]
+* [[沙箱测试页面3&gt;&gt;Sandbox.TestPage3]]
 
-下面是[[XWiki语法&amp;gt;&amp;gt;XWiki.XWikiSyntax]]的一个基本说明，你可以在wiki页面中使用这些语法（比如：标题，图片，表格）。 
+下面是[[XWiki语法&gt;&gt;XWiki.XWikiSyntax]]的一个基本说明，你可以在wiki页面中使用这些语法（比如：标题，图片，表格）。 
 
 = 标题 =
 
@@ -135,11 +135,11 @@ XWiki支持的基本样式：
 
 XWiki允许您创建连接到wiki中其他页面或者互联网页面的链接：
 
-* [[WebHome]] -&amp;gt; 连接到当前wiki空间的首页；
-* [[沙箱首页&amp;gt;&amp;gt;WebHome]] -&amp;gt; 链接可以有自己的标题，这里使用了”沙箱首页“；
-* [[Wiki Home&amp;gt;&amp;gt;Main.WebHome]] -&amp;gt; 使用”空间名称.页面名称“的格式可以连接到同一wiki其他空间的指定页面；
-* [[http://www.xwiki.org]] -&amp;gt; 您还可以直接连接到外部web网站；
-* [[XWiki.org网站&amp;gt;&amp;gt;http://www.xwiki.org]] -&amp;gt; 当然，也可以给外部链接加上自己的标题。
+* [[WebHome]] -&gt; 连接到当前wiki空间的首页；
+* [[沙箱首页&gt;&gt;WebHome]] -&gt; 链接可以有自己的标题，这里使用了”沙箱首页“；
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; 使用”空间名称.页面名称“的格式可以连接到同一wiki其他空间的指定页面；
+* [[http://www.xwiki.org]] -&gt; 您还可以直接连接到外部web网站；
+* [[XWiki.org网站&gt;&gt;http://www.xwiki.org]] -&gt; 当然，也可以给外部链接加上自己的标题。
 
 = 图片=
 

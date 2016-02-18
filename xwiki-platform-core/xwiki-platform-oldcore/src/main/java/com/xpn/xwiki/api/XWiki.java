@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -283,13 +284,13 @@ public class XWiki extends Api
 
     /**
      * @param fullname the {@link XWikiDocument#getFullName() name} of the document to search for.
-     * @param lang an optional {@link XWikiDocument#getLanguage() language} to filter results.
+     * @param locale an optional {@link XWikiDocument#getLocale() locale} to filter results.
      * @return A list with all the deleted versions of a document in the recycle bin.
      * @throws XWikiException if any error
      */
-    public List<DeletedDocument> getDeletedDocuments(String fullname, String lang) throws XWikiException
+    public List<DeletedDocument> getDeletedDocuments(String fullname, String locale) throws XWikiException
     {
-        XWikiDeletedDocument[] dds = this.xwiki.getDeletedDocuments(fullname, lang, this.context);
+        XWikiDeletedDocument[] dds = this.xwiki.getDeletedDocuments(fullname, locale, this.context);
         if (dds == null || dds.length == 0) {
             return Collections.emptyList();
         }
@@ -303,15 +304,15 @@ public class XWiki extends Api
     /**
      * @return specified documents in recycle bin
      * @param fullname - {@link XWikiDocument#getFullName()}
-     * @param lang - {@link XWikiDocument#getLanguage()}
+     * @param locale - {@link XWikiDocument#getLocale()}
      * @throws XWikiException if any error
      */
-    public DeletedDocument getDeletedDocument(String fullname, String lang, String index) throws XWikiException
+    public DeletedDocument getDeletedDocument(String fullname, String locale, String index) throws XWikiException
     {
         if (!NumberUtils.isDigits(index)) {
             return null;
         }
-        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), this.context);
+        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
         if (dd == null) {
             return null;
         }
@@ -601,33 +602,33 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for documents allowing to have mutliple entries per language
+     * API allowing to search for documents allowing to have mutliple entries per locale
      *
      * @param wheresql query to use similar to searchDocuments(wheresql)
-     * @param distinctbylanguage true to return multiple rows per language
+     * @param distinctbylocale true to return multiple rows per locale
      * @return List of Document object matching
      * @throws XWikiException
      */
-    public List<Document> searchDocuments(String wheresql, boolean distinctbylanguage) throws XWikiException
+    public List<Document> searchDocuments(String wheresql, boolean distinctbylocale) throws XWikiException
     {
-        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, getXWikiContext()));
+        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, getXWikiContext()));
     }
 
     /**
-     * API allowing to search for documents allowing to have multiple entries per language
+     * API allowing to search for documents allowing to have multiple entries per locale
      *
      * @param wheresql query to use similar to searchDocuments(wheresql)
-     * @param distinctbylanguage true to return multiple rows per language
+     * @param distinctbylocale true to return multiple rows per locale
      * @return List of Document object matching
      * @param nb return only 'nb' rows
      * @param start skip the first 'start' rows
      * @throws XWikiException
      */
-    public List<Document> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start)
+    public List<Document> searchDocuments(String wheresql, boolean distinctbylocale, int nb, int start)
         throws XWikiException
     {
         return convert(this.xwiki.getStore()
-            .searchDocuments(wheresql, distinctbylanguage, nb, start, getXWikiContext()));
+            .searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
     }
 
     /**
@@ -913,11 +914,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per language This function will find the
-     * right preference object associated to the current active language
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the
+     * right preference object associated to the current active locale
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getXWikiPreference(String preference)
     {
@@ -925,12 +926,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per language This function will find the
-     * right preference object associated to the current active language
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the
+     * right preference object associated to the current active locale
      *
      * @param preference Preference name
-     * @param defaultValue default value to return if the prefenrece does not exist or is empty
-     * @return The preference for this wiki and the current language
+     * @param defaultValue default value to return if the preference does not exist or is empty
+     * @return The preference for this wiki and the current locale
      */
     public String getXWikiPreference(String preference, String defaultValue)
     {
@@ -938,12 +939,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per language This function will find the
-     * right preference object associated to the current active language If no preference is found it will look in the
+     * API to access an Space Preference There can be one preference object per locale This function will find the
+     * right preference object associated to the current active locale If no preference is found it will look in the
      * XWiki Preferences
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getSpacePreference(String preference)
     {
@@ -951,13 +952,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per language This function will find the
-     * right preference object associated to the current active language If no preference is found it will look in the
+     * API to access an Space Preference There can be one preference object per locale This function will find the
+     * right preference object associated to the current active locale If no preference is found it will look in the
      * XWiki Preferences
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getSpacePreference(String preference, String defaultValue)
     {
@@ -994,7 +995,7 @@ public class XWiki extends Api
      *
      * @param preference Preference name
      * @param space The space for which this preference is requested
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getSpacePreferenceFor(String preference, String space)
     {
@@ -1009,7 +1010,7 @@ public class XWiki extends Api
      * @param preference Preference name
      * @param space The space for which this preference is requested
      * @param defaultValue default value to return if the preference does not exist or is empty
-     * @return The preference for this wiki and the current language in long format
+     * @return The preference for this wiki and the current locale in long format
      */
     public String getSpacePreferenceFor(String preference, String space, String defaultValue)
     {
@@ -1051,12 +1052,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference as a long number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language
+     * API to access an XWiki Preference as a long number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale
      *
      * @param preference Preference name
-     * @param defaultValue default value to return if the prefenrece does not exist or is empty
-     * @return The preference for this wiki and the current language in long format
+     * @param defaultValue default value to return if the preference does not exist or is empty
+     * @return The preference for this wiki and the current locale in long format
      */
     public long getXWikiPreferenceAsLong(String preference, long defaultValue)
     {
@@ -1064,11 +1065,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference as a long number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language
+     * API to access an XWiki Preference as a long number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language in long format
+     * @return The preference for this wiki and the current locale in long format
      */
     public long getXWikiPreferenceAsLong(String preference)
     {
@@ -1076,13 +1077,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a Space Preference as a long number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language If no preference is found it will
+     * API to access a Space Preference as a long number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale If no preference is found it will
      * look for the XWiki Preference
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
-     * @return The preference for this wiki and the current language in long format
+     * @return The preference for this wiki and the current locale in long format
      */
     public long getSpacePreferenceAsLong(String preference, long defaultValue)
     {
@@ -1090,12 +1091,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a Space Preference as a long number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language If no preference is found it will
+     * API to access a Space Preference as a long number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale If no preference is found it will
      * look for the XWiki Preference
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language in long format
+     * @return The preference for this wiki and the current locale in long format
      */
     public long getSpacePreferenceAsLong(String preference)
     {
@@ -1103,12 +1104,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference as an int number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language
+     * API to access an XWiki Preference as an int number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
-     * @return The preference for this wiki and the current language in int format
+     * @return The preference for this wiki and the current locale in int format
      */
     public int getXWikiPreferenceAsInt(String preference, int defaultValue)
     {
@@ -1116,11 +1117,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference as a int number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language
+     * API to access an XWiki Preference as a int number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language in int format
+     * @return The preference for this wiki and the current locale in int format
      */
     public int getXWikiPreferenceAsInt(String preference)
     {
@@ -1128,13 +1129,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a space Preference as a int number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language If no preference is found it will
+     * API to access a space Preference as a int number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale If no preference is found it will
      * look for the XWiki Preference
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
-     * @return The preference for this wiki and the current language in int format
+     * @return The preference for this wiki and the current locale in int format
      */
     public int getSpacePreferenceAsInt(String preference, int defaultValue)
     {
@@ -1142,12 +1143,12 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a Space Preference as a int number There can be one preference object per language This function
-     * will find the right preference object associated to the current active language If no preference is found it will
+     * API to access a Space Preference as a int number There can be one preference object per locale This function
+     * will find the right preference object associated to the current active locale If no preference is found it will
      * look for the XWiki Preference
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language in int format
+     * @return The preference for this wiki and the current locale in int format
      */
     public int getSpacePreferenceAsInt(String preference)
     {
@@ -1159,7 +1160,7 @@ public class XWiki extends Api
      * is found it will look in the Space Preferences If no preference is found it will look in the XWiki Preferences
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getUserPreference(String preference)
     {
@@ -1170,7 +1171,7 @@ public class XWiki extends Api
      * API to access a User Preference from cookie This function will look in the session cookie for the preference
      *
      * @param preference Preference name
-     * @return The preference for this wiki and the current language
+     * @return The preference for this wiki and the current locale
      */
     public String getUserPreferenceFromCookie(String preference)
     {
@@ -1178,29 +1179,54 @@ public class XWiki extends Api
     }
 
     /**
-     * First try to find the current language in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default language defined in the XWiki preferences. If the wiki is multilingual try to get
-     * the language passed in the request. If none was passed try to get it from a cookie. If no language cookie exists
-     * then use the user default language and barring that use the browser's "Accept-Language" header sent in HTTP
-     * request. If none is defined use the default language.
+     * Same as {@link #getLocalePreference()} but as a String.
      *
-     * @return the language to use
+     * @return the locale to use
+     * @deprecated since 8.0M1, use {@link #getLocalePreference()} instead
      */
+    @Deprecated
     public String getLanguagePreference()
     {
         return this.xwiki.getLanguagePreference(getXWikiContext());
     }
 
     /**
-     * API to access the interface language preference for the request Order of evaluation is: Language of the wiki in
-     * mono-lingual mode language request paramater language in context language user preference language in cookie
-     * language accepted by the navigator
+     * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
+     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get
+     * the locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists
+     * then use the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP
+     * request. If none is defined use the default locale.
      *
-     * @return the document language preference for the request
+     * @return the locale to use
+     * @since 8.0M1
      */
+    public Locale getLocalePreference()
+    {
+        return this.xwiki.getLocalePreference(getXWikiContext());        
+    }
+
+    /**
+     * Same as {@link #getInterfaceLocalePreference()} but as a String.
+     *
+     * @return the document locale preference for the request
+     * @deprecated since 8.0M1, use {@link #getInterfaceLocalePreference()} instead
+     */
+    @Deprecated
     public String getInterfaceLanguagePreference()
     {
         return this.xwiki.getInterfaceLanguagePreference(getXWikiContext());
+    }
+
+    /**
+     * API to access the interface locale preference for the request Order of evaluation is: locale of the wiki in
+     * mono-lingual mode locale request parameter locale in context locale user preference locale in cookie
+     * locale accepted by the navigator
+     *
+     * @return the document locale preference for the request
+     */
+    public Locale getInterfaceLocalePreference()
+    {
+        return this.xwiki.getInterfaceLocalePreference(getXWikiContext());
     }
 
     /**
@@ -1393,13 +1419,13 @@ public class XWiki extends Api
      *
      * @param docname source document
      * @param targetdocname target document
-     * @param wikilanguage language to copy
+     * @param wikilocale locale to copy
      * @return true if the copy was sucessfull
      * @throws XWikiException if the document was not copied properly
      */
-    public boolean copyDocument(String docname, String targetdocname, String wikilanguage) throws XWikiException
+    public boolean copyDocument(String docname, String targetdocname, String wikilocale) throws XWikiException
     {
-        return this.copyDocument(docname, targetdocname, null, null, wikilanguage, false, false);
+        return this.copyDocument(docname, targetdocname, null, null, wikilocale, false, false);
     }
 
     /**
@@ -1408,14 +1434,14 @@ public class XWiki extends Api
      * @param docname source document
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
-     * @param wikilanguage language to copy
+     * @param wikilocale locale to copy
      * @return true if the copy was sucessfull
      * @throws XWikiException if the document was not copied properly
      */
-    public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage)
+    public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilocale)
         throws XWikiException
     {
-        return this.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, false);
+        return this.copyDocument(docname, docname, sourceWiki, targetWiki, wikilocale, true, false);
     }
 
     /**
@@ -1425,15 +1451,15 @@ public class XWiki extends Api
      * @param docname source document
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
-     * @param wikilanguage language to copy
+     * @param wikilocale locale to copy
      * @param reset true to reset versions
      * @return true if the copy was sucessfull
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
-        String wikilanguage, boolean reset) throws XWikiException
+        String wikilocale, boolean reset) throws XWikiException
     {
-        return this.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, false);
+        return this.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilocale, reset, false);
     }
 
     /**
@@ -1444,14 +1470,14 @@ public class XWiki extends Api
      * @param targetdocname target document name
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
-     * @param wikilanguage language to copy
+     * @param wikilocale locale to copy
      * @param reset true to reset versions
      * @param force true to overwrite the previous document
      * @return true if the copy was sucessfull
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
-        String wikilanguage, boolean reset, boolean force) throws XWikiException
+        String wikilocale, boolean reset, boolean force) throws XWikiException
     {
         DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
@@ -1467,7 +1493,7 @@ public class XWiki extends Api
                     targetWiki));
         }
 
-        return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force);
+        return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force);
     }
 
     /**
@@ -1476,7 +1502,7 @@ public class XWiki extends Api
      *
      * @param sourceDocumentReference the reference to the document to copy
      * @param targetDocumentReference the reference to the document to create
-     * @param wikilanguage language to copy
+     * @param wikilocale locale to copy
      * @param resetHistory {@code true} to reset versions
      * @param overwrite {@code true} to overwrite the previous document
      * @return {@code true} if the copy was sucessful
@@ -1484,7 +1510,7 @@ public class XWiki extends Api
      * @since 3.0M3
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, boolean resetHistory, boolean overwrite) throws XWikiException
+        String wikilocale, boolean resetHistory, boolean overwrite) throws XWikiException
     {
         // In order to copy the source document the user must have at least the right to view it.
         if (hasAccessLevel("view", this.defaultStringEntityReferenceSerializer.serialize(sourceDocumentReference))) {
@@ -1496,7 +1522,7 @@ public class XWiki extends Api
             if (hasAccessLevel("edit", targetDocStringRef)
                 && (!overwrite || !exists(targetDocumentReference) || hasAccessLevel("delete", targetDocStringRef))) {
                 // Reset creation data otherwise the required rights for page copy need to be reconsidered.
-                return this.xwiki.copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage,
+                return this.xwiki.copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale,
                     resetHistory, overwrite, true, getXWikiContext());
             }
         }
@@ -1510,16 +1536,16 @@ public class XWiki extends Api
      * @param space source Space
      * @param sourceWiki source Wiki
      * @param targetWiki target Wiki
-     * @param language language to copy
+     * @param locale locale to copy
      * @param clean true to delete all document of the target space
      * @return number of copied documents
      * @throws XWikiException if the space was not copied properly
      */
-    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language, boolean clean)
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String locale, boolean clean)
         throws XWikiException
     {
         if (hasProgrammingRights()) {
-            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, clean, getXWikiContext());
+            return this.xwiki.copySpaceBetweenWikis(space, sourceWiki, targetWiki, locale, clean, getXWikiContext());
         }
 
         return -1;

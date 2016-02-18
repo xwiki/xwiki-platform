@@ -23,14 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -41,7 +39,6 @@ import org.xwiki.wiki.provisioning.WikiCopier;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -61,9 +58,6 @@ public class DefaultWikiManager implements WikiManager
 
     @Inject
     private ObservationManager observationManager;
-
-    @Inject
-    private Logger logger;
 
     @Inject
     private WikiCreator wikiCreator;
@@ -150,17 +144,4 @@ public class DefaultWikiManager implements WikiManager
             throw new WikiManagerException("Fail to look at the databases.");
         }
     }
-
-    private XWikiDocument getDocument(DocumentReference reference) throws WikiManagerException
-    {
-        XWikiContext context = xcontextProvider.get();
-        com.xpn.xwiki.XWiki xwiki = context.getWiki();
-        try {
-            return xwiki.getDocument(reference, context);
-        } catch (XWikiException e) {
-            throw new WikiManagerException(String.format(
-                    "Failed to get document [%s] containing a XWiki.XWikiServerClass object", reference), e);
-        }
-    }
-
 }

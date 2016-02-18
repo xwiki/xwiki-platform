@@ -24,7 +24,6 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <E>
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 @Role
 public interface EntityEventGenerator<E>
 {

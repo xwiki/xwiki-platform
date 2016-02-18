@@ -30,6 +30,7 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -86,5 +87,6 @@ public class IntegrationTests
         when(authorizationManager.hasAccess(Right.VIEW, null, documentReference)).thenReturn(true);
 
         componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        componentManager.registerMockComponent(SpaceReferenceResolver.TYPE_STRING, "current");
     }
 }

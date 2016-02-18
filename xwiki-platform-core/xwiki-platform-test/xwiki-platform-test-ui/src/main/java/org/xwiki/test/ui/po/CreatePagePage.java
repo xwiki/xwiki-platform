@@ -152,7 +152,7 @@ public class CreatePagePage extends ViewPage
      */
     public EditPage createPage(String title, String spaceValue, String pageValue, boolean isTerminalPage)
     {
-        createPageInternal(title, spaceValue, pageValue, isTerminalPage);
+        fillForm(title, spaceValue, pageValue, isTerminalPage);
         clickCreate();
         return new EditPage();
     }
@@ -182,24 +182,31 @@ public class CreatePagePage extends ViewPage
     public EditPage createPageFromTemplate(String title, String spaceValue, String pageValue, String templateValue,
         boolean isTerminalPage)
     {
-        createPageInternal(title, spaceValue, pageValue, isTerminalPage);
+        fillForm(title, spaceValue, pageValue, isTerminalPage);
         setTemplate(templateValue);
         clickCreate();
         return new EditPage();
     }
 
-    private void createPageInternal(String title, String spaceValue, String pageValue, boolean isTerminalPage)
+    /**
+     * @param title document title, ignored if {@code null}
+     * @param spaceReference document's space reference (parent nested document), ignored if {@code null}
+     * @param pageName document's name (space name or page name, depending if terminal or not), ignored if {@code null}
+     * @param isTerminalPage true if the new document is terminal, false for non-terminal
+     * @since public since 7.4M2
+     */
+    public void fillForm(String title, String spaceReference, String pageName, boolean isTerminalPage)
     {
         if (title != null) {
             getDocumentPicker().setTitle(title);
         }
 
-        if (spaceValue != null) {
-            getDocumentPicker().setParent(spaceValue);
+        if (spaceReference != null) {
+            getDocumentPicker().setParent(spaceReference);
         }
 
-        if (pageValue != null) {
-            getDocumentPicker().setName(pageValue);
+        if (pageName != null) {
+            getDocumentPicker().setName(pageName);
         }
 
         // Since the default is to not create terminal pages, only set this if the user is asking to create a terminal

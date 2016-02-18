@@ -37,8 +37,6 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -69,9 +67,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
-    /** Execution context handler, needed for accessing the XWikiContext. */
+    /** Needed for accessing the XWikiContext. */
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -103,9 +101,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     private XWikiContext getContext()
     {
-        ExecutionContext econtext = this.execution.getContext();
-
-        return econtext != null ? (XWikiContext) econtext.getProperty("xwikicontext") : null;
+        return this.contextProvider.get();
     }
 
     @Override
@@ -192,14 +188,24 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public boolean exists(DocumentReference documentReference)
     {
-        return getContext().getWiki().exists(documentReference, getContext());
+        XWikiContext context = getContext();
+        if (context != null) {
+            return context.getWiki().exists(documentReference, context);
+        } else {
+            return false;
+        }
     }
 
     @Override
     @Deprecated
     public boolean exists(String documentReference)
     {
-        return getContext().getWiki().exists(documentReference, getContext());
+        XWikiContext context = getContext();
+        if (context != null) {
+            return context.getWiki().exists(documentReference, context);
+        } else {
+            return false;
+        }
     }
 
     @Override

@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Converts a {@link VfsResourceReference} into a {@link URI} in a format compatible with TrueVFS. Specifically TrueVFS

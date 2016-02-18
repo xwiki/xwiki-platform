@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -43,14 +42,14 @@ public interface MailTemplateManager
      * @param templateReference the reference to the template document containing the XWiki.Mail xobject
      * @param property the name of xproperty
      * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
-     * @param locale the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
-     *        language)
+     * @param localeValue the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
+     *        language). Can be either a Locale or a String.
      * @return the evaluated property
      * @throws MessagingException when an error occurs
      * @since 6.1
      */
     String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
-        Locale locale) throws MessagingException;
+        Object localeValue) throws MessagingException;
 
     /**
      * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per

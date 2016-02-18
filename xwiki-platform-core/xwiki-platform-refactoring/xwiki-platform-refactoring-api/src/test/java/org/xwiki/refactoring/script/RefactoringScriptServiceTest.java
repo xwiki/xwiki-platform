@@ -39,7 +39,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -114,6 +114,7 @@ public class RefactoringScriptServiceTest
         assertEquals(false, request.getValue().isDeep());
         assertEquals(true, request.getValue().isDeleteSource());
         assertEquals(true, request.getValue().isUpdateLinks());
+        assertEquals(true, request.getValue().isAutoRedirect());
         assertEquals(false, request.getValue().isInteractive());
         assertEquals(true, request.getValue().isCheckRights());
     }
@@ -224,25 +225,18 @@ public class RefactoringScriptServiceTest
     }
 
     @Test
-    public void getJobStatus() throws Exception
+    public void create() throws Exception
     {
-        EntityJobStatus<MoveRequest> moveStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> renameStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> copyStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<MoveRequest> copyAsStatus = new EntityJobStatus<>(null, null, null, null);
-        EntityJobStatus<EntityRequest> deleteStatus = new EntityJobStatus<>(null, null, null, null);
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
 
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "move", "id"))).thenReturn(moveStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "rename", "id"))).thenReturn(renameStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "copy", "id"))).thenReturn(copyStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "copyAs", "id"))).thenReturn(copyAsStatus);
-        when(this.jobScriptService.getJobStatus(Arrays.asList("refactoring", "delete", "id"))).thenReturn(deleteStatus);
+        getService().create(documentReference);
 
-        assertSame(moveStatus, getService().getMoveJobStatus("id"));
-        assertSame(renameStatus, getService().getRenameJobStatus("id"));
-        assertSame(copyStatus, getService().getCopyJobStatus("id"));
-        assertSame(copyAsStatus, getService().getCopyAsJobStatus("id"));
-        assertSame(deleteStatus, getService().getDeleteJobStatus("id"));
+        ArgumentCaptor<CreateRequest> request = ArgumentCaptor.forClass(CreateRequest.class);
+        verify(this.jobExecutor).execute(eq(RefactoringJobs.CREATE), request.capture());
+
+        assertEquals(RefactoringJobs.CREATE, request.getValue().getJobType());
+        assertEquals(Arrays.asList(documentReference), request.getValue().getEntityReferences());
+        assertTrue(request.getValue().isDeep());
     }
 
     @Test

@@ -20,14 +20,12 @@
 package org.xwiki.filter.event.xwiki;
 
 import org.xwiki.filter.event.model.WikiAttachmentFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * 
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public interface XWikiWikiAttachmentFilter extends WikiAttachmentFilter
 {
     /**

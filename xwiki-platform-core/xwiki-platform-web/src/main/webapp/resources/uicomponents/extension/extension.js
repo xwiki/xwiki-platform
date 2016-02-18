@@ -42,9 +42,6 @@ XWiki.ExtensionBehaviour = Class.create({
     // Enhances the behaviour of the Dependencies section.
     this._enhanceDependenciesBehaviour();
 
-    // Enhances the behaviour of the Progress section.
-    this._enhanceProgressBehaviour();
-
     // Refresh the extension display if the extension has a job running.
     this._maybeScheduleRefresh();
   },
@@ -465,30 +462,6 @@ XWiki.ExtensionBehaviour = Class.create({
     $(menuItem.getAttribute('href').substring(1)).next('.extension-body-section').setStyle({'display' : 'block'});
     // Mark the given menu item as active (i.e. select the menu item that was clicked).
     menuItem.addClassName('current');
-  },
-
-  /**
-   * Enhances the behaviour of the Progress section within the extension details.
-   */
-  _enhanceProgressBehaviour : function() {
-    // Scroll the progress log to the end if it has a loading item.
-    // TODO: Preserve the scroll position if the user scrolls through the log.
-    var loadingLogItem = this.container.down('.log-item-loading');
-    if (loadingLogItem) {
-      var log = loadingLogItem.up();
-      log.scrollTop = log.scrollHeight;
-    }
-    // Make the job log collapsible. This is useful when the job is waiting for user input because it leaves more space
-    // for the job question.
-    this.container.select('.xform label.collapsible').each(function(collapsibleLabel) {
-      if (collapsibleLabel.hasClassName('collapsed')) {
-        collapsibleLabel.up('dt').next('dd').hide();
-      }
-      collapsibleLabel.observe('click', function () {
-        collapsibleLabel.toggleClassName('collapsed');
-        collapsibleLabel.up('dt').next('dd').toggle();
-      });
-    });
   },
 
   /**

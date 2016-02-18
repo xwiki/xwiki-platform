@@ -117,7 +117,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
@@ -154,6 +154,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
@@ -305,6 +306,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
     }
 
+    /**
+     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
+     */
+    private static EntityReferenceResolver<ResourceReference> getResourceReferenceEntityReferenceResolver()
+    {
+        return Utils.getComponent(DefaultResourceReferenceEntityReferenceResolver.TYPE_RESOURCEREFERENCE);
+    }
+
     private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
     {
         return Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
@@ -441,9 +450,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Wiki syntax supported by this document. This is used to support different syntaxes inside the same wiki. For
-     * example a page can use the Confluence 2.0 syntax while another one uses the XWiki 1.0 syntax. In practice our
-     * first need is to support the new rendering component. To use the old rendering implementation specify a
-     * "xwiki/1.0" syntaxId and use a "xwiki/2.0" syntaxId for using the new rendering component.
+     * example a page can use the MediaWiki 1.0 syntax while another one uses the XWiki 2.1 syntax.
      */
     private Syntax syntax;
 
@@ -1181,7 +1188,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @param text the text to render
-     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param syntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param context the XWiki Context object
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 1.6M1
@@ -1193,7 +1200,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @param text the text to render
-     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param syntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param context the XWiki Context object
      * @return the given text rendered in the context of this document using the passed Syntax
@@ -1208,7 +1215,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @param text the text to render
-     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 2.0M3
@@ -1220,7 +1227,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @param text the text to render
-     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @return the given text rendered in the context of this document using the passed Syntax
@@ -1478,8 +1485,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Similar to {@link #getRenderedTitle(Syntax, XWikiContext)} but the Syntax used is XHTML 1.0 unless the current
-     * skin defines another output Syntax in which case it's the one used.
+     * Similar to {@link #getRenderedTitle(Syntax, XWikiContext)} but the output Syntax used is XHTML 1.0 unless the
+     * current skin defines another output Syntax in which case it's the one used.
      *
      * @param context the XWiki context
      * @return the rendered version of the document title
@@ -1604,6 +1611,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @since 3.0M3
      */
+    @Override
     public DocumentReference getContentAuthorReference()
     {
         return this.contentAuthorReference;
@@ -1842,6 +1850,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context)
     {
+        // Attachment file name cannot be empty
+        if (StringUtils.isEmpty(filename)) {
+            return null;
+        }
+
         return context.getWiki().getAttachmentURL(new AttachmentReference(filename, this.getDocumentReference()),
             action, querystring, context);
     }
@@ -1853,6 +1866,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
+        // Attachment file name cannot be empty
+        if (StringUtils.isEmpty(filename)) {
+            return null;
+        }
+
         return context.getWiki().getAttachmentRevisionURL(new AttachmentReference(filename, getDocumentReference()),
             revision, querystring, context);
     }
@@ -2510,7 +2528,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Get an xobject with the passed xclass at the passed location.
      * <p>
      * If <code>create</code> is true and the is no xobject at the passed located, it's created.
-     * 
+     *
      * @param classReference the xlcass of the object to retrieve
      * @param number the location of the xobject
      * @param create if true the xobject is created when it does not exist
@@ -3621,14 +3639,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *       "users": ["XWiki.Admin"]
      *     }
      *   ],
-     *   "XWiki.XWikiUsers": 
+     *   "XWiki.XWikiUsers":
      *     "1": {
      *       "name": ["Spirou"]
      *     }
      *   ]
      * }
      * </pre></code>
-     * 
+     *
      * @param request is the input HTTP request that provides the parameters
      * @param context
      * @return a map containing ordered data
@@ -3690,7 +3708,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * existing number of objects. For example, if the document already has 2 objects of type 'Space.Class', then it
      * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
      * 'Space.Class_42_prop=foobar' for example, will be ignore.
-     * 
+     *
      * @param eform is form information that contains all the query parameters
      * @param context
      * @throws XWikiException
@@ -5028,7 +5046,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Get a list of unique links from this document to others documents.
      * <p>
      * <ul>
-     * <li>1.0 content: get the unique links associated to document from database. This is stored when the document is
+     * <li>xwiki/1.0 content: get the unique links associated to document from database. This is stored when the document is
      * saved. You can use "backlinks" in XWikiPreferences or "xwiki.backlinks" in xwiki.cfg file to enable links storage
      * in the database.</li>
      * <li>Other content: call {@link #getUniqueLinkedPages(XWikiContext)} and generate the List</li>.
@@ -5036,7 +5054,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param context the XWiki context
      * @return the found wiki links.
-     * @throws XWikiException error when getting links from database when 1.0 content.
+     * @throws XWikiException error when getting links from database when xwiki/1.0 content.
      * @since 1.9M2
      */
     public Set<XWikiLink> getUniqueWikiLinkedPages(XWikiContext context) throws XWikiException
@@ -5063,8 +5081,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Extract all the unique static (i.e. not generated by macros) wiki links (pointing to wiki page) from this 1.0
-     * document's content to others documents.
+     * Extract all the unique static (i.e. not generated by macros) wiki links (pointing to wiki page) from this
+     * xwiki/1.0 document's content to others documents.
      *
      * @param context the XWiki context.
      * @return the document names for linked pages, if null an error append.
@@ -5169,6 +5187,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             } else {
                 XDOM dom = getXDOM();
 
+                // TODO: Add support for macro as well.
                 List<LinkBlock> linkBlocks =
                     dom.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
                 pageNames = new LinkedHashSet<String>(linkBlocks.size());
@@ -5177,27 +5196,33 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                 for (LinkBlock linkBlock : linkBlocks) {
                     ResourceReference reference = linkBlock.getReference();
-                    if (reference.getType().equals(ResourceType.DOCUMENT)) {
-                        // If the reference is empty, the link is an autolink
-                        if (!StringUtils.isEmpty(reference.getReference())
-                            || (StringUtils.isEmpty(reference.getParameter(DocumentResourceReference.ANCHOR)) && StringUtils
-                                .isEmpty(reference.getParameter(DocumentResourceReference.QUERY_STRING)))) {
-                            // The reference may not have the space or even document specified (in case of an empty
-                            // string)
-                            // Thus we need to find the fully qualified document name
-                            DocumentReference documentReference =
-                                getCurrentDocumentReferenceResolver().resolve(reference.getReference());
+                    String referenceString = reference.getReference();
+                    ResourceType resourceType = reference.getType();
 
-                            // Verify that the link is not an autolink (i.e. a link to the current document)
-                            if (!documentReference.equals(currentDocumentReference)) {
-                                // Since this method is used for saving backlinks and since backlinks must be
-                                // saved with the space and page name but without the wiki part, we remove the wiki
-                                // part before serializing.
-                                // This is a bit of a hack since the default serializer should theoretically fail
-                                // if it's passed an invalid reference.
-                                pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
-                            }
-                        }
+                    // TODO: Add support for ATTACHMENT as well.
+                    if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                        // We are only interested in Document or Space references.
+                        continue;
+                    }
+
+                    // Optimisation: If the reference is empty, the link is an autolink and we don`t include it.
+                    if (StringUtils.isEmpty(referenceString)) {
+                        continue;
+                    }
+
+                    // FIXME?: pass this.getDocumentReference as parameter to the resolve so that relative references
+                    // get resolved relative to this and not to the context document.
+                    EntityReference documentReference =
+                        getResourceReferenceEntityReferenceResolver().resolve(reference, EntityType.DOCUMENT);
+
+                    // Verify after resolving it that the link is not an autolink(i.e. a link to the current document)
+                    if (!documentReference.equals(currentDocumentReference)) {
+                        // Since this method is used for saving backlinks and since backlinks must be
+                        // saved with the space and page name but without the wiki part, we remove the wiki
+                        // part before serializing.
+                        // This is a bit of a hack since the default serializer should theoretically fail
+                        // if it's passed an invalid reference.
+                        pageNames.add(getCompactWikiEntityReferenceSerializer().serialize(documentReference));
                     }
                 }
             }
@@ -5439,8 +5464,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 // - Also add all the included pages found in the velocity macro when using the deprecated #include*
                 // macros
                 // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
-                // play
-                // nice with people migrating from 1.0 to 2.0 syntax
+                // play nice with people migrating from 1.0 to 2.0 syntax
 
                 if (macroBlock.getId().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("reference");
@@ -5450,9 +5474,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             continue;
                         }
                     }
-                    if (documentName.indexOf('.') == -1) {
-                        documentName = getSpace() + "." + documentName;
+
+                    DocumentReference documentReference =
+                        getExplicitDocumentReferenceResolver().resolve(documentName, getDocumentReference());
+                    if (this.getDocumentReference().equals(documentReference)) {
+                        // Skip auto-includes since they are not allowed anyway.
+                        continue;
                     }
+
+                    documentName = LOCAL_REFERENCE_SERIALIZER.serialize(documentReference);
+
                     result.add(documentName);
                 } else if (macroBlock.getId().equalsIgnoreCase("velocity")
                     && !StringUtils.isEmpty(macroBlock.getContent())) {
@@ -6015,16 +6046,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getTranslatedContent(language, context);
     }
 
-    public String getTranslatedContent(String language, XWikiContext context) throws XWikiException
+    public String getTranslatedContent(String locale, XWikiContext context) throws XWikiException
     {
-        XWikiDocument tdoc = getTranslatedDocument(language, context);
+        XWikiDocument tdoc = getTranslatedDocument(locale, context);
         return tdoc.getContent();
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException
     {
-        String language = context.getWiki().getLanguagePreference(context);
-        return getTranslatedDocument(language, context);
+        String locale = context.getWiki().getLanguagePreference(context);
+        return getTranslatedDocument(locale, context);
     }
 
     /**
@@ -6559,33 +6590,59 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Get new document
         XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
 
-        // Step 4: Refactor the links contained in the document
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
         if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
+
+            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
+
+            DocumentReference oldDocumentReference = getDocumentReference();
+
             XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<LinkBlock> linkBlockList =
-                newDocumentXDOM.getBlocks(new ClassBlockMatcher(LinkBlock.class), Block.Axes.DESCENDANT);
+            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
 
+            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
+            // xwiki-platform-refactoring-default
             boolean modified = false;
-            for (LinkBlock linkBlock : linkBlockList) {
-                ResourceReference linkReference = linkBlock.getReference();
-                if (linkReference.getType().equals(ResourceType.DOCUMENT)) {
-                    DocumentReference currentLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                            getDocumentReference());
+            for (Block block : blocks) {
+                ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
+                if (resourceReference == null) {
+                    // Skip invalid blocks.
+                    continue;
+                }
 
-                    DocumentReference newLinkReference =
-                        getExplicitDocumentReferenceResolver().resolve(linkReference.getReference(),
-                            newDocument.getDocumentReference());
+                ResourceType resourceType = resourceReference.getType();
 
-                    if (!newLinkReference.equals(currentLinkReference)) {
-                        modified = true;
-                        linkReference.setReference(getCompactWikiEntityReferenceSerializer().serialize(
-                            currentLinkReference, newDocument.getDocumentReference()));
-                    }
+                // TODO: support ATTACHMENT as well.
+                if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
+                    // We are currently only interested in Document or Space references.
+                    continue;
+                }
+
+                // current link, use the old document's reference to fill in blanks.
+                EntityReference oldLinkReference =
+                    getResourceReferenceEntityReferenceResolver()
+                        .resolve(resourceReference, null, oldDocumentReference);
+                // new link, use the new document's reference to fill in blanks.
+                EntityReference newLinkReference =
+                    getResourceReferenceEntityReferenceResolver()
+                        .resolve(resourceReference, null, newDocumentReference);
+
+                // If the new and old link references don`t match, then we must update the relative link.
+                if (!newLinkReference.equals(oldLinkReference)) {
+                    modified = true;
+
+                    // Serialize the old (original) link relative to the new document's location, in compact form.
+                    String serializedLinkReference =
+                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
+
+                    // Update the reference in the XDOM.
+                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
                 }
             }
-            // Set new content and save document if needed
+
+            // Set the new content and save document if needed
             if (modified) {
                 newDocument.setContent(newDocumentXDOM);
                 newDocument.setAuthorReference(context.getUserReference());
@@ -6607,6 +6664,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldLink, DocumentReference newLink,
         XWikiContext context) throws XWikiException
     {
+        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
+        // xwiki-platform-refactoring-default
         getOldRendering().renameLinks(backlinkDocument, oldLink, newLink, context);
 
         // Save if content changed
@@ -6670,7 +6729,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Avoid the technical "WebHome" name.
-     * 
+     *
      * @param documentReference a document reference
      * @return the last space name if the document is the home of a space, the document name otherwise
      */
@@ -7004,7 +7063,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @param syntaxId the new syntax id to set (eg "xwiki/1.0", "xwiki/2.0", etc)
+     * @param syntaxId the new syntax id to set (e.g. {@code xwiki/2.0}, {@code xwiki/2.1}, etc)
      * @see #getSyntaxId()
      * @deprecated since 2.3M1, use {link #setSyntax(Syntax)} instead
      */
@@ -8319,7 +8378,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
      *
-     * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
+     * @param targetSyntaxId the syntax to convert to (e.g. {@code xwiki/2.0}, {@code xhtml/1.0}, etc)
      * @throws XWikiException if an exception occurred during the conversion process
      */
     public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
@@ -8335,7 +8394,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
      *
-     * @param targetSyntax the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
+     * @param targetSyntax the syntax to convert to (e.g. {@code xwiki/2.0}, {@code xhtml/1.0}, etc)
      * @throws XWikiException if an exception occurred during the conversion process
      */
     public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException

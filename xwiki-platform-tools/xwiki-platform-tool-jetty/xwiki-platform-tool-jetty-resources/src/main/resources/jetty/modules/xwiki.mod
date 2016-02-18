@@ -24,6 +24,7 @@ resources
 server
 logging
 http
+annotations
 deploy
 requestlog
 

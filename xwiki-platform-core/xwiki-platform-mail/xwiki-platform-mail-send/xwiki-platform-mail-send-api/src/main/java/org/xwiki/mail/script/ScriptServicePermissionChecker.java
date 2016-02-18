@@ -22,7 +22,6 @@ package org.xwiki.mail.script;
 import javax.mail.MessagingException;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Decide if mails can be sent from the Mail Sender Scripting Service.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M2
  */
 @Role
-@Unstable
 public interface ScriptServicePermissionChecker
 {
     /**

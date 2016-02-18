@@ -22,7 +22,6 @@ package org.xwiki.mail.internal.factory.template;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -31,7 +30,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -75,12 +73,10 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
     {
         Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
 
-        String language = (String) parameters.get("language");
+        Object localeValue = parameters.get("language");
 
-        Locale locale = LocaleUtils.toLocale(language);
-
-        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables, locale);
-        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables, locale);
+        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables, localeValue);
+        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables, localeValue);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);

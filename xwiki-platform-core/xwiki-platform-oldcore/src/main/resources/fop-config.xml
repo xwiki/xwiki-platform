@@ -43,7 +43,7 @@
         <!-- Fonts located in WEB-INF/fonts/ are automatically loaded -->
 
         <!-- Load system fonts -->
-        <auto-detect/>
+        <!-- <auto-detect/> -->
       </fonts>
     </renderer>
   </renderers>

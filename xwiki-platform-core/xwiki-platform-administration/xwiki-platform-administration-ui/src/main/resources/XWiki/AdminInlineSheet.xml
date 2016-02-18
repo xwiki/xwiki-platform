@@ -55,7 +55,7 @@
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="xnotification" value="$!xnotification" /&gt;
       &lt;input type="hidden" name="template" value="$!request.template" /&gt;
-      &lt;input type="hidden" name="language" value="$!doc.language" /&gt;
+      &lt;input type="hidden" name="language" value="$!doc.locale" /&gt;
       #if("$!request.parent" != '')
         &lt;input type="hidden" name="parent" value="$!request.parent" /&gt;
       #end

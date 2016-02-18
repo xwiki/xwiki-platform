@@ -20,7 +20,9 @@
 package org.xwiki.wysiwyg.server;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * The WYSIWYG editor API exposed to server-side scripts like Velocity.
@@ -51,6 +53,20 @@ public interface WysiwygEditorScriptService extends ScriptService
      * @return the XHTML result of rendering the given HTML fragment
      */
     String parseAndRender(String html, String syntaxId);
+
+    /**
+     * Produces the input for the editor by rendering the specified content template as a full HTML page, making sure
+     * the skin extension hooks are resolved. The template is rendered in the context of the current document and the
+     * Velocity context is not isolated so you can put the data needed by the template in the Velocity context before
+     * calling this method. The advantage of using this method to obtain the editor input is that the editor doesn't
+     * have to make an additional HTTP request for the content template.
+     * 
+     * @param templateReference specifies the document that serves as the template for the editor content
+     * @return the result of rendering the specified content template
+     * @since 7.4.1, 8.0M1
+     */
+    @Unstable
+    String render(DocumentReference templateReference);
 
     /**
      * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the

@@ -40,17 +40,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($editor == 'spaceadmin')
-  {{info}}
-  #set($webHomeRef = $services.model.resolveDocument('WebHome'))
-  ## For the children link, we do not use 'viewer=children' because the WebHome might not exist and the viewer shows a 
-  ## 404 error in that case. Instead, we use 'xpage=children' because it always works, and because children document
-  ## could exist even if the parent document does not.
-  $services.localization.render('admin.rights.info', ['**', '[[', "&gt;&gt;path:$xwiki.getURL($webHomeRef, 'view', 'xpage=children')]]", '**'])
-  {{/info}}
-#end
-
-### Administrate the rights in a wiki (globally or per space).
+## Administrate the rights in a wiki globally.
 {{html}}
 #template('rightsUI.vm')
 {{/html}}

@@ -21,6 +21,7 @@ package com.xpn.xwiki.api;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,11 +69,22 @@ public class DeletedDocument extends Api
     }
 
     /**
-     * @return language of document
+     * @return locale of document
+     * @deprecated since 8.0M1, use {@link #getLocale()} instead
      */
+    @Deprecated
     public String getLanguage()
     {
         return this.deletedDoc.getLanguage();
+    }
+
+    /**
+     * @return locale of document
+     * @since 8.0M1
+     */
+    public Locale getLocale()
+    {
+        return this.deletedDoc.getLocale();
     }
 
     /**

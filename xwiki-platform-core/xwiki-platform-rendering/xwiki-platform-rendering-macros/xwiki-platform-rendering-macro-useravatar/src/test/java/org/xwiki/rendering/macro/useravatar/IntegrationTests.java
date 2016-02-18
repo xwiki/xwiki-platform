@@ -59,7 +59,8 @@ public class IntegrationTests
         final SkinAccessBridge mockSkinAccessBridge =
             registerMockComponent(componentManager, mockery, SkinAccessBridge.class);
         mockery.checking(new Expectations() {{
-            allowing(mockSkinAccessBridge).getSkinFile("noavatar.png"); will(returnValue("/xwiki/noavatar.png"));
+            allowing(mockSkinAccessBridge).getSkinFile("icons/xwiki/noavatar.png");
+            will(returnValue("/xwiki/resources/icons/xwiki/noavatar.png"));
         }});
 
         // Document Access Bridge Mock

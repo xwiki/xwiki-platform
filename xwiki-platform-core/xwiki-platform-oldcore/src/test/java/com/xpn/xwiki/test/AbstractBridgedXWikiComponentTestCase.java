@@ -22,12 +22,15 @@ package com.xpn.xwiki.test;
 import java.io.File;
 import java.util.Date;
 
+import javax.inject.Provider;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
@@ -43,7 +46,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 /**
  * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
  * Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
- * 
+ *
  * @version $Id$
  * @since 1.6M1
  *
@@ -98,10 +101,21 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
             getComponentManager().getInstance(XWikiStubContextProvider.class);
         stubContextProvider.initialize(this.context);
 
+        // Bridge with XWiki Context Provider, required by newer code.
+        Mock mockContextProvider = mock(Provider.class);
+        mockContextProvider.stubs().method("get").will(returnValue(this.context));
+
+        DefaultComponentDescriptor<Provider<XWikiContext>> contextProviderDescriptor =
+            new DefaultComponentDescriptor<Provider<XWikiContext>>();
+        contextProviderDescriptor.setRoleType(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        contextProviderDescriptor.setRoleHint("default");
+        getComponentManager().registerComponent(contextProviderDescriptor,
+            (Provider<XWikiContext>) mockContextProvider.proxy());
+
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
-        Mock mockServletContext = mock(ServletContext.class); 
+        Mock mockServletContext = mock(ServletContext.class);
         environment.setServletContext((ServletContext) mockServletContext.proxy());
         mockServletContext.stubs().method("getResourceAsStream").will(returnValue(null));
         mockServletContext.stubs().method("getResource").will(returnValue(null));

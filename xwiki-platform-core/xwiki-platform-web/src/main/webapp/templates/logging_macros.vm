@@ -114,18 +114,13 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (printLogs $logs $loading)
-  #if ($logs.size() > 0)
   <ul class="log">
   #foreach ($log in $logs)
     #set ($logLevel = $log.level.toString().toLowerCase())
-    #if ($loading && !$foreach.hasNext)
-      ## Display the last log item as loading if the associated task is not finished.
-      #set ($logLevel = 'loading')
-    #end
-    <li class="log-item log-item-$logLevel">
+    ## Display the last log item as loading if the associated task is not finished.
+    <li class="log-item log-item-$logLevel#if ($loading && !$foreach.hasNext) log-item-loading#end">
       #printLog($log)
     </li>
   #end
   </ul>
-  #end
 #end

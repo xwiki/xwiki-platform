@@ -25,6 +25,7 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -45,6 +46,8 @@ public class ScriptMockSetup
     public AttachmentReferenceResolver<String> attachmentReferenceResolver;
 
     public DocumentReferenceResolver<String> documentReferenceResolver;
+
+    public SpaceReferenceResolver<String> spaceReferenceResolver;
 
     public WikiModel wikiModel;
 
@@ -78,5 +81,8 @@ public class ScriptMockSetup
         // Use a mock for the DocumentReference Resolver
         this.documentReferenceResolver =
             cm.registerMockComponent(mockery, DocumentReferenceResolver.TYPE_STRING, "current");
+
+        // Use a mock for the SpaceReference Resolver
+        this.spaceReferenceResolver = cm.registerMockComponent(mockery, SpaceReferenceResolver.TYPE_STRING, "current");
     }
 }

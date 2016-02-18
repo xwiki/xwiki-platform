@@ -129,6 +129,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -151,7 +152,6 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.velocity.VelocityManager;
@@ -1543,10 +1543,20 @@ public class XWiki implements EventListener
             // an XWikiDocument as source and an XWikiContext as data.
 
             if (om != null) {
+                CancelableEvent documentEvent;
                 if (originalDocument.isNew()) {
-                    om.notify(new DocumentCreatingEvent(document.getDocumentReference()), document, context);
+                    documentEvent = new DocumentCreatingEvent(document.getDocumentReference());
                 } else {
-                    om.notify(new DocumentUpdatingEvent(document.getDocumentReference()), document, context);
+                    documentEvent = new DocumentUpdatingEvent(document.getDocumentReference());
+                }
+                om.notify(documentEvent, document, context);
+
+                // If the action has been canceled by the user then don't perform any save and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
+                        String.format("An Event Listener has cancelled the document save for [%s]. Reason: [%s]",
+                            document.getDocumentReference(), documentEvent.getReason()));
                 }
             }
 
@@ -1608,7 +1618,6 @@ public class XWiki implements EventListener
      *
      * @since 5.0M1
      */
-    @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
         return getDocument(getCurrentGetDocumentResolver().resolve(reference), context);
@@ -1702,12 +1711,12 @@ public class XWiki implements EventListener
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String, String)
      */
-    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String lang, XWikiContext context)
+    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String locale, XWikiContext context)
         throws XWikiException
     {
         if (hasRecycleBin(context)) {
             XWikiDocument doc = new XWikiDocument(getCurrentMixedDocumentReferenceResolver().resolve(fullname));
-            doc.setLanguage(lang);
+            doc.setLanguage(locale);
             return getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
         } else {
             return null;
@@ -1717,12 +1726,12 @@ public class XWiki implements EventListener
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)
      */
-    public XWikiDeletedDocument getDeletedDocument(String fullname, String lang, int index, XWikiContext context)
+    public XWikiDeletedDocument getDeletedDocument(String fullname, String locale, int index, XWikiContext context)
         throws XWikiException
     {
         if (hasRecycleBin(context)) {
             XWikiDocument doc = new XWikiDocument(getCurrentMixedDocumentReferenceResolver().resolve(fullname));
-            doc.setLanguage(lang);
+            doc.setLanguage(locale);
             return getRecycleBinStore().getDeletedDocument(doc, index, context, true);
         } else {
             return null;
@@ -2346,14 +2355,34 @@ public class XWiki implements EventListener
     }
 
     /**
-     * First try to find the current language in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default language defined in the XWiki preferences. If the wiki is multilingual try to get
-     * the language passed in the request. If none was passed try to get it from a cookie. If no language cookie exists
-     * then use the user default language and barring that use the browser's "Accept-Language" header sent in HTTP
-     * request. If none is defined use the default language.
+     * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
+     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get
+     * the locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists
+     * then use the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP
+     * request. If none is defined use the default locale.
      *
-     * @return the language to use
+     * @return the locale to use
+     * @since 8.0M1
      */
+    public Locale getLocalePreference(XWikiContext context)
+    {
+        String language = getLanguagePreference(context);
+
+        return LocaleUtils.toLocale(language);
+    }
+
+    /**
+     * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
+     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get
+     * the locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists
+     * then use the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP
+     * request. If none is defined use the default locale.
+     *
+     * @return the locale to use
+     * @deprecated since 8.0M1, use {@link #getLocalePreference(XWikiContext)} instead
+     */
+    @Deprecated
+    // TODO: move implementation to #getLocalePreference
     public String getLanguagePreference(XWikiContext context)
     {
         // First we try to get the language from the XWiki Context. This is the current language
@@ -2471,7 +2500,6 @@ public class XWiki implements EventListener
      * @return A list of language codes, in the client preference order; might be empty if the header is not well
      *         formed.
      */
-    @SuppressWarnings("unchecked")
     private List<String> getAcceptedLanguages(XWikiRequest request)
     {
         List<String> result = new ArrayList<String>();
@@ -2555,6 +2583,21 @@ public class XWiki implements EventListener
         return locales;
     }
 
+    /**
+     * @since 8.0M1
+     */
+    public Locale getDocLocalePreferenceNew(XWikiContext context)
+    {
+        String language = getDocLanguagePreferenceNew(context);
+
+        return LocaleUtils.toLocale(language);
+    }
+
+    /**
+     * @deprecated since 8.0M1, use {@link #getDocLocalePreferenceNew(XWikiContext)} instead
+     */
+    @Deprecated
+    // TODO: move implementation to #getDocLocalePreferenceNew
     public String getDocLanguagePreferenceNew(XWikiContext context)
     {
         // Get context language
@@ -2645,6 +2688,21 @@ public class XWiki implements EventListener
         return language;
     }
 
+    /**
+     * @since 8.0M1
+     */
+    public Locale getInterfaceLocalePreference(XWikiContext context)
+    {
+        String language = getInterfaceLanguagePreference(context);
+
+        return LocaleUtils.toLocale(language);
+    }
+
+    /**
+     * @deprecated since 8.0M1, use {@link #getInterfaceLocalePreference(XWikiContext)} instead
+     */
+    @Deprecated
+    // TODO: move implementation to #getInterfaceLocalePreference
     public String getInterfaceLanguagePreference(XWikiContext context)
     {
         String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "",
@@ -3433,8 +3491,8 @@ public class XWiki implements EventListener
             doc.setAuthorReference(doc.getDocumentReference());
 
             // The information from the user profile needs to be indexed using the proper locale. If multilingual is
-            // enabled then the user can choose the desired language (from the list of supported languages) before
-            // registering. An administrator registering users can do the same. Otherwise, if there is only one language
+            // enabled then the user can choose the desired locale (from the list of supported locales) before
+            // registering. An administrator registering users can do the same. Otherwise, if there is only one locale
             // supported then that langage will be used.
             doc.setDefaultLocale(context.getLocale());
 
@@ -3528,7 +3586,7 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Prepares the localized resources, according to the selected language. From any point in the code (java, velocity
+     * Prepares the localized resources, according to the selected locale. From any point in the code (java, velocity
      * or groovy) the "msg" parameter holds an instance of the localized resource bundle, and the "locale" parameter
      * holds the current locale settings.
      *
@@ -3896,27 +3954,27 @@ public class XWiki implements EventListener
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, XWikiContext context) throws XWikiException
+        String wikilocale, XWikiContext context) throws XWikiException
     {
-        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, true, context);
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, true, context);
     }
 
     /**
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, boolean reset, XWikiContext context) throws XWikiException
+        String wikilocale, boolean reset, XWikiContext context) throws XWikiException
     {
-        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, false, context);
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, false, context);
     }
 
     /**
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException
+        String wikilocale, boolean reset, boolean force, XWikiContext context) throws XWikiException
     {
-        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force, false,
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force, false,
             context);
     }
 
@@ -3924,7 +3982,7 @@ public class XWiki implements EventListener
      * @since 2.2M2
      */
     public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
-        String wikilanguage, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
+        String wikilocale, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
             throws XWikiException
     {
         String db = context.getWikiId();
@@ -3958,7 +4016,7 @@ public class XWiki implements EventListener
                 // Let's switch back again to the original db
                 context.setWikiId(sourceWiki);
 
-                if (wikilanguage == null) {
+                if (wikilocale == null) {
                     tdoc = sdoc.copyDocument(targetDocumentReference, context);
 
                     // We know the target document doesn't exist and we want to save the attachments without
@@ -4052,7 +4110,7 @@ public class XWiki implements EventListener
                     }
                 } else {
                     // We want only one language in the end
-                    XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilanguage, context);
+                    XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilocale, context);
 
                     tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
@@ -4062,7 +4120,7 @@ public class XWiki implements EventListener
                     tdoc.setNew(true);
 
                     // forget language
-                    tdoc.setDefaultLanguage(wikilanguage);
+                    tdoc.setDefaultLanguage(wikilocale);
                     tdoc.setLanguage("");
                     // forget past versions
                     if (reset) {
@@ -4101,13 +4159,13 @@ public class XWiki implements EventListener
         }
     }
 
-    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language,
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String locale,
         XWikiContext context) throws XWikiException
     {
-        return copySpaceBetweenWikis(space, sourceWiki, targetWiki, language, false, context);
+        return copySpaceBetweenWikis(space, sourceWiki, targetWiki, locale, false, context);
     }
 
-    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String language, boolean clean,
+    public int copySpaceBetweenWikis(String space, String sourceWiki, String targetWiki, String locale, boolean clean,
         XWikiContext context) throws XWikiException
     {
         String db = context.getWikiId();
@@ -4154,7 +4212,7 @@ public class XWiki implements EventListener
                     .replaceParent(sourceDocumentReference.getWikiReference(), sourceWikiReference);
                 DocumentReference targetDocumentReference =
                     sourceDocumentReference.replaceParent(sourceWikiReference, targetWikiReference);
-                copyDocument(sourceDocumentReference, targetDocumentReference, language, context);
+                copyDocument(sourceDocumentReference, targetDocumentReference, locale, context);
                 nb++;
             }
             return nb;
@@ -4170,17 +4228,17 @@ public class XWiki implements EventListener
      *
      * @param sourceWiki the source wiki identifier
      * @param targetWiki the target wiki identifier
-     * @param language the language to copy
+     * @param locale the locale to copy
      * @param context the XWiki context
      * @return the number of copied documents
      * @throws XWikiException failed to copy wiki
      * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
     @Deprecated
-    public int copyWiki(String sourceWiki, String targetWiki, String language, XWikiContext context)
+    public int copyWiki(String sourceWiki, String targetWiki, String locale, XWikiContext context)
         throws XWikiException
     {
-        return copyWiki(sourceWiki, targetWiki, language, false, context);
+        return copyWiki(sourceWiki, targetWiki, locale, false, context);
     }
 
     /**
@@ -4188,7 +4246,7 @@ public class XWiki implements EventListener
      *
      * @param sourceWiki the source wiki identifier
      * @param targetWiki the target wiki identifier
-     * @param language the language to copy
+     * @param locale the locale to copy
      * @param clean clean the target wiki before copying
      * @param context the XWiki context
      * @return the number of copied documents
@@ -4196,10 +4254,10 @@ public class XWiki implements EventListener
      * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
     @Deprecated
-    public int copyWiki(String sourceWiki, String targetWiki, String language, boolean clean, XWikiContext context)
+    public int copyWiki(String sourceWiki, String targetWiki, String locale, boolean clean, XWikiContext context)
         throws XWikiException
     {
-        int documents = copySpaceBetweenWikis(null, sourceWiki, targetWiki, language, clean, context);
+        int documents = copySpaceBetweenWikis(null, sourceWiki, targetWiki, locale, clean, context);
 
         ObservationManager om = getObservationManager();
 
@@ -6460,7 +6518,8 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @return the ids of configured syntaxes for this wiki (eg "xwiki/1.0", "xwiki/2.0", "mediawiki/1.0", etc)
+     * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
+     *         {@code mediawiki/1.0}, etc)
      */
     public List<String> getConfiguredSyntaxes()
     {
@@ -6733,7 +6792,6 @@ public class XWiki implements EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
-    @Unstable
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -6792,7 +6850,6 @@ public class XWiki implements EventListener
      * @see #searchAttachments(String, boolean, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
      */
-    @Unstable
     public int countAttachments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {

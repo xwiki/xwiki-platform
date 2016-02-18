@@ -1,9 +1,13 @@
 500:org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration
-500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
-500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
 500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
+500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
 500:org.xwiki.rendering.internal.transformation.XWikiRenderingContext
-500:org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration
 500:org.xwiki.rendering.internal.transformation.icon.XWikiIconTransformationConfiguration
-org.xwiki.rendering.script.RenderingScriptService
+500:org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration
+500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
+org.xwiki.rendering.internal.resolver.AttachmentResourceReferenceEntityReferenceResolver
+org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver
+org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver
+org.xwiki.rendering.internal.resolver.SpaceResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.parser.DefaultContentParser
+org.xwiki.rendering.script.RenderingScriptService

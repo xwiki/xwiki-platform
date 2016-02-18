@@ -38,7 +38,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.signature.BlockSignatureGenerator;
 import org.xwiki.rendering.signature.BlockSignatureVerifier;
-import org.xwiki.stability.Unstable;
 
 /**
  * Helper to implement signable Macro, supplementing the default implementation provided
@@ -48,7 +47,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implements SignableMacro
 {
     private static final String HINT = "macro";

@@ -20,20 +20,20 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
   $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
   $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)##
-  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.locale})##
   $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)##
   $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)##
   $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)##
   $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')##
-  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.locale})##
   $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##
 #else
-  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})##
-  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})##
+  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.locale})##
+  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.locale})##
 #end
-$xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : $xcontext.language})##
+$xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : $xcontext.locale})##
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh

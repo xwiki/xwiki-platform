@@ -1,5 +1,5 @@
 ### Show list of deleted documents
-#set($dds = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.language))
+#set($dds = $xwiki.getDeletedDocuments($tdoc.fullName, $tdoc.locale))
 #displayDeletedDocuments($dds, 'docs')
 
 #if ($doc.name == 'WebHome')
@@ -7,7 +7,7 @@
   ## eg. If the current document is: "A.B.WebHome", we should also display any deleted terminal page called "A.B".
   ## This is important because when the user delete a terminal document and go back to the location, she should see
   ## the page she have just deleted, and not an empty page because A.B.WebHome has never existed...
-  #set($dds = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.language))
+  #set($dds = $xwiki.getDeletedDocuments($tdoc.space, $tdoc.locale))
   #displayDeletedDocuments($dds, 'terminal-docs', 'core.recyclebin.showListTerminalPagesMsg')
 #end
 

@@ -741,8 +741,8 @@ public class Package
 
                 // Make sure it's not already there
                 if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
-                    for (String feature : localExtension.getFeatures()) {
-                        if (installedRepository.getInstalledExtension(feature, namespace) != null) {
+                    for (ExtensionId feature : localExtension.getExtensionFeatures()) {
+                        if (installedRepository.getInstalledExtension(feature.getId(), namespace) != null) {
                             // Already exist so don't register it or it could create a mess
                             return;
                         }
@@ -752,11 +752,12 @@ public class Package
                 }
 
                 // Register the extension as installed
-                InstalledExtension installedExtension = installedRepository.installExtension(localExtension, namespace, false);
+                InstalledExtension installedExtension =
+                    installedRepository.installExtension(localExtension, namespace, false);
 
                 // Tell the world about it
-                Utils.getComponent(ObservationManager.class).notify(
-                    new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
+                Utils.getComponent(ObservationManager.class)
+                    .notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }
@@ -809,8 +810,8 @@ public class Package
             addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
-        if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST
-            && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
+        if (status == DocumentInfo.INSTALL_OK
+            || status == DocumentInfo.INSTALL_ALREADY_EXIST && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
             XWikiDocument previousdoc = null;
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST) {
                 previousdoc = context.getWiki().getDocument(doc.getFullName(), context);
@@ -1391,8 +1392,8 @@ public class Package
 
                             ++count;
                         } else {
-                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "document "
-                                + doc.getDocumentReference() + " does not exist in package definition");
+                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                                "document " + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
                         LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
@@ -1418,8 +1419,8 @@ public class Package
     public String readFromDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
         if (!dir.isDirectory()) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, dir.getAbsolutePath()
-                + " is not a directory");
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
+                dir.getAbsolutePath() + " is not a directory");
         }
 
         int count = 0;

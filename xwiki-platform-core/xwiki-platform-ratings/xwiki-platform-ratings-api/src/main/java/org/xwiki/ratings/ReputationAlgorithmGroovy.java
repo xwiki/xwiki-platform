@@ -21,7 +21,6 @@ package org.xwiki.ratings;
 
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -31,7 +30,6 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 6.4M3
  */
-@Unstable
 public interface ReputationAlgorithmGroovy extends ReputationAlgorithm
 {
     /**

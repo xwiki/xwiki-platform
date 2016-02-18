@@ -85,13 +85,7 @@ public class EditorElement extends BaseElement
                             return richTextEditor;
                         }
                     } catch (NotFoundException xRichTextEditorNotFound) {
-                        try {
-                            // TinyMCE editor 1.x syntax
-                            WebElement mceEditor = driver.findElement(By.className("mceEditor"));
-                            return mceEditor;
-                        } catch (NotFoundException mceNotFound) {
-                            return null;
-                        }
+                        return null;
                     }
                 }
             }

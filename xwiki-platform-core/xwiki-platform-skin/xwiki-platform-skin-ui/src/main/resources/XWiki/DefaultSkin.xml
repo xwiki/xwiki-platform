@@ -213,7 +213,7 @@
       <header.vm/>
     </property>
     <property>
-      <logo>logo.png</logo>
+      <logo>logo.svg</logo>
     </property>
     <property>
       <name>Default XWiki Skin</name>

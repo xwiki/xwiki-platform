@@ -53,6 +53,11 @@ public class MoveRequest extends EntityRequest
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
 
     /**
+     * @see #isAutoRedirect()
+     */
+    private static final String PROPERTY_AUTO_REDIRECT = "autoRedirect";
+
+    /**
      * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}
      */
     public EntityReference getDestination()
@@ -109,5 +114,26 @@ public class MoveRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
+    }
+
+    /**
+     * @return {@code true} if the original pages should be redirected automatically to the new location when accessed
+     *         by the user, in order to preserve external links, {@code false} otherwise
+     */
+    public boolean isAutoRedirect()
+    {
+        return getProperty(PROPERTY_AUTO_REDIRECT, true);
+    }
+
+    /**
+     * Sets whether the original pages should be redirected automatically to the new location when accessed by the user,
+     * in order to preserve external links.
+     * 
+     * @param autoRedirect {@code true} to automatically redirect the old pages to the new location, {@code false}
+     *            otherwise
+     */
+    public void setAutoRedirect(boolean autoRedirect)
+    {
+        setProperty(PROPERTY_AUTO_REDIRECT, autoRedirect);
     }
 }

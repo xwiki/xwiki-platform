@@ -2,8 +2,8 @@
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
-  #set($currentLanguage = "$!{tdoc.realLanguage}")
-  #set($originalLanguage = "$!{doc.realLanguage}")
+  #set($currentLanguage = "$!{tdoc.realLocale}")
+  #set($originalLanguage = "$!{doc.realLocale}")
   #set ($availtrans = $doc.translationList)
   #set ($discard = $availtrans.add($originalLanguage))
   #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
@@ -31,7 +31,7 @@
 ## Display the pretty name of a language
 ##########################################
 #macro(displayLanguagePrettyName $language)
-#if ($language == '')
+#if ($language != '')
 #set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))
 #else
 $services.localization.render('defaultlanguage')

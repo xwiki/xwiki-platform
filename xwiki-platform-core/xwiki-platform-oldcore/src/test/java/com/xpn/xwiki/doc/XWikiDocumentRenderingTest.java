@@ -50,7 +50,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTestCase
@@ -243,7 +243,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     }
 
     public void testGetRenderedTitleWithoutTitlePLAIN()
-    {   
+    {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
@@ -270,7 +270,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
-    
+
     /**
      * Make sure title extracted from content is protected from cycles
      */

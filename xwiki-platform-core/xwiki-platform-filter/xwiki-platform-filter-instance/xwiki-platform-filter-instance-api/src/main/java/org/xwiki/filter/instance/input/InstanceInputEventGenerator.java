@@ -27,13 +27,11 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 import org.xwiki.filter.instance.internal.InstanceFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 @Role
 public interface InstanceInputEventGenerator extends InstanceFilter
 {

@@ -558,14 +558,12 @@ public class Document extends Api
     }
 
     /**
-     * Get the language of the document. If the document is a translation it returns the language set for it, otherwise,
-     * it returns the default language in the wiki where the document is stored.
+     * Same as {@link #getLocale()} but as String.
      *
-     * @return the language of the document.
+     * @return the locale of the document.
      * @deprecated since 5.4M1 use {@link #getLocale()} instead
-     * @todo Add a @Deprecated annotation too but be prepared to fix all the resulting Velocity warnings that will
-     *       appear in the logs
      */
+    @Deprecated
     public String getLanguage()
     {
         return this.doc.getLanguage();
@@ -597,23 +595,50 @@ public class Document extends Api
     }
 
     /**
-     * Gets the real language of the document. The real language is either the default language field when the language
-     * field is empty (when the document is the default document) or the language field otherwise when the document is a
-     * translation document
+     * Same as {@link #getRealLocale()} but as String.
      *
-     * @return the release language as a two character code (en,fr,de)
+     * @return the real locale
+     * @deprecated since 8.0M1, use {@link #getRealLocale()} instead
      */
+    @Deprecated
     public String getRealLanguage() throws XWikiException
     {
         return this.doc.getRealLanguage(getXWikiContext());
     }
 
     /**
-     * @return the language of the default document
+     * Gets the real locale of the document. The real locale is either the default locale field when the locale field is
+     * empty (when the document is the default document) or the locale field otherwise when the document is a
+     * translation document
+     * 
+     * @return the actual locale of the document
+     * @since 8.0M1
      */
+    public Locale getRealLocale()
+    {
+        return this.doc.getRealLocale();
+    }
+
+    /**
+     * Same as {@link #getDefaultLocale()} but as String.
+     * 
+     * @return the locale of the default document
+     * @deprecated since 8.0M1, use {@link #getDefaultLocale()} instead
+     */
+    @Deprecated
     public String getDefaultLanguage()
     {
         return this.doc.getDefaultLanguage();
+    }
+
+    /**
+     * @return the Locale of the default version of the document (usually {@value Locale#ROOT} or
+     *         {@value Locale#ENGLISH})
+     * @since 8.0M1
+     */
+    public Locale getDefaultLocale()
+    {
+        return this.doc.getDefaultLocale();
     }
 
     /**
@@ -649,8 +674,8 @@ public class Document extends Api
     }
 
     /**
-     * @return the translated document's content if the wiki is multilingual, the language is first checked in the URL,
-     *         the cookie, the user profile and finally the wiki configuration if not, the language is the one on the
+     * @return the translated document's content if the wiki is multilingual, the locale is first checked in the URL,
+     *         the cookie, the user profile and finally the wiki configuration if not, the locale is the one on the
      *         wiki configuration.
      */
     public String getTranslatedContent() throws XWikiException
@@ -659,24 +684,24 @@ public class Document extends Api
     }
 
     /**
-     * @return the translated content in the given language
+     * @return the translated content in the given locale
      */
-    public String getTranslatedContent(String language) throws XWikiException
+    public String getTranslatedContent(String locale) throws XWikiException
     {
-        return this.doc.getTranslatedContent(language, getXWikiContext());
+        return this.doc.getTranslatedContent(locale, getXWikiContext());
     }
 
     /**
-     * @return the translated document in the given language
+     * @return the translated document in the given locale
      */
-    public Document getTranslatedDocument(String language) throws XWikiException
+    public Document getTranslatedDocument(String locale) throws XWikiException
     {
-        return this.doc.getTranslatedDocument(language, getXWikiContext()).newDocument(getXWikiContext());
+        return this.doc.getTranslatedDocument(locale, getXWikiContext()).newDocument(getXWikiContext());
     }
 
     /**
-     * @return the tranlated Document if the wiki is multilingual, the language is first checked in the URL, the cookie,
-     *         the user profile and finally the wiki configuration if not, the language is the one on the wiki
+     * @return the tranlated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
+     *         the user profile and finally the wiki configuration if not, the locale is the one on the wiki
      *         configuration.
      */
     public Document getTranslatedDocument() throws XWikiException
@@ -792,11 +817,11 @@ public class Document extends Api
      * Return the relative URL of download for the the given attachment name.
      *
      * @param filename the name of the attachment
-     * @return A String with the URL
+     * @return A String with the URL or null if the file name is empty
      */
     public String getAttachmentURL(String filename)
     {
-        return this.doc.getAttachmentURL(filename, "download", getXWikiContext());
+        return this.doc.getAttachmentURL(filename, getXWikiContext());
     }
 
     /**
@@ -804,7 +829,7 @@ public class Document extends Api
      *
      * @param filename the name of the attachment.
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev".
-     * @return a string representation of a URL to do the given opperation.
+     * @return a string representation of a URL to do the given operation or null if the file name is empty
      */
     public String getAttachmentURL(String filename, String action)
     {
@@ -819,7 +844,7 @@ public class Document extends Api
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev"
      * @param queryString parameters added to the URL, the "rev" parameter is used to specify a revision if using the
      *            "downloadrev" action. The query string must not begin with an ? character.
-     * @return a string representation of a URL to do the given opperation.
+     * @return a string representation of a URL to do the given operation or null if the file name is empty
      */
     public String getAttachmentURL(String filename, String action, String queryString)
     {
@@ -831,7 +856,8 @@ public class Document extends Api
      *
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
-     * @return the URL for accessing to the archive of the attachment "filename" at the version "version"
+     * @return the URL for accessing to the archive of the attachment "filename" at the version "version" or null if the
+     *         file name is empty
      */
     public String getAttachmentRevisionURL(String filename, String version)
     {
@@ -845,7 +871,7 @@ public class Document extends Api
      * @param version a revision number such as "1.1" or "1.2".
      * @param queryString additional query parameters to pass in the request.
      * @return the URL for accessing to the archive of the attachment "filename" at the version "version" with the given
-     *         queryString parameters.
+     *         queryString parameters or null if the file name is empty
      */
     public String getAttachmentRevisionURL(String filename, String version, String queryString)
     {
@@ -2173,9 +2199,9 @@ public class Document extends Api
         return this.doc.getEditURL(action, mode, getXWikiContext());
     }
 
-    public String getEditURL(String action, String mode, String language)
+    public String getEditURL(String action, String mode, String locale)
     {
-        return this.doc.getEditURL(action, mode, language, getXWikiContext());
+        return this.doc.getEditURL(action, mode, locale, getXWikiContext());
     }
 
     public boolean isCurrentUserCreator()

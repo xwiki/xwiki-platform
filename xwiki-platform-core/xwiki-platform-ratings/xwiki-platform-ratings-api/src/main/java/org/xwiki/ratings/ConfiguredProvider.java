@@ -21,7 +21,6 @@ package org.xwiki.ratings;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide instances of objects configured relative to the passed document.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M3
  */
 @Role
-@Unstable
 //TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public interface ConfiguredProvider<T>
 {

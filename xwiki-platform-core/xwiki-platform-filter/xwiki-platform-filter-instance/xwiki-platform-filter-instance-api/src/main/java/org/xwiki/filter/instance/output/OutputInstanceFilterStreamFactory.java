@@ -21,13 +21,11 @@ package org.xwiki.filter.instance.output;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 @Role
 public interface OutputInstanceFilterStreamFactory extends OutputFilterStreamFactory
 {

@@ -24,7 +24,6 @@ import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A reference to a LESS resource containing in an XObject property in the wiki.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M2
  * @version $Id$
  */
-@Unstable
 public class LESSObjectPropertyResourceReference implements LESSResourceReference
 {
     private ObjectPropertyReference objectPropertyReference;

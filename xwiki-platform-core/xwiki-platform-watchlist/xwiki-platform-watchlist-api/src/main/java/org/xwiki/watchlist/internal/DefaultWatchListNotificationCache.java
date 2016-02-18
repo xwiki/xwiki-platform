@@ -49,7 +49,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation for {@link WatchListNotificationCache}.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -114,9 +114,10 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
     /**
      * Init watchlist store. Get all the intervals/jobs present in the wiki. Create the list of subscribers.
-     * 
+     *
      * @throws InitializationException if problems occur
      */
+    @Override
     public void initialize() throws InitializationException
     {
         XWikiContext context = contextProvider.get();
@@ -125,7 +126,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
         try {
             intervals = new ArrayList<String>();
 
-            if ("true".equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
+            if (xwikiProperties.getProperty("watchlist.realtime.enabled", false)) {
                 // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then
                 // propose/use it as possible notification interval option.
                 intervals.add(REALTIME_INTERVAL_ID);
@@ -135,7 +136,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
             Query jobDocumentsQuery = queryManager.getNamedQuery("getWatchlistJobDocuments");
             // Make double sure we run the query on the main wiki, since that is where the jobs are defined.
             jobDocumentsQuery.setWiki(context.getWikiId());
-            List<String> jobDocumentNames = (List<String>) (List) jobDocumentsQuery.execute();
+            List<String> jobDocumentNames = jobDocumentsQuery.execute();
 
             // TODO: Sort them by cron expression.
 
@@ -153,7 +154,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
     /**
      * Retrieves all the users from all the wikis with a WatchList object in their profile.
-     * 
+     *
      * @param intervalId name of the interval to init the cache for
      * @param context the XWiki context
      */
@@ -180,7 +181,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
     /**
      * Search documents on all the wikis by passing HQL where clause values as parameters.
-     * 
+     *
      * @param request The HQL where clause.
      * @param nb Number of results to retrieve
      * @param start Offset to use in the search query
@@ -230,7 +231,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
     /**
      * Destroy subscribers cache for the given job.
-     * 
+     *
      * @param intervalId ID of the interval for which the cache must be destroyed
      * @param context the XWiki context
      */

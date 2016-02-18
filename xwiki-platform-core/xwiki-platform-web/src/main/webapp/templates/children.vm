@@ -43,7 +43,7 @@
     ##
     #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
     #set ($colprops = {
-      'doc.title'    : { 'link' : 'view' },
+      'doc.title'    : { 'link' : 'view', 'sortable': false },
       'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
       'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
       '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }

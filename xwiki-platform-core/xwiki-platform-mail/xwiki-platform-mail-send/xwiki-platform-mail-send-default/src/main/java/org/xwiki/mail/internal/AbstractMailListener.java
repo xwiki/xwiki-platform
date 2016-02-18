@@ -22,14 +22,13 @@ package org.xwiki.mail.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailListener;
 
 /**
- * Helper for implementation of {@Link MailListener}.
+ * Helper for implementation of {@link MailListener}.
  *
  * @version $Id$
  */
@@ -43,23 +42,6 @@ public abstract class AbstractMailListener implements MailListener
     protected String getBatchId()
     {
         return batchId;
-    }
-
-    protected String getMessageId(MimeMessage message)
-    {
-        try {
-            String messageId = message.getMessageID();
-            // Ensure that a messageId is generated if the caller have omitted calling saveChanges()
-            if (messageId == null) {
-                message.saveChanges();
-                messageId = message.getMessageID();
-            }
-            return messageId;
-        } catch (MessagingException e) {
-            // This cannot happen in practice since the implementation never throws any exception!
-            logger.error("Failed to retrieve messageID from the message.", e);
-            return null;
-        }
     }
 
     @Override
@@ -76,20 +58,20 @@ public abstract class AbstractMailListener implements MailListener
     }
 
     @Override
-    public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation succeed for message [{}] of batch [{}].", getMessageId(message),
-                batchId);
+            logger.debug("Mail preparation succeed for message [{}] of batch [{}].",
+                message.getUniqueMessageId(), batchId);
         }
     }
 
     @Override
-    public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onPrepareMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation failed for message [{}] of batch [{}].", getMessageId(message), batchId,
-                exception);
+            logger.debug("Mail preparation failed for message [{}] of batch [{}].",
+                message.getUniqueMessageId(), batchId, exception);
         }
     }
 
@@ -106,25 +88,26 @@ public abstract class AbstractMailListener implements MailListener
     }
 
     @Override
-    public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail sent successfully for message [{}] of batch [{}].", getMessageId(message), batchId);
+            logger.debug("Mail sent successfully for message [{}] of batch [{}].",
+                message.getUniqueMessageId(), batchId);
         }
     }
 
     @Override
-    public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("Mail sending failed for message [{}] of batch [{}].", getMessageId(message), batchId,
-                exception);
+            logger.debug("Mail sending failed for message [{}] of batch [{}].",
+                message.getUniqueMessageId(), batchId, exception);
         }
     }
 
     @Override
-    public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageFatalError(String uniqueMessageId, Exception exception, Map<String, Object> parameters)
     {
-        logger.debug("Mail loading failed for message [{}] of batch [{}].", messageId, batchId, exception);
+        logger.debug("Mail loading failed for message [{}] of batch [{}].", uniqueMessageId, batchId, exception);
     }
 }

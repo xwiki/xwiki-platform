@@ -25,14 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>7.4-SNAPSHOT</version>
+    <version>8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-bridge</artifactId>
   <name>XWiki Platform - Bridge</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
+  <description>Temporary bridge between new components and the old core, until the old core is completely split into components</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Model Bridge API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

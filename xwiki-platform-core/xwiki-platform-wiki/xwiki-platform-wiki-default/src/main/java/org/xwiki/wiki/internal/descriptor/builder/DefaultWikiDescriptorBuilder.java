@@ -37,7 +37,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
@@ -84,9 +83,6 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     @Inject
     @Named("user")
     private DocumentReferenceResolver<String> userReferenceResolver;
-
-    @Inject
-    private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
     private Provider<WikiPropertyGroupManager> wikiPropertyGroupManagerProvider;

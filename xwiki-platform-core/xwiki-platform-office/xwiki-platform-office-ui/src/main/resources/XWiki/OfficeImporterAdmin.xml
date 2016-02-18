@@ -37,120 +37,162 @@
   <title>$services.localization.render('admin.ooserver')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($msgParameter=$services.localization.render('xe.officeimporter.openoffice.parameter'))
-#set($msgValue=$services.localization.render('xe.officeimporter.openoffice.value'))
-#set($msgYes=$services.localization.render('xe.officeimporter.openoffice.yes'))
-#set($msgNo=$services.localization.render('xe.officeimporter.openoffice.no'))
-#set($msgServerType=$services.localization.render('xe.officeimporter.openoffice.servertype'))
-#set($msgServerPort=$services.localization.render('xe.officeimporter.openoffice.serverport'))
-#set($msgAutoConnect=$services.localization.render('xe.officeimporter.openoffice.autoconnect'))
-#set($msgAutoStart=$services.localization.render('xe.officeimporter.openoffice.autostart'))
-#set($msgServerTypeInternal=$services.localization.render('xe.officeimporter.openoffice.servertype.internal'))
-#set($msgServerTypeExternalLocal=$services.localization.render('xe.officeimporter.openoffice.servertype.external'))
-#set($msgServerTypeExternalRemote=$services.localization.render('xe.officeimporter.openoffice.servertype.remote'))
-#set($msgServerPath=$services.localization.render('xe.officeimporter.openoffice.serverpath'))
-#set($msgServerProfile=$services.localization.render('xe.officeimporter.openoffice.serverprofile'))
-#set($msgServerProfileDefault=$services.localization.render('xe.officeimporter.openoffice.serverprofile.default'))
-#set($msgServerState=$services.localization.render('xe.officeimporter.openoffice.serverstate'))
-#set($msgActions=$services.localization.render('xe.officeimporter.openoffice.actions'))
-#set($msgStart=$services.localization.render('xe.officeimporter.openoffice.actions.start'))
-#set($msgConnect=$services.localization.render('xe.officeimporter.openoffice.actions.connect'))
-#set($msgStop=$services.localization.render('xe.officeimporter.openoffice.actions.stop'))
-#set($msgDisconnect=$services.localization.render('xe.officeimporter.openoffice.actions.disconnect'))
-#set($msgRestart=$services.localization.render('xe.officeimporter.openoffice.actions.restart'))
-#set($msgUpdate=$services.localization.render('xe.officeimporter.openoffice.update'))
-#set($msgLimitedControl=$services.localization.render('xe.officeimporter.openoffice.limitedcontrol'))
-#set ($msgServerPathError = $services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected'))
-#if($hasAdmin)
-  #set($currentAction = "$!{request.action}")
-  #if($currentAction == "stop" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
+###
+### Perform actions (if asked)
+###
+#if ($hasAdmin &amp;&amp; $xcontext.isMainWiki())
+  #set ($currentAction = "$!{request.action}")
+  #if ($currentAction == 'stop' &amp;&amp; $services.csrf.isTokenValid("$!request.form_token"))
     #if(!$services.officemanager.stopServer())
       {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
-  #elseif($currentAction == "start" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #if(!$services.officemanager.startServer())
+  #elseif ($currentAction == 'start' &amp;&amp; $services.csrf.isTokenValid("$!request.form_token"))
+    #if (!$services.officemanager.startServer())
       {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
-  #elseif($currentAction == "restart" &amp;&amp; ${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    #if(!$services.officemanager.stopServer())
+  #elseif ($currentAction == 'restart' &amp;&amp; $services.csrf.isTokenValid("$!request.form_token"))
+    #if (!$services.officemanager.stopServer())
       {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
-    #elseif(!$services.officemanager.startServer())
+    #elseif (!$services.officemanager.startServer())
       {{error}}$services.officemanager.lastErrorMessage{{/error}}
 
     #end
   #end
 #end
-#set($actionStart=$msgConnect)
-#set($actionStop=$msgDisconnect)
-#set($autoStart=$msgAutoConnect)
-#if($services.officemanager.config.serverType == 0)
-  #set($serverType=$msgServerTypeInternal)
-  #set($actionStart=$msgStart)
-  #set($actionStop=$msgStop)
-  #set($actionRestart=$msgRestart)
-  #set($autoStart=$msgAutoStart)
-#elseif($services.officemanager.config.serverType == 1)
-  #set($serverType=$msgServerTypeExternalLocal)
-#elseif($services.officemanager.config.serverType == 2)
-  #set($serverType=$msgServerTypeExternalRemote)
+###
+### Compute the correct actions name depending on the configuration.
+### ex: use 'connect' if the office server is an external instance or 'start' if it's an internally managed instance
+###
+#set ($actionStart     = $services.localization.render('xe.officeimporter.openoffice.actions.connect'))
+#set ($actionStop      = $services.localization.render('xe.officeimporter.openoffice.actions.disconnect'))
+#set ($autoStart       = $services.localization.render('xe.officeimporter.openoffice.autoconnect'))
+#if ($services.officemanager.config.serverType == 0)
+  #set ($serverType    = $services.localization.render('xe.officeimporter.openoffice.servertype.internal'))
+  #set ($actionStart   = $services.localization.render('xe.officeimporter.openoffice.actions.start'))
+  #set ($actionStop    = $services.localization.render('xe.officeimporter.openoffice.actions.stop'))
+  #set ($actionRestart = $services.localization.render('xe.officeimporter.openoffice.actions.restart'))
+  #set ($autoStart     = $services.localization.render('xe.officeimporter.openoffice.autostart'))
+#elseif ($services.officemanager.config.serverType == 1)
+  #set ($serverType    = $services.localization.render('xe.officeimporter.openoffice.servertype.external'))
+#elseif ($services.officemanager.config.serverType == 2)
+  #set ($serverType    = $services.localization.render('xe.officeimporter.openoffice.servertype.remote'))
 #end
-{{html wiki="true" clean="false"}}
-&lt;form action="$xwiki.relativeRequestURL" enctype="multipart/form-data" method="post" class="xform"&gt;
-&lt;fieldset&gt;
-&lt;legend&gt;$services.localization.render('admin.ooserver.options')&lt;/legend&gt;
-
-{{info}}$services.localization.render('admin.ooserver.options.source', ['##xwiki.properties##']){{/info}}
-
-&lt;dl&gt;
-&lt;dt&gt;&lt;label&gt;$msgServerType&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;$serverType&lt;/dd&gt;
-&lt;dt&gt;&lt;label&gt;$msgServerPort&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;$services.officemanager.config.serverPort&lt;/dd&gt;
-&lt;dt&gt;&lt;label&gt;$autoStart&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;#if($services.officemanager.config.autoStart)$msgYes#else$msgNo#end&lt;/dd&gt;
-#if($services.officemanager.config.serverType == 0)
-  &lt;dt&gt;&lt;label&gt;$msgServerPath&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;#set ($homePath = $services.officemanager.config.homePath)
-      #if ("$!homePath" != '')
-        $homePath
-      #else
-        {{error}}$msgServerPathError{{/error}}
-      #end
-  &lt;/dd&gt;
-  &lt;dt&gt;&lt;label&gt;$msgServerProfile&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;#if("$!services.officemanager.config.profilePath" == '' &amp;&amp; $services.officemanager.config.profilePath != '')$msgServerProfileDefault#{else}$services.officemanager.config.profilePath#end&lt;/dd&gt;
-#end
-&lt;dt&gt;&lt;label&gt;$msgServerState&lt;/label&gt;&lt;/dt&gt;
-&lt;dd&gt;$services.officemanager.serverState&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;/fieldset&gt;
-#if($hasAdmin &amp;&amp; $xcontext.isMainWiki())
-  &lt;fieldset&gt;
-  &lt;legend&gt;$msgActions&lt;/legend&gt;
-  &lt;dl&gt;
-  &lt;dd&gt;&lt;label for="action1"&gt;&lt;input id="action1" name="action" type="radio" value="start" checked="checked"/&gt; $actionStart&lt;/label&gt;&lt;/dd&gt;
-  &lt;dd&gt;&lt;label for="action2"&gt;&lt;input id="action2" name="action" type="radio" value="stop"/&gt; $actionStop&lt;/label&gt;&lt;/dd&gt;
-  #if($actionRestart)&lt;dd&gt;&lt;label for="action3"&gt;&lt;input id="action3" name="action" type="radio" value="restart"/&gt; $actionRestart&lt;/label&gt;&lt;/dd&gt;#end
-  &lt;/dl&gt;
-  &lt;/fieldset&gt;
-  &lt;div class="buttons"&gt;
-  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msgUpdate" class="button"/&gt;&lt;/span&gt;
-  &lt;/div&gt;
-#end
-&lt;/form&gt;
+###
+### Display the configuration and the actions form
+###
+{{html}}
+  &lt;form action="$xwiki.relativeRequestURL" method="post" class="xform"&gt;
+    &lt;fieldset&gt;
+      &lt;legend&gt;$escapetool.html($services.localization.render('admin.ooserver.options'))&lt;/legend&gt;
+      ###
+      ### Info about the place to modify the configuration
+      ###
+      &lt;div class="box infomessage"&gt;
+        ## TODO: we do not escape this string because we inject some HTML code. We should improve it.
+        $services.localization.render('admin.ooserver.options.source', ['&lt;span class="monospace"&gt;xwiki.properties&lt;/span&gt;'])
+      &lt;/div&gt;
+      &lt;dl&gt;
+        ###
+        ### Server Type
+        ###
+        &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.servertype'))&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$escapetool.html($serverType)&lt;/dd&gt;
+        ###
+        ### Server Port
+        ###
+        &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverport'))&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$escapetool.html($services.officemanager.config.serverPort)&lt;/dd&gt;
+        ###
+        ### Auto Start
+        ###
+        &lt;dt&gt;&lt;label&gt;$escapetool.html($autoStart)&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;
+          #if($services.officemanager.config.autoStart)
+            $escapetool.html($services.localization.render('xe.officeimporter.openoffice.yes'))
+          #else
+            $escapetool.html($services.localization.render('xe.officeimporter.openoffice.no'))
+          #end
+        &lt;/dd&gt;
+        ###
+        ### If the server is an internally managed office server instance.
+        ###
+        #if($services.officemanager.config.serverType == 0)
+          ###
+          ### Server Path
+          ###
+          &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverpath'))&lt;/label&gt;&lt;/dt&gt;
+          &lt;dd&gt;#set ($homePath = $services.officemanager.config.homePath)
+              #if ("$!homePath" != '')
+                $escapetool.html($homePath)
+              #else
+                &lt;div class="box errormessage"&gt;$escapetool.html($services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected'))&lt;/div&gt;
+              #end
+          &lt;/dd&gt;
+          ###
+          ### Server Profile
+          ###
+          &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverprofile'))&lt;/label&gt;&lt;/dt&gt;
+          &lt;dd&gt;
+            #if("$!services.officemanager.config.profilePath" == '' &amp;&amp; $services.officemanager.config.profilePath != '')
+              $escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverprofile.default'))
+            #else
+              $escapetool.html($services.officemanager.config.profilePath)
+            #end
+          &lt;/dd&gt;
+        #end
+        ###
+        ### Server State
+        ###
+        &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverstate'))&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$escapetool.html($services.officemanager.serverState)&lt;/dd&gt;
+      &lt;/dl&gt;
+    &lt;/fieldset&gt;
+    ###
+    ### Actions
+    ###
+    #if($hasAdmin &amp;&amp; $xcontext.isMainWiki())
+      &lt;fieldset&gt;
+        &lt;legend&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.actions'))&lt;/legend&gt;
+        ###
+        ### Start server
+        ###
+        &lt;p&gt;&lt;label for="action1"&gt;&lt;input id="action1" name="action" type="radio" value="start" checked="checked"/&gt; $escapetool.html($actionStart)&lt;/label&gt;&lt;/p&gt;
+        ###
+        ### Stop Server
+        ###
+        &lt;p&gt;&lt;label for="action2"&gt;&lt;input id="action2" name="action" type="radio" value="stop"/&gt; $escapetool.html($actionStop)&lt;/label&gt;&lt;/p&gt;
+        ###
+        ### Restart Server
+        ###
+        #if($actionRestart)
+          &lt;p&gt;&lt;label for="action3"&gt;&lt;input id="action3" name="action" type="radio" value="restart"/&gt; $escapetool.html($actionRestart)&lt;/label&gt;&lt;/p&gt;
+        #end
+      &lt;/fieldset&gt;
+      ###
+      ### Button to perform the action
+      ###
+      &lt;div class="buttons"&gt;
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+        &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.html($services.localization.render('xe.officeimporter.openoffice.update'))" class="button"/&gt;&lt;/span&gt;
+      &lt;/div&gt;
+    #end
+  &lt;/form&gt;
 {{/html}}
-#if($hasAdmin &amp;&amp; !$xcontext.isMainWiki())
 
-  {{info}}$msgLimitedControl{{/info}}
+###
+### Display a warning message if the wiki is not the main one
+###
+#if($hasAdmin &amp;&amp; !$xcontext.isMainWiki())
+  {{info}}$services.localization.render('xe.officeimporter.openoffice.limitedcontrol'){{/info}}
 #end
-{{/velocity}}</content>
+{{/velocity}}
+</content>
   <attachment>
     <filename>icon.png</filename>
     <author>xwiki:XWiki.Admin</author>

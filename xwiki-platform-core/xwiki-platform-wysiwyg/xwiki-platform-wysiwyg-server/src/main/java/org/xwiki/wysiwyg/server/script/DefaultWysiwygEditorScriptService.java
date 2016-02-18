@@ -24,15 +24,20 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 import org.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -53,11 +58,17 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      */
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
+    @Inject
+    private Logger logger;
+
     /**
      * The component manager. We need it because we have to access components dynamically.
      */
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * The component used to convert HTML to wiki syntax.
@@ -113,6 +124,26 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             }
 
             setSecurityDocument(originalSecurityDocument);
+        }
+    }
+
+    @Override
+    public String render(DocumentReference templateReference)
+    {
+        if (!this.authorization.hasAccess(Right.VIEW, templateReference)) {
+            return null;
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            XWikiDocument template = xcontext.getWiki().getDocument(templateReference, xcontext);
+            String templateSyntax = template.getSyntax().toIdString();
+            String output = xcontext.getDoc().getRenderedContent(template.getContent(), templateSyntax, xcontext);
+            // Make sure the skin extension hooks are properly replaced with style sheets includes.
+            return xcontext.getWiki().getPluginManager().endParsing(output, xcontext);
+        } catch (XWikiException e) {
+            this.logger.debug("Failed to render [{}].", templateReference, e);
+            return null;
         }
     }
 

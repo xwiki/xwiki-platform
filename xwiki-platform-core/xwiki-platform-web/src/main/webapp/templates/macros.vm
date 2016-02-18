@@ -236,15 +236,15 @@ $xwiki.getUserName("xwiki:${username}")
       #if (!$userReference)
         #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
       #end
-      #set ($userName = ${userReference.name})
+      #set($userReferenceString = $services.model.serialize($userReference, 'default'))
       #getUserAvatarURL($userReference $avatarURL 30)
       <li class="user">
         <div class="user-avatar-wrapper">
           ## The string returned by XWiki#getUserName() is XML encoded.
           <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-            alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
+            alt="${xwiki.getUserName($userReferenceString, false)}" />
         </div>
-        <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
+        <div class="user-name">${xwiki.getUserName($userReferenceString)}</div>
         <div>
           <span class="user-alias">${escapetool.xml($userReference.name)}</span>
           ## Display the wiki only for local users.
@@ -309,9 +309,9 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 ###    useravatar
 ###
-### Display the avatar of a user, or a standard image if the user has no avatar
+### Display the avatar of a user or a group, or a default image if the user/group has no avatar
 ###
-### @param username The name of the user whose avatar will be displayed
+### @param username The name of the user or group whose avatar will be displayed
 ###
 #macro(getUserAvatarURL $userName $return $size)
   #set ($specified = false)
@@ -334,6 +334,10 @@ $xwiki.getUserName("xwiki:${username}")
           #break
         #end
       #end
+    #else
+      ## This ensures that $avatarAttachment is always set before the following "if" is called, preventing a previous
+      ## call to this macro from leaking...
+      #set ($avatarAttachment = $NULL)
     #end
     #if ($avatarAttachment && $avatarAttachment.isImage())
       #set ($queryString = '')
@@ -1261,7 +1265,9 @@ ${Msz}Mb##
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
-{{html}}
+## We don't clean the HTML because we control the markup and because we want to preserve the whitespace characters in the
+## attribute values (e.g. if the live table id contains whitespaces)
+{{html clean="false"}}
 #else {pre} #end
 #end
   ##
@@ -1289,9 +1295,8 @@ ${Msz}Mb##
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
-  #if("$!options.queryFilters" != '')
-    #set ($queryFilters = $!options.queryFilters)
-  #else
+  #set ($queryFilters = $options.queryFilters)
+  #if (!$queryFilters)
     #set ($queryFilters = 'currentlanguage,hidden')
   #end
   #set($classname = "$!options.className")
@@ -2642,6 +2647,7 @@ Recursive title display detected!##
 ### @param $defaultValue the default value to use
 ### @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first option
 ### @param $cssClass class to add to the div (could be 'xwiki-select-small', 'xwiki-select-medium', 'xwiki-select-tall' or any other class)
+### @param $id (optional) id to give to the widget
 ###
 ### Example of use:
 ###
@@ -2662,11 +2668,11 @@ Recursive title display detected!##
 ###                 ])
 ### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small')
 #########################################################
-#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass)
+#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id)
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/select/select.css', {'forceSkinAction': true}))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/select/select.js' , {'forceSkinAction': true}))
-  <div class="xwiki-select $!cssClass">
+  <div class="xwiki-select $!cssClass" #if("$!id" != '')id="$id"#end>
     ## Here we let a place to add a filter in the future, that is why the options are inside the following div block.
     <div class="xwiki-select-options">
       <ul>

@@ -24,14 +24,12 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.4M3
  */
 @Role
-@Unstable
 public interface RatingsManager
 {
     public static final String RATINGS_CLASSPAGE = "RatingsClass";

@@ -31,7 +31,7 @@
             <select size="1" id="language" name="language">
             #set($defaultLanguage = "$!doc.defaultLanguage")
             #if($defaultLanguage == '')
-              #set($defaultLanguage = "$!doc.language")
+              #set($defaultLanguage = "$!doc.locale")
               #if($defaultLanguage == '')
                 #set($defaultLanguage = 'default')
               #end
@@ -40,7 +40,7 @@
             #set($discard =  $languages.add($defaultLanguage))
             #foreach($lang in $languages)
               ## By default, we suggest that the export is done for current language set
-              #if($lang == $tdoc.realLanguage)
+              #if($lang == "$tdoc.realLocale")
                 <option value="$lang" selected="selected">$lang $services.localization.render('core.export.pdf.options.currentLanguage')</option>
               #else
                 <option value="$lang">$lang</option>
@@ -66,6 +66,24 @@
             $services.localization.render('core.export.pdf.options.toc')
           </label>
           <span class="xHint">$services.localization.render('core.export.pdf.options.toc.hint')</span>
+        </dt>
+        ## Header
+        <dt>
+          <label for="pdfheader">
+            <input id="pdfheader" name="pdfheader" type="checkbox" checked="checked" value="1" />
+            <input name="pdfheader" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.header')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.header.hint')</span>
+        </dt>
+        ## Footer
+        <dt>
+          <label for="pdffooter">
+            <input id="pdffooter" name="pdffooter" type="checkbox" checked="checked" value="1" />
+            <input name="pdffooter" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.footer')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.footer.hint')</span>
         </dt>
         ## Comments
         <dt>

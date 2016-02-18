@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>cs</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language cs generated from http://www.l10n.xwiki.org
+platform.appwithinminutes.appHomePageActionsHeading=Akce
+platform.appwithinminutes.appHomePageAddEntryHint=Přidejte novou položku
+platform.appwithinminutes.appHomePageAddEntryLabel=Přidat
+platform.appwithinminutes.appHomePageEntryNameLabel=Název položky\:
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Smazat
+platform.appwithinminutes.appLiveTableEditEntryActionName=Upravit
+platform.appwithinminutes.appLiveTableHeading=Položky
+platform.appwithinminutes.appNameEmptyError=Zadejte název aplikace,prosím.
+platform.appwithinminutes.appNameHint=Název aplikace určuje URL úvodní stránky aplikace, prostor kde se data budou  ukládat, stejně jako jméno třídy, která bude popisovat strukturu aplikace.
+platform.appwithinminutes.appNameIsUsedWarning=Tato aplikace již existuje. Přejdete-li k dalšímu kroku, budete upravovat tuto existující aplikací.
+platform.appwithinminutes.appNameLabel=Název aplikace
+platform.appwithinminutes.appNamePageTitle=Vytvořit aplikaci
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Třída aplikace
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Prostor dat aplikace
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL úvodní stránky aplikace
+platform.appwithinminutes.appsLiveTable.doc.author=Poslední autor
+platform.appwithinminutes.appsLiveTable.doc.date=Datum aktualizace
+platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
+platform.appwithinminutes.appsLiveTableHeading=Aplikace
+platform.appwithinminutes.classEditorAdvancedCategoryName=Pokročilý
+platform.appwithinminutes.classEditorBindSheetSaveComment=Vytvořit vazbu na vzhled třídy
+platform.appwithinminutes.classEditorBooleanFieldName=Boolean
+platform.appwithinminutes.classEditorCanvasHint=Přetáhněte pole z palety a umístěte je do této oblasti
+platform.appwithinminutes.classEditorConfigureFieldLabel=Konfigurace
+platform.appwithinminutes.classEditorDBListFieldName=Databázový seznam
+platform.appwithinminutes.classEditorDateFieldName=Datum
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Vymazat
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Dnes
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Nyní
+platform.appwithinminutes.classEditorDeleteFieldLabel=Smazat
+platform.appwithinminutes.classEditorDuplicateFieldNameError=Třída má dvě pole se stejným jménem\: {0}
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Výchozí hodnota
+platform.appwithinminutes.classEditorGroupsFieldName=Skupina
+platform.appwithinminutes.classEditorMoveFieldHint=Přetáhněte myší pro změnu pořadí
+platform.appwithinminutes.classEditorMoveFieldLabel=Přesunout
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Tato třída má více listů vzhledu
+platform.appwithinminutes.classEditorNumberFieldName=Číslo
+platform.appwithinminutes.classEditorPaletteHint=Přetáhněte myší pole z palety pro vytvoření formuláře.
+platform.appwithinminutes.classEditorPaletteTitle=Paleta polí
+platform.appwithinminutes.classEditorPickersCategoryName=Výběry
+platform.appwithinminutes.classEditorPreviewFieldHint=Ukrýt konfigurační panel a provést změny
+platform.appwithinminutes.classEditorPreviewFieldLabel=Náhled
+platform.appwithinminutes.classEditorSheetSaveComment=Aktualizace vzhledu třídy
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Přidat
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Smazat
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Hodnota
+platform.appwithinminutes.classEditorStaticListFieldName=Výčtový seznam
+platform.appwithinminutes.classEditorStringFieldName=Text krátký
+platform.appwithinminutes.classEditorTemplateSaveComment=Aktualizace výchozích hodnot
+platform.appwithinminutes.classEditorTextAreaFieldName=Text dlouhý
+platform.appwithinminutes.classEditorUpdateSheetHint=Znovu vytvořit list vzhledu pro zobrazení a úpravy objektů této třídy ({0}).
+platform.appwithinminutes.classEditorUpdateSheetLabel=Aktualizace listu vzhledu třídy
+platform.appwithinminutes.classEditorUpdateTemplateHint=Uložte výchozí hodnoty pole v šabloně třídy ({0}).
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Aktualizace šablony třídy
+platform.appwithinminutes.classEditorUsersFieldName=Uživatel
+platform.appwithinminutes.createAppButtonLabel=Vytvořit aplikaci
+platform.appwithinminutes.description=Vytvoření webové aplikace s možností společného přístupu  a úprav během pár minut na základě mocného strukturovaného systému správy dat platformy XWiki.
+platform.appwithinminutes.homePageTitle=Aplikace za pár minut
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Seznam akcí, které lze provádět s položkami aplikace, jako je úprava a smazání
+platform.appwithinminutes.liveTableEditorActionsColumnName=Akce
+platform.appwithinminutes.liveTableEditorAddColumnHint=Přidat
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Speciální sloupec pro zobrazení odkazů na přílohy úvodní stránky
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Přílohy
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Speciální sloupec pro zobrazení avataru (obrázku uživatele). Funguje pouze pro tabulku spřaženou s třídou XWiki.XWikiUsers
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Pole třídy
+platform.appwithinminutes.liveTableEditorColumnsHint=Vyberte sloupce, které chcete zahrnout do "živé" tabulky zobrazené na úvodní stránce aplikace.
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Smazat
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění? &lt;a href\=""&gt; Ano &lt;/ a&gt; / &lt;a href\=""&gt; Ne &lt;/ a&gt;
+platform.appwithinminutes.liveTableEditorDescriptionHint=Popis stručně shrnuje co aplikace dělá a jaký druh údajů bude zpracovávat.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=Uživatel, který naposledy upravil položku aplikace
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Poslední autor
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=Datum, kdy byla vytvořena položka aplikace
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Datum vytvoření
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=Uživatel, který vytvořil položku aplikace
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Tvůrce
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=Datum, kdy byla naposledy upravena položka aplikace
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Datum aktualizace
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Název stránky, která obsahuje položku aplikace, s předponou jména prostoru
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Celý název stránky
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Název stránky, která obsahuje položku aplikace
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Název stránky
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Název prostoru, který obsahuje položku aplikace
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Prostor
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Nadpis stránky, která obsahuje položku aplikace
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Nadpis stránky
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Obecné sloupce
+platform.appwithinminutes.liveTableEditorHelpDescription=Obecné sloupce "živé" tabulky jsou nezávislé na struktuře aplikace. Poskytují informace o stránkách, které obsahují položky aplikace.
+platform.appwithinminutes.liveTableEditorHelpTitle=Tip
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Speciální sloupec pro zobrazení obrázků přiložených ke stránce položky
+platform.appwithinminutes.liveTableEditorImagesColumnName=obrázky
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Přetáhněte myší pro změnu pořadí
+platform.appwithinminutes.liveTableEditorSaveComment=Aktualizace "živé" tabulky
+platform.appwithinminutes.wizardStep1Description=Zadejte název aplikace
+platform.appwithinminutes.wizardStep1Name=Název
+platform.appwithinminutes.wizardStep1Title=Pojmenujte svou aplikaci
+platform.appwithinminutes.wizardStep2Description=Vygenerujte strukturu vaší aplikace určením, jaké typy polí bude obsahovat.
+platform.appwithinminutes.wizardStep2Name=Struktura
+platform.appwithinminutes.wizardStep2Title=Určete strukturu vaší aplikace
+platform.appwithinminutes.wizardStep3Description=Přizpůsobte domovskou stránku aplikace.
+platform.appwithinminutes.wizardStep3Name=Prezentace
+platform.appwithinminutes.wizardStep3Title=Upravte domovskou stránku aplikace.
+platform.appwithinminutes.wizardStepFinishButtonLabel=Konec
+platform.appwithinminutes.wizardStepFinishButtonTip=Na úvodní stránku aplikace
+platform.appwithinminutes.wizardStepHeading=Krok {0} — {1}
+platform.appwithinminutes.wizardStepHelpDescription=Tento průvodce vám pomůže při vytvoření vaší aplikace. Tyto kroky nastaví způsob zobrazení aplikace a jaké informace bude obsahovat\:
+platform.appwithinminutes.wizardStepHelpTitle=Kroky
+platform.appwithinminutes.wizardStepNextButtonLabel=Další krok
+platform.appwithinminutes.wizardStepNextButtonTip=Jdi na další krok
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Předchozí krok
+platform.appwithinminutes.wizardStepPreviousButtonTip=Jdi na předchozí krok
+</content>
+</xwikidoc>

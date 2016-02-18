@@ -28,15 +28,14 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 import org.xwiki.filter.instance.input.InstanceInputProperties;
 import org.xwiki.filter.script.AbstractFilterScriptService;
 import org.xwiki.filter.script.FilterScriptService;
+import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
-import org.xwiki.filter.descriptor.FilterStreamDescriptor;
-import org.xwiki.filter.type.FilterStreamType;
 
 /**
  * Expose various FilterStream <tt>instance</tt> input/output streams related APIs to scripts.
@@ -47,7 +46,6 @@ import org.xwiki.filter.type.FilterStreamType;
 @Component
 @Named(InstanceFilterScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class InstanceFilterScriptService extends AbstractFilterScriptService
 {
     public static final String ROLEHINT = FilterScriptService.ROLEHINT + ".instance";

@@ -19,8 +19,6 @@
  */
 package org.xwiki.ratings;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -29,7 +27,6 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 6.4M3
  */
-@Unstable
 public class RatingsException extends XWikiException
 {
     private static final long serialVersionUID = 1L;

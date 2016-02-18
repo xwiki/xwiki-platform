@@ -35,11 +35,6 @@
   margin: 2px;
   float: right;
 }
-.mceToolbar .fullScreenEditButton, .mceToolbar .fullScreenCloseButton {
-  padding: 2px;
-  width: 16px;
-  height: 16px;
-}
 .gwt-MenuBar .fullScreenEditButton, .gwt-MenuBar .fullScreenCloseButton {
   float: right;
   margin: 5px;
@@ -64,14 +59,6 @@
   display: none !important;
 }
 
-.fullScreenWrapper .mceEditorContainer {
-  height: auto !important;
-}
-.fullScreenWrapper table.mceEditor {
-  height: auto !important;
-  margin: 0 !important;
-  border: none !important;
-}
 * html .fullScreenWrapper {
   position: absolute !important;
 }

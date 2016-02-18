@@ -32,6 +32,7 @@ import javax.mail.MessagingException;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -77,12 +78,9 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
     @Override
     public String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
-        Locale locale) throws MessagingException
+        Object localeValue) throws MessagingException
     {
-        Locale computedLocale = locale;
-        if (computedLocale == null || computedLocale == Locale.ROOT) {
-            computedLocale = getDefaultLocale();
-        }
+        Locale locale = getLocale(localeValue);
 
         // Note: Make sure to use the class reference relative to the template's wiki and not the current wiki.
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS, templateReference.getWikiReference());
@@ -91,7 +89,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         String templateFullName = this.serializer.serialize(templateReference);
 
-        int objectNumber = getObjectMailNumber(templateReference, mailClassReference, computedLocale);
+        int objectNumber = getObjectMailNumber(templateReference, mailClassReference, locale);
 
         String content =
             this.documentBridge.getProperty(templateReference, mailClassReference, objectNumber, property).toString();
@@ -102,7 +100,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } catch (XWikiVelocityException e) {
             throw new MessagingException(String.format(
                 "Failed to evaluate property [%s] for Document [%s] and locale [%s]",
-                    property, templateReference, locale), e);
+                    property, templateReference, localeValue), e);
         }
     }
 
@@ -187,5 +185,23 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     {
         XWikiContext context = this.xwikiContextProvider.get();
         return context.getWiki().getDefaultLocale(context);
+    }
+
+    private Locale getLocale(Object languageValue)
+    {
+        Locale locale;
+
+        if ((languageValue == null) || ((languageValue instanceof Locale) && Locale.ROOT.equals(languageValue))) {
+            locale = getDefaultLocale();
+        } else {
+            // Note: we support both a Locale type and String mostly for backward-compatibility reasons (the first
+            // version of this API only supported String and we've moved to support Locale).
+            if (languageValue instanceof Locale) {
+                locale = (Locale) languageValue;
+            } else {
+                locale = LocaleUtils.toLocale(languageValue.toString());
+            }
+        }
+        return locale;
     }
 }

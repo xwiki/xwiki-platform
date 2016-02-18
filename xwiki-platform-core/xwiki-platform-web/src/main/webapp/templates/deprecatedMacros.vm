@@ -7,8 +7,8 @@
   #foreach ($rev in $tdoc.getRecentRevisions(4))
     <a href="$doc.getURL('view', "rev=${rev}")">${rev}</a><span class="xwikisep"> | </span>
   #end
-  #if ($tdoc.realLanguage != '')
-    <a href="$doc.getURL('view', "xpage=diff&amp;language=${tdoc.realLanguage}")">$services.localization.render('diff')</a><span class="xwikisep"> | </span>
+  #if ("$tdoc.realLocale" != '')
+    <a href="$doc.getURL('view', "xpage=diff&amp;language=${tdoc.realLocale}")">$services.localization.render('diff')</a><span class="xwikisep"> | </span>
   #else
     <a href="$doc.getURL('view', "xpage=diff")">$services.localization.render('diff')</a><span class="xwikisep"> | </span>
   #end

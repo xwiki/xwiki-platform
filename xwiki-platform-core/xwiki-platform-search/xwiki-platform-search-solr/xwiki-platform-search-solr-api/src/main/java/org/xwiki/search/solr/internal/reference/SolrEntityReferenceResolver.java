@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexableField;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -50,8 +52,8 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     /**
      * Helper for unit tests.
      */
-    public static final Type TYPE = new DefaultParameterizedType(null, EntityReferenceResolver.class,
-        SolrDocument.class);
+    public static final Type TYPE =
+        new DefaultParameterizedType(null, EntityReferenceResolver.class, SolrDocument.class);
 
     @Inject
     @Named("explicit")
@@ -71,7 +73,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
         EntityReference spaceReference = getSpaceReference(solrDocument, wikiReference, parameters);
         EntityReference documentReference = getDocumentReferenceWithLocale(solrDocument, spaceReference, parameters);
 
-        String indexedEntityType = (String) solrDocument.get(FieldUtils.TYPE);
+        String indexedEntityType = getFieldStringValue(solrDocument, FieldUtils.TYPE);
         EntityType actualEntityType =
             StringUtils.isEmpty(indexedEntityType) ? expectedEntityType : EntityType.valueOf(indexedEntityType);
 
@@ -90,7 +92,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
     private EntityReference getWikiReference(SolrDocument solrDocument, Object... parameters)
     {
-        String wikiName = (String) solrDocument.get(FieldUtils.WIKI);
+        String wikiName = getFieldStringValue(solrDocument, FieldUtils.WIKI);
         if (!StringUtils.isEmpty(wikiName)) {
             return new EntityReference(wikiName, EntityType.WIKI);
         } else {
@@ -116,7 +118,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
         Object... parameters)
     {
         EntityReference documentReference = getDocumentReference(solrDocument, parent, parameters);
-        String localeString = (String) solrDocument.get(FieldUtils.DOCUMENT_LOCALE);
+        String localeString = getFieldStringValue(solrDocument, FieldUtils.DOCUMENT_LOCALE);
         if (!StringUtils.isEmpty(localeString)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(localeString));
         }
@@ -126,7 +128,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     private EntityReference getDocumentReference(SolrDocument solrDocument, EntityReference parent,
         Object... parameters)
     {
-        String documentName = (String) solrDocument.get(FieldUtils.NAME);
+        String documentName = getFieldStringValue(solrDocument, FieldUtils.NAME);
         if (!StringUtils.isEmpty(documentName)) {
             return new EntityReference(documentName, EntityType.DOCUMENT, parent);
         } else {
@@ -137,7 +139,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     private EntityReference getAttachmentReference(SolrDocument solrDocument, EntityReference parent,
         Object... parameters)
     {
-        String fileName = (String) solrDocument.getFirstValue(FieldUtils.FILENAME);
+        String fileName = getFieldFirstStringValue(solrDocument, FieldUtils.FILENAME);
         if (!StringUtils.isEmpty(fileName)) {
             return new EntityReference(fileName, EntityType.ATTACHMENT, parent);
         } else {
@@ -147,8 +149,8 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
 
     private EntityReference getObjectReference(SolrDocument solrDocument, EntityReference parent, Object... parameters)
     {
-        String classReference = (String) solrDocument.getFirstValue(FieldUtils.CLASS);
-        Integer objectNumber = (Integer) solrDocument.get(FieldUtils.NUMBER);
+        String classReference = getFieldFirstStringValue(solrDocument, FieldUtils.CLASS);
+        Number objectNumber = getFieldNumberValue(solrDocument, FieldUtils.NUMBER);
         if (!StringUtils.isEmpty(classReference) && objectNumber != null) {
             return new EntityReference(String.format("%s[%s]", classReference, objectNumber), EntityType.OBJECT,
                 parent);
@@ -160,7 +162,7 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     private EntityReference getObjectPropertyReference(SolrDocument solrDocument, EntityReference parent,
         Object... parameters)
     {
-        String propertyName = (String) solrDocument.get(FieldUtils.PROPERTY_NAME);
+        String propertyName = getFieldStringValue(solrDocument, FieldUtils.PROPERTY_NAME);
         if (!StringUtils.isEmpty(propertyName)) {
             return new EntityReference(propertyName, EntityType.OBJECT_PROPERTY, parent);
         } else {
@@ -173,5 +175,46 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
         EntityReference entityReference =
             this.explicitReferenceEntityReferenceResolver.resolve(null, entityType, parameters);
         return entityReference.replaceParent(entityReference.getParent(), parent);
+    }
+
+    // Tools to workaround a change in Solr 5.3 which caused SolrDocument to return Field instead of value in some cases
+
+    private String getFieldStringValue(SolrDocument solrDocument, String fieldName)
+    {
+        Object field = solrDocument.get(fieldName);
+
+        if (field instanceof Field) {
+            return ((Field) field).stringValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).stringValue();
+        }
+
+        return field != null ? field.toString() : null;
+    }
+
+    private String getFieldFirstStringValue(SolrDocument solrDocument, String fieldName)
+    {
+        Object field = solrDocument.getFirstValue(fieldName);
+
+        if (field instanceof Field) {
+            return ((Field) field).stringValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).stringValue();
+        }
+
+        return field != null ? field.toString() : null;
+    }
+
+    private Number getFieldNumberValue(SolrDocument solrDocument, String fieldName)
+    {
+        Object field = solrDocument.get(fieldName);
+
+        if (field instanceof Field) {
+            return ((Field) field).numericValue();
+        } else if (field instanceof IndexableField) {
+            return ((IndexableField) field).numericValue();
+        }
+
+        return field != null ? (Number) field : null;
     }
 }

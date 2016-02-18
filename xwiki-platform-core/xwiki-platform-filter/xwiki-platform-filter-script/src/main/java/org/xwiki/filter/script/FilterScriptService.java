@@ -50,7 +50,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Expose various FilterStream related APIs to scripts.
@@ -61,7 +60,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(FilterScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class FilterScriptService extends AbstractFilterScriptService
 {
     public static final String ROLEHINT = "filter";

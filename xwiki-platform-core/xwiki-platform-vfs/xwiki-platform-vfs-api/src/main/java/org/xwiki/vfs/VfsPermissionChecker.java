@@ -21,7 +21,6 @@ package org.xwiki.vfs;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.vfs.internal.VfsResourceReference;
 
 /**
  * Verify if the user has permissions to access the VFS asked. For example it would be dangerous to let a user

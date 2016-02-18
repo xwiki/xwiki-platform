@@ -105,6 +105,7 @@
  * @param $options various display options; default values are {
  *   id: null, // the value of the id attribute to set on the container element
  *   excludeSelf: false, // whether the target reference has been excluded from the path
+ *   selfIsActive: true, // whether the target reference should be marked as active or not
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
@@ -126,7 +127,7 @@
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end
   #end
-  <ol id="$!options.id" class="$breadCrumbClassNames" $breadCrumbParameters><li
+  <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters><li
     #foreach ($item in $pathData)
       #set ($classNames = $collectionstool.set)
       #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))
@@ -137,7 +138,7 @@
       ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
       #set ($closingTag = '</li><li')
       #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
-        #if (!$options.excludeSelf)
+        #if (!$options.excludeSelf && "$!options.selfIsActive" != 'false')
           #set ($discard = $classNames.add('active'))
         #end
         #set ($closingTag = '')
@@ -171,8 +172,10 @@
     #if ($index > 0 && $openTo.type != 'WIKI')
       #set ($root = $pathData.get($mathtool.sub($index, 1)).reference)
       #if ($root.type == 'ellipsis')
-        #set ($root = $openTo.parent)
-      #elseif ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+        ## $openTo may have been converted to a document reference above so we take the parent from its initial value.
+        #set ($root = $pathData.get($openToIndex).reference.parent)
+      #end
+      #if ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
         ## The tree shows nested documents.
         #set ($root = $services.model.resolveDocument('', 'default', $root))
       #end

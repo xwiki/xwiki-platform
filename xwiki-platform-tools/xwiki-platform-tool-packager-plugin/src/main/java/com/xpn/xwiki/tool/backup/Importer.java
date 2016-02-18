@@ -55,15 +55,15 @@ public class Importer extends AbstractPackager
      *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
-     * @param databaseName some database name (TODO: find out what this name is really)
+     * @param wikiId id of the wiki into which to import the documents (e.g. {@code xwiki})
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
      *            password, etc)
      * @throws Exception if the import failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the importation
+     * @todo Replace the Hibernate config file with a list of parameters required for the import
      */
-    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig) throws Exception
+    public void importDocuments(File sourceDirectory, String wikiId, File hibernateConfig) throws Exception
     {
-        importDocuments(sourceDirectory, databaseName, hibernateConfig, null);
+        importDocuments(sourceDirectory, wikiId, hibernateConfig, null);
     }
 
     /**
@@ -76,18 +76,18 @@ public class Importer extends AbstractPackager
      *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
-     * @param databaseName some database name (TODO: find out what this name is really)
+     * @param wikiId id of the wiki into which to import the documents (e.g. {@code xwiki})
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
      *            password, etc)
      * @param importUser optionally the user under which to perform the import (useful for example when importing pages
      *            that need to have Programming Rights and the page author is not the same as the importing user)
      * @throws Exception if the import failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the importation
+     * @todo Replace the Hibernate config file with a list of parameters required for the import
      */
-    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig, String importUser)
+    public void importDocuments(File sourceDirectory, String wikiId, File hibernateConfig, String importUser)
         throws Exception
     {
-        XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);
+        XWikiContext xcontext = createXWikiContext(wikiId, hibernateConfig);
 
         Package pack = new Package();
         pack.setWithVersions(false);

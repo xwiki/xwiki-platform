@@ -109,7 +109,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     &lt;div class="min-half column"&gt;
       &lt;div class="watchlistRss"&gt;
         &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
-        &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
+        &lt;a id="watchlistRssLink" target="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
       &lt;div class="watchlistElements"&gt;
         &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;

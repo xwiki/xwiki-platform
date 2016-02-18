@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>tr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
+platform.appwithinminutes.appHomePageActionsHeading=Eylemleri
+platform.appwithinminutes.appHomePageAddEntryHint=Yeni girdi ekle
+platform.appwithinminutes.appHomePageAddEntryLabel=Ekle
+platform.appwithinminutes.appHomePageDeleteAppLabel=Uygulamayı Sil
+platform.appwithinminutes.appHomePageEditAppLabel=Uygulamayı Düzenle
+platform.appwithinminutes.appHomePageEntryNameLabel=Girdi adı \:
+platform.appwithinminutes.appHomePageTranslateAppLabel=Uygulamayı Çevir
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Sil
+platform.appwithinminutes.appLiveTableEditEntryActionName=Düzenleme
+platform.appwithinminutes.appLiveTableHeading=Yazılar
+platform.appwithinminutes.appNameIsUsedWarning=Bu uygulama zaten var . Eğerbir sonraki adıma gidersenizmevcut uygulamayı düzenlerken edilecektir .
+platform.appwithinminutes.appNameLabel=Uygulama Adı
+platform.appwithinminutes.appNamePageTitle=Oluşturma Uygulama
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Uygulama sınıfı
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Uygulama veri alanı
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Uygulama ana sayfa URL
+platform.appwithinminutes.appPanelCreateEntry=Kendi oluşturun\!
+platform.appwithinminutes.appsLiveTable._actions=Eylemleri
+platform.appwithinminutes.appsLiveTable.doc.author=Son yazar
+platform.appwithinminutes.appsLiveTable.doc.date=Güncelleme tarihi
+platform.appwithinminutes.appsLiveTable.doc.space=Uygulama adı
+platform.appwithinminutes.appsLiveTableHeading=Uygulamaları
+platform.appwithinminutes.classEditorAdvancedCategoryName=İleri
+platform.appwithinminutes.classEditorBindSheetSaveComment=Bind sınıfı levha
+platform.appwithinminutes.classEditorBooleanFieldName=Boolean
+platform.appwithinminutes.classEditorCanvasHint=Sürüklepaletinden alanlar ve bu alanda onları bırakın .
+platform.appwithinminutes.classEditorConfigureFieldLabel=Yapılandırma
+platform.appwithinminutes.classEditorContentFieldName=İçerik
+platform.appwithinminutes.classEditorDBListFieldName=Veritabanı Liste
+platform.appwithinminutes.classEditorDateFieldName=Tarih
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Tamam
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Temizle
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Bugün
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Şimdi
+platform.appwithinminutes.classEditorDeleteFieldLabel=Sil
+platform.appwithinminutes.classEditorDocumentCategoryName=Belge
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Varsayılan değer
+platform.appwithinminutes.classEditorGroupsFieldName=Grup
+platform.appwithinminutes.classEditorMoveFieldHint=değiştirmek için sürükle ve bıraksipariş
+platform.appwithinminutes.classEditorMoveFieldLabel=Taşı
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Bu sınıf , birden fazla sayfa var .
+platform.appwithinminutes.classEditorNumberFieldName=Numara
+platform.appwithinminutes.classEditorPaletteHint=formunuzu oluşturmak içinpaletten Sürükle &amp; Bırak alanlar.
+platform.appwithinminutes.classEditorPaletteTitle=Alan Palet
+platform.appwithinminutes.classEditorPickersCategoryName=toplayıcılar
+platform.appwithinminutes.classEditorPreviewFieldHint=gizle yapılandırma paneli ve uygulamak değişiklikler
+platform.appwithinminutes.classEditorPreviewFieldLabel=Önizleme
+platform.appwithinminutes.classEditorSheetSaveComment=Güncelleme sınıf levha
+platform.appwithinminutes.classEditorStandardCategoryName=Standart
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Ekle
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Sil
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Değer
+platform.appwithinminutes.classEditorStaticListFieldName=Statik Listesi
+platform.appwithinminutes.classEditorStringFieldName=Kısa Metin
+platform.appwithinminutes.classEditorTemplateSaveComment=Güncelleme varsayılan değerler
+platform.appwithinminutes.classEditorTextAreaFieldName=Uzun Metin
+platform.appwithinminutes.classEditorTitleFieldName=Başlık
+platform.appwithinminutes.classEditorTranslationsSaveComment=Güncelleme çeviriler
+platform.appwithinminutes.classEditorUpdateSheetHint=Bu sınıfın nesneleri görüntülemek ve düzenlemek için kullanılanlevha yeniden oluşturun ( {0} ) .
+platform.appwithinminutes.classEditorUpdateSheetLabel=Güncelleme sınıf levha
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Güncelleme sınıf şablonu
+platform.appwithinminutes.classEditorUpdateTranslationsHint=alan güzel isimleri ve listesi değerleriçevirisini güncelleyin ( {0} ) .
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Güncelleme sınıf çeviri bohça
+platform.appwithinminutes.classEditorUsersFieldName=Kullanıcı
+platform.appwithinminutes.createAppButtonLabel=Oluşturma Uygulama
+platform.appwithinminutes.description=XWiki güçlü yapılandırılmış veri yönetim sistemine dayalı dakika içinde ortak web uygulamaları oluşturun .
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Hibe alan yönetim hakları saklıdır.
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=gibi düzenleme olarakuygulama giriş , gerçekleştirilebilir ve silme yapılabilir eylemlerin listesi
+platform.appwithinminutes.liveTableEditorActionsColumnName=Eylemleri
+platform.appwithinminutes.liveTableEditorAddColumnHint=Ekle
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Eklentiler
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Sınıf alanlar
+platform.appwithinminutes.liveTableEditorColumnsHint=Eğercanlı tabloya eklemek istediğinizsütunları seçinUygulama ana sayfasında görüntülenir .
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Sil
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=sonuygulama girişi düzenlenebilirkullanıcı
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Son Yazar
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Oluşturma tarihi
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creator
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Güncelleme tarihi
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Sayfa tam adı
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Sayfa adı
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Uzay
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Sayfa başlığı
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Genel sütunlar
+platform.appwithinminutes.liveTableEditorHelpDescription=Jenerik canlı tablo sütunları uygulama yapısından bağımsızdır . Bunlar uygulama girişleri tutunsayfaları hakkında bilgi vermek .
+platform.appwithinminutes.liveTableEditorHelpTitle=İpucu
+platform.appwithinminutes.liveTableEditorIcon=İkon
+platform.appwithinminutes.liveTableEditorImagesColumnName=Görüntüler
+platform.appwithinminutes.liveTableEditorMoveColumnHint=değiştirmek için sürükle ve bıraksipariş
+platform.appwithinminutes.liveTableEditorSaveComment=Güncelleme LiveTable
+platform.appwithinminutes.wizardStep1Name=Ad
+platform.appwithinminutes.wizardStep1Title=başvurunuzu Ad
+platform.appwithinminutes.wizardStep2Description=o içerecektir alanların ne tür belirterek uygulamanınyapısını oluşturun .
+platform.appwithinminutes.wizardStep2Name=Yapı
+platform.appwithinminutes.wizardStep2Title=uygulamanızınyapısını tanımlayın
+platform.appwithinminutes.wizardStep3Description=uygulamanınana sayfasını kişiselleştirin .
+platform.appwithinminutes.wizardStep3Name=Sunum
+platform.appwithinminutes.wizardStep3Title=uygulamanızınana sayfa özelleştirme
+platform.appwithinminutes.wizardStepFinishButtonLabel=Bitir
+platform.appwithinminutes.wizardStepHeading=Adım {0}  u2014 {1}
+platform.appwithinminutes.wizardStepHelpDescription=Bu sihirbaz uygulama kurma yolunda size rehberlik edecektir . Bu adımlar uygulaması görüntülenir olacakşekilde yapılandırmak ve ne tür bilgiler içerecektir \:
+platform.appwithinminutes.wizardStepHelpTitle=Adımlar
+platform.appwithinminutes.wizardStepNextButtonLabel=Sonraki Adım
+platform.appwithinminutes.wizardStepNextButtonTip=sonraki adıma git
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Önceki Adım
+platform.appwithinminutes.wizardStepPreviousButtonTip=Önceki adıma git
+</content>
+</xwikidoc>

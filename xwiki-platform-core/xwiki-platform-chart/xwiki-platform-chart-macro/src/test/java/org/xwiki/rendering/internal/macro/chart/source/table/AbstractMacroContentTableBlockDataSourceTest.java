@@ -26,8 +26,15 @@ import java.util.Map;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.chart.source.DataSource;
+import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
@@ -40,8 +47,8 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 /**
@@ -50,16 +57,25 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 4.2M1
  */
+// @formatter:off
 @ComponentList({
     PlainTextBlockRenderer.class,
     PlainTextRendererFactory.class,
     XWiki20Parser.class,
     XWiki20LinkReferenceParser.class,
+    DefaultUntypedLinkReferenceParser.class,
     URLResourceReferenceTypeParser.class,
     XWiki20ImageReferenceParser.class,
     PlainTextRenderer.class,
-    DefaultLinkLabelGenerator.class
+    DefaultLinkLabelGenerator.class,
+    DefaultEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DocumentResourceReferenceTypeParser.class,
+    SpaceResourceReferenceTypeParser.class,
+    AttachmentResourceReferenceTypeParser.class,
+    RelativeStringEntityReferenceResolver.class
 })
+//@formatter:on
 @MockingRequirement(value = MacroContentTableBlockDataSource.class,
     exceptions={ComponentManager.class, BlockRenderer.class})
 public abstract class AbstractMacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase

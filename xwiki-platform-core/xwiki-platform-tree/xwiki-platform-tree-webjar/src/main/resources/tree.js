@@ -319,16 +319,16 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
         }
       }
     };
+    var plugins = [];
+    if (element.attr('data-checkboxes') === 'true') {
+      plugins.push('checkbox');
+    }
     if (element.attr('data-url')) {
-      var plugins = [];
       if (element.attr('data-dragAndDrop') === 'true') {
         plugins.push('dnd');
       }
       if (element.attr('data-contextMenu') === 'true') {
         plugins.push('contextmenu');
-      }
-      if (element.attr('data-checkboxes') === 'true') {
-        plugins.push('checkbox');
       }
       if (element.attr('data-finder') === 'true') {
         plugins.push('finder');
@@ -353,6 +353,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       });
     } else {
       // The tree structure is in-line.
+      baseParams.plugins = plugins;
       return baseParams;
     }
   };

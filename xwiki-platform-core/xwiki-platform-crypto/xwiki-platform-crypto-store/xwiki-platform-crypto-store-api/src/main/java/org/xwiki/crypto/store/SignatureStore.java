@@ -21,7 +21,6 @@ package org.xwiki.crypto.store;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Store and retrieve signatures of entities.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.0
  */
 @Role
-@Unstable
 public interface SignatureStore
 {
     /**

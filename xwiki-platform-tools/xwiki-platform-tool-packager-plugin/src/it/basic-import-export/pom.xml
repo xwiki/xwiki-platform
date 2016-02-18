@@ -28,7 +28,7 @@
     <artifactId>xwiki-platform-tools</artifactId>
     <version>@project.version@</version>
   </parent>
-  <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
+  <artifactId>xwiki-platform-tool-packager-it-basic-import-export</artifactId>
   <packaging>pom</packaging>
   <name>Maven XWiki Backup Plugin Basic Import/Export Sample</name>
   <description>Maven XWiki Backup Plugin Basic Import/Export Sample</description>

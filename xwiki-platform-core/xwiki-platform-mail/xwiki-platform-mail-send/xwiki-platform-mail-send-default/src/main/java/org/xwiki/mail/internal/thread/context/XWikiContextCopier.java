@@ -35,7 +35,10 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 /**
  * Additionally to using {@link XWikiContext#clone()}, this implementation also tries to make sure that the cloned
  * context is usable in a different thread. To do this, the request and the response are stubbed, the URL factory is
- * reinitialized and the store cache is cleared.
+ * reinitialized and the store session/transaction are cleared. This latter point is sensible since there is currently
+ * no way to clear the session/transaction only in the copied context. So the session/transaction is cleared in the
+ * original context before cloning, causing a side effect on the original context. You should never copy a context
+ * while a create/update transaction is in progress, since some changes would get rollbacked.
  * <p/>
  * Note: The clone is still rather shallow, since many fields will still be shared with the original
  * {@link XWikiContext}.
@@ -50,14 +53,29 @@ public class XWikiContextCopier implements Copier<XWikiContext>
     @Inject
     private Copier<XWikiRequest> xwikiRequestCloner;
 
+    /**
+     * {@inheritDoc}
+     *
+     * Any in progress session/transaction on the store retained by the original context will be closed/rollbacked
+     * prior cloning (see {@link com.xpn.xwiki.store.XWikiStoreInterface#cleanUp(XWikiContext)}). Therefore,
+     * the copy operation has a side effect on the original context. You should never copy a context
+     * while a create/update transaction is in progress, since some changes would get rollbacked.
+     */
     @Override
     public XWikiContext copy(XWikiContext originalXWikiContext)
     {
+        // Clean up the store session/transaction before cloning. For the hibernate store, in progress
+        // session/transaction is stored in the context, and would be swallow copied when the context is cloned.
+        // Cleaning after clone would not help, since it would close/rollback the session/transaction still referenced
+        // in the original context as well, causing this context to be corrupted.
+        // The correct way would be to not shallow clone the session/transaction when cloning the original context,
+        // since session/transaction are lazy initialize on request when missing.
+        originalXWikiContext.getWiki().getStore().cleanUp(originalXWikiContext);
+
         // This is still a shallow clone, but at least for stuff like wikiID and userReference it gets the job done.
         XWikiContext clonedXWikiContext = originalXWikiContext.clone();
 
         // lets now build the stub context
-        clonedXWikiContext.getWiki().getStore().cleanUp(originalXWikiContext);
 
         // Copy the request from the context.
         clonedXWikiContext.setRequest(this.xwikiRequestCloner.copy(originalXWikiContext.getRequest()));

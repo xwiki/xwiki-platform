@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -50,12 +49,6 @@ public class WikisFlavorDistributionStep extends AbstractDistributionStep
      * ID of the distribution step. 
      */
     public static final String ID = "extension.flavor.wikis";
-
-    /**
-     * The component used to get information about the current distribution.
-     */
-    @Inject
-    private transient DistributionManager distributionManager;
 
     /**
      * The flavor manager.

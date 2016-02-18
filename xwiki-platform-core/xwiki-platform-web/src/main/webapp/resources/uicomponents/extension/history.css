@@ -9,27 +9,21 @@
   margin: .5em 0;
 }
 
-.extension-history-sources-header .icon-opened,
-.extension-history-replay-log .icon-opened {
+.extension-history-sources-header .icon-opened {
   display: none;
 }
-.extension-history-sources-selector.opened .extension-history-sources-header .icon-opened,
-.extension-history-replay-log.opened .icon-opened {
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-opened {
   display: inline-block;
 }
-.extension-history-sources-header .icon-closed,
-.extension-history-replay-log .icon-closed {
+.extension-history-sources-header .icon-closed {
   display: inline-block;
 }
-.extension-history-sources-selector.opened .extension-history-sources-header .icon-closed,
-.extension-history-replay-log.opened .icon-closed {
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-closed {
   display: none;
 }
 
 .extension-history-sources-header .icon-opened,
-.extension-history-sources-header .icon-closed,
-.extension-history-replay-log .icon-opened,
-.extension-history-replay-log .icon-closed {
+.extension-history-sources-header .icon-closed {
   width: 10px;
 }
 
@@ -137,17 +131,6 @@ li.extension-history-record input[type="checkbox"] {
 
 .extension-history-record-status {
   margin-left: -20px;
-}
-
-.extension-history-replay-log .xHint {
-  cursor: pointer;
-}
-
-.extension-history-replay-log ul.log {
-  display: none;
-}
-.extension-history-replay-log.opened ul.log {
-  display: block;
 }
 
 /**

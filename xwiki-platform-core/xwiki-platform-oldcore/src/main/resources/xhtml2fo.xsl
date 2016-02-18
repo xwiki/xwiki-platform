@@ -525,8 +525,14 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:apply-templates select="." mode="transform"/>
     </xsl:template>
 
-    <!-- The 'style' preprocessor, which takes care of a few CSS properties that need special handling in FO -->
-    <xsl:template match="*[@style]" mode="preprocess">
+    <!-- The 'style' preprocessor, which takes care of a few CSS properties that need special handling in FO.
+
+         Note: Starting with css4j 0.16, css4j applies styles to all elements, including the body tag. For example:
+           <body class="exportbody" id="body" pdfcover="0" pdftoc="0" style="display: block; margin: 8pt; ">
+         As a result we need to exclude the body tag from being processed as otherwise it would lead to a fo:block
+         being issued at the wrong place.
+    -->
+    <xsl:template match="*[@style and not(self::html:body)]" mode="preprocess">
         <!-- Remove all white space and prepend ; for easier processing of the style -->
         <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
         <!-- Chain the 'style' processing into several named templates -->
@@ -807,7 +813,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                             <fo:conditional-page-master-reference page-position="rest" master-reference="rest"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <fo:conditional-page-master-reference page-position="all" master-reference="rest"/>
+                            <fo:conditional-page-master-reference page-position="any" master-reference="rest"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </fo:repeatable-page-master-alternatives>

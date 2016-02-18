@@ -63,7 +63,7 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 
 /**
  * Unit tests for {@link DisplayMacro}.
- * 
+ *
  * @version $Id$
  */
 public class DisplayMacroTest extends AbstractComponentTestCase

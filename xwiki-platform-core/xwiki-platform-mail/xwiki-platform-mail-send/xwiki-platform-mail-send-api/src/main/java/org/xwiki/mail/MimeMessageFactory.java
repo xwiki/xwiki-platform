@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.mail.MessagingException;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Create one or several {@link javax.mail.internet.MimeMessage}. This allows Component implementers the ability to
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4.1
  */
 @Role
-@Unstable
 public interface MimeMessageFactory<T>
 {
     /**

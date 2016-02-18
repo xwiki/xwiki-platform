@@ -391,14 +391,16 @@ public class XWikiAttachment implements Cloneable
 
     public void setDoc(XWikiDocument doc)
     {
-        this.doc = doc;
-        this.reference = null;
+        if (this.doc != doc) {
+            this.doc = doc;
+            this.reference = null;
 
-        if (isMetaDataDirty() && doc != null) {
-            doc.setMetaDataDirty(true);
-        }
-        if (getAttachment_content() != null) {
-            getAttachment_content().setOwnerDocument(doc);
+            if (isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
+            }
+            if (getAttachment_content() != null) {
+                getAttachment_content().setOwnerDocument(doc);
+            }
         }
     }
 

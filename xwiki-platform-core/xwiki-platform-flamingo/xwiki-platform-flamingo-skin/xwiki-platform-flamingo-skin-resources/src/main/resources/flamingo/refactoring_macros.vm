@@ -52,8 +52,10 @@
         <input type="checkbox" name="deep" value="true" />
         $services.localization.render($options.label, ["<a href='$childrenURL'>", $childCount, '</a>'])
       </label>
-      <span class="xHint">$services.localization.render($options.hint)</span>
     </dt>
+    <dd>
+      <span class="xHint">$services.localization.render($options.hint)</span>
+    </dd>
   #end
 #end
 
@@ -78,8 +80,10 @@
     </label>
     ## Hidden input used to ensure that an unchecked terminal checkbox means non-terminal and that the default is not used by mistake.
     <input type="hidden" name="terminal" value="false" />
-    <span class="xHint">$services.localization.render($options.hint)</span>
   </dt>
+  <dd>
+    <span class="xHint">$services.localization.render($options.hint)</span>
+  </dd>
 #end
 
 #macro (maybeDisplayTerminalCheckbox $options)

@@ -22,15 +22,12 @@ package org.xwiki.resource;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a reference to an XWiki Resource (Entity Resource, Attachment Resource, Template Resource, etc).
  *
  * @version $Id$
  * @since 6.1M2
  */
-@Unstable
 public interface ResourceReference
 {
     /**

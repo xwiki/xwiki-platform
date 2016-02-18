@@ -115,7 +115,7 @@ public class CreatePageTest extends AbstractTest
         // Step 2: Create a wanted link and verify that clicking it displays the Template and that we can use it.
 
         // Put a wanted link in the template instance
-        templateInstanceEdit.setContent("[[NewPage]]");
+        templateInstanceEdit.setContent("[[doc:NewPage]]");
         ViewPage vp = templateInstanceEdit.clickSaveAndView();
 
         // Verify that clicking on the wanted link pops up a box to choose the template.
@@ -282,7 +282,8 @@ public class CreatePageTest extends AbstractTest
             currentURL.substring(0, currentURL.indexOf('?') > 0 ? currentURL.indexOf('?') : currentURL.length());
         // Try to create the a space (non-terminal document) that already exist.
         createSpace.getDocumentPicker().toggleLocationAdvancedEdit();
-        createSpace.createPage(existingSpaceName, "", null, false);
+        createSpace.fillForm(existingSpaceName, "", null, false);
+        createSpace.clickCreate();
         String urlAfterSubmit = getDriver().getCurrentUrl();
         urlAfterSubmit =
             urlAfterSubmit.substring(0,

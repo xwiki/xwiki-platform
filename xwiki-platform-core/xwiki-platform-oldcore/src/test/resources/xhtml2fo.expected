@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:svg="http://www.w3.org/2000/svg" writing-mode="lr-tb" hyphenate="false" text-align="start" font-family="FreeSerif, AR PL UMing CN, serif" role="html:html">
+<fo:layout-master-set>
+    <fo:simple-page-master page-width="auto" page-height="auto" master-name="first">
+        <fo:region-body column-gap="12pt" column-count="1" margin-left="1in" margin-bottom="1in" margin-right="1in" margin-top="1in"/>
+        <fo:region-before display-align="before" extent="1in" region-name="page-header-first"/>
+        <fo:region-after display-align="after" extent="1in" region-name="page-footer-first"/>
+        <fo:region-start extent="1in"/>
+        <fo:region-end extent="1in"/>
+    </fo:simple-page-master>
+    <fo:simple-page-master page-width="auto" page-height="auto" master-name="rest">
+        <fo:region-body column-gap="12pt" column-count="1" margin-left="1in" margin-bottom="1in" margin-right="1in" margin-top="1in"/>
+        <fo:region-before display-align="before" extent="1in" region-name="page-header"/>
+        <fo:region-after display-align="after" extent="1in" region-name="page-footer"/>
+        <fo:region-start extent="1in"/>
+        <fo:region-end extent="1in"/>
+    </fo:simple-page-master>
+    <fo:page-sequence-master master-name="all-pages">
+        <fo:repeatable-page-master-alternatives>
+            <fo:conditional-page-master-reference master-reference="rest" page-position="any"/>
+        </fo:repeatable-page-master-alternatives>
+    </fo:page-sequence-master>
+</fo:layout-master-set>
+<fo:page-sequence id="x-page-sequence" master-reference="all-pages">
+    <fo:title/>
+    <fo:static-content flow-name="page-header">
+        <fo:block font-size="small" text-align="center" space-before="0.5in" space-before.conditionality="retain">
+            <fo:block role="html:div">
+                            Main.test2 - test2
+
+                    </fo:block>
+            </fo:block>
+        </fo:static-content>
+        <fo:static-content flow-name="page-footer">
+            <fo:block font-size="small" text-align="center" space-after="0.5in" space-after.conditionality="retain">
+                <fo:block role="html:div">
+                              Page <fo:page-number/> of <fo:page-number-citation-last ref-id="x-page-sequence"/> - last modified by Administrator on 2016/01/25 14:07
+
+                </fo:block>
+            </fo:block>
+        </fo:static-content>
+        <fo:flow flow-name="xsl-region-body">
+            <fo:block font-size="0.75em" break-before="page" role="html:body" id="body" margin="8pt">
+                <fo:block>
+                    <fo:block role="html:div" id="xwikimaincontainer">
+                        <fo:block>
+                            <fo:block role="html:div" id="xwikimaincontainerinner">
+                                <fo:block>
+                                    <fo:block role="html:div" id="xwikicontent">
+                                        <fo:block>
+                                            <fo:block space-before="0.8em" space-after="0.8em" text-indent="0em" role="html:p" margin="1em 0" color="red">
+                                                <fo:inline role="html:span" font="7px 14px Courier">Test</fo:inline>
+                                            </fo:block>
+                                        </fo:block>
+                                    </fo:block>
+                                </fo:block>
+                            </fo:block>
+                        </fo:block>
+                    </fo:block>
+                </fo:block>
+            </fo:block>
+        </fo:flow>
+    </fo:page-sequence>
+</fo:root>

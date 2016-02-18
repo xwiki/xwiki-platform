@@ -33,8 +33,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceTree;
-import org.xwiki.model.reference.EntityReferenceTreeNode;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.job.AbstractEntityJob.Visitor;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -83,9 +83,9 @@ public class EntityJobTest
         }
 
         @Override
-        public void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+        public void visitDocuments(SpaceReference spaceReference, Visitor<DocumentReference> visitor)
         {
-            super.visitDocumentNodes(node, visitor);
+            super.visitDocuments(spaceReference, visitor);
         }
 
         @Override
@@ -100,11 +100,14 @@ public class EntityJobTest
 
     private AuthorizationManager authorization = mock(AuthorizationManager.class);
 
+    private ModelBridge modelBridge = mock(ModelBridge.class);
+
     private void initialize(NoopEntityJob job, EntityRequest request)
     {
         ReflectionUtils.setFieldValue(job, "jobContext", mock(JobContext.class));
         ReflectionUtils.setFieldValue(job, "progressManager", mock(JobProgressManager.class));
         ReflectionUtils.setFieldValue(job, "authorization", this.authorization);
+        ReflectionUtils.setFieldValue(job, "modelBridge", this.modelBridge);
 
         EntityReferenceProvider defaultEntityReferenceProvider = mock(EntityReferenceProvider.class);
         ReflectionUtils.setFieldValue(job, "defaultEntityReferenceProvider", defaultEntityReferenceProvider);
@@ -153,7 +156,7 @@ public class EntityJobTest
     }
 
     @Test
-    public void visitDocumentNodes()
+    public void visitDocuments()
     {
         DocumentReference alice = new DocumentReference("foo", "Alice", "WebHome");
         DocumentReference alicePrefs = new DocumentReference("WebPreferences", alice.getLastSpaceReference());
@@ -165,14 +168,15 @@ public class EntityJobTest
 
         DocumentReference carolBio = new DocumentReference("bar", Arrays.asList("Users", "Carol"), "Bio");
 
-        EntityReferenceTree tree =
-            new EntityReferenceTree(alice, alicePrefs, aliceBio, bob, bobPrefs, bobBio, carolBio);
+        SpaceReference spaceReference = mock(SpaceReference.class);
+        when(this.modelBridge.getDocumentReferences(spaceReference)).thenReturn(
+            Arrays.asList(alice, alicePrefs, aliceBio, bob, bobPrefs, bobBio, carolBio));
 
         NoopEntityJob job = new NoopEntityJob();
         initialize(job, new EntityRequest());
 
         final List<DocumentReference> documentReferences = new ArrayList<>();
-        job.visitDocumentNodes(tree, new Visitor<DocumentReference>()
+        job.visitDocuments(spaceReference, new Visitor<DocumentReference>()
         {
             @Override
             public void visit(DocumentReference documentReference)

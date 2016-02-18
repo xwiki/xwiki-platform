@@ -121,7 +121,7 @@
   #set ($discard = $feed.setAuthor('XWiki'))
   #set ($discard = $feed.setTitle($services.localization.render('activity.rss.feed.description')))
   #set ($discard = $feed.setDescription($description))
-  #set ($discard = $feed.setLanguage($xcontext.language))
+  #set ($discard = $feed.setLanguage("$xcontext.locale"))
   #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
   $xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))
 #end

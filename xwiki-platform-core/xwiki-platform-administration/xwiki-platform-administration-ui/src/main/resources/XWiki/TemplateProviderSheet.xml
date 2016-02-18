@@ -75,7 +75,7 @@
       ## Name
       ##
       &lt;dt&gt;
-        &lt;label for="XWiki.TemplateProviderClass_0_name"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename'))&lt;/label&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_name"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename'))&lt;/label&gt;
         #if ($isEditing)
           &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.templatename.info'))&lt;/span&gt;
         #end
@@ -91,7 +91,7 @@
       ## Template
       ##
       &lt;dt&gt;
-        &lt;label for="XWiki.TemplateProviderClass_0_template"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.template'))&lt;/label&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_template"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.template'))&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         #if ($isEditing)
@@ -109,7 +109,7 @@
       ##
       #if ($isAdvancedUser || $isSuperAdmin)
         &lt;dt&gt;
-          &lt;label for="XWiki.TemplateProviderClass_0_terminal"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal'))&lt;/label&gt;
+          &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_terminal"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal'))&lt;/label&gt;
           &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
@@ -120,7 +120,7 @@
       ## Action
       ##
       &lt;dt&gt;
-        &lt;label for="XWiki.TemplateProviderClass_0_action"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action'))&lt;/label&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_action"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action'))&lt;/label&gt;
         #if ($isEditing)
           &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.action.info'))&lt;/span&gt;
         #end

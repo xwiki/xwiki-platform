@@ -22,13 +22,11 @@ package org.xwiki.filter.event.xwiki;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.model.WikiFilter;
 import org.xwiki.filter.event.model.WikiSpaceFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public interface XWikiWikiDocumentFilter extends WikiFilter, WikiSpaceFilter, WikiDocumentFilter
 {
     /**

@@ -32,7 +32,7 @@ import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.vfs.VfsPermissionChecker;
-import org.xwiki.vfs.internal.VfsResourceReference;
+import org.xwiki.vfs.VfsResourceReference;
 
 import net.java.truevfs.access.TPath;
 

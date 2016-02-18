@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Algorithm to calculate a user's reputation.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M3
  */
 @Role
-@Unstable
 public interface ReputationAlgorithm
 {
 

@@ -22,11 +22,11 @@ package org.xwiki.mail.internal;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
@@ -45,7 +45,7 @@ public class MemoryMailListener extends AbstractMailListener
     private MemoryMailStatusResult mailStatusResult = new MemoryMailStatusResult();
 
     @Override
-    public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         super.onPrepareMessageSuccess(message, parameters);
 
@@ -54,7 +54,7 @@ public class MemoryMailListener extends AbstractMailListener
     }
 
     @Override
-    public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onPrepareMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         super.onPrepareMessageError(message, exception, parameters);
 
@@ -76,7 +76,7 @@ public class MemoryMailListener extends AbstractMailListener
     }
 
     @Override
-    public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
         super.onPrepareMessageSuccess(message, parameters);
 
@@ -86,18 +86,18 @@ public class MemoryMailListener extends AbstractMailListener
     }
 
     @Override
-    public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageFatalError(String uniqueMessageId, Exception exception, Map<String, Object> parameters)
     {
-        super.onSendMessageFatalError(messageId, exception, parameters);
+        super.onSendMessageFatalError(uniqueMessageId, exception, parameters);
 
-        MailStatus status = this.mailStatusResult.getStatus(messageId);
+        MailStatus status = this.mailStatusResult.getStatus(uniqueMessageId);
         if (status != null) {
             status.setState(MailState.SEND_FATAL_ERROR);
             status.setError(exception);
             this.mailStatusResult.setStatus(status);
         } else {
             this.logger.error("Failed to find a previous mail status for message id [{}] of batch [{}]. "
-                + "Unable to report the fatal error encountered during mail sending.", messageId, getBatchId(),
+                + "Unable to report the fatal error encountered during mail sending.", uniqueMessageId, getBatchId(),
                 exception);
         }
 
@@ -105,7 +105,7 @@ public class MemoryMailListener extends AbstractMailListener
     }
 
     @Override
-    public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         super.onSendMessageError(message, exception, parameters);
 

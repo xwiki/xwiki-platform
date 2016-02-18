@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import javax.inject.Provider;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
@@ -34,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -81,17 +81,14 @@ public class SendMailRunnableTest
         properties.setProperty("mail.smtp.host", "xwiki-unknown");
         Session session = Session.getDefaultInstance(properties);
 
-        MimeMessage message1 = new MimeMessage(session);
-        message1.setSubject("subject1");
-        message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
-        message1.saveChanges();
-        String id1 = message1.getMessageID();
-
-        MimeMessage message2 = new MimeMessage(session);
-        message2.setSubject("subject2");
-        message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
-        message2.saveChanges();
-        String id2 = message2.getMessageID();
+        MimeMessage msg1 = new MimeMessage(session);
+        msg1.setText("Content1");
+        ExtendedMimeMessage message1 = new ExtendedMimeMessage(msg1);
+        String id1 = message1.getUniqueMessageId();
+        MimeMessage msg2 = new MimeMessage(session);
+        msg2.setText("Content2");
+        ExtendedMimeMessage message2 = new ExtendedMimeMessage(msg2);
+        String id2 = message2.getUniqueMessageId();
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
@@ -150,12 +147,14 @@ public class SendMailRunnableTest
         Properties properties = new Properties();
         Session session = Session.getDefaultInstance(properties);
 
-        MimeMessage message1 = new MimeMessage(session);
-        message1.saveChanges();
-        String id1 = message1.getMessageID();
-        MimeMessage message2 = new MimeMessage(session);
-        message2.saveChanges();
-        String id2 = message2.getMessageID();
+        MimeMessage msg1 = new MimeMessage(session);
+        msg1.setText("Content1");
+        ExtendedMimeMessage message1 = new ExtendedMimeMessage(msg1);
+        String id1 = message1.getUniqueMessageId();
+        MimeMessage msg2 = new MimeMessage(session);
+        msg2.setText("Content2");
+        ExtendedMimeMessage message2 = new ExtendedMimeMessage(msg2);
+        String id2 = message2.getUniqueMessageId();
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();

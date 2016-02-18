@@ -25,14 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webdav</artifactId>
-    <version>7.4-SNAPSHOT</version>
+    <version>8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webdav-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - WebDAV - Server</name>
   <description>Service for accessing XWiki through WebDAV</description>
   <properties>
-    <jackrabbit.version>1.4</jackrabbit.version>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WebDAV Server</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

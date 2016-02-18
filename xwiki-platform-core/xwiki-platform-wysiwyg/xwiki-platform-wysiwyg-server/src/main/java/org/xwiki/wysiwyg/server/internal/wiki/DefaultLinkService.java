@@ -27,9 +27,9 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityConfig;
 import org.xwiki.gwt.wysiwyg.client.wiki.URIReference;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -42,7 +42,7 @@ import org.xwiki.wysiwyg.server.wiki.LinkService;
 
 /**
  * The service used to create links.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -70,13 +70,6 @@ public class DefaultLinkService implements LinkService
     private EntityReferenceResolver<EntityReference> explicitReferenceEntityReferenceResolver;
 
     /**
-     * The component used to resolve a string entity reference relative to another entity reference.
-     */
-    @Inject
-    @Named("explicit")
-    private EntityReferenceResolver<String> explicitStringEntityReferenceResolver;
-
-    /**
      * The component used to serialize link references.
      * <p>
      * Note: The link reference syntax is independent of the syntax of the edited document. The current hint should be
@@ -101,6 +94,15 @@ public class DefaultLinkService implements LinkService
      */
     @Inject
     private EntityReferenceConverter entityReferenceConverter;
+
+    /**
+     * Used to resolve a DocumentReference from a SpaceReference, i.e. the space's homepage.
+     */
+    @Inject
+    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
 
     @Override
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
@@ -167,47 +169,87 @@ public class DefaultLinkService implements LinkService
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
         ResourceReference linkReference = linkReferenceParser.parse(linkReferenceAsString);
+
+        ResourceType linkResourceType = linkReference.getType();
+        if (ResourceType.SPACE.equals(linkResourceType)) {
+            // Treat space resources the same as documents in order to reuse the UI.
+            linkResourceType = ResourceType.DOCUMENT;
+        }
+
         org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference clientLinkReference =
             new org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference();
         clientLinkReference.setType(org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType
-            .forScheme(linkReference.getType().getScheme()));
+            .forScheme(linkResourceType.getScheme()));
         clientLinkReference.setTyped(linkReference.isTyped());
         clientLinkReference.getParameters().putAll(linkReference.getParameters());
-        clientLinkReference.setEntityReference(parseEntityReferenceFromResourceReference(linkReference.getReference(),
+        clientLinkReference.setEntityReference(parseEntityReferenceFromResourceReference(linkReference,
             clientLinkReference.getType(), baseReference));
+
         return clientLinkReference;
     }
 
     /**
      * Parses a client entity reference from a link/resource reference.
-     * 
-     * @param stringEntityReference a string entity reference extracted from a link/resource reference
-     * @param resourceType the type of resource the string entity reference was extracted from
+     *
+     * @param resourceReference the resource reference to parse
+     * @param clientResourceType the previously resolved client-side type of the passed resource reference
      * @param baseReference the client entity reference that is used to resolve the parsed entity reference relative to
      * @return an untyped client entity reference
      */
     private org.xwiki.gwt.wysiwyg.client.wiki.EntityReference parseEntityReferenceFromResourceReference(
-        String stringEntityReference, org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType resourceType,
+        ResourceReference resourceReference,
+        org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType clientResourceType,
         org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
     {
-        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType entityType;
-        switch (resourceType) {
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference result = null;
+
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType clientEntityType;
+        switch (clientResourceType) {
             case DOCUMENT:
-                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT;
+                clientEntityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.DOCUMENT;
                 break;
             case ATTACHMENT:
-                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT;
+                clientEntityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.ATTACHMENT;
                 break;
             default:
-                entityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL;
+                clientEntityType = org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL;
                 break;
         }
-        if (entityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL) {
-            return new URIReference(stringEntityReference).getEntityReference();
+
+        if (clientEntityType == org.xwiki.gwt.wysiwyg.client.wiki.EntityReference.EntityType.EXTERNAL) {
+            result = new URIReference(resourceReference.getReference()).getEntityReference();
         } else {
-            return entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(
-                stringEntityReference, EntityType.valueOf(entityType.toString()),
-                entityReferenceConverter.convert(baseReference)));
+            EntityReference serverEntityReference =
+                parseServerEntityReferenceFromResourceReference(resourceReference, baseReference);
+
+            result = entityReferenceConverter.convert(serverEntityReference);
         }
+
+        return result;
+    }
+
+    /**
+     * @param resourceReference the reference to resolve
+     * @param baseReference the base reference to use when resolving
+     * @return the resolved {@link EntityReference}
+     */
+    private EntityReference parseServerEntityReferenceFromResourceReference(ResourceReference resourceReference,
+        org.xwiki.gwt.wysiwyg.client.wiki.EntityReference baseReference)
+    {
+        EntityReference result = null;
+
+        EntityReference baseServerEntityReference = entityReferenceConverter.convert(baseReference);
+
+        result = resourceReferenceResolver.resolve(resourceReference, null, baseServerEntityReference);
+
+        ResourceType resourceType = resourceReference.getType();
+
+        // Depending on the resource type, additional work might be needed to resolve the reference.
+        if (ResourceType.SPACE.equals(resourceType)) {
+            // Make sure to return the space's WebHome since space links are mapped to documents for now.
+            result = defaultReferenceDocumentReferenceResolver.resolve(result);
+        }
+
+        return result;
     }
 }

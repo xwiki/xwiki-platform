@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.NamespaceValidator;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
@@ -75,6 +76,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * with <code>wiki:</code> which gives for the wiki <code>wiki1</code>: <code>wiki:wiki1</code>.
  * 
  * @version $Id$
+ * @since 2.5M2
  */
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT)
@@ -121,6 +123,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private NamespaceValidator namespaceResolver;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -228,6 +233,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param extensionDependency the extension dependency to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
      *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     * @since 3.4M1
      * @deprecated since 5.3M1, use {@link #resolve(ExtensionDependency, String)} instead
      */
     @Deprecated
@@ -799,6 +805,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param version the string to parse
      * @return the {@link Version} instance
+     * @since 3.4M1
      */
     public Version parseVersion(String version)
     {
@@ -808,6 +815,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param versionRange the string to parse
      * @return the {@link VersionRange} instance
+     * @since 3.4M1
      */
     public VersionRange parseVersionRange(String versionRange)
     {
@@ -825,6 +833,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * @param versionConstraint the string to parse
      * @return the {@link VersionConstraint} instance
+     * @since 3.4M1
      */
     public VersionConstraint parseVersionConstraint(String versionConstraint)
     {
@@ -859,6 +868,28 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         return null;
     }
 
+    /**
+     * @param allowedNamespaces the allowed dynamic (or not) namespaces, null matches any namespace
+     * @param namespace to validate against passed allowed namespaces
+     * @return the namespace(s) corresponding to the passed dynamic namespaces
+     * @since 8.0M1
+     */
+    public boolean isAllowed(Collection<String> allowedNamespaces, String namespace)
+    {
+        return this.namespaceResolver.isAllowed(allowedNamespaces, namespace);
+    }
+
+    /**
+     * @param extension the extension to check with the passed namespace
+     * @param namespace to validate against passed allowed namespaces
+     * @return the namespace(s) corresponding to the passed dynamic namespaces
+     * @since 8.0M1
+     */
+    public boolean isAllowed(Extension extension, String namespace)
+    {
+        return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);
+    }
+
     // Deprecated (generally moved to dedicated script services)
 
     /**
@@ -889,8 +920,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
-        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions(
-            namespace);
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
+            .getInstalledExtensions(namespace);
     }
 
     /**
@@ -910,8 +941,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
-        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtension(
-            feature, namespace);
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
+            .getInstalledExtension(feature, namespace);
     }
 
     /**
@@ -927,8 +958,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
     {
-        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getBackwardDependencies(
-            feature);
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
+            .getBackwardDependencies(feature);
     }
 
     /**

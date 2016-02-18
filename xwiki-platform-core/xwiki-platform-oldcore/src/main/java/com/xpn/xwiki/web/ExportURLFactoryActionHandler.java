@@ -22,7 +22,6 @@ package com.xpn.xwiki.web;
 import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +34,6 @@ import com.xpn.xwiki.XWikiContext;
  * @since 6.2RC1
  */
 @Role
-@Unstable
 public interface ExportURLFactoryActionHandler
 {
     /**

@@ -228,7 +228,7 @@
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit' &amp;&amp; $editor == 'wysiwyg')
   #set ($content = "$services.icon.render('chart_organisation') $services.localization.render('tree.macro.editModeWarning')")
 #end
-#set ($output = "(% #treeAttributes($options) %)((($!content)))")
+#set ($output = "(% #treeAttributes($options true) %)((($!content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
 {{/velocity}}</code>

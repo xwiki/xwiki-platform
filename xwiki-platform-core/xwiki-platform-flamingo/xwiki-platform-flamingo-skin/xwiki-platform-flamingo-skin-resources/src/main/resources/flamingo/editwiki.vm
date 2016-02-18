@@ -12,7 +12,7 @@
 #end
 <input type="hidden" name="xcontinue" value="$xcontinue"/>
 <input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="language" value="$!tdoc.realLanguage" />
+<input type="hidden" name="language" value="$!tdoc.realLocale" />
 </div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">
@@ -24,7 +24,7 @@ $xwiki.getTextArea($tdoc.content)
 </div> ## noname
 <div class="bottombuttons form-inline">#template("editactions.vm")</div>
 ## Insert JS and CSS needed for the fullscreen edit feature
-$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)
 ## Autosave feature
 $xwiki.jsfx.use('js/xwiki/editors/autosave.js', true)

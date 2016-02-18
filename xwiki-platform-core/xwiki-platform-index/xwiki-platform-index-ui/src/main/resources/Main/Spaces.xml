@@ -343,7 +343,7 @@ ul.xlist li.xitem div.xshowonhover img {
 ## List spaces within the wiki.
 ##
 $xwiki.ssx.use('Main.Spaces')##
-#set($spaceList = $xwiki.getSpaces())
+#set($spaceList = $services.query.xwql('select distinct doc.space from Document doc order by doc.space').addFilter('hidden').execute())
 {{html}}
 &lt;ul class="xlist"&gt;
   ##

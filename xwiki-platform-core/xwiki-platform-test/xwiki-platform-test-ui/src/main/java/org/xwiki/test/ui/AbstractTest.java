@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -101,7 +102,7 @@ public abstract class AbstractTest
             initializeSystem(persistentTestContext);
 
             // Start XWiki
-            persistentTestContext.getExecutor().start();
+            persistentTestContext.start();
 
             // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
             // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
@@ -117,6 +118,13 @@ public abstract class AbstractTest
         if (context != null) {
             context.shutdown();
         }
+    }
+
+    @Before
+    public void beforeTest()
+    {
+        // Make sure to start the test on first instance
+        getUtil().switchExecutor(0);
     }
 
     protected String getTestMethodName()

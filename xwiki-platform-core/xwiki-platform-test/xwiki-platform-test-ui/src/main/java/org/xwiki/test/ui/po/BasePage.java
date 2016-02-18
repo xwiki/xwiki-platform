@@ -552,4 +552,14 @@ public class BasePage extends BaseElement
     {
         return this.notificationsMenu.findElement(By.className("dropdown-menu")).isDisplayed();
     }
+
+    /**
+     * @return the text of uncaught errors
+     * @since 8.0M1
+     */
+    public String getErrorContent()
+    {
+        return getDriver().findElementWithoutWaiting(
+            By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]")).getText();
+    }
 }

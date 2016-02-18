@@ -21,7 +21,6 @@ package org.xwiki.lesscss.compiler;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * The Integrated LESS Compiler is a LESS compiler that take care of the wiki context (skin and color themes) to
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface LESSCompiler
 {
     /**

@@ -39,14 +39,12 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <F>
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public abstract class AbstractInstanceInputEventGenerator<F> implements InstanceInputEventGenerator, Initializable
 {
     @Inject

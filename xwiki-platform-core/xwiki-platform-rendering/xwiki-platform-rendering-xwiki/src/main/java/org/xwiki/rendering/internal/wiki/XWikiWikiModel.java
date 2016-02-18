@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.wiki;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,11 +35,15 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
@@ -53,7 +56,7 @@ import com.steadystate.css.parser.SACParserCSS21;
 
 /**
  * Implementation using the Document Access Bridge ({@link DocumentAccessBridge}).
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -102,7 +105,8 @@ public class XWikiWikiModel implements WikiModel
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     /**
-     * Convert an Attachment Reference from a String into an Attachment object.
+     * Convert an Attachment Reference from a String (specified using the document reference format) into an Attachment
+     * object.
      */
     @Inject
     @Named("current")
@@ -114,6 +118,16 @@ public class XWikiWikiModel implements WikiModel
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    /**
+     * Used to resolve a Resource Reference into a Space Reference.
+     */
+    @Inject
+    @Named("current")
+    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
+
+    @Inject
+    private EntityReferenceResolver<ResourceReference> resourceReferenceEntityReferenceResolver;
 
     /**
      * Provides logging for this class.
@@ -128,7 +142,7 @@ public class XWikiWikiModel implements WikiModel
      * {@link CSSOMParser} sets the {@code org.w3c.css.sac.parser} system property to its own implementation, i.e.
      * {@link com.steadystate.css.parser.SACParserCSS2}, affecting other components that require a CSS SAC parser (e.g.
      * PDF export).
-     * 
+     *
      * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-5625">XWIKI-5625: PDF styling doesn't work anymore</a>
      */
     private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS21());
@@ -141,7 +155,14 @@ public class XWikiWikiModel implements WikiModel
     public String getLinkURL(ResourceReference linkReference)
     {
         // Note that we don't ask for a full URL because links should be relative as much as possible
-        return this.documentAccessBridge.getAttachmentURL(resolveAttachmentReference(linkReference),
+        EntityReference attachmentReference =
+            resourceReferenceEntityReferenceResolver.resolve(linkReference, EntityType.ATTACHMENT);
+
+        if (attachmentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(attachmentReference));
+        }
+
+        return this.documentAccessBridge.getAttachmentURL(new AttachmentReference(attachmentReference),
             linkReference.getParameter(AttachmentResourceReference.QUERY_STRING), false);
     }
 
@@ -149,6 +170,7 @@ public class XWikiWikiModel implements WikiModel
      * {@inheritDoc}
      * @since 2.5RC1
      */
+    @Override
     public String getImageURL(ResourceReference imageReference, Map<String, String> parameters)
     {
         // Handle icon references
@@ -177,27 +199,39 @@ public class XWikiWikiModel implements WikiModel
     }
 
     @Override
-    public boolean isDocumentAvailable(ResourceReference documentResourceReference)
+    public boolean isDocumentAvailable(ResourceReference resourceReference)
     {
-        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
-        return this.documentAccessBridge.exists(documentReference);
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
+        return this.documentAccessBridge.exists(new DocumentReference(documentReference));
     }
 
     @Override
-    public String getDocumentViewURL(ResourceReference documentResourceReference)
+    public String getDocumentViewURL(ResourceReference resourceReference)
     {
-        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
-        return this.documentAccessBridge.getDocumentURL(documentReference, "view",
-            documentResourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
-            documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
+
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
+        }
+
+        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "view",
+            resourceReference.getParameter(DocumentResourceReference.QUERY_STRING),
+            resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     @Override
-    public String getDocumentEditURL(ResourceReference documentResourceReference)
+    public String getDocumentEditURL(ResourceReference resourceReference)
     {
         // Add the parent=<current document name> parameter to the query string of the edit URL so that
         // the new document is created with the current page as its parent.
-        String modifiedQueryString = documentResourceReference.getParameter(DocumentResourceReference.QUERY_STRING);
+        String modifiedQueryString = resourceReference.getParameter(DocumentResourceReference.QUERY_STRING);
         if (StringUtils.isBlank(modifiedQueryString)) {
             DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
             if (reference != null) {
@@ -224,75 +258,15 @@ public class XWikiWikiModel implements WikiModel
             }
         }
 
-        DocumentReference documentReference = resolveDocumentReference(documentResourceReference);
-        return this.documentAccessBridge.getDocumentURL(documentReference, "create", modifiedQueryString,
-            documentResourceReference.getParameter(DocumentResourceReference.ANCHOR));
-    }
+        EntityReference documentReference =
+            resourceReferenceEntityReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT);
 
-    /**
-     * Resolve the reference passed as a String into a DocumentReference object.
-     *
-     * @param documentResourceReference the resource to transform into a {@link DocumentReference} object
-     * @return the resolved reference resolved using the base resource reference if any
-     */
-    private DocumentReference resolveDocumentReference(ResourceReference documentResourceReference)
-    {
-        DocumentReference documentReference;
-        if (!documentResourceReference.getBaseReferences().isEmpty()) {
-            // If the passed reference has a base reference, resolve it first with a current resolver (it should
-            // normally be absolute but who knows what the API caller has specified...)
-            DocumentReference baseReference = resolveBaseReference(documentResourceReference.getBaseReferences());
-            documentReference =
-                this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference(), baseReference);
-        } else {
-            documentReference = this.currentDocumentReferenceResolver.resolve(documentResourceReference.getReference());
+        if (documentReference == null) {
+            throw new IllegalArgumentException(String.valueOf(resourceReference));
         }
 
-        return documentReference;
-    }
-
-    /**
-     * Resolve the list of base references taking the first element in the list, resolving it and then resolving the
-     * other elements based on the previous resolving.
-     *
-     * @param baseReferences the list of base references to resolve
-     * @return the resolved base reference against which to resolve the target resource reference
-     */
-    private DocumentReference resolveBaseReference(List<String> baseReferences)
-    {
-        DocumentReference resolvedBaseReference = null;
-        for (String baseReference : baseReferences) {
-            if (resolvedBaseReference != null) {
-                resolvedBaseReference =
-                    this.currentDocumentReferenceResolver.resolve(baseReference, resolvedBaseReference);
-            } else {
-                resolvedBaseReference = this.currentDocumentReferenceResolver.resolve(baseReference);
-            }
-        }
-        return resolvedBaseReference;
-    }
-
-    /**
-     * Resolve the reference passed as a String into an AttachmentReference object.
-     *
-     * @param attachmentResourceReference the resource to transform into a {@link AttachmentReference} object
-     * @return the resolved reference resolved using the base resource reference if any
-     */
-    private AttachmentReference resolveAttachmentReference(ResourceReference attachmentResourceReference)
-    {
-        AttachmentReference attachmentReference;
-        if (!attachmentResourceReference.getBaseReferences().isEmpty()) {
-            // If the passed reference has a base reference, resolve it first with a current resolver (it should
-            // normally be absolute but who knows what the API caller has specified...)
-            DocumentReference baseReference = resolveBaseReference(attachmentResourceReference.getBaseReferences());
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
-                attachmentResourceReference.getReference(), baseReference);
-        } else {
-            attachmentReference = this.currentAttachmentReferenceResolver.resolve(
-                attachmentResourceReference.getReference());
-        }
-
-        return attachmentReference;
+        return this.documentAccessBridge.getDocumentURL(new DocumentReference(documentReference), "create",
+            modifiedQueryString, resourceReference.getParameter(DocumentResourceReference.ANCHOR));
     }
 
     /**

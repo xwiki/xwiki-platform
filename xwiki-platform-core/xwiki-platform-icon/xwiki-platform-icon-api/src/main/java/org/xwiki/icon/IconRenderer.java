@@ -20,7 +20,6 @@
 package org.xwiki.icon;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to render an icon (either with Wiki Syntax or HTML).
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface IconRenderer
 {
     /**

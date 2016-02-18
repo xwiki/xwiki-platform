@@ -52,8 +52,8 @@ import org.xwiki.model.reference.EntityReference;
 @Component
 @Named(ExtensionInstanceOutputFilterStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ExtensionInstanceOutputFilterStream extends
-    AbstractBeanOutputFilterStream<ExtensionInstanceOutputProperties> implements ExtensionFilter, WikiFilter
+public class ExtensionInstanceOutputFilterStream
+    extends AbstractBeanOutputFilterStream<ExtensionInstanceOutputProperties> implements ExtensionFilter, WikiFilter
 {
     private static final String WIKINAMESPACE = "wiki:";
 
@@ -158,8 +158,8 @@ public class ExtensionInstanceOutputFilterStream extends
             // Make sure it's not already there
             // TODO: should probably make it configurable
             if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
-                for (String feature : localExtension.getFeatures()) {
-                    if (installedRepository.getInstalledExtension(feature, namespace) != null) {
+                for (ExtensionId feature : localExtension.getExtensionFeatures()) {
+                    if (installedRepository.getInstalledExtension(feature.getId(), namespace) != null) {
                         // Already exist so don't register it or it could create a mess
                         return;
                     }

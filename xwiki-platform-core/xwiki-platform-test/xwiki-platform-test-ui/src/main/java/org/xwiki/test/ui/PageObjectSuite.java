@@ -79,7 +79,7 @@ public class PageObjectSuite extends XWikiExecutorSuite
     private void initializePersistentTestContext()
     {
         try {
-            this.context = new PersistentTestContext(getExecutors().get(0));
+            this.context = new PersistentTestContext(getExecutors());
             AbstractTest.initializeSystem(this.context.getUnstoppable());
 
             // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically

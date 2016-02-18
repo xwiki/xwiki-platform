@@ -36,13 +36,13 @@ actionButtons.EditActions = Class.create({
       item.observe('click', this.onCancel.bindAsEventListener(this));
     }.bind(this));
     $$('input[name=action_preview]').each(function(item) {
-      item.observe('click', this.onPreview.bindAsEventListener(this));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'preview'));
     }.bind(this));
     $$('input[name=action_save]').each(function(item) {
-      item.observe('click', this.onSaveAndView.bindAsEventListener(this));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'save'));
     }.bind(this));
     $$('input[name=action_saveandcontinue]').each(function(item) {
-      item.observe('click', this.onSaveAndContinue.bindAsEventListener(this));
+      item.observe('click', this.onSubmit.bindAsEventListener(this, 'save', true));
     }.bind(this));
   },
   addShortcuts : function() {
@@ -137,26 +137,14 @@ actionButtons.EditActions = Class.create({
     // Call the cancel URL directly instead of submitting the form. (optimisation)
     window.location = location + cancelActionParameter + xredirectParameter + fragmentId;
   },
-  onPreview : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      // Notify others
-      this.notify(event, "preview");
-    }
-  },
-  onSaveAndView : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      this.notify(event, "save", {"continue" : false});
-    }
-  },
-  onSaveAndContinue : function(event) {
-    if (!this.validateForm(event.element().form)) {
-      event.stop();
-    } else {
-      this.notify(event, "save", {"continue" : true});
+  onSubmit: function(event, action, continueEditing) {
+    var beforeAction = 'before' + action.substr(0, 1).toUpperCase() + action.substr(1);
+    if (this.notify(event, beforeAction, {'continue': continueEditing})) {
+      if (this.validateForm(event.element().form)) {
+        this.notify(event, action, {'continue' : continueEditing});
+      } else {
+        event.stop();
+      }
     }
   },
   notify : function(event, action, params) {
@@ -165,6 +153,7 @@ actionButtons.EditActions = Class.create({
     if (event.stopped) {
       event.stop();
     }
+    return !event.stopped;
   }
 });
 
@@ -206,7 +195,7 @@ actionButtons.AjaxSaveAndContinue = Class.create({
     }
 
     // This could be a custom form, in which case we need to keep it simple to avoid breaking applications.
-    var isCustomForm = !this.form.action.contains("/preview/");
+    var isCustomForm = (this.form.action.indexOf("/preview/") == -1);
 
     // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
     var isAsync = (this.form.async && this.form.async.value === 'true');

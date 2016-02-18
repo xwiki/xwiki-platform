@@ -23,13 +23,11 @@ import java.util.HashMap;
 
 import org.xwiki.filter.FilterStreamProperties;
 import org.xwiki.properties.RawProperties;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties, FilterStreamProperties
 {
     @Override

@@ -48,6 +48,10 @@ import org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFil
 import org.xwiki.rendering.internal.parser.DefaultContentParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
+import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
+import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
@@ -142,6 +146,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     XWiki20Parser.class,
     XWiki20LinkReferenceParser.class,
     XWiki20ImageReferenceParser.class,
+    DefaultUntypedLinkReferenceParser.class,
+    DocumentResourceReferenceTypeParser.class,
+    SpaceResourceReferenceTypeParser.class,
+    AttachmentResourceReferenceTypeParser.class,
 
     // XHTML 1.0
     XHTMLBlockRenderer.class,

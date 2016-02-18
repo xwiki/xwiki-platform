@@ -38,7 +38,6 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Expose Mail Sending API to scripts.
@@ -58,7 +57,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("mailsender")
 @Singleton
-@Unstable
 public class MailSenderScriptService extends AbstractMailScriptService
 {
     /**

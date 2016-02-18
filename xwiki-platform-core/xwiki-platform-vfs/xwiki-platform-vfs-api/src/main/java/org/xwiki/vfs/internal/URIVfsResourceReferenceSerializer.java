@@ -33,6 +33,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Serializer which transforms a {@link VfsResourceReference} into a {@link URI} by looking for a URI scheme-specific

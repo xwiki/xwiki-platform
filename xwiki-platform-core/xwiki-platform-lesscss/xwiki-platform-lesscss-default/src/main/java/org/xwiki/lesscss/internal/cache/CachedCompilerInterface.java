@@ -21,7 +21,6 @@ package org.xwiki.lesscss.internal.cache;
 
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A compiler that the AbstractCachedCompiler can use when the expected result of the compilation is not in the cache.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M2
  * @version $Id$
  */
-@Unstable
 public interface CachedCompilerInterface<T>
 {
     /**

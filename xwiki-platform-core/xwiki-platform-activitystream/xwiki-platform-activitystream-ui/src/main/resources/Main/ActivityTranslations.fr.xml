@@ -45,6 +45,7 @@
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 activity.link.title=Situé dans {0} » {1} » {2} 
+activity.page.link.title=Situé dans {0}
 activity.rss.feed.description=Flux RSS des documents modifiés
 activity.rss.feed.spaces.description=Flux RSS des documents modifiés pour les espaces "{0}"
 activity.rss.feed.tags.description=Flux RSS des documents modifiés et tagués avec "{0}"

@@ -499,7 +499,7 @@ public class PackageMojo extends AbstractMojo
 
         // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.2.9", "", "jar");
+            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.3.3", "", "jar");
         }
 
         if (hsqldbArtifact != null) {
@@ -651,8 +651,6 @@ public class PackageMojo extends AbstractMojo
         // provide. We'll be able to remove them when we start using Servlet 3.0 -->
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-wysiwyg-server", getXWikiPlatformVersion(), null, "jar"));
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-webdav-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-rest-server", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

@@ -20,15 +20,16 @@
 package org.xwiki.rendering.internal.renderer;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
@@ -51,8 +52,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
 
     /**
      * {@inheritDoc}
@@ -64,7 +64,12 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         String result;
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(reference.getReference());
+
+        EntityReference resolvedReference = resourceReferenceResolver.resolve(reference, EntityType.DOCUMENT);
+        if (resolvedReference == null) {
+            throw new IllegalArgumentException(String.valueOf(reference));
+        }
+        DocumentReference documentReference = new DocumentReference(resolvedReference);
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

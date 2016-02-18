@@ -71,7 +71,7 @@
     'creationdate', 'class', 'mimetype', 'attauthor', 'attdate', 'attsize'],
   'facetQuery': {
     'type': 'DOCUMENT',
-    'locale': [$xcontext.language, '']
+    'locale': ["$xcontext.locale", '']
   },
   'facetEnabled': true,
   'facetDisplayers': {

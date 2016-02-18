@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
@@ -239,8 +239,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
         assertEquals(
-            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage",
-                "targetwiki:TargetSpace.TargetPage")), linkedPages);
+            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
+                "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException
@@ -532,12 +532,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testConvertSyntax() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
-        this.baseObject.setLargeStringValue("area", "object content not in section\n"
-            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
-        this.baseObject.setLargeStringValue("puretextarea", "object content not in section\n"
-            + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
+        this.document.setSyntax(Syntax.HTML_4_01);
+        this.document.setContent("<p>content not in section</p>"
+            + "<h1>header 1</h1><p>header 1 content</p>"
+            + "<h2>header 2</h2><p>header 2 content</p>");
+        this.baseObject.setLargeStringValue("area", "<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>");
+        this.baseObject.setLargeStringValue("puretextarea", "<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>");
 
         this.document.convertSyntax("xwiki/2.0", getContext());
 
@@ -545,8 +549,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             + "== header 2 ==\n\nheader 2 content", this.document.getContent());
         assertEquals("object content not in section\n\n" + "= object header 1 =\n\nobject header 1 content\n\n"
             + "== object header 2 ==\n\nobject header 2 content", this.baseObject.getStringValue("area"));
-        assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"
-            + "1.1 object header 2\nobject header 2 content", this.baseObject.getStringValue("puretextarea"));
+        assertEquals("<p>object content not in section</p>"
+            + "<h1>object header 1</h1><p>object header 1 content</p>"
+            + "<h2>object header 2</h2><p>object header 2 content</p>", this.baseObject.getStringValue("puretextarea"));
         assertEquals("xwiki/2.0", this.document.getSyntaxId());
     }
 
@@ -588,29 +593,29 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
 
-        this.document.setContent("[[pageinsamespace]]");
-        this.document.setSyntax(Syntax.XWIKI_2_0);
+        this.document.setContent("[[doc:pageinsamespace]]");
+        this.document.setSyntax(Syntax.XWIKI_2_1);
         DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
         XWikiDocument targetDocument = this.document.duplicate(targetReference);
         targetDocument.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
         XWikiDocument doc1 = new XWikiDocument(reference1);
-        doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" + DOCSPACE + "." + DOCNAME
-            + "]] [[" + DOCNAME + "]]");
-        doc1.setSyntax(Syntax.XWIKI_2_0);
+        doc1.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>doc:" + DOCSPACE + "."
+            + DOCNAME + "]] [[doc:" + DOCNAME + "]]");
+        doc1.setSyntax(Syntax.XWIKI_2_1);
         doc1.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
         XWikiDocument doc2 = new XWikiDocument(reference2);
-        doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc2.setSyntax(Syntax.XWIKI_2_0);
+        doc2.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
+        doc2.setSyntax(Syntax.XWIKI_2_1);
         doc2.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
         XWikiDocument doc3 = new XWikiDocument(reference3);
-        doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc3.setSyntax(Syntax.XWIKI_2_0);
+        doc3.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
+        doc3.setSyntax(Syntax.XWIKI_2_1);
         doc3.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         // Test to make sure it also drags children along.
@@ -640,11 +645,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5), getContext());
 
         // Test links
-        assertEquals("[[Wiki:Space.pageinsamespace]]", this.document.getContent());
-        assertEquals("[[newwikiname:newspace.newpage]] " + "[[someName>>newwikiname:newspace.newpage]] "
-            + "[[newwikiname:newspace.newpage]]", doc1.getContent());
-        assertEquals("[[newspace.newpage]]", doc2.getContent());
-        assertEquals("[[newpage]]", doc3.getContent());
+        assertEquals("[[doc:Wiki:Space.pageinsamespace]]", this.document.getContent());
+        assertEquals("[[doc:newwikiname:newspace.newpage]] " + "[[someName>>doc:newwikiname:newspace.newpage]] "
+            + "[[doc:newwikiname:newspace.newpage]]", doc1.getContent());
+        assertEquals("[[doc:newspace.newpage]]", doc2.getContent());
+        assertEquals("[[doc:newpage]]", doc3.getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage", doc4.getParent());
@@ -693,6 +698,15 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("good {{include reference=\"One.Two\"/}}");
         assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
+
+        this.document.setContent("bad recursive {{include reference=\"\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad recursive {{include reference=\"" + DOCNAME + "\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
+
+        this.document.setContent("bad recursive {{include reference=\"" + DOCSPACE + "." + DOCNAME + "\"/}}");
+        assertTrue(this.document.getIncludedPages(getContext()).isEmpty());
     }
 
     /**

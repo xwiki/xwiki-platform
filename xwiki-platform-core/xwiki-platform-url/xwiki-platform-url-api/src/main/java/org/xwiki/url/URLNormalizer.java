@@ -20,7 +20,6 @@
 package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Normalize a relative URL. Various implementations can exist, for example one implementation may normalize the passed
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 6.1M2
  */
 @Role
-@Unstable
 public interface URLNormalizer<T>
 {
     /**

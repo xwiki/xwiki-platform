@@ -25,7 +25,6 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
-import org.xwiki.stability.Unstable;
 
 /**
  * Attachment related events.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.2M1
  */
-@Unstable
 public interface WikiAttachmentFilter
 {
     /**

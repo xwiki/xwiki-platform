@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.LESSConfiguration;
 import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
@@ -61,6 +62,8 @@ public class CachedLESSCompilerTest
 
     private Less4jCompiler less4jCompiler;
 
+    private LESSConfiguration lessConfiguration;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
@@ -71,6 +74,7 @@ public class CachedLESSCompilerTest
     public void setUp() throws Exception
     {
         less4jCompiler = mocker.getInstance(Less4jCompiler.class);
+        lessConfiguration = mocker.getInstance(LESSConfiguration.class);
         xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -83,6 +87,8 @@ public class CachedLESSCompilerTest
         XWikiDocument mockDocument = mock(XWikiDocument.class);
         when(mockDocument.getPrefixedFullName()).thenReturn("SomeContextDocument");
         when(xcontext.getDoc()).thenReturn(mockDocument);
+
+        when(lessConfiguration.getMaximumSimultaneousCompilations()).thenReturn(1);
     }
 
     @Test

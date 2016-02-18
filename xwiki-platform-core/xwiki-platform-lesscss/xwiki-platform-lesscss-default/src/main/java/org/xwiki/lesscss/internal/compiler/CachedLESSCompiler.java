@@ -20,13 +20,17 @@
 package org.xwiki.lesscss.internal.compiler;
 
 import java.io.StringWriter;
+import java.util.concurrent.Semaphore;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.LESSConfiguration;
 import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
@@ -45,7 +49,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component(roles = CachedLESSCompiler.class)
 @Singleton
-public class CachedLESSCompiler implements CachedCompilerInterface<String>
+public class CachedLESSCompiler implements CachedCompilerInterface<String>, Initializable
 {
     /**
      * The name of the file holding the main skin style (on which Velocity is always executed).
@@ -60,6 +64,17 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
     @Inject
     private Less4jCompiler less4JCompiler;
 
+    @Inject
+    private LESSConfiguration lessConfiguration;
+
+    private Semaphore semaphore;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.semaphore = new Semaphore(lessConfiguration.getMaximumSimultaneousCompilations(), true);
+    }
+
     @Override
     public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
         boolean useLESS, String skin) throws LESSCompilerException
@@ -67,6 +82,7 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
         StringWriter source = new StringWriter();
 
         try {
+            semaphore.acquire();
             if (lessResourceReference instanceof LESSSkinFileResourceReference || includeSkinStyle) {
 
                 if (includeSkinStyle) {
@@ -94,9 +110,11 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
 
             // Otherwise return the raw LESS code
             return lessCode;
-        } catch (Less4jException e) {
+        } catch (Less4jException | InterruptedException e) {
             throw new LESSCompilerException(String.format("Failed to compile the resource [%s] with LESS.",
                     lessResourceReference), e);
+        } finally {
+            semaphore.release();
         }
     }
 

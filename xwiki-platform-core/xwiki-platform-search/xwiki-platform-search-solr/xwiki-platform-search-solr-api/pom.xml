@@ -154,12 +154,32 @@
         </configuration>
       </plugin>
       <!-- Attach default configuration package -->
+      <!-- We require the jar in both test and package but we don't want to get it if we don't need it (for example with clirr check) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>attach-default-configuration</id>
+            <id>attach-default-configuration-test</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attach-default-configuration-package</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>copy</goal>

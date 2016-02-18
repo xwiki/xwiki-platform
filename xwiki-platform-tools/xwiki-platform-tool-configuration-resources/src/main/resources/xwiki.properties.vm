@@ -724,7 +724,7 @@ extension.oldflavors=$oldFlavor.trim()
 # debug.minify=false
 
 #-------------------------------------------------------------------------------------
-# LESS
+# LESS CSS
 #-------------------------------------------------------------------------------------
 
 #-# [Since 7.4.2, 8.0M2]
@@ -732,7 +732,7 @@ extension.oldflavors=$oldFlavor.trim()
 #-# limited.
 #-#
 #-# The default is:
-# less.maximumSimultaneousCompilations = 4
+# lesscss.maximumSimultaneousCompilations = 4
 
 
 $!xwikiPropertiesAdditionalProperties

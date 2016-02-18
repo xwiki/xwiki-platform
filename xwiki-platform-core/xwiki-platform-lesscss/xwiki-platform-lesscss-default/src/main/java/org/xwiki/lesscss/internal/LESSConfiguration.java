@@ -35,7 +35,7 @@ import org.xwiki.configuration.ConfigurationSource;
 @Singleton
 public class LESSConfiguration
 {
-    private static final String CONFIGURATION_PREFIX = "less.";
+    private static final String CONFIGURATION_PREFIX = "lesscss.";
 
     @Inject
     private ConfigurationSource configurationSource;

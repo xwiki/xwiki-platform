@@ -213,8 +213,11 @@
   CKEDITOR.plugins.add('xwiki-tree', {
     requires: 'xwiki-resource',
     init: function(editor) {
-      registerResourcePicker(editor, 'doc', 'Select Page');
-      registerResourcePicker(editor, 'attach', 'Select Attachment');
+      if (typeof $.fn.xtree === 'function') {
+        // Register the tree pickers only if the tree is available.
+        registerResourcePicker(editor, 'doc', 'Select Page');
+        registerResourcePicker(editor, 'attach', 'Select Attachment');
+      }
     }
   });
 })();

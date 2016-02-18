@@ -99,7 +99,7 @@
      <!-- LESS CSS cache -->
      <local-cache name="lesscss.skinfiles.cache">
         <persistence>
-           <file-store purge="true">
+           <file-store purge="false">
               <!-- Let XWiki cache module set the proper location -->
            </file-store>
         </persistence>

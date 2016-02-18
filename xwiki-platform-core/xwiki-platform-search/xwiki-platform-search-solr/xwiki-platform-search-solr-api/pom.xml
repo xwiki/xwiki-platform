@@ -160,7 +160,7 @@
         <executions>
           <execution>
             <id>attach-default-configuration</id>
-            <phase>process-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy</goal>
             </goals>

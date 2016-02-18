@@ -57,7 +57,7 @@
         <executions>
           <execution>
             <id>attach-plugin</id>
-            <phase>process-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy</goal>
             </goals>

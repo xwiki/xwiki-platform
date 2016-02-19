@@ -58,7 +58,9 @@
   var createTreeElement = function(attributes) {
     return $(document.createElement('div')).attr($.extend({
       'class': 'ckeditor-tree jstree-no-links',
+      'data-edges': true,
       'data-finder': true,
+      'data-icons': true,
       'data-responsive': true
     }, attributes));
   };

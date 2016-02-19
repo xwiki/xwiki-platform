@@ -178,24 +178,10 @@ require.config({
   }
 });
 
-require([
-  'jquery',
-  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
-], function($) {
+(function() {
   window.CKEDITOR_BASEPATH = "$!ckeditorBasePath";
-  require([
-    'ckeditor',
-    // Used to access the form token.
-    'xwiki-meta',
-    // Used by the page and attachment pickers.
-    'tree',
-    // Used to catch form action events fired from Prototype.js code (actionButtons.js).
-    'xwiki-events-bridge'
-  ], function(ckeditor, xwikiMeta) {
-    // xwiki-meta module is available only since 6.3M2
-    xwikiMeta = xwikiMeta || {
-      form_token: $('meta[name="form_token"]').attr('content')
-    };
+
+  var init = function($, ckeditor, xwikiMeta) {
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
@@ -248,8 +234,44 @@ require([
         }
       });
     });
+  };
+
+  var loadTreeCode = function(callback) {
+    if (!require.specified('tree')) {
+      // Before 6.4
+      require.config({
+        paths: {
+          jsTree: "$!services.webjars.url('jstree', 'jstree.min.js')",
+          JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
+          tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
+        }
+      });
+    }
+    require(['tree'], function() {
+      callback();
+    });
+  };
+
+  require([
+    'jquery',
+    'ckeditor',
+    // Used to access the form token.
+    'xwiki-meta',
+    // Used to catch form action events fired from Prototype.js code (actionButtons.js).
+    'xwiki-events-bridge',
+    // Configures the path to the tree widget module and its dependencies.
+    "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+  ], function($, ckeditor, xwikiMeta) {
+    // xwiki-meta module is available only since 6.3M2
+    xwikiMeta = xwikiMeta || {
+      form_token: $('meta[name="form_token"]').attr('content')
+    };
+    // Load the tree used by the page and attachment pickers.
+    loadTreeCode(function() {
+      init($, ckeditor, xwikiMeta);
+    });
   });
-});</code>
+})();</code>
     </property>
     <property>
       <name>CKEditor Loader</name>
@@ -405,11 +427,74 @@ require([
   }
 })();
 
+// Make sure the "Back To Edit" button from the Preview mode works as expected.
 require(['jquery'], function($) {
-  // Make sure the "Back To Edit" button from the Preview mode works as expected.
   $('form#inline').find('input[name="xcontinue"]').val(function(index, oldValue) {
     return oldValue + '&amp;sheet=CKEditor.EditSheet';
   });
+});
+
+// Polyfill for entityReference.js
+require(['jquery'], function($) {
+  if (typeof XWiki.EntityType.byName !== 'function') {
+    // Before 6.4.1
+    var entityTypeByName = {
+      wiki: XWiki.EntityType.WIKI,
+      space: XWiki.EntityType.SPACE,
+      document: XWiki.EntityType.DOCUMENT,
+      attachment: XWiki.EntityType.ATTACHMENT
+    };
+    XWiki.EntityType.byName = function(name) {
+      return entityTypeByName[name];
+    };
+  }
+
+  if (typeof XWiki.EntityType.getName !== 'function') {
+    // Before 6.4.1
+    var entityTypes = ['wiki', 'space', 'document', 'attachment'];
+    XWiki.EntityType.getName = function(entityType) {
+      return entityTypes[entityType];
+    }
+  }
+
+  if (typeof XWiki.EntityReference.prototype.getReversedReferenceChain !== 'function') {
+    // Before 7.2M2
+    XWiki.EntityReference.prototype.getReversedReferenceChain = function() {
+      return this._extractComponents().reverse();
+    };
+  }
+
+  if (typeof XWiki.currentDocument.getDocumentReference !== 'function') {
+    // Before 7.2M3
+    // Take the current document full name.
+    var currentDocumentReference = $('meta[name="document"]').attr('content');
+    // Resolve the local reference.
+    currentDocumentReference = XWiki.Model.resolve(currentDocumentReference, XWiki.EntityType.DOCUMENT);
+    // Add the wiki component.
+    currentDocumentReference.getReversedReferenceChain()[0].parent = new XWiki.WikiReference(XWiki.currentWiki);
+    XWiki.currentDocument.getDocumentReference = function() {
+      return currentDocumentReference;
+    };
+  }
+
+  var reference = XWiki.Model.resolve('S', XWiki.EntityType.SPACE, new XWiki.WikiReference('W'));
+  if (!reference.parent) {
+    // The resolve method did not support a default value provider before 7.2M1.
+    var oldResolve = XWiki.Model.resolve;
+    XWiki.Model.resolve = function(representation, entityType, defaultValueProvider) {
+      var reference = oldResolve.apply(this, arguments);
+      if (reference &amp;&amp; defaultValueProvider &amp;&amp; typeof defaultValueProvider.extractReference === 'function') {
+        // The given default value provider is an entity reference (normally a document reference).
+        var root = reference.getReversedReferenceChain()[0];
+        // We cover the document and attachment references mainly,
+        var defaultRoot = defaultValueProvider.extractReference(root.type) || {parent: defaultValueProvider};
+        // Nested spaces were introduced in 7.2M1 so we can safely assume that the given default value provider has only
+        // one space reference component.
+        root.parent = defaultRoot.parent;
+      }
+      return reference;
+    };
+  }
 });</code>
     </property>
     <property>
@@ -533,6 +618,33 @@ require(['jquery'], function($) {
   }
   .cke_hidpi a.cke_button &gt; span.cke_button_icon {
     background-image: url("$ckeditorSkinPath/icons_hidpi.png") !important;
+  }
+  .cke_notification_close, a.cke_dialog_close_button {
+    background-image: url("$ckeditorSkinPath/images/close.png") !important;
+  }
+  .cke_hidpi .cke_dialog_close_button {
+    background-image: url("$ckeditorSkinPath/images/hidpi/close.png") !important;
+  }
+  .cke_dialog a.cke_btn_reset {
+    background-image: url("$ckeditorSkinPath/images/refresh.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_reset {
+    background-image: url("$ckeditorSkinPath/images/hidpi/refresh.png") !important;
+  }
+  .cke_dialog a.cke_btn_locked {
+    background-image: url("$ckeditorSkinPath/images/lock.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_locked {
+    background-image: url("$ckeditorSkinPath/images/hidpi/lock.png") !important;
+  }
+  .cke_dialog a.cke_btn_unlocked {
+    background-image: url("$ckeditorSkinPath/images/lock-open.png") !important;
+  }
+  .cke_hidpi .cke_dialog a.cke_btn_unlocked {
+    background-image: url("$ckeditorSkinPath/images/hidpi/lock-open.png") !important;
+  }
+  .cke_menuarrow {
+    background-image: url("$ckeditorSkinPath/images/arrow.png") !important;
   }
   /*
 #end

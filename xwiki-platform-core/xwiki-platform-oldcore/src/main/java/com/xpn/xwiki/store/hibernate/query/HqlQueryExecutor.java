@@ -104,7 +104,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     }
 
     /**
-     * @param statement the statement to evaluate
+     * @param statementString the statement to evaluate
      * @return true if the select is allowed for user without PR
      */
     protected static boolean isSafeSelect(String statementString)

@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 
 import javax.inject.Provider;
@@ -27,6 +28,7 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -40,13 +42,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultModelBridge}.
- * 
+ *
  * @version $Id$
  */
 public class DefaultModelBridgeTest
@@ -193,5 +201,58 @@ public class DefaultModelBridgeTest
         verify(query).setWiki(spaceReference.getWikiReference().getName());
         verify(query).bindValue("space", "Space");
         verify(query).bindValue("spacePrefix", "Space.%");
+    }
+
+    @Test
+    public void updateParentFields() throws Exception
+    {
+        DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
+
+        XWikiDocument oldParentDocument = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(oldParentReference, this.xcontext)).thenReturn(oldParentDocument);
+
+        DocumentReference child1Reference = new DocumentReference("wiki", "Space", "Child1");
+        DocumentReference child2Reference = new DocumentReference("wiki", "Space", "Child2");
+        when(oldParentDocument.getChildrenReferences(this.xcontext)).thenReturn(
+            Arrays.asList(child1Reference, child2Reference));
+
+        JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
+
+        XWikiDocument child1Document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(child1Reference, this.xcontext)).thenReturn(child1Document);
+        XWikiDocument child2Document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(child2Reference, this.xcontext)).thenReturn(child2Document);
+
+        this.mocker.getComponentUnderTest().updateParentField(oldParentReference, newParentReference);
+
+        verify(mockProgressManager).pushLevelProgress(2, this.mocker.getComponentUnderTest());
+
+        verify(child1Document).setParentReference(newParentReference);
+        verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
+
+        verify(child2Document).setParentReference(newParentReference);
+        verify(this.xcontext.getWiki()).saveDocument(child1Document, "Updated parent field.", true, this.xcontext);
+    }
+
+    @Test
+    public void updateParentFieldsNoChildren() throws Exception
+    {
+        DocumentReference oldParentReference = new DocumentReference("wiki", "Space", "Old");
+        DocumentReference newParentReference = new DocumentReference("wiki", "Space", "New");
+
+        XWikiDocument oldParentDocument = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(oldParentReference, this.xcontext)).thenReturn(oldParentDocument);
+
+        when(oldParentDocument.getChildrenReferences(this.xcontext)).thenReturn(
+            Collections.<DocumentReference>emptyList());
+
+        JobProgressManager mockProgressManager = mocker.getInstance(JobProgressManager.class);
+
+        this.mocker.getComponentUnderTest().updateParentField(oldParentReference, newParentReference);
+
+        verify(mockProgressManager, never()).pushLevelProgress(anyInt(), any());
+        verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), eq("Updated parent field."),
+            eq(true), eq(this.xcontext));
     }
 }

@@ -58,6 +58,11 @@ public class MoveRequest extends EntityRequest
     private static final String PROPERTY_AUTO_REDIRECT = "autoRedirect";
 
     /**
+     * @see #isUpdateParentField()
+     */
+    private static final String PROPERTY_UPDATE_PARENT_FIELD = "updateParentField";
+
+    /**
      * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}
      */
     public EntityReference getDestination()
@@ -135,5 +140,29 @@ public class MoveRequest extends EntityRequest
     public void setAutoRedirect(boolean autoRedirect)
     {
         setProperty(PROPERTY_AUTO_REDIRECT, autoRedirect);
+    }
+
+    /**
+     * @return {@code true} if the parent-child relationship should be preserved by updating the {@code parent} field of
+     *         the {@code source}'s child pages to use the {@code destination} as parent instead; {@code false}
+     *         otherwise
+     * @since 8.0M2, 7.4.2
+     */
+    public boolean isUpdateParentField()
+    {
+        return getProperty(PROPERTY_UPDATE_PARENT_FIELD, true);
+    }
+
+    /**
+     * Sets whether the parent-child relationship should be preserved by updating the {@code parent} field of the
+     * {@code source}'s child pages to use the {@code destination} as parent instead; {@code false} otherwise.
+     *
+     * @param updateParentField {@code true} to update the parent field of the {@code source}'s child pages and use the
+     *            {@code destination} as parent instead, {@code false} otherwise
+     * @since 8.0M2, 7.4.2
+     */
+    public void setUpdateParentField(boolean updateParentField)
+    {
+        setProperty(PROPERTY_UPDATE_PARENT_FIELD, updateParentField);
     }
 }

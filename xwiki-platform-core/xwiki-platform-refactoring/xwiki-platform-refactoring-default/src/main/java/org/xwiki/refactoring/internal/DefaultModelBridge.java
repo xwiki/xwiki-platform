@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -103,6 +104,9 @@ public class DefaultModelBridge implements ModelBridge
     @Inject
     @Named("explicit")
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
+
+    @Inject
+    private JobProgressManager progressManager;
 
     @Override
     public boolean create(DocumentReference documentReference, DocumentReference userReference)
@@ -277,6 +281,7 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = xcontextProvider.get();
         XWiki wiki = context.getWiki();
 
+        boolean popLevelProgress = false;
         try {
             // Note: This operation could have been done in Hibernate (using the Store API) in one single update query.
             // However, due to XWiki's document cache, it`s better in the end to use the Document API and update each
@@ -284,9 +289,18 @@ public class DefaultModelBridge implements ModelBridge
             XWikiDocument oldParentDocument = wiki.getDocument(oldParentReference, context);
 
             List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
+
+            if (childReferences.size() > 0) {
+                this.progressManager.pushLevelProgress(childReferences.size(), this);
+                popLevelProgress = true;
+            }
+
             for (DocumentReference childReference : childReferences) {
+                this.progressManager.startStep(this);
+
                 XWikiDocument childDocument = wiki.getDocument(childReference, context);
                 childDocument.setParentReference(newParentReference);
+
                 wiki.saveDocument(childDocument, "Updated parent field.", true, context);
             }
 
@@ -298,6 +312,10 @@ public class DefaultModelBridge implements ModelBridge
             this.logger.error("Failed to update the document parent fields from [{}] to [{}].", oldParentReference,
                 newParentReference, e);
             return false;
+        } finally {
+            if (popLevelProgress) {
+                this.progressManager.popLevelProgress(this);
+            }
         }
 
         return true;

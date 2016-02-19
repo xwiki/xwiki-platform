@@ -243,6 +243,7 @@ public class RefactoringScriptService implements ScriptService
         request.setDestination(destination);
         request.setUpdateLinks(true);
         request.setAutoRedirect(true);
+        request.setUpdateParentField(true);
         return request;
     }
 

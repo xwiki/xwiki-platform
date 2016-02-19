@@ -173,7 +173,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void move(DocumentReference oldReference, DocumentReference newReference)
     {
-        this.progressManager.pushLevelProgress(5, this);
+        this.progressManager.pushLevelProgress(6, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -195,37 +195,38 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
                 return;
             }
 
-            // Step 3: Update the links.
-            this.progressManager.startStep(this);
-            if (this.request.isUpdateLinks()) {
-                updateLinks(oldReference, newReference);
-            }
+            // Step 3 + 4: Update other documents that might be affected by this move.
+            updateDocuments(oldReference, newReference);
 
-            // Step 4: Delete the source document.
+            // Step 5: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
-                this.progressManager.pushLevelProgress(2, this);
-
-                try {
-                    this.progressManager.startStep(this);
-                    this.modelBridge.delete(oldReference, this.request.getUserReference());
-
-                    // (legacy) Preserve existing parent-child relationships by updating the parent field of documents
-                    // having the moved document as parent.
-                    this.progressManager.startStep(this);
-                    this.modelBridge.updateParentField(oldReference, newReference);
-                } finally {
-                    this.progressManager.popLevelProgress(this);
-                }
+                this.modelBridge.delete(oldReference, this.request.getUserReference());
             }
 
-            // Step 5: Create an automatic redirect.
+            // Step 6: Create an automatic redirect.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);
             }
         } finally {
             this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void updateDocuments(DocumentReference oldReference, DocumentReference newReference)
+    {
+        // Step 3: Update the links.
+        this.progressManager.startStep(this);
+        if (this.request.isUpdateLinks()) {
+            updateLinks(oldReference, newReference);
+        }
+
+        // Step 4: (legacy) Preserve existing parent-child relationships by updating the parent field of documents
+        // having the moved document as parent.
+        this.progressManager.startStep(this);
+        if (this.request.isUpdateParentField()) {
+            this.modelBridge.updateParentField(oldReference, newReference);
         }
     }
 

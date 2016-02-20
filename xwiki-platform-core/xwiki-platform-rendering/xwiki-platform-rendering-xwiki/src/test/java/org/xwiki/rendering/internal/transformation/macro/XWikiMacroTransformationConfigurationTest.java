@@ -21,14 +21,13 @@ package org.xwiki.rendering.internal.transformation.macro;
 
 import java.util.Properties;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link XWikiMacroTransformationConfiguration}.
@@ -36,33 +35,21 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.6RC1
  */
-@MockingRequirement(XWikiMacroTransformationConfiguration.class)
-public class XWikiMacroTransformationConfigurationTest extends AbstractMockingComponentTestCase
+public class XWikiMacroTransformationConfigurationTest
 {
-    private MacroTransformationConfiguration configuration;
-
-    private ConfigurationSource source;
-
-    @Before
-    public void configure() throws Exception
-    {
-        this.source = getComponentManager().getInstance(ConfigurationSource.class);
-        this.configuration = getComponentManager().getInstance(MacroTransformationConfiguration.class);
-    }
+    @Rule
+    public MockitoComponentMockingRule<XWikiMacroTransformationConfiguration> mocker =
+        new MockitoComponentMockingRule<>(XWikiMacroTransformationConfiguration.class);
 
     @Test
-    public void testGetCategories() throws Exception
+    public void getCategories() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.transformation.macro.categories", Properties.class);
-                will(returnValue(new Properties()));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.transformation.macro.categories", Properties.class)).thenReturn(
+            new Properties());
 
-        Properties categories = this.configuration.getCategories();
-        Assert.assertNotNull(categories);
-        Assert.assertEquals(0, categories.size());
+        Properties categories = this.mocker.getComponentUnderTest().getCategories();
+        assertNotNull(categories);
+        assertEquals(0, categories.size());
     }
 }

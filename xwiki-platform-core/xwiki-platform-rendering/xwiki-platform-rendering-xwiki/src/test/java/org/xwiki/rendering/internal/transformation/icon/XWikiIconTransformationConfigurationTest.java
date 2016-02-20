@@ -21,14 +21,13 @@ package org.xwiki.rendering.internal.transformation.icon;
 
 import java.util.Properties;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.rendering.transformation.icon.IconTransformationConfiguration;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link XWikiIconTransformationConfiguration}.
@@ -36,37 +35,24 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.6RC1
  */
-@MockingRequirement(XWikiIconTransformationConfiguration.class)
-public class XWikiIconTransformationConfigurationTest extends AbstractMockingComponentTestCase
+public class XWikiIconTransformationConfigurationTest
 {
-    private IconTransformationConfiguration configuration;
-
-    private ConfigurationSource source;
-
-    @Before
-    public void configure() throws Exception
-    {
-        this.source = getComponentManager().getInstance(ConfigurationSource.class);
-        this.configuration = getComponentManager().getInstance(IconTransformationConfiguration.class);
-    }
+    @Rule
+    public MockitoComponentMockingRule<XWikiIconTransformationConfiguration> mocker =
+        new MockitoComponentMockingRule<>(XWikiIconTransformationConfiguration.class);
 
     @Test
-    public void testGetMappings() throws Exception
+    public void getMappings() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.transformation.icon.mappings", Properties.class);
-                Properties props = new Properties();
-                props.setProperty("::", "test");
-                will(returnValue(props));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        Properties props = new Properties();
+        props.setProperty("::", "test");
+        when(source.getProperty("rendering.transformation.icon.mappings", Properties.class)).thenReturn(props);
 
-        Properties mappings = this.configuration.getMappings();
-        Assert.assertNotNull(mappings);
+        Properties mappings = this.mocker.getComponentUnderTest().getMappings();
+        assertNotNull(mappings);
         // Make sure we have our mapping coming from the configuration source + the default mappings
-        Assert.assertTrue(mappings.size() > 1);
-        Assert.assertEquals("test", mappings.getProperty("::"));
+        assertTrue(mappings.size() > 1);
+        assertEquals("test", mappings.getProperty("::"));
     }
 }

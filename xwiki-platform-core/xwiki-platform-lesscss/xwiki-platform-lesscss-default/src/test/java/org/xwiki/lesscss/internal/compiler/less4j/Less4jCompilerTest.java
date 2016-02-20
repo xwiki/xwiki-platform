@@ -20,6 +20,8 @@
 package org.xwiki.lesscss.internal.compiler.less4j;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
@@ -37,6 +39,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.github.sommeri.less4j.Less4jException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -102,12 +105,24 @@ public class Less4jCompilerTest
         // Test
         StringWriter source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-        String result = mocker.getComponentUnderTest().compile(source.toString(), "skin");
-        
+        String result = mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
+
+
+        StringWriter source2 = new StringWriter();
+        IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source2);
+        String result2 = mocker.getComponentUnderTest().compile(source.toString(), "skin", true);
+
+        //StringReader s2 = new StringReader(result2);
+        //IOUtils.copy(s2, new FileOutputStream("/var/tmp/style3.css_inl"));
+
         // Verify
         StringWriter expected = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.css").getFile()), expected);
         assertEquals(expected.toString(), result);
+
+        //StringWriter expected2 = new StringWriter();
+        //IOUtils.copy(new FileInputStream(getClass().getResource("/style3_inl.css").getFile()), expected2);
+        assertTrue(result2.contains("/*# sourceMappingURL=data:application/json;base64,"));
     }
 
     @Test
@@ -123,7 +138,7 @@ public class Less4jCompilerTest
         try {
             StringWriter source = new StringWriter();
             IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-            mocker.getComponentUnderTest().compile(source.toString(), "skin");
+            mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
         } catch (Less4jException e) {
             caughtException = e;
         }

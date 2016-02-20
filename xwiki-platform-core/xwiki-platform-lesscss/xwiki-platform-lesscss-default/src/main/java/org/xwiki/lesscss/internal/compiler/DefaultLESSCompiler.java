@@ -61,14 +61,14 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
 
     @Override
     public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
-        boolean force) throws LESSCompilerException
+                          boolean force) throws LESSCompilerException
     {
         return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, force);
     }
 
     @Override
     public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
-        String skin, boolean force) throws LESSCompilerException
+                         String skin, boolean force) throws LESSCompilerException
     {
         return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, skin, force);
     }

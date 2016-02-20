@@ -47,4 +47,13 @@ public class LESSConfiguration
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "maximumSimultaneousCompilations", 4);
     }
+
+    /**
+     *
+     * @return whether the LESS compiler should generate inline sourcemaps.
+     */
+    public boolean isGenerateInlineSourceMaps()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "generateInlineSourceMaps",false);
+    }
 }

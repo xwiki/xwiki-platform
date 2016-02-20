@@ -105,7 +105,7 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
 
             // Compile the LESS code
             if (useLESS) {
-                return less4JCompiler.compile(lessCode, skin);
+                return less4JCompiler.compile(lessCode, skin, lessConfiguration.isGenerateInlineSourceMaps());
             }
 
             // Otherwise return the raw LESS code

@@ -185,4 +185,28 @@ public class XWikiLinkLabelGeneratorTest
         assertEquals("[$0:\\.$0] \\ $0 $0 $0 ($0) [$0:\\.$0] \\ $0 $0 $0 ($0)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
+
+    @Test
+    public void generateWhithPageNameWithPercent() throws Exception
+    {
+        ResourceReference resourceReference = new DocumentResourceReference("HelloWorld");
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page%t");
+
+        EntityReferenceResolver<ResourceReference> resourceReferenceResolver = this.mocker.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
+        when(resourceReferenceResolver.resolve(resourceReference, EntityType.DOCUMENT)).thenReturn(documentReference);
+
+        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+        when(dab.getDocument(documentReference)).thenReturn(dmb);
+        when(dmb.getTitle()).thenReturn("my title");
+
+        EntityReferenceSerializer<String> localSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localSerializer.serialize(new SpaceReference("wiki", "space"))).thenReturn("space");
+
+        assertEquals("[wiki:space.page%t] space page%t page%t page%t (my title) "
+            + "[wiki:space.page%t] space page%t page%t page%t (my title)",
+            this.mocker.getComponentUnderTest().generate(resourceReference));
+    }
 }

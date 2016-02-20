@@ -59,7 +59,7 @@ public class XWikiLinkLabelGeneratorTest
     {
         RenderingConfiguration configuration = this.mocker.getInstance(RenderingConfiguration.class);
         when(configuration.getLinkLabelFormat()).thenReturn(
-            "[%w:%s.%p] %ls %np %P %NP (%t) [%w:%s.%p] %ls %np %P %NP (%t)");
+            "%l%la%n%na%N%NA [%w:%s.%p] %ls %np %P %NP (%t) [%w:%s.%p] %ls %np %P %NP (%t)");
 
         EntityReferenceProvider entityReferenceProvider = this.mocker.getInstance(EntityReferenceProvider.class);
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(
@@ -86,7 +86,8 @@ public class XWikiLinkLabelGeneratorTest
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localSerializer.serialize(new SpaceReference("wiki", "space1", "space2"))).thenReturn("space1.space2");
 
-        assertEquals("[wiki:space1.space2.HelloWorld] space2 HelloWorld Hello World Hello World (My title) "
+        assertEquals("%l%la%n%na%N%NA "
+            + "[wiki:space1.space2.HelloWorld] space2 HelloWorld Hello World Hello World (My title) "
             + "[wiki:space1.space2.HelloWorld] space2 HelloWorld Hello World Hello World (My title)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
@@ -112,7 +113,8 @@ public class XWikiLinkLabelGeneratorTest
         when(localSerializer.serialize(new SpaceReference("wiki", "space1", "NestedPage"))).thenReturn(
             "space1.NestedPage");
 
-        assertEquals("[wiki:space1.NestedPage.WebHome] NestedPage NestedPage Web Home Nested Page (My title) "
+        assertEquals("%l%la%n%na%N%NA "
+            + "[wiki:space1.NestedPage.WebHome] NestedPage NestedPage Web Home Nested Page (My title) "
             + "[wiki:space1.NestedPage.WebHome] NestedPage NestedPage Web Home Nested Page (My title)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
@@ -134,7 +136,8 @@ public class XWikiLinkLabelGeneratorTest
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
 
-        assertEquals("[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
+        assertEquals("%l%la%n%na%N%NA "
+            + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
@@ -158,7 +161,8 @@ public class XWikiLinkLabelGeneratorTest
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localSerializer.serialize(new SpaceReference("xwiki", "Main"))).thenReturn("Main");
 
-        assertEquals("[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
+        assertEquals("%l%la%n%na%N%NA "
+            + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld) "
             + "[xwiki:Main.HelloWorld] Main HelloWorld Hello World Hello World (HelloWorld)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
@@ -182,7 +186,7 @@ public class XWikiLinkLabelGeneratorTest
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localSerializer.serialize(new SpaceReference("$0", "\\"))).thenReturn("\\");
 
-        assertEquals("[$0:\\.$0] \\ $0 $0 $0 ($0) [$0:\\.$0] \\ $0 $0 $0 ($0)",
+        assertEquals("%l%la%n%na%N%NA [$0:\\.$0] \\ $0 $0 $0 ($0) [$0:\\.$0] \\ $0 $0 $0 ($0)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }
 
@@ -205,7 +209,8 @@ public class XWikiLinkLabelGeneratorTest
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localSerializer.serialize(new SpaceReference("wiki", "space"))).thenReturn("space");
 
-        assertEquals("[wiki:space.page%t] space page%t page%t page%t (my title) "
+        assertEquals("%l%la%n%na%N%NA "
+            + "[wiki:space.page%t] space page%t page%t page%t (my title) "
             + "[wiki:space.page%t] space page%t page%t page%t (my title)",
             this.mocker.getComponentUnderTest().generate(resourceReference));
     }

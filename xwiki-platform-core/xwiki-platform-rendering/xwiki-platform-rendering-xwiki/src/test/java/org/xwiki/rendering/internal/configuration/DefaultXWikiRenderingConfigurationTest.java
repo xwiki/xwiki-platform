@@ -22,14 +22,13 @@ package org.xwiki.rendering.internal.configuration;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration}.
@@ -37,90 +36,57 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
-@AllComponents
-@MockingRequirement(value = DefaultXWikiRenderingConfiguration.class, role = XWikiRenderingConfiguration.class)
-public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingComponentTestCase
+public class DefaultXWikiRenderingConfigurationTest
 {
-    private XWikiRenderingConfiguration configuration;
+    @Rule
+    public MockitoComponentMockingRule<DefaultXWikiRenderingConfiguration> mocker =
+        new MockitoComponentMockingRule<>(DefaultXWikiRenderingConfiguration.class, XWikiRenderingConfiguration.class);
 
-    private ConfigurationSource source;
-
-    @Before
-    public void configure() throws Exception
+    @Test
+    public void getLinkLabelFormat() throws Exception
     {
-        this.source = getComponentManager().getInstance(ConfigurationSource.class);
-        this.configuration = getComponentManager().getInstance(XWikiRenderingConfiguration.class);
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.linkLabelFormat", "%np")).thenReturn("%np");
+
+        assertEquals("%np", this.mocker.getComponentUnderTest().getLinkLabelFormat());
     }
 
     @Test
-    public void testGetLinkLabelFormat() throws Exception
+    public void getImageWidthLimit() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.linkLabelFormat", "%np");
-                will(returnValue("%np"));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.imageWidthLimit", -1)).thenReturn(100);
 
-        Assert.assertEquals("%np", this.configuration.getLinkLabelFormat());
+        assertEquals(100, this.mocker.getComponentUnderTest().getImageWidthLimit());
     }
 
     @Test
-    public void testGetImageWidthLimit() throws Exception
+    public void getImageHeightLimit() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.imageWidthLimit", -1);
-                will(returnValue(100));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.imageHeightLimit", -1)).thenReturn(150);
 
-        Assert.assertEquals(100, this.configuration.getImageWidthLimit());
+        assertEquals(150, this.mocker.getComponentUnderTest().getImageHeightLimit());
     }
 
     @Test
-    public void testGetImageHeightLimit() throws Exception
+    public void isImageDimensionsIncludedInImageURL() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.imageHeightLimit", -1);
-                will(returnValue(150));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.imageDimensionsIncludedInImageURL", true)).thenReturn(false);
 
-        Assert.assertEquals(150, this.configuration.getImageHeightLimit());
+        assertFalse(this.mocker.getComponentUnderTest().isImageDimensionsIncludedInImageURL());
     }
 
     @Test
-    public void testIsImageDimensionsIncludedInImageURL() throws Exception
+    public void getTransformationNames() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.imageDimensionsIncludedInImageURL", true);
-                will(returnValue(false));
-            }
-        });
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class);
+        when(source.getProperty("rendering.transformations", Arrays.asList("macro", "icon"))).thenReturn(
+            Arrays.asList("mytransformation"));
 
-        Assert.assertFalse(this.configuration.isImageDimensionsIncludedInImageURL());
-    }
-
-    @Test
-    public void testGetTransformationNames() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(source).getProperty("rendering.transformations", Arrays.asList("macro", "icon"));
-                will(returnValue(Arrays.asList("mytransformation")));
-            }
-        });
-
-        List<String> txs = this.configuration.getTransformationNames();
-        Assert.assertEquals(1, txs.size());
-        Assert.assertEquals("mytransformation", txs.get(0));
+        List<String> txs = this.mocker.getComponentUnderTest().getTransformationNames();
+        assertEquals(1, txs.size());
+        assertEquals("mytransformation", txs.get(0));
     }
 }

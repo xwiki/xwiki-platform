@@ -58,12 +58,12 @@ public class DefaultXWikiRenderingConfigurationTest extends AbstractMockingCompo
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(source).getProperty("rendering.linkLabelFormat", "%p");
-                will(returnValue("%p"));
+                oneOf(source).getProperty("rendering.linkLabelFormat", "%np");
+                will(returnValue("%np"));
             }
         });
 
-        Assert.assertEquals("%p", this.configuration.getLinkLabelFormat());
+        Assert.assertEquals("%np", this.configuration.getLinkLabelFormat());
     }
 
     @Test

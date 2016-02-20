@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.reference;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,9 +32,10 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link DefaultLinkReferenceParser} in the context of XWiki.
+ * Integration tests for {@link DefaultLinkReferenceParser} in the context of XWiki.
  *
  * @version $Id$
  * @since 2.6M1
@@ -55,140 +55,140 @@ public class DefaultLinkReferenceParserTest
     }
 
     @Test
-    public void testParseWhenInWikiMode() throws Exception
+    public void parseWhenInWikiMode() throws Exception
     {
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         WikiModel mockWikiModel = this.componentManager.registerMockComponent(WikiModel.class);
 
         ResourceReference reference = this.parser.parse("");
-        Assert.assertEquals("", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = []", reference.toString());
+        assertEquals("", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Typed = [false] Type = [doc] Reference = []", reference.toString());
 
         when(mockWikiModel.isDocumentAvailable(new DocumentResourceReference("existingpage"))).thenReturn(true);
         reference = this.parser.parse("existingpage");
-        Assert.assertEquals("existingpage", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [existingpage]", reference.toString());
+        assertEquals("existingpage", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Typed = [false] Type = [doc] Reference = [existingpage]", reference.toString());
 
         reference = this.parser.parse("unexistingpage");
-        Assert.assertEquals("unexistingpage", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [unexistingpage]", reference.toString());
+        assertEquals("unexistingpage", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Typed = [false] Type = [doc] Reference = [unexistingpage]", reference.toString());
 
         reference = this.parser.parse("space.unexistingpage");
-        Assert.assertEquals("space.unexistingpage", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [space.unexistingpage]", reference.toString());
+        assertEquals("space.unexistingpage", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Typed = [false] Type = [doc] Reference = [space.unexistingpage]", reference.toString());
 
         reference = this.parser.parse("http://xwiki.org");
-        Assert.assertEquals("http://xwiki.org", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.URL, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [url] Reference = [http://xwiki.org]", reference.toString());
+        assertEquals("http://xwiki.org", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.URL, reference.getType());
+        assertEquals("Typed = [false] Type = [url] Reference = [http://xwiki.org]", reference.toString());
 
         // Verify mailto: URI is recognized
         reference = this.parser.parse("mailto:john@smith.com?subject=test");
-        Assert.assertEquals("john@smith.com?subject=test", reference.getReference());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals(ResourceType.MAILTO, reference.getType());
-        Assert.assertEquals("Typed = [true] Type = [mailto] Reference = [john@smith.com?subject=test]",
+        assertEquals("john@smith.com?subject=test", reference.getReference());
+        assertTrue(reference.isTyped());
+        assertEquals(ResourceType.MAILTO, reference.getType());
+        assertEquals("Typed = [true] Type = [mailto] Reference = [john@smith.com?subject=test]",
             reference.toString());
 
         // Verify attach: URI is recognized
         reference = this.parser.parse("attach:some:content");
-        Assert.assertEquals("some:content", reference.getReference());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals(ResourceType.ATTACHMENT, reference.getType());
-        Assert.assertEquals("Typed = [true] Type = [attach] Reference = [some:content]", reference.toString());
+        assertEquals("some:content", reference.getReference());
+        assertTrue(reference.isTyped());
+        assertEquals(ResourceType.ATTACHMENT, reference.getType());
+        assertEquals("Typed = [true] Type = [attach] Reference = [some:content]", reference.toString());
 
         // Verify that unknown URIs are ignored
         // Note: In this example we point to a document and we consider that myxwiki is the wiki name and
         // http://xwiki.org is the page name
         reference = this.parser.parse("mywiki:http://xwiki.org");
-        Assert.assertEquals("mywiki:http://xwiki.org", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [mywiki:http://xwiki.org]",
+        assertEquals("mywiki:http://xwiki.org", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Typed = [false] Type = [doc] Reference = [mywiki:http://xwiki.org]",
             reference.toString());
 
         // Verify doc links work
         reference = this.parser.parse("doc:wiki:space.page");
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("wiki:space.page", reference.getReference());
-        Assert.assertEquals("Typed = [true] Type = [doc] Reference = [wiki:space.page]", reference.toString());
-        Assert.assertTrue(reference.isTyped());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("wiki:space.page", reference.getReference());
+        assertEquals("Typed = [true] Type = [doc] Reference = [wiki:space.page]", reference.toString());
+        assertTrue(reference.isTyped());
 
         // Verify space links work
         reference = this.parser.parse("space:wiki:space");
-        Assert.assertEquals(ResourceType.SPACE, reference.getType());
-        Assert.assertEquals("wiki:space", reference.getReference());
-        Assert.assertEquals("Typed = [true] Type = [space] Reference = [wiki:space]", reference.toString());
-        Assert.assertTrue(reference.isTyped());
+        assertEquals(ResourceType.SPACE, reference.getType());
+        assertEquals("wiki:space", reference.getReference());
+        assertEquals("Typed = [true] Type = [space] Reference = [wiki:space]", reference.toString());
+        assertTrue(reference.isTyped());
 
         // Verify InterWiki links work
         reference = this.parser.parse("interwiki:alias:content");
-        Assert.assertEquals(ResourceType.INTERWIKI, reference.getType());
-        Assert.assertEquals("content", reference.getReference());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals("alias", ((InterWikiResourceReference) reference).getInterWikiAlias());
-        Assert.assertEquals("Typed = [true] Type = [interwiki] Reference = [content] "
+        assertEquals(ResourceType.INTERWIKI, reference.getType());
+        assertEquals("content", reference.getReference());
+        assertTrue(reference.isTyped());
+        assertEquals("alias", ((InterWikiResourceReference) reference).getInterWikiAlias());
+        assertEquals("Typed = [true] Type = [interwiki] Reference = [content] "
             + "Parameters = [[interWikiAlias] = [alias]]", reference.toString());
 
         // Verify that an invalid InterWiki link is considered as Document link
         reference = this.parser.parse("interwiki:invalid_since_doesnt_have_colon");
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("interwiki:invalid_since_doesnt_have_colon", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [interwiki:invalid_since_doesnt_have_colon]",
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("interwiki:invalid_since_doesnt_have_colon", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertEquals("Typed = [false] Type = [doc] Reference = [interwiki:invalid_since_doesnt_have_colon]",
             reference.toString());
 
         // Verify typed URLs
         reference = this.parser.parse("url:http://xwiki.org");
-        Assert.assertEquals(ResourceType.URL, reference.getType());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals("http://xwiki.org", reference.getReference());
-        Assert.assertEquals("Typed = [true] Type = [url] Reference = [http://xwiki.org]", reference.toString());
+        assertEquals(ResourceType.URL, reference.getType());
+        assertTrue(reference.isTyped());
+        assertEquals("http://xwiki.org", reference.getReference());
+        assertEquals("Typed = [true] Type = [url] Reference = [http://xwiki.org]", reference.toString());
 
         // Verify query string and anchors have no meaning in link reference to documents.
         reference = this.parser.parse("Hello World?no=queryString#notAnAnchor");
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("Hello World?no=queryString#notAnAnchor", reference.getReference());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertNull(((DocumentResourceReference) reference).getAnchor());
-        Assert.assertNull(((DocumentResourceReference) reference).getQueryString());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [Hello World?no=queryString#notAnAnchor]",
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("Hello World?no=queryString#notAnAnchor", reference.getReference());
+        assertFalse(reference.isTyped());
+        assertNull(((DocumentResourceReference) reference).getAnchor());
+        assertNull(((DocumentResourceReference) reference).getQueryString());
+        assertEquals("Typed = [false] Type = [doc] Reference = [Hello World?no=queryString#notAnAnchor]",
             reference.toString());
 
         // Verify that the interwiki separator from XWiki Syntax 2.0 has not meaning in link references to documents
         reference = this.parser.parse("page@alias");
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertFalse(reference.isTyped());
-        Assert.assertEquals("page@alias", reference.getReference());
-        Assert.assertEquals("Typed = [false] Type = [doc] Reference = [page@alias]", reference.toString());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertFalse(reference.isTyped());
+        assertEquals("page@alias", reference.getReference());
+        assertEquals("Typed = [false] Type = [doc] Reference = [page@alias]", reference.toString());
 
         // Verify path link types
         reference = this.parser.parse("path:/some/path");
-        Assert.assertEquals(ResourceType.PATH, reference.getType());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals("/some/path", reference.getReference());
-        Assert.assertEquals("Typed = [true] Type = [path] Reference = [/some/path]", reference.toString());
+        assertEquals(ResourceType.PATH, reference.getType());
+        assertTrue(reference.isTyped());
+        assertEquals("/some/path", reference.getReference());
+        assertEquals("Typed = [true] Type = [path] Reference = [/some/path]", reference.toString());
 
         // Verify UNC link types
         reference = this.parser.parse("unc:\\\\myserver\\myshare\\mydoc.txt");
-        Assert.assertEquals(ResourceType.UNC, reference.getType());
-        Assert.assertTrue(reference.isTyped());
-        Assert.assertEquals("\\\\myserver\\myshare\\mydoc.txt", reference.getReference());
-        Assert.assertEquals("Typed = [true] Type = [unc] Reference = [\\\\myserver\\myshare\\mydoc.txt]",
+        assertEquals(ResourceType.UNC, reference.getType());
+        assertTrue(reference.isTyped());
+        assertEquals("\\\\myserver\\myshare\\mydoc.txt", reference.getReference());
+        assertEquals("Typed = [true] Type = [unc] Reference = [\\\\myserver\\myshare\\mydoc.txt]",
             reference.toString());
 
         // Verify that reference escapes are left as is by the link parser
         reference = this.parser.parse("pa\\.ge");
-        Assert.assertEquals(ResourceType.DOCUMENT, reference.getType());
-        Assert.assertEquals("pa\\.ge", reference.getReference());
+        assertEquals(ResourceType.DOCUMENT, reference.getType());
+        assertEquals("pa\\.ge", reference.getReference());
     }
 }

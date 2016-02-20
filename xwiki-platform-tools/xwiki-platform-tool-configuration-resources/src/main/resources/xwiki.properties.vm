@@ -98,16 +98,21 @@ environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 #-# Specifies how links labels are displayed when the user doesn't specify the label explicitly.
 #-# Valid values:
 #-#   %w: wiki name
-#-#   %s: space name
+#-#   %s: full space name (e.g. space1.space2)
+#-#       Note: Prior to 7.4.2/8.0M2 this was only displaying the last space name
+#-#   %ls: last space name. New in 7.4.2/8.0M2
 #-#   %p: page name
+#-#   %np: nested page name (i.e. will display the space name for Nested Pages). New in 7.4.2/8.0M2
 #-#   %P: page name with spaces between camel case words, i.e. "My Page" if the page name is "MyPage"
+#-#   %NP: nested page name with spaces between camel case words, i.e. "My Page" if the page name is "MyPage".
+#-#        New in 7.4.2/8.0M2
 #-#   %t: page title
 #-#
-#-# Note that if the page title is empty or not defined then it defaults to %p. This is also the case
+#-# Note that if the page title is empty or not defined then it defaults to %np. This is also the case
 #-# if the title cannot be retrieved for the document.
 #-#
-#-# The default is "%p". Some examples: "%s.%p", "%w:%s.%p".
-# rendering.linkLabelFormat = %p
+#-# The default is "%np". Some examples: "%s.%p", "%w:%s.%p".
+# rendering.linkLabelFormat = %np
 
 #-# [Since 2.0M3]
 #-# Overrides default macro categories (Each macro has a default category already defined, for example

@@ -47,7 +47,7 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
     /**
      * @see #getLinkLabelFormat()
      */
-    private static final String DEFAULT_LINK_LABEL_FORMAT = "%p";
+    private static final String DEFAULT_LINK_LABEL_FORMAT = "%np";
 
     /**
      * Defines from where to read the rendering configuration data.

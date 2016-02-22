@@ -107,9 +107,7 @@ public class Less4jCompilerTest
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
         String result = mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
 
-	// Now with sourcemaps.
-        StringWriter source2 = new StringWriter();
-        IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source2);
+	    // Now with sourcemaps.
         String result2 = mocker.getComponentUnderTest().compile(source.toString(), "skin", true);
 
         // Verify

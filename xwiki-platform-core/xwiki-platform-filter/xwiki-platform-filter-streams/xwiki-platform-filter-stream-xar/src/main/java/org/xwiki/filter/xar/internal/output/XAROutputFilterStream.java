@@ -153,9 +153,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.wikiWriter =
-            new XARWikiWriter(this.properties.getPackageName() != null ? this.properties.getPackageName() : name,
-                this.properties);
+        this.wikiWriter = new XARWikiWriter(
+            this.properties.getPackageName() != null ? this.properties.getPackageName() : name, this.properties);
     }
 
     @Override
@@ -173,9 +172,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiSpace(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.currentSpaceReference =
-            currentSpaceReference == null ? new EntityReference(name, EntityType.SPACE) : new EntityReference(name,
-                EntityType.SPACE, this.currentSpaceReference);
+        this.currentSpaceReference = currentSpaceReference == null ? new EntityReference(name, EntityType.SPACE)
+            : new EntityReference(name, EntityType.SPACE, this.currentSpaceReference);
     }
 
     @Override
@@ -215,15 +213,14 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer = new FilterStreamXMLStreamWriter(this.properties, true);
             } else {
                 if (this.wikiWriter == null) {
-                    this.wikiWriter =
-                        new XARWikiWriter(this.properties.getPackageName() != null ? this.properties.getPackageName()
-                            : "package", this.properties);
+                    this.wikiWriter = new XARWikiWriter(
+                        this.properties.getPackageName() != null ? this.properties.getPackageName() : "package",
+                        this.properties);
                 }
 
-                this.writer =
-                    new FilterStreamXMLStreamWriter(this.wikiWriter.newEntry(new LocalDocumentReference(
-                        this.currentDocumentReference, locale)), this.properties.getEncoding(),
-                        this.properties.isFormat(), true);
+                this.writer = new FilterStreamXMLStreamWriter(
+                    this.wikiWriter.newEntry(new LocalDocumentReference(this.currentDocumentReference, locale)),
+                    this.properties.getEncoding(), this.properties.isFormat(), true);
             }
         }
 
@@ -239,8 +236,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         if (this.currentDocumentReference.getParent().getParent() == null) {
             // If single space behave as it used to and put the space name instead of the reference to keep
             // compatibility when importing in older version
-            this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE, this.currentDocumentReference.getParent()
-                .getName());
+            this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE,
+                this.currentDocumentReference.getParent().getName());
         } else {
             // If nested space put the space reference in the field
             this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE,
@@ -253,8 +250,8 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
         this.writer.writeElement(XarDocumentModel.ELEMENT_DEFAULTLOCALE,
             toString(this.currentDocumentParameters.get(XWikiWikiDocumentFilter.PARAMETER_LOCALE)));
-        this.writer.writeElement(XarDocumentModel.ELEMENT_ISTRANSLATION, locale != null && !Locale.ROOT.equals(locale)
-            ? "1" : "0");
+        this.writer.writeElement(XarDocumentModel.ELEMENT_ISTRANSLATION,
+            locale != null && !Locale.ROOT.equals(locale) ? "1" : "0");
 
         if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
             this.writer.writeElement(XarDocumentModel.ELEMENT_CREATION_AUTHOR,
@@ -292,66 +289,71 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     {
         this.currentDocumentVersion = version;
 
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_PARENT)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_PARENT,
-                toString((EntityReference) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT)));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_AUTHOR,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_CUSTOMCLASS,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_AUTHOR,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_DATE,
-                toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_DATE,
-                toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)));
-        }
-        this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION, this.currentDocumentVersion);
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_TITLE)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_TITLE,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_TITLE));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_DEFAULTTEMPLATE,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_VALIDATIONSCRIPT,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_COMMENT,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_MINOR,
-                toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_SYNTAX,
-                toString((Syntax) parameters.get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_HIDDEN,
-                toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
-        }
-        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML)) {
-            this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_HTML,
-                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+        try {
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_PARENT)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_PARENT,
+                    toString((EntityReference) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_AUTHOR,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_CUSTOMCLASS,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_AUTHOR,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_AUTHOR));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_DATE,
+                    toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_DATE,
+                    toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_DATE)));
+            }
+            this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION, this.currentDocumentVersion);
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_TITLE)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_TITLE,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_TITLE));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_DEFAULTTEMPLATE,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_VALIDATIONSCRIPT,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_COMMENT,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_MINOR,
+                    toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_SYNTAX,
+                    toString((Syntax) parameters.get(XWikiWikiDocumentFilter.PARAMETER_SYNTAX)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_HIDDEN,
+                    toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT_HTML,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+            }
+        } catch (Exception e) {
+            throw new FilterException(String.format("Failed to write begin document [%s] with version [%s]",
+                this.currentDocumentReference, this.currentDocumentVersion), e);
         }
     }
 
@@ -365,185 +367,243 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
-        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
+        try {
+            this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, name);
-        if (this.properties.isPreserveVersion()
-            && parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
-                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
-        }
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, name);
+            if (this.properties.isPreserveVersion()
+                && parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+            }
 
-        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_MIMETYPE,
-                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
-        }
-        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
-                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
-        }
-        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
-                toString((Date) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
-        }
-        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION,
-                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
-        }
-        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT)) {
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
-                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-        }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_MIMETYPE,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
+            }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
+            }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
+                    toString((Date) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
+            }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
+            }
+            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT)) {
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
+                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
+            }
 
-        if (content != null) {
-            long contentSize = 0;
+            if (content != null) {
+                long contentSize = 0;
 
-            this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
-            byte[] buffer = new byte[ATTACHMENT_BUFFER_CHUNK_SIZE];
-            int readSize;
-            do {
-                try {
-                    readSize = content.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
-                } catch (IOException e) {
-                    throw new FilterException("Failed to read content stream", e);
-                }
-
-                if (readSize > 0) {
-                    String chunk;
-                    if (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE) {
-                        chunk = Base64.encodeBase64String(buffer);
-                    } else {
-                        chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+                this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
+                byte[] buffer = new byte[ATTACHMENT_BUFFER_CHUNK_SIZE];
+                int readSize;
+                do {
+                    try {
+                        readSize = content.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
+                    } catch (IOException e) {
+                        throw new FilterException("Failed to read content stream", e);
                     }
-                    this.writer.writeCharacters(chunk);
-                    contentSize += readSize;
-                }
-            } while (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE);
+
+                    if (readSize > 0) {
+                        String chunk;
+                        if (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE) {
+                            chunk = Base64.encodeBase64String(buffer);
+                        } else {
+                            chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+                        }
+                        this.writer.writeCharacters(chunk);
+                        contentSize += readSize;
+                    }
+                } while (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE);
+                this.writer.writeEndElement();
+
+                this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+            }
+
             this.writer.writeEndElement();
-
-            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write attachment [%s] from document [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
         }
-
-        this.writer.writeEndElement();
     }
 
     @Override
     public void beginWikiClass(FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeStartElement(XARClassModel.ELEMENT_CLASS);
+        try {
+            this.writer.writeStartElement(XARClassModel.ELEMENT_CLASS);
 
-        this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null ? this.currentObjectClass
-            : this.localSerializer.serialize(this.currentDocumentReference));
+            this.writer.writeElement(XARClassModel.ELEMENT_NAME, this.currentObjectClass != null
+                ? this.currentObjectClass : this.localSerializer.serialize(this.currentDocumentReference));
 
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_CUSTOMCLASS)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMCLASS,
-                (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMCLASS));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_CUSTOMMAPPING)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMMAPPING,
-                (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_SHEET_DEFAULTVIEW,
-                (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_SHEET_DEFAULTEDIT,
-                (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_DEFAULTSPACE)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_DEFAULTSPACE,
-                (String) parameters.get(WikiClassFilter.PARAMETER_DEFAULTSPACE));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_NAMEFIELD)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_NAMEFIELD,
-                (String) parameters.get(WikiClassFilter.PARAMETER_NAMEFIELD));
-        }
-        if (parameters.containsKey(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT)) {
-            this.writer.writeElement(XARClassModel.ELEMENT_VALIDATIONSCRIPT,
-                (String) parameters.get(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_CUSTOMCLASS)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMCLASS,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMCLASS));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_CUSTOMMAPPING)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_CUSTOMMAPPING,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_CUSTOMMAPPING));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_SHEET_DEFAULTVIEW,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_SHEET_DEFAULTEDIT,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_DEFAULTSPACE)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_DEFAULTSPACE,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_DEFAULTSPACE));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_NAMEFIELD)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_NAMEFIELD,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_NAMEFIELD));
+            }
+            if (parameters.containsKey(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT)) {
+                this.writer.writeElement(XARClassModel.ELEMENT_VALIDATIONSCRIPT,
+                    (String) parameters.get(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
+            }
+        } catch (Exception e) {
+            throw new FilterException(String.format("Failed to write begin xclass [%s] with version [%s]",
+                this.currentDocumentReference, this.currentDocumentVersion), e);
         }
     }
 
     @Override
     public void endWikiClass(FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeEndElement();
+        try {
+            this.writer.writeEndElement();
+        } catch (Exception e) {
+            throw new FilterException(String.format("Failed to write end xclass [%s] with version [%s]",
+                this.currentDocumentReference, this.currentDocumentVersion), e);
+        }
     }
 
     @Override
     public void beginWikiClassProperty(String name, String type, FilterEventParameters parameters)
         throws FilterException
     {
-        this.writer.writeStartElement(name);
+        try {
+            this.writer.writeStartElement(name);
 
-        if (this.currentObjectProperties != null) {
-            this.currentObjectProperties.put(name, type);
+            if (this.currentObjectProperties != null) {
+                this.currentObjectProperties.put(name, type);
+            }
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write begin property [%s] from class [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
         }
     }
 
     @Override
     public void endWikiClassProperty(String name, String type, FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeElement(XARClassPropertyModel.ELEMENT_CLASSTYPE, type);
+        try {
+            this.writer.writeElement(XARClassPropertyModel.ELEMENT_CLASSTYPE, type);
 
-        this.writer.writeEndElement();
+            this.writer.writeEndElement();
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write end property [%s] from class [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
+        }
     }
 
     @Override
     public void onWikiClassPropertyField(String name, String value, FilterEventParameters parameters)
         throws FilterException
     {
-        this.writer.writeElement(name, value);
+        try {
+            this.writer.writeElement(name, value);
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write property field [%s:%s] from class [%s] with version [%s]", name, value,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
+        }
     }
 
     @Override
     public void beginWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeStartElement(XARObjectModel.ELEMENT_OBJECT);
+        try {
+            this.writer.writeStartElement(XARObjectModel.ELEMENT_OBJECT);
 
-        this.currentObjectClass = (String) parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
+            this.currentObjectClass = (String) parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
 
-        this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
-            this.localSerializer.serialize(this.currentDocumentReference));
-        this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
-            toString((Integer) parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
-        this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);
+            this.writer.writeElement(XARObjectModel.ELEMENT_NAME,
+                this.localSerializer.serialize(this.currentDocumentReference));
+            this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
+                toString((Integer) parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
+            this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);
 
-        if (parameters.containsKey(WikiObjectFilter.PARAMETER_GUID)) {
-            this.writer.writeElement(XARObjectModel.ELEMENT_GUID,
-                (String) parameters.get(WikiObjectFilter.PARAMETER_GUID));
+            if (parameters.containsKey(WikiObjectFilter.PARAMETER_GUID)) {
+                this.writer.writeElement(XARObjectModel.ELEMENT_GUID,
+                    (String) parameters.get(WikiObjectFilter.PARAMETER_GUID));
+            }
+
+            this.currentObjectProperties = new HashMap<String, String>();
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write begin xobject [%s] from document [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
         }
-
-        this.currentObjectProperties = new HashMap<String, String>();
     }
 
     @Override
     public void endWikiObject(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeEndElement();
+        try {
+            this.writer.writeEndElement();
 
-        this.currentObjectClass = null;
-        this.currentObjectProperties = null;
+            this.currentObjectClass = null;
+            this.currentObjectProperties = null;
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write end xobject [%s] from document [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
+        }
     }
 
     @Override
-    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters)
-        throws FilterException
+    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {
-        this.writer.writeStartElement(XARObjectPropertyModel.ELEMENT_PROPERTY);
-
-        this.writer.writeStartElement(name);
-
         try {
-            this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name)).write(
-                this.writer.getWriter(), value);
+            this.writer.writeStartElement(XARObjectPropertyModel.ELEMENT_PROPERTY);
+
+            this.writer.writeStartElement(name);
+
+            try {
+                this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name))
+                    .write(this.writer.getWriter(), value);
+            } catch (Exception e) {
+                throw new FilterException("Failed to write property value", e);
+            }
+
+            this.writer.writeEndElement();
+
+            this.writer.writeEndElement();
         } catch (Exception e) {
-            throw new FilterException("Failed to write property value", e);
+            throw new FilterException(
+                String.format("Failed to write xobject property [%s:%s] from document [%s] with version [%s]", name,
+                    value, this.currentDocumentReference, this.currentDocumentVersion),
+                e);
         }
-
-        this.writer.writeEndElement();
-
-        this.writer.writeEndElement();
     }
 }

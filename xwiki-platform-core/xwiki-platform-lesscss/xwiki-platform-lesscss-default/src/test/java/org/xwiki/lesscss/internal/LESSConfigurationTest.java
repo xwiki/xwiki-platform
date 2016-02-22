@@ -26,6 +26,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,7 +52,7 @@ public class LESSConfigurationTest {
     {
         when(xwikiPropertiesSource.getProperty("lesscss.maximumSimultaneousCompilations",4)).thenReturn(4);
         int i = mocker.getComponentUnderTest().getMaximumSimultaneousCompilations();
-        assertTrue(i == 4);
+        assertEquals(4,i);
     }
 
     @Test
@@ -59,6 +60,6 @@ public class LESSConfigurationTest {
     {
         when(xwikiPropertiesSource.getProperty("lesscss.generateInlineSourceMaps", false)).thenReturn(true);
         boolean b  = mocker.getComponentUnderTest().isGenerateInlineSourceMaps();
-        assertTrue(b == true);
+        assertTrue(b);
     }
 }

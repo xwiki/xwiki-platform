@@ -54,6 +54,6 @@ public class LESSConfiguration
      */
     public boolean isGenerateInlineSourceMaps()
     {
-        return configurationSource.getProperty(CONFIGURATION_PREFIX + "generateInlineSourceMaps",false);
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "generateInlineSourceMaps", false);
     }
 }

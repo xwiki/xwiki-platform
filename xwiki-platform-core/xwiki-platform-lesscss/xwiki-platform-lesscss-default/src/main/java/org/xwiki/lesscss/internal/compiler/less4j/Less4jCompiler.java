@@ -51,6 +51,7 @@ public class Less4jCompiler
      * Compile the LESS code and get the included files from the skin templates.
      * @param lessCode code to compile
      * @param skin skin holding the templates
+     * @param inlineSourceMap whether to create inline sourcemaps in the generated css
      * @return the results of the LESS compilation
      * @throws Less4jException if problems occur
      */

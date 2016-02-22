@@ -282,7 +282,7 @@ public class HqlQueryExecutorTest
     @Test
     public void executeNamedQueryWithProgrammingRights() throws QueryException
     {
-        execute("somename", true);
+        executeNamed("somename", true);
     }
 
     @Test

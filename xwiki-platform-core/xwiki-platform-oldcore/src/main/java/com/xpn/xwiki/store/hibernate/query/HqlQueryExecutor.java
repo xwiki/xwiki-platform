@@ -35,8 +35,6 @@ import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.NamedQueryDefinition;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -63,7 +61,7 @@ import com.xpn.xwiki.util.Util;
 @Component
 @Named("hql")
 @Singleton
-public class HqlQueryExecutor implements QueryExecutor, Initializable
+public class HqlQueryExecutor implements QueryExecutor
 {
     /**
      * Path to Hibernate mapping with named queries. Configured via component manager.
@@ -85,22 +83,31 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private ContextualAuthorizationManager authorization;
 
-    private Set<String> allowedNamedQueries = new HashSet<>();
+    private volatile Set<String> allowedNamedQueries;
 
-    @Override
-    public void initialize() throws InitializationException
+    private Set<String> getAllowedNamedQueries()
     {
-        Configuration configuration = this.sessionFactory.getConfiguration();
+        if (this.allowedNamedQueries == null) {
+            synchronized (this) {
+                if (this.allowedNamedQueries == null) {
+                    this.allowedNamedQueries = new HashSet<>();
 
-        configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
+                    Configuration configuration = this.sessionFactory.getConfiguration();
 
-        // Gather the list of allowed named queries
-        Map<String, NamedQueryDefinition> namedQueries = configuration.getNamedQueries();
-        for (Map.Entry<String, NamedQueryDefinition> query : namedQueries.entrySet()) {
-            if (HqlQueryUtils.isSafe(query.getValue().getQuery())) {
-                this.allowedNamedQueries.add(query.getKey());
+                    configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
+
+                    // Gather the list of allowed named queries
+                    Map<String, NamedQueryDefinition> namedQueries = configuration.getNamedQueries();
+                    for (Map.Entry<String, NamedQueryDefinition> query : namedQueries.entrySet()) {
+                        if (HqlQueryUtils.isSafe(query.getValue().getQuery())) {
+                            this.allowedNamedQueries.add(query.getKey());
+                        }
+                    }
+                }
             }
         }
+        
+        return this.allowedNamedQueries;
     }
 
     /**
@@ -116,7 +123,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     {
         if (query instanceof SecureQuery && ((SecureQuery) query).isCurrentAuthorChecked()) {
             if (!this.authorization.hasAccess(Right.PROGRAM)) {
-                if (query.isNamed() && !this.allowedNamedQueries.contains(query.getStatement())) {
+                if (query.isNamed() && !getAllowedNamedQueries().contains(query.getStatement())) {
                     throw new QueryException("Named queries requires programming right", query, null);
                 }
 

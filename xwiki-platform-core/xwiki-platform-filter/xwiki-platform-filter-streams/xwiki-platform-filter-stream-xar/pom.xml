@@ -31,7 +31,7 @@
   <name>XWiki Platform - Filter - XAR</name>
   <description>Filter stream extension to read and write XAR packages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
 
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filter XAR module</xwiki.extension.name>

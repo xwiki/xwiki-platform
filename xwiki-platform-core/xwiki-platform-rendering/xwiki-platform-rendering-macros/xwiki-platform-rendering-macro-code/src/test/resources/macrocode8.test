@@ -16,8 +16,8 @@ beginGroup [[class]=[box]]
 beginGroup [[class]=[code]]
 beginFormat [NONE] [[style]=[color: #008000; ]]
 onWord [export]
-onSpace
 endFormat [NONE] [[style]=[color: #008000; ]]
+onSpace
 beginFormat [NONE] [[style]=[color: #19177C; ]]
 onWord [X]
 endFormat [NONE] [[style]=[color: #19177C; ]]

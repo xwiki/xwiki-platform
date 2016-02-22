@@ -89,6 +89,7 @@ public class CachedLESSCompilerTest
         when(xcontext.getDoc()).thenReturn(mockDocument);
 
         when(lessConfiguration.getMaximumSimultaneousCompilations()).thenReturn(1);
+        when(lessConfiguration.isGenerateInlineSourceMaps()).thenReturn(false);
     }
 
     @Test
@@ -99,7 +100,8 @@ public class CachedLESSCompilerTest
         when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
             thenReturn("Some Velocity-rendered LESS content");
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2")))
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2"),
+                eq(false)))
             .thenReturn("output");
 
         // Tests
@@ -116,7 +118,8 @@ public class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"))).thenReturn("output");
+        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"),
+                eq(false))).thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, true, "skin2"));
@@ -154,7 +157,8 @@ public class CachedLESSCompilerTest
                 .thenReturn("@import (reference) \"style.less.vm\";\n"
                         +"Some Velocity-rendered LESS content");
         when(less4jCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
-            +"Some Velocity-rendered LESS content"), eq("skin")))
+            +"Some Velocity-rendered LESS content"), eq("skin"),
+                eq(false)))
                 .thenReturn("output");
 
         // Tests
@@ -171,7 +175,8 @@ public class CachedLESSCompilerTest
         when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
                 thenReturn("Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"))).
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"),
+                eq(false))).
             thenThrow(lessCompilerException);
 
         // Tests

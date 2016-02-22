@@ -51,14 +51,17 @@ public class Less4jCompiler
      * Compile the LESS code and get the included files from the skin templates.
      * @param lessCode code to compile
      * @param skin skin holding the templates
+     * @param inlineSourceMap whether to create inline sourcemaps in the generated css
      * @return the results of the LESS compilation
      * @throws Less4jException if problems occur
      */
-    public String compile(String lessCode, String skin) throws Less4jException
+    public String compile(String lessCode, String skin, boolean inlineSourceMap) throws Less4jException
     {
         LessCompiler lessCompiler = new DefaultLessCompiler();
         LessCompiler.Configuration options = new LessCompiler.Configuration();
         options.setCompressing(true);
+        options.getSourceMapConfiguration().setInline(inlineSourceMap);
+        options.getSourceMapConfiguration().setIncludeSourcesContent(true);
         LessSource lessSource = 
             new CustomContentLESSSource(lessCode, templateManager, skinManager.getSkin(skin));
         LessCompiler.CompilationResult lessResult = lessCompiler.compile(lessSource, options);

@@ -739,5 +739,11 @@ extension.oldflavors=$oldFlavor.trim()
 #-# The default is:
 # lesscss.maximumSimultaneousCompilations = 4
 
+#-# [Since 8.0RC1]
+#-# Generate sourcemaps inline in the CSS files.
+#-#
+#-# The default is:
+# lesscss.generateInlineSourceMaps = false
+
 
 $!xwikiPropertiesAdditionalProperties

@@ -59,7 +59,6 @@ public class Less4jCompiler
         LessCompiler lessCompiler = new DefaultLessCompiler();
         LessCompiler.Configuration options = new LessCompiler.Configuration();
         options.setCompressing(true);
-        //LessCompiler.SourceMapConfiguration smopts = options.getSourceMapConfiguration();
         options.getSourceMapConfiguration().setInline(inlineSourceMap);
         options.getSourceMapConfiguration().setIncludeSourcesContent(true);
         LessSource lessSource = 

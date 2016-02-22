@@ -107,21 +107,16 @@ public class Less4jCompilerTest
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
         String result = mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
 
-
+	// Now with sourcemaps.
         StringWriter source2 = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source2);
         String result2 = mocker.getComponentUnderTest().compile(source.toString(), "skin", true);
-
-        //StringReader s2 = new StringReader(result2);
-        //IOUtils.copy(s2, new FileOutputStream("/var/tmp/style3.css_inl"));
 
         // Verify
         StringWriter expected = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.css").getFile()), expected);
         assertEquals(expected.toString(), result);
 
-        //StringWriter expected2 = new StringWriter();
-        //IOUtils.copy(new FileInputStream(getClass().getResource("/style3_inl.css").getFile()), expected2);
         assertTrue(result2.contains("/*# sourceMappingURL=data:application/json;base64,"));
     }
 

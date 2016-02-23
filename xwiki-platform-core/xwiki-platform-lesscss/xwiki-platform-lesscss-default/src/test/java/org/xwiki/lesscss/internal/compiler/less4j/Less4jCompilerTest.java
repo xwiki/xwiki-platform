@@ -20,8 +20,6 @@
 package org.xwiki.lesscss.internal.compiler.less4j;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
@@ -39,8 +37,8 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.github.sommeri.less4j.Less4jException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

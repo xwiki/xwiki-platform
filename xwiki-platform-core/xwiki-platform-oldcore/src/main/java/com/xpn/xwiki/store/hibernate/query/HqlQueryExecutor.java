@@ -35,6 +35,8 @@ import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.NamedQueryDefinition;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -61,7 +63,7 @@ import com.xpn.xwiki.util.Util;
 @Component
 @Named("hql")
 @Singleton
-public class HqlQueryExecutor implements QueryExecutor
+public class HqlQueryExecutor implements QueryExecutor, Initializable
 {
     /**
      * Path to Hibernate mapping with named queries. Configured via component manager.
@@ -85,6 +87,14 @@ public class HqlQueryExecutor implements QueryExecutor
 
     private volatile Set<String> allowedNamedQueries;
 
+    @Override
+    public void initialize() throws InitializationException
+    {
+        Configuration configuration = this.sessionFactory.getConfiguration();
+
+        configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
+    }
+
     private Set<String> getAllowedNamedQueries()
     {
         if (this.allowedNamedQueries == null) {
@@ -93,8 +103,6 @@ public class HqlQueryExecutor implements QueryExecutor
                     this.allowedNamedQueries = new HashSet<>();
 
                     Configuration configuration = this.sessionFactory.getConfiguration();
-
-                    configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
 
                     // Gather the list of allowed named queries
                     Map<String, NamedQueryDefinition> namedQueries = configuration.getNamedQueries();

@@ -20,6 +20,9 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,9 +76,11 @@ public class DefaultWikiComponentManager implements WikiComponentManager
     private WikiComponentManagerContext wikiComponentManagerContext;
 
     /**
-     * Map of registered components.
+     * Map of registered components. We need to keep a cache because wiki components can be components of various
+     * Role Types and we cannot ask the Component Manager for wiki component only (which we need to do when we need to
+     * unregister them). A wiki page can hold one or several wiki components.
      */
-    private Map<WikiComponent, Boolean> registeredComponents = new ConcurrentHashMap<WikiComponent, Boolean>();
+    private Map<DocumentReference, List<WikiComponent>> registeredComponents = new ConcurrentHashMap<>();
 
     @Override
     public void registerWikiComponent(WikiComponent component) throws WikiComponentException
@@ -103,11 +108,13 @@ public class DefaultWikiComponentManager implements WikiComponentManager
                 }
             }
 
+            // Register the wiki component against the Component Manager
             getComponentManager(component.getScope()).registerComponent(componentDescriptor,
                 roleTypeClass.cast(component));
 
-            // And hold a reference to it.
-            this.registeredComponents.put(component, Boolean.FALSE);
+            // And add it the wiki component cache so that we can remove it later on. We need to do this since we need
+            // to be able to unregister a wiki component associated with a wiki page
+            cacheWikiComponent(component);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s] wiki "
                 + "component registration failed", component.getScope()), e);
@@ -119,41 +126,59 @@ public class DefaultWikiComponentManager implements WikiComponentManager
         }
     }
 
+    private void cacheWikiComponent(WikiComponent component)
+    {
+        List<WikiComponent> wikiComponents = this.registeredComponents.get(component.getDocumentReference());
+        if (wikiComponents == null) {
+            wikiComponents = new ArrayList<>();
+            this.registeredComponents.put(component.getDocumentReference(), wikiComponents);
+        }
+        if (!wikiComponents.contains(component)) {
+            wikiComponents.add(component);
+        }
+    }
+
     @Override
     public void unregisterWikiComponents(DocumentReference reference) throws WikiComponentException
     {
-        WikiComponent unregisteredComponent = null;
+        List<WikiComponent> wikiComponents = this.registeredComponents.get(reference);
+        if (wikiComponents != null) {
+            Iterator<WikiComponent> iterator = wikiComponents.iterator();
+            while (iterator.hasNext()) {
+                unregisterWikiComponent(iterator);
+            }
+            // Clean up wiki component cache for the passed reference, if it doesn't contain any wiki component
+            wikiComponents = this.registeredComponents.get(reference);
+            if (wikiComponents.isEmpty()) {
+                this.registeredComponents.remove(reference);
+            }
+        }
+    }
+
+    private void unregisterWikiComponent(Iterator<WikiComponent> iterator)
+        throws WikiComponentException
+    {
+        WikiComponent wikiComponent = iterator.next();
 
         // Save current context information
         DocumentReference currentUserReference = this.wikiComponentManagerContext.getCurrentUserReference();
         EntityReference currentEntityReference = this.wikiComponentManagerContext.getCurrentEntityReference();
-
-        for (WikiComponent registered : this.registeredComponents.keySet()) {
-            if (registered.getDocumentReference().equals(reference)) {
-                // Unregister component
-                unregisteredComponent = registered;
-                try {
-                    // Set the proper information so the component manager use the proper keys to find components to
-                    // unregister
-                    this.wikiComponentManagerContext.setCurrentUserReference(registered.getAuthorReference());
-                    this.wikiComponentManagerContext.setCurrentEntityReference(registered.getDocumentReference());
-
-                    getComponentManager(registered.getScope()).unregisterComponent(registered.getRoleType(),
-                        registered.getRoleHint());
-                } catch (ComponentLookupException e) {
-                    throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s]",
-                        registered.getScope()), e);
-                } finally {
-                    this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
-                    this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
-                }
-
-            }
-        }
-
-        // Remove reference
-        if (unregisteredComponent != null) {
-            this.registeredComponents.remove(reference);
+        try {
+            // Set the proper information so the component manager use the proper keys to find components to
+            // unregister
+            this.wikiComponentManagerContext.setCurrentUserReference(wikiComponent.getAuthorReference());
+            this.wikiComponentManagerContext.setCurrentEntityReference(wikiComponent.getDocumentReference());
+            // Remove from the Component Manager
+            getComponentManager(wikiComponent.getScope()).unregisterComponent(wikiComponent.getRoleType(),
+                wikiComponent.getRoleHint());
+            // Remove from the wiki component cache
+            iterator.remove();
+        } catch (ComponentLookupException e) {
+            throw new WikiComponentException(String.format("Failed to find a component manager for scope [%s]",
+                wikiComponent.getScope()), e);
+        } finally {
+            this.wikiComponentManagerContext.setCurrentUserReference(currentUserReference);
+            this.wikiComponentManagerContext.setCurrentEntityReference(currentEntityReference);
         }
     }
 

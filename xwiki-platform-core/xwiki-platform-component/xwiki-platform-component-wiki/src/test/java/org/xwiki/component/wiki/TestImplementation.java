@@ -23,11 +23,26 @@ import java.lang.reflect.Type;
 
 import org.xwiki.model.reference.DocumentReference;
 
+/**
+ * Stub wiki component implementation for testing.
+ *
+ * @version $Id$
+ */
 public class TestImplementation implements TestRole, WikiComponent
 {
-    private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
+    private DocumentReference documentReference;
 
-    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
+    private DocumentReference authorReference;
+
+    private WikiComponentScope scope;
+
+    public TestImplementation(DocumentReference documentReference, DocumentReference authorReference,
+        WikiComponentScope scope)
+    {
+        this.documentReference = documentReference;
+        this.authorReference = authorReference;
+        this.scope = scope;
+    }
 
     @Override
     public String test()
@@ -38,13 +53,13 @@ public class TestImplementation implements TestRole, WikiComponent
     @Override
     public DocumentReference getDocumentReference()
     {
-        return DOC_REFERENCE;
+        return this.documentReference;
     }
 
     @Override
     public DocumentReference getAuthorReference()
     {
-        return AUTHOR_REFERENCE;
+        return this.authorReference;
     }
 
     @Override
@@ -62,6 +77,6 @@ public class TestImplementation implements TestRole, WikiComponent
     @Override
     public WikiComponentScope getScope()
     {
-        return WikiComponentScope.WIKI;
+        return this.scope;
     }
 }

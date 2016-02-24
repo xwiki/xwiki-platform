@@ -497,6 +497,16 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/diff/DiffPlugin</className>
+              <justification>Not really a breackage. Just moved to its own module.</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/diff/DiffPluginApi</className>
+              <justification>Not really a breackage. Just moved to its own module.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

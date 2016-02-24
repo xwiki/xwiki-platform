@@ -172,7 +172,18 @@ $xwiki.getDocument('MenuTemplate').content
       });
     });
   });
-})</code>
+  // Manage the submenus text overflow
+  $(function(){
+  $('li.xDropdown ul').each(function(index){
+     if($(this).parents(".xDropdown").length &gt; 1){
+      var ulwidth = $(this).parent().parent().outerWidth();
+      $(this).css( "left", ulwidth);
+     }
+    });
+  });
+
+})
+</code>
     </property>
     <property>
       <name/>
@@ -398,7 +409,7 @@ $xwiki.getDocument('MenuTemplate').content
 }
 
 .skin-colibri .menu-horizontal.fixedWidth ul ul {
-  width: 12em;
+  width: auto;
 }
 
 .skin-colibri .menu-horizontal.fixedWidth ul ul ul {
@@ -709,7 +720,7 @@ $xwiki.getDocument('MenuTemplate').content
         top: 100%;
         left: 0;
         z-index: @zindex-dropdown;
-        display: none; // none by default, but block on "open" of the menu
+        visibility: hidden; // hidden by default, but visible on "open" of the menu
         float: left;
         min-width: 160px;
         padding: 5px 0;
@@ -743,6 +754,8 @@ $xwiki.getDocument('MenuTemplate').content
             line-height: @line-height-base;
             color: @dropdown-link-color;
             white-space: nowrap; // prevent links from randomly breaking onto new lines
+            overflow: hidden;
+            text-overflow: ellipsis; // displaying ... if the text is so long
             &amp;:hover {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               /* .dropdown-menu&gt;li&gt;a:hover */ 
@@ -801,7 +814,7 @@ $xwiki.getDocument('MenuTemplate').content
     li {
       /* Display submenus on hover */
       &amp;:hover &gt; ul {
-        display: block;
+        visibility: visible;
       }
       /* Display an arrow for expandable items */
       &amp;.xDropdown {
@@ -818,7 +831,8 @@ $xwiki.getDocument('MenuTemplate').content
         position: relative;
       }
       ul ul {
-        width: 12em;
+        min-width: 12em; 
+        max-width: 30em;   
         ul {
           left: 12em;
           margin: 0;
@@ -877,6 +891,12 @@ $xwiki.getDocument('MenuTemplate').content
         }
       }
       li {
+          ul{
+            display: none; // none by default, but block on "open" of the menu 
+          }
+            &amp;:hover&gt;ul {
+            display: block;
+          }
         &amp;.xDropdown {
           /* Place the arrow on the right */
           &amp;:after {
@@ -889,6 +909,7 @@ $xwiki.getDocument('MenuTemplate').content
       }
       &amp;.fixedWidth ul ul {
         width: auto;
+        max-width: 100%;
       }
     }
   }

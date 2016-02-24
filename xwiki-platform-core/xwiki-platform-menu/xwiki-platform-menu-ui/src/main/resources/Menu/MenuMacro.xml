@@ -742,7 +742,8 @@ $xwiki.getDocument('MenuTemplate').content
             font-weight: normal;
             line-height: @line-height-base;
             color: @dropdown-link-color;
-            white-space: nowrap; // prevent links from randomly breaking onto new lines
+            overflow: hidden;
+            text-overflow: ellipsis; // Displaying ... if the text is too long
             &amp;:hover {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               /* .dropdown-menu&gt;li&gt;a:hover */ 
@@ -762,7 +763,6 @@ $xwiki.getDocument('MenuTemplate').content
             font-weight: normal;
             line-height: @line-height-base;
             color: @dropdown-link-color;
-            white-space: nowrap; // prevent links from randomly breaking onto new lines
             /* Empty dropdowns should have height in order to display the arrow */
             min-height: 2 * @font-size-base;
             &amp;:hover {

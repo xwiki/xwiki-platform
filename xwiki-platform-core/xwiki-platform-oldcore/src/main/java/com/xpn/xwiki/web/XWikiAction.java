@@ -680,7 +680,7 @@ public abstract class XWikiAction extends Action
      * document is moved).
      *
      * @param context the XWiki context
-     * @return either ot not a redirection have been sent
+     * @return either or not a redirection have been sent
      * @throws XWikiException if error occurs
      *
      * @since 8.0RC1, 7.4.2

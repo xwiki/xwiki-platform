@@ -47,7 +47,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Component
 @Named("XWiki.XWikiServerXwiki")
 @Singleton
-public class XWikiServerXWikiDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     /**
      * The name of the mandatory document.
@@ -69,7 +69,7 @@ public class XWikiServerXWikiDocumentInitializer extends AbstractMandatoryDocume
     /**
      * Default constructor.
      */
-    public XWikiServerXWikiDocumentInitializer()
+    public XWikiServerXwikiDocumentInitializer()
     {
         super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
     }

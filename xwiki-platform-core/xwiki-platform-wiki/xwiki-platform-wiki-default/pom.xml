@@ -32,7 +32,7 @@
   <description>XWiki Platform - Wiki - Default Implementation</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -75,11 +75,9 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

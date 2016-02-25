@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+rm -rf /etc/xwiki/lib
+
+#########################
+# var
+#########################
+
+if [ ! -d /var/lib/xwiki ]; then
+  mkdir /var/lib/xwiki
+fi
+if [ ! -d /var/lib/xwiki/data ]; then
+  mkdir /var/lib/xwiki/data
+fi

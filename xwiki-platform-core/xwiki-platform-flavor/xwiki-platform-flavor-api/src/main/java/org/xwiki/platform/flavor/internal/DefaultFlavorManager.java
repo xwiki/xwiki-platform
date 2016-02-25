@@ -57,7 +57,14 @@ public class DefaultFlavorManager implements FlavorManager
     private ConfigurationSource configurationSource;
 
     @Override
+    @Deprecated
     public IterableResult<Extension> getFlavors(FlavorQuery query)
+    {
+        return searchFlavors(query);
+    }
+
+    @Override
+    public IterableResult<Extension> searchFlavors(FlavorQuery query)
     {
         return extensionRepositoryManager.search(query);
     }

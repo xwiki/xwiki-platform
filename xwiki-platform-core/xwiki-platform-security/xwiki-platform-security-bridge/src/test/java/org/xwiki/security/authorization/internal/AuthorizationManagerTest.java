@@ -249,6 +249,17 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
             Right.EDIT, userB, new DocumentReference("wiki", "XWiki", "WebPreferences"), ctx);
         assertAccessFalse("Non-admin should not have edit access to XWikiPreferences even when allowed by the space",
             Right.EDIT, userB, new DocumentReference("wiki2", "XWiki", "WebPreferences"), ctx);
+    }
 
+    @Test
+    public void testMainWikiOwner() throws Exception
+    {
+        LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+        ctx.setWikiId("wiki");
+
+        assertAccessTrue("Main wiki oner shoudl have Programming Right", Right.PROGRAM,
+            new DocumentReference("wiki", "XWiki", "Admin"), null, ctx);
     }
 }

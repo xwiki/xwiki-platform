@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution-debian</artifactId>
+    <version>8.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-debian-common</artifactId>
+  <packaging>deb</packaging>
+  <name>XWiki Platform - Distribution - Debian - Common</name>
+  <description>XWiki common package</description>
+  <properties>
+    <war.path>${project.build.directory}/war</war.path>
+
+    <xwiki.properties.environment.permanentDirectory>/var/lib/xwiki/data</xwiki.properties.environment.permanentDirectory>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-war</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Unpack the war -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+            <execution>
+              <id>unzip-application</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.xwiki.platform</groupId>
+                    <artifactId>xwiki-platform-distribution-war</artifactId>
+                    <version>${project.version}</version>
+                    <type>war</type>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+      </plugin>
+      <!-- Prepare configuration -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+      <!-- Produce deb package -->
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <configuration>
+          <dataSet>
+            <data>
+              <src>${war.path}</src>
+              <type>directory</type>
+              <excludes>WEB-INF,WEB-INF/**/*</excludes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/lib/xwiki</prefix>
+              </mapper>
+            </data>
+            <data>
+              <src>${war.path}/WEB-INF/lib</src>
+              <type>directory</type>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/lib/xwiki/WEB-INF/lib</prefix>
+              </mapper>
+            </data>
+
+            <!-- Configuration files -->
+            <data>
+              <src>${war.path}/WEB-INF</src>
+              <type>directory</type>
+              <excludes>**/lib,**/lib/*,**/hibernate.cfg.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/etc/xwiki</prefix>
+              </mapper>
+              <conffile>true</conffile>
+            </data>
+            <data>
+              <src>${project.build.directory}/maven-shared-archive-resources</src>
+              <type>directory</type>
+              <includes>xwiki.cfg,xwiki.properties</includes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/etc/xwiki</prefix>
+              </mapper>
+              <conffile>true</conffile>
+            </data>
+
+            <!-- Links to /usr/lib/xwiki/WEB-INF files/folders -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/cache</linkName>
+              <linkTarget>/etc/xwiki/cache</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/fonts</linkName>
+              <linkTarget>/etc/xwiki/fonts</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/classes</linkName>
+              <linkTarget>/etc/xwiki/classes</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/observation</linkName>
+              <linkTarget>/etc/xwiki/observation</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/portlet.xml</linkName>
+              <linkTarget>/etc/xwiki/portlet.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/struts-config.xml</linkName>
+              <linkTarget>/etc/xwiki/struts-config.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/sun-web.xml</linkName>
+              <linkTarget>/etc/xwiki/sun-web.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/web.xml</linkName>
+              <linkTarget>/etc/xwiki/web.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
+              <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/version.properties</linkName>
+              <linkTarget>/etc/xwiki/version.properties</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.cfg</linkName>
+              <linkTarget>/etc/xwiki/xwiki.cfg</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/hibernate.cfg.xml</linkName>
+              <linkTarget>/etc/xwiki/hibernate.cfg.xml</linkTarget>
+            </data>
+          </dataSet>
+        </configuration>
+      </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

@@ -34,8 +34,24 @@
   #else
     #set ($flavorQuery = $services.flavor.createFlavorQuery())
   #end
-  #set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
-  #set ($flavors = $services.flavor.getFlavors($flavorQuery))
+  ##set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
+  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus("wiki:$xcontext.database"))
+  #if (!$flavorSearchJobStatus)
+    #set ($flavorSearchJob = $services.flavor.searchValidFlavors($flavorQuery, "wiki:$xcontext.database"))
+    ## TODO: make it asynchronous
+    #set ($void = $flavorSearchJob.join())
+    #set ($flavorSearchJobStatus = $flavorSearchJob.status)
+  #end
+  #set ($jobFlavors = $flavorSearchJobStatus.flavors)
+  ## Apply offset
+  #set ($flavors = $jobFlavors.subList($offset, $jobFlavors.size()))
+  ## Apply limit
+  #if ($resultsPerPage > 0)
+    #if ($resultsPerPage > $flavors.size())
+      #set($limit = $flavors.size())
+    #end
+    #set ($flavors = $flavors.subList(0, $limit))
+  #end
   <div class="xwiki-flavor-picker-results">
     <ul>
     #foreach ($flavor in $flavors)
@@ -66,7 +82,7 @@
     #end
     #set($paginationParameters = {
       'url' : $url,
-      'totalItems' : $flavors.totalHits,
+      'totalItems' : $jobFlavors.size(),
       'defaultItemsPerPage' : $resultsPerPage,
       'position': 'top'
     })

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Rights
+#########################
+
+## Make sure tomcat is able to write in the data folder
+chown tomcat7.tomcat7 /var/lib/xwiki/data
+
+#########################
+# Configuration
+#########################
+
+. /usr/share/debconf/confmodule
+
+#########################
+# Restart Tomcat
+#########################
+
+invoke-rc.d --quiet tomcat7 restart || {
+    RESULT=$?
+    # Ignore if tomcat7 init script does not exist (yet)
+    if [ $RESULT != 100 ]; then
+    exit $RESULT
+    fi
+}

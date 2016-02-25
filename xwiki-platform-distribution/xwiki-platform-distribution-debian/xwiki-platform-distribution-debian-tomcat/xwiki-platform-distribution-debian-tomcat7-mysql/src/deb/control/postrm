@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ "$1" = "purge" ] && [ -f /usr/share/debconf/confmodule ]; then
+	. /usr/share/debconf/confmodule
+	db_purge
+fi
+
+#########################
+# Restart Tomcat
+#########################
+
+invoke-rc.d --quiet tomcat7 restart || {
+    RESULT=$?
+    # Ignore if tomcat7 init script does not exist (yet)
+    if [ $RESULT != 100 ]; then
+	exit $RESULT
+    fi
+}

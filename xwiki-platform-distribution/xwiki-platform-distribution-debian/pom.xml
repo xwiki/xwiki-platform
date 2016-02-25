@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution</artifactId>
+    <version>8.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-debian</artifactId>
+  <name>XWiki Platform - Distribution - Debian</name>
+  <packaging>pom</packaging>
+  <description>Debian installer for XWiki</description>
+  <modules>
+    <module>xwiki-platform-distribution-debian-common</module>
+    <module>xwiki-platform-distribution-debian-mysql-common</module>
+    <module>xwiki-platform-distribution-debian-pgsql-common</module>
+    <module>xwiki-platform-distribution-debian-tomcat</module>
+  </modules>
+  <properties>
+    <jdeb.version>1.5</jdeb.version>
+    <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
+    <debian.license>LGPL 2.1</debian.license>
+    <xwiki.debian.description>
+ XWiki is a free wiki software platform written in Java with a design emphasis
+ on extensibility.
+ .
+ XWiki is an easily installed wiki and collaboration platform with features such as
+ WYSIWYG editing, OpenOffice based document import/export, semantic annotations
+ and tagging, and advanced permissions management.
+ .
+ XWiki is designed to help teams collaborate more efficiently. It
+ runs in a Java servlet container such as Tomcat.
+    </xwiki.debian.description>
+    <debian.description>
+ ${xwiki.debian.description}
+    </debian.description>
+    <debian.bugs>http://jira.xwiki.org</debian.bugs>
+    <debian.homepage>http://www.xwiki.org</debian.homepage>
+  </properties>
+  <build>
+    <extensions>
+      <!-- Needed to add support for the "deb" packaging -->
+      <extension>
+        <groupId>org.vafer</groupId>
+        <artifactId>jdeb</artifactId>
+        <version>${jdeb.version}</version>
+      </extension>
+    </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>jdeb</artifactId>
+          <groupId>org.vafer</groupId>
+          <version>${jdeb.version}</version>
+          <configuration>
+            <snapshotExpand>true</snapshotExpand>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

@@ -1,0 +1,122 @@
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<assembly>
+  <id>distribution</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <dependencySets>
+    <!-- "xwiki" webapp. -->
+    <dependencySet>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-distribution-war</include>
+      </includes>
+      <outputDirectory>webapps/xwiki</outputDirectory>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>**/hibernate.cfg.xml</exclude>
+        </excludes>
+      </unpackOptions>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- ROOT webapp, redirecting to /xwiki/ when no application is specified. -->
+    <dependencySet>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-tool-rootwebapp</include>
+      </includes>
+      <outputDirectory>webapps/root</outputDirectory>
+      <unpack>true</unpack>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- Unpack Jetty files
+         Note1: We need to apply filtering to resolve the "xwikiDataDir" property in start shell scripts.
+         Note2: Since the Assembly plugin doesn't allow us to specify which files should be filtered we need two
+                definitions, one with only start shell scripts and one without them.
+    -->
+    <dependencySet>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-tool-jetty-resources</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <!-- TODO: This shouldn't be needed but there's a bug see http://jira.codehaus.org/browse/MASSEMBLY-554 -->
+      <outputFileNameMapping>/</outputFileNameMapping>
+      <unpackOptions>
+        <filtered>true</filtered>
+        <includes>
+          <include>**/start_xwiki*.*</include>
+        </includes>
+      </unpackOptions>
+      <!-- Extracting some resources from the dependency somehow looses the file permissions, so we need to set them
+           again so that the start xwiki scripts are executable... -->
+      <fileMode>755</fileMode>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>org.xwiki.platform:xwiki-platform-tool-jetty-resources</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <!-- TODO: This shouldn't be needed but there's a bug see http://jira.codehaus.org/browse/MASSEMBLY-554 -->
+      <outputFileNameMapping>/</outputFileNameMapping>
+      <unpackOptions>
+        <filtered>false</filtered>
+        <excludes>
+          <exclude>**/start_xwiki*.*</exclude>
+        </excludes>
+      </unpackOptions>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+    <!-- Add JDBC driver for the database to use. -->
+    <dependencySet>
+      <includes>
+        <include>${hsqldb.groupId}:${hsqldb.artifactId}</include>
+      </includes>
+      <outputDirectory>webapps/xwiki/WEB-INF/lib</outputDirectory>
+      <unpack>false</unpack>
+      <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
+      <useProjectArtifact>false</useProjectArtifact>
+    </dependencySet>
+  </dependencySets>
+  <!-- Add Hibernate configuration file -->
+  <files>
+    <file>
+      <source>${basedir}/target/maven-shared-archive-resources/hibernate.cfg.xml</source>
+      <outputDirectory>webapps/xwiki/WEB-INF</outputDirectory>
+    </file>
+  </files>
+  <!-- Add License/Notice files -->
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/target/maven-shared-archive-resources/META-INF</directory>
+      <outputDirectory>META-INF</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

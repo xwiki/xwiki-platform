@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
@@ -66,15 +65,14 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     /** A security rules to deny everyone the edit right by allowing edit to no one. */
     private static final SecurityRule DENY_EDIT = new AllowEditToNoOneRule();
 
+    /** Right set allowed for main wiki owner. */
+    private static final Set<Right> MAINWIKIOWNER_RIGHTS = new RightSet(Right.PROGRAM);
+
     /** Right set allowed for wiki owner. */
     private static final Set<Right> OWNER_RIGHTS = new RightSet(Right.ADMIN);
 
     /** Right set allowed for document creators. */
     private static final Set<Right> CREATOR_RIGHTS = new RightSet(Right.CREATOR);
-
-    /** Logger. **/
-    @Inject
-    private Logger logger;
 
     /** Resolver for user and group names. */
     @Inject
@@ -291,10 +289,17 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
         if (isGlobalRightsReference) {
             if (isGlobalRightRequested) {
-                DocumentReference owner = getWikiOwner(documentReference.getWikiReference());
+                WikiReference documentWiki = documentReference.getWikiReference();
+                DocumentReference owner = getWikiOwner(documentWiki);
                 if (owner != null) {
+                    XWikiContext context = getXWikiContext();
+
                     // Allow global rights to wiki owner
-                    rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    if (context.isMainWiki(documentWiki.getName())) {
+                        rules.add(new XWikiSecurityRule(MAINWIKIOWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    } else {
+                        rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    }
                 }
             } else {
                 // Deny local edit right on documents hosting global rights for anyone but admins.

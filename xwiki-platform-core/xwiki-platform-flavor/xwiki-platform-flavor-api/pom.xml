@@ -41,5 +41,10 @@
       <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-script</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/config.pgsql
+
+dbc_go xwiki $@

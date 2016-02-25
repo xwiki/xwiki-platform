@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution</artifactId>
+    <version>8.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-war</artifactId>
+  <name>XWiki Platform - Distribution - War</name>
+  <packaging>war</packaging>
+  <description>The XWiki WAR package. It contains everything needed to run XWiki in production and then choose a flavor.</description>
+  <properties>
+    <!-- By default we don't include Legacy modules and thus we don't need to exclude the non legacy JARs -->
+    <xwiki.war.legacy.excludes />
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!--
+        Custom version with embedded commons-logging maven descriptor (so that it's found as core extension).
+        See http://jira.qos.ch/browse/SLF4J-340.
+      -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}-xwiki</version>
+      </dependency>
+      <!--
+        Custom version with embedded log4j maven descriptor (so that it's found as core extension).
+        See http://jira.qos.ch/browse/SLF4J-339.
+      -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>${slf4j.version}-xwiki</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <!-- ********************************************************************** -->
+    <!-- Core extension (what we absolutely require in a minimum XWiki runtime) -->
+
+    <!-- Components Modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-wiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- REST module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- ClassLoader -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classloader-xwiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classloader-protocol-attachmentjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Extension Manager -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-handler-jar</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-xwiki</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-cluster</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-distribution</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Wiki macros support -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Default syntaxes -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-html5</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-annotatedhtml5</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-plain</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Logging Dependencies. Ensures all logging goes through SLF4J and Logback. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Configuration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Security -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- LESS CSS Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-lesscss-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- URL -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Active Installs -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Localization -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-source-legacy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Crypto Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-crypto-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-crypto-store-filesystem</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-crypto-store-wiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Filter -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-stream-xml</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-extension</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Wiki Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-workspaces-migrator</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Servlets for Resource API -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-servlet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Mailsender -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-storage</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Watchlist -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-watchlist-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Wysiwyg -->
+    <!-- Add the GWT JAR so that the XWiki GWT Servlet can be activated by default in web.xml -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Plugins, hard to install as extensions (we need to get rid of all that) -->
+
+    <!-- Skin Extension -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Feed -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-feed-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Old Mail Sender Plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mailsender</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Generic templates and web resources dependencies -->
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <!-- Refactoring API implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Annotations modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-core</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-reference</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-io</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-maintainer</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-rest</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-annotation-scripting</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Security Script Services -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- CSRF protection -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-csrf</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Diff Script Services -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-diff-script</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Skin -->
+
+    <!-- Skins
+         Note: even though the dependency plugin below doesn't need explicit dependencies set to work it's a best
+         practice to put them here since they are real dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ********************************************************************** -->
+    <!-- Add dependencies on the base flavor for the mainwiki and for subwikis so that we transitively
+         include all JAR dependencies in the generated WAR -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-flavor-main</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-flavor-wiki</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Generate XWiki's configuration files -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>xwiki-platform-tool-configuration-resources</id>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Unpack the Skins (they're packaged as zips) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <!-- Unpack the Flamingo skin -->
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skin</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <!-- Include License resources -->
+            <resource>
+              <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+              <targetPath>META-INF</targetPath>
+            </resource>
+            <!-- Include Configuration files that were generated -->
+            <resource>
+              <directory>${project.build.directory}/maven-shared-archive-resources</directory>
+              <targetPath>WEB-INF</targetPath>
+              <includes>
+                <include>hibernate.cfg.xml</include>
+                <include>xwiki.cfg</include>
+                <include>xwiki.properties</include>
+              </includes>
+            </resource>
+            <!-- Add the skins -->
+            <resource>
+              <directory>${project.build.directory}/skin</directory>
+              <targetPath>skins</targetPath>
+              <filtering>false</filtering>
+            </resource>
+          </webResources>
+          <!-- - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
+                 log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
+               - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
+                 and non aspectified ones
+               - Exclude JavaBeans Activation Framework (activation-*.jar) since it's included in Java SE 6.
+               - Exclude JAXB since it's included in Java SE 6
+               - Exclude STAX API since it's included in Java SE 6
+               - Exclude all XAR files from being placed in WEB-INF/lib. This is done by the WAR plugin which supports
+                 XAR files (not our format, some other format! See https://jira.codehaus.org/browse/MWAR-281). The
+                 reason we have XAR files in our dependencies is because we've added them in order to automatically
+                 bundle all JAR files which are dependencies of XAR modules!
+          -->
+          <packagingExcludes>
+            ${xwiki.war.legacy.excludes}
+            WEB-INF/lib/commons-logging-*.jar,
+            %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
+            WEB-INF/lib/activation-*.jar,
+            WEB-INF/lib/jaxb-impl-*.jar,
+            WEB-INF/lib/jaxb-api-*.jar,
+            WEB-INF/lib/stax-api-*.jar,
+            WEB-INF/extensions/*.xar
+          </packagingExcludes>
+        </configuration>
+      </plugin>
+      <!-- Ensure that some modules are not added as dependencies. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.jmock:*</exclude>
+                    <exclude>junit:*</exclude>
+                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
+                  </excludes>
+                  <includes>
+                    <!-- Allow only JUnit and JMock with scope test because -->
+                    <include>org.jmock:*:*:*:test</include>
+                    <include>junit:*:*:*:test</include>
+                  </includes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Override check from top level POM that prevents depending on a legacy module since we want to package
+               Legacy modules in the generated XE product -->
+          <execution>
+            <id>enforce-no-legacy-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <xwikiBannedDependencies implementation="org.xwiki.tool.enforcer.XWikiBannedDependencies">
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <!-- Override the value from the top level POM with a value that'll not ban any dependency -->
+                    <exclude>alwaysok</exclude>
+                  </excludes>
+                </xwikiBannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Ensure we don't have duplicates in WEB-INF/lib -->
+      <plugin>
+        <groupId>org.basepom.maven</groupId>
+        <artifactId>duplicate-finder-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+              <exceptions>
+                <!-- Xalan bundles a lot of other projects: org/apache/xml/**, org/apache/bcel/**, JLex/**,
+                     java_cup/**, org/apache/regexp/**. In addition, it even has these jars in its source tree without
+                     any indication about their versions... Thus there's isn't much we can do ATM but it means there's
+                     an uncertainty about which version of those classes are used at runtime.
+                     TODO: Find an alternative to Xalan or find a good maven packaging of it -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>xalan</groupId>
+                      <artifactId>xalan</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>jakarta-regexp</groupId>
+                      <artifactId>jakarta-regexp</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <packages>
+                    <package>org.apache.regexp</package>
+                  </packages>
+                </exception>
+                <!-- css4j:0.13 depends on jclf:2.3.0 so the duplicate classes must be the same ones. -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>info.informatica</groupId>
+                      <artifactId>css4j</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>info.informatica</groupId>
+                      <artifactId>jclf</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <classes>
+                    <class>info.informatica.doc.DocumentException</class>
+                    <class>info.informatica.doc.RenderingException</class>
+                  </classes>
+                </exception>
+                <!-- None of these should bundle org.w3c classes but at least they seem compatible.
+                     See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
+                     https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>org.apache.xmlgraphics</groupId>
+                      <artifactId>batik-ext</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>xml-apis</groupId>
+                      <artifactId>xml-apis</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <classes>
+                    <class>org.w3c.dom.ElementTraversal</class>
+                    <class>org.w3c.dom.events.DocumentEvent</class>
+                    <class>org.w3c.dom.events.Event</class>
+                    <class>org.w3c.dom.events.EventException</class>
+                    <class>org.w3c.dom.events.EventListener</class>
+                    <class>org.w3c.dom.events.EventTarget</class>
+                    <class>org.w3c.dom.events.MouseEvent</class>
+                    <class>org.w3c.dom.events.MutationEvent</class>
+                    <class>org.w3c.dom.events.UIEvent</class>
+                  </classes>
+                </exception>
+                <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
+                     don't see a solution ATM... -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>org.w3c.css</groupId>
+                      <artifactId>sac</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>xml-apis</groupId>
+                      <artifactId>xml-apis-ext</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <packages>
+                    <package>org.w3c.css.sac</package>
+                  </packages>
+                </exception>
+                <!-- Logging shouldn't be configured by libraries! In any case since we route everything through
+                     SLF4J, logging is configured by the SLF4J implementation used (e.g. Logback). -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>org.apache.axis</groupId>
+                      <artifactId>axis</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>radeox</groupId>
+                      <artifactId>radeox</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <resources>
+                    <resource>simplelog.properties</resource>
+                  </resources>
+                </exception>
+                <!-- The files are different but removing them would mean repackaging the JARs which is PITA.
+                     Since the versions are the same for bc (1.52) there's a good chance the files are compatible. -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>org.bouncycastle</groupId>
+                      <artifactId>bcmail-jdk15on</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.bouncycastle</groupId>
+                      <artifactId>bcpkix-jdk15on</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.bouncycastle</groupId>
+                      <artifactId>bcprov-jdk15on</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <resources>
+                    <resource>META-INF/BCKEY.DSA</resource>
+                    <resource>META-INF/BCKEY.SF</resource>
+                  </resources>
+                </exception>
+                <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
+                     See http://x-stream.github.io/jira/689/ for more.
+                 -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>xmlpull</groupId>
+                      <artifactId>xmlpull</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>xpp3</groupId>
+                      <artifactId>xpp3_min</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>xpp3</groupId>
+                      <artifactId>xpp3</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <packages>
+                    <package>org.xmlpull</package>
+                  </packages>
+                </exception>
+                <!-- Seems to be the same thing -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>xpp3</groupId>
+                      <artifactId>xpp3</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>xml-apis</groupId>
+                      <artifactId>xml-apis</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <packages>
+                    <package>javax.xml.namespace</package>
+                  </packages>
+                </exception>
+                <!-- Does not seems to be an issue -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>org.apache.cxf</groupId>
+                      <artifactId>cxf-core</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.cxf</groupId>
+                      <artifactId>cxf-rt-transports-http</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <resources>
+                    <resource>META-INF/cxf/bus-extensions.txt</resource>
+                  </resources>
+                </exception>
+                <!-- Remove when http://jira.xwiki.org/browse/XCOMMONS-859 is closed -->
+                <exception>
+                  <conflictingDependencies>
+                    <dependency>
+                      <groupId>com.google.code.findbugs</groupId>
+                      <artifactId>annotations</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>net.jcip</groupId>
+                      <artifactId>jcip-annotations</artifactId>
+                    </dependency>
+                  </conflictingDependencies>
+                  <classes>
+                    <class>net.jcip.annotations.GuardedBy</class>
+                    <class>net.jcip.annotations.Immutable</class>
+                    <class>net.jcip.annotations.NotThreadSafe</class>
+                    <class>net.jcip.annotations.ThreadSafe</class>
+                  </classes>
+                </exception>
+              </exceptions>
+              <ignoredResourcePatterns>
+                <!-- Exclude XWiki's Component registration file -->
+                <ignoredResourcePattern>META-INF/components.txt</ignoredResourcePattern>
+                <!-- Several libs have a README file -->
+                <ignoredResourcePattern>META-INF/README.txt</ignoredResourcePattern>
+                <!-- Several libs have a RELEASENOTES file -->
+                <ignoredResourcePattern>RELEASE_NOTES.TXT</ignoredResourcePattern>
+                <!-- JAXB2 plugin resources. TODO: Exclude them from the XWiki JARs -->
+                <ignoredResourcePattern>META-INF/sun-jaxb.episode</ignoredResourcePattern>
+                <ignoredResourcePattern>simple.xjb</ignoredResourcePattern>
+                <!-- JDOM resources -->
+                <ignoredResourcePattern>META-INF/jdom-info.xml</ignoredResourcePattern>
+                <!-- Sisu components -->
+                <ignoredResourcePattern>META-INF/sisu/javax.inject.Named</ignoredResourcePattern>
+                <!-- Eclipse projects generally contains about.html file -->
+                <ignoredResourcePattern>about.html</ignoredResourcePattern>
+                <!-- Usually contain licenses often having same file name -->
+                <ignoredResourcePattern>license/.*.txt</ignoredResourcePattern>
+                <!-- ApplicationResources.properties is duplicated but that's ok since it's how we want it work, see:
+                     http://extensions.xwiki.org/xwiki/bin/view/Extension/Localization+Module#HProvidetranslationbundleinajar
+                 -->
+                <ignoredResourcePattern>ApplicationResources(_.*)?\.properties</ignoredResourcePattern>
+                <!-- Apache karaf stuff -->
+                <ignoredResourcePattern>features.xml</ignoredResourcePattern>
+              </ignoredResourcePatterns>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <!-- Add Legacy modules -->
+    <profile>
+      <id>legacy</id>
+      <properties>
+        <xwiki.war.legacy.excludes>
+          <!-- Exclude from war non legacy modules that have legacy modules wrapping them -->
+          <!-- This list should match the list of excluded dependencies of the duplicate finder below -->
+          WEB-INF/lib/xwiki-commons-component-api-*.jar,
+          WEB-INF/lib/xwiki-commons-component-default-*.jar,
+          WEB-INF/lib/xwiki-rendering-api-*.jar,
+          WEB-INF/lib/xwiki-platform-oldcore-*.jar,
+          WEB-INF/lib/xwiki-platform-office-importer-*.jar,
+          WEB-INF/lib/xwiki-platform-rendering-macro-include-*.jar,
+          <!-- Leave the ending comma because this list is concatenated with another one. -->
+        </xwiki.war.legacy.excludes>
+        <!-- Include the legacy WatchList plugin in xwiki.cfg -->
+        <xwiki.cfg.plugins>${war.xwiki.cfg.plugins},\
+  com.xpn.xwiki.plugin.watchlist.WatchListPlugin
+        </xwiki.cfg.plugins>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-legacy-component-default</artifactId>
+          <version>${commons.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-legacy-configuration</artifactId>
+          <version>${commons.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-legacy-properties</artifactId>
+          <version>${commons.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>xwiki-rendering-legacy-api</artifactId>
+          <version>${rendering.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-oldcore</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-observation</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-annotation</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-model</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-office-importer</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-url</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-web</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-ldap-authenticator</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-watchlist-api</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-chart-macro10</artifactId>
+          <version>${project.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <!-- Ensure we don't have duplicates in WEB-INF/lib -->
+          <plugin>
+            <groupId>org.basepom.maven</groupId>
+            <artifactId>duplicate-finder-maven-plugin</artifactId>
+            <configuration>
+              <!-- Ignore non legacy modules that have legacy modules wrapping them -->
+              <!-- This list should match in property xwiki.war.legacy.excludes above -->
+              <ignoredDependencies combine.children="append">
+                <dependency>
+                  <groupId>org.xwiki.commons</groupId>
+                  <artifactId>xwiki-commons-component-api</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.commons</groupId>
+                  <artifactId>xwiki-commons-component-default</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.commons</groupId>
+                  <artifactId>xwiki-commons-observation-api</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.rendering</groupId>
+                  <artifactId>xwiki-rendering-api</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-crypto-script</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-oldcore</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-office-importer</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+                </dependency>
+              </ignoredDependencies>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>clover</id>
+      <!-- Add the Clover JAR to the WAR so that it's available at runtime. It's needed because instrumented jars in
+           the WAR will call Clover APIs at runtime when they execute. -->
+      <dependencies>
+        <dependency>
+          <groupId>com.cenqua.clover</groupId>
+          <artifactId>clover</artifactId>
+        </dependency>
+      </dependencies>
+      <!-- Skip Duplicate class finder since it's causing duplicate problems with Clovered jars containing dups and we
+           don't need it -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.basepom.maven</groupId>
+            <artifactId>duplicate-finder-maven-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>snapshotModules</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
+          <version>${commons.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+</project>

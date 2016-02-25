@@ -19,45 +19,55 @@
  */
 package org.xwiki.platform.flavor.script;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.script.AbstractExtensionScriptService;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.platform.flavor.FlavorQuery;
-import org.xwiki.script.service.ScriptService;
+import org.xwiki.platform.flavor.internal.job.FlavorSearchJob;
+import org.xwiki.platform.flavor.internal.job.FlavorSearchStatus;
+import org.xwiki.platform.flavor.job.FlavorSearchRequest;
 import org.xwiki.stability.Unstable;
 
 /**
  * Script service to find flavors.
- *  
+ * 
  * @version $Id$
  * @since 7.1M2
  */
 @Component
-@Named("flavor")
+@Named(FlavorManagerScriptService.ROLEHINT)
 @Singleton
 @Unstable
-public class FlavorManagerScriptService implements ScriptService
+public class FlavorManagerScriptService extends AbstractExtensionScriptService
 {
     /**
-     * The key under which the last encountered error is stored in the current execution context.
+     * The role hint of this component.
      */
-    private static final String ERROR_KEY = "scriptservice.flavor.error";
-    
+    public static final String ROLEHINT = "flavor";
+
     @Inject
     private FlavorManager flavorManager;
 
-    @Inject
-    private Execution execution;
+    private List<String> getSearchJobId(String namespace)
+    {
+        return Arrays.asList(ROLEHINT, "search", namespace);
+    }
 
     /**
      * Creates a flavor query.
+     * 
      * @return a new flavor query
      */
     public FlavorQuery createFlavorQuery()
@@ -67,6 +77,7 @@ public class FlavorManagerScriptService implements ScriptService
 
     /**
      * Creates a flavor query.
+     * 
      * @param query the query to execute
      * @return a new flavor query
      */
@@ -77,43 +88,75 @@ public class FlavorManagerScriptService implements ScriptService
 
     /**
      * Get all flavors matching a query.
+     * 
      * @param query query to execute
      * @return flavors matching the query
+     * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
      */
+    @Deprecated
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
-        return flavorManager.getFlavors(query);
+        return this.flavorManager.getFlavors(query);
+    }
+
+    /**
+     * Search for all flavors matching a query.
+     * 
+     * @param query query to execute
+     * @return flavors matching the query
+     * @since 8.0RC1
+     */
+    public IterableResult<Extension> searchFlavors(FlavorQuery query)
+    {
+        return this.flavorManager.searchFlavors(query);
+    }
+
+    /**
+     * @param namespace the namespace where to validate the flavors
+     * @return the status of the current or last flavor search
+     */
+    public FlavorSearchStatus getSearchValidFlavorsStatus(String namespace)
+    {
+        return (FlavorSearchStatus) getJobStatus(getSearchJobId(namespace));
+    }
+
+    /**
+     * Start a Job search and validating flavors matching a provided flacro query.
+     * 
+     * @param query the query to control the flavors to search
+     * @param namespace the namespace where to validate the flavors
+     * @return the {@link Job} searching the flavors
+     */
+    public Job searchValidFlavors(FlavorQuery query, String namespace)
+    {
+        setError(null);
+
+        Job job = null;
+        try {
+            FlavorSearchRequest flavorRequest = new FlavorSearchRequest();
+
+            flavorRequest.setId(getSearchJobId(namespace));
+            flavorRequest.setQuery(query);
+            flavorRequest.addNamespace(namespace);
+
+            setRightsProperties(flavorRequest);
+
+            job = this.jobExecutor.execute(FlavorSearchJob.JOBTYPE, flavorRequest);
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
     }
 
     /**
      * Get the flavor installed on a given wiki.
+     * 
      * @param wikiId id of the wiki
      * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
      */
     public ExtensionId getFlavorOfWiki(String wikiId)
     {
-        return flavorManager.getFlavorOfWiki(wikiId);
-    }
-
-    /**
-     * Get the error generated while performing the previously called action.
-     * @return an eventual exception or {@code null} if no exception was thrown
-     * @since 1.1
-     */
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
-    }
-
-    /**
-     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     *
-     * @param e the exception to store, can be {@code null} to clear the previously stored exception
-     * @see #getLastError()
-     * @since 1.1
-     */
-    private void setLastError(Exception e)
-    {
-        this.execution.getContext().setProperty(ERROR_KEY, e);
+        return this.flavorManager.getFlavorOfWiki(wikiId);
     }
 }

@@ -26,22 +26,35 @@ import org.xwiki.extension.repository.result.IterableResult;
 
 /**
  * Find the flavors into the repositories, applying filters according to the configuration.
- *  
+ * 
  * @version $Id$
- * @since 7.1M2 
+ * @since 7.1M2
  */
 @Role
 public interface FlavorManager
 {
     /**
      * Get all flavors matching a query.
+     * 
      * @param query query to execute
      * @return flavors matching the query
+     * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
      */
+    @Deprecated
     IterableResult<Extension> getFlavors(FlavorQuery query);
 
     /**
+     * Get all flavors matching a query.
+     * 
+     * @param query query to execute
+     * @return flavors matching the query
+     * @since 8.0RC1
+     */
+    IterableResult<Extension> searchFlavors(FlavorQuery query);
+
+    /**
      * Get the flavor installed on a given wiki.
+     * 
      * @param wikiId id of the wiki
      * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
      */

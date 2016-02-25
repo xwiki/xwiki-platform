@@ -44,6 +44,7 @@ public class ViewAction extends XWikiAction
     public ViewAction()
     {
         this.waitForXWikiInitialization = false;
+        this.handleRedirectObject = true;
     }
 
     @Override

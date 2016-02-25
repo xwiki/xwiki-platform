@@ -40,6 +40,7 @@ public class ViewAttachRevAction extends XWikiAction
     public ViewAttachRevAction()
     {
         this.waitForXWikiInitialization = false;
+        this.handleRedirectObject = true;
     }
 
     @Override

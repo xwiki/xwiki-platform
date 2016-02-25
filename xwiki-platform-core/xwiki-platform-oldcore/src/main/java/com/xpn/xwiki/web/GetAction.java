@@ -38,6 +38,14 @@ public class GetAction extends XWikiAction
      */
     public static final String GET_ACTION = "get";
 
+    /**
+     * Default constructor.
+     */
+    public GetAction()
+    {
+        this.handleRedirectObject = true;
+    }
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

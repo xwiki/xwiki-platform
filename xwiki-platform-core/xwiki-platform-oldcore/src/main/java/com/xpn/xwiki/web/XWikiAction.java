@@ -53,10 +53,12 @@ import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.WrappedThreadEventListener;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -129,6 +131,11 @@ public abstract class XWikiAction extends Action
      * Indicate if the action is blocked until XWiki is initialized.
      */
     protected boolean waitForXWikiInitialization = true;
+
+    /**
+     * Indicate if the XWiki.RedirectClass is handled by the action (see handleRedirectObject()).
+     */
+    protected boolean handleRedirectObject = false;
 
     private ContextualLocalizationManager localization;
 
@@ -408,12 +415,18 @@ public abstract class XWikiAction extends Action
 
                 getProgress().startStep(this, "Execute action render");
 
+                // Handle the XWiki.RedirectClass object that can be attached to the current document
+                boolean hasRedirect = false;
+                if (handleRedirectObject) {
+                    hasRedirect = handleRedirectObject(context);
+                }
+
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been
                 // migrated to new Actions yet).
                 String renderResult = null;
                 XWikiDocument doc = context.getDoc();
                 docName = doc.getFullName();
-                if (action(context)) {
+                if (!hasRedirect && action(context)) {
                     renderResult = render(context);
                 }
 
@@ -660,6 +673,50 @@ public abstract class XWikiAction extends Action
     public String render(XWikiContext context) throws XWikiException
     {
         return null;
+    }
+
+    /**
+     * Redirect the user to an other location if the document holds an XWiki.RedirectClass instance (used when a
+     * document is moved).
+     *
+     * @param context the XWiki context
+     * @return either ot not a redirection have been sent
+     * @throws XWikiException if error occurs
+     *
+     * @since 8.0RC1, 7.4.2
+     */
+    protected boolean handleRedirectObject(XWikiContext context) throws XWikiException
+    {
+        WikiReference wikiReference = context.getWikiReference();
+
+        // Look if the document has a redirect object
+        XWikiDocument doc = context.getDoc();
+        BaseObject redirectObj = doc.getXObject(
+                new DocumentReference("RedirectClass", new SpaceReference("XWiki", wikiReference)));
+        if (redirectObj == null) {
+            return false;
+        }
+
+        // Get the location
+        String location = redirectObj.getStringValue("location");
+        if (StringUtils.isBlank(location)) {
+            return false;
+        }
+
+        // Get the URL corresponding to the location
+        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        DocumentReference locationReference = resolver.resolve(location, wikiReference);
+        // Note: the anchor part is lost in the process, because it is not sent to the server
+        // (see: http://stackoverflow.com/a/4276491)
+        String url = context.getWiki().getURL(locationReference, context.getAction(),
+                context.getRequest().getQueryString(), null, context);
+        try {
+            context.getResponse().sendRedirect(url);
+        } catch (IOException e) {
+            throw new XWikiException("Failed to redirect.", e);
+        }
+
+        return true;
     }
 
     protected void handleRevision(XWikiContext context) throws XWikiException

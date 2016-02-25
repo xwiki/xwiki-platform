@@ -66,38 +66,6 @@
   <object>
     <name>XWiki.RedirectClass</name>
     <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>55504e2c-3975-4ac5-947a-1c337988b3e9</guid>
-    <class>
-      <name>XWiki.ClassSheetBinding</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <sheet>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>sheet</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>Sheet</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </sheet>
-    </class>
-    <property>
-      <sheet>RedirectSheet</sheet>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.RedirectClass</name>
-    <number>0</number>
     <className>XWiki.DocumentSheetBinding</className>
     <guid>4c846c9a-eeca-4202-bab5-0fb6d16c6ed3</guid>
     <class>

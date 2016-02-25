@@ -30,6 +30,7 @@ public class ViewrevAction extends XWikiAction
     public ViewrevAction()
     {
         this.waitForXWikiInitialization = false;
+        this.handleRedirectObject = true;
     }
 
     @Override

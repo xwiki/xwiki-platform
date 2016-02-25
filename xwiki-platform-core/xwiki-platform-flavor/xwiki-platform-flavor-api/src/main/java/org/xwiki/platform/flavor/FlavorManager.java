@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.stability.Unstable;
 
 /**
  * Find the flavors into the repositories, applying filters according to the configuration.
@@ -31,6 +32,7 @@ import org.xwiki.extension.repository.result.IterableResult;
  * @since 7.1M2
  */
 @Role
+@Unstable
 public interface FlavorManager
 {
     /**

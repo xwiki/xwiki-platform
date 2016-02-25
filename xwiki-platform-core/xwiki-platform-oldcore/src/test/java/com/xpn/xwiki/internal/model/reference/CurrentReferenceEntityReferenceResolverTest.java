@@ -69,8 +69,7 @@ public class CurrentReferenceEntityReferenceResolverTest extends AbstractBridged
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setWikiId(CURRENT_WIKI);
-        getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
+        getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
             resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);

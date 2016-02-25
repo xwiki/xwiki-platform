@@ -241,7 +241,7 @@
   #if(!$headingAlreadyShowing)
     #set($headingAlreadyShowing = true)
 
-    = {{translation key="admin.customize"/}} __[[$appName&gt;&gt;$appName]]__: =
+    = {{translation key="admin.customize"/}} [[$appName&gt;&gt;$appName]]: =
   #end
 #end
 

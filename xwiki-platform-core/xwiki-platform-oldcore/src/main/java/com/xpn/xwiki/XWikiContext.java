@@ -456,6 +456,12 @@ public class XWikiContext extends Hashtable<Object, Object>
             remove("doc");
         } else {
             put("doc", doc);
+
+            // Make sure the context wiki is in synch with the context doc's wiki.
+            WikiReference newDocWikiReference = doc.getDocumentReference().getWikiReference();
+            if (!newDocWikiReference.equals(this.getWikiReference())) {
+                setWikiReference(newDocWikiReference);
+            }
         }
     }
 

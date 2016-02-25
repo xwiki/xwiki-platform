@@ -470,13 +470,7 @@
          include all JAR dependencies in the generated WAR -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-main</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-flavor-wiki</artifactId>
+      <artifactId>xwiki-platform-distribution-flavor</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

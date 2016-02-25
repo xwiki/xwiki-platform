@@ -901,11 +901,6 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
     </property>
     <property>
       <code>#template("colorThemeInit.vm")
-/* Hide unwanted page stuff */
-#contentmenu *, #hierarchy, #document-info, #xdocFooter, #document-title {
-  display: none;
-}
-
 .invitation, .invitation input[type='text'], .invitation textarea, .invitation table {
   float: left;
   width: 450px;
@@ -979,6 +974,9 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
 .invitation-preview strong {
   padding-left: 20px;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Invitation Style Sheet</name>

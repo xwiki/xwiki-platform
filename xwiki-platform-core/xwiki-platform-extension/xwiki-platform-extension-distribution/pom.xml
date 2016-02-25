@@ -88,6 +88,7 @@
             **/DistributionScriptService.java,
             **/DocumentsModifiedDuringDistributionListener.java,
             **/DefaultDistributionManager.java,
+            **/FarmDistributionJob.java,
             **/FarmDistributionJobStatus.java,
             **/OutdatedExtensionsDistributionStep.java,
             **/ReportDistributionStep.java,

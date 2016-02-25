@@ -5062,10 +5062,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Set<XWikiLink> links;
 
         if (is10Syntax()) {
-            links = new LinkedHashSet<XWikiLink>(getStore(context).loadLinks(getId(), context, true));
+            links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
             Set<String> linkedPages = getUniqueLinkedPages(context);
-            links = new LinkedHashSet<XWikiLink>(linkedPages.size());
+            links = new LinkedHashSet<>(linkedPages.size());
             for (String linkedPage : linkedPages) {
                 XWikiLink wikiLink = new XWikiLink();
 

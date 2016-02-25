@@ -32,7 +32,9 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -99,6 +101,9 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      */
     @Inject
     private TransformationManager transformationManager;
+
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * Used to get a parser for a specific syntax.
@@ -213,14 +218,19 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         DocumentDisplayerParameters parameters)
     {
         Map<String, Object> backupObjects = new HashMap<String, Object>();
+        EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             // The following method call also clones the execution context.
             documentAccessBridge.pushDocumentInContext(backupObjects, document.getDocumentReference());
+            // Make sure to synchronize the context wiki with the context document's wiki.
+            modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
             return display(document, nameSpace, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             documentAccessBridge.popDocumentFromContext(backupObjects);
+            // Also restore the context wiki.
+            this.modelContext.setCurrentEntityReference(currentWikiReference);
         }
     }
 

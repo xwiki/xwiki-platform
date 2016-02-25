@@ -35,7 +35,9 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
@@ -46,7 +48,6 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
@@ -116,6 +117,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * Used to emulate an in-line parsing.
@@ -220,13 +224,14 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         VelocityEngine velocityEngine;
         try {
             velocityEngine = this.velocityManager.getVelocityEngine();
-        } catch (XWikiVelocityException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // Execute Velocity code
         Map<String, Object> backupObjects = null;
         boolean canPop = false;
+        EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
@@ -234,6 +239,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 documentAccessBridge.pushDocumentInContext(backupObjects, documentReference);
                 // Pop the document from the context only if the push was successful!
                 canPop = true;
+                // Make sure to synchronize the context wiki with the context document's wiki.
+                modelContext.setCurrentEntityReference(documentReference.getWikiReference());
             }
             velocityEngine
                 .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
@@ -242,6 +249,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         } finally {
             if (canPop) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
+                // Also restore the context wiki.
+                this.modelContext.setCurrentEntityReference(currentWikiReference);
             }
         }
         return writer.toString();

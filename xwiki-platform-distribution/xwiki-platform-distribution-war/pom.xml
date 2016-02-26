@@ -32,6 +32,9 @@
   <packaging>war</packaging>
   <description>The XWiki WAR package. It contains everything needed to run XWiki in production and then choose a flavor.</description>
   <properties>
+    <!-- Put the name of the distribution which will be displayed in the footer -->
+    <xwiki.extension.name>XWiki</xwiki.extension.name>
+
     <!-- By default we don't include Legacy modules and thus we don't need to exclude the non legacy JARs -->
     <xwiki.war.legacy.excludes />
   </properties>

@@ -22,7 +22,7 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -173,7 +173,7 @@ public class ImportMojo extends AbstractMojo
         // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
         // their version) after they are added to the Set of dependencies and this causes the hash code to change. As a
         // result the #contains(Artifact) method doesn't work as expected because it uses the new hash code.
-        Set<Artifact> directDependencies = new HashSet<>(this.project.getDependencyArtifacts());
+        Set<Artifact> directDependencies = new LinkedHashSet<>(this.project.getDependencyArtifacts());
 
         // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
         // LinkedHashSet behind the scene)

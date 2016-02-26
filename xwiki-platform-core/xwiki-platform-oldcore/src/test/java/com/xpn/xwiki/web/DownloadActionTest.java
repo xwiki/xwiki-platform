@@ -27,7 +27,6 @@ import java.util.Date;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,14 +46,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 /**
  * Validate {@link DownloadAction}.
@@ -130,9 +124,8 @@ public class DownloadActionTest
         doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
         when(this.ec.getMimeType("file.txt")).thenReturn("text/plain");
         when(this.response.getOutputStream()).thenReturn(this.out);
-        when(
-            this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), anyString(), anyString(),
-                any(XWikiContext.class))).thenReturn(false);
+        when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), anyString(), anyString(),
+            any(XWikiContext.class))).thenReturn(false);
 
         // Mock what's needed for extracting the filename from the URL
         this.resourceReferenceManager = this.oldcore.getMocker().registerMockComponent(ResourceReferenceManager.class);
@@ -145,7 +138,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -158,7 +151,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -171,7 +164,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime(), DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -181,7 +174,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
     }
 
     @Test(expected = XWikiException.class)
@@ -210,7 +203,7 @@ public class DownloadActionTest
 
         setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
         verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
@@ -256,7 +249,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, "two", null, null, -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -278,7 +271,7 @@ public class DownloadActionTest
         when(this.ec.getMimeType("file.png")).thenReturn("image/png");
         setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "image/png",
             "inline; filename*=utf-8''file.png");
@@ -292,7 +285,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "attachment; filename*=utf-8''file.txt");
@@ -306,7 +299,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -320,7 +313,7 @@ public class DownloadActionTest
         when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l, "file name.txt");
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "inline; filename*=utf-8''file%20name.txt");
@@ -335,7 +328,7 @@ public class DownloadActionTest
         when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "attachment; filename*=utf-8''file%20name.txt");
@@ -351,7 +344,7 @@ public class DownloadActionTest
         when(this.ec.getMimeType("file\u021B.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "attachment; filename*=utf-8''file%C8%9B.txt");
@@ -366,7 +359,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 0-3/" + DownloadActionTest.this.fileContent.length);
@@ -382,7 +375,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 3-5/" + DownloadActionTest.this.fileContent.length);
@@ -398,7 +391,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
@@ -414,7 +407,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 0-0/" + DownloadActionTest.this.fileContent.length);
@@ -430,7 +423,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 11-13/" + DownloadActionTest.this.fileContent.length);
@@ -446,7 +439,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
@@ -462,7 +455,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 10-13/" + DownloadActionTest.this.fileContent.length);
@@ -478,7 +471,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
@@ -494,7 +487,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 0-13/" + DownloadActionTest.this.fileContent.length);
@@ -510,7 +503,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         verify(this.response).setHeader("Content-Range", "bytes 9-13/" + DownloadActionTest.this.fileContent.length);
@@ -525,7 +518,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -538,7 +531,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
@@ -552,7 +545,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
     }
@@ -565,7 +558,7 @@ public class DownloadActionTest
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L, DEFAULT_FILE_NAME);
 
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verify(this.response).setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
     }
@@ -576,7 +569,7 @@ public class DownloadActionTest
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L, DEFAULT_FILE_NAME);
-        Assert.assertNull(this.action.render(this.oldcore.getXWikiContext()));
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
         verifyOutputExpectations(0, this.fileContent.length);
         verifyResponseExpectations(d.getTime(), this.fileContent.length);

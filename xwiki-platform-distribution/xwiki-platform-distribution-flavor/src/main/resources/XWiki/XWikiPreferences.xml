@@ -2809,7 +2809,7 @@ In order to activate your account, please follow this link:
 ${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&amp;xwikiname=${xwikiname}")}</validation_email_content>
     </property>
     <property>
-      <version>XWiki Enterprise $xwiki.getVersion() - &lt;a onclick="openURL('http://enterprise.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;" href="http://www.xwiki.org/xwiki/bin/view/Main/Documentation"&gt;Documentation&lt;/a&gt;</version>
+      <version>$services.extension.core.repository.environmentExtension.name $xwiki.getVersion()</version>
     </property>
     <property>
       <webcopyright>This wiki is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by/2.0/"&gt;Creative Commons 2.0&lt;/a&gt; license</webcopyright>

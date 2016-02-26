@@ -44,6 +44,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
@@ -312,14 +313,20 @@ public class DownloadAction extends XWikiAction
     }
 
     /**
-     * @return the filename of the attachment.
+     * @return the filename of the attachment or null if the URL didn't point to an attachment
      */
     private String getFileName()
     {
         // Extract the Attachment file name from the parsed request URL that was done before this Action is called
         ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
         EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
-        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
+
+        // Try to extract the attachment from the reference but it's possible that the URL didn't point to an
+        // attachment, in which case we return null.
+        EntityReference attachmentReference =
+            entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT);
+
+        return attachmentReference == null ? null : attachmentReference.getName();
     }
 
     private Pair<XWikiDocument, XWikiAttachment> extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(

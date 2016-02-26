@@ -22,7 +22,6 @@ package org.xwiki.localization.jar.internal;
 import java.util.Locale;
 
 import org.junit.Assert;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,13 +32,14 @@ import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
+import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 @ComponentList({MessageToolTranslationMessageParser.class, PlainTextBlockParser.class,
 ContextComponentManagerProvider.class, DefaultLocalizationManager.class, DefaultTranslationBundleContext.class,
-DefaultExecution.class, RootClassLoaderTranslationBundle.class})
+DefaultExecution.class, DefaultModelContext.class, RootClassLoaderTranslationBundle.class})
 public class RootClassLoaderTranslationBundleTest
 {
     @Rule

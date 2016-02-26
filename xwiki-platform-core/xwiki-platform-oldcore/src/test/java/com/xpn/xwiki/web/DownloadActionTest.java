@@ -114,7 +114,7 @@ public class DownloadActionTest
         this.oldcore.getXWikiContext().setEngineContext(this.ec);
         this.out = mock(ServletOutputStream.class);
 
-        final XWikiPluginManager pluginManager = new XWikiPluginManager();
+        XWikiPluginManager pluginManager = new XWikiPluginManager();
         pluginManager.initInterface();
 
         this.documentReference = new DocumentReference("wiki", "space", "page");
@@ -132,9 +132,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testNormalDownload() throws XWikiException, IOException
+    public void downloadNormal() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -145,9 +145,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testIfModifiedSinceBefore() throws XWikiException, IOException
+    public void downloadWhenIfModifiedSinceBefore() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l, DEFAULT_FILE_NAME);
 
@@ -158,9 +158,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testIfModifiedSinceSame() throws XWikiException, IOException
+    public void downloadWhenIfModifiedSinceSame() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime(), DEFAULT_FILE_NAME);
 
@@ -168,9 +168,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testIfModifiedSinceAfter() throws XWikiException, IOException
+    public void downloadWhenIfModifiedSinceAfter() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l, DEFAULT_FILE_NAME);
 
@@ -178,7 +178,7 @@ public class DownloadActionTest
     }
 
     @Test(expected = XWikiException.class)
-    public void testDownloadMissingFile() throws XWikiException
+    public void downloadWhenMissingFile() throws XWikiException
     {
         setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -186,9 +186,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testDownloadById() throws XWikiException, IOException
+    public void downloadById() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         XWikiAttachment att;
         for (byte i = 0; i < 10; ++i) {
             att = new XWikiAttachment(this.document, "file." + i + ".txt");
@@ -235,7 +235,7 @@ public class DownloadActionTest
     @Test(expected = XWikiException.class)
     public void testDownloadByWrongId() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, "42", null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -243,9 +243,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testDownloadByInvalidId() throws XWikiException, IOException
+    public void downloadWhenInvalidId() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, "two", null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -256,7 +256,7 @@ public class DownloadActionTest
     }
 
     @Test(expected = XWikiException.class)
-    public void testDownloadWithIncompletePath() throws XWikiException
+    public void downloadWhenIncompletePath() throws XWikiException
     {
         setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -264,9 +264,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testDifferentMimeType() throws XWikiException, IOException
+    public void downloadWhenDifferentMimeType() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, "file.png");
         when(this.ec.getMimeType("file.png")).thenReturn("image/png");
         setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
@@ -279,9 +279,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testForceDownload() throws XWikiException, IOException
+    public void downloadWhenForce() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
 
@@ -293,9 +293,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testRealDate() throws XWikiException, IOException
+    public void downloadWithRealDate() throws XWikiException, IOException
     {
-        final Date d = new Date(411757300000l);
+        Date d = new Date(411757300000l);
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
 
@@ -306,9 +306,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testNameWithSpacesEncodedWithPlus() throws XWikiException, IOException
+    public void downloadWhenNameWithSpacesEncodedWithPlus() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, "file name.txt");
         when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l, "file name.txt");
@@ -321,9 +321,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
+    public void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, "file name.txt");
         when(this.ec.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
@@ -336,9 +336,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testNameWithNonAsciiChars() throws XWikiException, IOException
+    public void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, "file\u021B.txt");
 
         when(this.ec.getMimeType("file\u021B.txt")).thenReturn("text/plain");
@@ -352,10 +352,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testValidStartRange() throws XWikiException, IOException
+    public void downloadWhenValidStartRange() throws XWikiException, IOException
     {
         // This test expects bytes 0, 1, 2 and 3 from the file.
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l, DEFAULT_FILE_NAME);
 
@@ -368,10 +368,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testValidMiddleRange() throws XWikiException, IOException
+    public void downloadWhenValidMiddleRange() throws XWikiException, IOException
     {
         // This test expects bytes 3, 4 and 5 from the file.
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l, DEFAULT_FILE_NAME);
 
@@ -384,10 +384,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testValidEndRange() throws XWikiException, IOException
+    public void downloadWhenValidEndRange() throws XWikiException, IOException
     {
         // This test expects bytes 9, 10, 11, 12 and 13 from the file.
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l, DEFAULT_FILE_NAME);
 
@@ -400,10 +400,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testOneByteRange() throws XWikiException, IOException
+    public void downloadWhenOneByteRange() throws XWikiException, IOException
     {
         // This test expects the last four bytes (10, 11, 12 and 13) from the file
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l, DEFAULT_FILE_NAME);
 
@@ -416,10 +416,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testRestRange() throws XWikiException, IOException
+    public void downloadWhenRestRange() throws XWikiException, IOException
     {
         // This test expects bytes from 11 to the end of the file (11, 12 and 13)
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l, DEFAULT_FILE_NAME);
 
@@ -432,10 +432,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testFullRestRange() throws XWikiException, IOException
+    public void downloadWhenFullRestRange() throws XWikiException, IOException
     {
         // This test expects the whole file
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l, DEFAULT_FILE_NAME);
 
@@ -448,10 +448,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testTailRange() throws XWikiException, IOException
+    public void downloadWhenTailRange() throws XWikiException, IOException
     {
         // This test expects the last four bytes (10, 11, 12 and 13) from the file
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l, DEFAULT_FILE_NAME);
 
@@ -464,10 +464,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testFullTailRange() throws XWikiException, IOException
+    public void downloadWhenFullTailRange() throws XWikiException, IOException
     {
         // This test expects the whole file
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l, DEFAULT_FILE_NAME);
 
@@ -480,10 +480,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testOverflowingTailRange() throws XWikiException, IOException
+    public void downloadWhenOverflowingTailRange() throws XWikiException, IOException
     {
         // This test expects the whole file, although the client requested more
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l, DEFAULT_FILE_NAME);
 
@@ -496,10 +496,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testValidOverflowingRange() throws XWikiException, IOException
+    public void downloadWhenValidOverflowingRange() throws XWikiException, IOException
     {
         // This test expects bytes 9, 10, 11, 12 and 13 from the file, although 14 and 15 are requested as well.
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l, DEFAULT_FILE_NAME);
 
@@ -512,9 +512,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testInvalidSwappedRange() throws XWikiException, IOException
+    public void downloadWhenInvalidSwappedRange() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l, DEFAULT_FILE_NAME);
 
@@ -525,9 +525,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testInvalidRange() throws XWikiException, IOException
+    public void downloadWhenInvalidRange() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l, DEFAULT_FILE_NAME);
 
@@ -538,10 +538,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testOutsideRange() throws XWikiException, IOException
+    public void downloadWhenOutsideRange() throws XWikiException, IOException
     {
         // This test expects a 416 response
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l, DEFAULT_FILE_NAME);
 
@@ -551,10 +551,10 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testOutsideRestRange() throws XWikiException, IOException
+    public void downloadWhenOutsideRestRange() throws XWikiException, IOException
     {
         // This test expects a 416 response
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L, DEFAULT_FILE_NAME);
 
@@ -564,9 +564,9 @@ public class DownloadActionTest
     }
 
     @Test
-    public void testEmptyRange() throws XWikiException, IOException
+    public void downloadWhenEmptyRange() throws XWikiException, IOException
     {
-        final Date d = new Date();
+        Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
         setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L, DEFAULT_FILE_NAME);
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
@@ -583,12 +583,11 @@ public class DownloadActionTest
         this.document.getAttachmentList().add(filetxt);
     }
 
-    private void setRequestExpectations(final String uri, final String id, final String forceDownload,
-        final String range, final long modifiedSince, String attachmentName)
+    private void setRequestExpectations(String uri, String id, String forceDownload,
+        String range, long modifiedSince, String attachmentName)
     {
-        final ResourceReference rr =
-            new EntityResourceReference(new AttachmentReference(attachmentName, this.documentReference),
-                EntityResourceAction.VIEW);
+        ResourceReference rr = new EntityResourceReference(new AttachmentReference(attachmentName,
+            this.documentReference), EntityResourceAction.VIEW);
 
         when(this.request.getRequestURI()).thenReturn(uri);
         when(this.request.getParameter("id")).thenReturn(id);
@@ -598,13 +597,12 @@ public class DownloadActionTest
         when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
     }
 
-    private void verifyResponseExpectations(final long modified, final int length)
+    private void verifyResponseExpectations(long modified, int length)
     {
         verifyResponseExpectations(modified, length, "text/plain", "inline; filename*=utf-8''file.txt");
     }
 
-    private void verifyResponseExpectations(final long modified, final int length, final String mime,
-        final String disposition)
+    private void verifyResponseExpectations(long modified, int length, String mime, String disposition)
     {
         verify(this.response).setContentType(mime);
         verify(this.response).setHeader("Accept-Ranges", "bytes");

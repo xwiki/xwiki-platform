@@ -34,6 +34,7 @@ import org.xwiki.display.internal.DocumentTitleDisplayer;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
+import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.properties.internal.DefaultBeanManager;
 import org.xwiki.properties.internal.DefaultConverterManager;
@@ -176,6 +177,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
     // Model
     DefaultDocumentAccessBridge.class,
+    DefaultModelContext.class,
 
     // Velocity
     DefaultScriptContextManager.class,

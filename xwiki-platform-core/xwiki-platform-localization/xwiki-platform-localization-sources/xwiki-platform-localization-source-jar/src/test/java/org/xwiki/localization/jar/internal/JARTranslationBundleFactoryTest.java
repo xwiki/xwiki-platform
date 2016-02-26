@@ -50,6 +50,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
+import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -59,8 +60,8 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 @ComponentList({JARTranslationBundleFactory.class, MessageToolTranslationMessageParser.class,
 PlainTextBlockParser.class, ContextComponentManagerProvider.class, DefaultLocalizationManager.class,
-DefaultTranslationBundleContext.class, DefaultExecution.class, DefaultObservationManager.class,
-JARTranslationBundleFactoryListener.class, DefaultComponentManagerManager.class,
+DefaultTranslationBundleContext.class, DefaultModelContext.class, DefaultExecution.class,
+DefaultObservationManager.class, JARTranslationBundleFactoryListener.class, DefaultComponentManagerManager.class,
 EmbeddableComponentManagerFactory.class})
 public class JARTranslationBundleFactoryTest
 {

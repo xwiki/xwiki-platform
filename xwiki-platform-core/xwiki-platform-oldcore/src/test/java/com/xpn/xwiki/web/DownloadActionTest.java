@@ -186,6 +186,22 @@ public class DownloadActionTest
     }
 
     @Test
+    public void downloadWhenURLNotPointingToAttachment() throws XWikiException
+    {
+        ResourceReference rr = new EntityResourceReference(this.documentReference, EntityResourceAction.VIEW);
+        when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
+
+        when(this.request.getRequestURI()).thenReturn("/xwiki/bin/download/space/page");
+
+        try {
+            this.action.render(this.oldcore.getXWikiContext());
+            fail("Should have thrown an exception before reaching here");
+        } catch (XWikiException expected) {
+            assertEquals("Error number 11003 in 11: Attachment not found", expected.getMessage());
+        }
+    }
+
+    @Test
     public void downloadById() throws XWikiException, IOException
     {
         Date d = new Date();

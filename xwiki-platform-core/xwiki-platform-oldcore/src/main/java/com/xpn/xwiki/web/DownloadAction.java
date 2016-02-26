@@ -191,9 +191,10 @@ public class DownloadAction extends XWikiAction
 
     private void throwNotFoundException(String filename) throws XWikiException
     {
-        Object[] args = { filename };
+        String message = filename == null ? "Attachment not found" :
+            String.format("Attachment [%s] not found", filename);
         throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
+            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, message);
     }
 
     /**

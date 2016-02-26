@@ -180,12 +180,6 @@
     </pluginManagement>
   </build>
   <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-distribution-test</module>
-      </modules>
-    </profile>
     <!-- Database Profiles used in several module builds -->
     <profile>
       <id>hsqldb</id>

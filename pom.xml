@@ -79,15 +79,6 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <includes>
-            <!-- At the moment, only check the following list of files for license headers -->
-            <include>**/*.java</include>
-            <include>**/*.bat</include>
-            <include>**/*.sh</include>
-            <include>**/ApplicationResources.properties</include>
-          </includes>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

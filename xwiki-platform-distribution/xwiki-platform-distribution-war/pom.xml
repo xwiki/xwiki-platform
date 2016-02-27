@@ -852,6 +852,10 @@
                 <ignoredResourcePattern>ApplicationResources(_.*)?\.properties</ignoredResourcePattern>
                 <!-- Apache karaf stuff -->
                 <ignoredResourcePattern>features.xml</ignoredResourcePattern>
+                <!-- Weird failure that can only be reproduced on Jenkins agent
+                     TODO: find out what it's about...
+                 -->
+                <ignoredResourcePattern>builddef.lst</ignoredResourcePattern>
               </ignoredResourcePatterns>
             </configuration>
           </execution>

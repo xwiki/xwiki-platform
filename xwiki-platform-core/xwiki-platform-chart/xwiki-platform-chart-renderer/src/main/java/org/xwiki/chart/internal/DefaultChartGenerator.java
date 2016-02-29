@@ -20,6 +20,7 @@
 package org.xwiki.chart.internal;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import javax.inject.Singleton;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.Plot;
+import org.xwiki.chart.ChartCustomizer;
 import org.xwiki.chart.ChartGenerator;
 import org.xwiki.chart.ChartGeneratorException;
 import org.xwiki.chart.internal.plot.PlotGenerator;
@@ -56,6 +58,9 @@ public class DefaultChartGenerator implements ChartGenerator
     @Named("context")
     private Provider<ComponentManager> contextComponentManager;
 
+    @Inject
+    private Provider<List<ChartCustomizer>> customizerProvider;
+
     @Override
     public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
     {
@@ -69,13 +74,15 @@ public class DefaultChartGenerator implements ChartGenerator
         } catch (ComponentLookupException e) {
             throw new ChartGeneratorException(String.format("No such chart type : [%s].", type), e);
         }
+
         Plot plot = generator.generate(model, parameters);
-
-        // Set the default colors to use if the user has specified some colors.
-        DrawingSupplierFactory drawingSupplierFactory = new DrawingSupplierFactory();
-        plot.setDrawingSupplier(drawingSupplierFactory.createDrawingSupplier(parameters));
-
         JFreeChart jfchart = new JFreeChart(title, plot);
+
+        // Run customizations
+        for (ChartCustomizer customizer : this.customizerProvider.get()) {
+            customizer.customize(jfchart, parameters);
+        }
+
         int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
         int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));
         try {

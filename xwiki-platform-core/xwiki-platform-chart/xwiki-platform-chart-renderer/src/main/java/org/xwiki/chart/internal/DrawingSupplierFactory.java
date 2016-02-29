@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.DrawingSupplier;
-import org.xwiki.chart.ChartGenerator;
 
 /**
  * Allows user to provide custom colors.
@@ -38,15 +37,21 @@ import org.xwiki.chart.ChartGenerator;
 public class DrawingSupplierFactory
 {
     /**
-     * @param parameters the user-defined parameters, containing {@link ChartGenerator#COLORS_PARAM} if the user
-     *        wants custom colors
+     * Color parameter identifier. The format is {@code color1,color2,...,colorN} where each color is specified as
+     * a 6 characters string, the first 2 representing in hexadecimal the red percentage, the next two the green
+     * percentage and the last 2 the blue percentage. For example {@code FF0000,00FF00,0000FF} for red, green, blue.
+     */
+    private static final String COLORS_PARAM = "colors";
+
+    /**
+     * @param parameters the user-defined parameters, containing {@link #COLORS_PARAM} if the user wants custom colors
      * @return the Drawing Supplier to use
      */
     public DrawingSupplier createDrawingSupplier(Map<String, String> parameters)
     {
         DrawingSupplier supplier;
 
-        String colorParam = parameters.get(ChartGenerator.COLORS_PARAM);
+        String colorParam = parameters.get(COLORS_PARAM);
         if (colorParam != null) {
             List<Color> colors = new ArrayList<Color>();
             for (String colorAsString : colorParam.split(",")) {

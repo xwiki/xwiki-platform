@@ -497,6 +497,12 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>6011</differenceType>
+              <className>org/xwiki/chart/ChartGenerator</className>
+              <field>COLORS_PARAM</field>
+              <justification>Removed constant that shouldn't have been there</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

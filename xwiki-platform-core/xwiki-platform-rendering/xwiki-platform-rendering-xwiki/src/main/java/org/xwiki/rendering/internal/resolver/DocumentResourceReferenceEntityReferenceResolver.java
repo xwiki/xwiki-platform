@@ -45,9 +45,6 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class DocumentResourceReferenceEntityReferenceResolver extends AbstractResourceReferenceEntityReferenceResolver
 {
     @Inject
-    private DocumentReferenceResolver<EntityReference> defaultEntityDocumentReferenceResolver;
-
-    @Inject
     private DocumentReferenceResolver<String> defaultStringDocumentReferenceResolver;
 
     @Inject
@@ -81,8 +78,9 @@ public class DocumentResourceReferenceEntityReferenceResolver extends AbstractRe
             this.relativeReferenceResolver.resolve(resourceReference.getReference(), EntityType.DOCUMENT);
 
         // Resolve the full document reference
+        // We don't start from the previously parsed relative reference to not loose "." prefixed reference meaning
         DocumentReference reference =
-            this.defaultEntityDocumentReferenceResolver.resolve(relativeReference, baseReference);
+            this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
 
         // Take care of fallback if needed
         reference = resolveDocumentReference(relativeReference, reference, baseReference);

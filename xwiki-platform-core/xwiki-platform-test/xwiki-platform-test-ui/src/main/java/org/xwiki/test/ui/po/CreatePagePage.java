@@ -252,9 +252,7 @@ public class CreatePagePage extends ViewPage
      */
     public void setTerminalPage(boolean isTerminalPage)
     {
-        if (isTerminalPage && !this.isTerminalCheckbox.isSelected()) {
-            this.isTerminalCheckbox.click();
-        } else if (!isTerminalPage && this.isTerminalCheckbox.isSelected()) {
+        if (isTerminalPage != this.isTerminalCheckbox.isSelected()) {
             this.isTerminalCheckbox.click();
         }
     }

@@ -184,18 +184,30 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
             if (trySpaceSibling
                 && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName)) {
-                // It does not exist, make it a space sibling.
-                EntityReference parentReference = reference.getParent().getParent();
-                if (parentReference instanceof SpaceReference) {
-                    finalReference = new DocumentReference(reference.getName(), (SpaceReference) parentReference);
-
-                    finalReference = resolveDocumentReference(sourceReference, finalReference, baseReference, false,
-                        defaultDocumentName);
-                } else {
-                    spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
-                    finalReference = new DocumentReference(defaultDocumentName, spaceReference);
-                }
+                // Try as a space sibling.
+                finalReference = resolveSiblingSpaceDocumentReference(sourceReference, reference, baseReference,
+                    defaultDocumentName);
             }
+        }
+
+        return finalReference;
+    }
+
+    protected DocumentReference resolveSiblingSpaceDocumentReference(EntityReference sourceReference,
+        DocumentReference reference, EntityReference baseReference, String defaultDocumentName)
+    {
+        DocumentReference finalReference;
+
+        // Create space sibling
+        EntityReference parentReference = reference.getParent().getParent();
+        if (parentReference instanceof SpaceReference) {
+            finalReference = new DocumentReference(reference.getName(), (SpaceReference) parentReference);
+
+            finalReference =
+                resolveDocumentReference(sourceReference, finalReference, baseReference, false, defaultDocumentName);
+        } else {
+            SpaceReference spaceReference = new SpaceReference(reference.getName(), (WikiReference) parentReference);
+            finalReference = new DocumentReference(defaultDocumentName, spaceReference);
         }
 
         return finalReference;

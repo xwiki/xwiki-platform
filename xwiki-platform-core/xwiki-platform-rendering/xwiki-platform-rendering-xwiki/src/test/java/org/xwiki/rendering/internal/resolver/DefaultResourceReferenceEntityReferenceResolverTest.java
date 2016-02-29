@@ -252,13 +252,13 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         when(this.currentDocumentProvider.get())
             .thenReturn(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, PAGE, DEFAULT_PAGE),
+        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, PAGE, DEFAULT_PAGE),
+        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource('.' + PAGE, false), null));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE), this.mocker
@@ -271,13 +271,15 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         when(this.currentDocumentProvider.get()).thenReturn(
             new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, CURRENT_SUBSPACE), DEFAULT_PAGE));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
+            DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
+            DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource('.' + PAGE, false), null));
 
         assertEquals(
@@ -295,6 +297,7 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         assertEquals(new DocumentReference(CURRENT_WIKI, Arrays.asList(SPACE, PAGE), DEFAULT_PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
+        // FIXME: This should always be resolved to a child (terminal or non-terminal) page and never to a sibling.
         assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource('.' + PAGE, false), null));
 

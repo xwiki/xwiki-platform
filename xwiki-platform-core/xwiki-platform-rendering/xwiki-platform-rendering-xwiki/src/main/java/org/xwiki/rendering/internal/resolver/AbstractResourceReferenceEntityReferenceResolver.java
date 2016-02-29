@@ -185,8 +185,17 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
             if (trySpaceSibling
                 && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName)) {
                 // Try as a space sibling.
-                finalReference = resolveSiblingSpaceDocumentReference(sourceReference, reference, baseReference,
+                DocumentReference siblingReference =
+                    resolveSiblingSpaceDocumentReference(sourceReference, reference, baseReference,
                     defaultDocumentName);
+
+                // We accept the resolved sibling reference only if it is a terminal document (i.e. an exists check was
+                // already performed for it) OR, in the case of a non-terminal document, if it actually exists (by
+                // performing the exists check now). Otherwise, the default will remain the child non-terminal document.
+                if (!siblingReference.getName().equals(defaultDocumentName)
+                    || documentAccessBridge.exists(siblingReference)) {
+                    finalReference = siblingReference;
+                }
             }
         }
 

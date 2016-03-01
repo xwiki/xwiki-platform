@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
  * Customize chart colors.
  *
  * @version $Id$
- * @since 8.0RC1
+ * @since 7.4.3, 8.0RC1
  */
 @Component
 @Named("color")
@@ -50,6 +50,21 @@ public class ColorChartCustomizer implements ChartCustomizer
      */
     private static final String PLOT_BACKGROUND_COLOR = "plotBackgroundColor";
 
+    /**
+     * Color of the plot border.
+     */
+    private static final String PLOT_BORDER_COLOR = "plotBorderColor";
+
+    /**
+     * Color of the outer graph border.
+     */
+    private static final String BORDER_COLOR = "borderColor";
+
+    /**
+     * Background color of the legend.
+     */
+    private static final String LEGEND_BACKGROUND_COLOR = "legendBackgroundColor";
+
     @Override
     public void customize(JFreeChart jfchart, Map<String, String> parameters)
     {
@@ -65,6 +80,21 @@ public class ColorChartCustomizer implements ChartCustomizer
         // Set the non-plot area background color if specified
         if (parameters.get(BACKGROUND_COLOR) != null) {
             jfchart.setBackgroundPaint(convertColor(parameters.get(BACKGROUND_COLOR)));
+        }
+
+        // Set the legend background color if specified
+        if (parameters.get(LEGEND_BACKGROUND_COLOR) != null) {
+            jfchart.getLegend().setBackgroundPaint(convertColor(parameters.get(LEGEND_BACKGROUND_COLOR)));
+        }
+
+        // Set the plot border color if specified
+        if (parameters.get(PLOT_BORDER_COLOR) != null) {
+            jfchart.getPlot().setOutlinePaint(convertColor(parameters.get(PLOT_BORDER_COLOR)));
+        }
+
+        // Set the graph border color if specified
+        if (parameters.get(BORDER_COLOR) != null) {
+            jfchart.setBorderPaint(convertColor(parameters.get(BORDER_COLOR)));
         }
     }
 

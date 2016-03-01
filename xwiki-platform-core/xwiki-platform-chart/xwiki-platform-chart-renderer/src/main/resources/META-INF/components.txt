@@ -1,5 +1,6 @@
 org.xwiki.chart.internal.DefaultChartGenerator
 org.xwiki.chart.internal.ColorChartCustomizer
+org.xwiki.chart.internal.VisibilityChartCustomizer
 org.xwiki.chart.internal.plot.AreaPlotGenerator
 org.xwiki.chart.internal.plot.Bar3DPlotGenerator
 org.xwiki.chart.internal.plot.BarPlotGenerator

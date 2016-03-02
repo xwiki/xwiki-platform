@@ -49,7 +49,7 @@
     #set ($childrenURL = $escapetool.xml($doc.getURL('view', 'viewer=children&displayHidden=true')))
     <dt>
       <label>
-        <input type="checkbox" name="deep" value="true" />
+        <input type="checkbox" name="deep" value="true" checked="checked" />
         $services.localization.render($options.label)
       </label>
     </dt>
@@ -66,7 +66,7 @@
   #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
   <dt>
     <label>
-      <input type="checkbox" name="updateLinks" value="true" />
+      <input type="checkbox" name="updateLinks" value="true" checked="checked" />
       $services.localization.render($options.label)
     </label>
     <span class="xHint">$services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])</span>

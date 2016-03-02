@@ -5,9 +5,9 @@
     <div class="col-xs-12 col-lg-6">
       <dl>
         #displayLocations('core.rename.source.label' 'core.rename.source.hint' $renameJobRequest.entityReferences)
-        #displayBooleanConfigParam('core.rename.children.labelWithoutParams', 'core.rename.children.hint'
+        #displayBooleanConfigParam('core.rename.children.label', 'core.rename.children.hintWithoutParams'
           $renameJobRequest.isDeep())
-        #displayBooleanConfigParam('core.rename.links.labelWithoutParams', 'core.rename.links.hint'
+        #displayBooleanConfigParam('core.rename.links.label', 'core.rename.links.hintWithoutParams'
           $renameJobRequest.isUpdateLinks())
         #displayBooleanConfigParam('core.rename.autoRedirect.label', 'core.rename.autoRedirect.hint'
           $renameJobRequest.isAutoRedirect())

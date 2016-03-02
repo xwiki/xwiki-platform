@@ -57,7 +57,8 @@
   .btn {
     // When the global search is active, the button has an "hover"-kind color
     background-color: @navbar-default-link-hover-bg;
-    border: 1px solid @navbar-default-link-hover-bg;
+    border: 0;
+    border-radius: 0;
     box-shadow: none;
     color: @navbar-default-link-color;
     margin: 0;
@@ -86,7 +87,7 @@
     // The button is transparent
     .btn {
       background-color: transparent;
-      border: 1px solid transparent;
+      border: 0;
       // Except when it is hovering!
       &:hover,
       &:focus {

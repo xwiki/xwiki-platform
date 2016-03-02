@@ -50,11 +50,13 @@
     <dt>
       <label>
         <input type="checkbox" name="deep" value="true" />
-        $services.localization.render($options.label, ["<a href='$childrenURL'>", $childCount, '</a>'])
+        $services.localization.render($options.label)
       </label>
     </dt>
     <dd>
-      <span class="xHint">$services.localization.render($options.hint)</span>
+      <span class="xHint">
+        $services.localization.render($options.hint, ["<a href='$childrenURL'>", $childCount, '</a>'])
+      </span>
     </dd>
   #end
 #end
@@ -65,9 +67,9 @@
   <dt>
     <label>
       <input type="checkbox" name="updateLinks" value="true" />
-      $services.localization.render($options.label, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+      $services.localization.render($options.label)
     </label>
-    <span class="xHint">$services.localization.render($options.hint)</span>
+    <span class="xHint">$services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])</span>
   </dt>
 #end
 

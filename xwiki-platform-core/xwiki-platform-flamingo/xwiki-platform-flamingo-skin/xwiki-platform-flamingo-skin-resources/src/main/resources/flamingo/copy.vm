@@ -203,7 +203,7 @@
     <div class="col-xs-12 col-lg-6">
       <dl>
         #displayLocations('core.copy.source.label' 'core.copy.source.hint' $copyJobRequest.entityReferences)
-        #displayBooleanConfigParam('core.rename.children.labelWithoutParams', 'core.copy.children.hint'
+        #displayBooleanConfigParam('core.rename.children.label', 'core.copy.children.hintWithoutParams'
           $copyJobRequest.isDeep())
       </dl>
     </div>

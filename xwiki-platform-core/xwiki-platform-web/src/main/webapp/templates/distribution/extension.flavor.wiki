@@ -14,6 +14,7 @@
 #macro(controller)
   #if ($flavorId && !$isFlavorValid)
     ## TODO: propose an upgrade of the flavor
+    #set ($showCompleteStepButton = true)
   #elseif ($request.noFlavor)
     ## Let the wiki be empty
     #displayNoFlavor()

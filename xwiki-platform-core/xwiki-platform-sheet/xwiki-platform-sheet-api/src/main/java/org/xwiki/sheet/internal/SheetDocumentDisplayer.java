@@ -33,7 +33,9 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
@@ -80,6 +82,9 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     @Inject
     private ModelBridge modelBridge;
 
+    @Inject
+    private ModelContext modelContext;
+
     /**
      * The component used to serialize entity references.
      */
@@ -92,17 +97,22 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
         XDOM xdom = null;
         if (isSheetExpected(document, parameters)) {
             Map<String, Object> backupObjects = null;
+            EntityReference currentWikiReference = null;
             try {
                 // It is very important to determine the sheet in a new, isolated, execution context, if the given
-                // document is not the currently on the execution context. Put the given document in the context only if
+                // document is not currently on the execution context. Put the given document in the context only if
                 // it's not already there.
                 if (!modelBridge.isCurrentDocument(document)) {
                     backupObjects = modelBridge.pushDocumentInContext(document);
+
+                    currentWikiReference = modelContext.getCurrentEntityReference();
+                    modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
                 }
                 xdom = maybeDisplayWithSheet(document, parameters);
             } finally {
                 if (backupObjects != null) {
                     documentAccessBridge.popDocumentFromContext(backupObjects);
+                    modelContext.setCurrentEntityReference(currentWikiReference);
                 }
             }
         }

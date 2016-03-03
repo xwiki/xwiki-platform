@@ -127,10 +127,7 @@ public class ContextTest extends AbstractComponentTestCase
             will(returnValue(document));
             allowing(xwiki).getXClass(documentReference, xcontext);
             will(returnValue(baseClass));
-            // Decide that there's no custom Displayer for the String field in the document's wiki.
-            allowing(xwiki).exists(new DocumentReference("wiki", "XWiki", "StringDisplayer"), xcontext);
-            will(returnValue(false));
-            // ...nor in the main wiki.
+            // Decide that there's no custom Displayer for the String field
             allowing(xwiki).exists(new DocumentReference("testwiki", "XWiki", "StringDisplayer"), xcontext);
             will(returnValue(false));
             allowing(xwiki).evaluateTemplate("displayer_string.vm", xcontext);

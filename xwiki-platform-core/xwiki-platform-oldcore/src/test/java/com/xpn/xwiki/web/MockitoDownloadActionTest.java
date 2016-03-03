@@ -45,14 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DownloadAction} using Mockito. This class is supposed to replace the
@@ -70,7 +64,6 @@ public class MockitoDownloadActionTest
     {
         public ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        @Override
         public void write(int i) throws IOException
         {
             baos.write(i);
@@ -99,8 +92,6 @@ public class MockitoDownloadActionTest
 
         // Set the current doc
         XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getDocumentReference()).thenReturn(
-            new DocumentReference("xwiki", Arrays.asList("space1", "space2"), "page"));
         when(document.getAttachment("file.ext")).thenReturn(attachment);
         xcontext.setDoc(document);
 
@@ -146,7 +137,6 @@ public class MockitoDownloadActionTest
 
         // Set the current doc and current wiki
         XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "space", "page"));
         when(document.getAttachment("path")).thenReturn(null);
         xcontext.setDoc(document);
         xcontext.setWikiId("wiki");

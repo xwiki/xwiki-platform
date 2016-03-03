@@ -133,8 +133,9 @@ public class CurrentStringEntityReferenceResolverTest
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
+        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
         this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
+            new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
@@ -144,48 +145,5 @@ public class CurrentStringEntityReferenceResolverTest
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
         Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
-    }
-
-    @Test
-    public void testResolveWikiReferenceWhenNoContextDocument()
-    {
-        EntityReference reference = resolver.resolve("", EntityType.WIKI);
-
-        Assert.assertEquals(CURRENT_WIKI, reference.getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getType());
-    }
-
-    /**
-     * XWIKI-13138: Changing the current context document does not also change the current context wiki.
-     */
-    @Test
-    public void testResolveWikiReferenceWhenContextDocumentFromSameWiki()
-    {
-        // Since the current context wiki and the set context document are from the same wiki, there should be no
-        // difference.
-        this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
-
-        EntityReference reference = resolver.resolve("", EntityType.WIKI);
-
-        Assert.assertEquals(CURRENT_WIKI, reference.getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getType());
-    }
-
-    /**
-     * XWIKI-13138: Changing the current context document does not also change the current context wiki.
-     */
-    @Test
-    public void testResolveWikiReferenceWhenContextDocumentFromOtherWiki()
-    {
-        // Setting the context document to a document from a different wiki should override the context wiki to ensure
-        // 1-way sync.
-        this.oldcore.getXWikiContext().setDoc(
-            new XWikiDocument(new DocumentReference("otherWiki", CURRENT_SPACE, CURRENT_PAGE)));
-
-        EntityReference reference = resolver.resolve("", EntityType.WIKI);
-
-        Assert.assertEquals("otherWiki", reference.getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getType());
     }
 }

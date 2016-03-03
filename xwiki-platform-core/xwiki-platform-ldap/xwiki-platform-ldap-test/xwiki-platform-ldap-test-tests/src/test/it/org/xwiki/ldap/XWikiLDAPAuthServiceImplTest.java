@@ -280,8 +280,6 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
     @Test
     public void testAuthenticateWithGroupMembership() throws XWikiException
     {
-        saveDocument(getDocument("XWiki.Group1"));
-
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.group_mapping",
             "XWiki.Group1=" + LDAPTestSetup.HMSLYDIA_DN);
 
@@ -300,8 +298,6 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
     @Test
     public void testAuthenticateWithGroupMembershipWhenOneXWikiGroupMapTwoLDAPGroups() throws XWikiException
     {
-        saveDocument(getDocument("XWiki.Group1"));
-
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.group_mapping",
             "XWiki.Group1=" + LDAPTestSetup.HMSLYDIA_DN + "|" + "XWiki.Group1=" + LDAPTestSetup.EXCLUSIONGROUP_DN);
 
@@ -320,8 +316,6 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
     @Test
     public void testAuthenticateTwiceWithGroupMembership() throws XWikiException
     {
-        saveDocument(getDocument("XWiki.Group1"));
-
         this.mocker.getMockXWikiCfg().setProperty("xwiki.authentication.ldap.group_mapping",
             "XWiki.Group1=" + LDAPTestSetup.HMSLYDIA_DN);
 

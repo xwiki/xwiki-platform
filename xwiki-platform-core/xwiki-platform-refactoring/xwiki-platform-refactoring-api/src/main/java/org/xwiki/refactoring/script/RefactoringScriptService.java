@@ -156,6 +156,7 @@ public class RefactoringScriptService implements ScriptService
     {
         MoveRequest request = createMoveRequest(RefactoringJobs.COPY, sources, destination);
         request.setDeleteSource(false);
+        request.setUpdateParentField(false);
         return request;
     }
 
@@ -182,6 +183,7 @@ public class RefactoringScriptService implements ScriptService
     {
         MoveRequest request = createMoveRequest(RefactoringJobs.COPY_AS, Arrays.asList(sourceReference), copyReference);
         request.setDeleteSource(false);
+        request.setUpdateParentField(false);
         return request;
     }
 

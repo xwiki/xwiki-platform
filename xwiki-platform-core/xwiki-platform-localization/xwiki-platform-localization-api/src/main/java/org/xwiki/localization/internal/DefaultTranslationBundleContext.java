@@ -21,6 +21,7 @@ package org.xwiki.localization.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -68,7 +69,7 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
      */
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * The logger.
@@ -84,8 +85,10 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
         SortedSet<TranslationBundle> currentBundles = new TreeSet<>();
 
         try {
-            currentBundles.addAll(this.componentManager.get().<TranslationBundle>getInstanceList(
-                TranslationBundle.class));
+            ComponentManager componentManager = this.componentManagerProvider.get();
+            List<TranslationBundle> availableBundles =
+                componentManager.<TranslationBundle>getInstanceList(TranslationBundle.class);
+            currentBundles.addAll(availableBundles);
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to lookup Bundle components", e);
         }

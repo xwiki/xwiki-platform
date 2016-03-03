@@ -26,11 +26,9 @@ import org.xwiki.ldap.framework.LDAPRunner;
 import org.xwiki.ldap.framework.LDAPTestSetup;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.ui.AbstractGuestTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
@@ -127,9 +125,12 @@ public class LDAPAuthTest extends AbstractGuestTest
         // ///////////////////
         // Validate XWIKI-2201: LDAP group mapping defined in XWikiPreferences is not working
         getUtil().setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
-        Property groupMember = getUtil().rest().get(new ObjectPropertyReference("member",
-            new ObjectReference("XWiki.XWikiGroups[0]", new DocumentReference("xwiki", "XWiki", "XWikiAdminGroup"))));
-        assertEquals("XWiki." + LDAPTestSetup.WILLIAMBUSH_UID, groupMember.getValue());
+        org.xwiki.rest.model.jaxb.Object groupMember = getUtil().rest().get(
+            new ObjectReference("XWiki.XWikiGroups[0]", new DocumentReference("xwiki", "XWiki", "XWikiAdminGroup")));
+        // Make sure the user is only added once to the group
+        assertEquals(1, groupMember.getProperties().size());
+        // Make sure the added with the right reference
+        assertEquals("XWiki." + LDAPTestSetup.WILLIAMBUSH_UID, groupMember.getProperties().get(0).getValue());
 
         // ///////////////////
         // Validate

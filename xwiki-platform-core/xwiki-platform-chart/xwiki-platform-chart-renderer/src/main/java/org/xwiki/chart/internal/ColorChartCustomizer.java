@@ -46,7 +46,7 @@ public class ColorChartCustomizer implements ChartCustomizer
     private static final String BACKGROUND_COLOR = "backgroundColor";
 
     /**
-     * Background color of the non-chart area.
+     * Background color of the plot area.
      */
     private static final String PLOT_BACKGROUND_COLOR = "plotBackgroundColor";
 

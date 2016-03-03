@@ -65,7 +65,7 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {XARFilterUtils.ROLEHINT_13, XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter
 {
@@ -224,7 +224,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
             }
         }
 
-        this.writer.writeStartDocument(this.properties.getEncoding(), "1.0");
+        this.writer.writeStartDocument(this.properties.getEncoding(), "1.1");
 
         this.writer.writeStartElement(XarDocumentModel.ELEMENT_DOCUMENT);
         this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_SPECVERSION, XarDocumentModel.VERSION_12);

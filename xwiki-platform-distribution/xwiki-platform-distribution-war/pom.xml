@@ -970,12 +970,6 @@
           <version>${project.version}</version>
           <scope>runtime</scope>
         </dependency>
-        <dependency>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-chart-macro10</artifactId>
-          <version>${project.version}</version>
-          <scope>runtime</scope>
-        </dependency>
       </dependencies>
       <build>
         <plugins>

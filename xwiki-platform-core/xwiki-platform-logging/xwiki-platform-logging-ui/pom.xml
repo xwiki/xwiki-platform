@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-logging-ui</artifactId>
   <name>XWiki Platform - Logging - UI</name>
   <packaging>xar</packaging>
-  <description>XWiki Platform - Logging - UI</description>
+  <description>Review and set logging levels dynamically</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

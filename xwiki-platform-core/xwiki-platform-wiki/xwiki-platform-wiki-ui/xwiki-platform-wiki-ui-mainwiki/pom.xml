@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Wiki - UI - Main Wiki</name>
-  <description>XWiki application that manages wiki.</description>
+  <description>Manage subwikis: create and delete subwikis, invite members</description>
   <properties>
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

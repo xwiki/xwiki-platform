@@ -2812,7 +2812,7 @@ ${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&a
       <version>$services.extension.core.repository.environmentExtension.name $xwiki.getVersion()</version>
     </property>
     <property>
-      <webcopyright></webcopyright>
+      <webcopyright/>
     </property>
     <property>
       <xwiki.title.mandatory>0</xwiki.title.mandatory>

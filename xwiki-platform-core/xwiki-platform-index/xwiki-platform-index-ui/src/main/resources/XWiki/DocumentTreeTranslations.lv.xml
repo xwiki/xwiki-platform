@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.DocumentTree</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1424709160000</creationDate>
+  <date>1424709200000</date>
+  <contentUpdateDate>1424709198000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+rendering.macro.documentTree.description=Parāda XWiki dokumentu koku
+rendering.macro.documentTree.name=Dokumentu koks
+rendering.macro.documentTree.parameter.checkboxes.description=Vai parādīt katra koka elementa priekšā iezīmējamo rūtiņu, ar kuru var atzīmēt uzreiz vairākus dokumentus kokā.
+rendering.macro.documentTree.parameter.checkboxes.name=Iezīmes rūtiņas
+rendering.macro.documentTree.parameter.compact.description=Ja jums ir ierobežots horizontālais laukums, vēlams ieslēgt šo iestatījumu. Rezultātā netiks rādītas dokumentu ikonas un tos saistošās līnijas. Tiks veikti arī citi izskata pielāgojumi, lai nodrošinātu, ka koks aizņem pēc iespējas mazāku horizontālo telpu.
+rendering.macro.documentTree.parameter.compact.name=Kompakti
+rendering.macro.documentTree.parameter.filterByClass.description=Rādīt tikai dokumentus, kuriem ir atbilstošs veids. Piemēram, norādot 'Blog.CategoryClass' tiks parādītas tikai emuāru kategorijas. Atstājiet šo lauku tukšu, ja vēlaties, lai kokā ir parādīti visi dokumentu viedi.
+rendering.macro.documentTree.parameter.filterByClass.name=Atlasīt pēc klases
+rendering.macro.documentTree.parameter.finder.description=Rādīt teksta lauku, ar kuru var atlasīt parādītos koka elementus. Lauks tiek parādīts virs koka un tajā piedāvā automātisku priekšāteikšanu. Izvēloties noteiktu vērtību, kokā tiek parādīts tikai izvēlētā elementa zars.
+rendering.macro.documentTree.parameter.finder.name=Meklētājs
+rendering.macro.documentTree.parameter.links.description=Norāda, vai elementu nosaukumi kokā tiek parādīti un darbojas kā hipersaites.
+rendering.macro.documentTree.parameter.links.name=Saites
+rendering.macro.documentTree.parameter.openTo.description=Koka sākuma elements. Tiks parādīts viss koks, kas sākas ar norādīto dokumentu. Elementa identifikatoru norāda kā parametru koka sākumam.
+rendering.macro.documentTree.parameter.openTo.name=Atvērt no
+rendering.macro.documentTree.parameter.readOnly.description=Vai lietotājam ir iespējams mainīt koka struktūru, ja viņam ir attiecīgas pieejas tiesības?
+rendering.macro.documentTree.parameter.readOnly.name=Tikai lasāms
+rendering.macro.documentTree.parameter.root.description=Koka sākuma elementa identifikators. Tas noder, ja vēlaties apskatīt koku, tikai sākot ar norādīto elementu (kas tad kalpo kā kokam norādītā sakne). Kokā tiek parādīti elementi, sākot ar saknes bērniem, līdz ar to pats norādītais elements parādīts netiek. Elementa attēlošanas formāts ir\: Veids\:Norāde, kur kur vieds var būt viki, vieta vai dokuments. Piem., viki\:xwiki, vieta\:xwiki\:Main, dokuments\:xwiki\:Main.WebHome.
+rendering.macro.documentTree.parameter.root.name=Sakne
+rendering.macro.documentTree.parameter.showAttachments.description=Vai rādīt dokumentu pielikumus
+rendering.macro.documentTree.parameter.showAttachments.name=Rādīt pielikumus
+rendering.macro.documentTree.parameter.showChildDocuments.description=Vai rādīt bērnu dokumentus, vadoties no norādītā vecāku dokumenta.
+rendering.macro.documentTree.parameter.showChildDocuments.name=Rādīt bērnu dokumentus
+rendering.macro.documentTree.parameter.showClassProperties.description=Vai rādīt klases īpašības dokumentiem, kuros ir definētas klases.
+rendering.macro.documentTree.parameter.showClassProperties.name=Rādīt klases īpašības
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Vai koka mezglam dokumenta nosaukuma vietā rādīt dokumenta virsrakstu. 
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Rādīt dokumenta virsrakstu
+rendering.macro.documentTree.parameter.showObjects.description=Vai rādīt doumenta objektus
+rendering.macro.documentTree.parameter.showObjects.name=Rādīt objektus
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Rādīt tikai viki, vietas un dokumentus, kuriem esošajam lietotājam ir pieejas tiesības. Ja ir atslēgts, tad viki, vietas un dokumenti, kas lietotājam nav pieejami tiek parādīti kā dokumentu nosaukumi. Lietotājam nebūs iespēju apskatīt dokumentu saturu, klikšķinot uz šo dokumentu saitēm (tomēr lietotājam būs zināms, ka šādi dokumenti pastāv).
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Rādīt tikai redzamos
+rendering.macro.documentTree.parameter.showSpaces.description=Vai rādīt vietu mezglus. Ja rāda, tad dokumenti ir grupēti vietu mezglos saskaņā ar to, kādā vietā tie atrodas.
+rendering.macro.documentTree.parameter.showSpaces.name=Rādīt vietas
+rendering.macro.documentTree.parameter.showTranslations.description=Vai rādīt dokumentu tulkojumus
+rendering.macro.documentTree.parameter.showTranslations.name=Rādīt tulkojumus
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Attēlojot viki mezglu, rādīt viki skaisto nosaukumu viki identifikatora vietā.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Rādīt viki skaisto nosaukumu
+rendering.macro.documentTree.parameter.showWikis.description=Vai rādīt dokumentu kokā kā mezglus viki. To var rādīt tikai galvenajā viki un, ja koka lapu ir saglabājis lietotājs ar programmēšanas tiesībām.
+rendering.macro.documentTree.parameter.showWikis.name=Rādīt viki
+</content>
+</xwikidoc>

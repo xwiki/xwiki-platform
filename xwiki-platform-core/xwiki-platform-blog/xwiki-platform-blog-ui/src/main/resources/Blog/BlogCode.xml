@@ -599,14 +599,14 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
         'comment' : $services.localization.render('xe.blog.code.madevisible')
         }))
       #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
-      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]
+      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]##
     #else
       #set ($discard = $queryString.putAll({
         "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 1,
         'comment' : $services.localization.render('xe.blog.code.hid')
         }))
       #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
-      [[#toolImage('lock', 'hide ')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]
+      [[#toolImage('lock', 'hide ')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]##
     #end
   #end
 #end

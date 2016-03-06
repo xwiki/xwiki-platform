@@ -15,7 +15,9 @@
   #if ($displayEditMenu && $hasEdit && !$isReadOnly)
     #displayEditMenu()
   #end
-  #if ($displayCreateMenu && $hasCreatePage)
+  ## Display a create menu if the user has the right to create spaces in the current wiki, even if he doesn't have
+  ## edit that right on the current space. We do this since the Create UI allows creating new pages at any location.
+  #if ($displayCreateMenu && $hasCreateSpace)
     #displayCreateButton()
   #end
   

@@ -73,7 +73,7 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
         GadgetInstance gadgetInstance = new GadgetInstance();
         gadgetInstance.setMacroCall(superResult);
         // prefill the title of the gadget with the name of the macro
-        gadgetInstance.setTitle($services.localization.render('rendering.macro.' + superResult.getName()));
+        gadgetInstance.setTitle("$services.localization.render('rendering.macro." + superResult.getName() + ".name')");
         return gadgetInstance;
     }
 }

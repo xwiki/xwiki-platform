@@ -50,6 +50,13 @@
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
     'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #if ("$!request.section" != '')
+    {{html}}
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="section" value="$!escapetool.xml($request.section)" /&gt;
+    &lt;/div&gt;
+    {{/html}}
+  #end
   (% class="xform" %)(((
     ; $services.localization.render('core.editors.content.contentField.label')
     : {{html}}

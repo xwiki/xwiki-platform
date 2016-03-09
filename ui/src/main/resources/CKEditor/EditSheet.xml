@@ -197,6 +197,10 @@ require.config({
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
+        // Don't convert Latin characters to the corresponding named HTML entities in the HTML output because the HTML
+        // cleaner used on the server side doesn't recognize some of them (XCOMMONS-929).
+        // See CKEDITOR-38: CKEditor converts Umlaute to HTML equivalents
+        entities_latin: false,
         filebrowserUploadUrl: XWiki.currentDocument.getURL('get', $.param({
           sheet: 'CKEditor.FileUploader',
           outputSyntax: 'plain',

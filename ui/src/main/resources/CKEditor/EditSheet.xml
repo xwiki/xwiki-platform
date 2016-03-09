@@ -78,6 +78,11 @@
       &lt;textarea name="content" class="ckeditor-textarea loading" spellcheck="false"&gt;$escapetool.xml($content)&lt;/textarea&gt;
       &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;
       &lt;input value="$doc.syntax.toIdString()" name="content_syntax" type="hidden"/&gt;
+      ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
+      ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
+      ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
+      ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
+      &lt;input value="" name="content_cache" type="hidden" class="cache"/&gt;
     {{/html}}
   )))
 #end

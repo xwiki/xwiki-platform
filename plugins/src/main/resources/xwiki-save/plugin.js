@@ -21,11 +21,15 @@
   'use strict';
   var $ = jQuery;
   CKEDITOR.plugins.add('xwiki-save', {
+    requires: 'xwiki-cache',
     editors: [],
 
     beforeInit: function(editor) {
-      // Make sure we restore the previous editing mode when the page is loaded from cache.
-      if (this.getContentTypeField(editor).prop('disabled')) {
+      // Make sure we restore the previous editing mode when the page is loaded from cache (back/forward/reload).
+      var contentTypeField = this.getContentTypeField(editor);
+      // Chrome doesn't cache the enabled/disabled state of form fields so we are caching it separately.
+      if (editor._.xwikiCache[contentTypeField.attr('name')] === false || contentTypeField.prop('disabled')) {
+        contentTypeField.prop('disabled', true);
         editor.config.startupMode = 'source';
       }
     },
@@ -112,12 +116,16 @@
     },
 
     updateContentType: function(editor) {
-      this.getContentTypeField(editor).prop('disabled', editor.mode === 'source');
+      var contentTypeField = this.getContentTypeField(editor);
+      var disabled = editor.mode === 'source';
+      contentTypeField.prop('disabled', disabled);
+      // Chrome doesn't cache the enabled/disabled state of form fields so we have to cache it separately.
+      editor._.xwikiCache[contentTypeField.attr('name')] = !disabled;
     },
 
     getContentTypeField: function(editor) {
       var fieldName = editor.element && editor.element.getNameAtt();
-      return $('input[type=hidden][name=RequiresHTMLConversion]').filter(function() {
+      return $('input[name=RequiresHTMLConversion]').filter(function() {
         return $(this).val() === fieldName;
       });
     },

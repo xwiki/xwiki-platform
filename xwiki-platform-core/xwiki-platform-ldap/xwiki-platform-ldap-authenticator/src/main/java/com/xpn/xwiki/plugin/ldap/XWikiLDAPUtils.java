@@ -1212,6 +1212,19 @@ public class XWikiLDAPUtils
             XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
 
             synchronized (groupDoc) {
+                // Make extra sure the group cannot contain duplicate (even if this method is not supposed to be called
+                // in this case)
+                for (BaseObject memberObj : groupDoc.getXObjects(groupClass.getDocumentReference())) {
+                    if (memberObj != null) {
+                        String existingMember = memberObj.getStringValue(XWIKI_GROUP_MEMBERFIELD);
+                        if (existingMember != null && existingMember.equals(xwikiUserName)) {
+                            LOGGER.warn("User [{}] already exist in group [{}]", xwikiUserName,
+                                groupDoc.getDocumentReference());
+                            return ;
+                        }
+                    }
+                }
+
                 // Add a member object to document
                 BaseObject memberObj = groupDoc.newXObject(groupClass.getDocumentReference(), context);
                 Map<String, String> map = new HashMap<String, String>();

@@ -190,16 +190,16 @@ public class UploadAction extends XWikiAction
         // Calculate and store mime type
         attachment.resetMimeType(context);
 
-        // Adding a comment with a link to the download URL
+        // Adding a comment with the name and revision of the added attachment.
         String comment;
         String nextRev = attachment.getNextVersion();
         ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
-        params.add(doc.getAttachmentRevisionURL(filename, nextRev, context));
+        params.add(nextRev);
         if (attachment.isImage(context)) {
-            comment = localizePlainOrKey("core.comment.uploadImageComment", params);
+            comment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
         } else {
-            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params);
+            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
         // Save the document.

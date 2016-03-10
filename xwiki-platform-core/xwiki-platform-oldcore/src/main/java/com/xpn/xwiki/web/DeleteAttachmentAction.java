@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -121,17 +119,16 @@ public class DeleteAttachmentAction extends XWikiAction
         newdoc.setAuthorReference(context.getUserReference());
 
         // Set "deleted attachment" as the version comment.
-        ArrayList<String> params = new ArrayList<String>();
-        params.add(filename);
+        String comment;
         if (attachment.isImage(context)) {
-            newdoc.setComment(localizePlainOrKey("core.comment.deleteImageComment", params));
+            comment = localizePlainOrKey("core.comment.deleteImageComment", filename);
         } else {
-            newdoc.setComment(localizePlainOrKey("core.comment.deleteAttachmentComment", params));
+            comment = localizePlainOrKey("core.comment.deleteAttachmentComment", filename);
         }
 
         try {
             newdoc.removeAttachment(attachment);
-            xwiki.saveDocument(newdoc, "Deleted attachment [" + attachment.getFilename() + "]", context);
+            xwiki.saveDocument(newdoc, comment, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");

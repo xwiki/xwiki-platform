@@ -38,28 +38,6 @@
     <!-- By default we don't include Legacy modules and thus we don't need to exclude the non legacy JARs -->
     <xwiki.war.legacy.excludes />
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <!--
-        Custom version with embedded commons-logging maven descriptor (so that it's found as core extension).
-        See http://jira.qos.ch/browse/SLF4J-340.
-      -->
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.version}-xwiki</version>
-      </dependency>
-      <!--
-        Custom version with embedded log4j maven descriptor (so that it's found as core extension).
-        See http://jira.qos.ch/browse/SLF4J-339.
-      -->
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>log4j-over-slf4j</artifactId>
-        <version>${slf4j.version}-xwiki</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <!-- ********************************************************************** -->
     <!-- Generic templates and web resources dependencies -->

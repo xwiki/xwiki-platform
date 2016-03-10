@@ -107,7 +107,29 @@
     <derby.version>10.11.1.1</derby.version>
     <pgsql.version>9.4-1201-jdbc41</pgsql.version>
   </properties>
-    <build>
+  <dependencyManagement>
+    <dependencies>
+      <!--
+        Custom version with embedded commons-logging maven descriptor (so that it's found as core extension).
+        See http://jira.qos.ch/browse/SLF4J-340.
+      -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}-xwiki-1</version>
+      </dependency>
+      <!--
+        Custom version with embedded log4j maven descriptor (so that it's found as core extension).
+        See http://jira.qos.ch/browse/SLF4J-339.
+      -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>${slf4j.version}-xwiki-1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
     <pluginManagement>
       <plugins>
         <plugin>

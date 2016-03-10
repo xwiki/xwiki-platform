@@ -288,12 +288,10 @@ public class DBListClass extends ListClass
                     whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                     // Get the from statements according to the type of property
                     try {
-                        PropertyClass pc = (PropertyClass) context.getWiki().getDocument(classname, context).getXClass()
-                                .get(idField);
-                        String classType = (pc == null) ? "StringProperty" : pc.newProperty().getClass().getName();
+                        String classType = getPropertyType(classname, idField,context);
                         fromStatements.add(classType + " as idprop");
-                    } catch (XWikiException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
                     }
                 }
 
@@ -308,13 +306,10 @@ public class DBListClass extends ListClass
                         whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                         // Get the from statements according to the type of property
                         try {
-                            PropertyClass pc = (PropertyClass) context.getWiki().getDocument(classname,
-                                    context).getXClass()
-                                    .get(valueField);
-                            String classType = (pc == null) ? "StringProperty" : pc.newProperty().getClass().getName();
-                            fromStatements.add(classType + "  as valueprop");
-                        } catch (XWikiException e) {
-                            e.printStackTrace();
+                            String classType = getPropertyType(classname, valueField,context);
+                            fromStatements.add(classType + " as valueprop");
+                        } catch (Exception e) {
+                            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
                         }
                     }
                 }
@@ -613,5 +608,16 @@ public class DBListClass extends ListClass
         } else {
             buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
+    }
+
+    private String getPropertyType(String className, String propertyName, XWikiContext context) throws Exception
+    {
+        PropertyClass pc = null;
+        try {
+            pc = (PropertyClass) context.getWiki().getDocument(className, context).getXClass().get(propertyName);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get property [{}] for document [{}]", propertyName, className, e);
+        }
+        return pc.newProperty().getClass().getName();
     }
 }

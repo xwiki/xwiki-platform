@@ -488,6 +488,11 @@
   display: block;
 }
 
+.floatinginfobox .wikiexternallink {
+  background: none;
+  padding: 0;
+}
+
 .errormessage, .warningmessage, .infomessage, .plainmessage {
   background-color: $theme.backgroundSecondaryColor;
 }

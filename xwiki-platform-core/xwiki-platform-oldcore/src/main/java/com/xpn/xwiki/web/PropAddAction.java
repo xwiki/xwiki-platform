@@ -67,7 +67,7 @@ public class PropAddAction extends XWikiAction
             parameters.add(propName);
             context.put("messageParameters", parameters);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.alreadyExists", parameters));
+                localizePlainOrKey("action.addClassProperty.error.alreadyExists", parameters.toArray()));
             return true;
         } else {
             MetaClass mclass = xwiki.getMetaclass();

@@ -36,6 +36,7 @@ import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -82,6 +83,8 @@ public class DBListClass extends ListClass
             if (item != null) {
                 if (item instanceof String) {
                     result.add(new ListItem((String) item));
+                } else if (item instanceof Number) {
+                    result.add(new ListItem(item.toString()));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -282,8 +285,16 @@ public class DBListClass extends ListClass
                     select.append("doc." + idField);
                 } else {
                     select.append("idprop.value");
-                    fromStatements.add("StringProperty as idprop");
                     whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
+                    // Get the from statements according to the type of property
+                    try {
+                        PropertyClass pc = (PropertyClass) context.getWiki().getDocument(classname, context).getXClass()
+                                .get(idField);
+                        String classType = (pc == null) ? "StringProperty" : pc.newProperty().getClass().getName();
+                        fromStatements.add(classType + " as idprop");
+                    } catch (XWikiException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 // If specified, add the second column to the query.
@@ -294,8 +305,17 @@ public class DBListClass extends ListClass
                         select.append(", doc." + valueField);
                     } else {
                         select.append(", valueprop.value");
-                        fromStatements.add("StringProperty as valueprop");
                         whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
+                        // Get the from statements according to the type of property
+                        try {
+                            PropertyClass pc = (PropertyClass) context.getWiki().getDocument(classname,
+                                    context).getXClass()
+                                    .get(valueField);
+                            String classType = (pc == null) ? "StringProperty" : pc.newProperty().getClass().getName();
+                            fromStatements.add(classType + "  as valueprop");
+                        } catch (XWikiException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 // Let's create the complete query

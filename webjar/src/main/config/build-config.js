@@ -82,6 +82,7 @@ var CKBUILDER_CONFIG = {
     stylescombo: 1,
     tab: 1,
     table: 1,
+    tableresize: 1,
     tabletools: 1,
     toolbar: 1,
     undo: 1,

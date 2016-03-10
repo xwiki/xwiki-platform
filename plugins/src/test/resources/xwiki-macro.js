@@ -77,6 +77,27 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
+  it('converts empty macro output into a widget', function(done) {
+    editor.setData('<p><!--startmacro:id|-|name="foo"--><span id="foo"></span><!--stopmacro--></p>', {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(1);
+
+        var idMacro = wikiMacroWidgets[0];
+        expect(idMacro.pathName).toBe('macro:id');
+        expect(idMacro.element.getAttribute('data-macro')).toBe('startmacro:id|-|name="foo"');
+
+        expect(editor.getData()).toBe('<p><!--startmacro:id|-|name="foo"--><!--stopmacro--></p>');
+
+        editor.config.fullData = true;
+        expect(editor.getData()).toBe('<p><!--startmacro:id|-|name="foo"-->' +
+          '<span class="macro-placeholder">macro:id</span><!--stopmacro--></p>');
+
+        done();
+      }
+    });
+  });
+
   var serializeAndParseMacroCall = function(macroCall) {
     var wikiMacroPlugin = CKEDITOR.plugins.get('xwiki-macro');
     var serializedMacroCall = wikiMacroPlugin.serializeMacroCall(macroCall);

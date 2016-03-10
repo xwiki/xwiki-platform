@@ -22,29 +22,78 @@
   CKEDITOR.plugins.add('xwiki-macro', {
     requires: 'widget,xwiki-marker',
     init : function(editor) {
-      // nodes: CKEDITOR.htmlParser.node[]
-      var isInline = function(nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var node = nodes[i];
-          if (node.type === CKEDITOR.NODE_ELEMENT && !!CKEDITOR.dtd.$block[node.name]) {
-            return false;
+      var macroPlugin = this;
+
+      // node: CKEDITOR.htmlParser.node
+      var isInlineNode = function(node) {
+        return node.type !== CKEDITOR.NODE_ELEMENT || CKEDITOR.dtd.$inline[node.name];
+      };
+
+      // node: CKEDITOR.htmlParser.node
+      var getPreviousSibling = function(node, siblingTypes) {
+        var i = node.getIndex() - 1;
+        while (i >= 0) {
+          var sibling = node.parent.children[i--];
+          if (!siblingTypes || siblingTypes.indexOf(sibling.type) >= 0) {
+            return sibling;
           }
         }
-        return true;
+        return null;
+      };
+
+      // node: CKEDITOR.htmlParser.node
+      var getNextSibling = function(node, siblingTypes) {
+        var i = node.getIndex() + 1;
+        while (i < node.parent.children.length) {
+          var sibling = node.parent.children[i++];
+          if (!siblingTypes || siblingTypes.indexOf(sibling.type) >= 0) {
+            return sibling;
+          }
+        }
+        return null;
+      };
+
+      // startMacroComment: CKEDITOR.htmlParser.comment
+      // output: CKEDITOR.htmlParser.node[]
+      var isInlineMacro = function(startMacroComment, output) {
+        if (output.length > 0) {
+          var i = 0;
+          while (i < output.length && isInlineNode(output[i])) {
+            i++;
+          }
+          return i >= output.length;
+        } else {
+          var previousSibling = getPreviousSibling(startMacroComment, [CKEDITOR.NODE_ELEMENT, CKEDITOR.NODE_TEXT]);
+          var nextSibling = getNextSibling(startMacroComment, [CKEDITOR.NODE_ELEMENT, CKEDITOR.NODE_TEXT]);
+          if (previousSibling || nextSibling) {
+            return (previousSibling && isInlineNode(previousSibling)) || (nextSibling && isInlineNode(nextSibling));
+          } else {
+            return !CKEDITOR.dtd.$blockLimit[startMacroComment.parent.name];
+          }
+        }
       };
 
       // startMacroComment: CKEDITOR.htmlParser.comment
       // output: CKEDITOR.htmlParser.node[]
       var wrapMacroOutput = function(startMacroComment, output) {
-        var wrapperName = isInline(output) ? 'span' : 'div';
+        var wrapperName = isInlineMacro(startMacroComment, output) ? 'span' : 'div';
         var wrapper = new CKEDITOR.htmlParser.element(wrapperName, {
           'class': 'macro',
           'data-macro': startMacroComment.value
         });
-        for (var i = 0; i < output.length; i++) {
-          output[i].remove();
-          wrapper.add(output[i]);
+        if (output.length > 0) {
+          for (var i = 0; i < output.length; i++) {
+            output[i].remove();
+            wrapper.add(output[i]);
+          }
+        } else {
+          // Use a placeholder for the macro output. The user cannot edit the macro otherwise.
+          var placeholder = new CKEDITOR.htmlParser.element('span', {'class': 'macro-placeholder'});
+          var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
+          placeholder.add(new CKEDITOR.htmlParser.text('macro:' + macroCall.name));
+          wrapper.add(placeholder);
         }
+
         startMacroComment.replaceWith(wrapper);
       };
 
@@ -78,7 +127,6 @@
         pathName: 'macro'
       });
 
-      var macroPlugin = this;
       editor.widgets.onWidget('xwiki-macro', 'ready', function(event) {
         var macroCall = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
         this.pathName += ':' + macroCall.name;

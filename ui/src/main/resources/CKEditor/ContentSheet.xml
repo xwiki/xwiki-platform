@@ -182,6 +182,11 @@ a[data-linktype="create"]::after {
   margin-left: 4px;
   padding: 0 4px;
   text-decoration: none;
+}
+
+.macro-placeholder {
+  font-family: monospace;
+  font-size: smaller;
 }</code>
     </property>
     <property>

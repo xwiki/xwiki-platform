@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Collections;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,9 +45,7 @@ public class PropDeleteAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.removeField(propertyName);
-        xwiki.saveDocument(
-            doc,
-            localizePlainOrKey("core.model.xclass.deleteClassProperty.versionSummary",
-                Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(doc,
+            localizePlainOrKey("core.model.xclass.deleteClassProperty.versionSummary", propertyName), true, context);
     }
 }

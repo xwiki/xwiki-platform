@@ -332,9 +332,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             tags.add(tag);
             setDocumentTags(document, tags, context);
 
-            List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tag);
-            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, commentArgs);
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tag);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -458,9 +456,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (needsUpdate) {
             setDocumentTags(document, tags, context);
-            List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tag);
-            String comment = localizePlainOrKey("plugin.tag.editcomment.removed", commentArgs);
+            String comment = localizePlainOrKey("plugin.tag.editcomment.removed", tag);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -491,10 +487,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
-        List<String> commentArgs = new ArrayList<String>();
-        commentArgs.add(tag);
-        commentArgs.add(newTag);
-        String comment = localizePlainOrKey("plugin.tag.editcomment.renamed", commentArgs);
+
+        String comment = localizePlainOrKey("plugin.tag.editcomment.renamed", tag, newTag);
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);

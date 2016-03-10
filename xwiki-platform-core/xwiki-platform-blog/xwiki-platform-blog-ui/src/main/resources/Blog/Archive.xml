@@ -42,7 +42,6 @@
   <content>{{include reference="Blog.BlogCode"/}}
 
 {{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
 ##
 ##
 ##
@@ -87,7 +86,7 @@
       #end
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticle'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticle'){{/info}}
   #end
 #end
 ##
@@ -120,7 +119,7 @@
       #end
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticlesyear'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticlesyear'){{/info}}
   #end
 #end
 ##
@@ -143,7 +142,7 @@
       #displayEntry($entryDoc $entryObj true true)
     #end
   #else
-    #info($services.localization.render('xe.blog.archive.noarticlesmonth'))
+    {{info}}$services.localization.render('xe.blog.archive.noarticlesmonth'){{info}}
   #end
 #end
 ##
@@ -168,6 +167,5 @@
     #displayBlogMonthArchive($blogDoc $year $month)
   #end
 #end
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

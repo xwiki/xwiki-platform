@@ -111,6 +111,8 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                 } else {
                     xobject.setStringValue(XWikiServerClassDocumentInitializer.FIELD_SERVER, "localhost");
                 }
+
+                needsUpdate = true;
             } catch (XWikiException e) {
                 this.logger.error("Faied to initialize main wiki descriptor", e);
             }

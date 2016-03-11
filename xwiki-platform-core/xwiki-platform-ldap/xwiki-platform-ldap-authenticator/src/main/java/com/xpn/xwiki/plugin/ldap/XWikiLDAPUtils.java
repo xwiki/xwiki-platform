@@ -1214,13 +1214,16 @@ public class XWikiLDAPUtils
             synchronized (groupDoc) {
                 // Make extra sure the group cannot contain duplicate (even if this method is not supposed to be called
                 // in this case)
-                for (BaseObject memberObj : groupDoc.getXObjects(groupClass.getDocumentReference())) {
-                    if (memberObj != null) {
-                        String existingMember = memberObj.getStringValue(XWIKI_GROUP_MEMBERFIELD);
-                        if (existingMember != null && existingMember.equals(xwikiUserName)) {
-                            LOGGER.warn("User [{}] already exist in group [{}]", xwikiUserName,
-                                groupDoc.getDocumentReference());
-                            return ;
+                List<BaseObject> xobjects = groupDoc.getXObjects(groupClass.getDocumentReference());
+                if (xobjects != null) {
+                    for (BaseObject memberObj : xobjects) {
+                        if (memberObj != null) {
+                            String existingMember = memberObj.getStringValue(XWIKI_GROUP_MEMBERFIELD);
+                            if (existingMember != null && existingMember.equals(xwikiUserName)) {
+                                LOGGER.warn("User [{}] already exist in group [{}]", xwikiUserName,
+                                    groupDoc.getDocumentReference());
+                                return;
+                            }
                         }
                     }
                 }

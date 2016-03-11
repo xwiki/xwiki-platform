@@ -117,7 +117,6 @@
   #set ($deleteWikiPageReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'DeleteWiki'))
   #if ($services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId) &amp;&amp; $xwiki.exists($deleteWikiPageReference) &amp;&amp; $services.security.authorization.hasAccess('view', $deleteWikiPageReference))
     #template('drawer_macros.vm')
-    #drawerSeparator()
     #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${escapetool.url($services.wiki.currentWikiId)}"))
     #drawerItem($deleteUrl, 'remove', $escapetool.xml($services.localization.render('platform.wiki.menu.deletewiki')), 'tmDeleteWiki')
   #end
@@ -131,7 +130,8 @@
       <name>org.xwiki.plaftorm.wiki.ui.deletewiki</name>
     </property>
     <property>
-      <parameters>order=70000</parameters>
+      <parameters>order=70000
+separator=true</parameters>
     </property>
     <property>
       <scope>wiki</scope>

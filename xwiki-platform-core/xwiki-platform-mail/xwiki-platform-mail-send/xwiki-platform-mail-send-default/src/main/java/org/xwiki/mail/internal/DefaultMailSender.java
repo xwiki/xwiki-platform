@@ -88,11 +88,13 @@ public class DefaultMailSender implements MailSender, Initializable
         // Step 1: Start the Mail Prepare Thread
         this.prepareMailThread = new Thread(this.prepareMailRunnable);
         this.prepareMailThread.setName("Mail Prepare Thread");
+        this.prepareMailThread.setDaemon(true);
         this.prepareMailThread.start();
 
         // Step 2: Start the Mail Sender Thread
         this.sendMailThread = new Thread(this.sendMailRunnable);
         this.sendMailThread.setName("Mail Sender Thread");
+        this.sendMailThread.setDaemon(true);
         this.sendMailThread.start();
     }
 

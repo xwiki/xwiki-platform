@@ -151,8 +151,8 @@ public class XWikiServletContextListener implements ServletContextListener
 
             // Make sure to dispose all components before leaving
             this.componentManager.dispose();
-
-            SHUTDOWN_LOGGER.debug("XWiki has been stopped!");
         }
+
+        SHUTDOWN_LOGGER.debug("XWiki has been stopped!");
     }
 }

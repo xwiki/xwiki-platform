@@ -22,8 +22,6 @@ package org.xwiki.mail.internal.thread;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSenderConfiguration;
 
@@ -33,7 +31,7 @@ import org.xwiki.mail.MailSenderConfiguration;
  * @version $Id$
  * @since 6.4
  */
-public abstract class AbstractMailRunnable implements MailRunnable, Disposable
+public abstract class AbstractMailRunnable implements MailRunnable
 {
     @Inject
     protected Logger logger;
@@ -58,11 +56,5 @@ public abstract class AbstractMailRunnable implements MailRunnable, Disposable
     public void stopProcessing()
     {
         this.shouldStop = true;
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        stopProcessing();
     }
 }

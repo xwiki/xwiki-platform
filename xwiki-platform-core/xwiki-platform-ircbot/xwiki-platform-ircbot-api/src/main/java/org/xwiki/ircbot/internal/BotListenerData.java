@@ -21,6 +21,8 @@ package org.xwiki.ircbot.internal;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * In-memory information about a Bot Listener.
@@ -137,5 +139,16 @@ public class BotListenerData
             .append(getDescription())
             .append(isWikiBotListener())
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("id", getId());
+        builder.append("name", getName());
+        builder.append("description", getDescription());
+        builder.append("isWikiBotListener", isWikiBotListener());
+        return builder.toString();
     }
 }

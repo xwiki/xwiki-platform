@@ -47,6 +47,9 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import org.junit.Assert;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
+
 /**
  * Unit tests for {@link DefaultWikiIRCBotManager}.
  *
@@ -202,6 +205,6 @@ public class DefaultWikiIRCBotManagerTest extends AbstractMockingComponentTestCa
         List<BotListenerData> expectedData = Arrays.asList(
             new BotListenerData("docspace.docname", "name", "description"),
             new BotListenerData("wikiid", "wikiname", "wikidescription"));
-        Assert.assertEquals(expectedData, data);
+        assertThat(expectedData, containsInAnyOrder(data.toArray()));
     }
 }

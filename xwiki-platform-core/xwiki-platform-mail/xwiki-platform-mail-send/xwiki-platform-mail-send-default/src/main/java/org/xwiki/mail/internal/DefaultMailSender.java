@@ -28,9 +28,13 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -54,8 +58,13 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class DefaultMailSender implements MailSender, Initializable
+public class DefaultMailSender implements MailSender, Initializable, Disposable
 {
+    /**
+     * Logger to use to log shutdown information (opposite of initialization).
+     */
+    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
+
     private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
 
     @Inject
@@ -143,6 +152,7 @@ public class DefaultMailSender implements MailSender, Initializable
         this.sendMailThread.interrupt();
         // Wait till the thread goes away
         this.sendMailThread.join();
+        SHUTDOWN_LOGGER.debug(String.format("Mail Prepare Thread has been stopped"));
 
         // Step 2: Stop the Mail Prepare Thread
 
@@ -151,6 +161,7 @@ public class DefaultMailSender implements MailSender, Initializable
         this.prepareMailThread.interrupt();
         // Wait till the thread goes away
         this.prepareMailThread.join();
+        SHUTDOWN_LOGGER.debug(String.format("Mail Sender Thread has been stopped"));
     }
 
     private MailListener getListener(String hint) throws MessagingException
@@ -162,5 +173,15 @@ public class DefaultMailSender implements MailSender, Initializable
             throw new MessagingException(String.format("Failed to locate Mail listener [%s].", hint), e);
         }
         return listener;
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        try {
+            stopMailThreads();
+        } catch (InterruptedException e) {
+            SHUTDOWN_LOGGER.debug("Mail threads shutdown has been interruped", e);
+        }
     }
 }

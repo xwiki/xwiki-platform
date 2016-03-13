@@ -29,10 +29,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -51,11 +48,6 @@ import org.xwiki.mail.MailListener;
 @Singleton
 public class SendMailRunnable extends AbstractMailRunnable
 {
-    /**
-     * Logger to use to log shutdown information (opposite of initialization).
-     */
-    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
-
     @Inject
     private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
 
@@ -196,12 +188,5 @@ public class SendMailRunnable extends AbstractMailRunnable
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        super.dispose();
-        SHUTDOWN_LOGGER.debug(String.format("Mail Sender Thread has been stopped"));
     }
 }

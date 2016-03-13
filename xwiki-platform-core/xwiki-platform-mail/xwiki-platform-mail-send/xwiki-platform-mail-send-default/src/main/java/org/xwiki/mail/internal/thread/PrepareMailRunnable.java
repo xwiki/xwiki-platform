@@ -31,10 +31,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -55,11 +52,6 @@ import org.xwiki.mail.internal.UpdateableMailStatusResult;
 @Singleton
 public class PrepareMailRunnable extends AbstractMailRunnable
 {
-    /**
-     * Logger to use to log shutdown information (opposite of initialization).
-     */
-    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
-
     @Inject
     private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
 
@@ -255,12 +247,5 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         } catch (MessagingException e) {
             return null;
         }
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        super.dispose();
-        SHUTDOWN_LOGGER.debug(String.format("Mail Prepare Thread has been stopped"));
     }
 }

@@ -376,7 +376,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         List<String> namespaces = descriptionPane.getNamespaces();
         assertEquals(1, namespaces.size());
-        String prefix = "xwiki, by superadmin on ";
+        String prefix = "Home, by superadmin on ";
         assertTrue(namespaces.get(0).startsWith(prefix));
         Date installDate = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(namespaces.get(0).substring(prefix.length()));
         // Ignore the seconds as they are not displayed.
@@ -612,7 +612,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
-        assertEquals("Resolving extension [bob-xar-extension 2.5-milestone-2] from namespace [xwiki]", log.get(2)
+        assertEquals("Resolving extension [bob-xar-extension 2.5-milestone-2] from namespace [Home]", log.get(2)
             .getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals("Finished job of type [uninstall] with identifier "
@@ -644,7 +644,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         log = extensionPane.confirm().openProgressSection().getJobLog();
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
-        assertEquals("Resolving extension [alice-xar-extension 1.3] from namespace [xwiki]", log.get(2).getMessage());
+        assertEquals("Resolving extension [alice-xar-extension 1.3] from namespace [Home]", log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals("Finished job of type [uninstall] with identifier "
             + "[extension/action/alice-xar-extension/wiki:xwiki]", log.get(log.size() - 1).getMessage());
@@ -731,7 +731,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
-        assertEquals("Resolving extension [alice-xar-extension 2.1.4] on namespace [xwiki]", log.get(2).getMessage());
+        assertEquals("Resolving extension [alice-xar-extension 2.1.4] on namespace [Home]", log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals("Finished job of type [install] with identifier "
             + "[extension/action/alice-xar-extension/wiki:xwiki]", log.get(log.size() - 1).getMessage());
@@ -900,7 +900,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         List<LogItemPane> log = extensionPane.openProgressSection().getJobLog();
         assertTrue(log.size() > 2);
         assertEquals("info", log.get(2).getLevel());
-        assertEquals("Resolving extension [alice-xar-extension 1.3] on namespace [xwiki]", log.get(2).getMessage());
+        assertEquals("Resolving extension [alice-xar-extension 1.3] on namespace [Home]", log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
         assertEquals("Finished job of type [install] with identifier "
             + "[extension/action/alice-xar-extension/wiki:xwiki]", log.get(log.size() - 1).getMessage());

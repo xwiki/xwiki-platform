@@ -219,7 +219,10 @@
   ## ============================================
   ## Save it!
   ## ============================================
-  #set ($discard = $logDoc.save("Logging from IRC", true))
+  ## If the wiki is in readonly mode, don't try to save since that would generate an error on the IRC channel
+  #if (!$xwiki.isReadOnly())
+    #set ($discard = $logDoc.save("Logging from IRC", true))
+  #end
 #end
 {{/velocity}}</code>
     </property>

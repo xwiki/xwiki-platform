@@ -30,11 +30,16 @@ import org.xwiki.rest.model.jaxb.JobStatus;
  * @version $Id$
  * @since 7.2M3
  */
-@Path("/jobstatus/{jobId: .+}")
+@Path("/" + JobStatusResource.NAME + "/{jobId: .+}")
 public interface JobStatusResource
 {
-    @GET JobStatus getJobStatus(
-            @PathParam("jobId") String jobId
-    ) throws XWikiRestException;
-    
+    /**
+     * The entry name of the resource.
+     * 
+     * @since 8.0
+     */
+    String NAME = "jobstatus";
+
+    @GET
+    JobStatus getJobStatus(@PathParam("jobId") String jobId) throws XWikiRestException;
 }

@@ -21,34 +21,34 @@ package org.xwiki.rest.internal.url.resources;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.resources.job.JobStatusResource;
 
 /**
  * @version $Id$
- * @since 7.2M1
+ * @since 8.0
  */
 @Component
 @Singleton
-public class SpaceRestURLGenerator extends AbstractEntityRestURLGenerator<SpaceReference>
+@Named(JobStatusResource.NAME)
+public class JobStatusRestURLGenerator extends AbstractJobRestURLGenerator<List<String>>
 {
     @Override
-    public URL getURL(SpaceReference reference) throws XWikiRestException
+    public URL getURL(List<String> id) throws XWikiRestException
     {
         // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
         // So it is consistent.
         try {
-            return Utils.createURI(getBaseURI(), SpaceResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference)).toURL();
+            return Utils.createURI(getBaseURI(), JobStatusResource.class, getIdStringElement(id)).toURL();
         } catch (MalformedURLException e) {
-            throw new XWikiRestException(String.format("Failed to generate a REST URL for the space [%s].", reference),
-                e);
+            throw new XWikiRestException(String.format("Failed to generate a REST URL for the job id [%s].", id), e);
         }
     }
 }

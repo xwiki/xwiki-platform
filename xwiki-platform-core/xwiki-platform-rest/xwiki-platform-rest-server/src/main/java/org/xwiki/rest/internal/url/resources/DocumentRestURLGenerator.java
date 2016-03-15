@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.internal.url.AbstractParametrizedRestURLGenerator;
 import org.xwiki.rest.resources.pages.PageResource;
 
 /**
@@ -37,12 +36,12 @@ import org.xwiki.rest.resources.pages.PageResource;
  */
 @Component
 @Singleton
-public class DocumentRestURLGenerator extends AbstractParametrizedRestURLGenerator<DocumentReference>
+public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<DocumentReference>
 {
     @Override
     public URL getURL(DocumentReference reference) throws XWikiRestException
     {
-        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths. 
+        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
         // So it is consistent.
         try {
             return Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),

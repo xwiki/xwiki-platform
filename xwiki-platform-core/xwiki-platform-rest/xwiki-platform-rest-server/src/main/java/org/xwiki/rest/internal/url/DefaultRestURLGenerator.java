@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.url.ParametrizedRestURLGenerator;
 import org.xwiki.rest.url.RestURLGenerator;
 
 /**

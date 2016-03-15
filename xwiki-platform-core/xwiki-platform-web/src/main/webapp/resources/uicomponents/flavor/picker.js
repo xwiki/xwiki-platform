@@ -31,43 +31,188 @@ require(['jquery'], function($) {
   var lastAjaxRequest = false;
 
   /**
+   * The found flavors
+   */
+  var flavors = [];
+
+  /**
+   * Number of maximum results per page
+   */
+  var resultsPerPage = 20;
+
+  /**
    * Send an event when the selection change or when the results are refreshed
    */
   var sendRefreshEvent = function (picker) {
     picker.trigger('xwiki:flavorpicker:updated', {'elements': picker[0]});
   }
-    
-  /** 
-   * Perform an ajax query and refresh the picker's results container with the results.
-   */
-  var refreshResults = function(picker, url, parameters) {
-    var thisAjaxCall = ++ajaxCalls;
-    var resultsContainer = picker.find('.xwiki-flavor-picker-results-container');
-    resultsContainer.addClass('loading');
-    resultsContainer.find('.xwiki-flavor-picker-results').fadeOut();
-    // Kill the previous request
-    if (lastAjaxRequest) {
-        lastAjaxRequest.abort();
-    }
-    $.ajax(url, {data: parameters}).done(function(data) {
-      // Exit if the ajax call is not the last one (kill old requests)
-      // Probably not usefull since we called lastAjaxRequest.abort() just before.
-      if (thisAjaxCall != ajaxCalls) {
-        return;
+
+  var updatePicker = function () {
+    updateFlavors();
+    updateProgress();
+  }
+
+  var updateProgress = function () {
+    // Get URL
+    var url = "$escapetool.javascript($services.flavor.getSearchValidFlavorsStatusURL())";
+
+    $.getJSON(url).done(function(data) {
+      // Update progress
+      var jobState = data.state;
+
+      var flavorProgressBackground = $('#xwiki-flavor-picker-progress-background');
+      if (flavorProgressBackground.length) {
+        var flavorProgressBar = $('#xwiki-flavor-picker-progress-bar');
+
+        // Update state in the dom
+        flavorProgressBackground.find('input').attr('value', jobState);
+
+        if (jobState == 'RUNNING') {
+          // Make sure progress is visible
+          flavorProgressBackground.removeClass('hidden');
+
+          var jobProgressOffset = data.progress.offset;
+          flavorProgressBar.css('width', (jobProgressOffset * 100) + '%');
+        } else {
+          // We don't need the progress anymore
+          flavorProgressBackground.addClass('hidden');
+        }
+
+        // Progress callback (if needed)
+        maybeNextStatus();
       }
-      resultsContainer[0].innerHTML = data;
-      resultsContainer.removeClass('loading');
-      var results = picker.find('.xwiki-flavor-picker-results');
-      results.hide();
-      results.fadeIn();
-      initPickerResults(picker);
     }).fail(function(){
       new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
-      resultsContainer.removeClass('loading');
-      picker.find('.xwiki-flavor-picker-results').fadeIn();
     });
   }
-  
+
+  var updateFlavors = function () {
+    // Get base URL
+    var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_flavors'))";
+
+    $.getJSON(url).done(function(data) {
+      // Update the list of flavors
+      flavors = data;
+
+      // Update the list of flavors
+      $.each( data, function( key, extension ) {
+        updateFlavor(key, extension);
+      });
+
+      // Update event listeners
+      initPickerResults($('.xwiki-flavor-picker'));
+    }).fail(function(data){
+      new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.picker.ajaxError'))", 'error');
+    });
+  }
+
+  var updateFlavor = function (key, flavor) {
+    var picker = $('.xwiki-flavor-picker');
+    var fieldName = picker.find('input[name="fieldName"]').attr('value');
+    var results = picker.find('ul');
+
+    var flavorValue = flavor.id.id + ':::' + flavor.id.version.value;
+
+    var flavorElement = results.find('input[value="' + flavorValue + '"]');
+    if (flavorElement.length == 0) {
+      // Add new flavor
+      var li = $('<li class="xwiki-flavor-picker-option"/>');
+      li.append($('<input type="radio"/>').attr('name', fieldName).attr('value', flavorValue).attr('id', fieldName + '_' + key));
+      li.append("<span class=\"xwiki-flavor-picker-option-icon\">$escapetool.javascript($services.icon.renderHTML('wiki'))</span>");
+      var div = $('<div/>');
+      var label = $('<div/>');
+      label.attr('for', fieldName + '_' + key);
+
+      // Name
+      var text;
+      if (flavor.name != null && flavor.name != '') {
+        text = flavor.name;
+      } else {
+        text = flavor.id.id;
+      }
+      if (flavor.website != null && flavor.website != '') {
+        label.append($('<a class="popup"/>').attr('href', flavor.website).text(text));
+      } else {
+        label.text(text);
+      }
+
+      label.append(' ');
+
+      // Version
+      label.append($('<small/>').text(flavor.id.version.value));
+
+      // Rating
+      var star = "$escapetool.javascript($services.icon.renderHTML('star'))";
+      if (flavor.rating != null && flavor.rating > 0) {
+        label.append(Array(Math.round(flavor.rating)).join(star));
+      }
+      
+      div.append(label);
+
+      // Authors
+      if (flavor.authors.length > 0) {
+        var authors = $('<p class="authors"/>');
+        var authorsBy = $('<small/>');
+        authorsBy.text("$escapetool.javascript($services.localization.render('flavor.picker.authorsBy')) ");
+
+        $.each(flavor.authors, function(key, author) {
+          if (key > 0) {
+            authorsBy.append(', ');
+          }
+          if (author.url != null && author.url != '') {
+            authorsBy.append($('<a/>').attr('href', author.url).text(author.name));
+          } else {
+            authorsBy.append(author.name);
+          }
+        });
+        authors.append(authorsBy);
+        div.append(authors);
+      }
+
+      // Summary
+      if (flavor != null && flavor.summary != '') {
+        div.append($('<p class="xHint"/>').text(flavor.summary));
+      }
+
+      li.append($('<input type="hidden" name="match"/>').attr('value', JSON.stringify(flavor)));
+
+      li.append(div);
+      results.append(li);
+    }
+  }
+
+  var maybeNextStatus = function () {
+    // Set a timeout if the job isnot finished
+    var flavorProgressBackground = $('#xwiki-flavor-picker-progress-background');
+    if (flavorProgressBackground.length) {
+      var state = flavorProgressBackground.find('input').attr('value');
+
+      if (state != 'FINISHED') {
+         setTimeout(updatePicker, 100)
+      }
+    }
+  }
+
+  var filterFlavor = function(flavor, filterString) {
+    var match = flavor.find('input[name="match"]').attr('value');
+    if (match.toLowerCase().indexOf(filterString) > -1) {
+      flavor.removeClass('hidden');
+    } else {
+      flavor.addClass('hidden');
+    }
+  }
+
+  var filterFlavors = function(filterString) {
+    var picker = $('.xwiki-flavor-picker');
+    if (!filterString || $.trim(filterString) === '') {
+      picker.find('li').removeClass('hidden');
+    } else {
+      picker.find('li').each(function(i) {
+        filterFlavor($(this), filterString);
+      });
+    }
+  }
+
   /**
    * Initializer called each time the picker's result container is refreshed
    */
@@ -89,14 +234,7 @@ require(['jquery'], function($) {
       window.open(this.href, 'flavor-popup', config='height=600, width=700, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');
       return false;
     });
-    
-    // Called when a pagination link is clicked
-    picker.find('.paginationFilter a').click(function (event) {
-      var picker = $(this).parents('.xwiki-flavor-picker');
-      refreshResults(picker, this.href, {});
-      return false;
-    });
-    
+
     sendRefreshEvent(picker);
   }
   
@@ -110,18 +248,8 @@ require(['jquery'], function($) {
     $('input.xwiki-flavor-picker-filter').keyup(function() {
       var filter = $(this);
       var filterValue = filter.val();
-      // To avoid having too much requests when the user is typing, we only do a research 500ms after the content has changed
-      setTimeout(function(){
-        // We do the request only if the content has not changed since the last event
-        if (filter.val() == filterValue) {
-          var picker = filter.parents('.xwiki-flavor-picker');
-          var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_results'))";
-          var fieldName = picker.find("input[type='radio']").attr('name');
-          var parameters = {'fieldName': fieldName, 'firstIndex': 0, 'filter': filter.val()};
-          refreshResults(picker, url, parameters);
-        }
-      }, 500);
 
+      filterFlavors(filterValue);
     });
     
     // Called when the "no flavor" option is clicked
@@ -130,6 +258,9 @@ require(['jquery'], function($) {
       picker.find('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
       sendRefreshEvent(picker);
     });
+
+    // Start progress
+    maybeNextStatus();
   }
 
   $(window).ready(init);

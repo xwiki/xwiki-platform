@@ -21,7 +21,6 @@ package org.xwiki.platform.flavor.job;
 
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.job.Request;
-import org.xwiki.platform.flavor.FlavorQuery;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -33,11 +32,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class FlavorSearchRequest extends InstallRequest
 {
-    /**
-     * @see #getExtensionProperties()
-     */
-    public static final String PROPERTY_QUERY = "flavor.query";
-
     /**
      * Default constructor.
      */
@@ -52,21 +46,5 @@ public class FlavorSearchRequest extends InstallRequest
     public FlavorSearchRequest(Request request)
     {
         super(request);
-    }
-
-    /**
-     * @return the flavor query to execute
-     */
-    public FlavorQuery getQuery()
-    {
-        return getProperty(PROPERTY_QUERY);
-    }
-
-    /**
-     * @param query the flavor query to execute
-     */
-    public void setQuery(FlavorQuery query)
-    {
-        setProperty(PROPERTY_QUERY, query);
     }
 }

@@ -19,36 +19,38 @@
  */
 package org.xwiki.rest.internal.url.resources;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.internal.url.AbstractParametrizedRestURLGenerator;
 
 /**
+ * Entity related Abstract class for ParametrizedRestURLGenerator.
+ *
+ * @param <T> the type of the resource for which the URL are created for.
  * @version $Id$
- * @since 7.2M1
+ * @since 8.0
  */
-@Component
-@Singleton
-public class SpaceRestURLGenerator extends AbstractEntityRestURLGenerator<SpaceReference>
+public abstract class AbstractEntityRestURLGenerator<T extends EntityReference>
+    extends AbstractParametrizedRestURLGenerator<T>
 {
-    @Override
-    public URL getURL(SpaceReference reference) throws XWikiRestException
+    protected List<String> getSpaceList(SpaceReference spaceReference)
     {
-        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
-        // So it is consistent.
-        try {
-            return Utils.createURI(getBaseURI(), SpaceResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference)).toURL();
-        } catch (MalformedURLException e) {
-            throw new XWikiRestException(String.format("Failed to generate a REST URL for the space [%s].", reference),
-                e);
+        List<String> spaces = new ArrayList<>();
+        for (EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE; ref =
+            ref.getParent()) {
+            spaces.add(ref.getName());
         }
+        Collections.reverse(spaces);
+        return spaces;
     }
+
+    @Override
+    public abstract URL getURL(T reference) throws XWikiRestException;
 }

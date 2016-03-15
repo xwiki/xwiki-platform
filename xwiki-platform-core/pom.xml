@@ -527,6 +527,52 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes combine.children="append">
+              <!-- Not really a breackage. Just moved to its own module. -->
+              <exclude>com.xpn.xwiki.plugin.diff.DiffPlugin</exclude>
+              <exclude>com.xpn.xwiki.plugin.diff.DiffPluginApi</exclude>
+              <!-- Removed constant that shouldn't have been there -->
+              <exclude>org.xwiki.chart.ChartGenerator</exclude>
+              <!-- Young API. Added searchFlavors() -->
+              <exclude>org.xwiki.platform.flavor.FlavorManager</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "filter": {
+                  "elements": {
+                     "exclude": [".*\\.internal\\..*", ".*\\.test\\..*"]
+                  }
+                },
+                "ignore": [
+                  {
+                    "code": "java.field.removedWithConstant",
+                    "old": "field org.xwiki.chart.ChartGenerator.COLORS_PARAM",
+                    "justification": "Removed constant that shouldn't have been there"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
+                    "justification": "Young API. Added searchFlavors()"
+                  }
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
+      </plugin>
     </plugins>
     <extensions>
       <!-- Needed to add support for the "xar" packaging -->

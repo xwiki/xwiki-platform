@@ -36,6 +36,8 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs revapi on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

@@ -35,6 +35,7 @@ import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.platform.flavor.FlavorManager;
@@ -65,6 +66,13 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     public String getType()
     {
         return JOBTYPE;
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        // We reuse install plan stuff but blocking in this job would cause more issues than it solves
+        return null;
     }
 
     @Override
@@ -102,6 +110,9 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
 
         try {
             installExtension(extensionId, namespace, currentTree);
+
+            // Cleanup
+            this.extensionsNodeCache.clear();
 
             return currentTree.get(0).getAction().getExtension();
         } catch (InstallException e) {

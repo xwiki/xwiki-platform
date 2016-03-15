@@ -29,14 +29,19 @@ import org.xwiki.rest.model.jaxb.JobLog;
 
 /**
  * @version $Id$
- * @since 7.2M3* 
+ * @since 7.2M3
  */
-@Path("/joblog/{jobId: .+}")
+@Path("/" + JobLogResource.NAME + "/{jobId: .+}")
 public interface JobLogResource
 {
-    @GET JobLog getJobLog(
-            @PathParam("jobId") String jobId,
-            @QueryParam("level") String level,
-            @QueryParam("fromLevel") String fromLevel
-    ) throws XWikiRestException;
+    /**
+     * The entry name of the resource.
+     * 
+     * @since 8.0
+     */
+    String NAME = "joblog";
+
+    @GET
+    JobLog getJobLog(@PathParam("jobId") String jobId, @QueryParam("level") String level,
+        @QueryParam("fromLevel") String fromLevel) throws XWikiRestException;
 }

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.url;
+package org.xwiki.rest.url;
 
 import java.net.URL;
 
@@ -25,20 +25,19 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.rest.XWikiRestException;
 
 /**
- * A parametrized REST URL generator. Enable to create one component per supported resource.
+ * A parameterized REST URL generator.
  *
- * @param <T> the type of the resource for which the URL are created for. Must inherit from 
- * {@link org.xwiki.model.reference.EntityReference}. 
+ * @param <T> the type of the resource for which the URL are created for.
  * @version $Id$
- * @since 7.2M1
+ * @since 8.0
  */
 @Role
 public interface ParametrizedRestURLGenerator<T>
 {
     /**
-     * @param reference an entity reference
+     * @param resource an resource
      * @return the REST URL to access the given entity
      * @throws XWikiRestException if problems occur
      */
-    URL getURL(T reference) throws XWikiRestException;
+    URL getURL(T resource) throws XWikiRestException;
 }

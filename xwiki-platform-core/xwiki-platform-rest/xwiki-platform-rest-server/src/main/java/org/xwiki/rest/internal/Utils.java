@@ -58,6 +58,28 @@ import com.xpn.xwiki.user.api.XWikiUser;
 public class Utils
 {
     /**
+     * Use to indicate the element is already encoded.
+     * 
+     * @since 8.0
+     * @version $Id$
+     */
+    public class EncodedElement
+    {
+        private String encodedElement;
+
+        public EncodedElement(String encodedElement)
+        {
+            this.encodedElement = encodedElement;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.encodedElement;
+        }
+    }
+
+    /**
      * Get the page id given its components.
      * 
      * @param wikiName
@@ -333,16 +355,19 @@ public class Utils
           
         Object[] encodedPathElements = new String[pathElements.length];
         for (int i = 0; i < pathElements.length; i++) {
-            if (pathElements[i] != null) {
+            Object pathElement = pathElements[i];
+            if (pathElement != null) {
                 try {
                     // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
                     if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
-                        if (!(pathElements[i] instanceof List)) {
+                        if (!(pathElement instanceof List)) {
                             throw new RuntimeException("The 'spaceName' parameter must be a list!");
                         }
                         encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
+                    } else if (pathElement instanceof EncodedElement) {
+                        encodedPathElements[i] = pathElement.toString();
                     } else {
-                        encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString());
                     }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);

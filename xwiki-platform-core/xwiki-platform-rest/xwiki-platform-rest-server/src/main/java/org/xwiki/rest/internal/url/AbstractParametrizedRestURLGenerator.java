@@ -23,17 +23,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.url.ParametrizedRestURLGenerator;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -41,8 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Abstract class for ParametrizedRestURLGenerator.
  *
- * @param <T> the type of the resource for which the URL are created for. Must inherit from
- *            {@link org.xwiki.model.reference.EntityReference}.
+ * @param <T> the type of the resource for which the URL are created for.
  * @version $Id$
  * @since 7.2M1
  */
@@ -74,17 +68,6 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
         } catch (URISyntaxException | MalformedURLException e) {
             throw new XWikiRestException("Failed to generate a proper base URI.", e);
         }
-    }
-
-    protected List<String> getSpaceList(SpaceReference spaceReference)
-    {
-        List<String> spaces = new ArrayList<>();
-        for (EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE; ref =
-            ref.getParent()) {
-            spaces.add(ref.getName());
-        }
-        Collections.reverse(spaces);
-        return spaces;
     }
 
     @Override

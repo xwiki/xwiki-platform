@@ -38,6 +38,9 @@ import org.xwiki.platform.flavor.FlavorQuery;
 import org.xwiki.platform.flavor.internal.job.FlavorSearchJob;
 import org.xwiki.platform.flavor.internal.job.FlavorSearchStatus;
 import org.xwiki.platform.flavor.job.FlavorSearchRequest;
+import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.resources.job.JobStatusResource;
+import org.xwiki.rest.url.ParametrizedRestURLGenerator;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -57,12 +60,21 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
      */
     public static final String ROLEHINT = "flavor";
 
+    /**
+     * The id to use in the jobs searching for flavors.
+     */
+    public static final String SEARCH_ID = "search";
+
     @Inject
     private FlavorManager flavorManager;
 
+    @Inject
+    @Named(JobStatusResource.NAME)
+    private ParametrizedRestURLGenerator<List<String>> jobstatusURLGenerator;
+
     private List<String> getSearchJobId(String namespace)
     {
-        return Arrays.asList(ROLEHINT, "search", namespace);
+        return Arrays.asList(ROLEHINT, SEARCH_ID, namespace);
     }
 
     /**
@@ -114,6 +126,7 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
     /**
      * @param namespace the namespace where to validate the flavors
      * @return the status of the current or last flavor search
+     * @since 8.0
      */
     public FlavorSearchStatus getSearchValidFlavorsStatus(String namespace)
     {
@@ -121,13 +134,64 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
     }
 
     /**
-     * Start a Job search and validating flavors matching a provided flacro query.
+     * @return the status of the current or last flavor search
+     * @since 8.0
+     */
+    public FlavorSearchStatus getSearchValidFlavorsStatus()
+    {
+        return getSearchValidFlavorsStatus(currentNamespace());
+    }
+
+    /**
+     * @param namespace the namespace where to validate the flavors
+     * @return the REST URL to access the job status
+     * @since 8.0
+     */
+    public String getSearchValidFlavorsStatusURL(String namespace)
+    {
+        setError(null);
+
+        try {
+            return this.jobstatusURLGenerator.getURL(getSearchJobId(namespace)).getPath();
+        } catch (XWikiRestException e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return the valid flavors found in the currently running job status
+     */
+    public List<Extension> getValidExtensions()
+    {
+        FlavorSearchStatus status = getSearchValidFlavorsStatus();
+
+        return status != null ? status.getFlavors() : null;
+    }
+
+    private String currentNamespace()
+    {
+        return "wiki:" + this.xcontextProvider.get().getWikiId();
+    }
+
+    /**
+     * @return the REST URL to access the job status
+     * @since 8.0
+     */
+    public String getSearchValidFlavorsStatusURL()
+    {
+        return getSearchValidFlavorsStatusURL(currentNamespace());
+    }
+
+    /**
+     * Start searching for valid flavors.
      * 
-     * @param query the query to control the flavors to search
      * @param namespace the namespace where to validate the flavors
      * @return the {@link Job} searching the flavors
+     * @since 8.0RC1
      */
-    public Job searchValidFlavors(FlavorQuery query, String namespace)
+    public Job searchValidFlavors(String namespace)
     {
         setError(null);
 
@@ -136,7 +200,6 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
             FlavorSearchRequest flavorRequest = new FlavorSearchRequest();
 
             flavorRequest.setId(getSearchJobId(namespace));
-            flavorRequest.setQuery(query);
             flavorRequest.addNamespace(namespace);
 
             setRightsProperties(flavorRequest);
@@ -147,6 +210,17 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
         }
 
         return job;
+    }
+
+    /**
+     * Start searching for valid flavors in the context of the current wiki.
+     * 
+     * @return the {@link Job} searching the flavors
+     * @since 8.0
+     */
+    public Job searchValidFlavors()
+    {
+        return searchValidFlavors(currentNamespace());
     }
 
     /**

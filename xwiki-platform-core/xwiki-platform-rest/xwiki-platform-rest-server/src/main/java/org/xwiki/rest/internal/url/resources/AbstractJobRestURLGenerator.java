@@ -19,36 +19,40 @@
  */
 package org.xwiki.rest.internal.url.resources;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.resources.spaces.SpaceResource;
+import org.xwiki.rest.internal.url.AbstractParametrizedRestURLGenerator;
 
 /**
+ * Jobs related Abstract class for ParametrizedRestURLGenerator.
+ * 
+ * @param <T> the type of the resource for which the URL are created for. Must inherit from
+ *            {@link org.xwiki.model.reference.EntityReference}.
  * @version $Id$
- * @since 7.2M1
+ * @since 8.0
  */
-@Component
 @Singleton
-public class SpaceRestURLGenerator extends AbstractEntityRestURLGenerator<SpaceReference>
+public abstract class AbstractJobRestURLGenerator<T> extends AbstractParametrizedRestURLGenerator<T>
 {
-    @Override
-    public URL getURL(SpaceReference reference) throws XWikiRestException
+    protected String getIdStringElement(List<String> id)
     {
-        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths.
-        // So it is consistent.
-        try {
-            return Utils.createURI(getBaseURI(), SpaceResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference)).toURL();
-        } catch (MalformedURLException e) {
-            throw new XWikiRestException(String.format("Failed to generate a REST URL for the space [%s].", reference),
-                e);
+        StringBuilder builder = new StringBuilder();
+
+        for (String idElement : id) {
+            if (builder.length() > 0) {
+                builder.append('/');
+            }
+            try {
+                builder.append(URLEncoder.encode(idElement, "UTF8"));
+            } catch (UnsupportedEncodingException e) {
+                // Should never happen
+            }
         }
+
+        return builder.toString();
     }
 }

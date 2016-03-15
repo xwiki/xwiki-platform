@@ -19,7 +19,9 @@
  */
 package org.xwiki.rest;
 
-import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,8 +56,20 @@ public class XWikiJobResource extends XWikiResource
     {
         JobStatus jobStatus;
 
-        List<String> id = Arrays.asList(jobId.split("/"));
+        String[] idArray = jobId.split("/");
 
+        List<String> id = new ArrayList<>(idArray.length);
+
+        // Unescape id sections
+        for (String idElement : idArray) {
+            try {
+                id.add(URLDecoder.decode(idElement, "UTF8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new WebApplicationException(e);
+            }
+        }
+
+        // Search job
         Job job = this.jobExecutor.getJob(id);
         if (job == null) {
             jobStatus = this.jobStore.getJobStatus(id);

@@ -16,6 +16,15 @@
     ## Filter
     <input type="text" id="${fieldName}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>
     ## Results
+    <div class="ui-progress-background hidden" id="xwiki-flavor-picker-progress-background">
+      <div class="ui-progress-bar green" id="xwiki-flavor-picker-progress-bar"/>
+      #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
+      ###if ($flavorSearchJobStatus)
+      ##  <input type="hidden" value="$flavorSearchJobStatus.state"/>
+      ###else
+        <input type="hidden" value=""/>
+      ###end
+    </div>
     <div class="xwiki-flavor-picker-results-container">
       #displayFlavorPicker_results($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, 0)
     </div>
@@ -35,25 +44,31 @@
     #set ($flavorQuery = $services.flavor.createFlavorQuery())
   #end
   ##set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
-  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus("wiki:$xcontext.database"))
+  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
   #if (!$flavorSearchJobStatus)
-    #set ($flavorSearchJob = $services.flavor.searchValidFlavors($flavorQuery, "wiki:$xcontext.database"))
-    ## TODO: make it asynchronous
-    #set ($void = $flavorSearchJob.join())
+    #set ($flavorSearchJob = $services.flavor.searchValidFlavors())
     #set ($flavorSearchJobStatus = $flavorSearchJob.status)
   #end
+  #set ($flavors = $flavorSearchJobStatus.flavors)
+  #*
   #set ($jobFlavors = $flavorSearchJobStatus.flavors)
+  ## TODO: put back pagination
   ## Apply offset
   #set ($flavors = $jobFlavors.subList($offset, $jobFlavors.size()))
   ## Apply limit
   #if ($resultsPerPage > 0)
     #if ($resultsPerPage > $flavors.size())
       #set($limit = $flavors.size())
+    #else
+      #set($limit = $resultsPerPage)
     #end
     #set ($flavors = $flavors.subList(0, $limit))
   #end
+  *#
   <div class="xwiki-flavor-picker-results">
+    <input type="hidden" name="fieldName" value="$fieldName" />
     <ul>
+    #*
     #foreach ($flavor in $flavors)
       #set ($value = "${flavor.id.id}:::${flavor.id.version}")
       #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
@@ -67,25 +82,27 @@
         <input type="radio" name="$fieldName" value="$escapetool.xml($value)" id="${fieldName}_${velocityCount}" $checked/>
         <span class="xwiki-flavor-picker-option-icon">$services.icon.renderHTML('wiki')</span>
         <div>
-          <label for="${fieldName}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end$escapetool.xml($flavor.name)#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
-          <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
+          <label for="${fieldName}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end#if($flavor.name)$escapetool.xml($flavor.name)#else$flavor.id.id#end#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
+          #if ($flavor.authors.size() > 0)
+            <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
+          #end
           #if ("$!flavor.summary" != '')
             <p class="xHint">$flavor.summary</p>
           #end
         </div>
       </li>
     #end
+    *#
     </ul>
-    #set ($url = $doc.getURL('view', "xpage=flavor/picker_results&fieldName=$escapetool.url($fieldName)"))
-    #if ("$!request.filter" != '')
-      #set ($url = $url + "&filter=$escapetool.url($request.filter)")
-    #end
+    ## TODO: put back pagination
+    #*
     #set($paginationParameters = {
-      'url' : $url,
+      'url' : $xwiki.relativeRequestURL,
       'totalItems' : $jobFlavors.size(),
       'defaultItemsPerPage' : $resultsPerPage,
       'position': 'top'
     })
     #pagination($paginationParameters)
+    *#
   </div>
 #end

@@ -497,28 +497,6 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/plugin/diff/DiffPlugin</className>
-              <justification>Not really a breackage. Just moved to its own module.</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/plugin/diff/DiffPluginApi</className>
-              <justification>Not really a breackage. Just moved to its own module.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/platform/flavor/FlavorManager</className>
-              <method>org.xwiki.extension.repository.result.IterableResult searchFlavors(org.xwiki.platform.flavor.FlavorQuery)</method>
-              <justification>Young API. Better name</justification>
-            </difference>
-            <difference>
-              <differenceType>6011</differenceType>
-              <className>org/xwiki/chart/ChartGenerator</className>
-              <field>COLORS_PARAM</field>
-              <justification>Removed constant that shouldn't have been there</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

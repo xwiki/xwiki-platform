@@ -116,7 +116,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4j.version}-xwiki-1</version>
+        <version>${slf4j.version}-xwiki</version>
       </dependency>
       <!--
         Custom version with embedded log4j maven descriptor (so that it's found as core extension).
@@ -125,7 +125,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
-        <version>${slf4j.version}-xwiki-1</version>
+        <version>${slf4j.version}-xwiki</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

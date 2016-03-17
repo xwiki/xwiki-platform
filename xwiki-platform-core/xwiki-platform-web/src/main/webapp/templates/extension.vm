@@ -140,6 +140,9 @@
     ## This extension can be uninstalled.
     ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
+    #if (!$installedExtension.isValid($extensionNamespace))
+      #extensionActionButtonsWithDisplayHint($installedExtension 'install' 'repair')
+    #end
     #extensionActionButtons($installedExtension 'uninstall' true)
     #if ($installedExtension && $installedExtension.type == 'xar'
         && $installedExtension.isInstalled($extensionNamespace))
@@ -164,9 +167,9 @@
     ## Compare this version with the version that is currently installed to determine which button to display.
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
     #if ($extension.compareTo($installedExtension) > 0)
-      #extensionActionButtons($installedExtension 'upgrade')
+      #extensionActionButtonsWithDisplayHint($installedExtension 'install' 'upgrade')
     #else
-      #extensionActionButtons($installedExtension 'downgrade' true)
+      #extensionActionButtonsWithDisplayHint($installedExtension 'install' 'downgrade' true)
     #end
   #end
 #end
@@ -1309,23 +1312,31 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
 #end
 
 #macro(extensionActionButtons $installedExtension $action $secondary)
+  #extensionActionButtonsWithDisplayHint($installedExtension $action $action $secondary $extraClassName)
+#end
+
+#macro(extensionActionButtonsWithDisplayHint $installedExtension $action $displayHint $secondary)
   #set ($isGlobalActionSecondary = $secondary)
   #set ($globalActionExtraClassName = $NULL)
   #if (!$installedExtension || ($installedExtension.isInstalled($extensionNamespace)
     && !$installedExtension.isInstalled($NULL)))
     ## Button that targets only the current wiki.
-    #extensionActionButton($action $secondary)
+    #extensionActionButtonWithDisplayHint($action $displayHint $secondary)
     #set ($isGlobalActionSecondary = true)
     ## Indicate that the local action is available.
     #set ($globalActionExtraClassName = 'alternative-action')
   #end
   #if ($xcontext.isMainWiki())
     ## Button that targets the entire farm.
-    #extensionActionButton("${action}Globally" $isGlobalActionSecondary $globalActionExtraClassName)
+    #extensionActionButtonWithDisplayHint("${action}Globally" "${displayHint}Globally", $isGlobalActionSecondary $globalActionExtraClassName)
   #end
 #end
 
 #macro (extensionActionButton $action $secondary $extraClassName)
+  #extensionActionButtonWithDisplayHint($action $action $secondary $extraClassName)
+#end
+
+#macro (extensionActionButtonWithDisplayHint $action $displayHint $secondary $extraClassName)
   #set ($classNames = [])
   #if ($secondary)
     #set ($discard = $classNames.add('secondary'))
@@ -1333,12 +1344,12 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #if ($extraClassName)
     #set ($discard = $classNames.add($extraClassName))
   #end
-  #set ($hintKey = "extensions.actions.${action}.hint")
+  #set ($hintKey = "extensions.actions.${displayHint}.hint")
   <span class="buttonwrapper">
     <button type="submit" name="extensionAction" value="$escapetool.xml($action)"
       #if ($classNames.size() > 0) class="$escapetool.xml($stringtool.join($classNames, ' '))"#end
       #if ($services.localization.get($hintKey)) title="$escapetool.xml($services.localization.render($hintKey))"#end>
-      $escapetool.xml($services.localization.render("extensions.actions.${action}"))</button>
+      $escapetool.xml($services.localization.render("extensions.actions.${displayHint}"))</button>
   </span>
 #end
 

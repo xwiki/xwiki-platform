@@ -41,7 +41,11 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 // When the error is not inline, display it in a box
 div.xwikirenderingerror {
   .box;
-  margin-bottom: 0;
+  
+  // Put the description box just after the error box, which has a 20px margin (see bootstrap/wells.less).
+  & + .xwikirenderingerrordescription {
+    margin-top: -20px;
+  }
 }
 
 // In every cases, apply the DANGER styling from bootstrap

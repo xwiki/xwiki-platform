@@ -31,8 +31,12 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Office - Importer</description>
   <properties>
-    <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
+    <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Skipping japicmp since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
+    <xwiki.japicmp.skip>true</xwiki.japicmp.skip>
     <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

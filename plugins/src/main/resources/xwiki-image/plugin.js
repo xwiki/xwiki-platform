@@ -110,7 +110,7 @@
         }
         originalData.call(this);
       };
-    },
+    }
   });
 
   CKEDITOR.on('dialogDefinition', function(event) {

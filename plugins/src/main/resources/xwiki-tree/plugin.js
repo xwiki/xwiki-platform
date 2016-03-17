@@ -70,6 +70,7 @@
     var selectButton = modal.find('.modal-footer .btn-primary');
 
     var validateSelection = function(tree) {
+      // jshint camelcase:false
       var selectedNodes = tree.get_selected(true);
       for (var i = 0; i < selectedNodes.size(); i++) {
         if (!handler.canSelect(selectedNodes[i])) {
@@ -106,6 +107,7 @@
           }
         });
       } else if (openToNodeId) {
+        // jshint camelcase:false
         tree.deselect_all();
         tree.close_all();
         tree.openTo(openToNodeId);
@@ -115,6 +117,7 @@
     selectButton.click(function() {
       modal.modal('hide');
       var tree = $.jstree.reference(treeElement);
+      // jshint camelcase:false
       handler.select(tree.get_selected(true));
     });
 

@@ -24,6 +24,7 @@
 
   CKEDITOR.plugins.xwikiDialog = {
     getUIElementPath: function(elementId, elements) {
+      // jshint maxdepth:4
       for (var i = 0; i < elements.length; i++) {
         var element = elements[i];
         if (element.id === elementId) {

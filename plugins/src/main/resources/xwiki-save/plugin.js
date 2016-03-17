@@ -73,7 +73,7 @@
         $.proxy(function(event, data) {
           // We reset the dirty field on 'xwiki:actions:save' only if it's not a Save & Continue. Otherwise we wait for
           // 'xwiki:document:saved' to be sure the document was saved.
-          if (!data || !data.continue) {
+          if (!data || !data['continue']) {
             submitInProgress = event.type === 'xwiki:actions:preview' || event.type === 'xwiki:actions:save';
             this.editors.forEach(function(editor) {
               editor.resetDirty();

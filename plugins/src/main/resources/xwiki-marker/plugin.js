@@ -191,18 +191,22 @@
         if (parameters.hasOwnProperty(key)) {
           var parameter = parameters[key];
           if (parameter !== null && parameter !== undefined) {
-            var name = parameter.name || key;
-            var value = parameter;
-            if (parameter.value !== null && parameter.value !== undefined) {
-              value = parameter.value;
-            }
-            // Escape the quotes.
-            var escapedValue = value.toString().replace(/([\\"])/g, '\\$1');
-            output.push(name + '="' + escapedValue + '"');
+            output.push(this.serializeParameter(key, parameter));
           }
         }
       }
       return output.join(' ');
+    },
+
+    serializeParameter: function(key, parameter) {
+      var name = parameter.name || key;
+      var value = parameter;
+      if (parameter.value !== null && parameter.value !== undefined) {
+        value = parameter.value;
+      }
+      // Escape the quotes.
+      var escapedValue = value.toString().replace(/([\\"])/g, '\\$1');
+      return name + '="' + escapedValue + '"';
     },
 
     parseParameters: function(text, parameters, start, delimiter, ignoreCase) {

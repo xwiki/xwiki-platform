@@ -67,6 +67,7 @@
         </executions>
         <configuration>
           <globals>CKEDITOR</globals>
+          <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
         </configuration>
       </plugin>
       <!-- Unpack the WebJar dependencies (CKEditor base, jQuery) to be able to use them in tests. -->

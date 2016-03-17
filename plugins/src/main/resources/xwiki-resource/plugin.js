@@ -179,7 +179,7 @@
           // Add the JavaScript behaviour.
           var domElement = $(this.getElement().$);
           addResourcePickerBehaviour(domElement);
-          // Listen to resource type changes (in order to be able to show different options for different resource types).
+          // Listen to resource type changes in order to be able to show different options for different resource types.
           domElement.on('changeResourceType', $.proxy(this, 'onResourceTypeChange'));
           // Open the resource picker that corresponds to the selected resource type.
           this.getTypeInput().on('click', $.proxy(this, 'openPicker'));

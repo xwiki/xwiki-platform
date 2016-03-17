@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Rule;
@@ -35,7 +36,6 @@ import com.google.gson.JsonParser;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
-import net.sf.json.JSONObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -57,8 +57,16 @@ public class DatePingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"sinceDays\":{\"type\":\"long\"},\"firstPingDate\":{\"type\":\"date\"}}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString());
+        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        assertEquals(2, mapping.size());
+
+        Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("sinceDays");
+        assertEquals(1, propertiesMapping.size());
+        assertEquals("long", propertiesMapping.get("type"));
+
+        propertiesMapping = (Map<String, Object>) mapping.get("firstPingDate");
+        assertEquals(1, propertiesMapping.size());
+        assertEquals("date", propertiesMapping.get("type"));
     }
 
     @Test
@@ -100,7 +108,9 @@ public class DatePingDataProviderTest
         JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        assertEquals("{\"sinceDays\":4,\"firstPingDate\":1392854400000}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideData()).toString());
+        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        assertEquals(2, data.size());
+        assertEquals(4L, data.get("sinceDays"));
+        assertEquals(1392854400000L, data.get("firstPingDate"));
     }
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 
 import org.junit.Rule;
@@ -27,8 +29,6 @@ import org.xwiki.activeinstalls.internal.client.data.ServletContainerPingDataPro
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import net.sf.json.JSONObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -49,10 +49,18 @@ public class ServletContainerPingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"servletContainerVersion\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
-                + "\"servletContainerName\":{\"index\":\"not_analyzed\",\"type\":\"string\"}}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString()
-        );
+        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        assertEquals(2, mapping.size());
+
+        Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("servletContainerVersion");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
+
+        propertiesMapping = (Map<String, Object>) mapping.get("servletContainerName");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
     }
 
     @Test
@@ -65,7 +73,9 @@ public class ServletContainerPingDataProviderTest
         when(servletEnvironment.getServletContext()).thenReturn(servletContext);
         when(servletContext.getServerInfo()).thenReturn("Apache Tomcat/7.0.4 (optional text)");
 
-        assertEquals("{\"servletContainerVersion\":\"7.0.4\",\"servletContainerName\":\"Apache Tomcat\"}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideData()).toString());
+        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        assertEquals(2, data.size());
+        assertEquals("7.0.4", data.get("servletContainerVersion"));
+        assertEquals("Apache Tomcat", data.get("servletContainerName"));
     }
 }

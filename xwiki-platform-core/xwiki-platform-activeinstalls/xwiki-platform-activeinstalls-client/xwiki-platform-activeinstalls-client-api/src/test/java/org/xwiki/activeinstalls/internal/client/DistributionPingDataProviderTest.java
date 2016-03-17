@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Rule;
@@ -30,8 +31,6 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import net.sf.json.JSONObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -52,11 +51,23 @@ public class DistributionPingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"distributionId\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
-                + "\"distributionVersion\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
-                + "\"instanceId\":{\"index\":\"not_analyzed\",\"type\":\"string\"}}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString()
-        );
+        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        assertEquals(3, mapping.size());
+
+        Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("distributionId");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
+
+        propertiesMapping = (Map<String, Object>) mapping.get("distributionVersion");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
+
+        propertiesMapping = (Map<String, Object>) mapping.get("instanceId");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
     }
 
     @Test
@@ -72,10 +83,10 @@ public class DistributionPingDataProviderTest
         CoreExtensionRepository CoreExtensionRepository = this.mocker.getInstance(CoreExtensionRepository.class);
         when(CoreExtensionRepository.getEnvironmentExtension()).thenReturn(environmentExtension);
 
-        assertEquals("{\"distributionId\":\"environmentextensionid\","
-                + "\"distributionVersion\":\"2.0\","
-                + "\"instanceId\":\"" + id.getInstanceId() + "\"}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideData()).toString()
-        );
+        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        assertEquals(3, data.size());
+        assertEquals("environmentextensionid", data.get("distributionId"));
+        assertEquals("2.0", data.get("distributionVersion"));
+        assertEquals(id.getInstanceId(), data.get("instanceId"));
     }
 }

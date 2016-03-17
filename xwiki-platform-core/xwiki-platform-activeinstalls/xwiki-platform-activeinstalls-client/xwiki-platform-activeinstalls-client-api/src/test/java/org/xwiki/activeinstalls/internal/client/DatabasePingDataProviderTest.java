@@ -20,6 +20,7 @@
 package org.xwiki.activeinstalls.internal.client;
 
 import java.sql.DatabaseMetaData;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,9 +33,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
-import net.sf.json.JSONObject;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,10 +52,18 @@ public class DatabasePingDataProviderTest
     @Test
     public void provideMapping() throws Exception
     {
-        assertEquals("{\"dbName\":{\"index\":\"not_analyzed\",\"type\":\"string\"},"
-                + "\"dbVersion\":{\"index\":\"not_analyzed\",\"type\":\"string\"}}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideMapping()).toString()
-        );
+        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        assertEquals(2, mapping.size());
+
+        Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("dbName");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
+
+        propertiesMapping = (Map<String, Object>) mapping.get("dbName");
+        assertEquals(2, propertiesMapping.size());
+        assertEquals("not_analyzed", propertiesMapping.get("index"));
+        assertEquals("string", propertiesMapping.get("type"));
     }
 
     @Test
@@ -78,7 +85,9 @@ public class DatabasePingDataProviderTest
         when(databaseMetaData.getDatabaseProductName()).thenReturn("HSQL Database Engine");
         when(databaseMetaData.getDatabaseProductVersion()).thenReturn("2.2.9");
 
-        assertEquals("{\"dbName\":\"HSQL Database Engine\",\"dbVersion\":\"2.2.9\"}",
-            JSONObject.fromObject(this.mocker.getComponentUnderTest().provideData()).toString());
+        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        assertEquals(2, data.size());
+        assertEquals("HSQL Database Engine", data.get("dbName"));
+        assertEquals("2.2.9", data.get("dbVersion"));
     }
 }

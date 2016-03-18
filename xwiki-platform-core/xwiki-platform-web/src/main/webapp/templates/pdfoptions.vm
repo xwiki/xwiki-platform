@@ -29,7 +29,7 @@
           </dt>
           <dd>
             <select size="1" id="language" name="language">
-            #set($defaultLanguage = "$!doc.defaultLanguage")
+            #set($defaultLanguage = "$!doc.defaultLocale")
             #if($defaultLanguage == '')
               #set($defaultLanguage = "$!doc.locale")
               #if($defaultLanguage == '')

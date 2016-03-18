@@ -153,7 +153,7 @@
     &lt;description&gt;$services.localization.render('xe.blog.code.description.space', [$blogDoc.space])&lt;/description&gt;
     #getWikiLogo($logoUrl)
     &lt;image rdf:resource="$logoUrl"/&gt;
-    &lt;dc:language&gt;$blogDoc.defaultLanguage&lt;/dc:language&gt;
+    &lt;dc:language&gt;$blogDoc.defaultLocale&lt;/dc:language&gt;
     &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
     ## TODO: Usually this is not something meaningful. Maybe add some Blog object properties for these.
     ## &lt;dc:publisher&gt;$escapetool.xml($xwiki.getUserName($blogDoc.author, false))&lt;/dc:publisher&gt;

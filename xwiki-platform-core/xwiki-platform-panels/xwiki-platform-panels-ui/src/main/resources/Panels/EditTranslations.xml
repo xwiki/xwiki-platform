@@ -125,7 +125,7 @@
       <content>{{velocity}}
 #if ($xwiki.isMultiLingual() || $showEmptyPanels)
   #largepanelheader($services.localization.render('panels.translation.title'))
-  #if ($request.language &amp;&amp; $request.language != 'default' &amp;&amp; $doc.defaultLanguage != $request.language)
+  #if ($request.language &amp;&amp; $request.language != 'default' &amp;&amp; "$doc.defaultLocale" != $request.language)
     #set ($forcetrans = $request.language)
     #set ($rlanguage = $request.language)
   #else
@@ -136,7 +136,7 @@
   ## not translatable and more importantly are not written in a specific spoken language. In order to be consistent with
   ## the language displayed in the top right corner (global.vm) we use 'default' when the default language is not
   ## specified. This is a temporary solution.
-  #set ($defaultLanguage = "$!doc.defaultLanguage")
+  #set ($defaultLanguage = "$!doc.defaultLocale")
   #if ($defaultLanguage == '')
     #set ($defaultLanguage = "$!doc.locale")
     #if ($defaultLanguage == '')
@@ -158,7 +158,7 @@
     (% class="important" %)
     **$services.localization.render('panels.translation.editingTranslation', [${rlanguage}])**
 
-    $services.localization.render('panels.translation.editOriginalLanguage', ["[[$defaultLanguage&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLanguage}"")]]"])
+    $services.localization.render('panels.translation.editOriginalLanguage', ["[[$defaultLanguage&gt;&gt;path:$doc.getURL('edit', ""editor=${editor}&amp;language=${doc.defaultLocale}"")]]"])
     #if ($doc.translationList.size() &gt; 1)
 
       $services.localization.render('panels.translation.otherTranslations')##
@@ -173,7 +173,7 @@
   #set ($elangs = $doc.translationList)
   #set ($extraTranslations = '')
   #foreach ($olang in $xwiki.getXWikiPreference('languages').split('\s*[|, ]\s*'))
-    #if (!$elangs.contains($olang) &amp;&amp; $olang != $doc.defaultLanguage &amp;&amp; $olang != $forcetrans)
+    #if (!$elangs.contains($olang) &amp;&amp; $olang != "$doc.defaultLocale" &amp;&amp; $olang != $forcetrans)
       #set ($extraTranslations = "${extraTranslations}[[$olang&gt;&gt;path:${doc.getURL('edit', ""editor=${editor}&amp;language=${olang}"")}]] ")
     #end
   #end

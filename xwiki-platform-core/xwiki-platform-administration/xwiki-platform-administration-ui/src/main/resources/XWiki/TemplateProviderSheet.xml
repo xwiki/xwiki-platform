@@ -388,7 +388,7 @@
         var localSpaceReference = spaceReference.relativeTo(wikiReference);
 
         // Remember to escape the separator char "," from the serialized individual value.
-        return XWiki.Model.serialize(localSpaceReference).replace(',', '\\,');
+        return XWiki.Model.serialize(localSpaceReference).replace(/,/g, '\\,');
       }).sort().join(',');
     }
 

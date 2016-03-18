@@ -43,18 +43,16 @@
 
 {{include reference="ExtensionCode.CreateExtension"/}}
 
-(% class="centered" %) (((
-
-(% class="extension-link search-extension" %)(((
-Search Extension...
+(% class="extension-link search-extension box" %)(((
 (((
 {{velocity}}
+=== #if($services.icon)$services.icon.render('find')#end Search Extension... ===
 {{html}}
 &lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
   &lt;input type="hidden" name="space" value="Extension" /&gt;
   &lt;input type="text" name="text" value="extension name..." size="25" class="withTip" id="searchTextInput" /&gt;
   &lt;span class="buttonwrapper"&gt;
-    &lt;input class="button" type="submit" value="Search"  id="searchSubmit"/&gt;
+    &lt;input class="btn btn-primary" type="submit" value="Search"  id="searchSubmit"/&gt;
   &lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
@@ -64,11 +62,10 @@ Search Extension...
 )))
 )))
 
-(% class="extension-link add-extension" %)(((
-Contribute Extension...
-
+(% class="extension-link add-extension box" %)(((
 (((
 {{velocity}}
+=== #if($services.icon)$services.icon.render('add')#end Contribute Extension... ===
 {{html}}
 #if ($isGuest)
   You need first to &lt;a href="${escapetool.xml($xwiki.getURL('Main.WebHome', 'login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
@@ -79,7 +76,7 @@ Contribute Extension...
   &lt;input type="hidden" name="createExtension" value="true" /&gt;
   &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
   &lt;span class="buttonwrapper"&gt;
-    &lt;input class="button" type="submit" value="Add" id="contributeSubmit"/&gt;
+    &lt;input class="btn btn-success" type="submit" value="Add" id="contributeSubmit"/&gt;
   &lt;/span&gt;
 &lt;/form&gt;
 {{/html}}
@@ -88,8 +85,6 @@ Contribute Extension...
 #end
 {{/velocity}}
 )))
-)))
-
 )))
 
 (% class="clearfloats" %)((()))(%%)
@@ -120,5 +115,6 @@ Temporary provide a link for robots to index all extension.
 In the future, this link will be provided via a sitemap.
 [[ExtensionCode.AllExtensionsList]]
 )))
+#set($docextras=[])
 {{/velocity}}</content>
 </xwikidoc>

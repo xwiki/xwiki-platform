@@ -235,17 +235,10 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>form#inline input[type="text"], form#inline input[type="password"], form#inline textarea, form#inline select {
-    width: 100%
-}
-table.extension {
-    width: 100%
-}
-
-div.extension-link {
+      <code>.extension-link {
   /* home page, "contribute extension" button */
   display: inline-block;
-  margin: 0 1em 1em 1em;
+  margin-right: 1em;
   padding: 0 1em 0.5em;
   min-height: 115px;
   min-width: 310px;
@@ -256,95 +249,18 @@ div.extension-link {
   padding-bottom: 0.5em;
 }
 
-div.extension-link p {
-  display:inline-block;
-  cursor:pointer;
-}
-
-.extension-link{
-  border-radius: 18px;
-
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(100%, 100%, 100%, 0.8) inset, 0 0 1px 1px rgba(0, 0, 0, 0.3);
-
-  background: #5B86B1;
-  background: linear-gradient(to bottom, #5B86B1 0%, #78A7E5 30px) #78A7E5;
-}
-
-.extension-link p, .small-extension-link  {
-  color: white !important;
-  font-size: 0.9em;
-  font-weight: 700;
-  letter-spacing: 1px;
-  line-height: 1em;
-  padding: 8px;
-  text-decoration: none !important;
-  text-shadow: 0 0 3px #000000;
-}
-
-.small-extension-link{
-  /* extension sheet, "download" button */
-  font-size: .85em;
-  text-transform: uppercase;
-  margin: 0 0 1em 1em;
-  float: right;
-}
-
-.extension-link div {
-  cursor:normal;
+.extension-link p {
+  display: inline-block;
 }
 
 .extension-link div p {
-  letter-spacing: 0;
   line-height: 1em;
   margin: 0;
   padding: 5px;
-  text-shadow: none;
-}
-
-.extension-link:before {
-  background: #6b4;
-  content: '\21a1';
-
-  border-radius: 12px;
-
-  box-shadow: 0 1px 2px #FFFFFF inset, 0 2px 5px #000000 inset, 0 0 2px #000, 0 0 1px 1px rgba(0, 0, 0, 0.5);
-
-  display: inline-block;
-  font-weight: 900;
-  padding: 3px 6px;
-  margin-right: 4px;
-}
-
-div.add-extension:before {
-  /* home page, "contribute extension" button */
-  content : '+';
-}
-div.search-extension:before {
-  /* home page, "search extension" button */
-  content: 'O-';
-  background-color: #EA8708;
-  letter-spacing: -2px;
-}
-
-.source-extension:before {
-  content: '&lt;&gt;';
-  background-color: #EA8708;
-}
-
-.update-extension:before {
-  content: 'o';
-  background-color: #EA8708;
-}
-
-.extensionsAbout {
-padding: 5px 10px;
-}
-
-/* Disable the external link icon */
-.extensionInfo~p .wikiexternallink {
-  background: none;
-  padding-right: 0;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name/>

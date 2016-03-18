@@ -131,11 +131,17 @@ public class ActiveInstallsTest extends AbstractTest
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Database Active Installs Count\\r?\\nHSQL Database Engine 1"));
 
-        // Verify XWikiVersion data
+        // Verify top 10 XWiki versions data
         getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]\\.[0-9].* 1"));
+
+        // Verify XWiki Cycle versions data
+        getUtil().gotoPage("ActiveInstalls", "XWikiVersionsCycleData");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]+\\.x 1"));
 
         // Verify ServletContainers data
         getUtil().gotoPage("ActiveInstalls", "ServletContainersData");

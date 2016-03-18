@@ -113,8 +113,9 @@
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #submenuitem()
   ##
   ## The annotation feature can only work on the default view page. So display the button only if no viewer is used.
+  ## Also display the button only when the page has content.
   ##
-  #if ($xcontext.action == 'view' &amp;&amp; ("$!request.viewer" == '' || "$!request.viewer" == 'content'))
+  #if ($xcontext.action == 'view' &amp;&amp; ("$!request.viewer" == '' || "$!request.viewer" == 'content') &amp;&amp; !$doc.isNew())
     ##
     ## Get the annotation configuration
     ##

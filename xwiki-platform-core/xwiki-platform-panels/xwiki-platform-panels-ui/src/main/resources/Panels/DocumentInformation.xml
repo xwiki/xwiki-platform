@@ -182,7 +182,7 @@ $xwiki.ssx.use('Panels.DocumentInformation')##
 #largepanelheader($services.localization.render('panels.documentInformation.title'))
 #if ("$tdoc.locale" == '' &amp;&amp; $xwiki.isMultiLingual())
 ; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
-: {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;{{/html}}
+: {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLocale" size="30"/&gt;{{/html}}
 #end
 ##--------------------------------------------------------------------------
 ## Display wiki syntax combo box if there's more than one configured syntax.

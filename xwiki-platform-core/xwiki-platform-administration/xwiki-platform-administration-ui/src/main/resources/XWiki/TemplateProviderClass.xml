@@ -96,8 +96,8 @@
       <picker>0</picker>
       <prettyName>spaces</prettyName>
       <relationalStorage>0</relationalStorage>
-      <separator> </separator>
-      <separators/>
+      <separator>,</separator>
+      <separators>,</separators>
       <size>10</size>
       <sort>none</sort>
       <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>

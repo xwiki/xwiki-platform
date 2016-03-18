@@ -20,19 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="ActiveInstalls.WebHome" locale="">
   <web>ActiveInstalls</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1399398031000</creationDate>
+  <creationDate>1381932584000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1399404593000</date>
-  <contentUpdateDate>1399398610000</contentUpdateDate>
+  <date>1458233911000</date>
+  <contentUpdateDate>1413887489000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Installations Statistics</title>
   <comment/>
@@ -185,9 +185,6 @@ Total number of XWiki installations that have ever sent us a ping (since XWiki 6
 
 
 
-
-
-
 </content>
     </property>
     <property>
@@ -327,9 +324,6 @@ Total number of XWiki installations that have sent us a ping in the past day (fr
 Total number of XWiki installations that have ever sent us a ping (from XWiki 5.2-milestone-2 to XWiki 6.0.*). Note that this includes installs used for tests performed by the XWiki dev team.
 
 
-
-
-
 </content>
     </property>
     <property>
@@ -400,7 +394,7 @@ Active Installs over time. Total number of XWiki installations that have sent us
 </content>
     </property>
     <property>
-      <position>1,5</position>
+      <position>1,6</position>
     </property>
     <property>
       <title>Active Installs History</title>
@@ -462,14 +456,14 @@ Active Installs over time. Total number of XWiki installations that have sent us
     <property>
       <content>{{include reference="ActiveInstalls.XWikiVersions"/}}
 
-Versions of XWiki used by Active Installs (since XWiki 6.1-milestone-1).
+top 10 versions of XWiki used by Active Installs (since XWiki 6.1-milestone-1).
 </content>
     </property>
     <property>
       <position>1,3</position>
     </property>
     <property>
-      <title>Active XWiki Versions</title>
+      <title>Top 10 Versions</title>
     </property>
   </object>
   <object>
@@ -532,10 +526,10 @@ Java versions used by by Active Installs (since XWiki 6.1-milestone-1).
 </content>
     </property>
     <property>
-      <position>2,3</position>
+      <position>1,4</position>
     </property>
     <property>
-      <title>Active Java Versions</title>
+      <title>Java Versions</title>
     </property>
   </object>
   <object>
@@ -598,10 +592,10 @@ Databases used by by Active Installs (since XWiki 6.1-milestone-1).
 </content>
     </property>
     <property>
-      <position>1,4</position>
+      <position>2,4</position>
     </property>
     <property>
-      <title>Active Databases</title>
+      <title>Databases</title>
     </property>
   </object>
   <object>
@@ -664,10 +658,76 @@ Servlet Containers used by by Active Installs (since XWiki 6.1-milestone-1).
 </content>
     </property>
     <property>
-      <position>2,4</position>
+      <position>1,5</position>
     </property>
     <property>
-      <title>Active Servlet Containers</title>
+      <title>Servlet Containers</title>
+    </property>
+  </object>
+  <object>
+    <name>ActiveInstalls.WebHome</name>
+    <number>9</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>a4402b38-c4dd-4c1f-a8e0-7d5d287c0452</guid>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <property>
+      <content>{{include reference="ActiveInstalls.XWikiVersionsCycle"/}}
+
+XWiki Cycle versions used by Active Installs (since XWiki 6.1-milestone-1).
+</content>
+    </property>
+    <property>
+      <position>2,3</position>
+    </property>
+    <property>
+      <title>Cycle Versions</title>
     </property>
   </object>
 </xwikidoc>

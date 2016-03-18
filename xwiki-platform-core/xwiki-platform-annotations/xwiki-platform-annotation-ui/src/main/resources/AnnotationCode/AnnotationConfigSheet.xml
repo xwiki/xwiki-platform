@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="AnnotationCode.AnnotationConfigSheet" locale="">
   <web>AnnotationCode</web>
   <name>AnnotationConfigSheet</name>
   <language/>
@@ -40,22 +40,79 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($annotationsConfigClass = $xwiki.getDocument("AnnotationCode.AnnotationConfig").xWikiClass)
-#set($configObj = $doc.getObject($doc.fullName))
-= $services.localization.render('annotations.config.activate.title') =
-$services.localization.render('annotations.config.activate.explanation')
+#set ($annotationsConfigClassName = 'AnnotationCode.AnnotationConfig')
+#set ($annotationsConfigDoc = $xwiki.getDocument($annotationsConfigClassName))
+#set ($configObject = $annotationsConfigDoc.getObject($annotationsConfigClassName))
+## FIXME: The class is currently stored in the same document as the configuration.
+#set ($annotationsConfigClass = $annotationsConfigDoc.xWikiClass)
 
-**$annotationsConfigClass.get("activated").prettyName**: $doc.display("activated")
-**$annotationsConfigClass.get("exceptionSpaces").prettyName**: #if($xcontext.action == "inline") $doc.display("exceptionSpaces")#else#foreach($space in $configObj.getProperty("exceptionSpaces").value)#if($velocityCount &gt; 1), #end[[$space&gt;&gt;${space}.WebHome]]#end#end
+#set ($discard = $xwiki.jsx.use('AnnotationCode.AnnotationConfigSheet'))
 
-= $services.localization.render('annotations.config.display.title') =
-**$annotationsConfigClass.get("displayed").prettyName**: $doc.display("displayed")
-**$annotationsConfigClass.get("displayHighlight").prettyName**: $doc.display("displayHighlight")
+{{html clean='false'}}
+## Keep the xform div separate from the form since in inline edit mode (when editing the config doc manually), the form is removed.
+&lt;div class="xform"&gt;
+&lt;form method="post" action="$annotationsConfigDoc.getURL('save')"&gt;
 
-= $services.localization.render('annotations.config.type.title') =
-$services.localization.render('annotations.config.type.explanation')
+  &lt;dt&gt;
+    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$xwiki.relativeRequestURL" /&gt;
+  &lt;/dt&gt;
 
-**$annotationsConfigClass.get("annotationClass").prettyName**: #if ($xcontext.action == "inline") $doc.display("annotationClass") #else [[$doc.display("annotationClass")&gt;&gt;$doc.display("annotationClass")]] #end
+  &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.activate.title'))&lt;/h2&gt;
+
+  &lt;p&gt;$escapetool.xml($services.localization.render('annotations.config.activate.explanation'))&lt;/p&gt;
+
+  &lt;dl&gt;
+
+    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('activated').prettyName)&lt;/dt&gt;
+    &lt;dd&gt;{{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('activated', 'edit'){{/html}}{{html clean='false'}}&lt;/dd&gt;
+
+    ## We can`t just join the list values in the hidden DOM element without escaping the separator from each value first.
+    #set ($spacesEscapedValues = [])
+    #foreach ($spacesValue in $configObject.getValue('exceptionSpaces'))
+      #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
+    #end
+    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get("exceptionSpaces").prettyName)&lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;input id="AnnotationCode.AnnotationConfig_0_exceptionSpaces" name="AnnotationCode.AnnotationConfig_0_exceptionSpaces"
+            value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
+      {{/html}}{{html wiki='true' clean='false'}}
+        {{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
+      {{/html}}{{html clean='false'}}
+    &lt;/dd&gt;
+
+  &lt;/dl&gt;
+
+  &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.display.title'))&lt;/h2&gt;
+
+  &lt;dl&gt;
+
+    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('displayed').prettyName)&lt;/dt&gt;
+    &lt;dd&gt;{{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayed', 'edit'){{/html}}{{html clean='false'}}&lt;/dd&gt;
+
+    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get("displayHighlight").prettyName)&lt;/dt&gt;
+    &lt;dd&gt;{{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('displayHighlight', 'edit'){{/html}}{{html clean='false'}}&lt;/dd&gt;
+
+  &lt;/dl&gt;
+
+  &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.type.title'))&lt;/h2&gt;
+
+  &lt;p&gt;$escapetool.xml($services.localization.render('annotations.config.type.explanation'))&lt;/p&gt;
+
+  &lt;dl&gt;
+    &lt;dt&gt;$escapetool.xml($annotationsConfigClass.get('annotationClass').prettyName)&lt;/dt&gt;
+    &lt;dd&gt;{{/html}}{{html wiki='true' clean='false'}}$annotationsConfigDoc.display('annotationClass', 'edit'){{/html}}{{html clean='false'}}&lt;/dd&gt;
+  &lt;/dl&gt;
+
+  ## Add a "Save" button for when displayed in an Administration section or even in view mode.
+  #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
+    &lt;span class="buttonwrapper"&gt;
+      &lt;input type="submit" value="${services.localization.render('save')}" class="button" /&gt;
+    &lt;/span&gt;
+  #end
+&lt;/form&gt;
+&lt;/div&gt;
+{{/html}}
 {{/velocity}}</content>
   <object>
     <name>AnnotationCode.AnnotationConfigSheet</name>
@@ -83,6 +140,218 @@ $services.localization.render('annotations.config.type.explanation')
     </class>
     <property>
       <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotationConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0f21197d-d521-40ee-9181-942a8f3577b2</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// FIXME: This code duplicates XWiki.TemplateProviderSheet's JSX except for the tree and data element locators.
+
+require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+
+  // Reminder: 'tree' is a jQuery plugin and returns the jQuery instance itself when required.
+  require(['tree', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
+    /**
+     * Initialization method.
+     */
+    function initialize() {
+      addEnabledSpacesTreeExtraConfiguration();
+    }
+
+    /**
+     * Configures the jsTree generated by the documentTree macro, initializes the checked values and adds the handlers
+     * for checking and unchecking tree nodes (documents).
+     */
+    function addEnabledSpacesTreeExtraConfiguration() {
+      var treeElement = $('.xtree');
+      var dataElement = $('#AnnotationCode\\.AnnotationConfig_0_exceptionSpaces');
+
+      // Extract the list of initially checked elements.
+      var savedIds = readSavedValues(dataElement.val());
+
+      // Wait for the tree to be ready (root children loaded).
+      treeElement.on('ready.jstree', function(event, data) {
+        var tree = $.jstree.reference(treeElement);
+
+        // Configure the tree to not cascade the check status when checking nodes.
+        // tree.settings.checkbox.three_state = false;
+        tree.settings.checkbox.cascade = '';
+
+        // Expand into view and check all tree nodes that are initially supposed to be checked.
+        for (var i=0; i&lt;savedIds.length; i++) {
+          var savedId = savedIds[i];
+          // Load and expand to the node.
+          tree.openTo(savedId, function(idToCheck) {
+            // Once the node is loaded, check it, if possible.
+            // If the node did not load (lack of permissions, hidden document, etc.), nothing happens.
+            tree.check_node(idToCheck);
+          }.bind(this, savedId));
+        }
+      });
+
+      // Listen to tree nodes being checked/unchecked and save the changes in the DOM to be saved on submit.
+      treeElement.on('changed.jstree', function(event, data) {
+        var node = data.node;
+        var initialNrOfNodes = savedIds.length;
+
+        // Update the savedIds list.
+        var savedIdIndex = savedIds.indexOf(node.id);
+        if (data.action == 'select_node') {
+          // If it's not in the list, add it.
+          if (savedIdIndex == -1) {
+            savedIds.push(node.id);
+          }
+        } else if (data.action == 'deselect_node') {
+          // If it's in the list, remove it.
+          if (savedIdIndex &gt; -1) {
+            savedIds.splice(savedIdIndex, 1);
+          }
+        }
+
+        // Save the list in the DOM, if nodes were added/removed.
+        if (initialNrOfNodes != savedIds.length) {
+          var serializedValues = serializeValues(savedIds);
+          dataElement.val(serializedValues);
+        }
+      });
+    }
+
+    function readSavedValues(savedValuesString) {
+      // Extract the list and transform local space references to space webhome references as IDs in the tree.
+      //
+      // When splitting by the separator char ('), we want to avoid values that contain the spliting char inside them, escaped.
+      // Trick: Since JavaScript does not support negative lookbehind regex "(?&lt;!\\)," we apply a negative lookahead ",(?!\\)" on the reversed string to properly split.
+      return reverseString(savedValuesString).split(/\s*,(?!\\)\s*/).map(function(refString) {
+        if (!refString) {
+          return refString;
+        }
+
+        // Unescape any input separator that might be part of the value and that was previously escaped when serialized in the hidden input element.
+        // Trick: Remember that we previously reverset the savedValuesString, so individual values need to be reversed back to make sense before unescaping.
+        refString = reverseString(refString).replace('\\,', ',');
+
+        // Transform the local space reference to an absolute document reference, for the Nested Pages tree to use as node ID.
+        refString = refString + '.WebHome';
+        var defaultValues = {};
+        defaultValues[XWiki.EntityType.WIKI] = xm.wiki;
+        var resolvedSpaceRef = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT, defaultValues);
+        var serializedSpaceRef = XWiki.Model.serialize(resolvedSpaceRef);
+
+        // Complete the tree node ID by adding the reference type prefix.
+        return 'document:' + serializedSpaceRef;
+      }).filter(function(id) {
+        return id;
+      });
+    }
+
+    function reverseString(initialString) {
+      return initialString.split('').reverse().join('');
+    }
+
+    function serializeValues(savedIds) {
+      return savedIds.map(function (id) {
+        // Transform the ID back to a local space reference string.
+        var refString = id.substring('document:'.length);
+        var reference = XWiki.Model.resolve(refString, XWiki.EntityType.DOCUMENT);
+        var wikiReference = reference.extractReference(XWiki.EntityType.WIKI);
+        var spaceReference = reference.extractReference(XWiki.EntityType.SPACE);
+        var localSpaceReference = spaceReference.relativeTo(wikiReference);
+
+        // Remember to escape the separator char "," from the serialized individual value.
+        return XWiki.Model.serialize(localSpaceReference).replace(/,/g, '\\,');
+      }).sort().join(',');
+    }
+
+    (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
+  });
+
+});</code>
+    </property>
+    <property>
+      <name>Javascript</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
     </property>
   </object>
 </xwikidoc>

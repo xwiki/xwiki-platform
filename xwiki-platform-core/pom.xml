@@ -511,13 +511,6 @@
         <configuration>
           <parameter>
             <excludes combine.children="append">
-              <!-- Not really a breackage. Just moved to its own module. -->
-              <exclude>com.xpn.xwiki.plugin.diff.DiffPlugin</exclude>
-              <exclude>com.xpn.xwiki.plugin.diff.DiffPluginApi</exclude>
-              <!-- Removed constant that shouldn't have been there -->
-              <exclude>org.xwiki.chart.ChartGenerator</exclude>
-              <!-- Young API. Added searchFlavors() -->
-              <exclude>org.xwiki.platform.flavor.FlavorManager</exclude>
             </excludes>
           </parameter>
         </configuration>
@@ -535,26 +528,6 @@
                   }
                 },
                 "ignore": [
-                  {
-                    "code": "java.field.removedWithConstant",
-                    "old": "field org.xwiki.chart.ChartGenerator.COLORS_PARAM",
-                    "justification": "Removed constant that shouldn't have been there"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
-                    "justification": "Young API. Added searchFlavors()"
-                  },
-                  {
-                    "code": "java.class.removed",
-                    "old": "class com.xpn.xwiki.plugin.diff.DiffPlugin",
-                    "justification": "Not really a breackage. Just moved to its own module."
-                  },
-                  {
-                    "code": "java.class.removed",
-                    "old": "class com.xpn.xwiki.plugin.diff.DiffPluginApi",
-                    "justification": "Not really a breackage. Just moved to its own module."
-                  }
                 ]
               }
             }

@@ -32,6 +32,9 @@
   <description>Old diff plugin</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <!-- Skip japicmp since there's no previous version of this module as it was introduced in 8.0M1.
+         TODO: Remove once we start comparing to 8.0 -->
+    <xwiki.japicmp.skip>true</xwiki.japicmp.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -44,7 +47,6 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.jmock</groupId>

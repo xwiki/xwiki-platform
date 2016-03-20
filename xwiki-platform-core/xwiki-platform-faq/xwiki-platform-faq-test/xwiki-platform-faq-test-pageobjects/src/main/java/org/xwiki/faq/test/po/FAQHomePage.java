@@ -37,11 +37,20 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class FAQHomePage extends ViewPage
 {
+    private static final String MAIN_WIKI = "xwiki";
+
+    /**
+     * FAQ home page document reference.
+     */
+    public static final FAQHomePage DEFAULT_FAQ_HOME_PAGE = new FAQHomePage(
+        new DocumentReference(MAIN_WIKI, Arrays.asList("FAQ"), "WebHome"));
+
     private EntityReference homeReference;
 
-    public static final FAQHomePage DEFAULT_FAQ_HOME_PAGE = new FAQHomePage(
-        new DocumentReference("xwiki", Arrays.asList("FAQ"), "WebHome"));
-
+    /**
+     * @param homeReference the reference to the home page where the FAQ app is installed (several versions of the FAQ
+     *        app can be installed in the same wiki)
+     */
     public FAQHomePage(EntityReference homeReference)
     {
         this.homeReference = homeReference;
@@ -56,14 +65,18 @@ public class FAQHomePage extends ViewPage
     }
 
     /**
+     * @return the String reference to the space where the FAQ app is installed (e.g. "{@code Space1.Space2})
      * @since 7.2RC1
      */
     public String getSpaces()
     {
         return getUtil().serializeReference(
-            this.homeReference.extractReference(EntityType.SPACE).removeParent(new WikiReference("xwiki")));
+            this.homeReference.extractReference(EntityType.SPACE).removeParent(new WikiReference(MAIN_WIKI)));
     }
 
+    /**
+     * @return the name of the home page where the FAQ app is installed (e.g. "{@code WebHome})
+     */
     public String getPage()
     {
         return this.homeReference.getName();

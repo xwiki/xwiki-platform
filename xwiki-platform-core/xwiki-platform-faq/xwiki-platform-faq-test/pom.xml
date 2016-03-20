@@ -35,7 +35,7 @@
     <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <!--xwiki.checkstyle.skip>true</xwiki.checkstyle.skip-->
   </properties>
   <modules>
     <module>xwiki-platform-faq-test-pageobjects</module>

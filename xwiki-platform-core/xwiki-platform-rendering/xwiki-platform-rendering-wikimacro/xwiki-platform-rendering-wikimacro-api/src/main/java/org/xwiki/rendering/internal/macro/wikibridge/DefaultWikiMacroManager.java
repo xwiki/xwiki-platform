@@ -88,7 +88,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
      * are deleted.
      */
-    private Map<DocumentReference, WikiMacroData> wikiMacroMap = new HashMap<DocumentReference, WikiMacroData>();
+    private Map<DocumentReference, WikiMacroData> wikiMacroMap = new HashMap<>();
 
     /**
      * Internal helper class to hold a wiki macro component role hint and the wiki Macro definition itself.
@@ -146,7 +146,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
 
         // Verify that the user has the right to register this wiki macro the chosen visibility
         if (this.wikiMacroFactory.isAllowed(documentReference, macroDescriptor.getVisibility())) {
-            DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
+            DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<>();
             componentDescriptor.setRoleType(Macro.class);
             componentDescriptor.setRoleHint(wikiMacro.getDescriptor().getId().getId());
 

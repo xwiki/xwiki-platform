@@ -89,9 +89,6 @@
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>
         <artifactId>jshint-maven-plugin</artifactId>
-        <configuration>
-          <options>laxbreak,expr</options>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.lesscss</groupId>

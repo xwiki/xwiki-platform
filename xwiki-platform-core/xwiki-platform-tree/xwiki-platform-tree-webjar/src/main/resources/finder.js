@@ -1,6 +1,9 @@
 define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   'use strict';
 
+  // jsTree uses the underscore notation for its API, instead of camel case.
+  // jshint camelcase:false
+
   // Default configuration options.
   $.jstree.defaults.finder = {
     url: '',

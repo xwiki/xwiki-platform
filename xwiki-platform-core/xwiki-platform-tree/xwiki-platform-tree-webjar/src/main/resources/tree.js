@@ -1,6 +1,9 @@
 define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) {
   'use strict';
 
+  // jsTree uses the underscore notation for its API, instead of camel case.
+  // jshint camelcase:false,maxstatements:false
+
   // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
   // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
   // order to add the following special characters: ?`.
@@ -18,7 +21,9 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     });
     var types = [];
     for (var type in typesMap) {
-      typesMap.hasOwnProperty(type) && types.push(type);
+      if (typesMap.hasOwnProperty(type)) {
+        types.push(type);
+      }
     }
     return types;
   };
@@ -58,8 +63,8 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   };
 
   var canAcceptChild = function(parent, child) {
-    return !parent.data || !parent.data.validChildren
-      || (child.data && parent.data.validChildren.indexOf(child.data.type) >= 0);
+    return !parent.data || !parent.data.validChildren ||
+      (child.data && parent.data.validChildren.indexOf(child.data.type) >= 0);
   };
 
   var canPerformBatchOperation = function(nodes, action) {
@@ -79,11 +84,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   var validateOperation = function (operation, node, parent, position, more) {
     // The operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'.
     // In case the operation is 'rename_node' the position is filled with the new node name.
-    return (operation === 'create_node' && canAcceptChild(parent, node))
-      || (operation === 'rename_node' && node.data && node.data.canRename)
-      || (operation === 'delete_node' && node.data && node.data.canDelete)
-      || (operation === 'move_node' && node.data && node.data.canMove && canAcceptChild(parent, node))
-      || (operation === 'copy_node' && node.data && node.data.canCopy && canAcceptChild(parent, node));
+    return (operation === 'create_node' && canAcceptChild(parent, node)) ||
+      (operation === 'rename_node' && node.data && node.data.canRename) ||
+      (operation === 'delete_node' && node.data && node.data.canDelete) ||
+      (operation === 'move_node' && node.data && node.data.canMove && canAcceptChild(parent, node)) ||
+      (operation === 'copy_node' && node.data && node.data.canCopy && canAcceptChild(parent, node));
   };
 
   var areDraggable = function(nodes) {
@@ -109,9 +114,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       $.each(children, function(index) {
         // Create the node only if it doesn't exist (the node may have been loaded by a call to openTo).
         // Note that deleting or moving the existing node may not be allowed by #validateOperation().
-        !tree.get_node(this) && tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
-          tree.select_node(firstChild);
-        });
+        if (!tree.get_node(this)) {
+          tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
+            tree.select_node(firstChild);
+          });
+        }
       });
     }, {offset: paginationNode.data.offset});
   };
@@ -281,8 +288,8 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     if (path && path.length > 0) {
       var child = this.get_node(path[0]);
       var children = this.get_children_dom(parent);
-      if (!child && canAcceptChild(parent, path[0]) && children.length > 0
-          && this.get_node(children.last()).data.type === 'pagination') {
+      if (!child && canAcceptChild(parent, path[0]) && children.length > 0 &&
+          this.get_node(children.last()).data.type === 'pagination') {
         // The child node is probably not displayed because of the pagination. It's expensive to retrieve all the rest
         // of the children (i.e. all the next pages) until we find the node from the path so we simply add the child to
         // the parent. Don't worry, the node won't be duplicated when the pagination is triggered.
@@ -296,7 +303,9 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       }
     }
     // If we get here then it means we cannot advance any more.
-    callback && callback(parent);
+    if (callback) {
+      callback(parent);
+    }
   };
 
   var extendQueryString = function(url, parameters) {
@@ -397,19 +406,23 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       var selectedNode = data.node;
       if (selectedNode.data && selectedNode.data.type === 'pagination') {
         addMoreChildren(tree, selectedNode);
-      } else if (data.event && !$(data.event.target).hasClass('jstree-no-link')
-          && $(data.event.target).closest('.jstree-no-links').length === 0) {
+      } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
+          $(data.event.target).closest('.jstree-no-links').length === 0) {
         // The node selection was triggered by an user event and links are enabled.
         window.location.href = selectedNode.a_attr.href;
       }
 
     }).on('open_node.jstree', function(event, data) {
       var originalNode = data.node.original;
-      originalNode && originalNode.iconOpened && data.instance.set_icon(data.node, originalNode.iconOpened);
+      if (originalNode && originalNode.iconOpened) {
+        data.instance.set_icon(data.node, originalNode.iconOpened);
+      }
 
     }).on('close_node.jstree', function(event, data) {
       var originalNode = data.node.original;
-      originalNode && originalNode.iconOpened && data.instance.set_icon(data.node, originalNode.icon);
+      if (originalNode && originalNode.iconOpened) {
+        data.instance.set_icon(data.node, originalNode.icon);
+      }
 
     //
     // Catch events triggered when the tree structure is modified.
@@ -444,9 +457,11 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     }).on('delete_node.jstree', function(event, data) {
       // Make sure the deleted tree node has an associated entity.
       var entityId = data.node.data && data.node.data.id;
-      entityId && deleteEntity(data.instance, data.node).fail(function() {
-        data.instance.refreshNode(data.parent);
-      });
+      if (entityId) {
+        deleteEntity(data.instance, data.node).fail(function() {
+          data.instance.refreshNode(data.parent);
+        });
+      }
 
     }).on('move_node.jstree', function(event, data) {
       var entityId = data.node.data && data.node.data.id;
@@ -529,8 +544,8 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
 
     }).on('xtree.contextMenu.remove', function(event, data) {
       var skipConfirmation = data.parameters.confirmationMessage === false;
-      var confirmationMessage = data.parameters.confirmationMessage
-        || 'Are you sure you want to delete the selected nodes?';
+      var confirmationMessage = data.parameters.confirmationMessage ||
+        'Are you sure you want to delete the selected nodes?';
       // Display the confirmation after the context menu closes.
       setTimeout(function() {
         if (skipConfirmation || window.confirm(confirmationMessage)) {

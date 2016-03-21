@@ -21,7 +21,14 @@ package org.xwiki.model.internal.reference;
 
 import javax.inject.Singleton;
 
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
+
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.StringUtils;
 
 /**
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
@@ -32,6 +39,31 @@ import org.xwiki.component.annotation.Component;
  */
 @Component
 @Singleton
-public class DefaultStringEntityReferenceSerializer extends AbstractDefaultStringEntityReferenceSerializer
+public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
+    @Override
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
+        boolean isLastReference, Object... parameters)
+    {
+        EntityType currentType = currentReference.getType();
+        EntityReference currentParent = currentReference.getParent();
+        String[] currentEscapeChars = ESCAPES.get(currentType);
+
+        // Add my separator if I am not the first one in the representation
+        if (currentParent != null && representation.length() > 0) {
+            if (currentParent.getType() == EntityType.WIKI) {
+                representation.append(WIKISEP);
+            } else {
+                representation.append(currentEscapeChars[0]);
+            }
+        }
+
+        // If we're on the Root reference then we don't need to escape anything
+        if (currentEscapeChars != null) {
+            representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
+                REPLACEMENTS.get(currentType)));
+        } else {
+            representation.append(StringUtils.doubleChar(currentReference.getName(), '\\'));
+        }
+    }
 }

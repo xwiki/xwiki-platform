@@ -30,7 +30,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * @version $Id$
  * @since 4.2M3
  */
-public class LocalizedStringEntityReferenceSerializer extends AbstractDefaultStringEntityReferenceSerializer
+public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,

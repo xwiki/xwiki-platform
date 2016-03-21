@@ -30,7 +30,7 @@ import com.google.gwt.dom.client.IFrameElement;
  * 
  * @version $Id$
  */
-public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
+public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE8toIE10
 {
     /**
      * Flag indicating if the load event needs to be fired manually when the rich text area is attached to the document.

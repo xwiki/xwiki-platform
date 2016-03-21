@@ -32,8 +32,8 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.6.0</gwt.version>
-    <gwt.maven.plugin.version>2.6.0</gwt.maven.plugin.version>
+    <gwt.version>2.7.0</gwt.version>
+    <gwt.maven.plugin.version>2.7.0</gwt.maven.plugin.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
@@ -333,10 +333,6 @@
           <configuration>
             <mode>htmlunit</mode>
             <testTimeOut>600</testTimeOut>
-            <!-- TODO: Since we're building with Java8 we need to explicitly set the source level as we're using a
-                 version of GWT that doesn't support java 8 at the source level. We need to upgrade to GWT 2.8+ to
-                 have support for Java 8 -->
-            <sourceLevel>1.7</sourceLevel>
           </configuration>
           <executions>
             <execution>

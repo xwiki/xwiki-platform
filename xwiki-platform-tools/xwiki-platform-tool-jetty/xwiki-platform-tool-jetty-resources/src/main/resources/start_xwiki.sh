@@ -59,7 +59,7 @@ cd "$PRGDIR"
 
 # If no XWIKI_OPTS env variable has been defined use default values.
 if [ -z "$XWIKI_OPTS" ] ; then
-  XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=196m"
+  XWIKI_OPTS="-Xmx1024m"
 fi
 
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT

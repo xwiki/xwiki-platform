@@ -34,7 +34,7 @@ REM -------------------------------------------------------------------------
 
 setlocal EnableDelayedExpansion
 
-if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
+if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx1024m
 
 REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
 if not defined JETTY_PORT (

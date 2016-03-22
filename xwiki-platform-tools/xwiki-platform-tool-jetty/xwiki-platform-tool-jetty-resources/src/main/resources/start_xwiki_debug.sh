@@ -61,7 +61,7 @@ cd "$PRGDIR"
 
 # If no XWIKI_OPTS env variable has been defined use default values.
 if [ -z "$XWIKI_OPTS" ] ; then
-  XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=196m"
+  XWIKI_OPTS="-Xmx1024m"
 fi
 XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
 XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"

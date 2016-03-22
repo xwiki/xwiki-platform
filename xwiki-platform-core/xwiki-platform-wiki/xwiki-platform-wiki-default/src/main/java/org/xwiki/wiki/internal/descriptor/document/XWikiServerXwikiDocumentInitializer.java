@@ -86,7 +86,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
     {
         boolean needsUpdate = false;
 
-        // Add a descritor of none already exist
+        // Add a descriptor if none already exist
         if (document.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS) == null) {
             XWikiContext xcontext = this.contextProvider.get();
 
@@ -117,6 +117,8 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
                 this.logger.error("Faied to initialize main wiki descriptor", e);
             }
         }
+
+        needsUpdate |= setDocumentFields(document, "");
 
         return needsUpdate;
     }

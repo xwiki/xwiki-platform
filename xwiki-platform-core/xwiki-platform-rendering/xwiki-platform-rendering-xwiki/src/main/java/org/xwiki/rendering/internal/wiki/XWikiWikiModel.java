@@ -22,6 +22,10 @@ package org.xwiki.rendering.internal.wiki;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -29,6 +33,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleDeclaration;
@@ -37,13 +44,10 @@ import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
@@ -80,6 +84,11 @@ public class XWikiWikiModel implements WikiModel
     private static final String HEIGHT = "height";
 
     /**
+     * The UTF-8 encoding.
+     */
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
+    /**
      * The component used to access configuration parameters.
      */
     @Inject
@@ -103,28 +112,6 @@ public class XWikiWikiModel implements WikiModel
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-
-    /**
-     * Convert an Attachment Reference from a String (specified using the document reference format) into an Attachment
-     * object.
-     */
-    @Inject
-    @Named("current")
-    private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
-
-    /**
-     * Used to resolve a Resource Reference into a proper Document Reference.
-     */
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
-
-    /**
-     * Used to resolve a Resource Reference into a Space Reference.
-     */
-    @Inject
-    @Named("current")
-    private SpaceReferenceResolver<String> currentSpaceReferenceResolver;
 
     @Inject
     private EntityReferenceResolver<ResourceReference> resourceReferenceEntityReferenceResolver;
@@ -180,15 +167,11 @@ public class XWikiWikiModel implements WikiModel
 
         // Handle attachment references
         if (this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
-            String extraQueryString = StringUtils.removeStart(getImageURLQueryString(parameters), "&");
-            if (!extraQueryString.isEmpty()) {
+            Map<String, Object> urlParameters = getImageURLParameters(parameters);
+            if (!urlParameters.isEmpty()) {
                 // Handle scaled image attachments.
                 String queryString = imageReference.getParameter(AttachmentResourceReference.QUERY_STRING);
-                if (StringUtils.isEmpty(queryString)) {
-                    queryString = extraQueryString;
-                } else {
-                    queryString += '&' + extraQueryString;
-                }
+                queryString = extendQueryString(queryString, urlParameters);
                 ResourceReference scaledImageReference = imageReference.clone();
                 scaledImageReference.setParameter(AttachmentResourceReference.QUERY_STRING, queryString);
                 return getLinkURL(scaledImageReference);
@@ -248,12 +231,11 @@ public class XWikiWikiModel implements WikiModel
                     // perform explicit encoding here.
 
                     modifiedQueryString = "parent=" + URLEncoder.encode(
-                        this.compactEntityReferenceSerializer.serialize(reference), "UTF-8");
+                        this.compactEntityReferenceSerializer.serialize(reference), UTF8.name());
                 } catch (UnsupportedEncodingException e) {
                     // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
                     // without that encoding.
-                    throw new RuntimeException("Failed to URL encode ["
-                        + this.compactEntityReferenceSerializer.serialize(reference) + "] using UTF-8.", e);
+                    throw new RuntimeException("Failed to URL encode [" + reference + "] using UTF-8.", e);
                 }
             }
         }
@@ -300,45 +282,58 @@ public class XWikiWikiModel implements WikiModel
     }
 
     /**
-     * Creates the query string that can be added to an image URL to resize the image on the server side.
+     * Creates the parameters that can be added to an image URL to resize the image on the server side.
      *
-     * @param imageParameters image parameters, including width and height then they are specified
-     * @return the query string to be added to an image URL in order to resize the image on the server side
+     * @param imageParameters image parameters, including width and height when they are specified
+     * @return the parameters to be added to an image URL in order to resize the image on the server side
      */
-    private String getImageURLQueryString(Map<String, String> imageParameters)
+    private Map<String, Object> getImageURLParameters(Map<String, String> imageParameters)
     {
         String width = StringUtils.removeEnd(getImageDimension(WIDTH, imageParameters), PIXELS);
         String height = StringUtils.removeEnd(getImageDimension(HEIGHT, imageParameters), PIXELS);
         boolean useHeight = StringUtils.isNotEmpty(height) && StringUtils.isNumeric(height);
-        StringBuilder queryString = new StringBuilder();
+        Map<String, Object> queryString = new LinkedHashMap<String, Object>();
         if (StringUtils.isEmpty(width) || !StringUtils.isNumeric(width)) {
             // Width is unspecified or is not measured in pixels.
             if (useHeight) {
                 // Height is specified in pixels.
-                queryString.append('&').append(HEIGHT).append('=').append(height);
+                queryString.put(HEIGHT, height);
             } else {
                 // If image width and height are unspecified or if they are not expressed in pixels then limit the image
                 // size to best fit the rectangle specified in the configuration (keeping aspect ratio).
                 int widthLimit = this.xwikiRenderingConfiguration.getImageWidthLimit();
                 if (widthLimit > 0) {
-                    queryString.append('&').append(WIDTH).append('=').append(widthLimit);
+                    queryString.put(WIDTH, widthLimit);
                 }
                 int heightLimit = this.xwikiRenderingConfiguration.getImageHeightLimit();
                 if (heightLimit > 0) {
-                    queryString.append('&').append(HEIGHT).append('=').append(heightLimit);
+                    queryString.put(HEIGHT, heightLimit);
                 }
                 if (widthLimit > 0 && heightLimit > 0) {
-                    queryString.append("&keepAspectRatio=").append(true);
+                    queryString.put("keepAspectRatio", true);
                 }
             }
         } else {
             // Width is specified in pixels.
-            queryString.append('&').append(WIDTH).append('=').append(width);
+            queryString.put(WIDTH, width);
             if (useHeight) {
                 // Height is specified in pixels.
-                queryString.append('&').append(HEIGHT).append('=').append(height);
+                queryString.put(HEIGHT, height);
             }
         }
-        return queryString.toString();
+        return queryString;
+    }
+
+    private String extendQueryString(String queryString, Map<String, Object> parameters)
+    {
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>(URLEncodedUtils.parse(queryString, UTF8, '&'));
+        // Exclude the parameters that are already on the query string.
+        for (NameValuePair pair : pairs) {
+            parameters.remove(pair.getName());
+        }
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            pairs.add(new BasicNameValuePair(entry.getKey(), String.valueOf(entry.getValue())));
+        }
+        return URLEncodedUtils.format(pairs, UTF8);
     }
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
+import org.hamcrest.core.AnyOf;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.api.Invocation;
@@ -92,12 +93,13 @@ public class IntegrationTest
                         "someVelocityCodeHere", true)), "1,1"))));
 
                 // Mock gadget for macrodashboard1.test
-                allowing(mockGadgetSource).getGadgets((String) with(anything()),
+                allowing(mockGadgetSource).getGadgets(with(aNull(String.class)),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
                     .<Block> asList(new WordBlock("content")), "1,1"))));
 
-                allowing(mockGadgetSource).getDashboardSourceMetadata((String) with(anything()),
+                allowing(mockGadgetSource).getDashboardSourceMetadata(
+                    with(AnyOf.anyOf(aNull(String.class), any(String.class))),
                     with(any(MacroTransformationContext.class)));
                 will(returnValue(Collections.<Block> emptyList()));
 

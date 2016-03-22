@@ -118,7 +118,7 @@ public class DefaultGadgetSource implements GadgetSource
         // use the passed source as a document reference
         DocumentReference sourceDocRef = getSourceDocumentReference(source);
         if (sourceDocRef == null) {
-            return new ArrayList<Gadget>();
+            return new ArrayList<>();
         }
 
         // get the current document, read the objects and turn that into gadgets
@@ -129,7 +129,7 @@ public class DefaultGadgetSource implements GadgetSource
         List<BaseObject> gadgetObjects = sourceDoc.getXObjects(gadgetsClass);
 
         if (gadgetObjects == null) {
-            return new ArrayList<Gadget>();
+            return new ArrayList<>();
         }
 
         return prepareGadgets(gadgetObjects, sourceDoc.getSyntax(), context);
@@ -147,7 +147,7 @@ public class DefaultGadgetSource implements GadgetSource
     private List<Gadget> prepareGadgets(List<BaseObject> objects, Syntax sourceSyntax,
         MacroTransformationContext context) throws Exception
     {
-        List<Gadget> gadgets = new ArrayList<Gadget>();
+        List<Gadget> gadgets = new ArrayList<>();
 
         // prepare velocity tools to render title
         VelocityContext velocityContext = velocityManager.getVelocityContext();

@@ -24,9 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -42,8 +41,10 @@ import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.wiki.WikiModel;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link XWikiWikiModel}.
@@ -51,59 +52,48 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * @version $Id$
  * @since 2.0M1
  */
-@MockingRequirement(XWikiWikiModel.class)
-public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiModel>
+public class XWikiWikiModelTest
 {
+    @Rule
+    public MockitoComponentMockingRule<WikiModel> mocker = new MockitoComponentMockingRule<WikiModel>(
+        XWikiWikiModel.class);
+
     private EntityReferenceResolver<ResourceReference> referenceResolver;
 
     private DocumentAccessBridge documentAccessBridge;
 
     @Before
-    @Override
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
-
         this.referenceResolver =
-            getComponentManager().getInstance(DefaultResourceReferenceEntityReferenceResolver.TYPE_RESOURCEREFERENCE);
-        this.documentAccessBridge = getComponentManager().getInstance((Type) DocumentAccessBridge.class);
+            this.mocker.getInstance(DefaultResourceReferenceEntityReferenceResolver.TYPE_RESOURCEREFERENCE);
+        this.documentAccessBridge = this.mocker.getInstance((Type) DocumentAccessBridge.class);
     };
 
     @Test
     public void testGetDocumentEditURLWhenNoQueryStringSpecified() throws Exception
     {
-        final DocumentResourceReference reference = new DocumentResourceReference("TargetSpace.TargetPage");
+        DocumentResourceReference reference = new DocumentResourceReference("TargetSpace.TargetPage");
         reference.setAnchor("anchor");
 
-        final EntityReferenceSerializer<?> compactEntityReferenceSerializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-
+        EntityReferenceSerializer<String> compactEntityReferenceSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
         // Note: we use a character that needs to be encoded in the current document's page name to make sure the
         // generate query string is encoded.
-        final DocumentReference currentDocumentReference = new DocumentReference("Wiki", "Space", "Page\u20AC");
+        DocumentReference currentDocumentReference = new DocumentReference("Wiki", "Space", "Page\u20AC");
+        DocumentReference documentReference = new DocumentReference("TargetWiki", "TargetSpace", "TargetPage");
 
-        final DocumentReference documentReference = new DocumentReference("TargetWiki", "TargetSpace", "TargetPage");
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
+        when(compactEntityReferenceSerializer.serialize(currentDocumentReference)).thenReturn("Wiki:Space.Page\u20AC");
+        when(this.referenceResolver.resolve(reference, EntityType.DOCUMENT)).thenReturn(documentReference);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(currentDocumentReference));
-                oneOf(compactEntityReferenceSerializer).serialize(currentDocumentReference);
-                will(returnValue("Wiki:Space.Page\u20AC"));
+        this.mocker.getComponentUnderTest().getDocumentEditURL(reference);
 
-                oneOf(referenceResolver).resolve(reference, EntityType.DOCUMENT);
-                will(returnValue(documentReference));
-
-                // The test is here: we verify that getDocumentURL is called with the query string already encoded
-                // since getDocumentURL() doesn't encode it.
-                oneOf(documentAccessBridge).getDocumentURL(documentReference, "create",
-                    "parent=Wiki%3ASpace.Page%E2%82%AC", "anchor");
-            }
-        });
-
-        getMockedComponent().getDocumentEditURL(reference);
+        // Verify that getDocumentURL is called with the query string already encoded since getDocumentURL() doesn't
+        // encode it.
+        verify(this.documentAccessBridge).getDocumentURL(documentReference, "create",
+            "parent=Wiki%3ASpace.Page%E2%82%AC", "anchor");
     }
 
     /**
@@ -148,7 +138,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "border: 1px; height: 30px; margin-top: 2em; width: 70px");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=70&height=30");
     }
 
@@ -178,7 +167,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "width: 5cm; height: 80px");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "height=80");
     }
 
@@ -191,20 +179,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited() throws Exception
     {
-        final XWikiRenderingConfiguration configuration =
-            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(configuration).getImageWidthLimit();
-                will(returnValue(200));
-                oneOf(configuration).getImageHeightLimit();
-                will(returnValue(170));
-            }
-        });
+        XWikiRenderingConfiguration configuration = this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        when(configuration.getImageWidthLimit()).thenReturn(200);
+        when(configuration.getImageHeightLimit()).thenReturn(170);
         Map<String, String> parameters = Collections.emptyMap();
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true,
             "width=200&height=170&keepAspectRatio=true");
     }
@@ -219,21 +198,13 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited() throws Exception
     {
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(configuration).getImageWidthLimit();
-                will(returnValue(25));
-                oneOf(configuration).getImageHeightLimit();
-                will(returnValue(-1));
-            }
-        });
+            this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        when(configuration.getImageWidthLimit()).thenReturn(25);
+        when(configuration.getImageHeightLimit()).thenReturn(-1);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("width", "45%");
         parameters.put("style", "height:10em");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
         testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=25");
     }
 
@@ -247,16 +218,9 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited() throws Exception
     {
         final XWikiRenderingConfiguration configuration =
-            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(configuration).getImageWidthLimit();
-                will(returnValue(-1));
-                oneOf(configuration).getImageHeightLimit();
-                will(returnValue(-1));
-            }
-        });
+            this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        when(configuration.getImageWidthLimit()).thenReturn(-1);
+        when(configuration.getImageHeightLimit()).thenReturn(-1);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "bad CSS declaration");
 
@@ -302,77 +266,49 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     public void testGetImageURLWhenIcon() throws Exception
     {
         ResourceReference reference = new ResourceReference("iconname", ResourceType.ICON);
-        final SkinAccessBridge skinAccessBridge = getComponentManager().getInstance((Type) SkinAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(skinAccessBridge).getIconURL("iconname");
-                will(returnValue("/path/to/icon"));
-            }
-        });
+        SkinAccessBridge skinAccessBridge = this.mocker.getInstance((Type) SkinAccessBridge.class);
+        when(skinAccessBridge.getIconURL("iconname")).thenReturn("/path/to/icon");
 
-        Assert.assertEquals("/path/to/icon",
-            getMockedComponent().getImageURL(reference, Collections.<String, String>emptyMap()));
+        assertEquals("/path/to/icon",
+            this.mocker.getComponentUnderTest().getImageURL(reference, Collections.<String, String>emptyMap()));
     }
 
     @Test
     public void testGetDocumentViewURLWhenNoBaseReference() throws Exception
     {
-        final ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
+        ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(this.referenceResolver.resolve(reference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.documentAccessBridge.getDocumentURL(documentReference, "view", null, null)).thenReturn("viewurl");
 
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(referenceResolver).resolve(reference, EntityType.DOCUMENT);
-                will(returnValue(documentReference));
-                oneOf(documentAccessBridge).getDocumentURL(documentReference, "view", null, null);
-                will(returnValue("viewurl"));
-            }
-        });
-
-        Assert.assertEquals("viewurl", getMockedComponent().getDocumentViewURL(reference));
+        assertEquals("viewurl", this.mocker.getComponentUnderTest().getDocumentViewURL(reference));
     }
 
     @Test
     public void testGetDocumentViewURLWhenBaseReferenceSpecified() throws Exception
     {
-        final ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
+        ResourceReference reference = new ResourceReference("reference", ResourceType.DOCUMENT);
         reference.addBaseReference("base");
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(this.referenceResolver.resolve(reference, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.documentAccessBridge.getDocumentURL(documentReference, "view", null, null)).thenReturn("viewurl");
 
-        final DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(referenceResolver).resolve(reference, EntityType.DOCUMENT);
-                will(returnValue(documentReference));
-                oneOf(documentAccessBridge).getDocumentURL(documentReference, "view", null, null);
-                will(returnValue("viewurl"));
-            }
-        });
-
-        Assert.assertEquals("viewurl", getMockedComponent().getDocumentViewURL(reference));
+        assertEquals("viewurl", this.mocker.getComponentUnderTest().getDocumentViewURL(reference));
     }
 
     private void testImageURL(final ResourceReference imageReference, Map<String, String> parameters,
         final boolean expectedIsImageDimensionsIncludedInImageURL, final String expectedQueryString) throws Exception
     {
-        final AttachmentReference attachmentReference =
+        AttachmentReference attachmentReference =
             new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
-        final XWikiRenderingConfiguration configuration =
-            getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(configuration).isImageDimensionsIncludedInImageURL();
-                will(returnValue(expectedIsImageDimensionsIncludedInImageURL));
-                oneOf(referenceResolver).resolve(imageReference, EntityType.ATTACHMENT);
-                will(returnValue(attachmentReference));
-                oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, expectedQueryString, false);
-                will(returnValue("?" + expectedQueryString));
-            }
-        });
+        XWikiRenderingConfiguration configuration = this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        when(configuration.isImageDimensionsIncludedInImageURL()).thenReturn(
+            expectedIsImageDimensionsIncludedInImageURL);
+        when(this.referenceResolver.resolve(imageReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);
+        when(this.documentAccessBridge.getAttachmentURL(attachmentReference, expectedQueryString, false)).thenReturn(
+            "?" + expectedQueryString);
 
-        Assert.assertEquals("?" + expectedQueryString, getMockedComponent().getImageURL(imageReference, parameters));
+        assertEquals("?" + expectedQueryString,
+            this.mocker.getComponentUnderTest().getImageURL(imageReference, parameters));
     }
 }

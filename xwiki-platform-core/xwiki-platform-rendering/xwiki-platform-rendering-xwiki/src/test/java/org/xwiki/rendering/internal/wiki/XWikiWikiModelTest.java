@@ -238,10 +238,11 @@ public class XWikiWikiModelTest
     {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("height", "17");
+        parameters.put("width", "23");
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        reference.setParameter(AttachmentResourceReference.QUERY_STRING, "param=value");
-        testImageURL(reference, parameters, true, "param=value&height=17");
+        reference.setParameter(AttachmentResourceReference.QUERY_STRING, "width=41&param=value");
+        testImageURL(reference, parameters, true, "width=41&param=value&height=17");
     }
 
     /**

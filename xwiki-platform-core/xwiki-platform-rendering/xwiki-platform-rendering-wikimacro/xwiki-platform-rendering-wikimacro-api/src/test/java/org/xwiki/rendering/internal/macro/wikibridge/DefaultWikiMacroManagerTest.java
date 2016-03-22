@@ -30,6 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -40,12 +41,17 @@ import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager}.
@@ -195,9 +201,10 @@ public class DefaultWikiMacroManagerTest
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"),
             "space");
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro",
-            "Description", "Test", visibility, new DefaultContentDescriptor(), Collections.emptyList());
-        XDOM xdom = new XDOM(Arrays.asList(new ParagraphBlock(Arrays.asList(new WordBlock("test")))));
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor(new MacroId("testwikimacro"), "Test Wiki Macro", "Description", "Test", visibility,
+                new DefaultContentDescriptor(), Collections.<WikiMacroParameterDescriptor>emptyList());
+        XDOM xdom = new XDOM(Arrays.asList(new ParagraphBlock(Arrays.<Block>asList(new WordBlock("test")))));
 
         DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, authorReference, true, descriptor,
             xdom, Syntax.XWIKI_2_0, this.mocker);

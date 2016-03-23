@@ -169,8 +169,8 @@ public class XWikiRepositoryModel
 
     // Solr
 
-    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION = toExtensionClassSolrPropertyName(
-        PROP_EXTENSION_VALIDEXTENSION, "boolean");
+    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
 
     public static final String SOLR_STRING = "string";
 
@@ -187,8 +187,8 @@ public class XWikiRepositoryModel
 
         public ExtensionSolrField(String name, String type, Float boostValue)
         {
-            super(toExtensionClassSolrPropertyName(name, type), type != null ? toExtensionClassSolrPropertyName(name)
-                : null, boostValue);
+            super(toExtensionClassSolrPropertyName(name, type),
+                type != null ? toExtensionClassSolrPropertyName(name) : null, boostValue);
         }
     }
 
@@ -201,8 +201,8 @@ public class XWikiRepositoryModel
 
         public RatingSolrField(String name, String type, Float boostValue)
         {
-            super(toAverageRatingClassSolrPropertyName(name, type), type != null
-                ? toAverageRatingClassSolrPropertyName(name) : null, boostValue);
+            super(toAverageRatingClassSolrPropertyName(name, type),
+                type != null ? toAverageRatingClassSolrPropertyName(name) : null, boostValue);
         }
     }
 
@@ -243,20 +243,22 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, new ExtensionSolrField(
-            PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL, new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
-            null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
+            new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
+            new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
-        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE,
+            new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
         SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_ALLOWEDNAMESPACE));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
+        SOLR_FIELDS.put(Extension.FIELD_PROPERTIES, new ExtensionSolrField(PROP_EXTENSION_PROPERTIES, null));
 
         // Rating
         SOLR_FIELDS.put(RatingExtension.FIELD_TOTAL_VOTES, new RatingSolrField(PROP_RATING_TOTALVOTES, "int", null));
         SOLR_FIELDS.put("votes", SOLR_FIELDS.get(PROP_RATING_TOTALVOTES));
-        SOLR_FIELDS
-            .put(RatingExtension.FIELD_AVERAGE_VOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
+        SOLR_FIELDS.put(RatingExtension.FIELD_AVERAGE_VOTE,
+            new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
 
         // Fields not stored

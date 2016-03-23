@@ -85,8 +85,9 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
+    public static final String[] EPROPERTIES_SUMMARY =
+        new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
+        XWikiRepositoryModel.PROP_EXTENSION_NAME, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES };
 
     protected static final String DEFAULT_BOOST;
 
@@ -372,20 +373,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         // Properties
-        List<String> properties =
-            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES);
-        if (properties != null) {
-            for (String stringProperty : properties) {
-                int index = stringProperty.indexOf('=');
-                if (index > 0) {
-                    Property property = new Property();
-                    property.setKey(stringProperty.substring(0, index));
-                    property.setStringValue((index + 1) < stringProperty.length() ? stringProperty.substring(index + 1)
-                        : "");
-                    extension.getProperties().add(property);
-                }
-            }
-        }
+        addProperties(extension,
+            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES));
 
         // Dependencies
         if (extensionVersion != null) {
@@ -674,10 +663,35 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Version
         extension.setVersion(this.<String>getSolrValue(document, Extension.FIELD_VERSION, true));
 
+        // Properties
+        addProperties(extension, this.<String>getSolrValues(document, Extension.FIELD_PROPERTIES));
+
         // TODO: add support for
         // * dependencies
 
         return extension;
+    }
+
+    protected Map<String, String> addProperties(AbstractExtension extension, Collection<String> properties)
+    {
+        Map<String, String> map = null;
+
+        if (properties != null) {
+            map = new HashMap<>();
+
+            for (String stringProperty : properties) {
+                int index = stringProperty.indexOf('=');
+                if (index > 0) {
+                    Property property = new Property();
+                    property.setKey(stringProperty.substring(0, index));
+                    property.setStringValue(
+                        (index + 1) < stringProperty.length() ? stringProperty.substring(index + 1) : "");
+                    extension.getProperties().add(property);
+                }
+            }
+        }
+
+        return map;
     }
 
     protected ExtensionRating getExtensionRating(DocumentReference extensionDocumentReference)

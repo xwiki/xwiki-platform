@@ -28,6 +28,8 @@
  *     // Use the module.
  *   });
  * });
+ *
+ * @since 8.1M1
  */
 define('deferred', ['jquery'], function($) {
   var promises = {};

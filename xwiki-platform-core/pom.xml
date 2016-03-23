@@ -562,7 +562,6 @@
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
-    <module>xwiki-platform-faq</module>
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>

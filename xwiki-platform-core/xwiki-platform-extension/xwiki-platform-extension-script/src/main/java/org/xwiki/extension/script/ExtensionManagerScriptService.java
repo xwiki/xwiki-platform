@@ -66,6 +66,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -410,13 +411,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             installRequest.addNamespace(namespace);
         }
 
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         // Indicate if it's allowed to do modification on root namespace
-        installRequest.setRootModificationsAllowed(
-            namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
+        installRequest.setRootModificationsAllowed(namespace == null || xcontext.isMainWiki(toWikiId(namespace)));
 
         // Provide informations on what started the job
-        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, xcontext.getWikiId());
+        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, xcontext.getAction());
 
         setRightsProperties(installRequest);
 

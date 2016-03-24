@@ -23,7 +23,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -31,9 +33,12 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreationStep;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Job that create a wiki and execute the WikiCreationSteps.
@@ -56,10 +61,21 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
      */
     public static final String JOB_TYPE = "wikicreationjob";
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
+
     @Override
     protected void runInternal() throws Exception
     {
         try {
+            // Consider that the owner id is a serialized user reference and put it in the context as the current user
+            // so that all steps are executed under that user.
+            this.xcontextProvider.get().setUserReference(
+                this.defaultDocumentReferenceResolver.resolve(getRequest().getOwnerId()));
+
             List<WikiCreationStep> wikiCreationStepList = componentManager.getInstanceList(WikiCreationStep.class);
             // Some extra steps needs to be executed AFTER some others, so we have introduce a getOrder() method in the
             // interface. We use this method to sort the list of extra steps by this order.

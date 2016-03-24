@@ -118,6 +118,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
             }
         }
 
+        // Note: We don't set a title since there's a sheet computing a proper title.
         needsUpdate |= setDocumentFields(document, "");
 
         return needsUpdate;

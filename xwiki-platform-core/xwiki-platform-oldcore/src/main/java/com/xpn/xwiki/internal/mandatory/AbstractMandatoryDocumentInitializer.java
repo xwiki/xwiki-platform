@@ -152,7 +152,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      * generate XWiki Syntax 2.0.
      *
      * @param document the document
-     * @param title the page title to set
+     * @param title the page title to set (if null or blank the title won't be set)
      * @return true if the document has been modified, false otherwise
      */
     protected boolean setDocumentFields(XWikiDocument document, String title)

@@ -78,24 +78,67 @@ describe('XWiki Macro Plugin for CKEditor', function() {
   });
 
   it('converts empty macro output into a widget', function(done) {
-    editor.setData('<p><!--startmacro:id|-|name="foo"--><span id="foo"></span><!--stopmacro--></p>', {
+    editor.setData(
+      '<!--startmacro:html|-||-|--><!--stopmacro-->' +
+      '<p>' +
+        '<!--startmacro:id|-|name="foo"-->' +
+        '<span id="foo"></span>' +
+        '<!--stopmacro-->' +
+      '</p>', {
       callback: function() {
         var wikiMacroWidgets = getWikiMacroWidgets(editor);
-        expect(wikiMacroWidgets.length).toBe(1);
+        expect(wikiMacroWidgets.length).toBe(2);
+
+        var htmlMacro = wikiMacroWidgets[1];
+        expect(htmlMacro.pathName).toBe('macro:html');
+        expect(htmlMacro.element.getAttribute('data-macro')).toBe('startmacro:html|-||-|');
 
         var idMacro = wikiMacroWidgets[0];
         expect(idMacro.pathName).toBe('macro:id');
         expect(idMacro.element.getAttribute('data-macro')).toBe('startmacro:id|-|name="foo"');
 
-        expect(editor.getData()).toBe('<p><!--startmacro:id|-|name="foo"--><!--stopmacro--></p>');
+        expect(editor.getData()).toBe(
+          '<!--startmacro:html|-||-|--><!--stopmacro-->' +
+          '<p><!--startmacro:id|-|name="foo"--><!--stopmacro--></p>'
+        );
 
         editor.config.fullData = true;
-        expect(editor.getData()).toBe('<p><!--startmacro:id|-|name="foo"-->' +
-          '<span class="macro-placeholder">macro:id</span><!--stopmacro--></p>');
+        expect(editor.getData()).toBe(
+          '<!--startmacro:html|-||-|-->' +
+          '<div class="macro-placeholder">macro:html</div>' +
+          '<!--stopmacro-->' +
+          '<p>' +
+            '<!--startmacro:id|-|name="foo"-->' +
+            '<span class="macro-placeholder">macro:id</span>' +
+            '<!--stopmacro-->' +
+          '</p>'
+        );
 
         done();
       }
     });
+  });
+
+  var assertNoChangeAfterDataRoundTrip = function(done, inputData) {
+    editor.setData(inputData, {
+      callback: function() {
+        editor.config.fullData = true;
+        editor.setData(editor.getData(), {
+          callback: function() {
+            editor.config.fullData = false;
+            expect(editor.getData()).toBe(inputData);
+            done();
+          }
+        });
+      }
+    });
+  };
+
+  it('checks if the edited content remains unchanged after performing data round-trips', function(done) {
+    [
+      // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor
+      '<!--startmacro:html|-||-|--><!--stopmacro--><p>text</p>'
+    ].forEach(jQuery.proxy(assertNoChangeAfterDataRoundTrip, null, done));
   });
 
   var serializeAndParseMacroCall = function(macroCall) {

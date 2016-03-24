@@ -88,7 +88,7 @@
           }
         } else {
           // Use a placeholder for the macro output. The user cannot edit the macro otherwise.
-          var placeholder = new CKEDITOR.htmlParser.element('span', {'class': 'macro-placeholder'});
+          var placeholder = new CKEDITOR.htmlParser.element(wrapperName, {'class': 'macro-placeholder'});
           var macroCall = macroPlugin.parseMacroCall(startMacroComment.value);
           placeholder.add(new CKEDITOR.htmlParser.text('macro:' + macroCall.name));
           wrapper.add(placeholder);

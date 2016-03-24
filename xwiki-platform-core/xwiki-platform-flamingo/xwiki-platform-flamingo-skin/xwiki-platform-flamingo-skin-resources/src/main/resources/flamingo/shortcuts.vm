@@ -5,7 +5,7 @@
 ##
 #if (!$docextralinks && !$docextras)
   #set($docextralinks = [])
-  ## Children
+  ## Children & Siblings (show it even if the document doesn't exist since there can be children or siblings)
   #if ($services.parentchild.isParentChildMechanismEnabled())
     #set ($discard = $docextralinks.add(['children', $services.localization.render('docextra.children'), -1, 'folder-open', {'hierarchy': 'parentchild'}]))
   #else
@@ -16,13 +16,13 @@
       #set ($discard = $docextralinks.add(['siblings', $services.localization.render('docextra.siblings'), -1, 'folder-open']))
     #end
   #end
-  #if($xcontext.action == 'view' && $viewer != 'content')
+  #if($xcontext.action == 'view' && $viewer != 'content' && !$doc.isNew())
     #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1, 'file']))
   #end
-  #if($viewer != 'comments' && $showcomments)
+  #if($viewer != 'comments' && $showcomments && !$doc.isNew())
     #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment']))
   #end
-  #if($showannotations)
+  #if($showannotations && !$doc.isNew())
     #if(!$annotationCount)
       ## Annotation count is supposed to be defined in xwikivars.vm. If for a reason or another it is not
       ## defined at this point, we tap into the standard annotation class, and do not load again the 
@@ -31,13 +31,13 @@
     #end
     #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'pushpin']))
   #end
-  #if($viewer != 'attachments' && $showattachments)
+  #if($viewer != 'attachments' && $showattachments && !$doc.isNew())
     #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'paperclip']))
   #end
-  #if($viewer != 'history' && $showhistory)
+  #if($viewer != 'history' && $showhistory && !$doc.isNew())
     #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time']))
   #end
-  #if($viewer != 'information' && $showinformation)
+  #if($viewer != 'information' && $showinformation && !$doc.isNew())
     #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'info-sign']))
   #end
 #end

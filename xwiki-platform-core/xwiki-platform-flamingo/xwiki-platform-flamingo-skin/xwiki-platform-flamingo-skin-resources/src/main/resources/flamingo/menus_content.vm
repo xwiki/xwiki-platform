@@ -64,17 +64,17 @@
  * @param $name the name of the UI extension to display
  * @param $staticExtensions (optional) an array of static extensions to display along with the regular uix.
  *         e.g. [ { 'content': 'someHTMLcontent', 'order': 20000, 'separator': true } ]
+ * @param $count out parameter containing the number of entries displayed in the menu
  * @since 7.3M1
  *
  * TODO: replace this macro to stop having "static extensions" but a mechanism to have real UI Extensions in templates.
  *#
-#macro(displaySecureUIX $name $staticExtensions)
-  ## Get the given static extension
-  #set($extensions = $staticExtensions)
-  #if (!$extensions)
-    #set ($extensions = [])
-  #end
-  ## Get the UIX from the system
+#macro(displaySecureUIX $name $staticExtensions $count)
+  #set ($count = 0)
+  ## Add the static UIX to the list of UIX to display
+  #set ($extensions = [])
+  #set ($discard = $extensions.addAll($staticExtensions))
+  ## Add the dynamic UIX to the list of of UIX to display
   #foreach($uix in $services.uix.getExtensions($name))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #set ($separator = ("$!uix.getParameters().separator" == 'true'))
@@ -96,8 +96,10 @@
     $content
     #if ($stringtool.isNotBlank($content))
       #set ($canHaveMenuSeparator = true)
+      #set ($count = $count + 1)
     #end
   #end
+  #setVariable("$count", $count)
 #end
 
 #**
@@ -265,12 +267,15 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    #displaySecureUIX('org.xwiki.plaftorm.moreoptions', $staticExtensions)
+    #displaySecureUIX('org.xwiki.plaftorm.moreoptions', $staticExtensions $count)
     ## ----------------------------
     ## Display the shortcuts
     ## ----------------------------
-    #if($canView && $displayShortcuts)
-      #submenuseparator()
+    #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
+      ## Only display a separator if at least one menu entry has been displayed
+      #if ($count > 0)
+        #submenuseparator()
+      #end
       #template("shortcuts.vm")
     #end
   #end

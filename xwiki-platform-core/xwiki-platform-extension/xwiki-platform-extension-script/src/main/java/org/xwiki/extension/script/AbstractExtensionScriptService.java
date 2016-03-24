@@ -138,6 +138,26 @@ public abstract class AbstractExtensionScriptService implements ScriptService
         return ((JobScriptService) jobScriptService).getJobStatus(jobId);
     }
 
+    /**
+     * @since 8.1M1
+     */
+    protected String toWikiId(String namespace)
+    {
+        if (namespace != null && namespace.startsWith(WIKI_NAMESPACE_PREFIX)) {
+            return namespace.substring(WIKI_NAMESPACE_PREFIX.length());
+        }
+
+        return null;
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    protected String fromWikitoNamespace(String wiki)
+    {
+        return WIKI_NAMESPACE_PREFIX + wiki;
+    }
+
     // Error management
 
     /**

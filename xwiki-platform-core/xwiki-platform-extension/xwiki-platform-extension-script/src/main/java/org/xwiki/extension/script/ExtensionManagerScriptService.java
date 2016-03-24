@@ -410,6 +410,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             installRequest.addNamespace(namespace);
         }
 
+        // Indicate if it's allowed to do modification on root namespace
+        installRequest.setRootModificationsAllowed(
+            namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
+
         // Provide informations on what started the job
         installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
         installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
@@ -560,6 +564,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
         }
+
+        // Indicate if it's allowed to do modification on root namespace
+        uninstallRequest.setRootModificationsAllowed(
+            namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
 
         // Provide informations on what started the job
         uninstallRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
@@ -743,8 +751,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // TODO: probably check current user namespace
 
         // Check current wiki namespace
-        String namespace = WIKI_NAMESPACE_PREFIX + this.xcontextProvider.get().getWikiId();
-        Job job = this.jobExecutor.getCurrentJob(new JobGroupPath(namespace, AbstractExtensionJob.ROOT_GROUP));
+        Job job = this.jobExecutor.getCurrentJob(new JobGroupPath(
+            fromWikitoNamespace(this.xcontextProvider.get().getWikiId()), AbstractExtensionJob.ROOT_GROUP));
 
         // Check root namespace
         if (job == null) {

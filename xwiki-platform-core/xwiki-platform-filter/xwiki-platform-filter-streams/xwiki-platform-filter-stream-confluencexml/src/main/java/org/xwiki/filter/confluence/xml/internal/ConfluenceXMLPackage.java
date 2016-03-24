@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -177,7 +177,7 @@ public class ConfluenceXMLPackage
 
     private File tree;
 
-    private Map<Integer, List<Integer>> pages = new HashMap<Integer, List<Integer>>();
+    private Map<Integer, List<Integer>> pages = new LinkedHashMap<Integer, List<Integer>>();
 
     public ConfluenceXMLPackage(InputSource source) throws IOException, FilterException, XMLStreamException,
         FactoryConfigurationError, NumberFormatException, ConfigurationException

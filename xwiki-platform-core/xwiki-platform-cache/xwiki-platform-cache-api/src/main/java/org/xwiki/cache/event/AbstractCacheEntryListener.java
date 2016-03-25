@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * @since 8.1M1
  */
 @Unstable
-public class CacheEntryListenerAdapter<T> implements CacheEntryListener<T>
+public abstract class AbstractCacheEntryListener<T> implements CacheEntryListener<T>
 {
     @Override
     public void cacheEntryAdded(CacheEntryEvent<T> event)

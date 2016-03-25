@@ -37,7 +37,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListenerAdapter;
+import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -798,7 +798,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Listener for cache events, to properly dispose entries removed.
      */
-    private class Listener extends CacheEntryListenerAdapter<SecurityCacheEntry>
+    private class Listener extends AbstractCacheEntryListener<SecurityCacheEntry>
     {
         @Override
         public void cacheEntryRemoved(CacheEntryEvent<SecurityCacheEntry> event)

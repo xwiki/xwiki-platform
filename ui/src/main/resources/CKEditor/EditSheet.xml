@@ -185,6 +185,8 @@ require.config({
   },
   shim: {
     ckeditor: {
+      // Some of the plugins that are bundled with the CKEditor code use jQuery.
+      deps: ['jquery'],
       exports: 'CKEDITOR'
     }
   }

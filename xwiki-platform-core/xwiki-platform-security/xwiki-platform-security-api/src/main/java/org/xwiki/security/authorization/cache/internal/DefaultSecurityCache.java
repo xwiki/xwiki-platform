@@ -37,7 +37,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListener;
+import org.xwiki.cache.event.CacheEntryListenerAdapter;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -798,14 +798,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Listener for cache events, to properly dispose entries removed.
      */
-    private class Listener implements CacheEntryListener<SecurityCacheEntry>
+    private class Listener extends CacheEntryListenerAdapter<SecurityCacheEntry>
     {
-        @Override
-        public void cacheEntryAdded(
-            CacheEntryEvent<SecurityCacheEntry> securityCacheEntryCacheEntryEvent)
-        {
-        }
-
         @Override
         public void cacheEntryRemoved(CacheEntryEvent<SecurityCacheEntry> event)
         {
@@ -818,12 +812,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     logger.debug("Removed entry [{}].", event.getEntry().getKey());
                 }
             }
-        }
-
-        @Override
-        public void cacheEntryModified(
-            CacheEntryEvent<SecurityCacheEntry> securityCacheEntryCacheEntryEvent)
-        {
         }
     }
     

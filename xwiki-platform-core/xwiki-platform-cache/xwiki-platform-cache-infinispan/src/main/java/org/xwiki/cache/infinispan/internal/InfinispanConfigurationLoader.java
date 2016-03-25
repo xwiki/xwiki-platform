@@ -35,6 +35,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.cache.util.AbstractCacheConfigurationLoader;
+import org.xwiki.environment.Environment;
 
 /**
  * Customize Infinispan configuration based on XWiki Cache configuration.
@@ -50,10 +51,11 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
 
     /**
      * @param configuration the XWiki cache configuration
+     * @param environment teh environment, can be null
      */
-    public InfinispanConfigurationLoader(CacheConfiguration configuration)
+    public InfinispanConfigurationLoader(CacheConfiguration configuration, Environment environment)
     {
-        super(configuration, null);
+        super(configuration, environment, null);
     }
 
     /**

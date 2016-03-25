@@ -88,6 +88,7 @@ var CKBUILDER_CONFIG = {
     undo: 1,
     uploadimage: 1,
     wysiwygarea: 1,
+    'xwiki-filter': 1,
     'xwiki-image': 1,
     'xwiki-link': 1,
     'xwiki-macro': 1,

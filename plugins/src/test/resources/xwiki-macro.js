@@ -21,16 +21,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
   var editor;
 
   beforeEach(function(done) {
-    editor = CKEDITOR.appendTo(document.body, {
-      allowedContent: true,
-      customConfig: '',
-      // Basic plugins, as per http://docs.ckeditor.com/#!/guide/dev_tests-section-test-requirements .
-      plugins: 'wysiwygarea,toolbar,undo,basicstyles,xwiki-macro',
-      skin: 'moono'
-    });
-    editor.on('instanceReady', function() {
-      done();
-    });
+    editor = testUtils.createEditor(done, {'extraPlugins': 'xwiki-macro'});
   });
 
   var getWikiMacroWidgets = function(editor) {
@@ -119,26 +110,11 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     });
   });
 
-  var assertNoChangeAfterDataRoundTrip = function(done, inputData) {
-    editor.setData(inputData, {
-      callback: function() {
-        editor.config.fullData = true;
-        editor.setData(editor.getData(), {
-          callback: function() {
-            editor.config.fullData = false;
-            expect(editor.getData()).toBe(inputData);
-            done();
-          }
-        });
-      }
-    });
-  };
-
   it('checks if the edited content remains unchanged after performing data round-trips', function(done) {
-    [
+    jQuery.when.apply(jQuery, [
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor
       '<!--startmacro:html|-||-|--><!--stopmacro--><p>text</p>'
-    ].forEach(jQuery.proxy(assertNoChangeAfterDataRoundTrip, null, done));
+    ].map(jQuery.proxy(testUtils.assertNoChangeAfterDataRoundTrip, testUtils, editor))).then(done);
   });
 
   var serializeAndParseMacroCall = function(macroCall) {

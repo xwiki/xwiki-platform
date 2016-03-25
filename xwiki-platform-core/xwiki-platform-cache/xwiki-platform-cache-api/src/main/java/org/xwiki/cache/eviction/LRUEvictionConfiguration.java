@@ -59,7 +59,7 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @param maxEntries the maximum entries the cache can contain.
+     * @param maxEntries see {@link #getMaxEntries()}
      */
     public void setMaxEntries(int maxEntries)
     {
@@ -67,7 +67,8 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @return the maximum entries the cache can contain.
+     * @return the maximum entries the cache can contain. When the cache reaches that any element, the defined eviction
+     *         algorithm kicks in to remove existing cache entries.
      */
     public int getMaxEntries()
     {
@@ -77,7 +78,7 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @param maxIdle the maximum time to live since the last time the value was used. In seconds.
+     * @param maxIdle see {@link #getMaxIdle()}
      * @since 7.4M2
      */
     public void setMaxIdle(int maxIdle)
@@ -86,7 +87,10 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @return the maximum time to live since the last time the value was used. In seconds.
+     * @return the time a cache entry will continue to stay in the cache after being last accessed, in seconds. When
+     *         the time is reached, the entry is expired and removed from the cache. In addition, when the cache
+     *         reaches its maximum number of entries, the defined eviction algorithm is used (e.g. LRU) and thus an
+     *         entry can stay less time in the cache than its maximum defined time.
      * @since 7.4M2
      */
     public int getMaxIdle()
@@ -95,7 +99,7 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @param lifespan the maximum time to live since the value has been cached. In seconds.
+     * @param lifespan see {@link #getLifespan()}
      * @since 7.4M2
      */
     public void setLifespan(int lifespan)
@@ -104,7 +108,10 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @return the maximum time to live since the value has been cached. In seconds.
+     * @return the maximum lifespan of a cache entry, after which the entry is expired and removed from the cache, in
+     *         seconds. In addition, when the cache reaches its maximum number of entries, the defined eviction
+     *         algorithm is used (e.g. LRU) and thus an entry can stay less time in the cache than its maximum defined
+     *         time.
      * @since 7.4M2
      */
     public int getLifespan()

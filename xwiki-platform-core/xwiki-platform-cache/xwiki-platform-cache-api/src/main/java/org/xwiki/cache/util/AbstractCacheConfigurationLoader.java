@@ -22,6 +22,7 @@ package org.xwiki.cache.util;
 import java.io.File;
 
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.environment.Environment;
 
 /**
  * Base class to load cache configuration.
@@ -41,6 +42,11 @@ public abstract class AbstractCacheConfigurationLoader
     private CacheConfiguration configuration;
 
     /**
+     * The environment. Used for example to access temporary folder.
+     */
+    private Environment environment;
+
+    /**
      * The default configuration identifier used to load cache configuration file.
      */
     private String defaultPropsId;
@@ -51,7 +57,19 @@ public abstract class AbstractCacheConfigurationLoader
      */
     public AbstractCacheConfigurationLoader(CacheConfiguration configuration, String defaultPropsId)
     {
+        this(configuration, null, defaultPropsId);
+    }
+
+    /**
+     * @param configuration the XWiki cache API configuration.
+     * @param environment the environment, can be null
+     * @param defaultPropsId the default configuration identifier used to load cache configuration file.
+     */
+    public AbstractCacheConfigurationLoader(CacheConfiguration configuration, Environment environment,
+        String defaultPropsId)
+    {
         this.configuration = (CacheConfiguration) configuration.clone();
+        this.environment = environment;
         this.defaultPropsId = defaultPropsId;
     }
 
@@ -71,15 +89,22 @@ public abstract class AbstractCacheConfigurationLoader
         String path = (String) this.configuration.get(CONFX_CACHE_PATH);
 
         if (path == null) {
-            path = System.getProperty("java.io.tmpdir") + File.separator + "xwiki";
-            if (this.configuration.getConfigurationId() == null) {
-                path += File.separator + this.configuration.getConfigurationId() + File.separator;
+            File file;
+            if (this.environment != null) {
+                file = new File(this.environment.getTemporaryDirectory().getAbsolutePath(), "cache");
+            } else {
+                file = new File(System.getProperty("java.io.tmpdir"), "xwiki");
             }
 
-            File tempDir = new File(path);
-            if (!tempDir.exists()) {
-                tempDir.mkdirs();
+            if (this.configuration.getConfigurationId() == null) {
+                file = new File(file, this.configuration.getConfigurationId());
             }
+
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            path = file.getAbsolutePath();
         }
 
         return path;

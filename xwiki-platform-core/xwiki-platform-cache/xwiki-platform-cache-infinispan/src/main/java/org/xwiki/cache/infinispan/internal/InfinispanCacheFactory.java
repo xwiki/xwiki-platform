@@ -145,7 +145,7 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable, Disp
     @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
-        InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration);
+        InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration, this.environment);
 
         String cacheName = configuration.getConfigurationId();
 

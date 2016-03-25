@@ -38,7 +38,8 @@ public class ExtensionPane extends BaseElement
     /**
      * The XPath used to locate an extension action button.
      */
-    private static final String ACTION_BUTTON_XPATH = ".//button[@name = 'extensionAction' and @value='%s']";
+    private static final String ACTION_BUTTON_XPATH =
+        ".//button[@name = 'extensionAction' and @value='%s' and normalize-space(text())='%s']";
 
     /**
      * The name of the "class" attribute of HTML elements.
@@ -149,7 +150,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getShowDetailsButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "showDetails")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "showDetails", "Show details")));
     }
 
     /**
@@ -195,7 +196,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getHideDetailsButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "hideDetails")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "hideDetails", "Hide details")));
     }
 
     /**
@@ -229,7 +230,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getInstallButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "install")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "install", "Install")));
     }
 
     /**
@@ -272,7 +273,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getUninstallButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "uninstall")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "uninstall", "Uninstall")));
     }
 
     /**
@@ -290,7 +291,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getUpgradeButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "upgrade")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "install", "Upgrade")));
     }
 
     /**
@@ -308,7 +309,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getDowngradeButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "downgrade")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "install", "Downgrade")));
     }
 
     /**
@@ -326,7 +327,7 @@ public class ExtensionPane extends BaseElement
      */
     public WebElement getContinueButton()
     {
-        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "continue")));
+        return maybeFindElement(By.xpath(String.format(ACTION_BUTTON_XPATH, "continue", "Continue")));
     }
 
     /**

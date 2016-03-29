@@ -27,12 +27,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -64,6 +69,9 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      */
     private static final String CONTENT_DESCRIPTION = "the content to cache.";
 
+    @Inject
+    private Logger logger;
+
     /**
      * Used to create the macro content cache.
      */
@@ -83,11 +91,14 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
     @Named("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
+    @Inject
+    private JobExecutor jobExecutor;
+
     /**
-     * Map of all caches. There's one cache per timeToLive/maxEntry combination since currently we cannot set these
+     * Map of all caches. There's one cache per timeToLive/maxEntries combination since currently we cannot set these
      * configuration values at the cache entry level but only for the whole cache.
      */
-    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new ConcurrentHashMap<>();
+    private Map<CacheKey, Cache<CacheValue>> contentCacheMap = new ConcurrentHashMap<>();
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -122,25 +133,49 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
             cacheKey = content;
         }
 
-        Cache<List<Block>> contentCache = getContentCache(parameters.getTimeToLive(), parameters.getMaxEntries());
-        List<Block> result = contentCache.get(cacheKey);
-        if (result == null) {
-            // Run the parser for the syntax on the content
-            // We run the current transformation on the cache macro content. We need to do this since we want to cache
-            // the XDOM resulting from the execution of Macros because that's where lengthy processing happens.
-            result = this.contentParser.parse(content, context, true, context.isInline()).getChildren();
-            contentCache.set(cacheKey, result);
+        Cache<CacheValue> contentCache = getContentCache(parameters.getTimeToLive(), parameters.getMaxEntries());
+        CacheValue value = contentCache.get(cacheKey);
+        if (value == null) {
+            this.logger.debug("Cached content for cache [{}] is going to be computed", cacheKey);
+            // Parse the macro content without executing the Macro transformation, since we want to save the static
+            // Blocks separately. We do this so that we can apply the Macro Transformation again when the cache entry
+            // expires and thus always have up to date cached content to return.
+            XDOM staticXDOM = this.contentParser.parse(content, context, false, context.isInline());
+
+            // Execute the recomputation job to execute the macro transformation on the static XDOM
+            CacheMacroRecomputeRequest request = new CacheMacroRecomputeRequest(contentCache, cacheKey, staticXDOM);
+            Job job;
+            try {
+                // This executes asynchronously and thus we wait before returning. The reason we call the job here
+                // is to make sure we always return the same rendered content whether the cache macro content has not
+                // been put in the cache yet or oce it's in the cache and it's expired and it's been recomputed.
+                // It also allows us to cleanly isolate from the current execution context (since it runs in another
+                // thread).
+                job = this.jobExecutor.execute(CacheMacroRecomputationJob.JOBTYPE, request);
+                job.join();
+            } catch (Exception e) {
+                throw new MacroExecutionException("Failed to create the job to render the Cache Macro content", e);
+            }
+
+            // If the job failed then it would have removed the entry from the cache
+            value = contentCache.get(cacheKey);
+            if (value == null) {
+                // The job failed, throw an error and get the excetion from the job
+                throw new MacroExecutionException("Failed to render the Cache Macro content",
+                    job.getStatus().getLog().getLogs(LogLevel.ERROR).get(0).getThrowable());
+            }
+        } else {
+            this.logger.debug("Cached content for cache [{}] found, no recomputation done", cacheKey);
         }
 
-        return result;
+        return value.getTransformedXDOM().getChildren();
     }
 
     /**
      * Get a cache matching the passed time to live and max entries.
      * <p>
-     * Note that whenever a new cache is created it currently means a new thread is used too (since the JBoss cache used
-     * underneath uses a thread for evicting entries from the cache). We need to modify our xwiki-cache module to allow
-     * setting time to live on cache items, see http://jira.xwiki.org/jira/browse/XWIKI-5907
+     * Note in the future, we need to modify our xwiki-cache module to allow setting time to live on cache items,
+     * see http://jira.xwiki.org/jira/browse/XWIKI-5907
      * </p>
      *
      * @param lifespan the number of seconds to cache the content
@@ -148,10 +183,10 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * @return the matching cache (a new cache is created if no existing one is found)
      * @throws MacroExecutionException in case we fail to create the new cache
      */
-    Cache<List<Block>> getContentCache(int lifespan, int maxEntries) throws MacroExecutionException
+    Cache<CacheValue> getContentCache(int lifespan, int maxEntries) throws MacroExecutionException
     {
         CacheKey cacheKey = new CacheKey(lifespan, maxEntries);
-        Cache<List<Block>> contentCache = this.contentCacheMap.get(cacheKey);
+        Cache<CacheValue> contentCache = this.contentCacheMap.get(cacheKey);
         if (contentCache == null) {
             // Create Cache
             LRUCacheConfiguration configuration =
@@ -164,6 +199,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
                 throw new MacroExecutionException("Failed to create content cache", e);
             }
 
+            contentCache.addCacheEntryListener(new CacheMacroCacheEntryListener(this.jobExecutor));
             this.contentCacheMap.put(cacheKey, contentCache);
         }
 

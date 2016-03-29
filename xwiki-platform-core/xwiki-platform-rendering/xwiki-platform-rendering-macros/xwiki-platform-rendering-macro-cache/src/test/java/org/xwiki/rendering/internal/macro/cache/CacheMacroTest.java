@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import org.junit.Test;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
@@ -60,6 +61,8 @@ public class CacheMacroTest extends AbstractComponentTestCase
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
         this.cacheMacro = getComponentManager().getInstance(Macro.class, "cache");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
+
+        getComponentManager().registerMockComponent(getMockery(), LoggerManager.class);
     }
 
     @Test

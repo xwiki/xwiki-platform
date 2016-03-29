@@ -37,7 +37,7 @@
   <title>Mail Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.email=Email
 admin.email.description=Configure email (general, mail sending) and view mail statuses.

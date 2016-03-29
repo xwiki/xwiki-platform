@@ -37,7 +37,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.panels.applications.helper=Here, you can select which applications are available in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. Don't forget to save your changes!
 platform.panels.applications.displayedapps=Applications in the bar

@@ -79,6 +79,27 @@
         return true;
       };
 
+      // Discard the HTML markup that is not needed in the wiki syntax conversion. This way we prevent unexpected
+      // conversion errors caused by such markup.
+      var submitOnlySignificantContent = {
+        elements: {
+          head: function(element) {
+            if (!editor.config.fullData) {
+              // Discard the HEAD element. Note that we keep the HTML and BODY elements because they allow us to convert
+              // the HTML to wiki syntax without needing to perform server-side HTML cleaning (to add the missing tags).
+              // See CKEDITOR-47: Styles are included in the content when using Firebug during page save
+              return false;
+            }
+          },
+          body: function(element) {
+            if (!editor.config.fullData) {
+              // Discard the attributes of the BODY element.
+              element.attributes = {};
+            }
+          }
+        }
+      };
+
       // Filter the editor input.
       var dataFilter = editor.dataProcessor && editor.dataProcessor.dataFilter;
       if (dataFilter) {
@@ -89,6 +110,7 @@
       var htmlFilter = editor.dataProcessor && editor.dataProcessor.htmlFilter;
       if (htmlFilter) {
         htmlFilter.addRules(replaceEmptyParagraphsWithEmptyLines, {priority: 14, applyToAll: true});
+        htmlFilter.addRules(submitOnlySignificantContent, {priority: 5, applyToAll: true});
       }
     }
   });

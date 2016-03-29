@@ -21,7 +21,7 @@ describe('XWiki Filter Plugin for CKEditor', function() {
   var editor;
 
   beforeEach(function(done) {
-    editor = testUtils.createEditor(done, {'extraPlugins': 'xwiki-filter'});
+    editor = testUtils.createEditor(done, {extraPlugins: 'xwiki-filter'});
   });
 
   it('converts empty lines to empty paragraphs', function(done) {
@@ -32,5 +32,18 @@ describe('XWiki Filter Plugin for CKEditor', function() {
   it('converts empty lines to empty paragraphs and back', function(done) {
     testUtils.assertNoChangeAfterDataRoundTrip(editor,
       '<p>before</p><div class="wikimodel-emptyline"></div><p>after</p>').then(done);
+  });
+
+  it('submits only significant content', function() {
+    editor.config.fullPage = true;
+    editor.config.fullData = false;
+    jQuery(editor.document.$).find('body').attr('data-foo', 'bar');
+    var data = editor.getData();
+    expect(data).not.toContain('<head');
+    expect(data).not.toContain('data-foo="bar"');
+    editor.config.fullData = true;
+    data = editor.getData();
+    expect(data).toContain('<head');
+    expect(data).toContain(' data-foo="bar"');
   });
 });

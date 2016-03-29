@@ -31,6 +31,7 @@ import org.infinispan.configuration.cache.SingleFileStoreConfigurationBuilder;
 import org.infinispan.configuration.cache.StoreConfiguration;
 import org.infinispan.configuration.cache.StoreConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
+import org.infinispan.eviction.EvictionType;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -44,6 +45,11 @@ import org.xwiki.environment.Environment;
  */
 public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoader
 {
+    /**
+     * The name of the field containing the wakeup interval used for expiration to set in the {@link EvictionConfig}.
+     */
+    public static final String CONFX_EXPIRATION_WAKEUPINTERVAL = "infinispan.expiration.wakeupinterval";
+
     /**
      * The default location of a filesystem based cache loader when not provided in the xml configuration file.
      */
@@ -118,14 +124,21 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
             (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
 
         if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
+            ////////////////////
+            // Eviction
             // Max entries
             builder = customizeEvictionMaxEntries(builder, configuration, eec);
 
+            ////////////////////
+            // Expiration
+            // Wakeup interval
+            builder = customizeExpirationWakeUpInterval(builder, configuration, eec);
+
             // Max idle
-            builder = customizeEvictionMaxIdle(builder, configuration, eec);
+            builder = customizeExpirationMaxIdle(builder, configuration, eec);
 
             // Lifespan
-            builder = customizeEvictionLifespan(builder, configuration, eec);
+            builder = customizeExpirationLifespan(builder, configuration, eec);
         }
 
         return builder;
@@ -142,14 +155,27 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
                 || configuration.eviction().maxEntries() != maxEntries) {
                 builder = builder(builder, null);
                 builder.eviction().strategy(EvictionStrategy.LRU);
-                builder.eviction().maxEntries((long) maxEntries);
+                builder.eviction().type(EvictionType.COUNT).size(maxEntries);
             }
         }
 
         return builder;
     }
 
-    private ConfigurationBuilder customizeEvictionMaxIdle(ConfigurationBuilder currentBuilder,
+    private ConfigurationBuilder customizeExpirationWakeUpInterval(ConfigurationBuilder currentBuilder,
+        Configuration configuration, EntryEvictionConfiguration eec)
+    {
+        ConfigurationBuilder builder = currentBuilder;
+
+        if (eec.get(CONFX_EXPIRATION_WAKEUPINTERVAL) instanceof Number) {
+            builder = builder(builder, null);
+            builder.expiration().wakeUpInterval(((Number) eec.get(CONFX_EXPIRATION_WAKEUPINTERVAL)).longValue());
+        }
+
+        return builder;
+    }
+
+    private ConfigurationBuilder customizeExpirationMaxIdle(ConfigurationBuilder currentBuilder,
         Configuration configuration, EntryEvictionConfiguration eec)
     {
         ConfigurationBuilder builder = currentBuilder;
@@ -165,7 +191,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
         return builder;
     }
 
-    private ConfigurationBuilder customizeEvictionLifespan(ConfigurationBuilder currentBuilder,
+    private ConfigurationBuilder customizeExpirationLifespan(ConfigurationBuilder currentBuilder,
         Configuration configuration, EntryEvictionConfiguration eec)
     {
         ConfigurationBuilder builder = currentBuilder;

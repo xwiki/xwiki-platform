@@ -28,10 +28,12 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntriesEvicted;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryCreated;
+import org.infinispan.notifications.cachelistener.annotation.CacheEntryExpired;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryModified;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryRemoved;
 import org.infinispan.notifications.cachelistener.event.CacheEntriesEvictedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryCreatedEvent;
+import org.infinispan.notifications.cachelistener.event.CacheEntryExpiredEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryModifiedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryRemovedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -128,6 +130,19 @@ public class InfinispanCache<T> extends AbstractCache<T>
             // Looks like eviction does not produce any pre event
             cacheEntryRemoved(key, value);
         }
+    }
+
+    /**
+     * @param event the expiration event.
+     */
+    @CacheEntryExpired
+    public void nodeExpired(CacheEntryExpiredEvent<String, T> event)
+    {
+        String key = event.getKey();
+        T value = event.getValue();
+
+        // Looks like eviction does not produce any pre event
+        cacheEntryRemoved(key, value);
     }
 
     /**

@@ -26,24 +26,36 @@
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <parent>XWiki.Ratings</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1356994800000</creationDate>
   <date>1356994800000</date>
   <contentUpdateDate>1356994800000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/1.0</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
+  <content>admin.ratings=Ratings
+admin.ratings.activateratings=Activate the ratings on this wiki
+admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) on the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
+admin.ratings.resetratings=Reset all the ratings on this wiki will make all documents start over with no vote. Be aware that this operation is not reversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a big amount of documents already rated.
+admin.ratings.uninstallratings=Uninstalling the ratings application will delete the document that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the save average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration*.
+admin.ratings.ratingsactivated=Ratings have been activated
+admin.ratings.ratingsdeactivated=Ratings have been deactivated
+admin.ratings.illegalrequest=Illegal request
+rating.rate=Rate!
+rating.yourvote=Your vote
+rating.logintorate=Login to rate
+rating.novotes=No votes yet</content>
   <object>
+    <name>XWiki.RatingsTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>e4745056-bd6e-442a-974b-35b4eeffe393</guid>
     <class>
       <name>XWiki.TranslationDocumentClass</name>
       <customClass/>
@@ -63,31 +75,15 @@
         <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>XWiki.RatingsTranslations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>e4745056-bd6e-442a-974b-35b4eeffe393</guid>
     <property>
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>admin.ratings=Ratings
-admin.ratings.activateratings=Activate the ratings on this wiki
-admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) on the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
-admin.ratings.resetratings=Reset all the ratings on this wiki will make all documents start over with no vote. Be aware that this operation is not reversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a big amount of documents already rated.
-admin.ratings.uninstallratings=Uninstalling the ratings application will delete the document that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the save average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration*.
-admin.ratings.ratingsactivated=Ratings have been activated
-admin.ratings.ratingsdeactivated=Ratings have been deactivated
-admin.ratings.illegalrequest=Illegal request
-rating.rate=Rate!
-rating.yourvote=Your vote
-rating.logintorate=Login to rate
-rating.novotes=No votes yet</content>
 </xwikidoc>

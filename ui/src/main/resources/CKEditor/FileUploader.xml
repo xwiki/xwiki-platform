@@ -66,6 +66,11 @@
   #set ($fileName = $xwiki.fileupload.getFileName('upload'))
   #if ("$!fileName" != '')
     #if ($services.csrf.isTokenValid($request.form_token))
+      #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
+        ## We need to generate a new name so that we don't overwrite existing attachments.
+        #set ($extension = $stringtool.substringAfter($fileName, '.'))
+        #set ($fileName = "${datetool.date.time}-${mathtool.random(100, 1000)}.$extension")
+      #end
       #createAttachment($fileName)
     #else
       #sendError(403 'The CSRF token is missing.')

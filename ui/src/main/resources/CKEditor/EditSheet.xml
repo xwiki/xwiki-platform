@@ -208,6 +208,8 @@ require.config({
           outputSyntax: 'plain',
           form_token: xwikiMeta.form_token
         })),
+        // This is used in CKEditor.FileUploader so we must keep them in sync.
+        fileTools_defaultFileName: '__fileCreatedFromDataURI__',
         fullPage: true,
         height: 500,
         removeButtons: 'Find,Anchor',

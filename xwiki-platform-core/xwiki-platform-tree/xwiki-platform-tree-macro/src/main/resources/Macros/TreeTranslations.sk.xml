@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
 rendering.macro.tree.content.description=Na definovanie stromovej štruktúry môžete používať HTML, alebo neusporiadaný zoznam. (ďalšie info\: http\://www.jstree.com/docs/html/ )

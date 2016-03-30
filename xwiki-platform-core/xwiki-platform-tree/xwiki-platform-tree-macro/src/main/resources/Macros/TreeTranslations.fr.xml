@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
 rendering.macro.tree.content.description=Vous pouvez utiliser les listes à puces HTML imbriqués pour décrire la structure de l'arbre. Voir http\://www.jstree.com/docs/html/ pour plus d'informations.

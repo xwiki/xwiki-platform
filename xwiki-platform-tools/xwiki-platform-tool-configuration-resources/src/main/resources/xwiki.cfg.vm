@@ -253,8 +253,6 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 # xwiki.showviewaction=1
 #-# The name of the default space. This is displayed when the URL specifies a document, but not a space, or neither.
 # xwiki.defaultweb=Main
-#-# Hide the /Space/ part of the URL when the space is the default one. Warning: use 1 to hide, 0 to show.
-# xwiki.usedefaultweb=0
 #-# The name of the default page of a space. This is displayed when the URL specifies a space, but not a document, or
 #-# neither.
 # xwiki.defaultpage=WebHome

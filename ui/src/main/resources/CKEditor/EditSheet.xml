@@ -171,7 +171,7 @@
 #set ($ckeditorPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'ckeditor'))
 #if ("$!ckeditorPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.4-SNAPSHOT/ckeditor.js'))
+  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.4/ckeditor.js'))
 #elseif ($ckeditorPath.indexOf('?') &gt;= 0)
   ## Before 7.1M1 the WebJar resource path was included in the query string which means we have to specify the '.js'
   ## extension (Require.js doesn't add it in this case).
@@ -627,7 +627,7 @@ require(['jquery'], function($) {
 #set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono'))
 #if ("$!ckeditorSkinPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.4-SNAPSHOT/skins/moono'))
+  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.4/skins/moono'))
 #end
 #if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
   ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving

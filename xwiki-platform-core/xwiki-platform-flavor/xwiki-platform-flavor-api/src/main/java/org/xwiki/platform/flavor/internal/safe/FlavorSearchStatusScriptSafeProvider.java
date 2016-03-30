@@ -17,23 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.flavor.internal.job;
+package org.xwiki.platform.flavor.internal.safe;
 
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.platform.flavor.internal.job.FlavorSearchStatus;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
- * Extends {@link ExtensionPlan} with a simple list of currently found flavors.
+ * Provide safe FlavorSearchStatus.
  * 
  * @version $Id$
- * @since 8.1M1
+ * @since 8.0M1
  */
-public interface FlavorSearchStatus extends ExtensionPlan
+@Component
+@Singleton
+public class FlavorSearchStatusScriptSafeProvider implements ScriptSafeProvider<FlavorSearchStatus>
 {
     /**
-     * @return the flavors found so far
+     * The provider of instances safe for public scripts.
      */
-    List<Extension> getFlavors();
+    @Inject
+    @SuppressWarnings("rawtypes")
+    private ScriptSafeProvider defaultSafeProvider;
+
+    @Override
+    public SafeFlavorSearchStatus get(FlavorSearchStatus unsafe)
+    {
+        return new SafeFlavorSearchStatus(unsafe, this.defaultSafeProvider);
+    }
 }

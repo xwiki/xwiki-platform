@@ -19,6 +19,9 @@
  */
 package org.xwiki.platform.flavor;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -62,4 +65,16 @@ public interface FlavorManager
      */
     ExtensionId getFlavorOfWiki(String wikiId);
 
+    /**
+     * Get the flavor know that the distribution.
+     * <p>
+     * Each {@link ExtensionId} always contains the flavor id but version might be null.
+     * 
+     * @return the already known flavors
+     * @since 8.1M1
+     */
+    default Collection<ExtensionId> getKnownFlavors()
+    {
+        return Collections.emptyList();
+    }
 }

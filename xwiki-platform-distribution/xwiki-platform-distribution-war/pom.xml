@@ -35,6 +35,13 @@
     <!-- Put the name of the distribution which will be displayed in the footer -->
     <xwiki.extension.name>XWiki</xwiki.extension.name>
 
+    <!-- Flavors known to be valid with the current distribution -->
+    <xwiki.extension.knownFlavors>
+        org.xwiki.platform:xwiki-platform-distribution-flavor/${project.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${project.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${project.version}
+    </xwiki.extension.knownFlavors>
+
     <!-- By default we don't include Legacy modules and thus we don't need to exclude the non legacy JARs -->
     <xwiki.war.legacy.excludes />
   </properties>

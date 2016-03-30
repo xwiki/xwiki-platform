@@ -17,23 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.flavor.internal.job;
+package org.xwiki.platform.flavor.internal.safe;
 
 import java.util.List;
 
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.script.internal.safe.SafeExtensionPlan;
+import org.xwiki.platform.flavor.internal.job.FlavorSearchStatus;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
- * Extends {@link ExtensionPlan} with a simple list of currently found flavors.
+ * Provide a public script access to a FlavorSearchStatus.
  * 
  * @version $Id$
  * @since 8.1M1
  */
-public interface FlavorSearchStatus extends ExtensionPlan
+public class SafeFlavorSearchStatus extends SafeExtensionPlan<FlavorSearchStatus> implements FlavorSearchStatus
 {
     /**
-     * @return the flavors found so far
+     * @param status the wrapped status
+     * @param safeProvider the provider of instances safe for public scripts
      */
-    List<Extension> getFlavors();
+    public SafeFlavorSearchStatus(FlavorSearchStatus status, ScriptSafeProvider<?> safeProvider)
+    {
+        super(status, safeProvider);
+    }
+
+    @Override
+    public List<Extension> getFlavors()
+    {
+        return safe(getWrapped().getFlavors());
+    }
 }

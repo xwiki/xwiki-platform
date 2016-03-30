@@ -20,8 +20,11 @@
 package org.xwiki.platform.flavor.internal.job;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,6 +32,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
@@ -60,7 +64,10 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     @Inject
     private FlavorManager flavorManager;
 
-    private List<Extension> remoteFlavors = new ArrayList<>();
+    @Inject
+    private ExtensionManager extensionManager;
+
+    private List<Extension> foundFlavors = new ArrayList<>();
 
     @Override
     public String getType()
@@ -89,11 +96,11 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     }
 
     @Override
-    protected FlavorSearchStatus createNewStatus(FlavorSearchRequest request)
+    protected DefaultFlavorSearchStatus createNewStatus(FlavorSearchRequest request)
     {
         Job currentJob = this.jobContext.getCurrentJob();
         JobStatus currentJobStatus = currentJob != null ? currentJob.getStatus() : null;
-        return new FlavorSearchStatus(request, this.observationManager, this.loggerManager, this.remoteFlavors,
+        return new DefaultFlavorSearchStatus(request, this.observationManager, this.loggerManager, this.foundFlavors,
             currentJobStatus);
     }
 
@@ -125,18 +132,62 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     @Override
     protected void runInternal() throws Exception
     {
+        // Get known flavors
+        Collection<ExtensionId> knownFlavors = this.flavorManager.getKnownFlavors();
+
+        // Get remote flavors
         IterableResult<Extension> flavors = this.flavorManager.searchFlavors(new FlavorQuery());
 
-        this.progressManager.pushLevelProgress(flavors.getSize(), this);
+        this.progressManager.pushLevelProgress(knownFlavors.size() + flavors.getSize(), this);
 
         try {
+            Set<String> doneFlavors = new HashSet<>();
+
+            String namespace = getRequest().getNamespaces().iterator().next();
+
+            // Add known flavors
+            for (ExtensionId flavorId : knownFlavors) {
+                this.progressManager.startStep(this);
+
+                if (flavorId.getVersion() != null) {
+                    try {
+                        // Get corresponding extension
+                        Extension flavor = this.extensionManager.resolveExtension(flavorId);
+
+                        // Filter allowed flavors on namespace
+                        if (this.namespaceResolver.isAllowed(flavor.getAllowedNamespaces(), namespace)) {
+                            // Directly add the flavor without trying to validate it first (99% of the time it's valid
+                            // or it
+                            // mean
+                            // the distribution was broken and you probably want to know about it)
+                            this.foundFlavors.add(flavor);
+                        }
+                    } catch (ResolveException e) {
+                        this.logger.debug("Failed to resolve extension [{}]", flavorId, e);
+                    }
+                } else {
+                    // Find a valid version of the flavor
+                    Extension flavor = findValidVersion(flavorId.getId(), namespace);
+
+                    if (flavor != null) {
+                        this.foundFlavors.add(flavor);
+                    }
+                }
+
+                // Remember we took care of this flavor
+                doneFlavors.add(flavorId.getId());
+            }
+
+            // Add remote flavors
             for (Extension flavor : flavors) {
                 this.progressManager.startStep(this);
 
-                Extension validExtension =
-                    findValidVersion(flavor.getId().getId(), getRequest().getNamespaces().iterator().next());
-                if (validExtension != null) {
-                    this.remoteFlavors.add(validExtension);
+                // Search only unknown flavors
+                if (!doneFlavors.contains(flavor.getId().getId())) {
+                    Extension validExtension = findValidVersion(flavor.getId().getId(), namespace);
+                    if (validExtension != null) {
+                        this.foundFlavors.add(validExtension);
+                    }
                 }
             }
         } finally {

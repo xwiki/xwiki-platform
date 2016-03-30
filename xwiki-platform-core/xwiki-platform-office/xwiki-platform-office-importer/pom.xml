@@ -93,9 +93,6 @@
       -->
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20080701</version>
-      <!-- This is provided as a transitive dependency of xwiki-platform-rest-server -->
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <!-- Gallery macro is used to display imported office presentations. -->

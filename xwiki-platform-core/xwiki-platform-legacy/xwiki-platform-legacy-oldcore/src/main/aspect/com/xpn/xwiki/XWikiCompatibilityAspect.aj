@@ -1345,4 +1345,24 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return new Date(time);
     }
+
+    /**
+     * @deprecated removed to support referencing a top level Nested Page easily. This method is there to prevent
+     *             any existing extension from breaking but the XWiki core code doesn't use call this method anymore
+     *             and thus it has not effect anymore
+     */
+    @Deprecated
+    public boolean XWiki.skipDefaultSpaceInURLs(XWikiContext context)
+    {
+        String bl = getXWikiPreference("usedefaultweb", "", context);
+        if ("1".equals(bl)) {
+            return true;
+        }
+
+        if ("0".equals(bl)) {
+            return false;
+        }
+
+        return "1".equals(getConfiguration().getProperty("xwiki.usedefaultweb", "0"));
+    }
 }

@@ -5753,20 +5753,6 @@ public class XWiki implements EventListener
         return defaultSpace;
     }
 
-    public boolean skipDefaultSpaceInURLs(XWikiContext context)
-    {
-        String bl = getXWikiPreference("usedefaultweb", "", context);
-        if ("1".equals(bl)) {
-            return true;
-        }
-
-        if ("0".equals(bl)) {
-            return false;
-        }
-
-        return "1".equals(getConfiguration().getProperty("xwiki.usedefaultweb", "0"));
-    }
-
     public boolean showViewAction(XWikiContext context)
     {
         String bl = getXWikiPreference("showviewaction", "", context);

@@ -44,7 +44,6 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,11 +73,6 @@ public class XWikiServletURLFactoryTest
     private boolean secure;
 
     /**
-     * Tests requiring to control the "usedefaultweb" config property should set this class variable.
-     */
-    private boolean skipDefaultSpaceInURLs;
-
-    /**
      * The map of HTTP headers.
      * <p>
      * Tests can add values to this map to control the value returned by {@link XWikiRequest#getHeader(String)}.
@@ -96,14 +90,6 @@ public class XWikiServletURLFactoryTest
     @Before
     public void before() throws Exception
     {
-        doAnswer(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                return XWikiServletURLFactoryTest.this.skipDefaultSpaceInURLs;
-            }
-        }).when(this.oldcore.getSpyXWiki()).skipDefaultSpaceInURLs(any(XWikiContext.class));
         doReturn("DefaultSpace").when(this.oldcore.getSpyXWiki()).getDefaultSpace(any(XWikiContext.class));
 
         // Request
@@ -528,22 +514,6 @@ public class XWikiServletURLFactoryTest
     {
         URL url = this.urlFactory.createURL("Space1.Space2", "Page", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page"), url);
-    }
-
-    @Test
-    public void testCreateURLWhenDefaultSpaceIsSkipped() throws Exception
-    {
-        this.skipDefaultSpaceInURLs = true;
-        URL url = this.urlFactory.createURL("DefaultSpace", "Page", this.oldcore.getXWikiContext());
-        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Page"), url);
-    }
-
-    @Test
-    public void testCreateURLWhenDefaultSpaceIsSkippedButDefaultSpaveDoesntMatch() throws Exception
-    {
-        this.skipDefaultSpaceInURLs = true;
-        URL url = this.urlFactory.createURL("NonDefaultSpace", "Page", this.oldcore.getXWikiContext());
-        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/NonDefaultSpace/Page"), url);
     }
 
     @Test

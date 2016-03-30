@@ -291,21 +291,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private void addSpaces(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)
     {
-        // Skip outputting the default space if the proper config parameter has been set AND there's only a single
-        // space (the concept doesn't work with multiple spaces)
-        if (spaceReference.getParent() == null) {
-            boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
-            if (skipDefaultSpace) {
-                String defaultSpace = context.getWiki().getDefaultSpace(context);
-                skipDefaultSpace = (spaceReference.getName().equals(defaultSpace)) && ("view".equals(action));
-            }
-            if (!skipDefaultSpace) {
-                appendSpacePathSegment(newpath, spaceReference, context);
-            }
-        } else {
-            for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
-                appendSpacePathSegment(newpath, reference, context);
-            }
+        for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
+            appendSpacePathSegment(newpath, reference, context);
         }
     }
 

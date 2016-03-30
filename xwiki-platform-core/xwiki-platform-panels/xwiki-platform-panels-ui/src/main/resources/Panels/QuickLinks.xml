@@ -124,9 +124,6 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.quicklinks'))
-#if ($xwiki.exists('Sandbox.WebHome'))
-* [[$services.localization.render('xe.panels.quicklinks.sandbox')&gt;&gt;Sandbox.WebHome]]
-#end
 #if ($xwiki.hasAdminRights())
 
 [[$services.localization.render('xe.panels.edit')&gt;&gt;path:${xwiki.getURL('Panels.QuickLinks', 'edit')}]]

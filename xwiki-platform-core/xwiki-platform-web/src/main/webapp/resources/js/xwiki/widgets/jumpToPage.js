@@ -77,8 +77,6 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
 
     // Allow the default close event ('Escape' key) to propagate so that the ajaxsuggest can catch it and clear the suggestions list.
     this.shortcuts['close'].options = { 'propagate' : true };
-
-    this.addQuickLinksEntry();
   },
   /**
    * Callback called when the UI was fully retrieved and inserted. Adds listeners to the buttons, enables the suggest,
@@ -154,16 +152,6 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         }
       }
     }
-  },
-  addQuickLinksEntry : function() {
-    $$(".panel.QuickLinks .xwikipanelcontents").each(function(item) {
-      var jumpToPageActivator = new Element('span', {'class': "jmp-activator"});
-      jumpToPageActivator.update("$services.localization.render('core.viewers.jump.quickLinksText')");
-      Event.observe(jumpToPageActivator, "click", function(event) {
-        this.showDialog(event);
-      }.bindAsEventListener(this));
-      item.appendChild(jumpToPageActivator);
-    }.bind(this));
   }
 });
 

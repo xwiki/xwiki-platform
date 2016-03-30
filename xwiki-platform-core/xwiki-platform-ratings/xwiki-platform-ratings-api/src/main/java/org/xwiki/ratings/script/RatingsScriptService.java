@@ -28,17 +28,21 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.ratings.AverageRatingApi;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Script service offering access to the ratings API.
@@ -68,6 +72,16 @@ public class RatingsScriptService implements ScriptService
     @Inject
     @Named("user/current")
     private DocumentReferenceResolver<String> userReferenceResolver;
+
+    /**
+     * Retrieves the XWiki private API object.
+     *
+     * @return The XWiki private API object
+     */
+    protected XWiki getXWiki()
+    {
+        return getXWikiContext().getWiki();
+    }
 
     /**
      * Retrieve the XWiki context from the current execution context.
@@ -392,6 +406,44 @@ public class RatingsScriptService implements ScriptService
 
         try {
             return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
+        } catch (Throwable e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves the lowest level ratings configuration document in the hierarchy and fallback to XWiki.RatingsConfig
+     * if does not exist.
+     *
+     * @param documentRef the document being rated or for which the existing ratings are fetched
+     * @return the lowest level ratings configuration doc
+     * @since 8.1M1
+     */
+
+    public Document getConfigDoc(DocumentReference documentRef)
+    {
+        setError(null);
+
+        try {
+            SpaceReference lastSpaceReference = documentRef.getLastSpaceReference();
+            while (lastSpaceReference.getType() == EntityType.SPACE) {
+                DocumentReference spaceConfigDocReference =
+                    new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, lastSpaceReference);
+                XWikiDocument spaceConfigDoc = getXWiki().getDocument(spaceConfigDocReference, getXWikiContext());
+                if (spaceConfigDoc != null
+                    && spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+                    return spaceConfigDoc.newDocument(getXWikiContext());
+                }
+                if (lastSpaceReference.getParent().getType() == EntityType.SPACE) {
+                    lastSpaceReference = new SpaceReference(lastSpaceReference.getParent());
+                } else {
+                    break;
+                }
+            }
+            XWikiDocument globalConfigDoc =
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
+            return globalConfigDoc.newDocument(getXWikiContext());
         } catch (Throwable e) {
             setError(e);
             return null;

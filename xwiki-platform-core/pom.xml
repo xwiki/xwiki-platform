@@ -514,9 +514,12 @@
           <analysisConfiguration><![CDATA[
             {
               "revapi": {
-                "filter": {
-                  "elements": {
-                     "exclude": [".*\\.internal\\..*", ".*\\.test\\..*"]
+                "java": {
+                  "filter": {
+                    "packages": {
+                      "include": ["org\\.xwiki\\..*"],
+                      "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?"]
+                    }
                   }
                 },
                 "ignore": [

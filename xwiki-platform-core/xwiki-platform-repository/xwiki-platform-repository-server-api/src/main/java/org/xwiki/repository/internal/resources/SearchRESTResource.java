@@ -61,8 +61,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
      * @since 3.3M2
      */
     @GET
-    public ExtensionsSearchResult searchGet(
-        @QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
+    public ExtensionsSearchResult searchGet(@QueryParam(Resources.QPARAM_SEARCH_QUERY) @DefaultValue("") String pattern,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
         @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
@@ -96,6 +95,12 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
 
         Query solrQuery = this.queryManager.createQuery(toSolrStatement(query.getQuery()), "solr");
+
+        // /////////////////
+        // Search only in the current wiki
+        // /////////////////
+
+        solrQuery.setWiki(this.xcontextProvider.get().getWikiId());
 
         // /////////////////
         // Limit and offset

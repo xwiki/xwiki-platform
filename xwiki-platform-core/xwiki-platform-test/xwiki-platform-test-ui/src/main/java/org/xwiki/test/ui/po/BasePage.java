@@ -58,6 +58,12 @@ public class BasePage extends BaseElement
 
     @FindBy(id ="tmDrawerActivator")
     private WebElement drawerActivator;
+    
+    @FindBy(id = "tmActionCopy")
+    private WebElement copyPageLink;
+
+    @FindBy(id = "tmActionDelete")
+    private WebElement deletePageLink;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
@@ -362,12 +368,6 @@ public class BasePage extends BaseElement
     {
         clickAdminActionsSubMenuEntry("tmActionCopy");
         return new CopyPage();
-    }
-    
-    public RenamePage rename()
-    {
-        clickAdminActionsSubMenuEntry("tmActionRename");
-        return new RenamePage();
     }
 
     /**

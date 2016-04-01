@@ -528,8 +528,8 @@ require(['jquery'], function($) {
   // Remove the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
   // edit mode. Note that we also remove the editMeta element because the edit sheet adds an element with the same id.
   $('#document-title').parent('#editMeta').remove();
-  // Move the content menu after the editMeta element so that they are displayed on the same row.
-  $('#contentmenu').parent('.col-xs-12').insertAfter('#editMeta');
+  // Move the content menu before the editMeta element so that they are displayed on the same row.
+  $('#contentmenu').parent('.col-xs-12').insertBefore('#editMeta');
 });</code>
     </property>
     <property>

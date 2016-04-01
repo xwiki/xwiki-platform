@@ -48,7 +48,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 
 /**
- * Converts HTML into/from xwiki/2.0 syntax.
+ * Converts HTML into/from markup syntax.
  * 
  * @version $Id$
  */

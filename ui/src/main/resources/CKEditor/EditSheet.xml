@@ -57,7 +57,7 @@
     &lt;/div&gt;
   #end
   &lt;div class="row"&gt;
-    &lt;div id="editMeta" class="col-xs-12 col-md-7"&gt;
+    &lt;div id="editMeta" class="col-xs-12 col-md-7 col-md-pull-5"&gt;
       ## Add support for editing the page title (which is not available by default in Inline Form edit mode).
       #set ($editor = 'wiki')
       #template('editmeta.vm')
@@ -529,7 +529,7 @@ require(['jquery'], function($) {
   // edit mode. Note that we also remove the editMeta element because the edit sheet adds an element with the same id.
   $('#document-title').parent('#editMeta').remove();
   // Move the content menu before the editMeta element so that they are displayed on the same row.
-  $('#contentmenu').parent('.col-xs-12').insertBefore('#editMeta');
+  $('#contentmenu').parent('.col-md-5').addClass('col-md-push-7').insertBefore('#editMeta');
 });</code>
     </property>
     <property>

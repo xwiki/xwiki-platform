@@ -43,6 +43,7 @@
 #if ($doc.fullName == 'CKEditor.EditSheet')
   This is a sheet for editing the document content using [[CKEditor&gt;&gt;http://ckeditor.com/]].
 #else
+  {{html clean="false"}}
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
   ## Tree styles needed for the document/attachment tree picker.
@@ -51,40 +52,45 @@
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
     'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   #if ("$!request.section" != '')
-    {{html}}
     &lt;div class="hidden"&gt;
-      &lt;input type="hidden" name="section" value="$!escapetool.xml($request.section)" /&gt;
+      &lt;input type="hidden" name="section" value="$!escapetool.xml($request.section)"/&gt;
     &lt;/div&gt;
-    {{/html}}
   #end
-  (% class="xform" %)(((
-    ; $services.localization.render('core.editors.content.contentField.label')
-    : {{html}}
-      #set ($content = $services.wysiwyg.render('CKEditor.ContentSheet'))
-      #if ("$!content" == '' &amp;&amp; $content != '')
-        ## $content is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
-        #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
-        #set ($content = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
-        #set ($skinExtensionHooks = {
-          'ssx': 'CssSkinExtensionPlugin',
-          'ssfx': 'CssSkinFileExtensionPlugin',
-          'ssrx': 'CssResourceSkinExtensionPlugin'
-        })
-        #foreach ($entry in $skinExtensionHooks.entrySet())
-          #set ($content = $content.replace("&lt;!-- com.xpn.xwiki.plugin.skinx.$entry.value --&gt;",
-            $xwiki.get($entry.key).importString))
-        #end
+  &lt;div class="row"&gt;
+    &lt;div id="editMeta" class="col-xs-12 col-md-7"&gt;
+      ## Add support for editing the page title (which is not available by default in Inline Form edit mode).
+      #set ($editor = 'wiki')
+      #template('editmeta.vm')
+      #set ($editor = 'inline')
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    #set ($content = $services.wysiwyg.render('CKEditor.ContentSheet'))
+    #if ("$!content" == '' &amp;&amp; $content != '')
+      ## $content is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
+      #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
+      #set ($content = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
+      #set ($skinExtensionHooks = {
+        'ssx': 'CssSkinExtensionPlugin',
+        'ssfx': 'CssSkinFileExtensionPlugin',
+        'ssrx': 'CssResourceSkinExtensionPlugin'
+      })
+      #foreach ($entry in $skinExtensionHooks.entrySet())
+        #set ($content = $content.replace("&lt;!-- com.xpn.xwiki.plugin.skinx.$entry.value --&gt;",
+          $xwiki.get($entry.key).importString))
       #end
-      &lt;textarea name="content" class="ckeditor-textarea loading" spellcheck="false"&gt;$escapetool.xml($content)&lt;/textarea&gt;
-      &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;
-      &lt;input value="$doc.syntax.toIdString()" name="content_syntax" type="hidden"/&gt;
-      ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
-      ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
-      ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
-      ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
-      &lt;input value="" name="content_cache" type="hidden" class="cache"/&gt;
-    {{/html}}
-  )))
+    #end
+    &lt;textarea id="content" name="content" class="ckeditor-textarea loading"
+      spellcheck="false"&gt;$escapetool.xml($content)&lt;/textarea&gt;
+    &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;
+    &lt;input value="$doc.syntax.toIdString()" name="content_syntax" type="hidden"/&gt;
+    ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
+    ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
+    ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
+    ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
+    &lt;input value="" name="content_cache" type="hidden" class="cache"/&gt;
+  &lt;/div&gt;
+  {{/html}}
 #end
 {{/velocity}}</content>
   <object>
@@ -515,6 +521,15 @@ require(['jquery'], function($) {
       return reference;
     };
   }
+});
+
+// Fix the layout to be consistent with the Wiki edit mode (tested with the Flamingo Skin).
+require(['jquery'], function($) {
+  // Remove the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
+  // edit mode. Note that we also remove the editMeta element because the edit sheet adds an element with the same id.
+  $('#document-title').parent('#editMeta').remove();
+  // Move the content menu after the editMeta element so that they are displayed on the same row.
+  $('#contentmenu').parent('.col-xs-12').insertAfter('#editMeta');
 });</code>
     </property>
     <property>

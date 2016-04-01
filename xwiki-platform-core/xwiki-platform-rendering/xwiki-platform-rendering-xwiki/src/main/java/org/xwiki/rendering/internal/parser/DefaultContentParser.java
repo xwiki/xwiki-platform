@@ -65,7 +65,7 @@ public class DefaultContentParser implements ContentParser
     public XDOM parse(String content, Syntax syntax, EntityReference source) throws ParseException,
         MissingParserException
     {
-        XDOM xdom = getParser(syntax).parse(new StringReader(content));
+        XDOM xdom = parse(content, syntax);
         if (source != null) {
             xdom.getMetaData().addMetaData(MetaData.SOURCE, serializer.serialize(source));
         }

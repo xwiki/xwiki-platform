@@ -132,6 +132,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
@@ -8440,11 +8441,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             try {
                 this.xdomCache = parseContent(getContent());
             } catch (XWikiException e) {
-                if (StringUtils.isEmpty(getContent())) {
-                    LOGGER.debug("Syntax [{}] cannot handle empty input. Returning empty XDOM.", getSyntax());
-                    return new XDOM(Collections.<Block>emptyList());
-                }
-                LOGGER.error("Failed to parse document content to XDOM", e);
+                ErrorBlockGenerator errorBlockGenerator = Utils.getComponent(ErrorBlockGenerator.class);
+                return new XDOM(errorBlockGenerator.generateErrorBlocks("Failed to render content", e, false));
             }
         }
 

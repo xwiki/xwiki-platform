@@ -62,7 +62,12 @@
 #if ("$!request.convert" != '')
   #set ($text = "$!request.text")
   #set ($toHTML = $request.convert == 'true')
-  #convert($text $toHTML)
+  #set ($output = "#convert($text $toHTML)")
+  ## We write the output directly to the response to avoid the execution of the Rendering Transformations. Another
+  ## option would be to specify which Rendering Transformations to execute in the query string (XWIKI-13167).
+  ## See CKEDITOR-51: Icon transformations are saved by CKEditor
+  #set ($discard = $response.writer.print($output))
+  #set ($discard = $response.setContentLength($output.length()))
 #else
   The service used by the CKEditor source plugin to convert between HTML and wiki syntax.
 #end

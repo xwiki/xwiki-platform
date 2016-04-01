@@ -58,7 +58,7 @@
       #if (!$source)
         #set ($source = $tdoc)
       #end
-      $doc.getRenderedContent($source.content, $source.syntax.toIdString(), 'annotatedxhtml/1.0')
+      $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString())
     &lt;/body&gt;
   &lt;/html&gt;
   {{/html}}

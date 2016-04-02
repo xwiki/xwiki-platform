@@ -20,6 +20,8 @@
 package org.xwiki.extension.xar.internal.job;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -61,16 +63,16 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     public static final String JOBTYPE = "repairxar";
 
-    private static final BeginTranslationMarker LOG_REPAIR_BEGIN = new BeginTranslationMarker(
-        "extension.xar.log.repair.begin");
+    private static final BeginTranslationMarker LOG_REPAIR_BEGIN =
+        new BeginTranslationMarker("extension.xar.log.repair.begin");
 
-    private static final BeginTranslationMarker LOG_REPAIR_NAMESPACE_BEGIN = new BeginTranslationMarker(
-        "extension.xar.log.repair.begin.namespace");
+    private static final BeginTranslationMarker LOG_REPAIR_NAMESPACE_BEGIN =
+        new BeginTranslationMarker("extension.xar.log.repair.begin.namespace");
 
     private static final EndTranslationMarker LOG_REPAIR_END = new EndTranslationMarker("extension.xar.log.repair.end");
 
-    private static final EndTranslationMarker LOG_REPAIR_END_NAMESPACE = new EndTranslationMarker(
-        "extension.xar.log.repair.end.namespace");
+    private static final EndTranslationMarker LOG_REPAIR_END_NAMESPACE =
+        new EndTranslationMarker("extension.xar.log.repair.end.namespace");
 
     /**
      * Used to resolve extensions to install.
@@ -128,13 +130,13 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                         for (String namespace : getRequest().getNamespaces()) {
                             this.progressManager.startStep(this);
 
-                            repairExtension(extensionId, namespace, false);
+                            repairExtension(extensionId, namespace, false, Collections.emptyMap());
                         }
                     } finally {
                         this.progressManager.popLevelProgress(this);
                     }
                 } else {
-                    repairExtension(extensionId, null, false);
+                    repairExtension(extensionId, null, false, Collections.emptyMap());
                 }
             }
         } finally {
@@ -182,9 +184,11 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      * @param extensionId the unique extension identifier
      * @param namespace the namespace where to install extension
      * @param dependency indicate of the extension is installed as a dependency of another
+     * @param managedDependencies the managed dependencies
      * @throws InstallException failed to repair extension
      */
-    private void repairExtension(ExtensionId extensionId, String namespace, boolean dependency) throws InstallException
+    private void repairExtension(ExtensionId extensionId, String namespace, boolean dependency,
+        Map<String, ExtensionDependency> managedDependencies) throws InstallException
     {
         if (this.installedRepository.getInstalledExtension(extensionId.getId(), namespace) != null) {
             this.logger.debug("Extension [{}] already installed on namespace [{}]", extensionId.getId(), namespace);
@@ -212,7 +216,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
             this.progressManager.startStep(this);
 
             if (localExtension != null) {
-                repairExtension(localExtension, namespace, dependency);
+                repairExtension(localExtension, namespace, dependency, managedDependencies);
             }
         } finally {
             if (getRequest().isVerbose()) {
@@ -220,8 +224,8 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                     this.logger.info(LOG_REPAIR_END_NAMESPACE, "Done repairing XAR extension [{}] on namespace [{}]",
                         extensionId, namespace);
                 } else {
-                    this.logger.info(LOG_REPAIR_END, "Done repairing XAR extension [{}] on all namespaces",
-                        extensionId, namespace);
+                    this.logger.info(LOG_REPAIR_END, "Done repairing XAR extension [{}] on all namespaces", extensionId,
+                        namespace);
                 }
             }
 
@@ -233,17 +237,18 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      * @param localExtension the local extension to install
      * @param namespace the namespace where to install extension
      * @param dependency indicate of the extension is installed as a dependency of another
+     * @param managedDependencies the managed dependencies
      * @throws InstallException failed to repair extension
      */
-    private void repairExtension(LocalExtension localExtension, String namespace, boolean dependency)
-        throws InstallException
+    private void repairExtension(LocalExtension localExtension, String namespace, boolean dependency,
+        Map<String, ExtensionDependency> managedDependencies) throws InstallException
     {
         this.progressManager.pushLevelProgress(2, this);
 
         try {
             this.progressManager.startStep(this);
 
-            Collection< ? extends ExtensionDependency> dependencies = localExtension.getDependencies();
+            Collection<? extends ExtensionDependency> dependencies = localExtension.getDependencies();
 
             if (!dependencies.isEmpty()) {
                 this.progressManager.pushLevelProgress(dependencies.size(), this);
@@ -252,7 +257,10 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                     for (ExtensionDependency extensionDependency : dependencies) {
                         this.progressManager.startStep(this);
 
-                        repairDependency(extensionDependency, namespace);
+                        // Replace with managed dependency if any
+                        extensionDependency = getDependency(extensionDependency, managedDependencies, localExtension);
+
+                        repairDependency(extensionDependency, namespace, append(managedDependencies, localExtension));
                     }
                 } finally {
                     this.progressManager.popLevelProgress(this);
@@ -274,20 +282,26 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     /**
      * @param extensionDependency the extension dependency to install
      * @param namespace the namespace where to install extension
+     * @param managedDependencies the managed dependencies
      */
-    private void repairDependency(ExtensionDependency extensionDependency, String namespace)
+    private void repairDependency(ExtensionDependency extensionDependency, String namespace,
+        Map<String, ExtensionDependency> managedDependencies)
     {
         // Skip core extensions
         if (this.coreRepository.getCoreExtension(extensionDependency.getId()) == null) {
+            // TODO: take into account managed dependencies
             if (extensionDependency.getVersionConstraint().getVersion() == null) {
-                this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
-                    + " since there is no way to know what has been installed", extensionDependency.getId(),
-                    extensionDependency.getVersionConstraint());
+                this.logger.warn(
+                    "Can't repair extension dependency [{}] with version range ([{}])"
+                        + " since there is no way to know what has been installed",
+                    extensionDependency.getId(), extensionDependency.getVersionConstraint());
 
             } else {
                 try {
-                    repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
-                        .getVersionConstraint().getVersion()), namespace, true);
+                    repairExtension(
+                        new ExtensionId(extensionDependency.getId(),
+                            extensionDependency.getVersionConstraint().getVersion()),
+                        namespace, true, managedDependencies);
                 } catch (InstallException e) {
                     this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
                 }

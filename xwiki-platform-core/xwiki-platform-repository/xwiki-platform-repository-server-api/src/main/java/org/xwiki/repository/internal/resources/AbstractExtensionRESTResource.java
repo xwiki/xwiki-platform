@@ -414,7 +414,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                                 XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
                             dependency.withRepositories(toExtensionRepositories(repositories));
 
-                            extensionVersion.getDependencies().add(dependency);
+                            if (getValue(dependencyObject, XWikiRepositoryModel.PROP_DEPENDENCY_MANAGED, 0) == 1) {
+                                extensionVersion.getManagedDependencies().add(dependency);
+                            } else {
+                                extensionVersion.getDependencies().add(dependency);
+                            }
                         }
                     }
                 }

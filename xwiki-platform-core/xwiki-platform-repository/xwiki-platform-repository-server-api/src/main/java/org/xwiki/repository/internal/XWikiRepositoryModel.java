@@ -36,8 +36,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 public class XWikiRepositoryModel
 {
@@ -53,28 +52,28 @@ public class XWikiRepositoryModel
 
     public static final String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
 
-    public static final EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSION_CLASSREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "ExtensionClass");
 
-    public static final EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONVERSION_CLASSREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "ExtensionVersionClass");
 
-    public static final EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
-        "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONDEPENDENCY_CLASSREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "ExtensionDependencyClass");
 
-    public static final EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSIONPROXY_CLASSREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "ExtensionProxyClass");
 
-    public static final EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference EXTENSION_TEMPLATEREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "ExtensionTemplate");
 
     public static final String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
 
-    public static final EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference CONFIGURATION_CLASSREFERENCE =
+        new LocalDocumentReference("ExtensionCode", "RepositoryConfigClass");
 
-    public static final EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig",
-        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final LocalDocumentReference CONFIGURATION_REFERENCE =
+        new LocalDocumentReference("ExtensionCode", "RepositoryConfig");
 
     // Properties
 
@@ -139,6 +138,11 @@ public class XWikiRepositoryModel
     public static final String PROP_DEPENDENCY_ID = "id";
 
     public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+
+    /**
+     * @since 8.1M1
+     */
+    public static final String PROP_DEPENDENCY_MANAGED = "managed";
 
     /**
      * @since 7.3M1

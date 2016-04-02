@@ -41,6 +41,7 @@ import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -65,8 +66,8 @@ public class XWikiContext extends Hashtable<Object, Object>
      *
      * @since 5.0M1
      */
-    public static final ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
-        XWikiContext.class);
+    public static final ParameterizedType TYPE_PROVIDER =
+        new DefaultParameterizedType(null, Provider.class, XWikiContext.class);
 
     public static final int MODE_SERVLET = 0;
 
@@ -764,6 +765,14 @@ public class XWikiContext extends Hashtable<Object, Object>
     public BaseClass getBaseClass(DocumentReference documentReference)
     {
         return this.classCache.get(documentReference);
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public BaseClass getBaseClass(LocalDocumentReference localReference)
+    {
+        return this.classCache.get(new DocumentReference(localReference, getWikiReference()));
     }
 
     /**

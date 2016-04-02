@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,27 +128,47 @@ public class RepositoryTestUtils
     /**
      * @since 7.3M1
      */
-    public static List<org.xwiki.rest.model.jaxb.Object> extensionDependencyObjects(Extension extension)
+    public static List<org.xwiki.rest.model.jaxb.Object> dependencyObjects(Extension extension)
     {
-        List<org.xwiki.rest.model.jaxb.Object> dependencies = new ArrayList<>(extension.getDependencies().size());
+        List<org.xwiki.rest.model.jaxb.Object> dependencyObjects =
+            new ArrayList<>(extension.getDependencies().size() + extension.getManagedDependencies().size());
 
         int number = 0;
-        for (ExtensionDependency dependency : extension.getDependencies()) {
-            org.xwiki.rest.model.jaxb.Object dependencyObject =
-                extensionDependencyObject(extension.getId().getVersion(), dependency);
+
+        number = dependencyObjects(number, dependencyObjects, extension.getId().getVersion(),
+            extension.getDependencies(), false);
+        number = dependencyObjects(number, dependencyObjects, extension.getId().getVersion(),
+            extension.getManagedDependencies(), true);
+
+        return dependencyObjects;
+    }
+
+    private static int dependencyObjects(int number, List<org.xwiki.rest.model.jaxb.Object> objects, Object version,
+        Collection<ExtensionDependency> dependencies, boolean managed)
+    {
+        for (ExtensionDependency dependency : dependencies) {
+            org.xwiki.rest.model.jaxb.Object dependencyObject = dependencyObject(version, dependency);
             dependencyObject.setNumber(number++);
 
-            dependencies.add(dependencyObject);
+            objects.add(dependencyObject);
         }
 
-        return dependencies;
+        return number;
     }
 
     /**
      * @since 7.3M1
      */
-    public static org.xwiki.rest.model.jaxb.Object extensionDependencyObject(Object version,
-        ExtensionDependency dependency)
+    public static org.xwiki.rest.model.jaxb.Object dependencyObject(Object version, ExtensionDependency dependency)
+    {
+        return dependencyObject(version, dependency, false);
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public static org.xwiki.rest.model.jaxb.Object dependencyObject(Object version, ExtensionDependency dependency,
+        boolean managed)
     {
         org.xwiki.rest.model.jaxb.Object dependencyObject = object(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME);
 
@@ -157,6 +178,8 @@ public class RepositoryTestUtils
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version));
 
         dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId()));
+
+        dependencyObject.getProperties().add(property(XWikiRepositoryModel.PROP_DEPENDENCY_MANAGED, managed ? 1 : 0));
 
         return dependencyObject;
     }
@@ -241,7 +264,7 @@ public class RepositoryTestUtils
         extensionPage.getObjects().getObjectSummaries().add(extensionVersionObject(extension));
 
         // Add the ExtensionDependency objects
-        extensionPage.getObjects().getObjectSummaries().addAll(extensionDependencyObjects(extension));
+        extensionPage.getObjects().getObjectSummaries().addAll(dependencyObjects(extension));
 
         // Save the extension page
         this.testUtils.rest().save(extensionPage, TestUtils.STATUS_CREATED);
@@ -289,10 +312,53 @@ public class RepositoryTestUtils
 
     public void addDependency(Extension extension, Object version, ExtensionDependency dependency)
     {
+        addDependency(extension, version, dependency, false);
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public void addManagedDependencies(Extension extension)
+    {
+        addManagedDependencies(extension, extension.getId().getVersion());
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public void addManagedDependencies(Extension extension, Object version)
+    {
+        for (ExtensionDependency dependency : extension.getManagedDependencies()) {
+            addManagedDependency(extension, version, dependency);
+        }
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public void addManagedDependency(Extension extension, ExtensionDependency dependency)
+    {
+        addManagedDependency(extension, extension.getId().getVersion(), dependency);
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public void addManagedDependency(Extension extension, Object version, ExtensionDependency dependency)
+    {
+        addDependency(extension, version, dependency, true);
+    }
+
+    /**
+     * @since 8.1M1
+     */
+    public void addDependency(Extension extension, Object version, ExtensionDependency dependency, boolean managed)
+    {
         this.testUtils.addObject(getExtensionPageReference(extension),
             XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSNAME, XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT,
             dependency.getVersionConstraint(), XWikiRepositoryModel.PROP_DEPENDENCY_ID, dependency.getId(),
-            XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version);
+            XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, version,
+            XWikiRepositoryModel.PROP_DEPENDENCY_MANAGED, managed ? 1 : 0);
     }
 
     public void attachFile(Extension extension) throws Exception

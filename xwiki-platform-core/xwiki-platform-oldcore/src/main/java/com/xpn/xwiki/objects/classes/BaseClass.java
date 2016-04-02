@@ -164,10 +164,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-                reference =
-                    new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                        new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
-                            .getParent().getParent()));
+                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                        reference.getParent().getParent()));
             } else {
                 reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
             }
@@ -827,12 +826,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addTemplateField(String fieldName, String fieldPrettyName)
     {
         boolean result = addTextAreaField(fieldName, fieldPrettyName, 80, 15);
-        
+
         if (result) {
             TextAreaClass property = (TextAreaClass) get(fieldName);
             property.setStringValue("editor", "PureText");
         }
-        
+
         return result;
     }
 
@@ -876,7 +875,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values, String displayType, String separators)
     {
-        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, false, values, displayType, separators);
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, false, values, displayType,
+            separators);
     }
 
     /**
@@ -1099,19 +1099,24 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException
     {
-        String customClass = getCustomClass();
+        BaseObject baseObject;
+
         try {
-            if ((customClass == null) || (customClass.equals(""))) {
-                return new BaseObject();
+            if (StringUtils.isEmpty(getCustomClass())) {
+                baseObject = new BaseObject();
             } else {
-                return (BaseObject) Class.forName(getCustomClass()).newInstance();
+                baseObject = (BaseObject) Class.forName(getCustomClass()).newInstance();
             }
         } catch (Exception e) {
-            Object[] args = { customClass };
+            Object[] args = { getCustomClass() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}",
-                e, args);
+                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                args);
         }
+
+        baseObject.setXClassReference(getDocumentReference());
+
+        return baseObject;
     }
 
     /**
@@ -1316,8 +1321,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
             getDefaultEditSheet(), mergeResult));
 
-        setNameField(MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
-            mergeResult));
+        setNameField(
+            MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(), mergeResult));
 
         // Properties
 

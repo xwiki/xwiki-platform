@@ -36,8 +36,12 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  * @since 3.4M1
  */
-@ComponentList(value = {InfinispanCacheFactory.class, DefaultCacheManager.class, DefaultCacheFactory.class,
-    DefaultCacheManagerConfiguration.class})
+@ComponentList({
+    InfinispanCacheFactory.class,
+    DefaultCacheManager.class,
+    DefaultCacheFactory.class,
+    DefaultCacheManagerConfiguration.class
+})
 public class InfinispanConfigTest extends AbstractTestCache
 {
     public InfinispanConfigTest()

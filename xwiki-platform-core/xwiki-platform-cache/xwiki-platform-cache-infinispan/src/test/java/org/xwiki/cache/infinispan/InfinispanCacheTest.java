@@ -28,8 +28,17 @@ import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
 import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
 import org.xwiki.test.annotation.ComponentList;
 
-@ComponentList(value = {InfinispanCacheFactory.class, DefaultCacheManager.class, DefaultCacheFactory.class,
-    DefaultCacheManagerConfiguration.class})
+/**
+ * Unit tests for {@link org.xwiki.cache.infinispan.internal.InfinispanCache}.
+ *
+ * @version $Id$
+ */
+@ComponentList({
+    InfinispanCacheFactory.class,
+    DefaultCacheManager.class,
+    DefaultCacheFactory.class,
+    DefaultCacheManagerConfiguration.class
+})
 public class InfinispanCacheTest extends AbstractEvictionGenericTestCache
 {
     public InfinispanCacheTest()

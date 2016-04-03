@@ -66,9 +66,8 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
         } catch (Exception ex) {
             throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}", parameters
                 .getFeedURL(), ex.getMessage()), ex);
-        }
-        finally {
-			getMethod.releaseConnection();
+        } finally {
+		    getMethod.releaseConnection();
 		}
         if (feed == null) {
             throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",

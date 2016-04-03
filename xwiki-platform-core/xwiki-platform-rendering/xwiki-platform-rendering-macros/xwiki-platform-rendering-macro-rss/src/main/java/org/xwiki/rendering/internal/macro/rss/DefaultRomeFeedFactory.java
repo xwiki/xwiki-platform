@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.internal.macro.rss;
 
-import java.net.SocketTimeoutException;
-import java.net.URLConnection;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import java.text.MessageFormat;
 
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -52,19 +52,24 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
         }
 
         SyndFeedInput syndFeedInput = new SyndFeedInput();
+        HttpClient httpClient = new HttpClient();
+		GetMethod getMethod = new GetMethod(parameters.getFeedURL());
+		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(TIMEOUT_MILLISECONDS);
 
         SyndFeed feed;
         try {
-            URLConnection connection = parameters.getFeedURL().openConnection();
-            connection.setConnectTimeout(TIMEOUT_MILLISECONDS);
-            feed = syndFeedInput.build(new XmlReader(connection));
-        } catch (SocketTimeoutException ex) {
+            httpClient.executeMethod(getMethod);
+            feed = syndFeedInput.build(new XmlReader(getMethod.getResponseBodyAsString()));
+        } catch (ConnectTimeoutException ex) {
             throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",
                 parameters.getFeedURL()));
         } catch (Exception ex) {
             throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}", parameters
                 .getFeedURL(), ex.getMessage()), ex);
         }
+        finally {
+			getMethod.releaseConnection();
+		}
         if (feed == null) {
             throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",
                 parameters.getFeedURL()));

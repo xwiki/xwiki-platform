@@ -58,8 +58,7 @@ import static org.mockito.Mockito.*;
 @ComponentList(value = {
     IncludeMacro.class,
     CurrentMacroDocumentReferenceResolver.class,
-    CurrentMacroEntityReferenceResolver.class,
-    DefaultErrorBlockGenerator.class
+    CurrentMacroEntityReferenceResolver.class
 })
 public class LiveTableResultsTest extends PageTest
 {

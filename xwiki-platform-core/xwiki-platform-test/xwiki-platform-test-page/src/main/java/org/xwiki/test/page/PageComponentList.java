@@ -72,6 +72,7 @@ import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
+import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
@@ -136,6 +137,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     MacroTransformation.class,
     DefaultMacroManager.class,
     DefaultMacroIdFactory.class,
+    DefaultErrorBlockGenerator.class,
 
     // Properties
     DefaultBeanManager.class,

@@ -784,7 +784,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
         assertNull(extensionPane.getStatusMessage());
 
         ProgressBarPane progressBar = extensionPane.getProgressBar();
-        assertEquals(83, progressBar.getPercent());
+        assertEquals(66, progressBar.getPercent());
         assertEquals("Conflict between [@@ -1,1 +1,1 @@] and [@@ -1,1 +1,1 @@]", progressBar.getMessage());
 
         ExtensionProgressPane progressPane = extensionPane.openProgressSection();

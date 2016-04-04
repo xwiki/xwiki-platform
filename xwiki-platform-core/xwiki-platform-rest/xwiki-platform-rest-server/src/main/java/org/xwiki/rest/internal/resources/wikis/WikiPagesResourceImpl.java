@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
@@ -145,10 +144,8 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
                         absoluteUrl, Utils.getXWikiContext(componentManager)));
 
-                String baseUri = uriInfo.getBaseUri().toString();
-
-                String pageUri = UriBuilder.fromUri(baseUri).path(PageResource.class)
-                    .build(doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
+                String pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
                 Link pageLink = objectFactory.createLink();
                 pageLink.setHref(pageUri);
                 pageLink.setRel(Relations.PAGE);

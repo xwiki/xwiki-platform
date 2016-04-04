@@ -57,6 +57,9 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
+
     /**
      * Retrieve the XWiki context from the current execution context.
      * 
@@ -81,11 +84,11 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     /**
      * Retrieve an instance of the desired ReputationAlorithm (default/simple/custom).
      *
-     * @param documentRef documentRef the document to which the ratings are associated to
+     * @param documentReference documentReference the document to which the ratings are associated to
      * @return the reputation algorithm selected by looking at the current configuration settings
      */
     @Override
-    public ReputationAlgorithm get(DocumentReference documentRef)
+    public ReputationAlgorithm get(DocumentReference documentReference)
     {
         String defaultAlgorithmHint = "default";
         String reputationAlgorithmHint =
@@ -94,17 +97,7 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                     + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, defaultAlgorithmHint);
 
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, ratingDocument.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            XWikiDocument configDoc =
-                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
-                    : spaceConfigDoc;
-
+            XWikiDocument configDoc = ratingsConfiguration.getConfigurationDocument(documentReference);
             if (configDoc != null && !configDoc.isNew()
                 && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
@@ -134,7 +127,7 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                     reputationInstance.setComponentManager(componentManager);
                     reputationInstance.setExecution(execution);
                     reputationInstance.setXWikiContext(getXWikiContext());
-                    reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentRef));
+                    reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentReference));
                     return reputationInstance;
                 }
             } catch (Throwable e) {

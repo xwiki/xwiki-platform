@@ -205,13 +205,13 @@
 
     var picker = createResourcePicker(modal, {resourceType: resourceType});
     editor._.resourcePickers[resourceType] = function(resourceReference) {
-      var promise = $.Deferred();
+      var deferred = $.Deferred();
       picker.select = function(resourceReferences) {
         // We assume that only one resource can be selected.
-        promise.resolve(resourceReferences[0]);
+        deferred.resolve(resourceReferences[0]);
       };
       picker.open(resourceReference);
-      return promise;
+      return deferred.promise();
     };
   };
 

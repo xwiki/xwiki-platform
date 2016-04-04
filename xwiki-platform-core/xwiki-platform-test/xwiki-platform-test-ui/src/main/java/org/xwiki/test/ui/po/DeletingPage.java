@@ -67,9 +67,18 @@ public class DeletingPage extends ViewPage
     
     public boolean isSuccess()
     {
-        return successMessage.isDisplayed();        
+        return successMessage.isDisplayed();
     }
-    
+
+    /**
+     * Wait until the delete process is terminated
+     * @since 8.1M1
+     */
+    public void waitUntilSuccessMessage()
+    {
+        getDriver().waitUntilElementIsVisible(By.id(SUCCESS_MESSAGE_ID));
+    }
+
     public String getSuccessMessage()
     {
         return successMessage.getText();

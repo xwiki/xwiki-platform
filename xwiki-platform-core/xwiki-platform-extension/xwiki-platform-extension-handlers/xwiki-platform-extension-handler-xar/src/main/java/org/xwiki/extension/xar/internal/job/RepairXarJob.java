@@ -258,9 +258,10 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                         this.progressManager.startStep(this);
 
                         // Replace with managed dependency if any
-                        extensionDependency = getDependency(extensionDependency, managedDependencies, localExtension);
+                        ExtensionDependency resolvedDependency =
+                            getDependency(extensionDependency, managedDependencies, localExtension);
 
-                        repairDependency(extensionDependency, namespace, append(managedDependencies, localExtension));
+                        repairDependency(resolvedDependency, namespace, append(managedDependencies, localExtension));
                     }
                 } finally {
                     this.progressManager.popLevelProgress(this);

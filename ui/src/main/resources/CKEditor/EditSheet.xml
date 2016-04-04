@@ -205,6 +205,16 @@ require.config({
     $('.ckeditor-textarea').each(function() {
       var editor = ckeditor.replace(this, {
         allowedContent: true,
+        // Modify the strike and underline core styles to match what the XWiki Rendering is generating and expecting.
+        // See CKEDITOR-52: Unable to un-strike or un-underline saved content
+        coreStyles_strike: {
+          element: 'del',
+          overrides: ['s', 'strike']
+        },
+        coreStyles_underline: {
+          element: 'ins',
+          overrides: 'u'
+        },
         // Don't convert Latin characters to the corresponding named HTML entities in the HTML output because the HTML
         // cleaner used on the server side doesn't recognize some of them (XCOMMONS-929).
         // See CKEDITOR-38: CKEditor converts Umlaute to HTML equivalents

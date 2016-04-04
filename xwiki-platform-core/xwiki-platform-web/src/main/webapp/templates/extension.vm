@@ -625,7 +625,7 @@ $namespace##
 
 #macro (displayExtensionPlan $plan)
   ## Group the extensions by the actions that will be performed on them.
-  #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': []})
+  #set($extensionsByAction = {'INSTALL': [], 'UPGRADE': [], 'DOWNGRADE': [], 'UNINSTALL': [], 'INITIALIZE': []})
   #set ($noAction = true)
   #foreach($planAction in $plan.actions)
     #set ($targetExtensions = $extensionsByAction.get($planAction.action.name()))

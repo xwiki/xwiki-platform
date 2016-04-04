@@ -21,7 +21,6 @@ package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +34,8 @@ import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the Delete Page feature.
@@ -73,21 +74,21 @@ public class DeletePageTest extends AbstractTest
     }
 
     @Test
-    public void testDeleteOkWhenConfirming()
+    public void deleteOkWhenConfirming()
     {
         ConfirmationPage confirmationPage = this.viewPage.delete();
         // This tests for regression of XWIKI-1388
-        Assert.assertNotNull("The interface should not show the user as logged out while deleting page",
+        assertNotNull("The interface should not show the user as logged out while deleting page",
             confirmationPage.getCurrentUser());
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilIsTerminated();
-        Assert.assertTrue(deletingPage.isTerminated());
-        Assert.assertTrue(deletingPage.isSuccess());
-        Assert.assertEquals(CONFIRMATION, deletingPage.getSuccessMessage());
+        assertTrue(deletingPage.isTerminated());
+        assertTrue(deletingPage.isSuccess());
+        assertEquals(CONFIRMATION, deletingPage.getSuccessMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
-        Assert.assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
-        Assert.assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
+        assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
+        assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
     }
 
     /**
@@ -95,22 +96,22 @@ public class DeletePageTest extends AbstractTest
      * we want when the delete is done.
      */
     @Test
-    public void testDeletePageCanSkipConfirmationAndDoARedirect()
+    public void deletePageCanSkipConfirmationAndDoARedirect()
     {
         String pageURL = getUtil().getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
         getUtil().gotoPage(SPACE_VALUE, PAGE_VALUE, DELETE_ACTION, "confirm=1&xredirect=" + pageURL);
         ViewPage vp = new ViewPage();
         // Since the page PAGE_VALUE + "Whatever" doesn't exist the View Action will redirect to the Nested Document
         // SPACE_VALUE + "." + PAGE_VALUE + "Whatever + ".WebHome".
-        Assert.assertEquals(SPACE_VALUE + "." + PAGE_VALUE + "Whatever", vp.getMetaDataValue("space"));
-        Assert.assertEquals("WebHome", vp.getMetaDataValue("page"));
+        assertEquals(SPACE_VALUE + "." + PAGE_VALUE + "Whatever", vp.getMetaDataValue("space"));
+        assertEquals("WebHome", vp.getMetaDataValue("page"));
     }
 
     /**
      * Verify that we can skip the default delete result page and instead redirect to any page we want.
      */
     @Test
-    public void testDeletePageCanDoRedirect()
+    public void deletePageCanDoRedirect()
     {
         // Set the current page to be any page (doesn't matter if it exists or not)
         String pageURL = getUtil().getURL(SPACE_VALUE, PAGE_VALUE + "Whatever");
@@ -120,27 +121,27 @@ public class DeletePageTest extends AbstractTest
         ViewPage vp = new ViewPage();
         // Since the page PAGE_VALUE + "Whatever" doesn't exist the View Action will redirect to the Nested Document
         // SPACE_VALUE + "." + PAGE_VALUE + "Whatever + ".WebHome".
-        Assert.assertEquals(SPACE_VALUE + "." + PAGE_VALUE + "Whatever", vp.getMetaDataValue("space"));
-        Assert.assertEquals("WebHome", vp.getMetaDataValue("page"));
+        assertEquals(SPACE_VALUE + "." + PAGE_VALUE + "Whatever", vp.getMetaDataValue("space"));
+        assertEquals("WebHome", vp.getMetaDataValue("page"));
     }
 
     /**
      * Verify that hitting cancel on the delete confirmation dialog box goes back to the page being deleted.
      */
     @Test
-    public void testDeletePageGoesToOriginalPageWhenCancelled()
+    public void deletePageGoesToOriginalPageWhenCancelled()
     {
         this.viewPage.delete().clickNo();
-        Assert.assertEquals(getUtil().getURL(SPACE_VALUE, PAGE_VALUE), getDriver().getCurrentUrl());
+        assertEquals(getUtil().getURL(SPACE_VALUE, PAGE_VALUE), getDriver().getCurrentUrl());
     }
 
     @Test
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
-    public void testDeletePageIsImpossibleWhenNoDeleteRights()
+    public void deletePageIsImpossibleWhenNoDeleteRights()
     {
         // Logs out to be guest and not have the right to delete
         this.viewPage.logout();
-        Assert.assertFalse(this.viewPage.canDelete());
+        assertFalse(this.viewPage.canDelete());
     }
 
     /**
@@ -150,7 +151,7 @@ public class DeletePageTest extends AbstractTest
      * @since 7.2RC1
      */
     @Test
-    public void testDeleteTerminalAndNonTerminalPages()
+    public void deleteTerminalAndNonTerminalPages()
     {
         DocumentReference terminalPageRef = new DocumentReference("xwiki",
                 Arrays.asList(getTestClassName()),
@@ -173,7 +174,7 @@ public class DeletePageTest extends AbstractTest
         
         // Look at the recycle bin
         DeletePageOutcomePage deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
-        Assert.assertFalse(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+        assertFalse(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
         
         // Create the terminal page.
         ViewPage terminalPage = getUtil().createPage(terminalPageRef, "Content", "Title");
@@ -183,7 +184,7 @@ public class DeletePageTest extends AbstractTest
         
         // Look at the recycle bin
         deletePageOutcomePage = deletingPage.getDeletePageOutcomePage();
-        Assert.assertTrue(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
+        assertTrue(deletePageOutcomePage.hasTerminalPagesInRecycleBin());
         
         // Delete both version in the recycle bin
         deletePageOutcomePage.clickDeletePage();
@@ -197,7 +198,7 @@ public class DeletePageTest extends AbstractTest
      * @since 7.2RC1
      */
     @Test
-    public void testDeleteChildren()
+    public void deleteChildren()
     {
         // Initialize the parent
         DocumentReference parentReference = new DocumentReference("xwiki",
@@ -206,7 +207,7 @@ public class DeletePageTest extends AbstractTest
         ViewPage parentPage = getUtil().createPage(parentReference, "Content", "Parent");
         // Try to delete it to make sure we don't have the "affect children" option yet
         ConfirmationPage confirmationPage = parentPage.delete();
-        Assert.assertFalse(confirmationPage.hasAffectChildrenOption());
+        assertFalse(confirmationPage.hasAffectChildrenOption());
         
         // Initialize the children pages
         final int NB_CHILDREN = 3;
@@ -221,35 +222,35 @@ public class DeletePageTest extends AbstractTest
         // Test 1: when you don't select "affect children", the children are not deleted
         parentPage = getUtil().gotoPage(parentReference);
         confirmationPage = parentPage.delete();
-        Assert.assertTrue(confirmationPage.hasAffectChildrenOption());
+        assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilIsTerminated();
-        Assert.assertTrue(deletingPage.isSuccess());
+        assertTrue(deletingPage.isSuccess());
         // Check the page have been effectively removed
         ViewPage page = getUtil().gotoPage(parentReference);
-        Assert.assertFalse(page.exists());
+        assertFalse(page.exists());
         // But not the children 
         for (int i = 0; i < NB_CHILDREN; ++i) {
             page = getUtil().gotoPage(childrenReferences[i]);
-            Assert.assertTrue(page.exists());
+            assertTrue(page.exists());
         }
         
         // Test 2: when you select "affect children", the children are deleted too
         parentPage = getUtil().createPage(parentReference, "Content", "Parent");
         confirmationPage = parentPage.delete();
-        Assert.assertTrue(confirmationPage.hasAffectChildrenOption());
+        assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(true);
         deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilIsTerminated();
-        Assert.assertTrue(deletingPage.isSuccess());
+        assertTrue(deletingPage.isSuccess());
         // Check the page have been effectively removed
         page = getUtil().gotoPage(parentReference);
-        Assert.assertFalse(page.exists());
+        assertFalse(page.exists());
         // And also the children
         for (int i = 0; i < NB_CHILDREN; ++i) {
             page = getUtil().gotoPage(childrenReferences[i]);
-            Assert.assertFalse(page.exists());
+            assertFalse(page.exists());
         }
         
     }

@@ -32,10 +32,6 @@
   <packaging>pom</packaging>
   <name>XWiki Platform - Tools - Packager - Test - Skin</name>
   <description>XWiki Platform - Tools - Packager - Test - Skin</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <modules>
     <module>dependency</module>
     <module>package</module>

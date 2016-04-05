@@ -32,8 +32,8 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - WYSIWYG Editor - Tests - Parent POM</description>
   <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>

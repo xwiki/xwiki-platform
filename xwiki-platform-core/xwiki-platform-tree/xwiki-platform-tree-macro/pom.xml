@@ -34,8 +34,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree Macro</xwiki.extension.name>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
     <!-- The tree widget is packaged as a WebJar -->

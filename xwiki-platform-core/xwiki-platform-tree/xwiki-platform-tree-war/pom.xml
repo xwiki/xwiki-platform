@@ -31,10 +31,6 @@
   <name>XWiki Platform - Tree - WAR</name>
   <packaging>war</packaging>
   <description>Velocity macros and JavaScript files that can't be packaged in the WebJar</description>
-  <properties>
-    <!-- Don't run CLIRR on this module since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <build>
     <plugins>
       <!-- Javascript and CSS files compression -->

@@ -38,9 +38,6 @@
     <module>xwiki-platform-distribution-debian</module>
   </modules>
   <properties>
-    <!-- Don't run CLIRR on distribution packages they are not really supposed to contain Java code and certainly no APIs -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-
     <!-- Hibernate configuration -->
     <xwiki.db.common.extraMappings>activitystream.hbm.xml,instance.hbm.xml</xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>

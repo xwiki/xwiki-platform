@@ -34,8 +34,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree Widget</xwiki.extension.name>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <jstree.version>3.0.8</jstree.version>
   </properties>
   <dependencies>

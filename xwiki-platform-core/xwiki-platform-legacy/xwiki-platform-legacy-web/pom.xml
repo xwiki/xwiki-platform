@@ -31,10 +31,6 @@
   <name>XWiki Platform - Legacy - Web Resources</name>
   <packaging>war</packaging>
   <description>Deprecated Web Resources for the XWiki platform</description>
-  <properties>
-    <!-- Don't run CLIRR on this module since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>

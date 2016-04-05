@@ -31,10 +31,6 @@
   <name>XWiki Platform - Extension - Tests - Page Objects</name>
   <packaging>jar</packaging>
   <description>The page objects used in the functional tests of the Extension Manager UI.</description>
-  <properties>
-    <!-- Don't run CLIRR in test modules because we don't care about backward compatibility for tests. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

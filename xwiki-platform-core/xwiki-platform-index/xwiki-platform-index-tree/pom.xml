@@ -32,8 +32,6 @@
   <description>XWiki Platform - Index - Tree - Parent POM</description>
   <packaging>pom</packaging>
     <properties>
-    <!-- Don't run CLIRR on this module since it doesn't contain java code -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>

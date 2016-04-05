@@ -41,8 +41,8 @@
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
   </modules>
   <properties>
-    <!-- Don't run CLIRR on tools since we currently consider them internal tools -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run backward-compatibility checks in tools modules since we don't consider them public API -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <dependencies>
     <dependency>

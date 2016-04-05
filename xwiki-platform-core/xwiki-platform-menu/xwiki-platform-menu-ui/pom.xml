@@ -31,8 +31,6 @@
   <name>XWiki Platform - Menu - UI</name>
   <packaging>xar</packaging>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       flaviusolaru:navigation-menu-wiki-macro,

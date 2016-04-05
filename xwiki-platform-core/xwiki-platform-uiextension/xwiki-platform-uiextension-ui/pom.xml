@@ -31,10 +31,6 @@
   <name>XWiki Platform - UI Extension - UI</name>
   <packaging>xar</packaging>
   <description>UI for the User Interface Extensions</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

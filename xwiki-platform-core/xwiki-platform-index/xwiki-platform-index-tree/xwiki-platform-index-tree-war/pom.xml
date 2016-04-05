@@ -31,10 +31,6 @@
   <name>XWiki Platform - Index - Tree - WAR</name>
   <packaging>war</packaging>
   <description>Velocity macros that can't be packaged in the XAR</description>
-  <properties>
-    <!-- Don't run CLIRR on this module since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>

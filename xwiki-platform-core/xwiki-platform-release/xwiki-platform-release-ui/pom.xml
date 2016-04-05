@@ -31,8 +31,6 @@
   <name>XWiki Platform - Release - UI</name>
   <packaging>xar</packaging>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Release Application</xwiki.extension.name>
   </properties>

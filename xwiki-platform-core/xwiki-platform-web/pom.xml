@@ -31,10 +31,6 @@
   <name>XWiki Platform - Web Resources</name>
   <packaging>war</packaging>
   <description>Web Resources for the XWiki platform</description>
-  <properties>
-    <!-- Don't run CLIRR on this module since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

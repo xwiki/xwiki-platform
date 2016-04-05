@@ -32,8 +32,6 @@
   <description>Provides a macro to easily upload and select attachments</description>
   <packaging>xar</packaging>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Application</xwiki.extension.name>
   </properties>

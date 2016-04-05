@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Cache - Tests</description>
   <properties>
-    <!-- Don't consider cache test framework as public API since it imposes unnecessary restrictions -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

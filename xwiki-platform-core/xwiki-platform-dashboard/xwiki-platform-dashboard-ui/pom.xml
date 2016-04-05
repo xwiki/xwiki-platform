@@ -32,8 +32,6 @@
   <packaging>xar</packaging>
   <description>Dashboard Application</description>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Dashboard Application</xwiki.extension.name>
   </properties>

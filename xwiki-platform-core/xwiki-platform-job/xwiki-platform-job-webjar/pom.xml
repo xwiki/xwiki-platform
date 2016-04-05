@@ -34,8 +34,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Job WebJar</xwiki.extension.name>
-    <!-- No Java code here -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
     <dependency>

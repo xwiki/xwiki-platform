@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,8 +30,8 @@
   <parent>Invitation.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1444133968000</date>
-  <contentUpdateDate>1444046348000</contentUpdateDate>
+  <date>1459855619000</date>
+  <contentUpdateDate>1456773313000</contentUpdateDate>
   <version>1.1</version>
   <title>Applications Panel Entry</title>
   <comment/>
@@ -119,7 +118,7 @@
       <name>platform.scheduler.invitationApplication</name>
     </property>
     <property>
-      <parameters>label=$services.localization.render('invitation.applicationsPanelEntryLabel')
+      <parameters>label=#if ($hasAdmin)$services.localization.render('invitation.applicationsPanelEntryLabel')#end
 target=Invitation.WebHome
 icon=icon:drink</parameters>
     </property>

@@ -23,7 +23,7 @@
 <xwikidoc>
   <web>Main</web>
   <name>SolrTranslations</name>
-  <language>nl</language>
+  <language>ca</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Main.SolrSearch</parent>
@@ -43,30 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
-solr.facets.hint=Selecteer een categorie en activeer filters op de huidige resultaten
-solr.facets.resetAll=Herstel alle
-solr.facets.title=Verfijn uw zoekopdracht
-solr.field.attcontent=Bijlage Inhoud
-solr.field.filename=Bijlage Naam
-solr.field.objcontent=Objecten
-solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.image=Afbeelding
-solr.filterBy.fileType.text=Tekst
-solr.filterBy.fileType.video=Video
-solr.filterBy.type.attachment=Bijlage
-solr.filterBy.type.document=Document
-solr.filterBy.type.object=Object
-solr.filterBy.type.object_property=Object eigenschap
-solr.result.author=Gewijzigd door {0} op {1} 
-solr.result.location=Gelegen in {0} » {1} » {2} 
-solr.result.mediaType=Bestand van het type {0}
-solr.sortBy=Sorteren op\:
-solr.sortBy.author_display_sort=Laatste auteur
-solr.sortBy.date=Datum
-solr.sortBy.score=Relevantie
-solr.sortBy.title_sort=Titel
-solr.sortOrder.asc=Oplopend
-solr.sortOrder.desc=Aflopend
+  <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
+solr.facet.date.today=Avui
 </content>
 </xwikidoc>

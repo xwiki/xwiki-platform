@@ -44,6 +44,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
+platform.wiki.create.title=Crear una nova wiki
 platform.wiki.menu.deletewiki=Suprimir
 platform.wiki.sheet.title.createnewalias=Crear nou àlies.
 </content>

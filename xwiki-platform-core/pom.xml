@@ -473,6 +473,7 @@
                 "java": {
                   "filter": {
                     "packages": {
+                      "regex": true,
                       "include": ["org\\.xwiki\\..*"],
                       "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?"]
                     }

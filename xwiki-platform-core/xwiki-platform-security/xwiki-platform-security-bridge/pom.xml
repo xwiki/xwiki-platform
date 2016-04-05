@@ -92,7 +92,8 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-test-oldcore</artifactId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

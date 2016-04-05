@@ -75,16 +75,9 @@
 
     <!-- Test Dependencies -->
     <dependency>
-      <!-- We're using the MockitoOldcoreRule -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Since we're mocking a class (XWiki) we need those -->

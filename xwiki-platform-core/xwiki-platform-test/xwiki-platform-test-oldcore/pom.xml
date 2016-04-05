@@ -44,9 +44,9 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

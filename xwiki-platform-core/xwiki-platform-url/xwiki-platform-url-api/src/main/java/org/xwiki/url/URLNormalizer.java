@@ -43,6 +43,4 @@ public interface URLNormalizer<T>
      * @return the normalized URL, what is done depends on the implementation
      */
     T normalize(ExtendedURL partialURL);
-
-    void test();
 }

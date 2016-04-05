@@ -68,6 +68,7 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -78,6 +79,12 @@
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

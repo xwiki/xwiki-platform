@@ -126,6 +126,7 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <!-- Testing dependencies -->
     <!-- Since we're mocking a class (XWiki) we need those -->
     <dependency>

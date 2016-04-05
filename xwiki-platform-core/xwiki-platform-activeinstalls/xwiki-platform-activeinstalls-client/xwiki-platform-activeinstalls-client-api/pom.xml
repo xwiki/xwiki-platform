@@ -63,6 +63,7 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
@@ -76,6 +77,12 @@
           <groupId>log4j</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

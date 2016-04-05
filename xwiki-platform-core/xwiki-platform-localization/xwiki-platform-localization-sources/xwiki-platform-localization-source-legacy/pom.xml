@@ -67,10 +67,9 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-      <type>test-jar</type>
     </dependency>
 
     <!-- Used to mock XWiki class -->
@@ -78,10 +77,6 @@
       <groupId>org.jmock</groupId>
       <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
   <build>

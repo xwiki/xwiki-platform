@@ -43,14 +43,6 @@
     <bootstrap.version>3.3.5</bootstrap.version>
     <batik.version>1.8</batik.version>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->

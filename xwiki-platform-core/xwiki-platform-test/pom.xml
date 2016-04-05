@@ -34,6 +34,7 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-test-integration</module>
+    <module>xwiki-platform-test-oldcore</module>
     <module>xwiki-platform-test-page</module>
     <module>xwiki-platform-test-ui</module>
   </modules>

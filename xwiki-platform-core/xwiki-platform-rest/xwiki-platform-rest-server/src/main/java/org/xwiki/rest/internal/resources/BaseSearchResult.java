@@ -93,7 +93,9 @@ public class BaseSearchResult extends XWikiResource
 
         /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            if (wikiName != null) {
+                Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            }
 
             List<SearchResult> result = new ArrayList<SearchResult>();
 
@@ -531,7 +533,9 @@ public class BaseSearchResult extends XWikiResource
 
         /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            if (wikiName != null) {
+                Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            }
 
             List<SearchResult> result;
 

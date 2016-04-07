@@ -6,6 +6,7 @@
   'edges': true,
   'finder': false,
   'icons': true,
+  'limit': 15,
   'links': false,
   'openTo': '',
   'reference': '',
@@ -51,6 +52,7 @@
   #set ($discard = $attributes.put('data-responsive', true))
   #if ("$!macro.options.reference" != '')
     #set ($defaultResourceParams = {
+      'limit': 15,
       'root': '',
       'showRoot': false
     })

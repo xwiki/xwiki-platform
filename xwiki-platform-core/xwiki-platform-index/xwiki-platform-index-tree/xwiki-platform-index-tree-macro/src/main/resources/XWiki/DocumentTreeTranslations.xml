@@ -81,6 +81,8 @@ rendering.macro.documentTree.parameter.hierarchyMode.name=Page Hierarchy Mode
 rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between pages. Possible values are "reference" (default) and "parentchild". If "reference" is used then the page hierarchy is defined using only the page reference, especially the nested spaces component of the page reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" page field from the database.
 rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden Documents
 rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
+rendering.macro.documentTree.parameter.limit.name=Limit
+rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 
 index.documentTree.empty=No pages found
 

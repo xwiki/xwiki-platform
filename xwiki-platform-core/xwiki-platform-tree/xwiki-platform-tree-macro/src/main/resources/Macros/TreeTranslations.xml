@@ -65,6 +65,8 @@ rendering.macro.tree.parameter.openTo.name=Open to
 rendering.macro.tree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also.
 rendering.macro.tree.parameter.finder.name=Finder
 rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
+rendering.macro.tree.parameter.limit.name=Limit
+rendering.macro.tree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large. The tree passes this parameter to the tree source so it works only with dynamic trees whose source implements child count limit.
 rendering.macro.tree.content.description=You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.
 tree.macro.editModeWarning=This tree can't be displayed in edit mode.
 </content>

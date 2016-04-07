@@ -124,6 +124,14 @@
         if (sourceButton) {
           sourceButton.addClass('loading');
         }
+        if (editor.mode === 'source') {
+          // When switching from Source mode to WYSIWYG mode the wiki syntax is converted to HTML on the server side.
+          // Before we receive the result the Source plugin sets the source (wiki syntax) as the data for the WYSIWYG
+          // mode. This adds an entry (snapshot) in the undo history for the WYSIWYG mode. In order to prevent this we
+          // lock the undo history until the conversion is done.
+          // See CKEDITOR-58: Undo operation can replace the rich text content with wiki syntax
+          editor.fire('lockSnapshot');
+        }
         // Disable the switch while the conversion takes place.
         setTimeout(function() {
           editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
@@ -132,6 +140,10 @@
         editor.ui.space('contents').removeStyle('visibility');
         if (sourceButton) {
           sourceButton.removeClass('loading');
+        }
+        if (editor.mode === 'wysiwyg') {
+          // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
+          editor.fire('unlockSnapshot');
         }
         editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       }

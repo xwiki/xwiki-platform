@@ -95,6 +95,7 @@
     #end
     ## only safe version should be used in SQL queries
     #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+    #livetable_getTableAlias($safe_tableAlias)
     ##
     #if($order.startsWith('doc.'))
       #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")

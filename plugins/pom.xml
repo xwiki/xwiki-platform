@@ -117,7 +117,7 @@
         <configuration>
           <phantomjs>
             <!-- There is no version 2.0 available for linux.. -->
-            <version>1.9.8</version>
+            <version>2.1.1</version>
           </phantomjs>
           <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
           <jsTestSrcDir>${project.basedir}/src/test/resources</jsTestSrcDir>

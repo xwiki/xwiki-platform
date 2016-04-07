@@ -31,6 +31,7 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
@@ -88,6 +89,13 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     @Override
     public boolean isSyntaxSupported(String syntaxId)
     {
+        // Special handling for XHTML since right the XHTML renderer doesn't produce valid XHTML. Thus if, for example,
+        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {code <p>a</p><p>b</p>} which is invalid XHTML
+        // and the page will fail to render.
+        if (syntaxId.equals(Syntax.XHTML_1_0.toIdString())) {
+            return false;
+        }
+
         try {
             this.componentManager.getInstance(Parser.class, syntaxId);
             this.componentManager.getInstance(PrintRendererFactory.class, syntaxId);

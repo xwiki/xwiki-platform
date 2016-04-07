@@ -33,6 +33,7 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -103,6 +104,9 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private Logger logger;
 
     private DocumentInstanceOutputProperties properties;
 
@@ -454,6 +458,9 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     {
         ComponentManager componentManager = this.componentManagerProvider.get();
 
+        this.currentClassPropertyMeta = null;
+        this.currentClassProperty = null;
+
         PropertyClassProvider provider;
 
         // First try to use the specified class type as hint.
@@ -464,7 +471,13 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
                 // In previous versions the class type was the full Java class name of the property class
                 // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
                 String classType = StringUtils.removeEnd(StringUtils.substringAfterLast(type, "."), "Class");
-                provider = componentManager.getInstance(PropertyClassProvider.class, classType);
+                if (componentManager.hasComponent(PropertyClassProvider.class, classType)) {
+                    provider = componentManager.getInstance(PropertyClassProvider.class, classType);
+                } else {
+                    this.logger.warn("Unknown property type [{}]", type);
+
+                    return ;
+                }
             }
         } catch (ComponentLookupException e) {
             throw new FilterException(String.format(
@@ -495,18 +508,19 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     public void onWikiClassPropertyField(String name, String value, FilterEventParameters parameters)
         throws FilterException
     {
-        PropertyClass propertyClass;
-        try {
-            propertyClass = (PropertyClass) this.currentClassPropertyMeta.get(name);
-        } catch (XWikiException e) {
-            throw new FilterException(String.format(
-                "Failed to get definition of field [%s] for property type [%s]", name,
-                this.currentClassProperty.getClassType()), e);
+        if (this.currentClassProperty != null) {
+            PropertyClass propertyClass;
+            try {
+                propertyClass = (PropertyClass) this.currentClassPropertyMeta.get(name);
+            } catch (XWikiException e) {
+                throw new FilterException(String.format("Failed to get definition of field [%s] for property type [%s]",
+                    name, this.currentClassProperty.getClassType()), e);
+            }
+
+            BaseProperty<?> field = propertyClass.fromString(value);
+
+            this.currentClassProperty.safeput(name, field);
         }
-
-        BaseProperty< ? > field = propertyClass.fromString(value);
-
-        this.currentClassProperty.safeput(name, field);
     }
 
     @Override

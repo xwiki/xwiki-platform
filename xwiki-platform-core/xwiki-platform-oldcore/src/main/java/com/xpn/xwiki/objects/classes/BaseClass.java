@@ -34,6 +34,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -70,6 +72,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
+
     private String customMapping;
 
     private String customClass;
@@ -619,14 +623,18 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                     provider = Utils.getComponent(PropertyClassProvider.class, classType);
                 }
 
-                // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but it
-                // doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
-                // assumption that all property classes extend PropertyClass.
-                PropertyClass property = (PropertyClass) provider.getInstance();
-                property.setName(name);
-                property.setObject(this);
-                property.fromXML(pcel);
-                safeput(name, property);
+                if (provider != null) {
+                    // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but
+                    // it doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
+                    // assumption that all property classes extend PropertyClass.
+                    PropertyClass property = (PropertyClass) provider.getInstance();
+                    property.setName(name);
+                    property.setObject(this);
+                    property.fromXML(pcel);
+                    safeput(name, property);
+                } else {
+                    LOGGER.warn("Uknown property type [{}]", classType);
+                }
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,

@@ -95,10 +95,11 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
                 defaultHint);
 
         try {
-            XWikiDocument configDoc = ratingsConfiguration.getConfigurationDocument(documentReference);
-            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            XWikiDocument configurationDocument = ratingsConfiguration.getConfigurationDocument(documentReference);
+            if (!configurationDocument.isNew()
+                && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                    (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 ratingsHint = (hint == null) ? ratingsHint : hint;

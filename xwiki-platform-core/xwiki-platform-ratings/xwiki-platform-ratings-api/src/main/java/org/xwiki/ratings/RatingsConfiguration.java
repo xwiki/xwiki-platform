@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Provides Ratings configuration.
  *
  * @version $Id$
- * @since 8.1M1
+ * @since 8.1M2
  */
 @Role
 @Unstable

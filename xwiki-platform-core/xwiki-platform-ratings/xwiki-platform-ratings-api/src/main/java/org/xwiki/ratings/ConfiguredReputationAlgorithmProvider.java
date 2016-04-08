@@ -97,16 +97,16 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                     + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, defaultAlgorithmHint);
 
         try {
-            XWikiDocument configDoc = ratingsConfiguration.getConfigurationDocument(documentReference);
-            if (configDoc != null && !configDoc.isNew()
-                && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            XWikiDocument configurationDocument = ratingsConfiguration.getConfigurationDocument(documentReference);
+            if (configurationDocument != null && !configurationDocument.isNew()
+                && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                    (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 if (hint == "custom") {
                     prop =
-                        (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                        (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                             RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
                     hint = (prop == null) ? null : (String) prop.getValue();
                 }

@@ -27,12 +27,13 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsManager;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
 
@@ -41,7 +42,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  *
  * @see RatingsConfiguration
  * @version $Id$
- * @since 8.1M1
+ * @since 8.1M2
  */
 @Component
 @Singleton
@@ -54,34 +55,21 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
     private Provider<XWikiContext> xcontextProvider;
 
     /**
-     * Retrieves the XWiki private API object.
+     * Get document.
      *
-     * @return The XWiki private API object
+     * @param reference the reference for which to return the document
+     * @return the document
      */
-    protected XWiki getXWiki()
+    public XWikiDocument getDocument(EntityReference reference)
     {
-        return getXWikiContext().getWiki();
-    }
-
-    /**
-     * Retrieve the XWiki context from the current execution context.
-     * 
-     * @return the XWiki context
-     * @throws RuntimeException If there was an error retrieving the context
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return this.xcontextProvider.get();
-    }
-
-    /**
-     * Store a caught exception in the context.
-     * 
-     * @param e the exception to store, can be null to clear the previously stored exception
-     */
-    private void setError(Throwable e)
-    {
-        getXWikiContext().put("exception", e);
+        XWikiContext context = xcontextProvider.get();
+        try
+        {
+            return context.getWiki().getDocument(reference, context);
+        } catch (XWikiException e) {
+            logger.error("Failed to retrieve the document for the reference [{}].", reference, e);
+            return null;
+        }
     }
 
     /**
@@ -89,34 +77,27 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
      *
      * @param documentReference the documentReference for which to return the configuration document
      * @return the configuration document
+     * @throws XWikiException
      */
     public XWikiDocument getConfigurationDocument(DocumentReference documentReference)
     {
-        setError(null);
-
-        try {
-            SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
-            while (lastSpaceReference.getType() == EntityType.SPACE) {
-                DocumentReference spaceConfigDocReference =
-                    new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, lastSpaceReference);
-                XWikiDocument spaceConfigDoc = getXWiki().getDocument(spaceConfigDocReference, getXWikiContext());
-                if (spaceConfigDoc != null
-                    && spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
-                    return spaceConfigDoc;
-                }
-                if (lastSpaceReference.getParent().getType() == EntityType.SPACE) {
-                    lastSpaceReference = new SpaceReference(lastSpaceReference.getParent());
-                } else {
-                    break;
-                }
+        SpaceReference lastSpaceReference = documentReference.getLastSpaceReference();
+        while (lastSpaceReference.getType() == EntityType.SPACE) {
+            DocumentReference configurationDocumentReference =
+                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, lastSpaceReference);
+            XWikiDocument spaceConfigurationDocument = getDocument((EntityReference) configurationDocumentReference);
+            if (spaceConfigurationDocument != null
+                && spaceConfigurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+                return spaceConfigurationDocument;
             }
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            return globalConfigDoc;
-        } catch (Throwable e) {
-            setError(e);
-            return null;
+            if (lastSpaceReference.getParent().getType() == EntityType.SPACE) {
+                lastSpaceReference = new SpaceReference(lastSpaceReference.getParent());
+            } else {
+                break;
+            }
         }
+        XWikiDocument globalConfigurationDocument = getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE);
+        return globalConfigurationDocument;
     }
     
     /**
@@ -127,21 +108,25 @@ public class DefaultRatingsConfiguration implements RatingsConfiguration
      * @param parameterName the parameter for which to retrieve the value
      * @param defaultValue the default value for the parameter
      * @return the value of the given parameter name from the current configuration context
+     * @throws XWikiException 
      */
     public String getConfigurationParameter(DocumentReference documentReference, String parameterName, 
         String defaultValue)
     {
-        try {
-            XWikiDocument configDoc = getConfigurationDocument(documentReference);
-            if (configDoc != null && !configDoc.isNew() 
-                && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
-                BaseProperty prop = (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE)
-                    .get(parameterName);
+        XWikiDocument configurationDocument = getConfigurationDocument(documentReference);
+        if (configurationDocument != null && !configurationDocument.isNew() 
+            && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            try
+            {
+                BaseProperty prop = (BaseProperty) configurationDocument.
+                    getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(parameterName);
                 String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
-                return (propValue.equals("") ? defaultValue : propValue);
-            }
-        } catch (Exception e) {
-            logger.error("Cannot read ratings config", e);
+                return (propValue.equals("") ? defaultValue : propValue);  
+            } catch (XWikiException e) {
+                logger.error("Failed to retrieve the property for the configurationDocument [{}].", 
+                    configurationDocument, e);
+                return null;
+            } 
         }
         return defaultValue;
     }

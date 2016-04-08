@@ -94,8 +94,7 @@
       #set($tableAlias = $order)
     #end
     ## only safe version should be used in SQL queries
-    #set($safe_tableAlias = $tableAlias)
-    #livetable_getTableAlias($safe_tableAlias)
+    #livetable_getTableAlias($tableAlias)
     ##
     #if($order.startsWith('doc.'))
       #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")

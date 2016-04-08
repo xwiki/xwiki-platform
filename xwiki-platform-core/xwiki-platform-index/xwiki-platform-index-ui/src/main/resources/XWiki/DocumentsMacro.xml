@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="XWiki.DocumentsMacro" locale="">
   <web>XWiki</web>
   <name>DocumentsMacro</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1402576900000</date>
-  <contentUpdateDate>1402576900000</contentUpdateDate>
+  <date>1460113981000</date>
+  <contentUpdateDate>1460113981000</contentUpdateDate>
   <version>1.1</version>
   <title>Documents Macro</title>
   <comment/>
@@ -45,7 +45,7 @@
 
 Generates:
 
-{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title, doc.location"/}}</content>
+{{documents id="example" count="5" actions="false" columns="doc.title, doc.location"/}}</content>
   <object>
     <name>XWiki.DocumentsMacro</name>
     <number>0</number>
@@ -186,6 +186,9 @@ Generates:
 })
 #if ("$!xcontext.macro.params.space" != "") 
   #set ($extraParams = "&amp;space=$escapetool.url($xcontext.macro.params.space)")
+#end
+#if ("$!xcontext.macro.params.location" != "") 
+  #set ($extraParams = "$!{extraParams}&amp;location=$escapetool.url($xcontext.macro.params.location)")
 #end
 #if ("$!xcontext.macro.params.parent" != "") 
   #set ($extraParams = "$!{extraParams}&amp;parent=$escapetool.url($xcontext.macro.params.parent)")
@@ -625,6 +628,72 @@ Generates:
     </property>
     <property>
       <name>columns</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentsMacro</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>6adff020-34b8-4e53-ac79-6d3674bb484a</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Only lists documents having a full reference matching the passed location (e.g. passing "Beau" would match a document reference of "France.Paris.Beaubourg.Office")</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>location</name>
     </property>
   </object>
 </xwikidoc>

@@ -411,7 +411,7 @@ public class RatingsScriptService implements ScriptService
      *
      * @param documentReference the documentReference for which to return the configuration document
      * @return the configuration document
-     * @since 8.1M1
+     * @since 8.1M2
      */
     public Document getConfigurationDocument(DocumentReference documentReference)
     {

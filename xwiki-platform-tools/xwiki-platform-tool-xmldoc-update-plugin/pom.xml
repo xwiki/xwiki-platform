@@ -132,6 +132,14 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <!-- TODO: Make this plugin work with the version defined in the top level POM! Right now it fails with:
+             Caused by: java.lang.ArrayIndexOutOfBoundsException: 48188
+        -->
+        <version>2.9</version>
+      </plugin>
     </plugins>
   </build>
   <profiles>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.rss;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.text.MessageFormat;
@@ -33,7 +34,7 @@ import com.sun.syndication.io.XmlReader;
 
 /**
  * Factory implementation using Rome to return the feed's data.
- * 
+ *
  * @version $Id$
  * @since 1.9
  */
@@ -43,6 +44,8 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
      * The maximum number of milliseconds to wait when inquiring the RSS feed provider.
      */
     private static final int TIMEOUT_MILLISECONDS = 5000;
+    private static final String USER_AGENT_HEADER = "User-Agent";
+    private static final String USER_AGENT = "XWiki/8.0.1";
 
     @Override
     public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException
@@ -55,19 +58,28 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
 
         SyndFeed feed;
         try {
-            URLConnection connection = parameters.getFeedURL().openConnection();
-            connection.setConnectTimeout(TIMEOUT_MILLISECONDS);
-            feed = syndFeedInput.build(new XmlReader(connection));
+            if (StringUtils.startsWith(parameters.getFeed().toLowerCase(), "https")) {
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) parameters.getFeedURL().openConnection();
+                httpsURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
+                httpsURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
+                feed = syndFeedInput.build(new XmlReader(httpsURLConnection));
+
+            } else {
+                URLConnection httpURLConnection = parameters.getFeedURL().openConnection();
+                httpURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
+                httpURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
+                feed = syndFeedInput.build(new XmlReader(httpURLConnection));
+            }
         } catch (SocketTimeoutException ex) {
             throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",
-                parameters.getFeedURL()));
+                    parameters.getFeedURL()));
         } catch (Exception ex) {
             throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}", parameters
-                .getFeedURL(), ex.getMessage()), ex);
+                    .getFeedURL(), ex.getMessage()), ex);
         }
         if (feed == null) {
             throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",
-                parameters.getFeedURL()));
+                    parameters.getFeedURL()));
         }
 
         return feed;

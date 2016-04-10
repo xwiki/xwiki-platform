@@ -81,10 +81,8 @@ public class DBListClass extends ListClass
             // were empty strings). This means we need to check for NULL and ignore NULL entries
             // from the list.
             if (item != null) {
-                if (item instanceof String) {
+                if (item instanceof String || item instanceof Number) {
                     result.add(new ListItem((String) item));
-                } else if (item instanceof Number) {
-                    result.add(new ListItem(item.toString()));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -114,7 +112,14 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            String hqlQuery = getQuery(context);
+            String hqlQuery = null;
+            try {
+                hqlQuery = getQuery(context);
+            } catch (XWikiException e) {
+                LOGGER.error("Failed to get the list", e);
+                list = new ArrayList<ListItem>();
+                return list;
+            }
 
             if (hqlQuery == null) {
                 list = new ArrayList<ListItem>();
@@ -202,7 +207,7 @@ public class DBListClass extends ListClass
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */
-    public String getQuery(XWikiContext context)
+    public String getQuery(XWikiContext context) throws XWikiException
     {
         // First, get the hql query entered by the user.
         String sql = getSql();
@@ -287,12 +292,8 @@ public class DBListClass extends ListClass
                     select.append("idprop.value");
                     whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                     // Get the from statements according to the type of property
-                    try {
-                        String classType = getPropertyType(classname, idField,context);
-                        fromStatements.add(classType + " as idprop");
-                    } catch (Exception e) {
-                        LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
-                    }
+                    String classType = getPropertyType(classname, idField, context);
+                    fromStatements.add(classType + " as idprop");
                 }
 
                 // If specified, add the second column to the query.
@@ -305,12 +306,8 @@ public class DBListClass extends ListClass
                         select.append(", valueprop.value");
                         whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                         // Get the from statements according to the type of property
-                        try {
-                            String classType = getPropertyType(classname, valueField,context);
-                            fromStatements.add(classType + " as valueprop");
-                        } catch (Exception e) {
-                            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
-                        }
+                        String classType = getPropertyType(classname, valueField, context);
+                        fromStatements.add(classType + " as valueprop");
                     }
                 }
                 // Let's create the complete query
@@ -610,7 +607,7 @@ public class DBListClass extends ListClass
         }
     }
 
-    private String getPropertyType(String className, String propertyName, XWikiContext context) throws Exception
+    private String getPropertyType(String className, String propertyName, XWikiContext context) throws XWikiException
     {
         PropertyClass pc = null;
         try {

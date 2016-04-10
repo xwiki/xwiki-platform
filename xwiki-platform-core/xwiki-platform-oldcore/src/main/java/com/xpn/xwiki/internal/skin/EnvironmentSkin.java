@@ -92,8 +92,10 @@ public class EnvironmentSkin extends AbstractSkin
                 try {
                     this.properties = new PropertiesConfiguration(url);
                 } catch (ConfigurationException e) {
-                    LOGGER.debug("Failed to load skin [{}] properties file", this.id,
+                    LOGGER.error("Failed to load skin [{}] properties file ([])", this.id, url,
                         ExceptionUtils.getRootCauseMessage(e));
+
+                    this.properties = new BaseConfiguration();
                 }
             } else {
                 LOGGER.debug("No properties found for skin [{}]", this.id);
@@ -152,7 +154,7 @@ public class EnvironmentSkin extends AbstractSkin
 
     @Override
     public String getOutputSyntaxString()
-    {                
+    {
         return getProperties().getString("outputSyntax");
     }
 }

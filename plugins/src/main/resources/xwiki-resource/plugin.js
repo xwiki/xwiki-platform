@@ -83,6 +83,16 @@
   });
 
   CKEDITOR.plugins.xwikiResource = {
+    cachedResources: {},
+
+    cacheResource: function(resource) {
+      this.cachedResources[resource.reference.type + ':' + resource.reference.reference] = resource;
+    },
+
+    getCachedResource: function(resourceReference) {
+      return this.cachedResources[resourceReference.type + ':' + resourceReference.reference];
+    },
+
     parseResourceReference: function(serializedResourceReference) {
       var parts = serializedResourceReference.split('|-|');
       var resourceReference = {
@@ -257,7 +267,10 @@
         openPicker: function() {
           var resourceReference = this.getValue();
           var picker = this.getPicker(resourceReference.type);
-          picker(resourceReference).done($.proxy(this, 'setValue'));
+          picker(resourceReference).done($.proxy(function(resource) {
+            CKEDITOR.plugins.xwikiResource.cacheResource(resource);
+            this.setValue(resource.reference);
+          }, this));
         }
       };
       pickerDefinition = pickerDefinition || {};
@@ -275,6 +288,15 @@
         var dispatcherURL = editor.config['xwiki-resource'].dispatcher;
         dispatcherURL += dispatcherURL.indexOf('?') < 0 ? '?' : '&';
         return dispatcherURL + $.param(resourceReference);
+      }
+    },
+
+    getResourceLabel: function(resourceReference) {
+      var resource = this.getCachedResource(resourceReference);
+      if (resource && resource.label) {
+        return resource.label;
+      } else {
+        return resourceReference.reference;
       }
     },
 

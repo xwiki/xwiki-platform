@@ -190,6 +190,12 @@
       // picker) to be focused when the dialog is opened.
       delete dialogDefinition.onFocus;
 
+      // The link dialog doesn't have a field to input or edit the link label (because the link label can be edited
+      // in-line) and it uses the link URL as the default label when there is no text or element (e.g. image) selected
+      // in the edited content. This is fine for the external (URL) links but for internal links it's nicer to use the
+      // resource label (e.g. the wiki page title or the attachment file name).
+      overwriteDefaultLinkLabel(dialogDefinition);
+
       resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
         ['info', resourcePicker.id], ['upload', 'uploadButton']);
     }
@@ -309,5 +315,32 @@
     definition.resourceReferenceParameter = true;
     definition.setup = setupFromResourceParameter(parameterName, resourceType, definition.setup);
     definition.commit = commitToResourceParameter(parameterName, resourceType, definition.commit);
+  };
+
+  /**
+   * Use the resource label as the default link label when creating a new link and there is no text or element (e.g.
+   * image) selected in the edited content.
+   */
+  var overwriteDefaultLinkLabel = function(dialogDefinition) {
+    var oldOnOk = dialogDefinition.onOk;
+    dialogDefinition.onOk = function() {
+      if (!this._.selectedElement) {
+        // When creating a new link..
+        var editor = this.getParentEditor();
+        var range = editor.getSelection().getRanges()[0];
+        if (range.collapsed) {
+          // And there's no text or element (e.g. image) selected in the edited content..
+          var resourceReference = this.getValueOf('info', 'resourceReference');
+          var resourceLabel = CKEDITOR.plugins.xwikiResource.getResourceLabel(resourceReference);
+          var textNode = new CKEDITOR.dom.text(resourceLabel, editor.document);
+          range.insertNode(textNode);
+          range.selectNodeContents(textNode);
+          range.select();
+        }
+      }
+      if (oldOnOk) {
+        oldOnOk.apply(this, arguments);
+      }
+    };
   };
 })();

@@ -129,11 +129,18 @@
     return handler;
   };
 
-  var getNodeReference = function(node) {
+  var getEntityReference = function(node) {
     var separatorIndex = node.id.indexOf(':');
     var nodeType = node.id.substr(0, separatorIndex);
     var nodeStringReference = node.id.substr(separatorIndex + 1);
     return XWiki.Model.resolve(nodeStringReference, XWiki.EntityType.byName(nodeType));
+  };
+
+  var getEntity = function(node) {
+    return {
+      label: node.text,
+      reference: getEntityReference(node)
+    };
   };
 
   var createEntityTreePicker = function(modal, handler) {
@@ -142,7 +149,7 @@
         return (node.data || {}).type === handler.entityType;
       },
       select: function(nodes) {
-        handler.select(nodes.map(getNodeReference));
+        handler.select(nodes.map(getEntity));
       }
     });
     handler.open = function(entityReference) {
@@ -170,11 +177,18 @@
     return XWiki.Model.resolve(resourceReference.reference, entityType, XWiki.currentDocument.getDocumentReference());
   };
 
+  var convertEntityToResource = function(entity) {
+    return $.extend({}, entity, {
+      reference: convertEntityReferenceToResourceReference(entity.reference),
+      entityReference: entity.reference
+    });
+  };
+
   var createResourcePicker = function(modal, handler) {
     var entityTreePickerHandler = createEntityTreePicker(modal, {
       entityType: resourceTypeToEntityType[handler.resourceType],
-      select: function(entityReferences) {
-        handler.select(entityReferences.map(convertEntityReferenceToResourceReference));
+      select: function(entities) {
+        handler.select(entities.map(convertEntityToResource));
       }
     });
     handler.open = function(resourceReference) {
@@ -206,9 +220,9 @@
     var picker = createResourcePicker(modal, {resourceType: resourceType});
     editor._.resourcePickers[resourceType] = function(resourceReference) {
       var deferred = $.Deferred();
-      picker.select = function(resourceReferences) {
+      picker.select = function(resources) {
         // We assume that only one resource can be selected.
-        deferred.resolve(resourceReferences[0]);
+        deferred.resolve(resources[0]);
       };
       picker.open(resourceReference);
       return deferred.promise();

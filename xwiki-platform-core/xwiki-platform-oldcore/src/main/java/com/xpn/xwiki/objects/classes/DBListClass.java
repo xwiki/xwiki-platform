@@ -290,10 +290,10 @@ public class DBListClass extends ListClass
                     select.append("doc." + idField);
                 } else {
                     select.append("idprop.value");
-                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                     // Get the from statements according to the type of property
                     String classType = getPropertyType(classname, idField, context);
                     fromStatements.add(classType + " as idprop");
+                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                 }
 
                 // If specified, add the second column to the query.
@@ -304,10 +304,10 @@ public class DBListClass extends ListClass
                         select.append(", doc." + valueField);
                     } else {
                         select.append(", valueprop.value");
-                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                         // Get the from statements according to the type of property
                         String classType = getPropertyType(classname, valueField, context);
                         fromStatements.add(classType + " as valueprop");
+                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                     }
                 }
                 // Let's create the complete query

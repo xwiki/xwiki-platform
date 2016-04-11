@@ -167,5 +167,16 @@
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
       </properties>
     </profile>
+    <profile>
+      <!-- TODO: Java 8 is now stricter for checking validity of javadoc. We need to fix our errors and then we can
+           disable this. -->
+      <id>disable-java8-doclint</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <properties>
+        <additionalparam>-Xdoclint:none</additionalparam>
+      </properties>
+    </profile>
   </profiles>
 </project>

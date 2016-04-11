@@ -82,7 +82,7 @@ public class DBListClass extends ListClass
             // from the list.
             if (item != null) {
                 if (item instanceof String || item instanceof Number) {
-                    result.add(new ListItem((String) item));
+                    result.add(new ListItem(item.toString()));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -116,7 +116,7 @@ public class DBListClass extends ListClass
             try {
                 hqlQuery = getQuery(context);
             } catch (XWikiException e) {
-                LOGGER.error("Failed to get the list", e);
+                LOGGER.error("Failed to get the query", e);
                 list = new ArrayList<ListItem>();
                 return list;
             }

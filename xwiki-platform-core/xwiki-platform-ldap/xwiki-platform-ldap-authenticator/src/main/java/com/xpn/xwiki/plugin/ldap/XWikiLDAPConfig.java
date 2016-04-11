@@ -71,6 +71,27 @@ public final class XWikiLDAPConfig
     public static final String PREF_LDAP_UID = "ldap_UID_attr";
 
     /**
+     * Enable photo update property name in XWikiPreferences.
+     * 
+     * @since 8.1M2
+     */
+    public static final String PREF_LDAP_UPDATE_PHOTO = "ldap_update_photo";
+
+    /**
+     * Profile photo attachment name property name in XWikiPreferences.
+     * 
+     * @since 8.1M2
+     */
+    public static final String PREF_LDAP_PHOTO_ATTACHMENT_NAME = "ldap_photo_attachment_name";
+
+    /**
+     * LDAP photo property name in XWikiPreferences.
+     * 
+     * @since 8.1M2
+     */
+    public static final String PREF_LDAP_PHOTO_ATTRIBUTE = "ldap_photo_attribute";
+
+    /**
      * Mapping fields separator.
      */
     public static final String USERMAPPING_SEP = DEFAULT_SEPARATOR;
@@ -93,6 +114,13 @@ public final class XWikiLDAPConfig
      * @since 1.5M1
      */
     public static final Set<String> DEFAULT_GROUP_MEMBERFIELDS = new HashSet<String>();
+
+    /**
+     * Default LDAP attribute name containing binary photo.
+     * 
+     * @since 8.1M2
+     */
+    public static final String DEFAULT_PHOTO_ATTRIBUTE = "thumbnailPhoto";
 
     /**
      * Logging tool.
@@ -515,5 +543,19 @@ public final class XWikiLDAPConfig
     public int getLDAPMaxResults(XWikiContext context)
     {
         return (int) getLDAPParamAsLong("ldap_maxresults", 1000, context);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return set of LDAP attributes that should be treated as binary data.
+     * @since 8.1M2
+     */
+    public Set<String> getBinaryAttributes(XWikiContext context)
+    {
+        Set<String> binaryAttributes = new HashSet<>();
+
+        binaryAttributes.add(getLDAPParam(XWikiLDAPConfig.PREF_LDAP_PHOTO_ATTRIBUTE, DEFAULT_PHOTO_ATTRIBUTE, context));
+
+        return binaryAttributes;
     }
 }

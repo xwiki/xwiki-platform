@@ -42,6 +42,7 @@ import com.novell.ldap.LDAPSearchConstraints;
 import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldap.LDAPSocketFactory;
 import com.xpn.xwiki.XWikiContext;
+import java.util.HashSet;
 
 /**
  * LDAP communication tool.
@@ -60,6 +61,11 @@ public class XWikiLDAPConnection
      * The LDAP connection.
      */
     private LDAPConnection connection;
+
+    /**
+     * LDAP attributes that should be treated as binary data.
+     */
+    private Set<String> binaryAttributes = new HashSet<>();
 
     /**
      * @param context the XWiki context.
@@ -149,10 +155,11 @@ public class XWikiLDAPConnection
             port = ssl ? LDAPConnection.DEFAULT_SSL_PORT : LDAPConnection.DEFAULT_PORT;
         }
 
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+        setBinaryAttributes(config.getBinaryAttributes(context));
+
         try {
             if (ssl) {
-                XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
                 // Dynamically set JSSE as a security provider
                 Security.addProvider(config.getSecureProvider(context));
 
@@ -373,17 +380,31 @@ public class XWikiLDAPConnection
         for (LDAPAttribute attribute : (Set<LDAPAttribute>) attributeSet) {
             String attributeName = attribute.getName();
 
-            LOGGER.debug("  - values for attribute [{}]", attributeName);
+            if(!isBinaryAttribute(attributeName)) {
+                LOGGER.debug("  - values for attribute [{}]", attributeName);
 
-            Enumeration<String> allValues = attribute.getStringValues();
+                Enumeration<String> allValues = attribute.getStringValues();
 
-            if (allValues != null) {
-                while (allValues.hasMoreElements()) {
-                    String value = allValues.nextElement();
+                if (allValues != null) {
+                    while (allValues.hasMoreElements()) {
+                        String value = allValues.nextElement();
 
-                    LOGGER.debug("    |- [{}]", value);
+                        LOGGER.debug("    |- [{}]", value);
 
-                    searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
+                        searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
+                    }
+                }
+            } else {
+                LOGGER.debug("  - attribute [{}] is binary", attributeName);
+
+                Enumeration<byte[]> allValues = attribute.getByteValues();
+
+                if (allValues != null) {
+                    while (allValues.hasMoreElements()) {
+                        byte[] value = allValues.nextElement();
+
+                        searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
+                    }
                 }
             }
         }
@@ -439,5 +460,26 @@ public class XWikiLDAPConnection
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Update list of LDAP attributes that should be treated as binary data.
+     * 
+     * @param binaryAttributes set of binary attributes
+     */
+    private void setBinaryAttributes(Set<String> binaryAttributes)
+    {
+        this.binaryAttributes = binaryAttributes;
+    }
+
+    /**
+     * Checks whether attribute should be treated as binary data.
+     * 
+     * @param attributeName name of attribute to check
+     * @return true if attribute should be treated as binary data.
+     */
+    private boolean isBinaryAttribute(String attributeName)
+    {
+        return binaryAttributes.contains(attributeName);
     }
 }

@@ -150,7 +150,7 @@ public class WebJarsScriptServiceTest
     }
 
     @Test
-    public void computeURLForBackwardCompatibilityWhenWikiIsSpecified() throws Exception
+    public void computeURLForBackwardCompatibilityWhenWikiIsSpecifiedAsParameter() throws Exception
     {
         InstalledExtensionRepository installedExtensionRepository =
             this.mocker.getInstance(InstalledExtensionRepository.class);
@@ -170,7 +170,7 @@ public class WebJarsScriptServiceTest
     }
 
     @Test
-    public void computeURLForBackwardCompatibilityWhenWikiIsNotSpecified() throws Exception
+    public void computeURLWithParametersAndWikiIsNotSpecifiedInParameter() throws Exception
     {
         WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");

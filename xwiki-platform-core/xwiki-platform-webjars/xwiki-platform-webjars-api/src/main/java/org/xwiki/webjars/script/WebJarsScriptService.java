@@ -176,13 +176,10 @@ public class WebJarsScriptService implements ScriptService
      *            can pass whatever parameters you like (they will be taken into account or not depending on the
      *            resource)
      * @return the URL to load the WebJar resource (relative to the context path of the web application)
-     * @Deprecated since 8.1M2, use {@link #url(String, String, String, Map)}
      */
-    @Deprecated
     public String url(String webjarId, String path, Map<String, ?> params)
     {
-        // Note that that if a wiki parameter has been specified, we pass it so that it appears in the generated URL so
-        // that the webjars URL handler will know in which wiki to get the webjars resource.
+        // For backward-compatibility reasons, we still support passing the target wiki in parameters
         String namespace = null;
         if (params != null) {
             // For backward-compatibility reasons we still support passing the target wiki in parameters

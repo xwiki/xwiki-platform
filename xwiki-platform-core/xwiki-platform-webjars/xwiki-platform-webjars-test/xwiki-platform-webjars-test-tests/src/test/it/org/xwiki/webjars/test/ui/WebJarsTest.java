@@ -65,8 +65,9 @@ public class WebJarsTest extends AbstractTest
         assertTrue(vp.getContent().contains("installed: org.webjars:AjaxQ-0.0.2"));
 
         // Click the link!
+        // Note: For understanding why there's a r=1 query string, see WebJarsScriptService#getResourceReference()
         WebElement link = getDriver().findElementWithoutWaiting(
-            By.xpath("//a[@href = '/xwiki/webjars/AjaxQ/0.0.2/ajaxq.js?wiki=mywiki']"));
+            By.xpath("//a[@href = '/xwiki/webjars/wiki%3Amywiki/AjaxQ/0.0.2/ajaxq.js?r=1']"));
         link.click();
 
         // Verify that the served resource is the one from the webjars

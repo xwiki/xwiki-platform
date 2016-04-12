@@ -100,9 +100,10 @@ public class WebJarsScriptService implements ScriptService
     private ResourceReferenceSerializer<ResourceReference, ExtendedURL> defaultResourceReferenceSerializer;
 
     /**
-     * Compute an XWiki WebJar URL of the form {@code http://server/webjars?resource=(resource name)}.
-     * 
-     * @param resourceName the resource asked (e.g. {@code angular/2.1.11/angular.js"})
+     * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar in the current wiki.
+     *
+     * @param resourceName the resource asked using the format {@code <webjarId>/<version>/<path/to/resource>}
+     *                     (e.g. {@code angular/2.1.11/angular.js"})
      * @return the computed URL
      */
     public String url(String resourceName)
@@ -121,12 +122,12 @@ public class WebJarsScriptService implements ScriptService
         // separator in the webjarId. This is required in order to ensure that the behavior of this method doesn't
         // change. Note that the groupdId is ignored if the WebJar version is specified so the fake groupId won't have
         // any effect.
-        return url("fakeGroupId:" + parts[0], parts[2], Collections.singletonMap(VERSION, parts[1]));
+        return url("fakeGroupId:" + parts[0], null, parts[2], Collections.singletonMap(VERSION, parts[1]));
     }
 
     /**
-     * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar.
-     * 
+     * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar in the current wiki.
+     *
      * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
      *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
      *            {@code groupId} can be omitted if it is {@link #DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
@@ -137,7 +138,27 @@ public class WebJarsScriptService implements ScriptService
      */
     public String url(String webjarId, String path)
     {
-        return url(webjarId, path, null);
+        return url(webjarId, null, path, null);
+    }
+
+    /**
+     * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar in the passed namespace.
+     * 
+     * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
+     *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
+     *            {@code groupId} can be omitted if it is {@link #DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
+     *            translates to {@code org.webjars:angular})
+     * @param namespace the namespace in which the webjars resources will be loaded from (e.g. for a wiki namespace you
+     *                  should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki
+     *                  namespace. And if the passed namespace doesn't exist, falls back to the main wiki namespace
+     * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
+     *            {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
+     * @return the URL to load the WebJar resource (relative to the context path of the web application)
+     * @since 8.1M2
+     */
+    public String url(String webjarId, String namespace, String path)
+    {
+        return url(webjarId, namespace, path, null);
     }
 
     /**
@@ -155,8 +176,46 @@ public class WebJarsScriptService implements ScriptService
      *            can pass whatever parameters you like (they will be taken into account or not depending on the
      *            resource)
      * @return the URL to load the WebJar resource (relative to the context path of the web application)
+     * @Deprecated since 8.1M2, use {@link #url(String, String, String, Map)}
      */
+    @Deprecated
     public String url(String webjarId, String path, Map<String, ?> params)
+    {
+        // Note that that if a wiki parameter has been specified, we pass it so that it appears in the generated URL so
+        // that the webjars URL handler will know in which wiki to get the webjars resource.
+        String namespace = null;
+        if (params != null) {
+            // For backward-compatibility reasons we still support passing the target wiki in parameters
+            String wikiId = (String) params.get(WIKI);
+            if (!StringUtils.isEmpty(wikiId)) {
+                namespace = constructNamespace(wikiId);
+            }
+        }
+
+        return url(webjarId, namespace, path, params);
+    }
+
+    /**
+     * Creates an URL that can be used to load a resource (JavaScript, CSS, etc.) from a WebJar in the passed namespace.
+     *
+     * @param webjarId the id of the WebJar that contains the resource; the format of the WebJar id is
+     *            {@code groupId:artifactId} (e.g. {@code org.xwiki.platform:xwiki-platform-job-webjar}), where the
+     *            {@code groupId} can be omitted if it is {@link #DEFAULT_WEBJAR_GROUP_ID} (i.e. {@code angular}
+     *            translates to {@code org.webjars:angular})
+     * @param namespace the namespace in which the webjars resources will be loaded from (e.g. for a wiki namespace you
+     *                  should use the format {@code wiki:<wikiId>}). If null then defaults to the current wiki
+     *                  namespace. And if the passed namespace doesn't exist, falls back to the main wiki namespace
+     * @param path the path within the WebJar, starting from the version folder (e.g. you should pass just
+     *            {@code angular.js} if the actual path is {@code META-INF/resources/webjars/angular/2.1.11/angular.js})
+     * @param params additional query string parameters to add to the returned URL; there are two known (reserved)
+     *            parameters: {@code version} (the WebJar version) and {@code evaluate} (a boolean parameter that
+     *            specifies if the requested resource has Velocity code that needs to be evaluated); besides these you
+     *            can pass whatever parameters you like (they will be taken into account or not depending on the
+     *            resource)
+     * @return the URL to load the WebJar resource (relative to the context path of the web application)
+     * @since 8.1M2
+     */
+    public String url(String webjarId, String namespace, String path, Map<String, ?> params)
     {
         if (StringUtils.isEmpty(webjarId)) {
             return null;
@@ -176,18 +235,20 @@ public class WebJarsScriptService implements ScriptService
             urlParams.putAll(params);
         }
 
-        // Note that that if a wiki parameter has been specified, we pass it so that it appears in the generated URL so
-        // that the webjars URL handler will know in which wiki to get the webjars resource.
-        String wikiId = (String) urlParams.get(WIKI);
+        // For backward-compatibility reasons we still support passing the target wiki in parameters. However we need
+        // to remove it from the params if that's the case since we don't want to output a URL with the wiki id in the
+        // query string (since the namespace is now part of the URL).
+        urlParams.remove(WIKI);
 
         Object version = urlParams.remove(VERSION);
         if (version == null) {
             // Try to determine the version based on the extensions that are currently installed or provided by default.
-            version = getVersion(String.format("%s:%s", groupId, artifactId), wikiId);
+            version = getVersion(String.format("%s:%s", groupId, artifactId), namespace);
         }
 
         // Construct a WebJarsResourceReference so that we can serialize it!
-        WebJarsResourceReference resourceReference = getResourceReference(artifactId, version, path, urlParams);
+        WebJarsResourceReference resourceReference =
+            getResourceReference(artifactId, version, namespace, path, urlParams);
 
         ExtendedURL extendedURL;
         try {
@@ -201,8 +262,8 @@ public class WebJarsScriptService implements ScriptService
         return extendedURL.serialize();
     }
 
-    private WebJarsResourceReference getResourceReference(String artifactId, Object version, String path,
-        Map<String, Object> urlParams)
+    private WebJarsResourceReference getResourceReference(String artifactId, Object version, String namespace,
+        String path, Map<String, Object> urlParams)
     {
         List<String> segments = new ArrayList<>();
         segments.add(artifactId);
@@ -226,7 +287,8 @@ public class WebJarsScriptService implements ScriptService
             urlParams.put("r", "1");
         }
 
-        WebJarsResourceReference resourceReference = new WebJarsResourceReference(segments);
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference(resolveNamespace(namespace), segments);
         for (Map.Entry<String, Object> parameterEntry : urlParams.entrySet()) {
             resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
         }
@@ -234,31 +296,41 @@ public class WebJarsScriptService implements ScriptService
         return resourceReference;
     }
 
-    private String getVersion(String extensionId, String wikiId)
+    private String getVersion(String extensionId, String namespace)
     {
         // Look for WebJars that are core extensions.
         Extension extension = this.coreExtensionRepository.getCoreExtension(extensionId);
         if (extension == null) {
-            // Look for WebJars that are installed on the passed wiki id (if defined), the current wiki or the main
+            // Look for WebJars that are installed on the passed namespace (if defined), the current wiki or the main
             // wiki.
-            String selectedWikiId;
-            if (StringUtils.isNotEmpty(wikiId)) {
-                selectedWikiId = wikiId;
-            } else {
-                selectedWikiId = this.wikiDescriptorManager.getCurrentWikiId();
-            }
-            String namespace = constructNamespace(selectedWikiId);
-            extension = this.installedExtensionRepository.getInstalledExtension(extensionId, namespace);
+            String selectedNamespace = resolveNamespace(namespace);
+            extension = this.installedExtensionRepository.getInstalledExtension(extensionId, selectedNamespace);
             if (extension == null) {
                 // Fallback by looking in the main wiki
-                namespace = constructNamespace(this.wikiDescriptorManager.getMainWikiId());
-                extension = this.installedExtensionRepository.getInstalledExtension(extensionId, namespace);
+                selectedNamespace = constructNamespace(this.wikiDescriptorManager.getMainWikiId());
+                extension = this.installedExtensionRepository.getInstalledExtension(extensionId, selectedNamespace);
                 if (extension == null) {
                     return null;
                 }
             }
         }
         return extension.getId().getVersion().getValue();
+    }
+
+    private String resolveNamespace(String namespace)
+    {
+        String resolvedNamespace;
+        if (StringUtils.isNotEmpty(namespace)) {
+            resolvedNamespace = namespace;
+        } else {
+            resolvedNamespace = constructNamespace(getCurrentWikiId());
+        }
+        return resolvedNamespace;
+    }
+
+    private String getCurrentWikiId()
+    {
+        return this.wikiDescriptorManager.getCurrentWikiId();
     }
 
     private String constructNamespace(String wikiId)

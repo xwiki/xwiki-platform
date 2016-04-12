@@ -74,7 +74,7 @@ public class FilesystemResourceReferenceSerializer
     public ExtendedURL serialize(WebJarsResourceReference reference)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        // Copy the resource from the webajar to the filesystem
+        // Copy the resource from the webjar to the filesystem
         FilesystemExportContext exportContext = this.exportContextProvider.get();
         try {
             copyResourceFromJAR(WEBJARS_RESOURCE_PREFIX, reference.getResourceName(), WEBJAR_PATH, exportContext);
@@ -128,6 +128,7 @@ public class FilesystemResourceReferenceSerializer
             JarEntry entry = enumeration.nextElement();
             if (entry.getName().startsWith(resourcePath) && !entry.isDirectory()) {
                 // Copy the resource!
+                // TODO: Won't this cause collisions if the same resource is available on several subwikis for example?
                 String targetPath = targetPrefix + entry.getName().substring(resourcePrefix.length());
                 File targetLocation = new File(exportContext.getExportDir(), targetPath);
                 if (!targetLocation.exists()) {

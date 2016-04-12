@@ -20,6 +20,7 @@
 package org.xwiki.webjars;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -65,7 +66,10 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeURLWithVersion() throws Exception
     {
-        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference("wiki:math",
             Arrays.asList("ang:ular", "2.1.11", "angular.css"));
         // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
         when(this.serializer.serialize(resourceReference)).thenReturn(
@@ -88,7 +92,7 @@ public class WebJarsScriptServiceTest
             extension);
         when(extension.getId()).thenReturn(new ExtensionId("bar", "2.1.11"));
 
-        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference("wiki:math",
             Arrays.asList("angular", "2.1.11", "angular.css"));
         when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
@@ -100,8 +104,11 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeURLWithoutVersionAndNoExtensionMatchingWebJarId() throws Exception
     {
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference(Arrays.asList("angular", "angular.css"));
+            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "angular.css"));
         when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
 
@@ -111,7 +118,7 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeURLWithParameters() throws Exception
     {
-        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference("wiki:wiki",
             Arrays.asList("angular", "2.1.11", "angular.js"));
         resourceReference.addParameter("evaluate", "true");
         resourceReference.addParameter("list", Arrays.asList("one", "two"));
@@ -124,18 +131,63 @@ public class WebJarsScriptServiceTest
         params.put("evaluate", true);
         params.put("list", new String[] {"one", "two"});
         assertEquals("/xwiki/angular/2.1.11/angular.js?evaluate=true&list=one&list=two",
-            this.mocker.getComponentUnderTest().url("angular", "angular.js", params));
+            this.mocker.getComponentUnderTest().url("angular", "wiki:wiki", "angular.js", params));
     }
 
     @Test
     public void computeJavaScriptURLWithSuffixAndNoParameters() throws Exception
     {
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference(Arrays.asList("angular", "angular.js"));
+            new WebJarsResourceReference("wiki:math", Arrays.asList("angular", "angular.js"));
         resourceReference.addParameter("r", "1");
         when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
 
         assertEquals("/xwiki/angular/angular.js?r=1", this.mocker.getComponentUnderTest().url("angular", "angular.js"));
+    }
+
+    @Test
+    public void computeURLForBackwardCompatibilityWhenWikiIsSpecified() throws Exception
+    {
+        InstalledExtensionRepository installedExtensionRepository =
+            this.mocker.getInstance(InstalledExtensionRepository.class);
+        InstalledExtension extension = mock(InstalledExtension.class);
+        when(installedExtensionRepository.getInstalledExtension("org.webjars:angular", "wiki:math")).thenReturn(
+            extension);
+        when(extension.getId()).thenReturn(new ExtensionId("bar", "2.1.11"));
+
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference("wiki:math",
+            Arrays.asList("angular", "2.1.11", "angular.css"));
+        when(this.serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+
+        assertEquals("/xwiki/angular/2.1.11/angular.css",
+            this.mocker.getComponentUnderTest().url("angular", "angular.css",
+                Collections.singletonMap("wiki", "math")));
+    }
+
+    @Test
+    public void computeURLForBackwardCompatibilityWhenWikiIsNotSpecified() throws Exception
+    {
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
+
+        InstalledExtensionRepository installedExtensionRepository =
+            this.mocker.getInstance(InstalledExtensionRepository.class);
+        InstalledExtension extension = mock(InstalledExtension.class);
+        when(installedExtensionRepository.getInstalledExtension("org.webjars:angular", "wiki:math")).thenReturn(
+            extension);
+        when(extension.getId()).thenReturn(new ExtensionId("bar", "2.1.11"));
+
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference("wiki:math",
+            Arrays.asList("angular", "2.1.11", "angular.css"));
+        when(this.serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
+
+        assertEquals("/xwiki/angular/2.1.11/angular.css",
+            this.mocker.getComponentUnderTest().url("angular", "angular.css", Collections.emptyMap()));
     }
 }

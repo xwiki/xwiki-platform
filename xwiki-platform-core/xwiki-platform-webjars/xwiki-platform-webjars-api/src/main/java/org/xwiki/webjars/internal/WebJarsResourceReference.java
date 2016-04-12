@@ -43,16 +43,18 @@ public class WebJarsResourceReference extends AbstractResourceReference
 
     private static final char RESOURCE_PATH_SEPARATOR = '/';
 
-    private static final String WIKI_PARAMETER_NAME = "wiki";
+    private String namespace;
 
     private List<String> resourceSegments;
 
     /**
+     * @param namespace see {@link #getNamespace()}
      * @param resourceSegments see {@link #getResourceSegments()}
      */
-    public WebJarsResourceReference(List<String> resourceSegments)
+    public WebJarsResourceReference(String namespace, List<String> resourceSegments)
     {
         setType(TYPE);
+        this.namespace = namespace;
         this.resourceSegments = new ArrayList<>(resourceSegments);
     }
 
@@ -66,12 +68,21 @@ public class WebJarsResourceReference extends AbstractResourceReference
     }
 
     /**
-     * @return the String representation with "/" separting each resource segment, e.g.
+     * @return the String representation with "/" separating each resource segment, e.g.
      *         {@code angular/2.1.11/angular.js}
      */
     public String getResourceName()
     {
         return StringUtils.join(getResourceSegments(), RESOURCE_PATH_SEPARATOR);
+    }
+
+    /**
+     * @return the namespace under which the webjars resource can be found. A name can be for example a wiki (e.g.
+     *         {@code wiki:<wikiId>})
+     */
+    public String getNamespace()
+    {
+        return this.namespace;
     }
 
     @Override
@@ -80,6 +91,7 @@ public class WebJarsResourceReference extends AbstractResourceReference
         return new HashCodeBuilder(5, 5)
             .append(getResourceSegments())
             .append(getType())
+            .append(getNamespace())
             .append(getParameters())
             .toHashCode();
     }
@@ -100,15 +112,8 @@ public class WebJarsResourceReference extends AbstractResourceReference
         return new EqualsBuilder()
             .append(getResourceSegments(), rhs.getResourceSegments())
             .append(getType(), rhs.getType())
+            .append(getNamespace(), rhs.getNamespace())
             .append(getParameters(), rhs.getParameters())
             .isEquals();
-    }
-
-    /**
-     * @return the optional name of a wiki specified using the {@code wiki} parameter name or null if not specified
-     */
-    public String getWikiId()
-    {
-        return getParameterValue(WIKI_PARAMETER_NAME);
     }
 }

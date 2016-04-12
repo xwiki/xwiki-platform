@@ -37,19 +37,25 @@ public class WebJarResourceReferenceTest
     @Test
     public void testEqualsAndHashCode()
     {
-        WebJarsResourceReference reference1 = new WebJarsResourceReference(Arrays.asList("one", "two"));
+        WebJarsResourceReference reference1 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
         reference1.addParameter("key1", "value1");
         reference1.addParameter("key2", new String[]{ "value2", "value3" });
 
-        WebJarsResourceReference reference2 = new WebJarsResourceReference(Arrays.asList("one", "two"));
+        WebJarsResourceReference reference2 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
         reference2.addParameter("key1", "value1");
         reference2.addParameter("key2", new String[]{ "value2", "value3" });
 
-        WebJarsResourceReference reference3 = new WebJarsResourceReference(Arrays.asList("one", "two"));
+        WebJarsResourceReference reference3 = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
+
+        WebJarsResourceReference reference4 = new WebJarsResourceReference("namespace2", Arrays.asList("one", "two"));
 
         assertEquals(reference2, reference1);
         assertEquals(reference2.hashCode(), reference1.hashCode());
+
         assertFalse(reference3.equals(reference1));
         assertFalse(reference3.hashCode() == reference1.hashCode());
+
+        assertFalse(reference4.equals(reference3));
+        assertFalse(reference4.hashCode() == reference3.hashCode());
     }
 }

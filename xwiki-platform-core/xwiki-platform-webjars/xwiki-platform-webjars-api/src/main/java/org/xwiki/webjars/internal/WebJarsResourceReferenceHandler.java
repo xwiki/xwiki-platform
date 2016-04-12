@@ -39,6 +39,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
+import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -92,7 +93,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     private VelocityManager velocityManager;
 
     @Inject
-    private ContextInitializer contextInitializer;
+    private ClassLoaderManager classLoaderManager;
 
     /**
      * Used to determine the Content Type of the requested resource files.
@@ -111,13 +112,6 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     {
         // This code only handles WebJars Resource References.
         WebJarsResourceReference webJarsResourceReference = (WebJarsResourceReference) resourceReference;
-
-        // Set up an XWiki Context for 2 reasons:
-        // 1) so that we can serve a resource located in a webjar JAR installed in a Wiki Component Manager (CM). If no
-        //    Context is set up then the Context CM will fallback on the Root CM and thus the webjar JAR won't be found.
-        // 2) so that we can set the current user in the Context and at the same time verify that the current user has
-        //    View Rights on this wiki
-        this.contextInitializer.initialize(webJarsResourceReference.getWikiId());
 
         if (!shouldBrowserUseCachedContent(webJarsResourceReference)) {
             // If we get here then either the resource is not cached by the browser or the resource is dynamic.
@@ -175,7 +169,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     private InputStream getResourceStream(WebJarsResourceReference resourceReference)
     {
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, getResourceName(resourceReference));
-        return getClassLoader().getResourceAsStream(resourcePath);
+        return getClassLoader(resourceReference.getNamespace()).getResourceAsStream(resourcePath);
     }
 
     /**
@@ -190,11 +184,9 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     /**
      * @return the Class Loader from which to look for WebJars resources
      */
-    protected ClassLoader getClassLoader()
+    protected ClassLoader getClassLoader(String namespace)
     {
-        // Load the resource from the context class loader in order to support WebJars located in XWiki Extensions
-        // loaded by the Extension Manager.
-        return Thread.currentThread().getContextClassLoader();
+        return this.classLoaderManager.getURLClassLoader(namespace, true);
     }
 
     /**
@@ -310,10 +302,5 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
                     statusCode), e);
             }
         }
-    }
-
-    private void setupContext(String wikiId) throws ResourceReferenceHandlerException
-    {
-
     }
 }

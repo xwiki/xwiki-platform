@@ -112,15 +112,7 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            String hqlQuery = null;
-            try {
-                hqlQuery = getQuery(context);
-            } catch (XWikiException e) {
-                LOGGER.error("Failed to get the query", e);
-                list = new ArrayList<ListItem>();
-                return list;
-            }
-
+            String hqlQuery = getQuery(context);
             if (hqlQuery == null) {
                 list = new ArrayList<ListItem>();
             } else {
@@ -207,7 +199,7 @@ public class DBListClass extends ListClass
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */
-    public String getQuery(XWikiContext context) throws XWikiException
+    public String getQuery(XWikiContext context)
     {
         // First, get the hql query entered by the user.
         String sql = getSql();
@@ -291,7 +283,12 @@ public class DBListClass extends ListClass
                 } else {
                     select.append("idprop.value");
                     // Get the from statements according to the type of property
-                    String classType = getPropertyType(classname, idField, context);
+                    String classType = null;
+                    try {
+                        classType = getPropertyType(classname, idField, context);
+                    } catch (XWikiException e) {
+                        return null;
+                    }
                     fromStatements.add(classType + " as idprop");
                     whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField + "'");
                 }
@@ -305,7 +302,12 @@ public class DBListClass extends ListClass
                     } else {
                         select.append(", valueprop.value");
                         // Get the from statements according to the type of property
-                        String classType = getPropertyType(classname, valueField, context);
+                        String classType = null;
+                        try {
+                            classType = getPropertyType(classname, valueField, context);
+                        } catch (XWikiException e) {
+                            return null;
+                        }
                         fromStatements.add(classType + " as valueprop");
                         whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'");
                     }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.webjars.internal;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -48,8 +49,22 @@ public class WebJarsResourceReferenceResolver extends AbstractResourceReferenceR
     public WebJarsResourceReference resolve(ExtendedURL extendedURL, ResourceType resourceType,
         Map<String, Object> parameters) throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
-        WebJarsResourceReference reference = new WebJarsResourceReference(extendedURL.getSegments());
-        copyParameters(extendedURL, reference);
+        WebJarsResourceReference reference;
+        List<String> segments = extendedURL.getSegments();
+
+        if (segments.size() > 1) {
+            // The first segment is the namespace
+            String namespace = segments.get(0);
+
+            // The other segments point to the resource path
+            List<String> resourceSegments = segments.subList(1, segments.size());
+
+            reference = new WebJarsResourceReference(namespace, resourceSegments);
+            copyParameters(extendedURL, reference);
+        } else {
+            throw new CreateResourceReferenceException(String.format("Invalid WebJars URL format [%s]",
+                extendedURL.toString()));
+        }
         return reference;
     }
 }

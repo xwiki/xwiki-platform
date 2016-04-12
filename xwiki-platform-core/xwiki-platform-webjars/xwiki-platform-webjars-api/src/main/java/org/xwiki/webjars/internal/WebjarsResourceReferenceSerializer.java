@@ -57,7 +57,10 @@ public class WebjarsResourceReferenceSerializer
         // Add the resource type segment.
         segments.add("webjars");
 
-        // Add the resource name
+        // Add the namespace
+        segments.add(resourceReference.getNamespace());
+
+        // Add the resource path segments
         segments.addAll(resourceReference.getResourceSegments());
 
         // Add all optional parameters

@@ -37,6 +37,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
@@ -45,8 +47,8 @@ import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.webjars.internal.TestableWebJarsResourceReferenceHandler;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
+import org.xwiki.webjars.internal.WebJarsResourceReferenceHandler;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -61,8 +63,8 @@ import static org.mockito.Mockito.*;
 public class WebJarsResourceReferenceHandlerTest
 {
     @Rule
-    public MockitoComponentMockingRule<TestableWebJarsResourceReferenceHandler> componentManager =
-        new MockitoComponentMockingRule<>(TestableWebJarsResourceReferenceHandler.class);
+    public MockitoComponentMockingRule<WebJarsResourceReferenceHandler> componentManager =
+        new MockitoComponentMockingRule<>(WebJarsResourceReferenceHandler.class);
 
     private ServletRequest request;
 
@@ -70,9 +72,11 @@ public class WebJarsResourceReferenceHandlerTest
 
     private ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
 
-    private TestableWebJarsResourceReferenceHandler handler;
+    private WebJarsResourceReferenceHandler handler;
 
-    private ClassLoader classLoader = mock(ClassLoader.class);
+    private ClassLoaderManager clm;
+
+    private NamespaceURLClassLoader classLoader;
 
     @Before
     public void configure() throws Exception
@@ -93,14 +97,17 @@ public class WebJarsResourceReferenceHandlerTest
         when(container.getRequest()).thenReturn(this.request);
 
         this.handler = this.componentManager.getComponentUnderTest();
-        this.handler.setClassLoader(this.classLoader);
+
+        this.classLoader = mock(NamespaceURLClassLoader.class);
+        ClassLoaderManager clm = this.componentManager.getInstance(ClassLoaderManager.class);
+        when(clm.getURLClassLoader("wiki:wiki", true)).thenReturn(this.classLoader);
     }
 
     @Test
     public void executeWhenResourceDoesntExist() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference(Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
 
         this.handler.handle(reference, this.chain);
 
@@ -114,7 +121,7 @@ public class WebJarsResourceReferenceHandlerTest
     public void executeWhenResourceExists() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference(Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
         when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
@@ -146,7 +153,7 @@ public class WebJarsResourceReferenceHandlerTest
     public void return304WhenIfModifiedSinceHeader() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference(Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
 
         when(this.request.getHttpServletRequest().getHeader("If-Modified-Since")).thenReturn("some value");
 
@@ -162,7 +169,7 @@ public class WebJarsResourceReferenceHandlerTest
     public void evaluateResource() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference(Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
         reference.addParameter("evaluate", true);
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
@@ -200,7 +207,7 @@ public class WebJarsResourceReferenceHandlerTest
     public void failingResourceEvaluation() throws Exception
     {
         WebJarsResourceReference reference =
-            new WebJarsResourceReference(Arrays.asList("angular", "2.1.11", "angular.js"));
+            new WebJarsResourceReference("wiki:wiki", Arrays.asList("angular", "2.1.11", "angular.js"));
         reference.addParameter("evaluate", "true");
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());

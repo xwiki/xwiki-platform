@@ -54,11 +54,12 @@ public class WebJarsResourceReferenceSerializerTest
         Map<String, List<String>> parameters = new HashMap<>();
         parameters.put("key1", Arrays.asList("value1"));
         parameters.put("key2", Arrays.asList("value2", "value3"));
-        ExtendedURL partialURL = new ExtendedURL(Arrays.asList("webjars", "one", "two"), parameters);
-        ExtendedURL expectedURL = new ExtendedURL(Arrays.asList("xwiki", "webjars", "one", "two"), parameters);
+        ExtendedURL partialURL = new ExtendedURL(Arrays.asList("webjars", "namespace", "one", "two"), parameters);
+        ExtendedURL expectedURL = new ExtendedURL(
+            Arrays.asList("xwiki", "webjars", "namespace", "one", "two"), parameters);
         when(normalizer.normalize(partialURL)).thenReturn(expectedURL);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference(Arrays.asList("one", "two"));
+        WebJarsResourceReference reference = new WebJarsResourceReference("namespace", Arrays.asList("one", "two"));
         reference.addParameter("key1", "value1");
         reference.addParameter("key2", new String[]{ "value2", "value3" });
 

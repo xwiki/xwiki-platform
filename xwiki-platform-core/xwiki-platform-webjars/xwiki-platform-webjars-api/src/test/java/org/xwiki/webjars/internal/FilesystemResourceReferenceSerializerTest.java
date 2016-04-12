@@ -70,7 +70,7 @@ public class FilesystemResourceReferenceSerializerTest
             null, Provider.class, FilesystemExportContext.class));
         Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference(Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
             "angular-paginate-anything", "2.5.3", "paginate-anything.js"));
 
         // Verify that the returned URL is ok
@@ -92,7 +92,7 @@ public class FilesystemResourceReferenceSerializerTest
             null, Provider.class, FilesystemExportContext.class));
         Mockito.when(exportContextProvider.get()).thenReturn(exportContext);
 
-        WebJarsResourceReference reference = new WebJarsResourceReference(Arrays.asList(
+        WebJarsResourceReference reference = new WebJarsResourceReference("wiki:wiki", Arrays.asList(
             "angular-paginate-anything", "2.5.3", "paginate-anything.js"));
 
         // Verify that the returned URL is ok

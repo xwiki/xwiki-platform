@@ -31,7 +31,7 @@
   <name>XWiki Platform - WebJars - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -40,13 +40,10 @@
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
-    <!-- Need at runtime to initialize the current context classloader which is used by the Webjars Handler to locate
-         the WebJars resource to serve -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-classloader-xwiki</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

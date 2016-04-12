@@ -50,11 +50,12 @@ public class WebJarsResourceReferenceResolverTest
         Map<String, List<String>> parameters = new HashMap<>();
         parameters.put("key1", Arrays.asList("value1"));
         parameters.put("key2", Arrays.asList("value2", "value3"));
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"), parameters);
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("namespace", "one", "two"), parameters);
 
         WebJarsResourceReference reference = this.mocker.getComponentUnderTest().resolve(extendedURL,
             WebJarsResourceReference.TYPE, Collections.<String, Object>emptyMap());
 
+        assertEquals("namespace", reference.getNamespace());
         assertEquals("one/two", reference.getResourceName());
         assertEquals("value1", reference.getParameterValue("key1"));
         assertEquals(Arrays.asList("value2", "value3"), reference.getParameterValues("key2"));

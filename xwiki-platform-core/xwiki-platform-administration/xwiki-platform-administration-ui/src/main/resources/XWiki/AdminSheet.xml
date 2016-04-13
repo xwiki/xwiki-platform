@@ -69,9 +69,9 @@
   {
     'id' : 'lf',
     'children': [
-       {'id' : 'Presentation', 'perSpace' : true, 'order' : 100},
-       {'id' : 'Elements', 'perSpace' : true, 'order' : 200},
-       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 300}
+       {'id' : 'Presentation', 'visibility' : 'global', 'order' : 100},
+       {'id' : 'Elements', 'visibility' : 'global', 'order' : 200},
+       {'id' : 'Panels.PanelWizard', 'visibility' : 'global', 'order' : 300}
     ]
   },
   {
@@ -80,8 +80,8 @@
        {'id' : 'Users', 'order' : 100},
        {'id' : 'Groups', 'order' : 200},
        {'id' : 'Rights', 'perSpace' : false, 'order' : 300},
-       {'id' : 'PageAndChildrenRights', 'perSpace' : true, 'order' : 300, 'global': false},
-       {'id' : 'PageRights', 'perSpace' : true, 'order' : 350, 'global': false},
+       {'id' : 'PageAndChildrenRights', 'order' : 300, 'visibility': 'space'},
+       {'id' : 'PageRights', 'order' : 350, 'visibility': 'space'},
        {'id' : 'Registration', 'order' : 400},
        {'id' : 'UserProfile', 'order' : 500}
     ]
@@ -139,9 +139,9 @@
 #foreach ($category in $adminMenu)
   #set ($sectionsToRemove = [])
   #foreach ($section in $category.children)
-    #if ($editor == 'spaceadmin' &amp;&amp; !$section.perSpace)
+    #if ($editor == 'spaceadmin' &amp;&amp; (!$section.visibility || "$!section.visibility" == 'wiki'))
       #set ($discard = $sectionsToRemove.add($section))
-    #elseif ($editor == 'globaladmin' &amp;&amp; "$!section.global" == "false")
+    #elseif ($editor == 'globaladmin' &amp;&amp; "$!section.visibility" == "space")
       ## For retro-compatibility, all sections are global unless the 'global' field is explicitly marked as false
       #set ($discard = $sectionsToRemove.add($section))
     #end

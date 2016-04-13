@@ -74,7 +74,8 @@
  * @param $section - String - Look for apps which specify that they should be configured in this section,
  *                            if null or "" then returns them for all sections.
  *
- * @param $globaladmin - boolean - If true then we will look for applications which should be configured globally.
+ * @param $visibility - ArrayList - The visibility. We will look for applications which should be configured 
+ *                                  according to the requested visibility.
  *
  * @param $space - String - If not looking for apps which are configured globally, then this is the space where we
  *                          will look for apps in. If null or "" or if $globaladmin is true, then all spaces will be
@@ -83,37 +84,24 @@
  * @param $outputList - List - The returns from this macro will be put in this list, passing the list as a parameter
  *                             a safety measure because macros can't return values.
  *###
-#macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
+#macro(findNamesOfAppsToConfigure, $section, $visibility, $space, $outputList)
   ## Use a parameterized sql query to prevent injection.
   #set($params = [])
+  #set($from = ', BaseObject as obj')
+  #set($where = "where doc.fullName=obj.name and obj.className='${nameOfThisDocument}'")
   #if($section &amp;&amp; $section != '')
     #set($discard = $params.add("$section"))
-    #set($sqlA = ' StringProperty as section,')
-    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
-  #else
-    ## Make sure they are "" in case they were set prior to calling the macro.
-    #set($sqlA = '')
-    #set($sqlB = '')
+    #set($from = "${from}, StringProperty as section")
+    #set($where = "${where} and section.id=obj.id and section.name='displayInSection' and section.value=?")
   #end
-  ## Set up query based on value of $globaladmin
-  #if($globaladmin == true)
-    #set($sqlC = '1')
-  #else
-    #if($space &amp;&amp; $space != '')
-      #set($sqlC = '0 and doc.space = ?')
-      #set($discard = $params.add($space))
-    #else
-      #set($sqlC = '0')
-    #end
+  #if($visibility &amp;&amp; $visibility.size &gt; 0)
+    #set($discard = $params.addAll($visibility))
+    #set($from = "${from}, StringProperty as visibility")
+    #set($where = "${where} and obj.id=visibility.id.id and visibility.name='visibility' and visibility.value in ($stringtool.repeat('?', ',', $visibility.size()))")
   #end
-  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
-              + "doc.fullName=obj.name and obj.className='" + $nameOfThisDocument + "'$sqlB "
-              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
-              + "order by doc.creationDate")
-  ##
+  #set($query = "${from} ${where}")
   ## Run the search
-  #set($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).addFilter('unique').execute()))
-  ##
+  #set($discard = $outputList.addAll($services.query.hql($query).bindValues($params).addFilter('unique').execute()))
 #end
 
 #*
@@ -122,7 +110,7 @@
 #macro(findCustomSectionsToConfigure $adminMenu)
   #set ($outputList = [])
   #set ($global = ($editor == 'globaladmin'))
-  #findNamesOfAppsToConfigure('', $global, $currentSpace, $outputList)
+  #findNamesOfAppsToConfigure('', ['global', 'wiki'], $currentSpace, $outputList)
   #set ($sectionsByName = {})
   #set ($categoriesByName = {})
   #foreach ($category in $adminMenu)
@@ -197,7 +185,7 @@
         ## If there is no section for this configurable, then we will have to add one.
         #set($key = "admin.${displayInSection.toLowerCase()}")
         #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInSection) #end
-        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder')})
+        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder'), 'visibility' : $configurableObject.getValue('visibility')})
         #if ($app.getValue('configureGlobally', $configurableObject) != 1)
           #set ($appSection.perSpace = true)
         #end

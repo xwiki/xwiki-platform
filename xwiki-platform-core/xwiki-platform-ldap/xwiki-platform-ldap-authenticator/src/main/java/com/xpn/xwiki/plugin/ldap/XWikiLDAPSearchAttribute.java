@@ -38,6 +38,13 @@ public class XWikiLDAPSearchAttribute
     public String value;
 
     /**
+     * Attribute byte value.
+     * 
+     * @since 8.1M2
+     */
+    public byte[] byteValue;
+
+    /**
      * Create attribute instance.
      * 
      * @param name attribute name.
@@ -47,11 +54,34 @@ public class XWikiLDAPSearchAttribute
     {
         this.name = name;
         this.value = value;
+        this.byteValue = null;
+    }
+
+    /**
+     * Create attribute instance.
+     * 
+     * @param name attribute name.
+     * @param byteValue attribute value.
+     * @since 8.1M2
+     */
+    public XWikiLDAPSearchAttribute(String name, byte[] byteValue)
+    {
+        this.name = name;
+        this.byteValue = byteValue;
+        this.value = null;
     }
 
     @Override
     public String toString()
     {
-        return "{name=" + name + " value=" + value + "}";
+        StringBuilder stringBuilder = new StringBuilder("{name=").append(name);
+
+        if (value != null) {
+            stringBuilder.append(" value=").append(value);
+        } else {
+            stringBuilder.append(" byteValue length=").append((byteValue != null ? byteValue.length : 0));
+        }
+
+        return stringBuilder.append("}").toString();
     }
 }

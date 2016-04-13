@@ -476,19 +476,19 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 #-# The default is 0
 xwiki.authentication.ldap.update_user=1
 
-#-# [Since 8.1M2, XWikiLDAPUtils]
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
 #-# On every login update photo from LDAP to XWiki avatar otherwise photo will not be updated.
 #-# - 0: never
 #-# - 1: at each authentication
 #-# The default is 0
 # xwiki.authentication.ldap.update_photo=0
 
-#-# [Since 8.1M2, XWikiLDAPUtils]
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
 #-# Profile attachment name which will be used to save LDAP photo.
 #-# The default is ldapPhoto
 # xwiki.authentication.ldap.photo_attachment_name=ldapPhoto
 
-#-# [Since 8.1M2, XWikiLDAPUtils]
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
 #-# Specifies the LDAP attribute containing the binary photo
 #-# The default is thumbnailPhoto
 # xwiki.authentication.ldap.photo_attribute=thumbnailPhoto

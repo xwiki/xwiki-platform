@@ -45,7 +45,8 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
      */
     private static final int TIMEOUT_MILLISECONDS = 5000;
     private static final String USER_AGENT_HEADER = "User-Agent";
-    private static final String USER_AGENT = "XWiki/8.0.1";
+    private String version = this.getClass().getPackage().getImplementationVersion();
+    private String userAgent = "XWiki/" + this.version;
 
     @Override
     public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException
@@ -61,13 +62,13 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
             if (StringUtils.startsWith(parameters.getFeed().toLowerCase(), "https")) {
                 HttpsURLConnection httpsURLConnection = (HttpsURLConnection) parameters.getFeedURL().openConnection();
                 httpsURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
-                httpsURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
+                httpsURLConnection.setRequestProperty(USER_AGENT_HEADER, userAgent);
                 feed = syndFeedInput.build(new XmlReader(httpsURLConnection));
 
             } else {
                 URLConnection httpURLConnection = parameters.getFeedURL().openConnection();
                 httpURLConnection.setConnectTimeout(TIMEOUT_MILLISECONDS);
-                httpURLConnection.setRequestProperty(USER_AGENT_HEADER, USER_AGENT);
+                httpURLConnection.setRequestProperty(USER_AGENT_HEADER, userAgent);
                 feed = syndFeedInput.build(new XmlReader(httpURLConnection));
             }
         } catch (SocketTimeoutException ex) {

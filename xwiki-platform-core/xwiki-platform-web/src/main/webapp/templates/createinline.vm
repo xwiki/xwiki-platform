@@ -275,6 +275,9 @@
           <dd>
             <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
           </dd>
+        #else
+          ## Pass along the "tocreate" parameter, as it was determined by the create action based on the first request.
+          <input type="hidden" name="tocreate" value="#if($isSpace)nonterminal#{else}terminal#end"/>
         #end
       </dl>
     </div>

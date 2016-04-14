@@ -39,7 +39,7 @@ public class RenamePageTest extends AbstractTest
     @Test
     public void convertNestedPageToTerminalPage() throws Exception
     {
-        // Clean-up: delete the pages that will be used in these tests
+        // Clean-up: delete the pages that will be used in this test
         getUtil().rest().deletePage("1", "2");
         getUtil().rest().delete(getUtil().resolveDocumentReference("1.2.WebHome"));
 
@@ -67,7 +67,7 @@ public class RenamePageTest extends AbstractTest
     @Test
     public void renamePagePreserveChildrenUpdateLinksSetAutoRedirect() throws Exception
     {
-        // Clean-up: delete the pages that will be used in these tests
+        // Clean-up: delete the pages that will be used in this test
         getUtil().rest().deletePage("My", "Page");
         getUtil().rest().delete(getUtil().resolveDocumentReference("1.2.WebHome"));
         getUtil().rest().delete(getUtil().resolveDocumentReference("1.2.3.WebHome"));
@@ -77,8 +77,8 @@ public class RenamePageTest extends AbstractTest
         // Create the needed pages
         getUtil().createPage(Arrays.asList("1", "2"), "WebHome", "", "");
         getUtil().createPage(Arrays.asList("1", "2", "3"), "WebHome", "", "");
-        // We set the content to "[[1.2]]" to test the "Update Links" feature
-        getUtil().createPage("My", "Page", "[[1.2]]", "");
+        // We set the content to "[[1.2.WebHome]]" to test the "Update Links" feature
+        getUtil().createPage("My", "Page", "[[1.2.WebHome]]", "");
 
         // Go to 1.2.WebHome to start the test
         getUtil().gotoPage(Arrays.asList("1", "2"), "WebHome", "", "");

@@ -136,7 +136,7 @@
               #end
               &amp;messageID=$message.getProperty('messageID').getValue()]]##
          #else
-           |$escapetool.xml($message.display($field, 'view'))##
+           |$services.rendering.escape($message.display($field, 'view') , $doc.syntax)##
          #end
        #end
 

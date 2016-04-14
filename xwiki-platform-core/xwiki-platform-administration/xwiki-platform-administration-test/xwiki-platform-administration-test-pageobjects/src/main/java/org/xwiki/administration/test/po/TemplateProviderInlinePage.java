@@ -128,7 +128,8 @@ public class TemplateProviderInlinePage extends InlinePage
     {
         if (this.spacesTree == null) {
             this.spacesTree =
-                new DocumentTreeElement(this.getDriver().findElement(By.cssSelector("#enabled-spaces .xtree")));
+                new DocumentTreeElement(this.getDriver().findElement(By.cssSelector("#enabled-spaces .xtree")))
+                    .waitForIt();
         }
 
         return this.spacesTree;

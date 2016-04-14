@@ -3833,14 +3833,23 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
+            // The source document is a new empty XWikiDocument to follow
+            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+            // doc.getOriginalDocument()
+            XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+            // Again to follow general event policy, new document author is the user who modified the document
+            // (here the modification is delete)
+            blankDoc.setOriginalDocument(doc.getOriginalDocument());
+            blankDoc.setAuthorReference(context.getUserReference());
+            blankDoc.setContentAuthorReference(context.getUserReference());
+
             ObservationManager om = getObservationManager();
 
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
             if (om != null) {
-                om.notify(new DocumentDeletingEvent(doc.getDocumentReference()),
-                    new XWikiDocument(doc.getDocumentReference()), context);
+                om.notify(new DocumentDeletingEvent(doc.getDocumentReference()), blankDoc, context);
             }
 
             if (hasRecycleBin(context) && totrash) {
@@ -3850,19 +3859,10 @@ public class XWiki implements EventListener
             getStore().deleteXWikiDoc(doc, context);
 
             try {
-                // Inform notification mecanisms that a document has been deleted
+                // Inform notification mechanisms that a document has been deleted
                 // Note that for the moment the event being send is a bridge event, as we are still passing around
                 // an XWikiDocument as source and an XWikiContext as data.
-                // The source document is a new empty XWikiDocument to follow
-                // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-                // doc.getOriginalDocument()
                 if (om != null) {
-                    XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-                    // Again to follow general event policy, new document author is the user who modified the document
-                    // (here the modification is delete)
-                    blankDoc.setOriginalDocument(doc);
-                    blankDoc.setAuthorReference(context.getUserReference());
-                    blankDoc.setContentAuthorReference(context.getUserReference());
                     om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
                 }
             } catch (Exception ex) {

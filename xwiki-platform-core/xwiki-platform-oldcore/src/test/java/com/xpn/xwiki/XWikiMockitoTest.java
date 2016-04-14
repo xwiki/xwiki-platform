@@ -26,12 +26,16 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -69,11 +73,13 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -282,6 +288,41 @@ public class XWikiMockitoTest
 
         // Verify that deleteXWikiDoc() is called
         verify(storeInterface).deleteXWikiDoc(document, xwikiContext);
+    }
+
+    @Test
+    public void deleteDocument() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        XWikiDocument originalDocument = mock(XWikiDocument.class);
+        when(document.getOriginalDocument()).thenReturn(originalDocument);
+
+        this.xwiki.deleteDocument(document, this.context);
+
+        ObservationManager observation = this.mocker.getInstance(ObservationManager.class);
+
+        Matcher<XWikiDocument> matcher = new ArgumentMatcher<XWikiDocument>()
+        {
+            @Override
+            public boolean matches(Object item)
+            {
+                XWikiDocument doc = (XWikiDocument) item;
+
+                return doc.getDocumentReference().equals(documentReference)
+                    && doc.getOriginalDocument() == originalDocument;
+            }
+        };
+
+        // Make sure the right events have been sent
+        verify(observation).notify(eq(new DocumentDeletingEvent(documentReference)), argThat(matcher),
+            same(this.context));
+        verify(observation).notify(eq(new DocumentDeletedEvent(documentReference)), argThat(matcher),
+            same(this.context));
+
+        verifyNoMoreInteractions(observation);
     }
 
     @Test

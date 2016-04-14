@@ -25,18 +25,14 @@ import org.openqa.selenium.support.FindBy;
 
 public class RenamePage extends ViewPage
 {
-
     @FindBy(name = "deep")
     private WebElement preserveChildrenCheckbox;
-    
+
     @FindBy(name = "updateLinks")
     private WebElement updateLinksCheckbox;
 
     @FindBy(name = "autoRedirect")
     private WebElement autoRedirectCheckbox;
-
-    @FindBy(id = "targetParentReference")
-    private WebElement targetParentReferenceField;
 
     @FindBy(css = "form#rename .button[value='Rename']")
     private WebElement renameButton;
@@ -44,26 +40,31 @@ public class RenamePage extends ViewPage
     @FindBy(name = "terminal")
     private WebElement terminalCheckbox;
 
-    public boolean preserveChildren()
+    @FindBy(className = "location-picker")
+    private WebElement documentPickerElement;
+
+    private DocumentPicker documentPicker;
+
+    public boolean isPreserveChildren()
     {
         return this.preserveChildrenCheckbox.isSelected();
     }
 
-    public void preserveChildren(boolean preserveChildren)
+    public void setPreserveChildren(boolean preserveChildren)
     {
-        if (preserveChildren != preserveChildren()) {
+        if (preserveChildren != isPreserveChildren()) {
             this.preserveChildrenCheckbox.click();
         }
     }
-    
-    public boolean updateLinks()
+
+    public boolean isUpdateLinks()
     {
         return this.updateLinksCheckbox.isSelected();
     }
 
-    public void updateLinks(boolean updateLinks)
+    public void setUpdateLinks(boolean updateLinks)
     {
-        if (updateLinks != updateLinks()) {
+        if (updateLinks != isUpdateLinks()) {
             this.updateLinksCheckbox.click();
         }
     }
@@ -80,10 +81,12 @@ public class RenamePage extends ViewPage
         }
     }
 
-    public void setTargetParentReference(String parent)
+    public DocumentPicker getDocumentPicker()
     {
-        this.targetParentReferenceField.clear();
-        this.targetParentReferenceField.sendKeys(parent);
+        if (this.documentPicker == null) {
+            this.documentPicker = new DocumentPicker(this.documentPickerElement);
+        }
+        return this.documentPicker;
     }
 
     public void clickRenameButton()

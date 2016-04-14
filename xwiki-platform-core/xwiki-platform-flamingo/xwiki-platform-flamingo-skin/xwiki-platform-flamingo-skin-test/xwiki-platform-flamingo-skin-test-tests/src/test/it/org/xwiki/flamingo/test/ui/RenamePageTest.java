@@ -88,11 +88,11 @@ public class RenamePageTest extends AbstractTest
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
         // Check the "Preserve Children", "Update Links" & "Auto Redirect" checkboxes.
-        renamePage.preserveChildren(true);
-        renamePage.updateLinks(true);
+        renamePage.setPreserveChildren(true);
+        renamePage.setUpdateLinks(true);
         renamePage.setAutoRedirect(true);
         // Set the new parent as "A.B"
-        renamePage.setTargetParentReference("A.B");
+        renamePage.getDocumentPicker().setParent("A.B");
         renamePage.clickRenameButton();
 
         // Test the Rename operation: we need to have 2.WebHome and 2.3.WebHome under A.B

@@ -67,6 +67,7 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -89,6 +90,10 @@ public class XarExtensionHandlerTest
 
     private ExtensionId localXarExtensiontId2;
 
+    private ExtensionId collisionextension1;
+
+    private ExtensionId collisionextension2;
+
     private JobExecutor jobExecutor;
 
     private InstalledExtensionRepository xarExtensionRepository;
@@ -108,6 +113,8 @@ public class XarExtensionHandlerTest
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
+        this.collisionextension1 = new ExtensionId("collisionextension1", "version");
+        this.collisionextension2 = new ExtensionId("collisionextension2", "version");
 
         // classes
 
@@ -827,6 +834,47 @@ public class XarExtensionHandlerTest
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
         Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
+    }
+
+    @Test
+    public void testUninstallExtensionWithCommonDocumentOnWiki() throws Throwable
+    {
+        mockHasAdminRight(true);
+        install(this.collisionextension1, "wiki", this.contextUser);
+        install(this.collisionextension2, "wiki", this.contextUser);
+
+        // uninstall
+
+        uninstall(this.collisionextension1, "wiki");
+
+        XWikiDocument page = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "samespace", "samepage"), getXWikiContext());
+
+        assertFalse(page.isNew());
+    }
+
+    @Test
+    public void testUninstallExtensionWithCommonDocumentOnRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        install(this.collisionextension1, null, this.contextUser);
+        install(this.collisionextension2, null, this.contextUser);
+    }
+
+    @Test
+    public void testUninstallExtensionWithCommonDocumentOnRootAndWiki() throws Throwable
+    {
+        mockHasAdminRight(true);
+        install(this.collisionextension1, "wiki", this.contextUser);
+        install(this.collisionextension2, null, this.contextUser);
+    }
+
+    @Test
+    public void testUninstallExtensionWithCommonDocumentOnWikiAndRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        install(this.collisionextension1, null, this.contextUser);
+        install(this.collisionextension2, "wiki", this.contextUser);
     }
 
     @Test

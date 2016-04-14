@@ -20,11 +20,12 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,8 +39,10 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.Request;
@@ -66,8 +69,8 @@ public class XarExtensionJobFinishedListener implements EventListener
     /**
      * The list of events observed.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new JobFinishedEvent(InstallJob.JOBTYPE),
-        new JobFinishedEvent(UninstallJob.JOBTYPE));
+    private static final List<Event> EVENTS =
+        Arrays.<Event>asList(new JobFinishedEvent(InstallJob.JOBTYPE), new JobFinishedEvent(UninstallJob.JOBTYPE));
 
     @Inject
     private Execution execution;
@@ -80,6 +83,10 @@ public class XarExtensionJobFinishedListener implements EventListener
 
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named(XarExtensionHandler.TYPE)
+    private InstalledExtensionRepository xarRepository;
 
     @Override
     public String getName()
@@ -122,22 +129,29 @@ public class XarExtensionJobFinishedListener implements EventListener
 
                         // Get pages to delete
 
-                        List<DocumentReference> pagesToDelete = new ArrayList<DocumentReference>();
+                        Set<DocumentReference> pagesToDelete = new HashSet<DocumentReference>();
 
                         for (Map.Entry<String, Map<XarEntry, XarExtensionPlanEntry>> previousWikiEntry : previousXAREntries
                             .entrySet()) {
                             if (!previousWikiEntry.getValue().isEmpty()) {
                                 try {
-                                    pagesToDelete.addAll(packager.getDocumentReferences(
-                                        previousWikiEntry.getValue().keySet(),
-                                        createPackageConfiguration(jobFinishedEvent.getRequest(),
-                                            previousWikiEntry.getKey())));
+                                    List<DocumentReference> references =
+                                        packager.getDocumentReferences(previousWikiEntry.getValue().keySet(),
+                                            createPackageConfiguration(jobFinishedEvent.getRequest(),
+                                                previousWikiEntry.getKey()));
 
+                                    for (DocumentReference reference : references) {
+                                        // Ignore document that are part of other installed extensions (don't even
+                                        // propose to enable them)
+                                        if (((XarInstalledExtensionRepository) this.xarRepository)
+                                            .getXarInstalledExtensions(reference).isEmpty()) {
+                                            pagesToDelete.add(reference);
+                                        }
+                                    }
                                 } catch (Exception e) {
-                                    this.logger
-                                        .warn(
-                                            "Exception when cleaning pages removed since previous xar extension version",
-                                            e);
+                                    this.logger.warn(
+                                        "Exception when cleaning pages removed since previous xar extension version",
+                                        e);
                                 }
                             }
                         }
@@ -247,8 +261,8 @@ public class XarExtensionJobFinishedListener implements EventListener
         PackageConfiguration configuration = new PackageConfiguration();
 
         configuration.setInteractive(false);
-        configuration.setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE,
-            request));
+        configuration
+            .setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE, request));
         configuration.setWiki(wiki);
         configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);

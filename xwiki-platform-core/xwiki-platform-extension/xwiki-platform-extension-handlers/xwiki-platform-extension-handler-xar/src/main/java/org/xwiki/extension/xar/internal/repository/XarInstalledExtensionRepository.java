@@ -20,10 +20,13 @@
 package org.xwiki.extension.xar.internal.repository;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,16 +42,16 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.event.ExtensionInstalledEvent;
-import org.xwiki.extension.event.ExtensionUninstalledEvent;
-import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
+import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 
 /**
@@ -63,20 +66,21 @@ import org.xwiki.xar.XarException;
 public class XarInstalledExtensionRepository extends AbstractInstalledExtensionRepository<XarInstalledExtension>
     implements InstalledExtensionRepository, Initializable
 {
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new ExtensionInstalledEvent(),
-        new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
-
     @Inject
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private transient ObservationManager observation;
+    private Logger logger;
 
     /**
-     * The logger to log.
+     * Index used to find extensions owners of a document installed on a specific wiki.
      */
-    @Inject
-    private Logger logger;
+    private Map<DocumentReference, Collection<XarInstalledExtension>> documents = new ConcurrentHashMap<>();
+
+    /**
+     * Index used to find extensions owners of a document installed on root namespace.
+     */
+    private Map<LocalDocumentReference, Collection<XarInstalledExtension>> rootDocuments = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() throws InitializationException
@@ -85,65 +89,92 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
             this.installedRepository.getDescriptor().getURI()));
 
         loadExtensions();
-
-        this.observation.addListener(new EventListener()
-        {
-            @Override
-            public void onEvent(Event event, Object source, Object data)
-            {
-                LocalExtension extension = (LocalExtension) source;
-                if (extension.getType().equals(XarExtensionHandler.TYPE)) {
-                    updateXarExtension(extension);
-
-                    if (data != null) {
-                        for (InstalledExtension installedExtension : (Collection<InstalledExtension>) data) {
-                            updateXarExtension(installedExtension);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public String getName()
-            {
-                return XarInstalledExtensionRepository.class.getName();
-            }
-
-            @Override
-            public List<Event> getEvents()
-            {
-                return EVENTS;
-            }
-        });
     }
 
-    private void updateXarExtension(LocalExtension extension)
+    void pagesRemoved(ExtensionId extensionId, String namespace) throws UnsupportedNamespaceException
     {
-        if (this.extensions.containsKey(extension.getId())) {
-            if (!(extension instanceof InstalledExtension)) {
-                removeXarExtension(extension.getId());
-            }
-        } else {
-            if (extension instanceof InstalledExtension) {
-                try {
-                    addXarExtension((InstalledExtension) extension);
-                } catch (Exception e) {
-                    this.logger.error("Failed to parse extension [" + extension + "]", e);
+        pagesUpdated(extensionId, namespace, false);
+    }
+
+    void pagesAdded(ExtensionId extensionId, String namespace) throws UnsupportedNamespaceException
+    {
+        pagesUpdated(extensionId, namespace, true);
+    }
+
+    private void pagesUpdated(ExtensionId extensionId, String namespace, boolean add)
+        throws UnsupportedNamespaceException
+    {
+        XarInstalledExtension installedExtension = (XarInstalledExtension) getInstalledExtension(extensionId);
+
+        if (installedExtension != null) {
+            for (XarEntry xarEntry : installedExtension.getXarPackage().getEntries()) {
+                if (namespace != null) {
+                    DocumentReference reference = new DocumentReference(xarEntry,
+                        new WikiReference(XarHandlerUtils.getWikiFromNamespace(namespace)));
+
+                    synchronized (this.documents) {
+                        Collection<XarInstalledExtension> referenceExtensions = this.documents.get(reference);
+                        if (referenceExtensions != null || add) {
+                            Set<XarInstalledExtension> newSet = referenceExtensions != null
+                                ? new LinkedHashSet<>(referenceExtensions) : new LinkedHashSet<>();
+
+                            if (add) {
+                                newSet.add(installedExtension);
+                            } else {
+                                newSet.remove(installedExtension);
+                            }
+
+                            this.documents.put(reference, newSet);
+                        }
+                    }
+                } else {
+                    synchronized (this.rootDocuments) {
+                        Collection<XarInstalledExtension> referenceExtensions = this.rootDocuments.get(xarEntry);
+                        if (referenceExtensions != null || add) {
+                            Set<XarInstalledExtension> newSet = referenceExtensions != null
+                                ? new LinkedHashSet<>(referenceExtensions) : new LinkedHashSet<>();
+
+                            if (add) {
+                                newSet.add(installedExtension);
+                            } else {
+                                newSet.remove(installedExtension);
+                            }
+
+                            this.rootDocuments.put(xarEntry, newSet);
+                        }
+                    }
                 }
             }
         }
     }
 
-    private void addXarExtension(InstalledExtension extension) throws IOException, XarException
+    void updateCachedXarExtension(ExtensionId extensionId)
     {
-        XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this);
+        InstalledExtension installedExtension = this.installedRepository.getInstalledExtension(extensionId);
+
+        if (installedExtension != null && installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+            if (getInstalledExtension(installedExtension.getId()) == null) {
+                try {
+                    addCacheXarExtension(installedExtension);
+                } catch (Exception e) {
+                    this.logger.error("Failed to parse extension [" + installedExtension + "]", e);
+                }
+            }
+        } else {
+            removeCachedXarExtension(extensionId);
+        }
+    }
+
+    private void addCacheXarExtension(InstalledExtension installedExtension) throws IOException, XarException
+    {
+        XarInstalledExtension xarExtension = new XarInstalledExtension(installedExtension, this);
 
         addCachedExtension(xarExtension);
     }
 
-    private void removeXarExtension(ExtensionId extensionId)
+    protected void removeCachedXarExtension(ExtensionId extensionId)
     {
-        removeCachedExtension(this.extensions.get(extensionId));
+        super.removeCachedExtension((XarInstalledExtension) getInstalledExtension(extensionId));
     }
 
     private void loadExtensions()
@@ -151,12 +182,35 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
             if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
                 try {
-                    addXarExtension(localExtension);
+                    addCacheXarExtension(localExtension);
                 } catch (Exception e) {
                     this.logger.error("Failed to parse extension [" + localExtension + "]", e);
                 }
             }
         }
+    }
+
+    /**
+     * @param reference the reference of the document
+     * @return the extension owners of the passed document
+     * @since 8.1M2
+     */
+    public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
+    {
+        Collection<XarInstalledExtension> wikiExtensions = this.documents.get(reference);
+        Collection<XarInstalledExtension> rootExtensions = this.rootDocuments.get(reference);
+
+        List<XarInstalledExtension> allExtensions = new ArrayList<>();
+
+        if (wikiExtensions != null) {
+            allExtensions.addAll(wikiExtensions);
+        }
+
+        if (rootExtensions != null) {
+            allExtensions.addAll(rootExtensions);
+        }
+
+        return allExtensions;
     }
 
     // InstalledExtensionRepository
@@ -195,8 +249,8 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(
-            id, namespace) : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE)
+            ? this.installedRepository.getBackwardDependencies(id, namespace) : null;
     }
 
     @Override
@@ -205,7 +259,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository
-            .getBackwardDependencies(extensionId) : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE)
+            ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 }

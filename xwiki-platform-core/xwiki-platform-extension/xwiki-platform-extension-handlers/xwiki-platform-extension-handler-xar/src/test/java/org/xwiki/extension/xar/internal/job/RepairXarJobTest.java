@@ -19,9 +19,6 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
@@ -29,9 +26,12 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
-import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
@@ -42,6 +42,8 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     public void setUp() throws Exception
     {
         super.setUp();
+
+        this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
 
         this.xarExtensionRepository =
             this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
@@ -73,7 +75,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
-        repair(extensionId, new String[] {"wiki1"}, LogLevel.WARN);
+        repair(extensionId, new String[] {"wiki:wiki1"}, LogLevel.WARN);
 
         InstalledExtension installedExtension = this.xarExtensionRepository.resolve(extensionId);
 

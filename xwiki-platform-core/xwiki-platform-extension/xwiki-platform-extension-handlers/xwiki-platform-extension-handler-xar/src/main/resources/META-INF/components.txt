@@ -9,6 +9,7 @@ org.xwiki.extension.xar.internal.job.DiffXarJob
 org.xwiki.extension.xar.internal.job.RepairXarJob
 org.xwiki.extension.xar.internal.question.CleanPagesQuestionRecorder
 org.xwiki.extension.xar.internal.question.ConflictQuestionRecorder
+org.xwiki.extension.xar.internal.repository.InstalledExtensionSynchronizer
 org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
 org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
 org.xwiki.extension.xar.internal.script.DiffXarJobStatusScriptSafeProvider

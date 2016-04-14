@@ -293,11 +293,11 @@ public class XWikiMockitoTest
     @Test
     public void deleteDocument() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        final DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
 
-        XWikiDocument originalDocument = mock(XWikiDocument.class);
+        final XWikiDocument originalDocument = mock(XWikiDocument.class);
         when(document.getOriginalDocument()).thenReturn(originalDocument);
 
         this.xwiki.deleteDocument(document, this.context);

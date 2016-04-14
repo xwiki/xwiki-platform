@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.plugin.ldap;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -51,20 +61,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.user.impl.LDAP.LDAPProfileXClass;
 import com.xpn.xwiki.web.Utils;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * LDAP communication tool.
@@ -1075,6 +1075,24 @@ public class XWikiLDAPUtils
         return attributeNameTable;
     }
 
+    private void set(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings,
+        BaseObject userObject, XWikiContext xcontext)
+    {
+        if (searchAttributes != null) {
+            // Convert LDAP attributes to a map (mostly to make easier to manipulate lists)
+            Map<String, Object> map = toMap(searchAttributes, userMappings);
+
+            // Set properties in the user object
+            for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<String, Object> entry = it.next();
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                userObject.set(key, value, xcontext);
+            }
+        }
+    }
+
     private Map<String, Object> toMap(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings)
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -1174,31 +1192,14 @@ public class XWikiLDAPUtils
         LOGGER.debug("Start synchronization of LDAP profile [{}] with existing user profile based on mapping [{}]",
             searchAttributes, userMappings);
 
-        Map<String, Object> map = toMap(searchAttributes, userMappings);
-        for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, Object> entry = it.next();
-            String key = entry.getKey();
-            Object value = entry.getValue();
+        // Clone the user object
+        BaseObject clonedUser = userObj.clone();
 
-            if (value instanceof String) {
-                String objValue = userObj.getStringValue(key);
-                if (objValue != null && objValue.equals(value)) {
-                    it.remove();
-                }
-            } else {
-                BaseProperty property = (BaseProperty) userObj.get(key);
-                Object objValue = property != null ? ((BaseProperty) userObj.get(key)).getValue() : null;
-                if (objValue != null && objValue.equals(value)) {
-                    it.remove();
-                }
-            }
-        }
+        // Apply all attributes to the clone
+        set(searchAttributes, userMappings, clonedUser, context);
 
-        boolean needsUpdate = false;
-        if (!map.isEmpty()) {
-            userClass.fromMap(map, userObj);
-            needsUpdate = true;
-        }
+        // Let BaseObject#apply tell us if something changed or not
+        boolean needsUpdate = userObj.apply(clonedUser, false);
 
         if(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UPDATE_PHOTO, "0", context).equals("1")) {
             // Sync user photo with LDAP

@@ -44,6 +44,7 @@ import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -376,6 +377,16 @@ public class XWikiLDAPAuthServiceImplTest extends AbstractLDAPTestCase
         userProfileObj = userProfile.getXObject(USER_XCLASS_REFERENCE);
 
         assertEquals("customvalue", userProfileObj.getStringValue("customproperty"));
+
+        // Authenticate again
+
+        assertAuthenticate(LDAPTestSetup.HORATIOHORNBLOWER_CN, LDAPTestSetup.HORATIOHORNBLOWER_PWD,
+            LDAPTestSetup.HORATIOHORNBLOWER_DN);
+
+        XWikiDocument userProfile2 = getDocument("XWiki." + LDAPTestSetup.HORATIOHORNBLOWER_CN);
+
+        // Make sure the user document was not touched
+        assertSame(userProfile, userProfile2);
     }
 
     @Test

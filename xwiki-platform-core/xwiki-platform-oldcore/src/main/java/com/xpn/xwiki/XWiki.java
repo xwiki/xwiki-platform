@@ -3130,16 +3130,10 @@ public class XWiki implements EventListener
             XWikiRequest request = context.getRequest();
             Map<String, String[]> map = Util.getObject(request, "register");
 
-            String content;
-            Syntax syntax;
-            if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-                content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
-                syntax = Syntax.XWIKI_2_0;
-            } else {
-                content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-                syntax = Syntax.XWIKI_1_0;
-            }
+            String content = "";
+            Syntax syntax = getDefaultDocumentSyntaxInternal();
 
+            // Read the values from the request.
             String xwikiname = request.getParameter("xwikiname");
             String password2 = request.getParameter("register2_password");
             String password = (map.get("password"))[0];
@@ -3148,6 +3142,7 @@ public class XWiki implements EventListener
             String parent = request.getParameter("parent");
             String validkey = null;
 
+            // Validate the values.
             if (XWikiRightService.SUPERADMIN_USER.equalsIgnoreCase(xwikiname)) {
                 return -8;
             }
@@ -3171,6 +3166,7 @@ public class XWiki implements EventListener
             if ((template != null) && (!template.equals(""))) {
                 XWikiDocument tdoc = getDocument(template, context);
                 if ((!tdoc.isNew())) {
+                    // FIXME: This ignores template objects, attachments, etc.
                     content = tdoc.getContent();
                     syntax = tdoc.getSyntax();
                 }
@@ -3180,6 +3176,7 @@ public class XWiki implements EventListener
                 parent = "XWiki.XWikiUsers";
             }
 
+            // Mark the user as active or waiting email validation.
             if (withValidation) {
                 map.put("active", new String[] { "0" });
                 validkey = generateValidationKey(16);
@@ -3190,10 +3187,12 @@ public class XWiki implements EventListener
                 map.put("active", new String[] { "1" });
             }
 
+            // Create the user.
             int result =
                 createUser(xwikiname, map, getRelativeEntityReferenceResolver().resolve(parent, EntityType.DOCUMENT),
                     content, syntax, userRights, context);
 
+            // Send validation mail, if needed.
             if ((result > 0) && (withValidation)) {
                 // Send the validation email
                 sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
@@ -3359,15 +3358,8 @@ public class XWiki implements EventListener
     {
         BaseClass userClass = getUserClass(context);
 
-        String content;
-        Syntax syntax;
-        if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-            content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
-            syntax = Syntax.XWIKI_2_0;
-        } else {
-            content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-            syntax = Syntax.XWIKI_1_0;
-        }
+        String content = "";
+        Syntax syntax = getDefaultDocumentSyntaxInternal();
 
         return createUser(userName, map,
             new EntityReference(userClass.getDocumentReference().getName(), EntityType.DOCUMENT), content, syntax,
@@ -3387,14 +3379,7 @@ public class XWiki implements EventListener
         try {
             syntax = getSyntaxFactory().createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
-            try {
-                syntax = getSyntaxFactory().createSyntaxFromIdString(getDefaultDocumentSyntax());
-            } catch (ParseException e1) {
-                // Let's jope that never happen
-                LOGGER.warn("Failed to set parse syntax [" + getDefaultDocumentSyntax() + "]", e);
-
-                syntax = Syntax.XWIKI_2_0;
-            }
+            syntax = getDefaultDocumentSyntaxInternal();
         }
 
         return createUser(userName, map, getRelativeEntityReferenceResolver().resolve(parent, EntityType.DOCUMENT),
@@ -6479,12 +6464,20 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @return the syntax id of the syntax to use when creating new documents.
+     * @return the syntax id of the syntax to use when creating new documents
      */
     public String getDefaultDocumentSyntax()
     {
         // TODO: Fix this method to return a Syntax object instead of a String
-        return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax().toIdString();
+        return getDefaultDocumentSyntaxInternal().toIdString();
+    }
+
+    /**
+     * @return the syntax to use when creating new documents
+     */
+    private Syntax getDefaultDocumentSyntaxInternal()
+    {
+        return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
     }
 
     /**

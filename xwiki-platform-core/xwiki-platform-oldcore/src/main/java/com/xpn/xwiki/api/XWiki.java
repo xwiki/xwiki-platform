@@ -1305,8 +1305,11 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
-     * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
+     * Privileged API to create a new user from the request.
+     * <p/>
+     * This API is used by the RegisterNewUser wiki page.
+     * <p/>
+     * This version sends a validation email to the user. Configuration of validation email is in the XWiki Preferences.
      *
      * @param withValidation true to send the validation email
      * @param userRights Rights to set for the user for it's own page(defaults to "edit")

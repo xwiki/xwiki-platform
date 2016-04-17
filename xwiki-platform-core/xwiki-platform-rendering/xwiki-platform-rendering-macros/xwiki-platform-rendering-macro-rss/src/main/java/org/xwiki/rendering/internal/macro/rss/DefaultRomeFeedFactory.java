@@ -45,8 +45,8 @@ public class DefaultRomeFeedFactory implements RomeFeedFactory
      */
     private static final int TIMEOUT_MILLISECONDS = 5000;
     private static final String USER_AGENT_HEADER = "User-Agent";
-    private String version = this.getClass().getPackage().getImplementationVersion();
-    private String userAgent = "XWiki/" + this.version;
+    private static final String VERSION = DefaultRomeFeedFactory.class.getPackage().getImplementationVersion();
+    private static final String userAgent = "XWiki/" + VERSION;
 
     @Override
     public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException

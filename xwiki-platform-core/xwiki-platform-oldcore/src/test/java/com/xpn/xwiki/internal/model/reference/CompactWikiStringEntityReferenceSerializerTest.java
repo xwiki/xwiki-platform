@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.annotation.ComponentList;
@@ -36,7 +37,11 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentList({ CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class })
+@ComponentList({
+    DefaultSymbolScheme.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class
+})
 public class CompactWikiStringEntityReferenceSerializerTest
 {
     public MockitoComponentMockingRule<EntityReferenceSerializer<String>> mocker =

@@ -71,6 +71,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -163,7 +164,8 @@ public class TestUtils
     private static final RelativeStringEntityReferenceResolver RELATIVE_RESOLVER =
         new RelativeStringEntityReferenceResolver();
 
-    private static DefaultStringEntityReferenceSerializer SERIALIZER = new DefaultStringEntityReferenceSerializer();
+    private static DefaultStringEntityReferenceSerializer SERIALIZER =
+        new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     private static PersistentTestContext context;
 

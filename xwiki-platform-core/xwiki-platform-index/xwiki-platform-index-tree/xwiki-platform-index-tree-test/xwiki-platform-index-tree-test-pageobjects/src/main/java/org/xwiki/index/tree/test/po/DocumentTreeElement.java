@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -39,7 +40,7 @@ import org.xwiki.tree.test.po.TreeNodeElement;
 public class DocumentTreeElement extends TreeElement
 {
     private DefaultStringEntityReferenceSerializer entityReferenceSerializer =
-        new DefaultStringEntityReferenceSerializer();
+        new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * Creates a new instance that can be used to interact with the document tree represented by the given element.

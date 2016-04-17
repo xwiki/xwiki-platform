@@ -32,15 +32,13 @@ import org.xwiki.model.reference.LocalDocumentReference;
  */
 public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
-    private SymbolScheme symbolScheme;
-
     /**
      * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
      *        between the Entity types, and the characters to escape and how to escape them)
      */
     public LocalizedStringEntityReferenceSerializer(SymbolScheme symbolScheme)
     {
-        this.symbolScheme = symbolScheme;
+        super(symbolScheme);
     }
 
     @Override
@@ -61,11 +59,5 @@ public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntit
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }
         }
-    }
-
-    @Override
-    protected SymbolScheme getSymbolScheme()
-    {
-        return this.symbolScheme;
     }
 }

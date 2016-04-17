@@ -20,6 +20,7 @@
 package org.xwiki.bridge.event;
 
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.AbstractCancelableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
@@ -42,7 +43,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * Used to serialize document name.
      */
     private static final DefaultStringEntityReferenceSerializer SERIALIZER =
-        new DefaultStringEntityReferenceSerializer();
+        new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * This event will match any other document event of the same type.

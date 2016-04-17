@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
 import org.xwiki.stability.Unstable;
 
@@ -45,7 +46,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Used to provide a nice and readable pretty name for the {@link #toString()} method.
      */
     protected static final LocalizedStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalizedStringEntityReferenceSerializer();
+        new LocalizedStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

@@ -21,10 +21,13 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link RelativeStringEntityReferenceResolver}.
@@ -32,18 +35,25 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class RelativeStringEntityReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<RelativeStringEntityReferenceResolver> mocker =
+        new MockitoComponentMockingRule<>(RelativeStringEntityReferenceResolver.class);
+
     private EntityReferenceResolver<String> resolver;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
-        this.resolver = new RelativeStringEntityReferenceResolver();
+        this.resolver = this.mocker.getComponentUnderTest();
     }
 
     @Test
-    public void testResolveDocumentReference() throws Exception
+    public void resolveDocumentReference() throws Exception
     {
         EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertNull(reference);
@@ -60,7 +70,7 @@ public class RelativeStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveDocumentReferenceWithBaseReference() throws Exception
+    public void resolveDocumentReferenceWithBaseReference() throws Exception
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));

@@ -22,11 +22,14 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link UidStringEntityReferenceSerializer}.
@@ -34,21 +37,28 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  * @since 3.5RC1
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class UidStringEntityReferenceSerializerTest
 {
+    @Rule
+    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> resolverMocker =
+        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+
     private EntityReferenceSerializer<String> serializer;
 
     private EntityReferenceResolver<String> resolver;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         this.serializer = new UidStringEntityReferenceSerializer();
-        this.resolver = new DefaultStringEntityReferenceResolver();
+        this.resolver = this.resolverMocker.getComponentUnderTest();
     }
 
     @Test
-    public void testSerializeDocumentReference() throws Exception
+    public void serializeDocumentReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("4:wiki5:space4:page", serializer.serialize(reference));
@@ -61,21 +71,21 @@ public class UidStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void testSerializeSpaceReference() throws Exception
+    public void serializeSpaceReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
         Assert.assertEquals("4:wiki6:space16:space2", serializer.serialize(reference));
     }
 
     @Test
-    public void testSerializeAttachmentReference() throws Exception
+    public void serializeAttachmentReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         Assert.assertEquals("4:wiki5:space4:page8:filename", serializer.serialize(reference));
     }
 
     @Test
-    public void testSerializeReferenceWithChild()
+    public void serializeReferenceWithChild()
     {
         EntityReference reference = resolver.resolve("wiki:Space.Page", EntityType.DOCUMENT);
         Assert.assertEquals("4:wiki5:Space", serializer.serialize(reference.getParent()));
@@ -87,7 +97,7 @@ public class UidStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void testSerializeObjectReference()
+    public void serializeObjectReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0]", EntityType.OBJECT);
         Assert.assertEquals("4:wiki5:space4:page19:wiki:space.class[0]", serializer.serialize(reference));
@@ -107,7 +117,7 @@ public class UidStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an property reference.
      */
     @Test
-    public void testSerializeObjectPropertyReference()
+    public void serializeObjectPropertyReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
         Assert.assertEquals("4:wiki5:space4:page19:wiki:space.class[0]4:prop", serializer.serialize(reference));
@@ -124,7 +134,7 @@ public class UidStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an class property reference.
      */
     @Test
-    public void testSerializeClassPropertyReference()
+    public void serializeClassPropertyReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^ClassProperty", EntityType.CLASS_PROPERTY);
         Assert.assertEquals("4:wiki5:space4:page13:ClassProperty", serializer.serialize(reference));
@@ -135,7 +145,7 @@ public class UidStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void testSerializeRelativeReference()
+    public void serializeRelativeReference()
     {
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
         Assert.assertEquals("4:page", serializer.serialize(reference));

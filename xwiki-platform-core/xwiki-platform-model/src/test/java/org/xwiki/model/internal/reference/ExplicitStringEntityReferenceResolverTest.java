@@ -21,11 +21,14 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
@@ -33,18 +36,25 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class ExplicitStringEntityReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<ExplicitStringEntityReferenceResolver> mocker =
+        new MockitoComponentMockingRule<>(ExplicitStringEntityReferenceResolver.class);
+
     private EntityReferenceResolver<String> resolver;
 
     @Before
     public void setUp() throws Exception
     {
-        this.resolver = new ExplicitStringEntityReferenceResolver();
+        this.resolver = this.mocker.getComponentUnderTest();
     }
 
     @Test
-    public void testResolveWithExplicitDocumentReference()
+    public void resolveWithExplicitDocumentReference()
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new DocumentReference("wiki", "space", "page"));
@@ -58,7 +68,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithExplicitEntityReference()
+    public void resolveWithExplicitEntityReference()
     {
         EntityReference reference =
             this.resolver.resolve("space.page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));
@@ -72,7 +82,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithAbsoluteReferenceAndNoExplicitReference()
+    public void resolveWithAbsoluteReferenceAndNoExplicitReference()
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
 
@@ -85,7 +95,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithExplicitReferenceWithHoles()
+    public void resolveWithExplicitReferenceWithHoles()
     {
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT,
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
@@ -99,7 +109,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
     
     @Test
-    public void testResolveWithNoExplicitAndPartialReference()
+    public void resolveWithNoExplicitAndPartialReference()
     {
         try {
             this.resolver.resolve("", EntityType.DOCUMENT);
@@ -111,7 +121,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithInvalidParameterType()
+    public void resolveWithInvalidParameterType()
     {
         try {
             this.resolver.resolve("", EntityType.DOCUMENT, "wrong type");
@@ -123,7 +133,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveWithIncompleteExplicitReference()
+    public void resolveWithIncompleteExplicitReference()
     {
         try {
             this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));

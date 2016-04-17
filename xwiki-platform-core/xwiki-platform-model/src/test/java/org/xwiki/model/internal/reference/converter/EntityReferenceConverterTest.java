@@ -42,7 +42,7 @@ public class EntityReferenceConverterTest
 {
     @Rule
     public MockitoComponentMockingRule<Converter<EntityReference>> mocker =
-        new MockitoComponentMockingRule<Converter<EntityReference>>(EntityReferenceConverter.class);
+        new MockitoComponentMockingRule<>(EntityReferenceConverter.class);
 
     private ConverterManager converterManager;
 
@@ -53,7 +53,7 @@ public class EntityReferenceConverterTest
     }
 
     @Test
-    public void testConvertDocumentFromString()
+    public void convertDocumentFromString()
     {
         EntityReference reference;
 
@@ -72,7 +72,7 @@ public class EntityReferenceConverterTest
     }
 
     @Test
-    public void testConvertSpaceFromString()
+    public void convertSpaceFromString()
     {
         EntityReference reference;
 
@@ -84,20 +84,20 @@ public class EntityReferenceConverterTest
     }
 
     @Test
-    public void testConvertWikiFromString()
+    public void convertWikiFromString()
     {
         EntityReference reference = new EntityReference("dev", EntityType.WIKI);
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "wiki:dev"));
     }
 
     @Test
-    public void testConvertFromNull()
+    public void convertFromNull()
     {
         assertNull(this.converterManager.convert(EntityReference.class, null));
     }
 
     @Test
-    public void testConvertToString()
+    public void convertToString()
     {
         EntityReference reference;
 

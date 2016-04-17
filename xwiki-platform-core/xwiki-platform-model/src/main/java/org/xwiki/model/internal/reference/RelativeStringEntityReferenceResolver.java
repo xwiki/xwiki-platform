@@ -46,7 +46,6 @@ import org.xwiki.model.reference.EntityReference;
 @Singleton
 public class RelativeStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
-
     @Override
     protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {

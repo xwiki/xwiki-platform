@@ -22,6 +22,7 @@ package org.xwiki.model.internal.reference;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,8 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
  * <p>
@@ -58,6 +57,9 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
      */
     public static final LocalUidStringEntityReferenceSerializer INSTANCE =
         new LocalUidStringEntityReferenceSerializer();
+
+    @Inject
+    private SymbolScheme symbolScheme;
 
     @Override
     public String serialize(EntityReference reference, Object... parameters)
@@ -100,7 +102,9 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
         // FIXME: Not really nice to parse here the serialized XClass reference to remove its wiki name when local.
         // This also why this is not a simple derived class of UidStringEntityReferenceSerializer.
         if (wikiReference != null && currentReference.getType() == EntityType.OBJECT) {
-            if (name.startsWith(wikiReference.getName() + WIKISEP)) {
+            if (name.startsWith(wikiReference.getName()
+                + this.symbolScheme.getSeparatorSymbols().get(EntityType.SPACE).get(EntityType.WIKI)))
+            {
                 name = name.substring(wikiReference.getName().length() + 1);
             }
         }

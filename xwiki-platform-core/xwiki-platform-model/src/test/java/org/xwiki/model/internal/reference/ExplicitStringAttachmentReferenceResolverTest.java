@@ -21,11 +21,14 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver}.
@@ -33,20 +36,26 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 3.0M1
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class ExplicitStringAttachmentReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<ExplicitStringEntityReferenceResolver> mocker =
+        new MockitoComponentMockingRule<>(ExplicitStringEntityReferenceResolver.class);
+
     private AttachmentReferenceResolver<String> resolver;
 
     @Before
     public void setUp() throws Exception
     {
         this.resolver = new ExplicitStringAttachmentReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver",
-            new ExplicitStringEntityReferenceResolver());
+        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
     }
 
     @Test
-    public void testResolveWithExplicitAttachmentReference()
+    public void resolveWithExplicitAttachmentReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         AttachmentReference reference = this.resolver.resolve("", new AttachmentReference("file", documentReference));

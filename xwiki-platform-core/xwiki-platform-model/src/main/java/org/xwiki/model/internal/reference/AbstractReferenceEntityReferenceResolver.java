@@ -19,11 +19,7 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -41,23 +37,6 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
 public abstract class AbstractReferenceEntityReferenceResolver extends AbstractEntityReferenceResolver implements
     EntityReferenceResolver<EntityReference>
 {
-    /**
-     * Map defining the parent relationship between reference types.
-     */
-    private Map<EntityType, List<EntityType>> nextAllowedEntityTypes = new HashMap<EntityType, List<EntityType>>()
-    {
-        {
-            put(EntityType.ATTACHMENT, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
-            put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
-            put(EntityType.WIKI, Collections.<EntityType>emptyList());
-            put(EntityType.OBJECT, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.OBJECT_PROPERTY, Arrays.asList(EntityType.OBJECT));
-            put(EntityType.CLASS_PROPERTY, Arrays.asList(EntityType.DOCUMENT));
-            put(EntityType.BLOCK, Arrays.asList(EntityType.DOCUMENT, EntityType.OBJECT_PROPERTY));
-        }
-    };
-
     @Override
     public EntityReference resolve(EntityReference referenceToResolve, EntityType type, Object... parameters)
     {
@@ -106,7 +85,7 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         EntityReference normalizedReference = referenceToResolve;
         EntityReference reference = normalizedReference;
         while (reference != null) {
-            List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
+            List<EntityType> types = EntityReferenceConstants.PARENT_TYPES.get(reference.getType());
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference =

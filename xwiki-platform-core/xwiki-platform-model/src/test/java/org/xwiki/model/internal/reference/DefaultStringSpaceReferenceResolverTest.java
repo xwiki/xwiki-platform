@@ -21,31 +21,40 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver}.
  * 
  * @version $Id$
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class DefaultStringSpaceReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> mocker =
+        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+
     private SpaceReferenceResolver<String> resolver;
 
     @Before
     public void setUp() throws Exception
     {
         this.resolver = new DefaultStringSpaceReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver",
-            new DefaultStringEntityReferenceResolver());
+        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
     }
 
     @Test
-    public void testResolveWithExplicitSpaceReference()
+    public void resolveWithExplicitSpaceReference()
     {
         SpaceReference reference = this.resolver.resolve("", new SpaceReference("space", new WikiReference("wiki")));
 

@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.test.TestConstants;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Mockito.*;
@@ -41,12 +41,19 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 2.2M1
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class DefaultStringEntityReferenceSerializerTest implements TestConstants
 {
     @Rule
     public MockitoComponentMockingRule<DefaultStringEntityReferenceSerializer> mocker = 
         new MockitoComponentMockingRule<>(DefaultStringEntityReferenceSerializer.class);
-    
+
+    @Rule
+    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> resolverMocker =
+        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+
     private EntityReferenceSerializer<String> serializer;
 
     private EntityReferenceResolver<String> resolver;
@@ -55,12 +62,9 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     public void setUp() throws Exception
     {
         this.serializer = this.mocker.getComponentUnderTest();
-        
-        this.resolver = new DefaultStringEntityReferenceResolver();
+        this.resolver = this.resolverMocker.getComponentUnderTest();
 
-        EntityReferenceProvider referenceProvider = mock(EntityReferenceProvider.class);
-        ReflectionUtils.setFieldValue(this.resolver, "provider", referenceProvider);
-
+        EntityReferenceProvider referenceProvider = this.resolverMocker.getInstance(EntityReferenceProvider.class);
         when(referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_PAGE_REFERENCE);
@@ -70,6 +74,13 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
             DEFAULT_OBJECT_PROPERTY_REFERENCE);
         when(referenceProvider.getDefaultReference(EntityType.CLASS_PROPERTY)).thenReturn(
             DEFAULT_CLASS_PROPERTY_REFERENCE);
+    }
+
+    @Test
+    public void serializeWikiReferences() throws Exception
+    {
+        EntityReference reference = resolver.resolve("wiki", EntityType.WIKI);
+        assertEquals("wiki", serializer.serialize(reference));
     }
 
     @Test
@@ -230,7 +241,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
 
         // property reference with no object
         reference = resolver.resolve("wiki:space.page.property", EntityType.CLASS_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^wiki:space\\.page\\.property", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defpage^wiki:space.page.property", serializer.serialize(reference));
 
         // test escaping character
         reference = resolver.resolve("wiki:space.page^Obje\\^ct", EntityType.CLASS_PROPERTY);
@@ -240,7 +251,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         assertEquals("wiki:spa^ce.page^Obje\\^ct", serializer.serialize(reference));
 
         reference = resolver.resolve(":.\\^@", EntityType.CLASS_PROPERTY);
-        assertEquals("defwiki:defspace.defpage^:\\.\\^@", serializer.serialize(reference));
+        assertEquals("defwiki:defspace.defpage^:.\\^@", serializer.serialize(reference));
     }
 
     @Test

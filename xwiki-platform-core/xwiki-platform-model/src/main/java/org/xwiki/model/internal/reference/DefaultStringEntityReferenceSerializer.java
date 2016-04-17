@@ -19,11 +19,8 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -41,29 +38,40 @@ import org.xwiki.text.StringUtils;
 @Singleton
 public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
+    @Inject
+    private SymbolScheme symbolScheme;
+
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
         EntityType currentType = currentReference.getType();
-        EntityReference currentParent = currentReference.getParent();
-        String[] currentEscapeChars = ESCAPES.get(currentType);
+        EntityReference parentReference = currentReference.getParent();
 
-        // Add my separator if I am not the first one in the representation
-        if (currentParent != null && representation.length() > 0) {
-            if (currentParent.getType() == EntityType.WIKI) {
-                representation.append(WIKISEP);
+        // Since the representation is being built from the root reference (i.e. from left to right), we need to add a
+        // separator if some content has already been added to the representation string (i.e. if a higher level entity
+        // type has already been processed).
+        if (parentReference != null && representation.length() > 0) {
+            // Get the separator to use between the previous type and the current type
+            Character separator =
+                getSymbolScheme().getSeparatorSymbols().get(currentType).get(parentReference.getType());
+            if (separator != null) {
+                representation.append(separator);
             } else {
-                representation.append(currentEscapeChars[0]);
+                // The reference is invalid, the parent type is not an allowed type. Thus there's no valid separator
+                // to separate the 2 types. Use the "???" character to show the user it's invalid.
+                representation.append("???");
             }
         }
 
-        // If we're on the Root reference then we don't need to escape anything
-        if (currentEscapeChars != null) {
-            representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
-                REPLACEMENTS.get(currentType)));
-        } else {
-            representation.append(StringUtils.doubleChar(currentReference.getName(), '\\'));
-        }
+        // Escape characters that require escaping for the current type
+        representation.append(StringUtils.replaceEach(currentReference.getName(),
+            getSymbolScheme().getSymbolsRequiringEscapes(currentType),
+            getSymbolScheme().getReplacementSymbols(currentType)));
+    }
+
+    protected SymbolScheme getSymbolScheme()
+    {
+        return this.symbolScheme;
     }
 }

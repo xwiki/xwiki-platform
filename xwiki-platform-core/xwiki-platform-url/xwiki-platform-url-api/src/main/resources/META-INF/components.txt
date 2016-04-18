@@ -7,3 +7,6 @@ org.xwiki.url.internal.GenericStringResourceTypeResolver
 org.xwiki.url.internal.DefaultStringResourceTypeResolver
 org.xwiki.url.internal.URLExecutionContextInitializer
 org.xwiki.url.internal.DefaultURLContextManager
+org.xwiki.url.internal.URLSymbolScheme
+org.xwiki.url.internal.URLStringEntityReferenceSerializer
+org.xwiki.url.internal.URLStringEntityReferenceResolver

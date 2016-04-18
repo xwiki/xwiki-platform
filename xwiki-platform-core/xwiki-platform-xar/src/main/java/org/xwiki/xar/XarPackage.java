@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.XarUtils;
@@ -64,7 +65,7 @@ import javanet.staxutils.IndentingXMLStreamWriter;
 public class XarPackage
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalStringEntityReferenceSerializer();
+        new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * Get all entries found in a XAR file.

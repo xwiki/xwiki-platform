@@ -29,6 +29,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -61,13 +62,25 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({ XClassMigratorListener.class, DefaultObservationManager.class,
-LocalStringEntityReferenceSerializer.class, DefaultStringDocumentReferenceResolver.class, PropertyConverter.class,
-CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, DefaultStringEntityReferenceResolver.class,
-DefaultEntityReferenceProvider.class, XClassPropertyEventGeneratorListener.class,
-CurrentStringDocumentReferenceResolver.class, CurrentStringEntityReferenceResolver.class,
-LocalUidStringEntityReferenceSerializer.class, DefaultStringEntityReferenceSerializer.class })
+@ComponentList({
+    XClassMigratorListener.class,
+    DefaultObservationManager.class,
+    LocalStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    PropertyConverter.class,
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultEntityReferenceProvider.class,
+    XClassPropertyEventGeneratorListener.class,
+    CurrentStringDocumentReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    LocalUidStringEntityReferenceSerializer.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
+})
 public class XClassMigratorListenerTest
 {
     @Rule

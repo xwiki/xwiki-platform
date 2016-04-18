@@ -24,9 +24,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
@@ -34,12 +36,14 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  *
  * @version $Id$
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class XClassRelativeStringEntityReferenceResolverTest
 {
     @Rule
     public MockitoComponentMockingRule<EntityReferenceResolver<String>> mocker =
-        new MockitoComponentMockingRule<EntityReferenceResolver<String>>(
-            XClassRelativeStringEntityReferenceResolver.class);
+        new MockitoComponentMockingRule<>(XClassRelativeStringEntityReferenceResolver.class);
 
     private EntityReferenceResolver<String> resolver;
 

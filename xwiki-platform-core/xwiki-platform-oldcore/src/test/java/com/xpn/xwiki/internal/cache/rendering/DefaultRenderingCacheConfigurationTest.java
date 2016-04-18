@@ -30,6 +30,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.internal.MockConfigurationSource;
@@ -43,9 +44,15 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * 
  * @version $Id$
  */
-@ComponentList(value = { DefaultRenderingCacheConfiguration.class, DefaultModelContext.class,
-CompactWikiStringEntityReferenceSerializer.class, DefaultStringEntityReferenceSerializer.class,
-CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class })
+@ComponentList(value = {
+    DefaultRenderingCacheConfiguration.class,
+    DefaultModelContext.class,
+    CompactWikiStringEntityReferenceSerializer.class,
+    DefaultStringEntityReferenceSerializer.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DefaultSymbolScheme.class
+})
 public class DefaultRenderingCacheConfigurationTest
 {
     @Rule

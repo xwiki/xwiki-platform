@@ -35,6 +35,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -58,12 +59,22 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * 
  * @version $Id$
  */
-@ComponentList(value = { DefaultDiffManager.class, LocalStringEntityReferenceSerializer.class,
-CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, CurrentStringDocumentReferenceResolver.class,
-CurrentStringEntityReferenceResolver.class, LocalUidStringEntityReferenceSerializer.class,
-DefaultStringEntityReferenceSerializer.class, DefaultStringDocumentReferenceResolver.class,
-DefaultStringEntityReferenceResolver.class, DefaultEntityReferenceProvider.class })
+@ComponentList(value = {
+    DefaultDiffManager.class,
+    LocalStringEntityReferenceSerializer.class,
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    CurrentStringDocumentReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    LocalUidStringEntityReferenceSerializer.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultEntityReferenceProvider.class,
+    DefaultSymbolScheme.class
+})
 public class XWikiDocumentMergeTest
 {
     @Rule

@@ -33,6 +33,7 @@ import org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.DefaultWikiReferenceProvider;
 import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
@@ -109,6 +110,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     CurrentGetDocumentReferenceDocumentReferenceResolver.class,
     DefaultReferenceDocumentReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
+    DefaultSymbolScheme.class,
 
     DefaultModelConfiguration.class
 })

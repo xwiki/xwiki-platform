@@ -31,6 +31,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
@@ -56,11 +57,20 @@ import static org.mockito.Mockito.verify;
  * 
  * @version $Id$
  */
-@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, DefaultStringEntityReferenceSerializer.class,
-DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
-DefaultEntityReferenceProvider.class, CurrentStringDocumentReferenceResolver.class,
-CurrentStringEntityReferenceResolver.class, LocalStringEntityReferenceSerializer.class })
+@ComponentList({
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultEntityReferenceProvider.class,
+    CurrentStringDocumentReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    LocalStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
+})
 public class XClassPropertyEventGeneratorListenerTest
 {
     public MockitoComponentMockingRule<XClassPropertyEventGeneratorListener> mocker =

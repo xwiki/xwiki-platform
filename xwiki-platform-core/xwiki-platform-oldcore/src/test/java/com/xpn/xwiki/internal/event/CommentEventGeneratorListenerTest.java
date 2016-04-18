@@ -28,6 +28,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -51,10 +52,17 @@ import static org.mockito.Mockito.verify;
  * 
  * @version $Id$
  */
-@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, DefaultStringEntityReferenceSerializer.class,
-DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
-DefaultEntityReferenceProvider.class })
+@ComponentList({
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultEntityReferenceProvider.class,
+    DefaultSymbolScheme.class
+})
 public class CommentEventGeneratorListenerTest
 {
     public MockitoComponentMockingRule<CommentEventGeneratorListener> mocker =

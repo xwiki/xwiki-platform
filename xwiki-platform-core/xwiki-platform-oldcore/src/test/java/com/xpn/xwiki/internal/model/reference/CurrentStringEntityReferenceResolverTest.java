@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -38,8 +39,12 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * 
  * @version $Id$
  */
-@ComponentList(value = { CurrentEntityReferenceProvider.class, CurrentStringEntityReferenceResolver.class,
-DefaultModelConfiguration.class })
+@ComponentList(value = {
+    CurrentEntityReferenceProvider.class,
+    CurrentStringEntityReferenceResolver.class,
+    DefaultModelConfiguration.class,
+    DefaultSymbolScheme.class
+})
 public class CurrentStringEntityReferenceResolverTest
 {
     @Rule

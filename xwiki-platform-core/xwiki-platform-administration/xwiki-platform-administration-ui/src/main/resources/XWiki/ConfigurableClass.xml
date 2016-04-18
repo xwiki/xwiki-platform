@@ -82,8 +82,10 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       &amp;&amp; $currentDoc != 'XWiki.XWikiPreferences')
   ##
     #set($globaladmin = false)
+    #set($visibility = 'space')
   #else
     #set($globaladmin = true)
+    #set($visibility = 'wiki')
   #end
 #end
 #set($currentSpace = $xwiki.getDocument($currentDoc).getSpace())
@@ -182,7 +184,9 @@ $doc.dropPermissions()##
       #foreach($configurableObj in $allConfigurableObjs)
         #if($app.getValue('displayInSection', $configurableObj) == $section)
           ## If this is space admin, then don't display global, if global don't display space.
-          #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+          #if(($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+            || ($app.getValue('visibility', $configurableObj) == 'global')
+            || ($app.getValue('visibility', $configurableObj) == $visibility))
             #set($discard = $configurableObjs.add($configurableObj))
           #end
         #end
@@ -622,6 +626,27 @@ $doc.dropPermissions()##
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </sectionOrder>
+    <visibility>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>visibility</name>
+      <number>13</number>
+      <picker>0</picker>
+      <prettyName>visibility</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>global|space|wiki</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </visibility>
   </class>
   <object>
     <name>XWiki.ConfigurableClass</name>

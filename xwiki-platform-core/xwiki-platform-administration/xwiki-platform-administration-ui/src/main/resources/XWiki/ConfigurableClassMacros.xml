@@ -85,34 +85,27 @@
  *###
 #macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
   ## Use a parameterized sql query to prevent injection.
-  #set($params = [])
-  #if($section &amp;&amp; $section != '')
-    #set($discard = $params.add("$section"))
-    #set($sqlA = ' StringProperty as section,')
-    #set($sqlB = " and section.id=obj.id and section.name='displayInSection' and section.value=?")
+  #set ($params = [])
+  #set ($from = ', BaseObject as obj, IntegerProperty as global')
+  #set ($where = "where doc.fullName=obj.name and obj.className='$nameOfThisDocument' and obj.id=global.id.id and global.name='configureGlobally' and global.value=?")
+  #if ($globaladmin == true)
+    #set ($discard = $params.add(1))
   #else
-    ## Make sure they are "" in case they were set prior to calling the macro.
-    #set($sqlA = '')
-    #set($sqlB = '')
-  #end
-  ## Set up query based on value of $globaladmin
-  #if($globaladmin == true)
-    #set($sqlC = '1')
-  #else
-    #if($space &amp;&amp; $space != '')
-      #set($sqlC = '0 and doc.space = ?')
-      #set($discard = $params.add($space))
-    #else
-      #set($sqlC = '0')
+    #set ($discard = $params.add(0))
+    #if ("$!space" != '')
+      #set ($where = "${where} and doc.space=?")
+      #set ($discard = $params.add($space))
     #end
   #end
-  #set($sql = ", BaseObject as obj,$sqlA IntegerProperty as global where "
-              + "doc.fullName=obj.name and obj.className='" + $nameOfThisDocument + "'$sqlB "
-              + "and global.id=obj.id and global.name='configureGlobally' and global.value=$sqlC "
-              + "order by doc.creationDate")
+  #if ($section &amp;&amp; $section != '')
+    #set ($discard = $params.add("$section"))
+    #set ($from = "${from}, StringProperty as section")
+    #set ($where = "${where} and obj.id=section.id.id and section.name='displayInSection' and section.value=?")
+  #end
+  #set ($sql = "${from} ${where} order by doc.creationDate")
   ##
   ## Run the search
-  #set($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).addFilter('unique').execute()))
+  #set ($discard = $outputList.addAll($services.query.hql($sql).bindValues($params).addFilter('unique').execute()))
   ##
 #end
 

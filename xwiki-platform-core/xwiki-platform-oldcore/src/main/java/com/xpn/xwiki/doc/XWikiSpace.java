@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -40,7 +41,8 @@ public class XWikiSpace
 {
     private static final String CURRENT = "current";
 
-    private static final LocalStringEntityReferenceSerializer SERIALIZER = new LocalStringEntityReferenceSerializer();
+    private static final LocalStringEntityReferenceSerializer SERIALIZER =
+        new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     private final XWikiStoreInterface store;
 

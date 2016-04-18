@@ -125,33 +125,41 @@ describe('EntityReference', function() {
   });
 
   describe('Resolver', function() {
+    var serialize = function(reference) {
+      return reference.getReversedReferenceChain().map(function(reference) {
+        return XWiki.EntityType.getName(reference.type).toUpperCase() + ':' + reference.name;
+      }).join(' ');
+    };
+
+    var assertReference = function(expectedSerialization, actualReference) {
+      expect(serialize(actualReference)).toEqual(expectedSerialization);
+    };
+
     it('Document reference', function() {
       var reference = XWiki.Model.resolve('wiki:path.to.page', XWiki.EntityType.DOCUMENT);
-      expect('wiki').toEqual(reference.extractReference(XWiki.EntityType.WIKI).name);
-      var spaceReference = reference.extractReference(XWiki.EntityType.SPACE);
-      expect('path').toEqual(spaceReference.parent.extractReference(XWiki.EntityType.SPACE).name);
-      expect('to').toEqual(spaceReference.name);
-      expect('page').toEqual(reference.name);
+      assertReference('WIKI:wiki SPACE:path SPACE:to DOCUMENT:page', reference);
 
-      reference = XWiki.Model.resolve('wiki:space.', XWiki.EntityType.DOCUMENT, reference);
-      expect('wiki').toEqual(reference.extractReference(XWiki.EntityType.WIKI).name);
-      expect('space').toEqual(reference.extractReference(XWiki.EntityType.SPACE).name);
-      expect('page').toEqual(reference.name);
+      var baseReference = reference;
+      reference = XWiki.Model.resolve('wiki:space.', XWiki.EntityType.DOCUMENT, baseReference);
+      assertReference('WIKI:wiki SPACE:space DOCUMENT:page', reference);
+
+      reference = XWiki.Model.resolve('', XWiki.EntityType.DOCUMENT, baseReference);
+      assertReference('WIKI:wiki SPACE:path SPACE:to DOCUMENT:page', reference);
+
+      reference = XWiki.Model.resolve('.one.Two', XWiki.EntityType.DOCUMENT, baseReference);
+      assertReference('WIKI:wiki SPACE:path SPACE:to SPACE:one DOCUMENT:Two', reference);
+
+      reference = XWiki.Model.resolve('one.Two', XWiki.EntityType.DOCUMENT, baseReference);
+      assertReference('WIKI:wiki SPACE:one DOCUMENT:Two', reference);
 
       reference = XWiki.Model.resolve('space.', XWiki.EntityType.DOCUMENT, [null, null, 'Test']);
-      expect(reference.extractReference(XWiki.EntityType.WIKI)).toBeUndefined();
-      expect('space').toEqual(reference.extractReference(XWiki.EntityType.SPACE).name);
-      expect('Test').toEqual(reference.name);
+      assertReference('SPACE:space DOCUMENT:Test', reference);
 
       reference = XWiki.Model.resolve('page', XWiki.EntityType.DOCUMENT);
-      expect(reference.extractReference(XWiki.EntityType.WIKI)).toBeUndefined();
-      expect(reference.extractReference(XWiki.EntityType.SPACE)).toBeUndefined();
-      expect('page').toEqual(reference.name);
+      assertReference('DOCUMENT:page', reference);
 
       reference = XWiki.Model.resolve('', XWiki.EntityType.DOCUMENT, function(type) {return 'X'});
-      expect('X').toEqual(reference.extractReference(XWiki.EntityType.WIKI).name);
-      expect('X').toEqual(reference.extractReference(XWiki.EntityType.SPACE).name);
-      expect('X').toEqual(reference.name);
+      assertReference('WIKI:X SPACE:X DOCUMENT:X', reference);
 
       reference = XWiki.Model.resolve('.', XWiki.EntityType.DOCUMENT);
       expect(reference).toBeUndefined();
@@ -163,21 +171,13 @@ describe('EntityReference', function() {
       expect(reference).toBeUndefined();
 
       reference = XWiki.Model.resolve('wiki1.wiki2:wiki3:space1.sp\\.ace2.sp\\:ace3.page', XWiki.EntityType.DOCUMENT);
-      expect('wiki1.wiki2:wiki3').toEqual(reference.extractReference(XWiki.EntityType.WIKI).name);
-      expect('sp:ace3').toEqual(reference.extractReference(XWiki.EntityType.SPACE).name);
-      expect('page').toEqual(reference.name);
+      assertReference('WIKI:wiki1.wiki2:wiki3 SPACE:space1 SPACE:sp.ace2 SPACE:sp:ace3 DOCUMENT:page', reference);
 
       reference = XWiki.Model.resolve('one.two.page', XWiki.EntityType.DOCUMENT);
-      expect(reference.extractReference(XWiki.EntityType.WIKI)).toBeUndefined();
-      var spaceReference = reference.extractReference(XWiki.EntityType.SPACE);
-      expect('one').toEqual(spaceReference.parent.extractReference(XWiki.EntityType.SPACE).name);
-      expect('two').toEqual(spaceReference.name);
-      expect('page').toEqual(reference.name);
+      assertReference('SPACE:one SPACE:two DOCUMENT:page', reference);
 
       reference = XWiki.Model.resolve('wiki:page', XWiki.EntityType.DOCUMENT);
-      expect(reference.extractReference(XWiki.EntityType.WIKI)).toBeUndefined();
-      expect(reference.extractReference(XWiki.EntityType.SPACE)).toBeUndefined();
-      expect('wiki:page').toEqual(reference.name);
+      assertReference('DOCUMENT:wiki:page', reference);
 
       // Test escapes.
 

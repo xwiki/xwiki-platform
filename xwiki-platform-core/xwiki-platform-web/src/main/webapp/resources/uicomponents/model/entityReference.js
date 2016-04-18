@@ -154,7 +154,7 @@ XWiki.EntityReference = Class.create({
   toString : function() {
     return XWiki.Model.serialize(this);
   },
-  
+
   getName : function() {
     return this.name;
   }
@@ -484,17 +484,33 @@ XWiki.EntityReferenceResolver = Class.create({
   },
 
   _resolveDefaultReference: function(type, defaultValueProvider) {
-    var name;
+    var name, reference;
     if (typeof defaultValueProvider === 'object') {
-      if (defaultValueProvider && typeof defaultValueProvider.extractReferenceValue === 'function') {
-        name = defaultValueProvider.extractReferenceValue(type);
+      if (defaultValueProvider && typeof defaultValueProvider.extractReference === 'function') {
+        reference = defaultValueProvider.extractReference(type);
+        name = [];
+        // Extract all the reference components with the specified type.
+        while (reference && reference.type === type) {
+          name.push(reference.name);
+          reference = reference.parent;
+        }
+        name.reverse();
       } else {
         name = defaultValueProvider && defaultValueProvider[type];
       }
     } else if (typeof defaultValueProvider === 'function') {
       name = defaultValueProvider(type);
     }
-    return name ? new XWiki.EntityReference(name, type) : null;
+    reference = null;
+    if (name && name.length > 0) {
+      if (typeof name === 'string') {
+        name = [name];
+      }
+      for (var i = 0; i < name.length; i++) {
+        reference = new XWiki.EntityReference(name[i], type, reference);
+      }
+    }
+    return reference;
   },
 
   _appendNewReference: function(reference, parent) {

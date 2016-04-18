@@ -89,6 +89,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
@@ -296,7 +297,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public static final String SPACE_NAME_SEP = ".";
 
     private static final LocalStringEntityReferenceSerializer LOCAL_REFERENCE_SERIALIZER =
-        new LocalStringEntityReferenceSerializer();
+        new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the

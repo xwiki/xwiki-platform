@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard;
+package org.xwiki.url.internal.standard.entity;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -38,7 +38,8 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.standard.entity.BinEntityResourceReferenceResolver;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.url.internal.standard.WikiReferenceExtractor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;

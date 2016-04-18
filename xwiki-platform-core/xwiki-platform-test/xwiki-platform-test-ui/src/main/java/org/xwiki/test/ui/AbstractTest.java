@@ -35,6 +35,8 @@ import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -86,8 +88,10 @@ public abstract class AbstractTest
         List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
         componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceResolver.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceSerializer.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(RelativeStringEntityReferenceResolver.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultSymbolScheme.class.getName()));
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
 
         TestUtils.initializeComponent(AbstractTest.componentManager);

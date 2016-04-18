@@ -36,6 +36,7 @@ import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -91,11 +92,19 @@ import static org.xwiki.security.authorization.Right.values;
  * Test XWiki Authorization policy against the authentication module.
  * @since 5.0M2
  */
-@ComponentList({DefaultSecurityCache.class, DefaultStringEntityReferenceResolver.class,
-    DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class,
-    DefaultModelConfiguration.class, AuthorizationManagerConfiguration.class,
-    DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
-    DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class})
+@ComponentList({
+    DefaultSecurityCache.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    AuthorizationManagerConfiguration.class,
+    DefaultSecurityReferenceFactory.class,
+    DefaultSecurityCacheLoader.class,
+    DefaultAuthorizationSettler.class,
+    DefaultAuthorizationManager.class,
+    DefaultSymbolScheme.class
+})
 public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
 {
     private AuthorizationManager authorizationManager;

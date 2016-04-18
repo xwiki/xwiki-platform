@@ -129,7 +129,7 @@ public class TestUtils
 
     /**
      * @since 5.0M2
-     * @deprecated since 7.3M1, use {@link #getBaseRestURL()} instead
+     * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
      */
     @Deprecated
     public static final String BASE_REST_URL = BASE_URL + "rest/";
@@ -161,19 +161,15 @@ public class TestUtils
      */
     public static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
 
-    private static final RelativeStringEntityReferenceResolver RELATIVE_RESOLVER =
-        new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
-
-    private static DefaultStringEntityReferenceSerializer SERIALIZER =
-        new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
-
     private static PersistentTestContext context;
 
     private static ComponentManager componentManager;
 
-    private static EntityReferenceResolver<String> referenceResolver;
+    private static EntityReferenceResolver<String> relativeReferenceResolver;
 
     private static EntityReferenceSerializer<String> referenceSerializer;
+
+    private static EntityReferenceResolver<String> referenceResolver;
 
     /**
      * Used to convert Java object into its REST XML representation.
@@ -250,6 +246,8 @@ public class TestUtils
     public static void initializeComponent(ComponentManager componentManager) throws Exception
     {
         TestUtils.componentManager = componentManager;
+        TestUtils.relativeReferenceResolver =
+            TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "relative");
         TestUtils.referenceResolver = TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING);
         TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
     }
@@ -1828,7 +1826,7 @@ public class TestUtils
         private String toSpaceElement(String spaceReference)
         {
             return toSpaceElement(
-                RELATIVE_RESOLVER.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
+                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
         }
 
         protected Object[] toElements(Page page)
@@ -1977,7 +1975,7 @@ public class TestUtils
 
             // Add spaces
             EntityReference spaceReference = reference.extractReference(EntityType.SPACE).removeParent(wikiReference);
-            page.setSpace(SERIALIZER.serialize(spaceReference));
+            page.setSpace(referenceSerializer.serialize(spaceReference));
 
             // Add page
             EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);

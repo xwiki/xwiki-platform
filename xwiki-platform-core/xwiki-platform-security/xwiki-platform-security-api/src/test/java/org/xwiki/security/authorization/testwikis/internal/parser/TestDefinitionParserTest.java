@@ -31,6 +31,7 @@ import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -59,8 +60,13 @@ import static org.junit.Assert.assertThat;
  * @version $Id$
  * @since 5.0M2
  */
-@ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
-    DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class})
+@ComponentList({
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultEntityReferenceProvider.class,
+    DefaultModelConfiguration.class,
+    DefaultSymbolScheme.class
+})
 public class TestDefinitionParserTest
 {
     @Rule

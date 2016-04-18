@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -75,10 +74,11 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     public AbstractStringEntityReferenceResolver(SymbolScheme symbolScheme)
     {
         this.symbolScheme = symbolScheme;
+        initialize();
     }
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         this.referenceSetup = new HashMap<>();
 

@@ -42,6 +42,7 @@ import org.xwiki.model.internal.reference.DefaultStringAttachmentReferenceResolv
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -68,14 +69,22 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList({ DefaultResourceReferenceEntityReferenceResolver.class,
-    AttachmentResourceReferenceEntityReferenceResolver.class, DocumentResourceReferenceEntityReferenceResolver.class,
-    DefaultStringAttachmentReferenceResolver.class, DefaultStringDocumentReferenceResolver.class,
-    SpaceResourceReferenceEntityReferenceResolver.class, DefaultReferenceEntityReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class, RelativeStringEntityReferenceResolver.class,
-    DefaultReferenceAttachmentReferenceResolver.class, DefaultReferenceDocumentReferenceResolver.class,
-    DefaultStringSpaceReferenceResolver.class, ContextComponentManagerProvider.class })
-
+@ComponentList({
+    DefaultResourceReferenceEntityReferenceResolver.class,
+    AttachmentResourceReferenceEntityReferenceResolver.class,
+    DocumentResourceReferenceEntityReferenceResolver.class,
+    DefaultStringAttachmentReferenceResolver.class,
+    DefaultStringDocumentReferenceResolver.class,
+    SpaceResourceReferenceEntityReferenceResolver.class,
+    DefaultReferenceEntityReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    RelativeStringEntityReferenceResolver.class,
+    DefaultReferenceAttachmentReferenceResolver.class,
+    DefaultReferenceDocumentReferenceResolver.class,
+    DefaultStringSpaceReferenceResolver.class,
+    ContextComponentManagerProvider.class,
+    DefaultSymbolScheme.class
+})
 public class DefaultResourceReferenceEntityReferenceResolverTest
 {
     private static final String DEFAULT_PAGE = "defaultpage";

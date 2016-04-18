@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -41,7 +42,8 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XarUtils
 {
-    public static final RelativeStringEntityReferenceResolver RESOLVER = new RelativeStringEntityReferenceResolver();
+    public static final RelativeStringEntityReferenceResolver RESOLVER =
+        new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
 
     private XarUtils()
     {

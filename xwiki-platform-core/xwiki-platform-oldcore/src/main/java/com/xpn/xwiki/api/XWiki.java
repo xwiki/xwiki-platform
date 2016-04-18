@@ -1283,7 +1283,7 @@ public class XWiki extends Api
     /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
      *
-     * @return true for success/false for failure
+     * @return integer status code
      * @throws XWikiException
      */
     public int createUser() throws XWikiException
@@ -1296,7 +1296,7 @@ public class XWiki extends Api
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      *
      * @param withValidation true to send the validationemail
-     * @return true for success/false for failure
+     * @return integer status code
      * @throws XWikiException
      */
     public int createUser(boolean withValidation) throws XWikiException
@@ -1310,7 +1310,7 @@ public class XWiki extends Api
      *
      * @param withValidation true to send the validation email
      * @param userRights Rights to set for the user for it's own page(defaults to "edit")
-     * @return true for success/false for failure
+     * @return integer status code
      * @throws XWikiException
      */
     public int createUser(boolean withValidation, String userRights) throws XWikiException

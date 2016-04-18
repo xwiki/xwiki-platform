@@ -5,7 +5,7 @@
     <p>$services.localization.render('core.register.welcome')</p>
   #end
   #if($reg && $reg <= 0)
-    #if($reg == -7)
+    #if($reg == -2)
       #error($services.localization.render('core.register.passwordMismatch'))
     #elseif($reg == -3)
       #error($services.localization.render('core.register.userAlreadyExists'))

@@ -3212,7 +3212,7 @@ public class XWiki implements EventListener
 
             if ((!password.equals(password2)) || (password.trim().equals(""))) {
                 // TODO: throw wrong password exception
-                return -7;
+                return -2;
             }
 
             if ((template != null) && (!template.equals(""))) {

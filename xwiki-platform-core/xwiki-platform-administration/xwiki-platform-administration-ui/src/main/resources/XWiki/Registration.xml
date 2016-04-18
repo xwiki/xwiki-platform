@@ -637,7 +637,7 @@
   ## Handle output from the registration.
   #if($reg &amp;&amp; $reg &lt;= 0)
     {{error}}
-    #if($reg == -7)
+    #if($reg == -2)
       {{translation key="core.register.passwordMismatch"/}}
     ## -3 means username taken, -8 means username is superadmin name
     #elseif($reg == -3 || $reg == -8)

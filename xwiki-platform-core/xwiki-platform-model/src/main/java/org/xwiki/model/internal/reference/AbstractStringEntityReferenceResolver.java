@@ -58,6 +58,25 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
 
     private Map<EntityType, Map<Character, EntityType>> referenceSetup;
 
+    /**
+     * Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme.
+     */
+    public AbstractStringEntityReferenceResolver()
+    {
+        // Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme
+    }
+
+    /**
+     * Constructor to be used when using this class as a POJO and not as a component.
+     *
+     * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
+     *        between the Entity types, and the characters to escape and how to escape them)
+     */
+    public AbstractStringEntityReferenceResolver(SymbolScheme symbolScheme)
+    {
+        this.symbolScheme = symbolScheme;
+    }
+
     @Override
     public void initialize() throws InitializationException
     {

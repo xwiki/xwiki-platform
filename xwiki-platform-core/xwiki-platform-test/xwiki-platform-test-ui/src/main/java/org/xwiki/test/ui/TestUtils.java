@@ -162,7 +162,7 @@ public class TestUtils
     public static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
 
     private static final RelativeStringEntityReferenceResolver RELATIVE_RESOLVER =
-        new RelativeStringEntityReferenceResolver();
+        new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
 
     private static DefaultStringEntityReferenceSerializer SERIALIZER =
         new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());

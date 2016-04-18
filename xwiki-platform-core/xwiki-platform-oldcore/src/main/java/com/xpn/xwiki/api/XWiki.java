@@ -1283,7 +1283,14 @@ public class XWiki extends Api
     /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
      *
-     * @return integer status code
+     * @return the integer status code
+     *         <ul>
+     *         <li>1: ok</li>
+     *         <li>-2: passwords are different or password is empty</li>
+     *         <li>-3: user already exists</li>
+     *         <li>-4: invalid username provided</li>
+     *         <li>-8: user already exists</li>
+     *         </ul>
      * @throws XWikiException
      */
     public int createUser() throws XWikiException
@@ -1296,7 +1303,14 @@ public class XWiki extends Api
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      *
      * @param withValidation true to send the validationemail
-     * @return integer status code
+     * @return the integer status code
+     *         <ul>
+     *         <li>1: ok</li>
+     *         <li>-2: passwords are different or password is empty</li>
+     *         <li>-3: user already exists</li>
+     *         <li>-4: invalid username provided</li>
+     *         <li>-8: user already exists</li>
+     *         </ul>
      * @throws XWikiException
      */
     public int createUser(boolean withValidation) throws XWikiException
@@ -1310,7 +1324,14 @@ public class XWiki extends Api
      *
      * @param withValidation true to send the validation email
      * @param userRights Rights to set for the user for it's own page(defaults to "edit")
-     * @return integer status code
+     * @return the integer status code
+     *         <ul>
+     *         <li>1: ok</li>
+     *         <li>-2: passwords are different or password is empty</li>
+     *         <li>-3: user already exists</li>
+     *         <li>-4: invalid username provided</li>
+     *         <li>-8: user already exists</li>
+     *         </ul>
      * @throws XWikiException
      */
     public int createUser(boolean withValidation, String userRights) throws XWikiException

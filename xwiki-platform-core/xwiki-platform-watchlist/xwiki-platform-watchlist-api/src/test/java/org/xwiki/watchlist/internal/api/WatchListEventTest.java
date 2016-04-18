@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.ComponentList;
@@ -40,7 +41,11 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @since 7.1M1
  */
-@ComponentList({LocalStringEntityReferenceSerializer.class, DefaultStringEntityReferenceSerializer.class})
+@ComponentList({
+    LocalStringEntityReferenceSerializer.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
+})
 public class WatchListEventTest
 {
     @Rule

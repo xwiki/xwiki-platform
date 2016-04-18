@@ -44,6 +44,7 @@ import org.xwiki.crypto.store.wiki.internal.query.AbstractX509KeyIdentifierQuery
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509StoreQuery;
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509SubjectQuery;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -79,8 +80,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
-@ComponentList({CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-                CurrentStringEntityReferenceResolver.class})
+@ComponentList({
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    DefaultSymbolScheme.class
+})
 public class X509CertificateWikiStoreTest
 {
     private static final byte[] CERTIFICATE = "certificate".getBytes();
@@ -150,8 +155,7 @@ public class X509CertificateWikiStoreTest
 
         mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
 
-        Provider<XWikiContext> xcontextProvider =
-            mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(com.xpn.xwiki.XWiki.class);

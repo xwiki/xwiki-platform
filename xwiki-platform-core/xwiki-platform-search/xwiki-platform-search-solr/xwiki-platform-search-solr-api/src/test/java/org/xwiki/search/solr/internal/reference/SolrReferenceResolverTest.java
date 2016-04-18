@@ -43,6 +43,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
@@ -90,16 +91,32 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({DefaultModelContext.class, DefaultModelConfiguration.class, LocalStringEntityReferenceSerializer.class,
-RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceProvider.class,
-CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceProvider.class,
-DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer.class,
-DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
-DefaultStringEntityReferenceSerializer.class, DefaultExecution.class, AttachmentSolrReferenceResolver.class,
-DefaultSolrReferenceResolver.class, DocumentSolrReferenceResolver.class, ObjectPropertySolrReferenceResolver.class,
-ObjectSolrReferenceResolver.class, SpaceSolrReferenceResolver.class, WikiSolrReferenceResolver.class,
-ExplicitStringEntityReferenceResolver.class})
+@ComponentList({
+    DefaultModelContext.class,
+    DefaultModelConfiguration.class,
+    LocalStringEntityReferenceSerializer.class,
+    RelativeStringEntityReferenceResolver.class,
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentEntityReferenceProvider.class,
+    CurrentMixedStringDocumentReferenceResolver.class,
+    CurrentMixedEntityReferenceProvider.class,
+    DefaultEntityReferenceProvider.class,
+    CompactWikiStringEntityReferenceSerializer.class,
+    DefaultStringDocumentReferenceResolver.class,
+    DefaultStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultExecution.class,
+    AttachmentSolrReferenceResolver.class,
+    DefaultSolrReferenceResolver.class,
+    DocumentSolrReferenceResolver.class,
+    ObjectPropertySolrReferenceResolver.class,
+    ObjectSolrReferenceResolver.class,
+    SpaceSolrReferenceResolver.class,
+    WikiSolrReferenceResolver.class,
+    ExplicitStringEntityReferenceResolver.class,
+    DefaultSymbolScheme.class
+})
 public class SolrReferenceResolverTest
 {
     @Rule

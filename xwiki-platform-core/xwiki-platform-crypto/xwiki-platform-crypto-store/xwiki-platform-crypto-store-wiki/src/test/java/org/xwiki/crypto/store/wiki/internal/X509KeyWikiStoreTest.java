@@ -41,6 +41,7 @@ import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -74,8 +75,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
-@ComponentList({CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-    CurrentStringEntityReferenceResolver.class})
+@ComponentList({
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    DefaultSymbolScheme.class
+})
 public class X509KeyWikiStoreTest
 {
     private static final byte[] PASSWORD = "password".getBytes();
@@ -106,8 +111,7 @@ public class X509KeyWikiStoreTest
     private static final StoreReference SPACE_STORE_REF = new WikiStoreReference(SPACE_STORE_ENTREF);
 
     @Rule
-    public MockitoComponentMockingRule<KeyStore> mocker =
-        new MockitoComponentMockingRule<KeyStore>(X509KeyWikiStore.class);
+    public MockitoComponentMockingRule<KeyStore> mocker = new MockitoComponentMockingRule<>(X509KeyWikiStore.class);
 
     private XWikiContext xcontext;
     private XWiki xwiki;
@@ -183,7 +187,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testStoringPrivateKeyToEmptyDocument() throws Exception
+    public void storingPrivateKeyToEmptyDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -207,7 +211,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testStoringPrivateKeyToCertificateDocument() throws Exception
+    public void storingPrivateKeyToCertificateDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -229,7 +233,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testStoringPrivateKeyToEmptySpace() throws Exception
+    public void storingPrivateKeyToEmptySpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
@@ -253,7 +257,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testStoringPrivateKeyToCertificateSpace() throws Exception
+    public void storingPrivateKeyToCertificateSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
@@ -275,7 +279,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testStoringEncryptedPrivateKey() throws Exception
+    public void storingEncryptedPrivateKey() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -299,7 +303,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testUpdatingPrivateKey() throws Exception
+    public void updatingPrivateKey() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -321,7 +325,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrievePrivateKeyFromDocument() throws Exception
+    public void retrievePrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -341,7 +345,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveEncryptedPrivateKeyFromDocument() throws Exception
+    public void retrieveEncryptedPrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -361,7 +365,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrievePrivateKeyFromSpace() throws Exception
+    public void retrievePrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
@@ -379,7 +383,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveEncryptedPrivateKeyFromSpace() throws Exception
+    public void retrieveEncryptedPrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
@@ -397,7 +401,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveMissingPrivateKeyFromDocument() throws Exception
+    public void retrieveMissingPrivateKeyFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -411,7 +415,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveMissingCertificateFromDocument() throws Exception
+    public void retrieveMissingCertificateFromDocument() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, DOCUMENT), xcontext)).thenReturn(storeDoc);
@@ -425,7 +429,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveMissingPrivateKeyFromSpace() throws Exception
+    public void retrieveMissingPrivateKeyFromSpace() throws Exception
     {
         XWikiDocument storeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(new DocumentReference(WIKI, SPACE, ENCODED_SUBJECTKEYID), xcontext)).thenReturn(storeDoc);
@@ -437,7 +441,7 @@ public class X509KeyWikiStoreTest
     }
 
     @Test
-    public void testRetrieveMissingCertificateFromSpace() throws Exception
+    public void retrieveMissingCertificateFromSpace() throws Exception
     {
         CertifiedKeyPair keyPair = store.retrieve(SPACE_STORE_REF, certificate);
         assertThat(keyPair, nullValue());

@@ -40,7 +40,7 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <!-- The bootstrap version is used is several places -->
-    <bootstrap.version>3.3.5</bootstrap.version>
+    <bootstrap.version>3.3.6</bootstrap.version>
     <batik.version>1.8</batik.version>
   </properties>
   <dependencyManagement>

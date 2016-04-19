@@ -187,6 +187,8 @@ import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
+import com.xpn.xwiki.internal.skin.WikiSkin;
+import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -415,6 +417,8 @@ public class XWiki implements EventListener
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
+
+    private WikiSkinUtils wikiSkinUtils;
 
     /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
@@ -653,6 +657,15 @@ public class XWiki implements EventListener
     private DocumentReference getDefaultDocumentReference()
     {
         return getDefaultDocumentReferenceProvider().get();
+    }
+
+    private WikiSkinUtils getWikiSkinUtils()
+    {
+        if (this.wikiSkinUtils == null) {
+            this.wikiSkinUtils = Utils.getComponent(WikiSkinUtils.class);
+        }
+
+        return this.wikiSkinUtils;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -2084,31 +2097,19 @@ public class XWiki implements EventListener
 
     public String getSkinPreference(String prefname, String default_value, XWikiContext context)
     {
-        try {
-            String skin = getSkin(context);
-            String oldskin = skin;
-            String value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
-            // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
-                skin = getBaseSkin(context);
-                if (!oldskin.equals(skin)) {
-                    value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
-                    oldskin = skin;
+        WikiSkin wikiSkin = null;
+
+        for (Skin skin = getInternalSkinManager().getCurrentSkin(true); skin != null; skin = skin.getParent()) {
+            if (skin instanceof WikiSkin) {
+                String value = getWikiSkinUtils().getSkinProperty(skin.getId(), prefname);
+
+                // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+                if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
+                    return value;
                 }
             }
-            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
-                skin = getDefaultBaseSkin(context);
-                if (!oldskin.equals(skin)) {
-                    value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
-                }
-            }
-            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
-                value = default_value;
-            }
-            return value;
-        } catch (XWikiException ex) {
-            LOGGER.warn("", ex);
         }
+
         return default_value;
     }
 

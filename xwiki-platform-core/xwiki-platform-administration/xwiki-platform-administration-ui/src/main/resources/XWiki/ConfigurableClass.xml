@@ -185,7 +185,7 @@ $doc.dropPermissions()##
         #if($app.getValue('displayInSection', $configurableObj) == $section)
           ## If this is space admin, then don't display global, if global don't display space. Valid for 
           ## configureGlobally xproperty.
-          ## visibility xproperty introduced the posibility to configure at both levels wiki&space(global) or 
+          ## visibility xproperty introduced the posibility to configure at both levels wiki&amp;space(global) or 
           ## at each level individually.
           #if(($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
             || ($app.getValue('visibility', $configurableObj) == 'global')
@@ -201,9 +201,17 @@ $doc.dropPermissions()##
         {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
 
       #else
-        #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
-        #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
-        #set($escapedAppName = $escapetool.xml($app.getFullName()))
+        #if ($editor == "globaladmin")
+          #set($escapedAppName = $escapetool.xml($app.getFullName()))
+          #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
+          #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
+        #else
+          ## when the application is configured at the space level, it uses the same form but with some different parameters
+          ## escapedAppName, formAction and formId are changed in order to be relative to the space document configuration (WebPreferences)
+          #set($escapedAppName = $escapetool.xml($doc.getFullName()))
+          #set($formAction = $xwiki.getURL($doc.getFullName(), 'save'))
+          #set($formId = "${section.toLowerCase()}_${doc.getFullName()}")
+        #end
         #foreach($configurableObj in $configurableObjs)
           ## Display the header if one exists.
           #set($heading = $app.getValue('heading', $configurableObj))
@@ -284,6 +292,11 @@ $doc.dropPermissions()##
           #set($thisURL = $request.getRequestURL())
           #if($request.getQueryString() &amp;&amp; $request.getQueryString().length() &gt; 0)
             #set($thisURL = "${thisURL}?$request.getQueryString()")
+          #end
+          #if($editor == 'spaceadmin')
+            ## this line adds a new configuration xobject to the space document configurationClass or updates the existing one
+            ## this way, the object is added only if the save button is hit
+            &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
           #end
           &lt;input type="hidden" id="${escapedAppName}_redirect" name="$redirectParameter" value="$escapetool.xml($thisURL)" /&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;

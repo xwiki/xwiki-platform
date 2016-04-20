@@ -139,10 +139,7 @@
 #foreach ($category in $adminMenu)
   #set ($sectionsToRemove = [])
   #foreach ($section in $category.children)
-    ## When editor=spaceadmin, a configurable application should have a configurationClass xobject in order to be displayed
-    ## in the admin menu
-    #if ($editor == 'spaceadmin' &amp;&amp; (!$section.perSpace
-      || ($section.configurable &amp;&amp; !$doc.getObject($section.configurationClass))))
+    #if ($editor == 'spaceadmin' &amp;&amp; !$section.perSpace)
       #set ($discard = $sectionsToRemove.add($section))
     #elseif ($editor == 'globaladmin' &amp;&amp; "$!section.global" == "false")
       ## For retro-compatibility, all sections are global unless the 'global' field is explicitly marked as false

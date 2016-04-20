@@ -189,7 +189,8 @@
         #set($key = "admin.${displayInSection.toLowerCase()}")
         #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInSection) #end
         #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder')})
-        #if ($app.getValue('configureGlobally', $configurableObject) != 1)
+        #if (($app.getValue('configureGlobally', $configurableObject) != 1)
+          || ($app.gerValue('visibility', $configurableObject) != 'wiki'))
           #set ($appSection.perSpace = true)
         #end
         #set ($key = "admin.${displayInSection.toLowerCase()}.description")
@@ -199,6 +200,13 @@
         #set ($discard = $sectionsByName.put($displayInSection, $appSection))
         #set ($discard = $appCategory.children.add($appSection))
         #set ($newSection = true)
+      #end
+      ##
+      ## add configurationClass to be used at space level configuration of an application
+      ## e.g: display appSection only if current document has a configurationClass xobject
+      #set ($configurationClass = $app.getValue('configurationClass', $configurableObject))
+      #if ("$!configurationClass" != '')
+        #set ($appSection.configurationClass = $configurationClass)
       #end
       ##
       ## If an attachment by the filename iconAttachment exists and is an image

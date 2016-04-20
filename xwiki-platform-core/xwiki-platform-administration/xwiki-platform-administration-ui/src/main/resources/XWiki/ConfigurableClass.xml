@@ -183,7 +183,10 @@ $doc.dropPermissions()##
       #set($configurableObjs = [])
       #foreach($configurableObj in $allConfigurableObjs)
         #if($app.getValue('displayInSection', $configurableObj) == $section)
-          ## If this is space admin, then don't display global, if global don't display space.
+          ## If this is space admin, then don't display global, if global don't display space. Valid for 
+          ## configureGlobally xproperty.
+          ## visibility xproperty introduced the posibility to configure at both levels wiki&space(global) or 
+          ## at each level individually.
           #if(($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
             || ($app.getValue('visibility', $configurableObj) == 'global')
             || ($app.getValue('visibility', $configurableObj) == $visibility))

@@ -787,7 +787,7 @@
 #macro (addPaginationNode $parentId $offset $totalCount $siblings)
   #set ($discard = $siblings.add({
     'id': "pagination:$parentId",
-    'text': "$!mathtool.sub($totalCount, $offset) $services.localization.render('index.documentTree.more')",
+    'text': "$services.localization.render('index.documentTree.more', $!mathtool.sub($totalCount, $offset))",
     'icon': 'fa fa-eye',
     'children': false,
     'data': {

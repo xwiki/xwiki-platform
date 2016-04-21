@@ -287,9 +287,9 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #else
       #setMessageStatus($message, 'pending', $services.localization.render('xe.invitation.messageSentLogEntry'))##
     #end
-    ## Comment = "Added Email Message."
-    $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.sendMail.addMessageSaveComment'))
   #end
+  ## Comment = "Added Email Message(s)."
+  $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.sendMail.addMessageSaveComment'))
 #end
 ##
 #*

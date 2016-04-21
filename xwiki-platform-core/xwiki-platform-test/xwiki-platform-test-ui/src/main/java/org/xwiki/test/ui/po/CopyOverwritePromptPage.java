@@ -58,10 +58,10 @@ public class CopyOverwritePromptPage extends ViewPage
      * Submit the copy overwrite prompt page form.
      * @return the copy confirmation page.
      */
-    public CopyStatusPage clickCopyButton()
+    public CopyOrRenameStatusPage clickCopyButton()
     {
         this.copyButton.submit();
-        return new CopyStatusPage();
+        return new CopyOrRenameStatusPage();
     }
 
     /**

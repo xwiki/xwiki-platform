@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.po.CopyOrRenameStatusPage;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -34,6 +35,8 @@ public class RenamePageTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    private static final String RENAME_SUCCESSFUL = "Done.";
 
     // Convert a nested page to a terminal page
     @Test
@@ -56,7 +59,7 @@ public class RenamePageTest extends AbstractTest
         RenamePage renamePage = vp.rename();
         renamePage.setTerminal(true);
         renamePage.setAutoRedirect(false);
-        renamePage.clickRenameButton();
+        renamePage.clickRenameButton().waitUntilFinished();
 
         // Test if 1.2.WebHome has been renamed to 1.2 (1.2.WebHome doesn't exist while 1.2 exists)
         assertTrue("Page 1.2 doesn't exist!", getUtil().pageExists(Arrays.asList("1"), "2"));
@@ -65,7 +68,7 @@ public class RenamePageTest extends AbstractTest
 
     // Rename a page with children, update the backlinks and test the Auto Redirect feature
     @Test
-    public void renamePagePreserveChildrenUpdateLinksSetAutoRedirect() throws Exception
+    public void renamePageCheckConfirmationPreserveChildrenUpdateLinksSetAutoRedirect() throws Exception
     {
         // Clean-up: delete the pages that will be used in this test
         getUtil().rest().deletePage("My", "Page");
@@ -93,8 +96,10 @@ public class RenamePageTest extends AbstractTest
         renamePage.setAutoRedirect(true);
         // Set the new parent as "A.B"
         renamePage.getDocumentPicker().setParent("A.B");
-        renamePage.clickRenameButton();
+        CopyOrRenameStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
 
+        // Check successful Rename confirmation
+        assertEquals(RENAME_SUCCESSFUL, renameStatusPage.getInfoMessage());
         // Test the Rename operation: we need to have 2.WebHome and 2.3.WebHome under A.B
         assertTrue("Page A.B.2.WebHome doesn't exist!", getUtil().pageExists(Arrays.asList("A", "B", "2"), "WebHome"));
         assertTrue("Page A.B.2.3.WebHome doesn't exist!",

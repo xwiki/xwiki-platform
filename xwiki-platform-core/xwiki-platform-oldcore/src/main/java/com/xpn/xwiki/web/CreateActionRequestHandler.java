@@ -408,7 +408,8 @@ public class CreateActionRequestHandler
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
             Query query =
                 queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
-                    + "where doc.fullName not like 'XWiki.TemplateProviderTemplate'", Query.XWQL);
+                    + "where doc.fullName not like 'XWiki.TemplateProviderTemplate' "
+                    + "order by template.name", Query.XWQL);
 
             // TODO: Extend the above query to include a filter on the type and allowed spaces properties so we can
             // remove the java code below, thus improving performance by not loading all the documents, but only the

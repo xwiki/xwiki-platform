@@ -76,7 +76,7 @@
     <xwiki.cfg.plugins>${war.xwiki.cfg.plugins}
     </xwiki.cfg.plugins>
     <xwiki.cfg.defaultskin>flamingo</xwiki.cfg.defaultskin>
-    <xwiki.cfg.defaultbaseskin />
+    <xwiki.cfg.defaultbaseskin>flamingo</xwiki.cfg.defaultbaseskin>
     <xwiki.cfg.encoding>UTF-8</xwiki.cfg.encoding>
     <xwiki.cfg.editcomment.mandatory>0</xwiki.cfg.editcomment.mandatory>
     <xwiki.cfg.additionalproperties />

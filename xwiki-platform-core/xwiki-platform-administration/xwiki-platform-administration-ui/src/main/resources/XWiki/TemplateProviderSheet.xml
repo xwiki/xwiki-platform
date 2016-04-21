@@ -166,6 +166,8 @@
                 &lt;li&gt;#hierarchy($spaceReference, { 'local' : true })&lt;/li&gt;
               #end
             &lt;/ul&gt;
+          #else
+            $escapetool.xml($services.localization.render('xe.templateprovider.spaces.all'))
           #end
         #end
       &lt;/dd&gt;

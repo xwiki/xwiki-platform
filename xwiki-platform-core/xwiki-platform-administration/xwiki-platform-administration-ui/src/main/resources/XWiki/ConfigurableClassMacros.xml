@@ -202,13 +202,6 @@
         #set ($newSection = true)
       #end
       ##
-      ## add configurationClass to be used at space level configuration of an application
-      ## e.g: display appSection only if current document has a configurationClass xobject
-      #set ($configurationClass = $app.getValue('configurationClass', $configurableObject))
-      #if ("$!configurationClass" != '')
-        #set ($appSection.configurationClass = $configurationClass)
-      #end
-      ##
       ## If an attachment by the filename iconAttachment exists and is an image
       #set ($attachment = $app.getAttachment("$!app.getValue('iconAttachment', $configurableObject)"))
       #if ($attachment &amp;&amp; $attachment.isImage())

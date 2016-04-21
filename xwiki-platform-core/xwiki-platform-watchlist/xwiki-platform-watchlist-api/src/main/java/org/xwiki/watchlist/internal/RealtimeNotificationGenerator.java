@@ -79,11 +79,6 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
         new DocumentUpdatedEvent(), new DocumentDeletedEvent());
 
     /**
-     * For parameters checking.
-     */
-    private static final String TRUE = "true";
-
-    /**
      * Used to detect if certain events are not independent, i.e. executed in the context of other events, case in which
      * they should be skipped.
      */
@@ -138,7 +133,6 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     public RealtimeNotificationGenerator()
     {
         super(LISTENER_NAME, EVENTS);
-        allowRemote = false;
     }
 
     /**
@@ -148,15 +142,13 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
      */
     public void initialize() throws InitializationException
     {
-        if (TRUE.equals(xwikiProperties.getProperty("watchlist.realtime.allow_remote"))) {
-            allowRemote = true;
-        }
+        this.allowRemote = this.xwikiProperties.getProperty("watchlist.realtime.allowRemote", false);
     }
 
     @Override
     public List<Event> getEvents()
     {
-        if (TRUE.equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
+        if (this.xwikiProperties.getProperty("watchlist.realtime.enabled", false)) {
             // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then enable
             // this event listener.
             return super.getEvents();

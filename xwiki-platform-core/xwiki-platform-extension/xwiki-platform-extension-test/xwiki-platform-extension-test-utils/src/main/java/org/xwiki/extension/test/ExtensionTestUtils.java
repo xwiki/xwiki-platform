@@ -19,15 +19,15 @@
  */
 package org.xwiki.extension.test;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -44,14 +44,9 @@ public class ExtensionTestUtils
     public final static String PROPERTY_KEY = "extensionUtils";
 
     /**
-     * The name of the space that contains the service page.
+     * The reference of the service page.
      */
-    private static final String SERVICE_SPACE_NAME = "ExtensionTest";
-
-    /**
-     * The name of the service page.
-     */
-    private static final String SERVICE_PAGE_NAME = "Service";
+    private static final LocalDocumentReference SERVICE_REFERENCE = new LocalDocumentReference("ExtensionTest", "Service");
 
     /**
      * The generic test utility methods.
@@ -67,12 +62,19 @@ public class ExtensionTestUtils
     {
         this.utils = utils;
 
-        // Create the service page.
+        // Create the service page if it does not exist
         try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
-            utils.gotoPage(SERVICE_SPACE_NAME, SERVICE_PAGE_NAME, "save",
-                Collections.singletonMap("content", IOUtils.toString(extensionTestService)));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read the extension test service code.", e);
+            // Make sure to save the service with superadmin
+            UsernamePasswordCredentials currentCredentials =
+                utils.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+            // Save the service
+            utils.rest().savePage(SERVICE_REFERENCE, IOUtils.toString(extensionTestService), "");
+
+            // Restore previous credentials
+            utils.setDefaultCredentials(currentCredentials);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to setup the service", e);
         }
     }
 
@@ -125,7 +127,7 @@ public class ExtensionTestUtils
     {
         parameters.put("action", action);
         parameters.put("outputSyntax", "plain");
-        utils.gotoPage(SERVICE_SPACE_NAME, SERVICE_PAGE_NAME, "get", parameters);
+        utils.gotoPage(SERVICE_REFERENCE, "get", parameters);
         utils.getDriver().waitUntilElementHasTextContent(By.tagName("body"), "Done!");
     }
 }

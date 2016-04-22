@@ -280,15 +280,19 @@ public class TestUtils
      */
     public void setDefaultCredentials(String username, String password)
     {
-        this.httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        setDefaultCredentials(new UsernamePasswordCredentials(username, password));
     }
 
     /**
      * @since 7.0RC1
      */
-    public void setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
+    public UsernamePasswordCredentials setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
     {
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+
         this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+
+        return currentCredentials;
     }
 
     public UsernamePasswordCredentials getDefaultCredentials()

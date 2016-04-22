@@ -49,7 +49,9 @@ if (job == null || job.getStatus().getLog().getLogs(LogLevel.ERROR).isEmpty()) {
   print 'Failed!'
   def error = job.getStatus().getLog().getLogs(LogLevel.ERROR).get(0)
   if (error.getThrowable() != null) {
-    print ' ' + ExceptionUtils.getRootCauseMessage(error.getThrowable())
+    println ' ' + ExceptionUtils.getRootCauseMessage(error.getThrowable())
+    println ''
+    println ExceptionUtils.getStackTrace(error.getThrowable())
   }
 }
 {{/groovy}}

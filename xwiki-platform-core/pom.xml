@@ -497,6 +497,23 @@
                     "old": "method java.util.Collection<? extends org.xwiki.extension.ExtensionDependency> org.xwiki.extension.wrap.WrappingExtension<E extends org.xwiki.extension.Extension>::getDependencies()",
                     "new": "method java.util.Collection<org.xwiki.extension.ExtensionDependency> org.xwiki.extension.wrap.WrappingExtension<E extends org.xwiki.extension.Extension>::getDependencies()",
                     "justification": "? return type makes signature more complex for nothing"
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.xwiki.test.ui.po.CopyStatusPage org.xwiki.test.ui.po.CopyOverwritePromptPage::clickCopyButton()",
+                    "new": "method org.xwiki.test.ui.po.CopyOrRenameStatusPage org.xwiki.test.ui.po.CopyOverwritePromptPage::clickCopyButton()",
+                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method org.xwiki.test.ui.po.CopyStatusPage org.xwiki.test.ui.po.CopyPage::clickCopyButton()",
+                    "new": "method org.xwiki.test.ui.po.CopyOrRenameStatusPage org.xwiki.test.ui.po.CopyPage::clickCopyButton()",
+                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.test.ui.po.CopyStatusPage",
+                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
                   }
                 ]
               }

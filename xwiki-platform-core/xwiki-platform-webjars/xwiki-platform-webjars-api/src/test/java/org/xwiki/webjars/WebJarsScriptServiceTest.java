@@ -188,6 +188,6 @@ public class WebJarsScriptServiceTest
             new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
-            this.mocker.getComponentUnderTest().url("angular", "angular.css", Collections.emptyMap()));
+            this.mocker.getComponentUnderTest().url("angular", "angular.css", Collections.<String, Object>emptyMap()));
     }
 }

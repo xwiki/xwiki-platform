@@ -51,7 +51,9 @@ public class GroupEditPage extends InlinePage
         this.addMemberButton.click();
     }
 
-    // Method to add a new member (user or group) to a Group
+    /**
+     * Method to add a new member (user or group) to a Group.
+     */
     public GroupEditPage addMemberToGroup(String member, boolean isUser)
     {
         UserPicker picker;
@@ -75,7 +77,9 @@ public class GroupEditPage extends InlinePage
         membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-2", member);
     }
 
-    // Method to go to a Group page in Edit mode
+    /**
+     * Method to go to a Group page in Edit mode.
+     */
     public static GroupEditPage gotoPage(DocumentReference groupReference)
     {
         getUtil().gotoPage(groupReference, "edit");

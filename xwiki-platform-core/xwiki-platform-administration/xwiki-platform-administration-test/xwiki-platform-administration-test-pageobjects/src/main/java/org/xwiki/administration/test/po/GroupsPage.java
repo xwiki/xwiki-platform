@@ -52,7 +52,9 @@ public class GroupsPage extends BasePage
         this.createGroupButton.click();
     }
 
-    // Method to create a new Group
+    /**
+     * Method to create a new Group.
+     */
     public GroupsPage addNewGroup(String groupName)
     {
         clickAddNewGroupButton();
@@ -68,7 +70,9 @@ public class GroupsPage extends BasePage
         return groupsPage;
     }
 
-    // Method to go to the Administration/Groups page
+    /**
+     * Method to go to the Administration/Groups page.
+     */
     public static GroupsPage gotoPage()
     {
         AdministrationPage.gotoPage().clickSection("Users & Groups", "Groups");
@@ -77,7 +81,11 @@ public class GroupsPage extends BasePage
         return groupsPage;
     }
 
-    // Method that overrides waitUntilPageIsLoaded() and waits also for the Groups livetable to load
+    /**
+     * Method that overrides waitUntilPageIsLoaded() and waits also for the Groups livetable to load.
+     * 
+     * @see org.xwiki.test.ui.po.BasePage#waitUntilPageIsLoaded()
+     */
     @Override
     public BasePage waitUntilPageIsLoaded()
     {

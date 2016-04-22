@@ -56,8 +56,8 @@ public class GroupTest extends AbstractTest
         groupsPage.addNewGroup(BIG_GROUP);
 
         // Test that the 2 groups have been successfully added
-        assertTrue("BIG_GROUP doesn't exist!", groupsPage.getGroupsTable().hasRow("Group Name", BIG_GROUP));
-        assertTrue("SUB_GROUP doesn't exist!", groupsPage.getGroupsTable().hasRow("Group Name", SUB_GROUP));
+        assertTrue("bigGroup doesn't exist!", groupsPage.getGroupsTable().hasRow("Group Name", BIG_GROUP));
+        assertTrue("subGroup doesn't exist!", groupsPage.getGroupsTable().hasRow("Group Name", SUB_GROUP));
 
         // Add SUB_GROUP & TESTER as members of BIG_GROUP
         GroupEditPage bigGroupPage = GroupEditPage.gotoPage(new DocumentReference("xwiki", "XWiki", BIG_GROUP));
@@ -66,12 +66,12 @@ public class GroupTest extends AbstractTest
 
         // Test that SUB_GROUP is a member of BIG_GROUP
         bigGroupPage.filterMembers(SUB_GROUP);
-        assertTrue("SUB_GROUP is not part of BIG_GROUP!",
+        assertTrue("subGroup is not part of bigGroup!",
             bigGroupPage.getMembersTable().hasRow("Member", SUB_GROUP + " (XWiki." + SUB_GROUP + ")"));
 
         // Test that TESTER is a member of BIG_GROUP
         bigGroupPage.filterMembers(TESTER);
-        assertTrue("TESTER is not part of BIG_GROUP!",
+        assertTrue("tester is not part of bigGroup!",
             bigGroupPage.getMembersTable().hasRow("Member", TESTER + " (XWiki." + TESTER + ")"));
     }
 }

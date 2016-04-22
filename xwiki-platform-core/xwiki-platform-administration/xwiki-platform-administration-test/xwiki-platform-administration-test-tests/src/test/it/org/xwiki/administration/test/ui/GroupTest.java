@@ -67,11 +67,9 @@ public class GroupTest extends AbstractTest
         // Test that SUB_GROUP is a member of BIG_GROUP
         bigGroupPage.filterMembers(SUB_GROUP);
         assertTrue("subGroup is not part of bigGroup!",
-            bigGroupPage.getMembersTable().hasRow("Member", SUB_GROUP + " (XWiki." + SUB_GROUP + ")"));
 
         // Test that TESTER is a member of BIG_GROUP
         bigGroupPage.filterMembers(TESTER);
         assertTrue("tester is not part of bigGroup!",
-            bigGroupPage.getMembersTable().hasRow("Member", TESTER + " (XWiki." + TESTER + ")"));
     }
 }

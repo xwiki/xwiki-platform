@@ -41,7 +41,8 @@
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.packaging.PackagePlugin
+      com.xpn.xwiki.plugin.packaging.PackagePlugin,\
+      com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
     <!-- We need to use the mail module in some tests (e.g. ResetPasswordTest) -->
     <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>

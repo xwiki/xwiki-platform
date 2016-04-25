@@ -136,6 +136,7 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override
@@ -155,6 +156,7 @@ public class XWikiWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override

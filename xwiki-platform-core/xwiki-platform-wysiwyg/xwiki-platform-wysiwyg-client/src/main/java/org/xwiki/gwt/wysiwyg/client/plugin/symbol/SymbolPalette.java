@@ -79,11 +79,7 @@ public class SymbolPalette extends Composite implements HasSelectionHandlers<Str
         initWidget(symbolGrid);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
-     */
+    @Override
     public HandlerRegistration addSelectionHandler(SelectionHandler<String> handler)
     {
         return addHandler(handler, SelectionEvent.getType());
@@ -97,11 +93,7 @@ public class SymbolPalette extends Composite implements HasSelectionHandlers<Str
         return (Grid) getWidget();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == getSymbolGrid()) {

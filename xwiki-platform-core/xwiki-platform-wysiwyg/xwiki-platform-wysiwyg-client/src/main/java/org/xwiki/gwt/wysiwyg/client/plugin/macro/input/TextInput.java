@@ -40,31 +40,19 @@ public class TextInput extends AbstractInput
         initWidget(textBox);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#setFocus(boolean)
-     */
+    @Override
     public void setFocus(boolean focused)
     {
         ((Focusable) getWidget()).setFocus(focused);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#setValue(String)
-     */
+    @Override
     public String getValue()
     {
         return ((HasText) getWidget()).getText();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#getValue()
-     */
+    @Override
     public void setValue(String value)
     {
         ((HasText) getWidget()).setText(value);

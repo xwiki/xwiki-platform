@@ -76,7 +76,9 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
 
     /**
      * {@inheritDoc}
+     * <p>
      * Obtain the lock and make sure the temporary and backup files are deleted.
+     * </p>
      *
      * @see StartableTransactionRunnable#onPreRun()
      */
@@ -87,11 +89,6 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
         this.preRunComplete = true;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see StartableTransactionRunnable#onRun()
-     */
     protected void onRun() throws IOException
     {
         if (this.toDelete.exists()) {
@@ -101,16 +98,18 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
 
     /**
      * {@inheritDoc}
-     * There are a few possibilities.
-     * If preRun() has not completed then there may be an old backup from a previous delete, anyway
-     * if preRun() has not completed then we know there is nothing to rollback.
-     * Otherwise:
-     * 1. There is a backup file but no main file, it has been renamed, rename it back to the main location.
-     * 2. There is a main file and no backup. Nothing has probably happened, do nothing to rollback.
-     * 3. There are neither backup nor main files, this means we tried to delete a file which didn't exist
-     *    to begin with.
-     * 4. There are both main and backup files. AAAAAaaa what do we do?! Throw an exception which will be
-     * reported.
+     * <p>
+     * There are a few possibilities. If preRun() has not completed then there may be an old backup from a previous
+     * delete, anyway if preRun() has not completed then we know there is nothing to rollback. Otherwise:
+     * </p>
+     * <ol>
+     * <li>There is a backup file but no main file, it has been renamed, rename it back to the main location.</li>
+     * <li>There is a main file and no backup. Nothing has probably happened, do nothing to rollback.</li>
+     * <li>There are neither backup nor main files, this means we tried to delete a file which didn't exist to begin
+     * with.</li>
+     * <li>There are both main and backup files. AAAAAaaa what do we do?! Throw an exception which will be reported.
+     * </li>
+     * </ol>
      *
      * @see StartableTransactionRunnable#onRollback()
      */
@@ -150,8 +149,10 @@ public class FileDeleteTransactionRunnable extends StartableTransactionRunnable<
 
     /**
      * {@inheritDoc}
+     * <p>
      * Once this is called, there is no going back.
      * Remove backup file and unlock the lock.
+     * </p>
      *
      * @see StartableTransactionRunnable#onComplete()
      */

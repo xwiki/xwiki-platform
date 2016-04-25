@@ -63,41 +63,25 @@ public abstract class AbstractTableFeature extends AbstractSelectionExecutable i
         this.plugin = plugin;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TableFeature#getName()
-     */
+    @Override
     public String getName()
     {
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TableFeature#getCommand()
-     */
+    @Override
     public Command getCommand()
     {
         return command;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TableFeature#getPlugin()
-     */
+    @Override
     public TablePlugin getPlugin()
     {
         return plugin;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TableFeature#destroy()
-     */
+    @Override
     public void destroy()
     {
     }

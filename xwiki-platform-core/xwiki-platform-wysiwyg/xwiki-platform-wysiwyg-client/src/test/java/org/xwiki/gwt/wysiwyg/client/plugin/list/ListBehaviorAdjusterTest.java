@@ -35,11 +35,7 @@ public class ListBehaviorAdjusterTest extends RichTextAreaTestCase
      */
     private ListBehaviorAdjuster behaviorAdjuster;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

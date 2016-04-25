@@ -231,7 +231,9 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored by this implementation.
+     * </p>
      *
      * @see AttachmentRecycleBinStore#restoreFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)
      */
@@ -247,8 +249,10 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored by this implementation.
      * context is unused and may safely be null.
+     * </p>
      *
      * @see AttachmentRecycleBinStore#getDeletedAttachment(long, XWikiContext, boolean)
      */
@@ -274,7 +278,9 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored by this implementation.
+     * </p>
      *
      * @see AttachmentRecycleBinStore#getAllDeletedAttachments(XWikiAttachment, XWikiContext, boolean)
      */
@@ -326,8 +332,10 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored by this implementation.
      * context is unused and may safely be null.
+     * </p>
      *
      * @see AttachmentRecycleBinStore#getAllDeletedAttachments(XWikiDocument, XWikiContext, boolean)
      */
@@ -372,9 +380,11 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored because the filesystem cannot synchronize with the database commit.
      * TODO: make getDeletedAttachmentPurgeRunnable public so that a transaction safe method is available.
      * context is unused and may safely be null.
+     * </p>
      *
      * @see AttachmentRecycleBinStore#deleteFromRecycleBin(long, XWikiContext, boolean)
      */

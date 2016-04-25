@@ -31,11 +31,7 @@ import com.google.gwt.core.client.EntryPoint;
  */
 public class Wysiwyg implements EntryPoint
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see EntryPoint#onModuleLoad()
-     */
+    @Override
     public void onModuleLoad()
     {
         CommandManagerApi.publish();

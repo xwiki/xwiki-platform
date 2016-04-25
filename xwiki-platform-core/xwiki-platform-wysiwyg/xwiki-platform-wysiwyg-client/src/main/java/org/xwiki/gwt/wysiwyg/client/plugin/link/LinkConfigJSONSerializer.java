@@ -28,11 +28,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecut
  */
 public class LinkConfigJSONSerializer extends AbstractConfigJSONSerializer<LinkConfig>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractConfigJSONSerializer#serialize(Object)
-     */
+    @Override
     public String serialize(LinkConfig linkConfig)
     {
         StringBuffer result = new StringBuffer();

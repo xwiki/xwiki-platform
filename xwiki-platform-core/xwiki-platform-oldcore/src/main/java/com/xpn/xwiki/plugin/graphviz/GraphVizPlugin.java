@@ -413,9 +413,6 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
             this.converterThread = converterThread;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void run()
         {

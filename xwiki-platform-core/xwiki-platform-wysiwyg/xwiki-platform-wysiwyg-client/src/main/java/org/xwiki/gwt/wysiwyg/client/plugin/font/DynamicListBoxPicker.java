@@ -36,11 +36,7 @@ public class DynamicListBoxPicker extends AbstractListBoxPicker
      */
     private String additionalOptionGroupLabel;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListBoxPicker#setSelectedValue(String, Matcher)
-     */
+    @Override
     protected void setSelectedValue(String value, Matcher<String> matcher)
     {
         super.setSelectedValue(value, matcher);

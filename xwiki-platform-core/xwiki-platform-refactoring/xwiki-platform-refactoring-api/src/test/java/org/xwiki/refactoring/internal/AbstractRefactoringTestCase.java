@@ -46,9 +46,6 @@ public class AbstractRefactoringTestCase extends AbstractComponentTestCase
      */
     protected Parser xwikiParser;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void registerComponents() throws Exception
     {

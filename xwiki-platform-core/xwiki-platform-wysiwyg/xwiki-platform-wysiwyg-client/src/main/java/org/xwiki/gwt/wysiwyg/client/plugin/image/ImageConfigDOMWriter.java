@@ -55,11 +55,7 @@ public class ImageConfigDOMWriter implements ConfigDOMWriter<ImageConfig, ImageE
      */
     private final ImageConfigDOMReader configDOMReader = new ImageConfigDOMReader();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigDOMWriter#write(Object, com.google.gwt.dom.client.Element)
-     */
+    @Override
     public void write(ImageConfig imageConfig, ImageElement image)
     {
         // Required attributes.

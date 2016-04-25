@@ -115,10 +115,8 @@ public class DavPage extends AbstractDavResource
         return !doc.isNew();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
+    @Override
     public DavResourceIterator getMembers()
     {
         // Protect against direct url referencing.

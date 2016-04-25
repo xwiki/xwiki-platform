@@ -37,10 +37,12 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 public abstract class AbstractTypedStringEntityReferenceResolver implements TypedStringEntityReferenceResolver
 {
     /**
-     * {@inheritDoc} <br/>
+     * {@inheritDoc}
+     * <p>
      * Override to allow detecting the type of the reference from the prefix specified in the beginning of the
      * serialized reference (e.g. DOCUMENT://Page). In case no type is specified, the second part parameter will be used
      * as the default type.
+     * </p>
      * 
      * @see TypedStringEntityReferenceResolver#resolve(String, org.xwiki.model.EntityType)
      */

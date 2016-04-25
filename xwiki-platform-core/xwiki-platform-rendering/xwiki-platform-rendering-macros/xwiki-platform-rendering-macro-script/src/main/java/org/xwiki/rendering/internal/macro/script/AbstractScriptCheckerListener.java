@@ -41,7 +41,9 @@ public abstract class AbstractScriptCheckerListener implements EventListener
 {
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation returns a singleton list with a {@link org.xwiki.script.event.ScriptEvaluatingEvent}.
+     * </p>
      * 
      * @see org.xwiki.observation.EventListener#getEvents()
      */
@@ -53,8 +55,10 @@ public abstract class AbstractScriptCheckerListener implements EventListener
 
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation casts the arguments to the correct type and calls
      * {@link #check(CancelableEvent, MacroTransformationContext, ScriptMacroParameters)}.
+     * </p>
      * 
      * @see org.xwiki.observation.EventListener#onEvent(Event, java.lang.Object, java.lang.Object)
      */

@@ -52,8 +52,9 @@ public class StandardExtendedURLResourceReferenceResolver implements ResourceRef
     /**
      * {@inheritDoc}
      *
-     * <p/>
+     * <p>
      * No specific parameter is supported.
+     * </p>
      *
      * @see org.xwiki.resource.ResourceReferenceResolver#resolve(Object, ResourceType, Map)
      */

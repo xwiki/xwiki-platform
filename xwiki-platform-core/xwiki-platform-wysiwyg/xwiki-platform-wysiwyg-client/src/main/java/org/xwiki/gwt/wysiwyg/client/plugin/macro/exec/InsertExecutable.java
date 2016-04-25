@@ -80,11 +80,7 @@ public class InsertExecutable extends InsertHTMLExecutable
         insertBlockHTMLExecutable = new InsertBlockHTMLExecutable(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         // Prepare the macro markers.
@@ -135,11 +131,7 @@ public class InsertExecutable extends InsertHTMLExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         if (selector.getMacroCount() > 0) {
@@ -149,11 +141,6 @@ public class InsertExecutable extends InsertHTMLExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertHTMLExecutable#isExecuted()
-     */
     @Override
     public boolean isExecuted()
     {

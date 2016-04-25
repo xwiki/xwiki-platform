@@ -47,9 +47,6 @@ public class EmptyLinkFilterTest extends RichTextAreaTestCase
      */
     private EmptyLinkFilter linkFilter;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void gwtSetUp() throws Exception
     {

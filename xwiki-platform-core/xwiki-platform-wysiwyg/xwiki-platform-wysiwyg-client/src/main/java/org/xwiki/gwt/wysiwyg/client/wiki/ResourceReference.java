@@ -200,11 +200,7 @@ public class ResourceReference implements IsSerializable
         return parameters;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#clone()
-     */
+    @Override
     public ResourceReference clone()
     {
         ResourceReference resourceReference = new ResourceReference();

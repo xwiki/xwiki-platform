@@ -65,11 +65,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefullPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -123,11 +119,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefullPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         for (PushButton button : buttons.keySet()) {
@@ -145,11 +137,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Command command = buttons.get(event.getSource());
@@ -159,11 +147,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ChangeHandler#onChange(ChangeEvent)
-     */
+    @Override
     public void onChange(ChangeEvent event)
     {
         if (event.getSource() == levels && levels.isEnabled()) {
@@ -173,11 +157,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#update()
-     */
+    @Override
     public void update()
     {
         if (levels != null && levels.isEnabled()) {

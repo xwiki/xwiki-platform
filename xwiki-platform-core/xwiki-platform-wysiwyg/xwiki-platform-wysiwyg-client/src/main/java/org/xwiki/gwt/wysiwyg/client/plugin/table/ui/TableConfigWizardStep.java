@@ -141,11 +141,7 @@ public class TableConfigWizardStep extends AbstractInteractiveWizardStep impleme
         display().add(getHeaderPanel());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -153,21 +149,13 @@ public class TableConfigWizardStep extends AbstractInteractiveWizardStep impleme
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return descriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     public void init(Object data, AsyncCallback< ? > cb)
     {
         cb.onSuccess(null);
@@ -175,21 +163,13 @@ public class TableConfigWizardStep extends AbstractInteractiveWizardStep impleme
         Scheduler.get().scheduleDeferred(new FocusCommand(rows));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         hideValidationMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         if (validate()) {
@@ -200,21 +180,13 @@ public class TableConfigWizardStep extends AbstractInteractiveWizardStep impleme
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#addNavigationListener(NavigationListener)
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#removeNavigationListener(NavigationListener)
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);

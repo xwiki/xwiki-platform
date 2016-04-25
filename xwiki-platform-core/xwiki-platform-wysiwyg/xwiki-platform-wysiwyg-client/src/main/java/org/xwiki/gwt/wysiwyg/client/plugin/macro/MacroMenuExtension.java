@@ -112,11 +112,7 @@ public class MacroMenuExtension extends MenuItemUIExtensionAdaptor
         addFeature("macroInsert", insert);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
-     */
+    @Override
     protected void onAttach(AttachEvent event)
     {
         boolean editMode = plugin.getTextArea().getCommandManager().isExecuted(MacroPlugin.INSERT);

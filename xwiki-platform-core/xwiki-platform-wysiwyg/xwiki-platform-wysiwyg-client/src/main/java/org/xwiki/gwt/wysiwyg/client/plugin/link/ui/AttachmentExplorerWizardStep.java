@@ -50,9 +50,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         setHelpLabelText(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         AttachmentReference attachmentReference =
@@ -61,9 +59,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             : LinkWizardStep.LINK_CONFIG.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         hideError();

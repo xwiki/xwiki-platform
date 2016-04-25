@@ -69,21 +69,13 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
             this.index = ++macroDescriptorRequestIndex;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onFailure(Throwable)
-         */
+        @Override
         public void onFailure(Throwable caught)
         {
             wizardCallback.onFailure(caught);
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onSuccess(Object)
-         */
+        @Override
         public void onSuccess(MacroDescriptor result)
         {
             // If this is the response to the last request and the wizard step wasn't canceled in the mean time then..
@@ -133,21 +125,13 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         super(config, macroService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return macroCall;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getStepTitle()
-     */
+    @Override
     public String getStepTitle()
     {
         String macroName =
@@ -155,11 +139,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         return Strings.INSTANCE.macro() + (macroName != null ? " : " + macroName : "");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     public void init(Object data, AsyncCallback<?> cb)
     {
         // Reset the model.
@@ -176,21 +156,13 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
             new MacroDescriptorAsyncCallback(cb));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         macroCall = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         if (validate()) {

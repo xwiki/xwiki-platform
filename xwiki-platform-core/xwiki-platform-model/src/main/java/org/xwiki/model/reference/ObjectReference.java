@@ -76,8 +76,10 @@ public class ObjectReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to check the type to be an object type.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
@@ -92,8 +94,10 @@ public class ObjectReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to ensure that the parent of an object is always a document.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */

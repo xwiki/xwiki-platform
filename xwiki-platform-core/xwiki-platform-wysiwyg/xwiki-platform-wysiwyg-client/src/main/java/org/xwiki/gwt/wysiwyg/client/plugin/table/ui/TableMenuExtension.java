@@ -116,11 +116,7 @@ public class TableMenuExtension extends MenuItemUIExtensionAdaptor
         addFeature(InsertRowBefore.NAME, insertRowBefore);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
-     */
+    @Override
     protected void onAttach(AttachEvent event)
     {
         boolean editMode = plugin.getTextArea().getCommandManager().isEnabled(new Command(DeleteTable.NAME));

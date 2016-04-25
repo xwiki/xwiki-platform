@@ -161,8 +161,10 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction cannot be used in this case, in order to have transaction atomicity,
      * please use getArchiveSaveRunnable() instead.
+     * </p>
      *
      * @see AttachmentVersioningStore#saveArchive(XWikiAttachmentArchive, XWikiContext, boolean)
      */
@@ -213,9 +215,11 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
 
     /**
      * {@inheritDoc}
+     * <p>
      * bTransaction is ignored by this implementation.
      * If you need to delete an archive inside of a larger transaction,
      * please use getArchiveDeleteRunnable()
+     * </p>
      *
      * @see AttachmentVersioningStore#deleteArchive(XWikiAttachment, XWikiContext, boolean)
      */

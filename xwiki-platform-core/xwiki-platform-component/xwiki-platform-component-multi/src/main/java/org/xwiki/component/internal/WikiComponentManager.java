@@ -77,6 +77,7 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
      * {@inheritDoc}
      * <p>
      * Override default implementation with one much better for performances.
+     * </p>
      * 
      * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
      */

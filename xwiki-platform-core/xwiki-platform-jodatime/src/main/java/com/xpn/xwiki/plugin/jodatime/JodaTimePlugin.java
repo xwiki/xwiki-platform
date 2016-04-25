@@ -73,9 +73,6 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
         return new JodaTimePluginApi((JodaTimePlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init(XWikiContext context)
     {

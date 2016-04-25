@@ -90,11 +90,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         display().insert(searchPanel, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         // set the keyword from the search input
@@ -103,11 +99,13 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         // refresh the results list
         refreshList(new AsyncCallback<Object>()
         {
+            @Override
             public void onSuccess(Object result)
             {
                 display().removeStyleName(STYLE_LOADING);
             }
 
+            @Override
             public void onFailure(Throwable caught)
             {
                 display().removeStyleName(STYLE_LOADING);
@@ -120,9 +118,6 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
@@ -146,11 +141,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         this.keyword = keyword;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         // if the key is enter in the search box, search
@@ -161,9 +152,6 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setActive()
     {

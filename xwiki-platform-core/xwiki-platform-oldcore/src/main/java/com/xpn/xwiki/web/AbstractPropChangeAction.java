@@ -73,9 +73,6 @@ public abstract class AbstractPropChangeAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

@@ -242,12 +242,6 @@ public class XWikiRCSArchive extends Archive
             return mergedText()[0].toString();
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @throws PatchFailedException
-         * @throws InvalidFileFormatException
-         */
         @Override
         public void patch(List original, boolean annotate) throws InvalidFileFormatException, PatchFailedException
         {

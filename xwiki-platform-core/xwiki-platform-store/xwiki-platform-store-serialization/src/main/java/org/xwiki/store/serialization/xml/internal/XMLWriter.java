@@ -315,11 +315,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
             super(toWrap);
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.io.FilterWriter#write(char[], int, int)
-         */
         @Override
         public void write(final char[] buffer, final int offset, final int count)
             throws IOException
@@ -328,11 +323,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
             this.lastChar = buffer[offset + count - 1];
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.io.FilterWriter#write(String, int, int)
-         */
         @Override
         public void write(final String str, final int offset, final int count)
             throws IOException
@@ -341,11 +331,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
             this.lastChar = str.charAt(offset + count - 1);
         }
 
-        /**
-         * {@inheritDoc}
-         *
-         * @see java.io.FilterWriter#write(int)
-         */
         @Override
         public void write(final int oneChar) throws IOException
         {

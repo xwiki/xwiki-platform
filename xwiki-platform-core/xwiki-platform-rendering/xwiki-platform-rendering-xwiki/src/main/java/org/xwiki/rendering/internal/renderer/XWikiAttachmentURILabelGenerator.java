@@ -47,10 +47,6 @@ public class XWikiAttachmentURILabelGenerator implements URILabelGenerator
     @Named("current")
     private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * @since 2.5RC1
-     */
     @Override
     public String generateLabel(ResourceReference reference)
     {

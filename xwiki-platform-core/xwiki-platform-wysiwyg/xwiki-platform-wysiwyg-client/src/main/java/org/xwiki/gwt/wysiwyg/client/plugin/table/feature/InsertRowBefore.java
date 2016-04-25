@@ -53,11 +53,7 @@ public class InsertRowBefore extends AbstractTableFeature
         super(NAME, new Command(NAME), Strings.INSTANCE.insertRowBefore(), plugin);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         TableCellElement currentCell =
@@ -67,11 +63,7 @@ public class InsertRowBefore extends AbstractTableFeature
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         if (!super.isEnabled()) {

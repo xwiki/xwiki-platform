@@ -34,9 +34,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public class PropDeleteAction extends AbstractPropChangeAction
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void changePropertyDefinition(BaseClass xclass, String propertyName, XWikiContext context)
         throws XWikiException

@@ -69,6 +69,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
+     * </p>
      *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
@@ -83,6 +84,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * {@inheritDoc}
      * <p>
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
+     * </p>
      *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */

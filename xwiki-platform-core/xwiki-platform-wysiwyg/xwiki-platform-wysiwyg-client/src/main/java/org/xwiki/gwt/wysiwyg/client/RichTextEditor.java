@@ -150,11 +150,6 @@ public class RichTextEditor extends Composite
         return loading;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composite#onLoad()
-     */
     @Override
     protected void onLoad()
     {

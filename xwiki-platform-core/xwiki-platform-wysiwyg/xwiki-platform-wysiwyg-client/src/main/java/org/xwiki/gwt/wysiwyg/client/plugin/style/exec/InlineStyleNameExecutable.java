@@ -58,11 +58,6 @@ public class InlineStyleNameExecutable extends InlineStyleExecutable
         super(rta, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#execute(String)
-     */
     @Override
     public boolean execute(String parameter)
     {
@@ -70,11 +65,6 @@ public class InlineStyleNameExecutable extends InlineStyleExecutable
         return super.execute(parameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#execute(Text, int, int, String)
-     */
     @Override
     protected TextFragment execute(Text text, int startIndex, int endIndex, String parameter)
     {
@@ -87,11 +77,6 @@ public class InlineStyleNameExecutable extends InlineStyleExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#addStyle(Element, String)
-     */
     @Override
     protected void addStyle(Element element, String parameter)
     {
@@ -144,11 +129,6 @@ public class InlineStyleNameExecutable extends InlineStyleExecutable
         return new TextFragment(text, 0, text.getLength());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#getParameter()
-     */
     @Override
     public String getParameter()
     {
@@ -226,11 +206,6 @@ public class InlineStyleNameExecutable extends InlineStyleExecutable
         return styleNames;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InlineStyleExecutable#isExecuted()
-     */
     @Override
     public boolean isExecuted()
     {

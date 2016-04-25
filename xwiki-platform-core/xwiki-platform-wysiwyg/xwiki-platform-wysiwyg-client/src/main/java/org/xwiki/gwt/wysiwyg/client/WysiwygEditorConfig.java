@@ -190,11 +190,7 @@ public class WysiwygEditorConfig implements ClosingHandler
         return config;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClosingHandler#onWindowClosing(ClosingEvent)
-     */
+    @Override
     public void onWindowClosing(ClosingEvent event)
     {
         // Make sure the cache is up to date before the page unloads. We have to do this because the queue of deferred

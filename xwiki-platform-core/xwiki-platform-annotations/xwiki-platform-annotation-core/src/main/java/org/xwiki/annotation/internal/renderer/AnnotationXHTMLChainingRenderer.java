@@ -201,6 +201,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override
@@ -233,6 +234,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
+     * 
      * @since 3.0M2
      */
     @Override
@@ -377,6 +379,7 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override

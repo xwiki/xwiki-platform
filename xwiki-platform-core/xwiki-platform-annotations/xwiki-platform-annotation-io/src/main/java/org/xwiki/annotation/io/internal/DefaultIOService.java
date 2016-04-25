@@ -101,8 +101,10 @@ public class DefaultIOService implements IOService
     private AnnotationConfiguration configuration;
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * This implementation saves the added annotation in the document where the target of the annotation is.
+     * </p>
      * 
      * @see org.xwiki.annotation.io.IOService#addAnnotation(String, org.xwiki.annotation.Annotation)
      */
@@ -162,9 +164,11 @@ public class DefaultIOService implements IOService
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * This implementation retrieves all the objects of the annotation class in the document where target points to, and
      * which have the target set to {@code target}.
+     * </p>
      * 
      * @see org.xwiki.annotation.io.IOService#getAnnotations(String)
      */
@@ -247,9 +251,11 @@ public class DefaultIOService implements IOService
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * This implementation deletes the annotation object with the object number indicated by {@code annotationID} from
      * the document indicated by {@code target}, if its stored target matches the passed target.
+     * </p>
      * 
      * @see org.xwiki.annotation.io.IOService#removeAnnotation(String, String)
      */
@@ -298,10 +304,12 @@ public class DefaultIOService implements IOService
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Implementation which gets all the annotation class objects in the document pointed by the target, and matches
      * their ids against the ids in the passed collection of annotations. If they match, they are updated with the new
      * data in the annotations in annotation.
+     * </p>
      * 
      * @see org.xwiki.annotation.io.IOService#updateAnnotations(String, java.util.Collection)
      */

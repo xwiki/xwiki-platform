@@ -68,6 +68,7 @@ public class PartialEntityReference extends EntityReference
      * {@inheritDoc}
      * <p>
      * This equals method actually skip null elements.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#equals(java.lang.Object)
      */

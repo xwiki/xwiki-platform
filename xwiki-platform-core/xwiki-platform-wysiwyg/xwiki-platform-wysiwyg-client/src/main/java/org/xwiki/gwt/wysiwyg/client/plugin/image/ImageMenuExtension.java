@@ -73,6 +73,7 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
         attachedImage =
             createMenuItem(Strings.INSTANCE.imageInsertAttachedImage(), null, new com.google.gwt.user.client.Command()
             {
+                @Override
                 public void execute()
                 {
                     plugin.onAttachedImage();
@@ -82,6 +83,7 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
             urlImage =
                 createMenuItem(Strings.INSTANCE.imageInsertURLImage(), null, new com.google.gwt.user.client.Command()
                 {
+                    @Override
                     public void execute()
                     {
                         plugin.onURLImage();
@@ -90,6 +92,7 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
         }
         edit = createMenuItem(Strings.INSTANCE.imageEditImage(), null, new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 plugin.onImageEdit();
@@ -97,6 +100,7 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
         });
         remove = createMenuItem(Strings.INSTANCE.imageRemoveImage(), null, new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 plugin.onImageRemove();
@@ -113,11 +117,7 @@ public class ImageMenuExtension extends MenuItemUIExtensionAdaptor
         addFeature("imageRemove", remove);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
-     */
+    @Override
     protected void onAttach(AttachEvent event)
     {
         boolean editMode = plugin.getTextArea().getCommandManager().isExecuted(Command.INSERT_IMAGE);

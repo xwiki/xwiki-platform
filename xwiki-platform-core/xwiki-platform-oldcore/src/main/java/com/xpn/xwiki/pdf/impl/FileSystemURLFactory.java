@@ -123,9 +123,6 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {

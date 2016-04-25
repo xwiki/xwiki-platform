@@ -57,11 +57,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseH
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -79,11 +75,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseH
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (insert != null) {
@@ -102,11 +94,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseH
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == insert) {
@@ -114,11 +102,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseH
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
+    @Override
     public void onClose(CloseEvent<CompositeDialogBox> event)
     {
         if (event.getSource() == getSymbolPicker() && !event.isAutoClosed()) {

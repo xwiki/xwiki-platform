@@ -45,9 +45,6 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
         display().addStyleName("xPagesRecent");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {

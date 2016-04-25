@@ -55,9 +55,6 @@ public class OutdentExecutable extends AbstractListExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean canExecute(Element listItem)
     {
@@ -68,8 +65,9 @@ public class OutdentExecutable extends AbstractListExecutable
     }
 
     /**
-     * {@inheritDoc} Moves the passed lust item one level up, as a next sibling of the list item it takes part of. If
-     * it's a first level list item, it is pulled out of its list.
+     * {@inheritDoc}
+     * <p>Moves the passed lust item one level up, as a next sibling of the list item it takes part of. If
+     * it's a first level list item, it is pulled out of its list.</p>
      */
     @Override
     protected void execute(Element listItem)
@@ -84,9 +82,6 @@ public class OutdentExecutable extends AbstractListExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean executeOnMultipleItems(Range range, boolean perform)
     {

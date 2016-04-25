@@ -129,11 +129,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         return getStepNames().get(0);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionHandler#onSelection(SelectionEvent)
-     */
+    @Override
     public void onSelection(SelectionEvent<Integer> event)
     {
         if (event.getSource() != tabPanel) {
@@ -154,11 +150,13 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         // initialize only if it wasn't initialized before
         lazyInitializeStep(stepToShow, new AsyncCallback<Object>()
         {
+            @Override
             public void onSuccess(Object result)
             {
                 onStepInitialized(stepToShow, stepPanel);
             }
 
+            @Override
             public void onFailure(Throwable caught)
             {
                 stepPanel.setVisible(true);
@@ -244,33 +242,25 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         return currentStepName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDirectionName(NavigationDirection direction)
     {
         return getCurrentStep().getDirectionName(direction);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         return getCurrentStep().getNextStep();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         return getCurrentStep().getResult();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(Object data, final AsyncCallback<?> cb)
     {
         // Maybe initialize the tab bar.
@@ -288,11 +278,13 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
 
         super.init(data, new AsyncCallback<Object>()
         {
+            @Override
             public void onSuccess(Object result)
             {
                 dispatchInit(cb);
             }
 
+            @Override
             public void onFailure(Throwable caught)
             {
                 cb.onFailure(caught);
@@ -368,25 +360,19 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
         getCurrentStep().onCancel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         getCurrentStep().onSubmit(async);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         // cannot delegate here because the steps shouldn't be initialized only to add listeners; only current step
@@ -394,17 +380,13 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         listeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         listeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onDirection(NavigationDirection direction)
     {
         // FIXME: at this point we assume that only the current step will send navigation event, or we relaunch the

@@ -109,11 +109,6 @@ public class LinkWizard extends Wizard
         this.setProvider(new LinkWizardStepProvider(config, wikiService));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Wizard#start(String, Object)
-     */
     @Override
     public void start(String startStep, Object data)
     {
@@ -129,13 +124,8 @@ public class LinkWizard extends Wizard
         super.start(startStep, new EntityLink<LinkConfig>(origin.getEntityReference(), destination, linkConfig));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Wizard#getResult()
-     */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     protected Object getResult()
     {
         return ((EntityLink<LinkConfig>) super.getResult()).getData();

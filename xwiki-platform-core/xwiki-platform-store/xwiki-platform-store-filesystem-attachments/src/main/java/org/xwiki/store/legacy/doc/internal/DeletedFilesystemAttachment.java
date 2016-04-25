@@ -77,6 +77,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
      * {@inheritDoc}
      * <p>
      * The XWiki context is unused and may safely be null.
+     * </p>
      *
      * @see com.xpn.xwiki.doc.DeletedAttachment#setAttachment(XWikiAttachment, XWikiContext)
      */

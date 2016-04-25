@@ -97,11 +97,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -147,11 +143,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         linkConfigFactory = new LinkConfigFactory(textArea);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         // Restore previous executables.
@@ -220,9 +212,11 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      * <p>
      * Handles wizard finish by creating the link HTML block from the {@link LinkConfig} setup through the wizard and
      * executing the {@link Command#CREATE_LINK} with it.
+     * </p>
      * 
      * @see WizardListener#onFinish(Wizard, Object)
      */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         // Return the focus to the rich text area.
@@ -232,11 +226,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         getTextArea().getCommandManager().execute(Command.CREATE_LINK, linkJSON);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onCancel(Wizard)
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         // Return the focus to the text area.

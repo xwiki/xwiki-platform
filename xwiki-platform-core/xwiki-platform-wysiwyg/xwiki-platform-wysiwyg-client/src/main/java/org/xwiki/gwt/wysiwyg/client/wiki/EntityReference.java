@@ -120,11 +120,6 @@ public class EntityReference implements IsSerializable
         components.put(componentName, componentValue);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
@@ -151,11 +146,7 @@ public class EntityReference implements IsSerializable
         return components.equals(other.components) && EntityType.areEqual(type, other.type);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#clone()
-     */
+    @Override
     public EntityReference clone()
     {
         EntityReference clone = new EntityReference();

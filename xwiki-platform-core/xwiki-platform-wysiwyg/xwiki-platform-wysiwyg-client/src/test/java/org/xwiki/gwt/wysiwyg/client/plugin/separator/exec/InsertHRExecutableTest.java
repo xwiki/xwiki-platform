@@ -34,11 +34,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.history.internal.DefaultHistory;
  */
 public class InsertHRExecutableTest extends RichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

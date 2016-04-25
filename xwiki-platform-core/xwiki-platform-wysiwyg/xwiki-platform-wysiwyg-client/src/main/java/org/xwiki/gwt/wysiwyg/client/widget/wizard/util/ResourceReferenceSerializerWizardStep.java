@@ -50,11 +50,6 @@ public class ResourceReferenceSerializerWizardStep<T extends EntityConfig> exten
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractAutoSubmitWizardStep#onSubmit(AsyncCallback)
-     */
     @Override
     public void onSubmit(final AsyncCallback<Boolean> callback)
     {
@@ -66,11 +61,13 @@ public class ResourceReferenceSerializerWizardStep<T extends EntityConfig> exten
         wikiService.getEntityConfig(getData().getOrigin(), getData().getDestination(),
             new AsyncCallback<EntityConfig>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     callback.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(EntityConfig result)
                 {
                     getData().getData().setReference(result.getReference());

@@ -82,9 +82,6 @@ public class ObjectsSynchronizeAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

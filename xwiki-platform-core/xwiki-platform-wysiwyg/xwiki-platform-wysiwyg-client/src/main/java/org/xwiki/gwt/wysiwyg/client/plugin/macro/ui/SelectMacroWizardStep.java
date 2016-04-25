@@ -97,11 +97,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             itemsByCategory.put(CATEGORY_USED, new ArrayList<ListItem<MacroDescriptor>>());
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see RepeatingCommand#execute()
-         */
+        @Override
         public boolean execute()
         {
             int step = 10;
@@ -180,11 +176,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             initWidget(container);
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see ChangeHandler#onChange(ChangeEvent)
-         */
+        @Override
         public void onChange(ChangeEvent event)
         {
             if (event.getSource() == categoryList) {
@@ -192,11 +184,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             }
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-         */
+        @Override
         public void onKeyUp(KeyUpEvent event)
         {
             if (event.getSource() == searchBox) {
@@ -357,11 +345,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         ((VerticalResizePanel) display()).setExpandingWidget(macroList, false);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         if (macroList.getSelectedItem() != null) {
@@ -373,21 +357,13 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getStepTitle()
-     */
+    @Override
     public String getStepTitle()
     {
         return Strings.INSTANCE.macroInsertDialogTitle();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback<?> initCallback)
     {
@@ -414,6 +390,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
             // There's no pending request for macro descriptors.
             macroDescriptorsCallback = new AsyncCallback<List<MacroDescriptor>>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     macroDescriptorsCallback = null;
@@ -421,6 +398,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
                     SelectMacroWizardStep.this.initCallback.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(List<MacroDescriptor> result)
                 {
                     if (result != null) {
@@ -435,21 +413,13 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         initCallback = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         boolean result = validate();
@@ -460,11 +430,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
-     */
+    @Override
     public void onDoubleClick(DoubleClickEvent event)
     {
         if (event.getSource() == macroList && macroList.getSelectedItem() != null) {
@@ -472,11 +438,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getSource() == macroList && event.getNativeKeyCode() == KeyCodes.KEY_ENTER
@@ -485,42 +447,33 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#addNavigationListener(NavigationListener)
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#removeNavigationListener(NavigationListener)
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
+    @Override
     public boolean canUpdate()
     {
         return true;
     }
 
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * Updates the {@link #macroList} based on the chosen category and specified search query.
+     * </p>
      * 
      * @see Updatable#update()
      */
+    @Override
     public void update()
     {
         if (usedMacroIds != null && CATEGORY_USED.equals(macroFilter.getCategory())) {

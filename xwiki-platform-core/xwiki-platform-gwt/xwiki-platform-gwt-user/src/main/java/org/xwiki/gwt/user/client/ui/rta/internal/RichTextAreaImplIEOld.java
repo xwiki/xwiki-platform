@@ -38,13 +38,17 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
     private static final String FIRE_LOAD_EVENT_MANUALLY = "__fireLoadEventManually";
 
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * NOTE: Remove this method as soon as Issue 3147 is fixed. <br />
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
+     * </p>
+     * <ul>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3147</li>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3156</li>
+     * </ul>
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#setHTMLImpl(String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
     @Override
     protected void setHTMLImpl(String html)
@@ -103,11 +107,13 @@ public class RichTextAreaImplIEOld extends com.google.gwt.user.client.ui.impl.Ri
      * IE doesn't unload the in-line frame used by the rich text area when we remove it from the DOM document. Its state
      * is preserved when we re-attach it. Naturally, IE doesn't fire the load and unload events in these cases since the
      * in-line frame's document is kept in memory, thus not reloaded when the in-line frame is re-attached.
+     * </p>
      * <p>
      * If the rich text area is detached using GWT code then its element is uninitialized even though the unload event
      * wasn't fired. If the unload event wasn't fired then the load event won't be fired next time we re-attach the rich
      * text area. We have to overwrite this method to prevent the rich text area's element from being uninitialized if
      * the unload even wasn't fired.
+     * </p>
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6#uninitElement()
      */

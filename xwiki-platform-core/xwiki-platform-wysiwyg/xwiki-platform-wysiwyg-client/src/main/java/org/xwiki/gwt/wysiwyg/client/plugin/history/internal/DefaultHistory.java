@@ -100,33 +100,21 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         textArea.getCommandManager().addCommandListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see History#canRedo()
-     */
+    @Override
     public boolean canRedo()
     {
         return textArea.getDocument() != null && currentEntry != null && currentEntry.getNextEntry() != null
             && !isDirty();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see History#canUndo()
-     */
+    @Override
     public boolean canUndo()
     {
         return textArea.getDocument() != null && currentEntry != null
             && (currentEntry.getPreviousEntry() != null || isDirty());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see History#redo()
-     */
+    @Override
     public void redo()
     {
         if (canRedo()) {
@@ -134,11 +122,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see History#undo()
-     */
+    @Override
     public void undo()
     {
         if (canUndo()) {
@@ -293,11 +277,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
+    @Override
     public void onKeyDown(KeyDownEvent event)
     {
         if (event.getSource() == textArea && !event.isControlKeyDown()) {
@@ -309,11 +289,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PasteHandler#onPaste(PasteEvent)
-     */
+    @Override
     public void onPaste(PasteEvent event)
     {
         if (event.getSource() == textArea) {
@@ -322,11 +298,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         if (sender == textArea.getCommandManager() && !IGNORED_COMMANDS.contains(command)) {
@@ -336,11 +308,7 @@ public class DefaultHistory implements History, KeyDownHandler, PasteHandler, Co
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         // ignore

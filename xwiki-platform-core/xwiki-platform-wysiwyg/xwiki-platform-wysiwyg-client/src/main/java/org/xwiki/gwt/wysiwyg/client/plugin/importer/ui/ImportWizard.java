@@ -98,9 +98,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
         this.setProvider(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         ImportWizardStep requestedStep = parseStepName(name);

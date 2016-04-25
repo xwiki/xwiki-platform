@@ -42,11 +42,11 @@ public class PathStringEntityReferenceSerializer extends AbstractStringEntityRef
 {
     /**
      * {@inheritDoc}
-     *
-     * <p/>
+     * <p>
      * Add a segment to the path. All non-URL compatible characters are escaped in the URL-escape format
      * (%NN). Dot (".") and Star ("*") characters are also encoded. If this is not the last segment in the reference,
      * append a "/" separator between reference element.
+     * <p>
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,

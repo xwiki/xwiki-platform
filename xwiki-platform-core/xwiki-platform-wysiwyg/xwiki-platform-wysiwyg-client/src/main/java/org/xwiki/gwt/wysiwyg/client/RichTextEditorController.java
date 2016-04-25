@@ -146,11 +146,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         pluginManager.setPluginFactoryManager(pfm);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
-     */
+    @Override
     public void onMouseUp(MouseUpEvent event)
     {
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
@@ -160,11 +156,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getSource() == richTextEditor.getTextArea()) {
@@ -172,22 +164,14 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         // ignore
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == richTextEditor.getTextArea().getCommandManager()) {
@@ -195,11 +179,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         if (event.getSource() == richTextEditor.getTextArea()) {
@@ -213,6 +193,7 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
                 // initialize the rich text editor.
                 Scheduler.get().scheduleDeferred(new ScheduledCommand()
                 {
+                    @Override
                     public void execute()
                     {
                         maybeInitialize();
@@ -266,21 +247,13 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#update()
-     */
+    @Override
     public void update()
     {
         toolBarController.update(richTextEditor.getTextArea(), syntaxValidator);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
+    @Override
     public boolean canUpdate()
     {
         RichTextArea textArea = richTextEditor.getTextArea();

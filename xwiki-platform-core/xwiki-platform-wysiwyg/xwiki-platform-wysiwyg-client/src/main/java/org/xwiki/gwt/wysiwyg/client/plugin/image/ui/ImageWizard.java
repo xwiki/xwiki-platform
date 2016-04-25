@@ -103,11 +103,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         this.setProvider(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepProvider#getStep(String)
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         ImageWizardStep requestedStep = parseStepName(name);
@@ -238,11 +234,6 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         return imageRefSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Wizard#start(String, Object)
-     */
     @Override
     public void start(String startStep, Object data)
     {
@@ -260,13 +251,8 @@ public class ImageWizard extends Wizard implements WizardStepProvider
             new EntityLink<ImageConfig>(origin.getEntityReference(), destination, (ImageConfig) data));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Wizard#getResult()
-     */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     protected Object getResult()
     {
         return ((EntityLink<ImageConfig>) super.getResult()).getData();

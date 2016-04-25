@@ -138,6 +138,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * </p>
      *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
@@ -153,6 +154,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * <p>
      * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and has been
      * replaced by this overridden method. See XWIKI-5285
+     * </p>
      *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
@@ -184,6 +186,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * This insures natural ordering between properties.
+     * </p>
      *
      * @see com.xpn.xwiki.objects.BaseCollection#addField(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
      */

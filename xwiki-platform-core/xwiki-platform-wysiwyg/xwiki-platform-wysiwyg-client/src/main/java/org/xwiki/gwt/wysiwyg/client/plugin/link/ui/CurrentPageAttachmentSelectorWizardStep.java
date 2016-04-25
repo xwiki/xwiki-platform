@@ -60,36 +60,24 @@ public class CurrentPageAttachmentSelectorWizardStep extends
         display().addStyleName("xAttachmentsSelector");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectHelpLabel()
     {
         return Strings.INSTANCE.linkSelectAttachmentHelpLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectErrorMessage()
     {
         return Strings.INSTANCE.linkNoAttachmentSelectedError();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
         wikiService.getAttachments(new WikiPageReference(getData().getOrigin()), callback);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<Attachment> getListItem(Attachment data)
     {
@@ -101,9 +89,6 @@ public class CurrentPageAttachmentSelectorWizardStep extends
         return item;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<Attachment> getNewOptionListItem()
     {
@@ -116,9 +101,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends
         return item;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         // check out the selection, if it's a new file option

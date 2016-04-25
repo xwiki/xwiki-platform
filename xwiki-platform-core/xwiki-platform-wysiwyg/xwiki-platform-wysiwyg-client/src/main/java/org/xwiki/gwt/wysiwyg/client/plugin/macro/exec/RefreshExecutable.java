@@ -79,11 +79,7 @@ public class RefreshExecutable extends AbstractSelectionExecutable implements As
         selectionPreserver = new SelectionPreserver(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         // Check if there is a refresh in progress.

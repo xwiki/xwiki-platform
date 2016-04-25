@@ -54,11 +54,7 @@ public class SubmitExecutable extends AbstractRichTextAreaExecutable
         this.fieldId = fieldId;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         Element field = (Element) Document.get().getElementById(fieldId);
@@ -69,43 +65,26 @@ public class SubmitExecutable extends AbstractRichTextAreaExecutable
         }
         return false;
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         Element field = (Element) Document.get().getElementById(fieldId);
         return field != null ? field.getPropertyString(VALUE) : null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return isSupported();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return rta != null && fieldId != null && Document.get().getElementById(fieldId) != null;

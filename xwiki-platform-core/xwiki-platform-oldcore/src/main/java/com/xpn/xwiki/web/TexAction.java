@@ -42,9 +42,6 @@ public class TexAction extends XWikiAction
     /** Logging helper object */
     private static final Logger LOGGER = LoggerFactory.getLogger(TexAction.class);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

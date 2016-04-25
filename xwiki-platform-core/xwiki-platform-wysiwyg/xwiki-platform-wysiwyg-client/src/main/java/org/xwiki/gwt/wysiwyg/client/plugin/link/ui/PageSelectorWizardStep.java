@@ -63,9 +63,6 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
         setStepTitle(Strings.INSTANCE.linkSelectWikipageTitle());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getRequiredStep()
     {
@@ -76,9 +73,6 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected WizardStep getStepInstance(String name)
     {
@@ -92,9 +86,6 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected List<String> getStepNames()
     {

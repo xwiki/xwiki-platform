@@ -61,11 +61,6 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         configJSONSerializer = new ImageConfigJSONSerializer();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#write(Object, com.google.gwt.dom.client.Element)
-     */
     @Override
     protected void write(ImageConfig config, ImageElement image)
     {
@@ -85,11 +80,6 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#getCacheKeyPrefix()
-     */
     @Override
     protected String getCacheKeyPrefix()
     {
@@ -100,6 +90,7 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
      * {@inheritDoc}
      * <p>
      * Gets the image element in the current selection.
+     * </p>
      * 
      * @see AbstractInsertElementExecutable#getSelectedElement()
      */
@@ -122,11 +113,6 @@ public class InsertImageExecutable extends AbstractInsertElementExecutable<Image
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#newElement()
-     */
     @Override
     protected ImageElement newElement()
     {

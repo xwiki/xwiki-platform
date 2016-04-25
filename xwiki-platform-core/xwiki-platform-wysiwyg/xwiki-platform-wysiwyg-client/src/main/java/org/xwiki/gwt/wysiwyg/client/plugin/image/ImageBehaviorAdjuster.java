@@ -61,11 +61,7 @@ public class ImageBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyP
      */
     private RichTextArea textArea;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
+    @Override
     public void onKeyDown(KeyDownEvent event)
     {
         // Test the current input and set the blocking flag.
@@ -104,11 +100,7 @@ public class ImageBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyP
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         // If we're blocking this key, prevent the default behavior for this key
@@ -117,11 +109,7 @@ public class ImageBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyP
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         // If we're blocking this key, prevent the default behavior for this key

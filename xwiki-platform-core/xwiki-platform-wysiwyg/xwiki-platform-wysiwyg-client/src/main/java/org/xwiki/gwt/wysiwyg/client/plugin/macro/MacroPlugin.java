@@ -111,11 +111,7 @@ public class MacroPlugin extends AbstractPlugin
         this.macroControler = new MacroController(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -141,6 +137,7 @@ public class MacroPlugin extends AbstractPlugin
         // which happens after all the plugins are loaded.
         Scheduler.get().scheduleDeferred(new ScheduledCommand()
         {
+            @Override
             public void execute()
             {
                 menuExtension.registerAttachHandlers();
@@ -153,11 +150,7 @@ public class MacroPlugin extends AbstractPlugin
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         menuExtension.clearFeatures();

@@ -30,11 +30,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
  */
 public class ImageConfigJSONParser implements ConfigJSONParser<ImageConfig>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigJSONParser#parse(String)
-     */
+    @Override
     public ImageConfig parse(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);

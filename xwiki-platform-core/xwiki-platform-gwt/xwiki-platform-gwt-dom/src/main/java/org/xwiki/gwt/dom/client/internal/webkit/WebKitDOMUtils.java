@@ -36,6 +36,7 @@ public class WebKitDOMUtils extends DOMUtils
      * offset left are always 0. As a consequence BR elements cannot be scrolled into view by default because we cannot
      * compute their position. The workaround is to insert a temporary in-line element before the BR element and scroll
      * that element into view, then remove it.
+     * </p>
      */
     @Override
     public void scrollIntoView(Element element)

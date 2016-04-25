@@ -126,45 +126,30 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
             getAttachment().setDate(new Date());
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setArchive(byte[] data) throws XWikiException
         {
             // Don't do anything since it's a void implementation.
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public byte[] getArchive(XWikiContext context) throws XWikiException
         {
             return new byte[0];
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setRCSArchive(Archive archive)
         {
             // Don't do anything since it's a void implementation.
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Version[] getVersions()
         {
             return new Version[] { getAttachment().getRCSVersion() };
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public XWikiAttachment getRevision(XWikiAttachment attachment, String rev, XWikiContext context)
             throws XWikiException
@@ -172,9 +157,6 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
             return (attachment.getVersion().equals(rev)) ? attachment : null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Object clone()
         {

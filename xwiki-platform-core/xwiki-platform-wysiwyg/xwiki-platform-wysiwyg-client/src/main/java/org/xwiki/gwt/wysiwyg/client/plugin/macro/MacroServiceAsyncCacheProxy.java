@@ -92,11 +92,13 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         // The macro descriptor wasn't found in the cache. We have to make the request to the server.
         service.getMacroDescriptor(macroId, syntaxId, wikiId, new AsyncCallback<MacroDescriptor>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 async.onFailure(caught);
             }
 
+            @Override
             public void onSuccess(MacroDescriptor result)
             {
                 if (result != null) {
@@ -107,11 +109,7 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroServiceAsync#getMacroDescriptor(String, String, AsyncCallback)
-     */
+    @Override
     public void getMacroDescriptor(final String macroId, final String syntaxId,
         final AsyncCallback<MacroDescriptor> async)
     {
@@ -144,11 +142,13 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         } else {
             service.getMacroDescriptors(syntaxId, wikiId, new AsyncCallback<List<MacroDescriptor>>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(List<MacroDescriptor> result)
                 {
                     if (result != null) {
@@ -160,11 +160,7 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroServiceAsync#getMacroDescriptors(String, AsyncCallback)
-     */
+    @Override
     public void getMacroDescriptors(final String syntaxId, final AsyncCallback<List<MacroDescriptor>> async)
     {
         getMacroDescriptors(syntaxId, null, async);

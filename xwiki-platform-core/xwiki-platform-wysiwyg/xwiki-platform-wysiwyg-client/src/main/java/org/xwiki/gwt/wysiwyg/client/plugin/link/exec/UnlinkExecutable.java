@@ -45,11 +45,7 @@ public class UnlinkExecutable extends AbstractSelectionExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         // Get the selected anchor
@@ -103,11 +99,7 @@ public class UnlinkExecutable extends AbstractSelectionExecutable
         rta.getDocument().getSelection().addRange(newRange);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         // check that there is a selected anchor

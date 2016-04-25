@@ -212,6 +212,7 @@ public class DateClass extends PropertyClass
      * We have to overwrite this method because the value of a date property is not serialized using the date format
      * specified in the XClass nor the time stamp but a custom hard-coded date format.. Changing this now will break
      * existing XARs..
+     * </p>
      */
     @Override
     public BaseProperty newPropertyfromXML(Element element)

@@ -83,6 +83,7 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
      * {@inheritDoc}
      * <p>
      * Override {@link AbstractEntityComponentManager#getKey()} because the prefix is not the reference type here.
+     * </p>
      * 
      * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
      */

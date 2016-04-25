@@ -34,9 +34,6 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
  */
 public class DeleteVersionsAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -143,9 +140,6 @@ public class DeleteVersionsAction extends XWikiAction
         sendRedirect(context.getResponse(), redirect);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

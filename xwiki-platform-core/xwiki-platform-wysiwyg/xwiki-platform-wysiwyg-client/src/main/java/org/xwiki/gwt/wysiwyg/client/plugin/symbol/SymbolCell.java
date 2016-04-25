@@ -94,11 +94,7 @@ public class SymbolCell extends FlowPanel
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FlowPanel#onBrowserEvent(Event)
-     */
+    @Override
     public void onBrowserEvent(Event event)
     {
         if (event.getTypeInt() == Event.ONMOUSEOVER) {

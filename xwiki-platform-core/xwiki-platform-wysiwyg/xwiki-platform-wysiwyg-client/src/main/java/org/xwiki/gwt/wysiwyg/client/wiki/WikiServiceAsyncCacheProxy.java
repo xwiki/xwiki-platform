@@ -64,58 +64,44 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
         this.service = service;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getPageNames(String, String, AsyncCallback)
-     */
+    @Override
     public void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async)
     {
         service.getPageNames(wikiName, spaceName, async);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void getRecentlyModifiedPages(String wikiName, int start, int count, AsyncCallback<List<WikiPage>> async)
     {
         service.getRecentlyModifiedPages(wikiName, start, count, async);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void getMatchingPages(String wikiName, String keyword, int start, int count,
         AsyncCallback<List<WikiPage>> async)
     {
         service.getMatchingPages(wikiName, keyword, start, count, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getSpaceNames(String, AsyncCallback)
-     */
+    @Override
     public void getSpaceNames(String wikiName, AsyncCallback<List<String>> async)
     {
         service.getSpaceNames(wikiName, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getVirtualWikiNames(AsyncCallback)
-     */
+    @Override
     public void getVirtualWikiNames(final AsyncCallback<List<String>> async)
     {
         if (virtualWikiNamesList == null) {
             service.getVirtualWikiNames(new AsyncCallback<List<String>>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(List<String> result)
                 {
                     virtualWikiNamesList = result;
@@ -127,21 +113,19 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#isMultiWiki(AsyncCallback)
-     */
+    @Override
     public void isMultiWiki(final AsyncCallback<Boolean> async)
     {
         if (isMultiWiki == null) {
             service.isMultiWiki(new AsyncCallback<Boolean>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(Boolean result)
                 {
                     isMultiWiki = result;
@@ -153,51 +137,31 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getEntityConfig(EntityReference, ResourceReference, AsyncCallback)
-     */
+    @Override
     public void getEntityConfig(EntityReference base, ResourceReference target, AsyncCallback<EntityConfig> async)
     {
         service.getEntityConfig(base, target, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getAttachment(AttachmentReference, AsyncCallback)
-     */
+    @Override
     public void getAttachment(AttachmentReference attachmentReference, AsyncCallback<Attachment> async)
     {
         service.getAttachment(attachmentReference, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getImageAttachments(WikiPageReference, AsyncCallback)
-     */
+    @Override
     public void getImageAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async)
     {
         service.getImageAttachments(documentReference, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getAttachments(WikiPageReference, AsyncCallback)
-     */
+    @Override
     public void getAttachments(WikiPageReference documentReference, AsyncCallback<List<Attachment>> async)
     {
         service.getAttachments(documentReference, async);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#getUploadURL(WikiPageReference, AsyncCallback)
-     */
+    @Override
     public void getUploadURL(final WikiPageReference documentReference, final AsyncCallback<String> async)
     {
         if (uploadURLCache.containsKey(documentReference.getEntityReference())) {
@@ -205,11 +169,13 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
         } else {
             service.getUploadURL(documentReference, new AsyncCallback<String>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(String result)
                 {
                     uploadURLCache.put(documentReference.getEntityReference().clone(), result);
@@ -219,11 +185,7 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiServiceAsync#parseLinkReference(String, EntityReference, AsyncCallback)
-     */
+    @Override
     public void parseLinkReference(String linkReference, EntityReference baseReference,
         AsyncCallback<ResourceReference> async)
     {

@@ -124,9 +124,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         helpLabel.setText(helpLabelText);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public VerticalResizePanel display()
     {
         return (VerticalResizePanel) super.display();
@@ -140,9 +138,6 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         return explorer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init(Object data, AsyncCallback<?> cb)
     {
@@ -150,11 +145,6 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         super.init(data, cb);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#initializeSelection(AsyncCallback)
-     */
     @Override
     protected void initializeSelection(AsyncCallback<?> initCallback)
     {
@@ -200,17 +190,13 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         display().refreshHeights();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         listeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         listeners.remove(listener);
@@ -235,11 +221,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         getData().getData().setUrl(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         // Do nothing.

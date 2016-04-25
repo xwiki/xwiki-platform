@@ -174,11 +174,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
         selection.addRange(range);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         if (StringUtils.isEmpty(parameter)) {
@@ -192,22 +188,14 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled()
             && TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) == null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onCancel(Wizard)
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         if (sender == getWizard()) {
@@ -215,11 +203,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onFinish(Wizard, Object)
-     */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         if (sender == getWizard()) {

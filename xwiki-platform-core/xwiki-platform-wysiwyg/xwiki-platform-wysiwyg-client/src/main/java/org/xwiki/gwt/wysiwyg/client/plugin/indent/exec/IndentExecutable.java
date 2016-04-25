@@ -43,9 +43,6 @@ public class IndentExecutable extends AbstractListExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean executeOnMultipleItems(Range range, boolean perform)
     {
@@ -118,9 +115,6 @@ public class IndentExecutable extends AbstractListExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean canExecute(Element listItem)
     {
@@ -137,9 +131,10 @@ public class IndentExecutable extends AbstractListExecutable
     }
 
     /**
-     * {@inheritDoc}. Performs the indent of the passed list item, if possible: it turns it into the child list item of
+     * {@inheritDoc}.
+     * <p>Performs the indent of the passed list item, if possible: it turns it into the child list item of
      * its previous sibling, if such an element exists, also handling the merge if the previous sibling already has a
-     * sublist.
+     * sublist.</p>
      */
     @Override
     protected void execute(Element listItem)

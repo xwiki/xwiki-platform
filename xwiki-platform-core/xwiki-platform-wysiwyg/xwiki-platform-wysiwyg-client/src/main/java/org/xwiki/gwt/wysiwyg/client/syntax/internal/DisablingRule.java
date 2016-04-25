@@ -61,21 +61,13 @@ public class DisablingRule implements ValidationRule
         return copy;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#areValid(RichTextArea)
-     */
+    @Override
     public boolean areValid(RichTextArea textArea)
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return copy(features);

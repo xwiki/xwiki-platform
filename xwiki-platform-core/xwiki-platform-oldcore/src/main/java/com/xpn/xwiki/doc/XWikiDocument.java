@@ -7037,6 +7037,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@inheritDoc}
      * <p>
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * </p>
      *
      * @see org.xwiki.bridge.DocumentModelBridge#getSyntaxId()
      * @deprecated since 2.3M1, use {link #getSyntax()} instead

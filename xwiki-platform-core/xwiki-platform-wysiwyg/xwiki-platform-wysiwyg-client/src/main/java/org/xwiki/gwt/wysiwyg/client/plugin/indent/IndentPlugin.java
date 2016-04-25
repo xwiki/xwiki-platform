@@ -57,11 +57,7 @@ public class IndentPlugin extends AbstractPlugin implements ClickHandler
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -97,11 +93,7 @@ public class IndentPlugin extends AbstractPlugin implements ClickHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         for (PushButton button : buttons.keySet()) {
@@ -114,11 +106,7 @@ public class IndentPlugin extends AbstractPlugin implements ClickHandler
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Command command = buttons.get(event.getSource());

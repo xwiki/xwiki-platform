@@ -69,11 +69,7 @@ public class LinkWizardStepProvider implements WizardStepProvider
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepProvider#getStep(String)
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         LinkWizardStep requestedStep = parseStepName(name);

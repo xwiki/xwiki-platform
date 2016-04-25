@@ -48,9 +48,6 @@ public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEnabled()
     {

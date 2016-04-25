@@ -492,11 +492,7 @@ public class MacroDisplayer implements InnerHTMLListener
         return placeHolder;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InnerHTMLListener#onInnerHTMLChange(Element)
-     */
+    @Override
     public void onInnerHTMLChange(Element element)
     {
         if (element.getOwnerDocument() == textArea.getDocument()) {

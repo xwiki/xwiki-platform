@@ -50,35 +50,20 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
         super(wikiService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#init(Object, AsyncCallback)
-     */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
         entityLink = (EntityLink<C>) data;
         super.init(data, cb);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#getTargetPageReference()
-     */
     @Override
     protected WikiPageReference getTargetPageReference()
     {
         return new WikiPageReference(entityLink.getDestination().getEntityReference());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#onAttachmentUploaded(Attachment, AsyncCallback)
-     */
     @Override
     protected void onAttachmentUploaded(Attachment attachment, final AsyncCallback<Boolean> callback)
     {
@@ -89,11 +74,7 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
         callback.onSuccess(true);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return entityLink;

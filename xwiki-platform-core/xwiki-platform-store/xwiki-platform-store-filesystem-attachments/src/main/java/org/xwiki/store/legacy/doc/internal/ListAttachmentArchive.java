@@ -215,7 +215,10 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * {@inheritDoc} Not implemented, always returns an empty array.
+     * {@inheritDoc}
+     * <p>
+     * Not implemented, always returns an empty array.
+     * </p>
      *
      * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getArchive()
      */

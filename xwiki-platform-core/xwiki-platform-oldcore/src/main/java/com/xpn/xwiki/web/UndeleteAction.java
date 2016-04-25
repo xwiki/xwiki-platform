@@ -39,9 +39,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class UndeleteAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

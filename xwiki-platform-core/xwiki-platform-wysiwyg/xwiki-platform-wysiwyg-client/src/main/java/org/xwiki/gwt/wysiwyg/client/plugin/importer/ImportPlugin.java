@@ -93,9 +93,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -143,26 +141,20 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
         getImportWizard().start(ImportWizardStep.OFFICE_FILE.toString(), null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         getTextArea().setFocus(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         getTextArea().setFocus(true);
         getTextArea().getCommandManager().execute(Command.INSERT_HTML, result.toString());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void destroy()
     {
         for (PushButton button : wizardSteps.keySet()) {
@@ -190,11 +182,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
         return importWizard;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Widget sender = (Widget) event.getSource();

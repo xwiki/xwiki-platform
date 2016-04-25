@@ -48,6 +48,7 @@ public class FormatBlockExecutable extends AbstractBlockExecutable
      * <p>
      * Formats as block the in-line neighborhood of the given node, using the specified block tag. If the specified tag
      * name is empty then the block format is removed (in-line formatting will be used instead).
+     * </p>
      * 
      * @see AbstractBlockExecutable#execute(Node, int, int, String)
      */
@@ -82,6 +83,7 @@ public class FormatBlockExecutable extends AbstractBlockExecutable
      * Returns the tag used for block formatting. If the returned string is empty it means there's no block formatting
      * (in other words, in-line formatting). If the returned string is null it means the given node doesn't support
      * block formatting.
+     * </p>
      * 
      * @see AbstractBlockExecutable#getParameter(Node)
      */

@@ -108,21 +108,19 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
      */
     protected abstract String getSelectErrorMessage();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
         hideError();
         super.init(data, new AsyncCallback<Object>()
         {
+            @Override
             public void onSuccess(Object result)
             {
                 refreshList(cb);
             }
 
+            @Override
             public void onFailure(Throwable caught)
             {
                 cb.onFailure(caught);
@@ -230,20 +228,12 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         hideError();
@@ -289,11 +279,7 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         display().refreshHeights();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
-     */
+    @Override
     public void onDoubleClick(DoubleClickEvent event)
     {
         if (event.getSource() == list && list.getSelectedItem() != null) {
@@ -301,9 +287,7 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getSource() == list && event.getNativeKeyCode() == KeyCodes.KEY_ENTER
@@ -312,17 +296,13 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         listeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         listeners.remove(listener);
@@ -346,11 +326,6 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         return list.getSelectedItem();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#display()
-     */
     @Override
     public VerticalResizePanel display()
     {
@@ -366,9 +341,6 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         this.newOptionOnTop = newOptionOnTop;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setActive()
     {

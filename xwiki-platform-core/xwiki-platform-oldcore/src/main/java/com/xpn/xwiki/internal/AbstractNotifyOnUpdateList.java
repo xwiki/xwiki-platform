@@ -242,6 +242,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
      * NOTE: We override the default {@link Object#toString()} implementation in order to preserve backwards
      * compatibility with code that was using {@link List#toString()} before we introduced
      * {@link AbstractNotifyOnUpdateList}.
+     * </p>
      *
      * @see <a href="http://jira.xwiki.org/browse/XWIKI-9013">XWIKI-9013: Multiple Select List values are not correctly
      *      indexed by Lucene</a>

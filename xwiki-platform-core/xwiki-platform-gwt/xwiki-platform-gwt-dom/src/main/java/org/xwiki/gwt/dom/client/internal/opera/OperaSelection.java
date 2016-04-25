@@ -47,9 +47,11 @@ public class OperaSelection extends DefaultSelection
     }
 
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * Opera native selection reports sometimes a wrong range (e.g. when the selection ends before an image) so we
      * compute the range based on the native selection anchor and focus nodes which seem to be correct.
+     * </p>
      * 
      * @see DefaultSelection#getRangeAt(int)
      */

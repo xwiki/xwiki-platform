@@ -113,21 +113,13 @@ public class URLImageSelectorWizardStep extends AbstractInteractiveWizardStep im
         display().addStyleName("xExternalImage");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return entityLink;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -143,22 +135,14 @@ public class URLImageSelectorWizardStep extends AbstractInteractiveWizardStep im
         cb.onSuccess(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         entityLink = null;
         hideValidationErrors();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         if (validate()) {
@@ -210,31 +194,19 @@ public class URLImageSelectorWizardStep extends AbstractInteractiveWizardStep im
         source.removeStyleName(FIELD_ERROR_STYLE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#addNavigationListener(NavigationListener)
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesNavigationEvents#removeNavigationListener(NavigationListener)
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {

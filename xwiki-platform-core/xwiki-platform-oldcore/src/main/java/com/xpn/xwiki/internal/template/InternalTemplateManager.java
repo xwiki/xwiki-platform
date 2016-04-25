@@ -376,6 +376,7 @@ public class InternalTemplateManager
          * {@inheritDoc}
          * <p>
          * Allow filesystem template to indicate the user to executed them with.
+         * </p>
          *
          * @see #setAuthorReference(DocumentReference)
          */

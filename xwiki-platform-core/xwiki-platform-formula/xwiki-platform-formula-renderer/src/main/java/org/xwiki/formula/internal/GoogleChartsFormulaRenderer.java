@@ -66,9 +66,6 @@ public final class GoogleChartsFormulaRenderer extends AbstractFormulaRenderer i
         this.client.getHttpConnectionManager().getParams().setConnectionTimeout(10000);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ImageData renderImage(String formula, boolean inline, FormulaRenderer.FontSize size,
         FormulaRenderer.Type type) throws IllegalArgumentException, IOException

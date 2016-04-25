@@ -173,9 +173,7 @@ public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implemen
         display().add(labelTextBox);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, final AsyncCallback< ? > callback)
     {
@@ -185,11 +183,13 @@ public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implemen
             wikiService.parseLinkReference(linkConfig.getLabelText(), entityLink.getOrigin(),
                 new AsyncCallback<ResourceReference>()
                 {
+                    @Override
                     public void onFailure(Throwable caught)
                     {
                         callback.onFailure(caught);
                     }
 
+                    @Override
                     public void onSuccess(ResourceReference result)
                     {
                         init(result, callback);
@@ -273,9 +273,7 @@ public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implemen
         return newWindowCheckBox;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         // first reset all error labels, consider everything's fine
@@ -321,16 +319,12 @@ public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implemen
         callback.onSuccess(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         // Always return the modified entity link as result of this wizard step.
@@ -347,27 +341,19 @@ public class LinkConfigWizardStep extends AbstractInteractiveWizardStep implemen
         return NavigationDirection.FINISH;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {

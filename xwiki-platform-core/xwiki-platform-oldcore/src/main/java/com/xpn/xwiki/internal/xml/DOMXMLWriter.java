@@ -131,7 +131,8 @@ public class DOMXMLWriter extends XMLWriter
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements, putting the whole stream content as text in the content of the <code>{@link Element}</code>. The
      * stream is converted to a String encoded in the current encoding.
-     *
+     * </p>
+     * 
      * @see com.xpn.xwiki.internal.xml.XMLWriter#write(org.dom4j.Element, java.io.InputStream)
      */
     @Override
@@ -146,6 +147,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of of
      * the <code>{@link Element}</code>.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#write(org.dom4j.Element, java.io.Reader)
      */
@@ -162,6 +164,7 @@ public class DOMXMLWriter extends XMLWriter
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements, putting the whole stream content as Base64 text in the content of the
      * <code>{@link Element}</code>.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeBase64(org.dom4j.Element, java.io.InputStream)
      */
@@ -180,6 +183,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Cleanup the stack of opened elements.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeDocumentEnd(org.dom4j.Document)
      */
@@ -195,6 +199,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Does nothing, avoid default action.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeDocumentStart(org.dom4j.Document)
      */
@@ -208,6 +213,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements.
+     * </p>
      *
      * @see org.dom4j.io.XMLWriter#write(org.dom4j.Element)
      */
@@ -225,6 +231,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Cleanup the stack of opened elements up to the given element.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeClose(org.dom4j.Element)
      */
@@ -246,6 +253,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements. Add this element at the top of the stack of opened elements.
+     * </p>
      *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeOpen(org.dom4j.Element)
      */

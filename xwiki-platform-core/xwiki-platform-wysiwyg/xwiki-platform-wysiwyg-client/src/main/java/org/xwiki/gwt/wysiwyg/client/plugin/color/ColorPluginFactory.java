@@ -53,11 +53,7 @@ public final class ColorPluginFactory extends AbstractPluginFactory
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return new ColorPlugin();

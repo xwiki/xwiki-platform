@@ -45,11 +45,7 @@ public class FontSizePicker extends CachedListBoxPicker
         setAdditionalOptionGroupLabel(Strings.INSTANCE.fontSizeOther());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CachedListBoxPicker#setValue(int, String)
-     */
+    @Override
     public void setValue(int index, String value)
     {
         super.setValue(index, value);
@@ -57,11 +53,7 @@ public class FontSizePicker extends CachedListBoxPicker
         option.getStyle().setProperty(Style.FONT_SIZE.getJSName(), value);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CachedListBoxPicker#setSelectedValue(String)
-     */
+    @Override
     public void setSelectedValue(String value)
     {
         if (isRelative(value)) {

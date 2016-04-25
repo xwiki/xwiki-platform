@@ -178,6 +178,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * Allows to scale images server-side, in order to have real thumbnails for reduced traffic. The new image
      * dimensions are passed in the request as the {@code width} and {@code height} parameters. If only one of the
      * dimensions is specified, then the other one is computed to preserve the original aspect ratio of the image.
+     * </p>
      *
      * @see XWikiDefaultPlugin#downloadAttachment(XWikiAttachment, XWikiContext)
      */

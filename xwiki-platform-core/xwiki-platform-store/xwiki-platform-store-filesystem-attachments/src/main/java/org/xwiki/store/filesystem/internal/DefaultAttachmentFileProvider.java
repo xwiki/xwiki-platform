@@ -76,6 +76,7 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
 
     /**
      * {@inheritDoc}
+     * <p>
      * Get a File for loading or storing this attachment's content.
      * This file is derived from the name of the document which the attachment resides in and the
      * attachment filename. The file will be placed in the storage area in a directory structure
@@ -83,6 +84,7 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
      * So an attachment called file.txt in a document called Sandbox.Test in a the main wiki ("xwiki")
      * would go in the following file:
      * <storage dir>/xwiki/Sandbox/Test/~this/attachments/file.txt/file.txt
+     * </p>
      *
      * @see AttachmentFileProvider#getAttachmentContentFile()
      */
@@ -94,7 +96,9 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
 
     /**
      * {@inheritDoc}
+     * <p>
      * This will be a file named ~METADATA.xml which will reside in the attachment directory.
+     * </p>
      *
      * @see AttachmentFileProvider#getAttachmentVersioningMetaFile()
      */
@@ -105,12 +109,14 @@ public class DefaultAttachmentFileProvider implements AttachmentFileProvider
 
     /**
      * {@inheritDoc}
+     * <p>
      * Get a file corrisponding to this version of this attachment.
      * If the file has one or more dots ('.') in it then the version number is inserted before
      * the last dot. Otherwise it is appended to the end. Version numbers always have "~v" prepended
      * to prevent collision.
      * version 1.1 of an attachment called file.txt will be stored as file~v1.1.txt
      * version 1.2 of an attachment called noExtension will be stored as noExtension~v1.2
+     * </p>
      *
      * @see AttachmentFileProvider#getAttachmentVersioningMetaFile()
      */

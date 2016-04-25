@@ -63,9 +63,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
     /** The SnuggleTeX engine responsible for rendering the formulae. */
     private SnuggleEngine engine = new SnuggleEngine();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ImageData renderImage(String formula, boolean inline, FormulaRenderer.FontSize size,
         FormulaRenderer.Type type) throws IllegalArgumentException, IOException
@@ -106,9 +103,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             setFontSize(String.valueOf(size));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public File getImageOutputFile(int mathmlCounter)
         {
@@ -116,9 +110,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public OutputStream getImageOutputStream(int mathmlCounter)
         {
@@ -126,9 +117,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return mathmlCounter == 0 ? this.target : null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getImageURL(int mathmlCounter)
         {
@@ -136,9 +124,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return "";
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void imageSavingFailed(Object imageFileOrOutputStream, int mathmlCounter, String contentType,
             Throwable exception)
         {

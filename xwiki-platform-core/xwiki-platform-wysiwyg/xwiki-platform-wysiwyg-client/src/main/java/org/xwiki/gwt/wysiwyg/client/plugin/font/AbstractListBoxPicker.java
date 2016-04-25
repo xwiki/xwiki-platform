@@ -43,32 +43,20 @@ public abstract class AbstractListBoxPicker extends ListBox implements Picker
         setVisibleItemCount(1);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ListBox#insertItem(String, String, int)
-     */
+    @Override
     public void insertItem(String item, String value, int index)
     {
         super.insertItem(item, value, index);
         setValue(index == -1 ? getItemCount() - 1 : index, value);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Picker#getSelectedValue()
-     */
+    @Override
     public String getSelectedValue()
     {
         return getSelectedIndex() < 0 ? null : getValue(getSelectedIndex());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Picker#setSelectedValue(String)
-     */
+    @Override
     public void setSelectedValue(String value)
     {
         setSelectedValue(value, matcher);

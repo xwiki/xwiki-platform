@@ -50,9 +50,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
         setHelpLabelText(Strings.INSTANCE.linkSelectWikipageHelpLabel());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         WikiPageReference wikiPageReference = new WikiPageReference(getData().getDestination().getEntityReference());
@@ -60,9 +58,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
             : LinkWizardStep.LINK_CONFIG.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
         hideError();

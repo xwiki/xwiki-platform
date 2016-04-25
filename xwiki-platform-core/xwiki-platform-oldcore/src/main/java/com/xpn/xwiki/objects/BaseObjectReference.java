@@ -149,8 +149,10 @@ public class BaseObjectReference extends ObjectReference
     }
 
     /**
-     * {@inheritDoc} <br/>
+     * {@inheritDoc}
+     * <p>
      * Overridden to always compute the class name and the object number.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
      */

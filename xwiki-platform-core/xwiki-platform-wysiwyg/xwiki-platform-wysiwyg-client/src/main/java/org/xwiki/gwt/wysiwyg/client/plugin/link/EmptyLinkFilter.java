@@ -71,11 +71,7 @@ public class EmptyLinkFilter implements CommandListener
         this.rta = rta;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         // We can assert if a link is visible only if the rich text area is visible.
@@ -148,11 +144,7 @@ public class EmptyLinkFilter implements CommandListener
         return DOMUtils.getInstance().getFirstAncestor(element, HIDDEN) == null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         // nothing

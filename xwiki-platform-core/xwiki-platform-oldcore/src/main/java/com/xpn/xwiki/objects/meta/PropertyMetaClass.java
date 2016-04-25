@@ -157,6 +157,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
      * <p>
      * This method is deprecated. Use directly the {@link PropertyClassProvider} if you need a new XClass property
      * instance.
+     * </p>
      */
     @Override
     public BaseCollection newObject(XWikiContext context) throws XWikiException

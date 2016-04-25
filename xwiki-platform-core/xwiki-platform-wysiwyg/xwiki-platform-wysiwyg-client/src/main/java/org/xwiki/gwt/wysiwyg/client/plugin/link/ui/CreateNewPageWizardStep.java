@@ -104,17 +104,13 @@ public class CreateNewPageWizardStep extends AbstractInteractiveWizardStep imple
         display().add(pageNameTextBox);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         return entityLink;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -124,16 +120,12 @@ public class CreateNewPageWizardStep extends AbstractInteractiveWizardStep imple
         Scheduler.get().scheduleDeferred(new FocusCommand(pageNameTextBox));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(final AsyncCallback<Boolean> callback)
     {
         hideError();
@@ -173,11 +165,7 @@ public class CreateNewPageWizardStep extends AbstractInteractiveWizardStep imple
         pageNameTextBox.removeStyleName(FIELD_ERROR_STYLE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
@@ -186,17 +174,13 @@ public class CreateNewPageWizardStep extends AbstractInteractiveWizardStep imple
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         listeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         listeners.remove(listener);

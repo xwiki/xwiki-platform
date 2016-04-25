@@ -40,6 +40,7 @@ public class InsertHTMLExecutableImplIE extends InsertHTMLExecutableImpl
      * {@inheritDoc}
      * <p>
      * Ensures the caret remains in the right position after the selected content is deleted.
+     * </p>
      * 
      * @see InsertHTMLExecutable#deleteSelection(RichTextArea)
      */

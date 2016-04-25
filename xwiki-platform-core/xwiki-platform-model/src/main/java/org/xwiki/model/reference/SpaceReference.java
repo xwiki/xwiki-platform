@@ -129,7 +129,10 @@ public class SpaceReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed parent.
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed parent.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid space reference parent (ie either a space
@@ -155,7 +158,10 @@ public class SpaceReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed type.
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed type.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a space type

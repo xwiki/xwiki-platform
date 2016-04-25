@@ -66,6 +66,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override

@@ -333,6 +333,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * {@inheritDoc}
      * <p>
      * Make sure to keep {@link #wikiId} fields and map synchronized.
+     * </p>
      *
      * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
      */
@@ -359,6 +360,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * {@inheritDoc}
      * <p>
      * Make sure to keep {@link #wikiId} field and map synchronized.
+     * </p>
      *
      * @see java.util.Hashtable#remove(java.lang.Object)
      */

@@ -38,11 +38,7 @@ public class RedoExecutable extends AbstractHistoryExecutable
         super(history);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         if (getHistory().canRedo()) {
@@ -53,42 +49,26 @@ public class RedoExecutable extends AbstractHistoryExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return getHistory().canRedo();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         // Right now there's no way to test if the redo command has been executed.
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return true;

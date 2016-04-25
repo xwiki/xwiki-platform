@@ -100,11 +100,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -166,11 +162,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (styleNamePicker != null) {
@@ -185,11 +177,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ChangeHandler#onChange(ChangeEvent)
-     */
+    @Override
     public void onChange(ChangeEvent event)
     {
         if (styleNamePicker == event.getSource() && styleNamePicker.isEnabled()) {
@@ -221,11 +209,7 @@ public class StylePlugin extends AbstractStatefulPlugin implements ChangeHandler
         getTextArea().getCommandManager().execute(command, styleName);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#update()
-     */
+    @Override
     public void update()
     {
         if (styleNamePicker.isEnabled()) {

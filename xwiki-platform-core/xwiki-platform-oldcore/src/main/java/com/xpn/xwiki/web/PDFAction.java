@@ -39,9 +39,6 @@ import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 @Deprecated
 public class PDFAction extends XWikiAction
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

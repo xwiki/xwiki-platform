@@ -73,6 +73,7 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
      * <p>
      * Start calling <code>context</code>'s {@link XWikiMessageTool#get(String)} then if nothing is found use
      * plugin's {@link ResourceBundle}.
+     * </p>
      * 
      * @see com.xpn.xwiki.web.XWikiMessageTool#getTranslation(java.lang.String)
      */

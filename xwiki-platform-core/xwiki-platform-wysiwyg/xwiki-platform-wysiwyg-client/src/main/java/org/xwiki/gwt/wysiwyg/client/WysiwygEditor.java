@@ -126,11 +126,6 @@ public class WysiwygEditor extends RichTextEditorController
         return sv;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextEditorController#onLoad(LoadEvent)
-     */
     @Override
     public void onLoad(LoadEvent event)
     {
@@ -263,11 +258,7 @@ public class WysiwygEditor extends RichTextEditorController
         return config;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextEditorController#destroy()
-     */
+    @Override
     public void destroy()
     {
         super.destroy();

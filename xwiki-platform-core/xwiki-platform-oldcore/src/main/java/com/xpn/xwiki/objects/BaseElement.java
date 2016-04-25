@@ -115,7 +115,10 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * Note that this method is used by Hibernate for saving an element. {@inheritDoc}
+     * {@inheritDoc}
+     * <p>
+     * Note that this method is used by Hibernate for saving an element.
+     * </p>
      *
      * @see com.xpn.xwiki.objects.ElementInterface#getName()
      */
@@ -140,7 +143,10 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * Note that this method is used by Hibernate for loading an element. {@inheritDoc}
+     * {@inheritDoc}
+     * <p>
+     * Note that this method is used by Hibernate for loading an element.
+     * </p>
      *
      * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
      */

@@ -40,7 +40,7 @@ import org.xwiki.model.EntityType;
 public class DocumentReference extends EntityReference
 {
     /**
-     * The {@link Type} for a Provider<DocumentReference>.
+     * The {@link Type} for a {@link Provider<DocumentReference>}.
      * 
      * @since 7.2M1
      */
@@ -195,7 +195,10 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed parent.
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed parent.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid document reference parent (ie a space
@@ -217,7 +220,10 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed type.
+     * {@inheritDoc}
+     * <p>
+     * Overridden in order to verify the validity of the passed type.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a document type

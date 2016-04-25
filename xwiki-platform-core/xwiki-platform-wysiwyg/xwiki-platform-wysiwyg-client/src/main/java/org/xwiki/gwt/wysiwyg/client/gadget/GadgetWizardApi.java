@@ -189,21 +189,13 @@ public class GadgetWizardApi implements WizardListener
         }
     }-*/;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onCancel(Wizard)
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         // nothing
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onFinish(Wizard, Object)
-     */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         if (sender == getInsertWizard()) {

@@ -43,32 +43,20 @@ public abstract class AbstractSeparator implements UIExtension
         this.role = role;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#getRole()
-     */
+    @Override
     public String getRole()
     {
         return role;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#isEnabled(String)
-     */
+    @Override
     public boolean isEnabled(String feature)
     {
         // always disabled
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see UIExtension#setEnabled(String, boolean)
-     */
+    @Override
     public void setEnabled(String feature, boolean enabled)
     {
         // ignore

@@ -83,11 +83,6 @@ public class XWikiExecutorTestMethodFilter extends Filter
         this.pattern = pattern;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.junit.runner.manipulation.Filter#shouldRun(org.junit.runner.Description)
-     */
     @Override
     public boolean shouldRun(Description description)
     {
@@ -97,11 +92,6 @@ public class XWikiExecutorTestMethodFilter extends Filter
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.junit.runner.manipulation.Filter#describe()
-     */
     @Override
     public String describe()
     {

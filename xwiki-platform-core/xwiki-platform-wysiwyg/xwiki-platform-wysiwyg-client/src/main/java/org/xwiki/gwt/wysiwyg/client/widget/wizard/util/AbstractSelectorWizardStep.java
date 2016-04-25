@@ -61,11 +61,7 @@ public abstract class AbstractSelectorWizardStep<T> extends AbstractInteractiveW
         setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.select());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -83,11 +79,7 @@ public abstract class AbstractSelectorWizardStep<T> extends AbstractInteractiveW
         initCallback.onSuccess(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return data;

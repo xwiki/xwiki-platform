@@ -38,14 +38,14 @@ import org.xwiki.model.EntityType;
 public interface EntityReferenceResolver<T>
 {
     /**
-     * Type instance for EntityReferenceResolver<String>.
+     * Type instance for {@link EntityReferenceResolver<String>}.
      * 
      * @since 4.0M1
      */
     ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class);
 
     /**
-     * Type instance for EntityReferenceResolver<EntityReference>.
+     * Type instance for {@link EntityReferenceResolver<EntityReference>}.
      * 
      * @since 4.0M1
      */

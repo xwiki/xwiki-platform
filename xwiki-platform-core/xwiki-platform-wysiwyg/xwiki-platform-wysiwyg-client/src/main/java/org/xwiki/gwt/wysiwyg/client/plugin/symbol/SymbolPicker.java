@@ -331,11 +331,7 @@ public class SymbolPicker extends CompositeDialogBox implements SelectionHandler
         initWidget(symbolPalette);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionHandler#onSelection(SelectionEvent)
-     */
+    @Override
     public void onSelection(SelectionEvent<String> event)
     {
         if (event.getSource() == symbolPalette) {
@@ -350,12 +346,8 @@ public class SymbolPicker extends CompositeDialogBox implements SelectionHandler
     {
         return symbolPalette.getSelectedSymbol();
     }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CompositeDialogBox#center()
-     */
+
+    @Override
     public void center()
     {
         // Reset the selected symbol each time the symbol picker is shown.

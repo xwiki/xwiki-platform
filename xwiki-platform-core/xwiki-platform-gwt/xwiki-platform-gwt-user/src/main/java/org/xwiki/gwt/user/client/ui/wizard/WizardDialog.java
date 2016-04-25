@@ -121,6 +121,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      * {@inheritDoc}
      * <p>
      * Expose the protected {@link ComplexDialogBox#showError(Throwable)} method.
+     * </p>
      * 
      * @see ComplexDialogBox#showError(Throwable)
      */
@@ -204,6 +205,7 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
      * {@inheritDoc}
      * <p>
      * Expose the protected {@link ComplexDialogBox#setCanceled(boolean)} method.
+     * </p>
      * 
      * @see ComplexDialogBox#setCanceled(boolean)
      */

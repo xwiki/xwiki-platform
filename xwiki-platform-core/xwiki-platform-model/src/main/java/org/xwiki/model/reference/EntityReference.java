@@ -596,12 +596,13 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Note: The default implementation relies on comparing the string serialization of the 2 entities. It is the
      * caller's responsibility to make sure that the entities are either first resolved or at least of the same type, in
      * order for the comparison to actually make sense.
-     * <p/>
-     * {@inheritDoc}
-     *
+     * </p>
+     * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override

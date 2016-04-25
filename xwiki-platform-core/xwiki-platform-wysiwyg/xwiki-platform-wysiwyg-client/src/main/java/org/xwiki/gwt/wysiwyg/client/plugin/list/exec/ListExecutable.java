@@ -58,9 +58,11 @@ public class ListExecutable extends DefaultExecutable
      * <p>
      * Overwrite the default function to handle situations of valid HTML lists which are not detected correctly by the
      * browsers.
+     * </p>
      * 
      * @see DefaultExecutable#isExecuted()
      */
+    @Override
     public boolean isExecuted()
     {
         if (rta.getDocument().getSelection().getRangeCount() > 0) {

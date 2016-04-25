@@ -97,9 +97,10 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private Logger logger;
 
     /**
-     * Initializes the storage and random number generator.
-     * 
      * {@inheritDoc}
+     * <p>
+     * Initializes the storage and random number generator.
+     * </p>
      */
     @Override
     public void initialize() throws InitializationException

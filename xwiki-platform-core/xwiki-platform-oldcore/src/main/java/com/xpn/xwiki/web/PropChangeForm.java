@@ -31,9 +31,6 @@ public class PropChangeForm extends XWikiForm
     /** The name of the class property to remove. */
     private String propertyName;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readRequest()
     {

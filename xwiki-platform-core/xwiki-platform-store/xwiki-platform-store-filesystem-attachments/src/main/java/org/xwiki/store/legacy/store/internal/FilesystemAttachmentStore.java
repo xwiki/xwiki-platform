@@ -94,8 +94,10 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
      * whether bTransaction is true or false.
+     * </p>
      *
      * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent(
      *XWikiAttachment, XWikiContext, boolean)
@@ -110,8 +112,10 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
      * whether bTransaction is true or false.
+     * </p>
      *
      * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentContent(
      *XWikiAttachment, boolean, XWikiContext, boolean)
@@ -175,8 +179,10 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation cannot operate in a larger transaction so it starts a new transaction no matter
      * whether bTransaction is true or false.
+     * </p>
      *
      * @see com.xpn.xwiki.store.XWikiAttachmentStoreInterface#saveAttachmentsContent(
      *List, XWikiDocument, boolean, XWikiContext, boolean)

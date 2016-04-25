@@ -89,11 +89,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
      */
     private Command currentCommand;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -131,11 +127,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (colorPicker != null) {
@@ -156,11 +148,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Widget sender = (Widget) event.getSource();
@@ -179,11 +167,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
+    @Override
     public void onClose(CloseEvent<PopupPanel> event)
     {
         if (event.getSource() == getColorPicker() && !event.isAutoClosed()) {

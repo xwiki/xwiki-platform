@@ -82,9 +82,7 @@ public abstract class AbstractListExecutable extends AbstractSelectionExecutable
                 UNORDERED_LIST_TAG));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public boolean execute(String param)
     {
         boolean executionResult = false;
@@ -137,11 +135,7 @@ public abstract class AbstractListExecutable extends AbstractSelectionExecutable
      */
     protected abstract boolean executeOnMultipleItems(Range range, boolean perform);
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         if (!super.isEnabled()) {

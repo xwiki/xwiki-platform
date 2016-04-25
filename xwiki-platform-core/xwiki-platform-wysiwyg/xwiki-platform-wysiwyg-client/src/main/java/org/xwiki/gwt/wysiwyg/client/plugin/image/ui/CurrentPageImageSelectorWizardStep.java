@@ -85,27 +85,18 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         getList().addSelectionHandler(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectHelpLabel()
     {
         return Strings.INSTANCE.imageSelectImageHelpLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectErrorMessage()
     {
         return Strings.INSTANCE.imageNoImageSelectedError();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
@@ -114,9 +105,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         wikiService.getImageAttachments(new WikiPageReference(currentPage), callback);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<Attachment> fillList(List<Attachment> attachments, Attachment selectedAttachment)
     {
@@ -125,9 +113,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         return selectedItem;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         if (getSelectedItem() != null && getSelectedItem().getData() == null) {
@@ -136,9 +122,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         return ImageWizardStep.IMAGE_CONFIG.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<Attachment> getListItem(Attachment image)
     {
@@ -167,9 +150,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         return url + separator + extraQueryString;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<Attachment> getNewOptionListItem()
     {
@@ -183,9 +163,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         return newImageOption;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSelection(SelectionEvent<ListItem<Attachment>> event)
     {
         // if the selection is the clear floats fake item, move it to the last item
@@ -195,11 +173,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractEntityListSelect
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractEntityListSelectorWizardStep#saveSelectedValue(AsyncCallback)
-     */
     @Override
     protected void saveSelectedValue(final AsyncCallback<Boolean> async)
     {

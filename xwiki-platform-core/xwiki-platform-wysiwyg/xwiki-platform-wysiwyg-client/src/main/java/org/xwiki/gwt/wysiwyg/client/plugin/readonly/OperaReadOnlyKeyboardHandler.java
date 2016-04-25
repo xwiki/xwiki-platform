@@ -36,6 +36,7 @@ public class OperaReadOnlyKeyboardHandler extends ReadOnlyKeyboardHandler
      * {@inheritDoc}
      * <p>
      * Opera doesn't allow us to place the caret before/after the macro unless we put the caret in a text node..
+     * </p>
      */
     @Override
     protected void moveCaretOutside(Node node, boolean before)

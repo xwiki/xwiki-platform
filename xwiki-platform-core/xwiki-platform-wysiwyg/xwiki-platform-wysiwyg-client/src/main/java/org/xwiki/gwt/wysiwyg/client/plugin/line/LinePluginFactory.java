@@ -55,11 +55,7 @@ public final class LinePluginFactory extends AbstractPluginFactory
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return GWT.create(LinePlugin.class);

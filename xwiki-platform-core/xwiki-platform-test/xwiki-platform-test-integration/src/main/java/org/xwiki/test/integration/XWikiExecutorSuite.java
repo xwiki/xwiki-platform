@@ -186,9 +186,6 @@ public class XWikiExecutorSuite extends ClasspathSuite
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void run(RunNotifier notifier)
     {

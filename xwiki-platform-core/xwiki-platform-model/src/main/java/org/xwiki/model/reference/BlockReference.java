@@ -84,9 +84,11 @@ public class BlockReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to check the type to be an block type.
-     *
+     * </p>
+     * 
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
     @Override
@@ -100,8 +102,10 @@ public class BlockReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to ensure that the parent of a block is either a document or an object property.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */

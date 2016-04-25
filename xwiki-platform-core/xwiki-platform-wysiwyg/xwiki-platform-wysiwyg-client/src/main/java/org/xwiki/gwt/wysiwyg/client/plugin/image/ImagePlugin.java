@@ -105,11 +105,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(XRichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -132,6 +128,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
             // initialized, which happens after all the plugins are loaded.
             Scheduler.get().scheduleDeferred(new ScheduledCommand()
             {
+                @Override
                 public void execute()
                 {
                     menuExtension.registerAttachHandlers();
@@ -156,11 +153,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         saveRegistration(getTextArea().addKeyPressHandler(behaviorAdjuster));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (imageButton != null) {
@@ -184,11 +177,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == imageButton) {
@@ -256,9 +245,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         getTextArea().setFocus(true);
@@ -266,9 +253,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         getTextArea().getCommandManager().execute(Command.INSERT_IMAGE, imageJSON);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         // return the focus to the text area

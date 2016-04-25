@@ -54,6 +54,7 @@ public class XWikiDavFilter implements Filter
      * Here we 'steal' both OPTIONS and PROPFIND request types and direct them to webdav servlet.
      * </p>
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException
     {

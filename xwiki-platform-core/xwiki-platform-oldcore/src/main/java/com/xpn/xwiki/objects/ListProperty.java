@@ -258,7 +258,8 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * {@inheritDoc}
      * <p>
-     * This is important.. Otherwise we can get a stackoverflow calling toXML()
+     * This is important.. Otherwise we can get a stackoverflow calling toXML().
+     * </p>
      *
      * @see com.xpn.xwiki.objects.BaseProperty#toString()
      */

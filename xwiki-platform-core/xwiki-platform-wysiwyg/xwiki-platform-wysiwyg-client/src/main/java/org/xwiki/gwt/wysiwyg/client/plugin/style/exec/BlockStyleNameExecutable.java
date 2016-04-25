@@ -55,11 +55,6 @@ public class BlockStyleNameExecutable extends BlockStyleExecutable
         super(rta, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlockStyleExecutable#execute(String)
-     */
     @Override
     public boolean execute(String parameter)
     {
@@ -67,11 +62,6 @@ public class BlockStyleNameExecutable extends BlockStyleExecutable
         return super.execute(parameter);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlockStyleExecutable#execute(Node, int, int, String)
-     */
     @Override
     protected void execute(Node node, int startOffset, int endOffset, String value)
     {
@@ -82,11 +72,6 @@ public class BlockStyleNameExecutable extends BlockStyleExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlockStyleExecutable#addStyle(Element, String)
-     */
     @Override
     protected void addStyle(Element element, String styleName)
     {
@@ -126,11 +111,6 @@ public class BlockStyleNameExecutable extends BlockStyleExecutable
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlockStyleExecutable#getParameter()
-     */
     @Override
     public String getParameter()
     {
@@ -200,11 +180,6 @@ public class BlockStyleNameExecutable extends BlockStyleExecutable
         return styleNames;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlockStyleExecutable#isExecuted()
-     */
     @Override
     public boolean isExecuted()
     {

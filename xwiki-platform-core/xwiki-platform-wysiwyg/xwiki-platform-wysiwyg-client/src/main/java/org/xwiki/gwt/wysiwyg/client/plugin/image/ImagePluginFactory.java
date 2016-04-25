@@ -64,11 +64,7 @@ public final class ImagePluginFactory extends AbstractPluginFactory
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return new ImagePlugin(wikiService);

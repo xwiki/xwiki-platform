@@ -155,8 +155,10 @@ public class IEOldDOMUtils extends IEDOMUtils
      * a consequence an attribute can be shared by multiple elements. When we {@link #removeAttribute(String)} the
      * {@code specified} flag is set to {@code false} and thus {@link #hasAttribute(String)}, which uses this flag in
      * its IE7 implementation, mistakenly reports the attribute as missing from the rest of the elements that share it.
+     * </p>
      * <p>
      * We also think that element properties of non-primitive types shouldn't be counted as attributes.
+     * </p>
      * 
      * @see IEDOMUtils#hasAttribute(Element, String)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
@@ -227,6 +229,7 @@ public class IEOldDOMUtils extends IEDOMUtils
      * <p>
      * Internet Explorer stores element properties in attribute nodes. In order to remove a property we have to remove
      * its attribute node too.
+     * </p>
      * 
      * @see IEDOMUtils#removeProperty(Element, String)
      */

@@ -42,11 +42,7 @@ public final class LinkConfigDOMWriter implements ConfigDOMWriter<LinkConfig, An
      */
     private static final String TARGET_BLANK = "__blank";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigDOMWriter#write(Object, com.google.gwt.dom.client.Element)
-     */
+    @Override
     public void write(LinkConfig config, AnchorElement anchor)
     {
         // Required attributes.

@@ -132,7 +132,10 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * {@inheritDoc} Make sure we don't leave files in temp directories and in memory.
+     * {@inheritDoc}
+     * <p>
+     * Make sure we don't leave files in temp directories and in memory.
+     * </p>
      */
     @Override
     public void endRendering(XWikiContext context)

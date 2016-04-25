@@ -64,21 +64,13 @@ public class DefaultValidationRule implements ValidationRule
         this.command = command;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#areValid(RichTextArea)
-     */
+    @Override
     public boolean areValid(RichTextArea textArea)
     {
         return textArea.getCommandManager().isEnabled(command);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return new String[] {feature};

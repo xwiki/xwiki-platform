@@ -514,6 +514,12 @@
                     "code": "java.class.removed",
                     "old": "class org.xwiki.test.ui.po.CopyStatusPage",
                     "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
+                  },
+                  {
+                    "code": "java.method.returnTypeChanged",
+                    "old": "method void org.xwiki.test.ui.TestUtils::setDefaultCredentials(org.apache.commons.httpclient.UsernamePasswordCredentials)",
+                    "new": "method org.apache.commons.httpclient.UsernamePasswordCredentials org.xwiki.test.ui.TestUtils::setDefaultCredentials(org.apache.commons.httpclient.UsernamePasswordCredentials)",
+                    "justification": "Minor change unlikely to break anything in practice"
                   }
                 ]
               }

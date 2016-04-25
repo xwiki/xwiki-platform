@@ -37,12 +37,12 @@ import org.xwiki.component.util.DefaultParameterizedType;
 public interface SpaceReferenceResolver<T>
 {
     /**
-     * Type instance for SpaceReferenceResolver<String>.
+     * Type instance for {@code SpaceReferenceResolver<String>}.
      */
     ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, SpaceReferenceResolver.class, String.class);
 
     /**
-     * Type instance for SpaceReferenceResolver<EntityReference>.
+     * Type instance for {@code SpaceReferenceResolver<EntityReference>}.
      */
     ParameterizedType TYPE_REFERENCE = new DefaultParameterizedType(null, SpaceReferenceResolver.class,
         EntityReference.class);

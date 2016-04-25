@@ -35,7 +35,7 @@ import org.xwiki.model.EntityType;
 public class WikiReference extends EntityReference
 {
     /**
-     * The {@link Type} for a Provider<WikiReference>.
+     * The {@link Type} for a {@code Provider<WikiReference>}.
      * 
      * @since 7.2M1
      */

@@ -38,7 +38,7 @@ import org.xwiki.model.EntityType;
 public class SpaceReference extends EntityReference
 {
     /**
-     * The {@link Type} for a Provider<SpaceReference>.
+     * The {@link Type} for a {@code Provider<SpaceReference>}.
      * 
      * @since 7.2M1
      */

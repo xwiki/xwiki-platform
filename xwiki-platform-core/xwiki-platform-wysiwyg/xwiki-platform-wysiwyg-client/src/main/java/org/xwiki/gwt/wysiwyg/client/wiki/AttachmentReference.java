@@ -141,7 +141,11 @@ public class AttachmentReference implements IsSerializable
             ? other.wikiPageReference == null : wikiPageReference.equals(other.wikiPageReference);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#clone()
+     */
     public AttachmentReference clone()
     {
         return new AttachmentReference(entityReference.clone());

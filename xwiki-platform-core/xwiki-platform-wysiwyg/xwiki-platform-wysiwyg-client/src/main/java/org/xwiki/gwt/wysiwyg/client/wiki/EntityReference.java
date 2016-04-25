@@ -146,7 +146,11 @@ public class EntityReference implements IsSerializable
         return components.equals(other.components) && EntityType.areEqual(type, other.type);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#clone()
+     */
     public EntityReference clone()
     {
         EntityReference clone = new EntityReference();

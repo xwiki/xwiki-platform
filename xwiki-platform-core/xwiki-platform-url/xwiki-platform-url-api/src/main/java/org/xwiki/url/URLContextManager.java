@@ -38,7 +38,7 @@ public interface URLContextManager
     String getURLFormatId();
 
     /**
-     * @param urlFormatId see {@link @getURLFormatId}
+     * @param urlFormatId see {@link #getURLFormatId}
      */
     void setURLFormatId(String urlFormatId);
 }

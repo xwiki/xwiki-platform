@@ -40,7 +40,7 @@ import org.xwiki.model.EntityType;
 public class DocumentReference extends EntityReference
 {
     /**
-     * The {@link Type} for a {@link Provider<DocumentReference>}.
+     * The {@link Type} for a {@code Provider<DocumentReference>}.
      * 
      * @since 7.2M1
      */

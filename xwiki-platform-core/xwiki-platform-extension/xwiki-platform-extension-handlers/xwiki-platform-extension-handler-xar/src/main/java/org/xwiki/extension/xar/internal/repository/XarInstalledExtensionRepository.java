@@ -157,7 +157,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
                 try {
                     addCacheXarExtension(installedExtension);
                 } catch (Exception e) {
-                    this.logger.error("Failed to parse extension [" + installedExtension + "]", e);
+                    this.logger.error("Failed to parse extension [{}]", installedExtension.getId(), e);
                 }
             }
         } else {
@@ -174,7 +174,11 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
 
     protected void removeCachedXarExtension(ExtensionId extensionId)
     {
-        super.removeCachedExtension((XarInstalledExtension) getInstalledExtension(extensionId));
+        XarInstalledExtension extension = (XarInstalledExtension) getInstalledExtension(extensionId);
+
+        if (extension != null) {
+            super.removeCachedExtension(extension);
+        }
     }
 
     private void loadExtensions()
@@ -184,7 +188,7 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
                 try {
                     addCacheXarExtension(localExtension);
                 } catch (Exception e) {
-                    this.logger.error("Failed to parse extension [" + localExtension + "]", e);
+                    this.logger.error("Failed to parse extension [{}]", localExtension.getId(), e);
                 }
             }
         }

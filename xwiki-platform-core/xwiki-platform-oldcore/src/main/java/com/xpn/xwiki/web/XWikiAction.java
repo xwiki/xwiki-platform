@@ -54,6 +54,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
@@ -69,6 +70,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
@@ -703,13 +705,28 @@ public abstract class XWikiAction extends Action
             return false;
         }
 
-        // Get the URL corresponding to the location
+        // Resolve the location to get a reference
         DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        DocumentReference locationReference = resolver.resolve(location, wikiReference);
+        EntityReference locationReference = resolver.resolve(location, wikiReference);
+
+        // Get the type of the current target
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        EntityReference entityReference = entityResource.getEntityReference();
+
+        // If the entity is inside a document, compute the new entity with the new document part.
+        if (entityReference.getType().ordinal() > EntityType.DOCUMENT.ordinal()) {
+            EntityReference parentDocument = entityReference.extractReference(EntityType.DOCUMENT);
+            locationReference = entityReference.replaceParent(parentDocument, locationReference);
+        }
+
+        // Get the URL corresponding to the location
         // Note: the anchor part is lost in the process, because it is not sent to the server
         // (see: http://stackoverflow.com/a/4276491)
         String url = context.getWiki().getURL(locationReference, context.getAction(),
-                context.getRequest().getQueryString(), null, context);
+                    context.getRequest().getQueryString(), null, context);
+
+        // Send the redirection
         try {
             context.getResponse().sendRedirect(url);
         } catch (IOException e) {

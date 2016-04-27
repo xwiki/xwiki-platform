@@ -123,32 +123,50 @@
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
         <version>1.5.3</version>
+        <configuration>
+          <basedir>${basedir}/target/xwiki/</basedir>
+          <regex>false</regex>
+          <commentsEnabled>false</commentsEnabled>
+          <skip>${skipTests}</skip>
+        </configuration>
         <executions>
           <execution>
+            <id>change-web-pom</id>
             <phase>generate-test-resources</phase>
             <goals>
               <goal>replace</goal>
             </goals>
+            <configuration>
+              <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
+              <replacements>
+                <replacement>
+                  <token>&lt;/description&gt;</token>
+                  <value>&lt;/description&gt;
+  &lt;properties&gt;
+    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
+  &lt;/properties&gt;</value>
+                </replacement>
+              </replacements>
+            </configuration>
+          </execution>
+          <!-- Disable DW -->
+          <execution>
+            <id>change-xwiki.properties</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <filesToInclude>webapps/xwiki/WEB-INF/xwiki.properties</filesToInclude>
+              <replacements>
+                <replacement>
+                  <token># distribution.automaticStartOnMainWiki=true</token>
+                  <value>distribution.automaticStartOnMainWiki=false</value>
+                </replacement>
+              </replacements>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <basedir>${basedir}/target/xwiki/</basedir>
-          <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml,webapps/xwiki/WEB-INF/xwiki.properties</filesToInclude>
-          <regex>false</regex>
-          <commentsEnabled>false</commentsEnabled>
-          <skip>${skipTests}</skip>
-          <replacements>
-            <replacement>
-              <token>&lt;/properties&gt;</token>
-              <value>    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
-  &lt;/properties&gt;</value>
-            </replacement>
-            <replacement>
-              <token># distribution.automaticStartOnMainWiki=true</token>
-              <value>distribution.automaticStartOnMainWiki=false</value>
-            </replacement>
-          </replacements>
-        </configuration>
       </plugin>
       <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
            browser several times -->

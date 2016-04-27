@@ -135,7 +135,7 @@
            - if you want the main wiki database to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:mysql://localhost/xwiki</property>
+    <property name="connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>

@@ -236,7 +236,7 @@
         <xwiki.db.jdbc.groupId>mysql</xwiki.db.jdbc.groupId>
         <xwiki.db.jdbc.artifactId>mysql-connector-java</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${mysql.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki</xwiki.db.connection.url>
+        <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>

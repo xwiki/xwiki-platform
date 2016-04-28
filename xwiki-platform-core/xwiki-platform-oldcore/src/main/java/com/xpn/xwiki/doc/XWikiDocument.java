@@ -2643,7 +2643,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 return getXObject(classReference);
             }
 
-            LOGGER.warn("Exception while accessing objects for document [{}]: {}", this, e.getMessage(), e);
+            LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(), e.getMessage(), e);
             return null;
         }
     }
@@ -4351,7 +4351,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             toXML(baos, bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
             return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
-            LOGGER.warn("Exception while generating XML serialization of document [{}]: {}", this, e.getMessage(), e);
+            LOGGER.warn("Exception while generating XML serialization of document [{}]: {}", getDocumentReference(), e.getMessage(), e);
             return "";
         }
     }
@@ -6451,7 +6451,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             newAttach));
                     }
                 } catch (XWikiException e) {
-                    LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach, newAttach);
+                    LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach.getReference(), newAttach.getReference());
                 }
             }
         }

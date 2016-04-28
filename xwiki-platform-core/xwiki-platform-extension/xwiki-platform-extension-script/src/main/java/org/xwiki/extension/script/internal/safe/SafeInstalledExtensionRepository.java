@@ -43,8 +43,8 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository> extends
-    SafeAdvancedSearchableExtensionRepository<T> implements InstalledExtensionRepository
+public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository>
+    extends SafeAdvancedSearchableExtensionRepository<T> implements InstalledExtensionRepository
 {
     /**
      * @param repository wrapped repository
@@ -187,5 +187,18 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
         throws SearchException
     {
         return safe(getWrapped().searchInstalledExtensions(namespace, query));
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(ExtensionQuery query) throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(query));
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(Collection<String> namespaces,
+        ExtensionQuery query) throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(namespaces, query));
     }
 }

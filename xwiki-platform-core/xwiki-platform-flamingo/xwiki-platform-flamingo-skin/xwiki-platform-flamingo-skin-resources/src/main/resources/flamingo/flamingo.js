@@ -1,3 +1,14 @@
+require(['jquery', 'drawer'], function($) {
+  $(document).ready(function() {
+    // Start the drawer
+    $('.drawer').drawer();
+    
+    // When the drawer is close, collapse sub items
+    $(body).on('drawer.closed', function() {
+      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
+    });
+  });
+});
 require(['jquery', 'bootstrap'], function($) {
   $(document).ready(function() {
 
@@ -21,11 +32,5 @@ require(['jquery', 'bootstrap'], function($) {
         }
       }
     });
-
-    // When the drawer is close, collapse sub items
-    $(body).on('drawer.closed', function() {
-      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
-    });
-
   });
 });

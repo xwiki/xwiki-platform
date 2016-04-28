@@ -18,6 +18,14 @@
 @xwiki-drawer-menu-item-seperator-color: darken(@xwiki-page-content-bg, 10%);
 
 
+.skin-flamingo {
+  .drawer-nav {
+    width: 280px;
+    right: -280px;
+    overflow-y: auto;
+  }
+}
+
 .drawer-default {
   background-color: @xwiki-drawer-bg;
   
@@ -26,9 +34,12 @@
     background-color: @xwiki-drawer-brand-bg;
     border-bottom: 1px solid @xwiki-drawer-brand-border;
     padding: 20px 16px;
+    line-height: 1em;
   
     a {
       color: @xwiki-drawer-brand-link-color;
+      display: block;
+      margin-bottom: 5px;
       padding: 0;
       
       &:hover, &:focus {
@@ -47,7 +58,7 @@
     .brand-links {
       float: left;
       margin-left: 16px;
-      margin-top: 8px;
+      display: block;
       
       a {
         font-size: 14px;
@@ -64,12 +75,17 @@
   // Menu Item =============================================================
   .drawer-menu-item {
     padding: 0;
+    
+    &:hover {
+      text-decoration: none;
+    }
      
     a {
       font-size: @xwiki-drawer-menu-item-size;
       font-weight: 400;
       margin-top: 0;
       padding: @xwiki-drawer-menu-item-padding;
+      display: block;
     
       &, &:hover, &:focus {
         background-color: @xwiki-drawer-menu-item-bg;
@@ -86,6 +102,8 @@
   
   // Sub Item =============================================================
   .drawer-menu-sub-item {
+    padding: 0;
+    
     a {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }

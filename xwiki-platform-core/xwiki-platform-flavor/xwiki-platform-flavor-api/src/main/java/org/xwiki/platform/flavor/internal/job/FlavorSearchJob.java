@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -67,7 +68,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     @Inject
     private ExtensionManager extensionManager;
 
-    private List<Extension> foundFlavors = new ArrayList<>();
+    private List<Extension> foundFlavors = new CopyOnWriteArrayList<>();
 
     @Override
     public String getType()

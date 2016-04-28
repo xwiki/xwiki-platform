@@ -21,6 +21,7 @@ com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
+com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer

@@ -660,11 +660,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("nb", "nb", 5, "integer");
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
             doc.setAuthorReference(doc.getCreatorReference());
         }
@@ -725,12 +725,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
         needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
 
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
             doc.setAuthorReference(doc.getCreatorReference());
         }

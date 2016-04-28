@@ -5468,7 +5468,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
                 // play nice with people migrating from 1.0 to 2.0 syntax
 
-                if (macroBlock.getId().equalsIgnoreCase("include")) {
+                if (macroBlock.getId().equalsIgnoreCase("include") || macroBlock.getId().equalsIgnoreCase("display")) {
                     String documentName = macroBlock.getParameters().get("reference");
                     if (StringUtils.isEmpty(documentName)) {
                         documentName = macroBlock.getParameters().get("document");

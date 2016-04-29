@@ -1158,7 +1158,7 @@ public class XWikiLDAPUtils
         XWikiDocument createdUserProfile = context.getWiki().getDocument(userProfile.getDocumentReference(), context);
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
-        if(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UPDATE_PHOTO, "0", context).equals("1")) {
+        if (config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UPDATE_PHOTO, "0", context).equals("1")) {
             // Add user photo from LDAP
             updatePhotoFromLdap(ldapUid, createdUserProfile, context);
         }
@@ -1201,7 +1201,7 @@ public class XWikiLDAPUtils
         // Let BaseObject#apply tell us if something changed or not
         boolean needsUpdate = userObj.apply(clonedUser, false);
 
-        if(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UPDATE_PHOTO, "0", context).equals("1")) {
+        if (config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UPDATE_PHOTO, "0", context).equals("1")) {
             // Sync user photo with LDAP
             needsUpdate = updatePhotoFromLdap(ldapUid, userProfile, context) || needsUpdate;
         }
@@ -1222,9 +1222,10 @@ public class XWikiLDAPUtils
      * @param userProfile the XWiki user profile document.
      * @param context the XWiki context.
      * @return true if avatar was updated, false otherwise.
-     * @throws XWikiException 
+     * @throws XWikiException
      */
-    protected boolean updatePhotoFromLdap(String ldapUid, XWikiDocument userProfile, XWikiContext context) throws XWikiException
+    protected boolean updatePhotoFromLdap(String ldapUid, XWikiDocument userProfile, XWikiContext context)
+        throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -1239,18 +1240,20 @@ public class XWikiLDAPUtils
         }
 
         // Get properties
-        String photoAttachmentName = config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_PHOTO_ATTACHMENT_NAME, "ldapPhoto", context);
-        String ldapPhotoAttribute = config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_PHOTO_ATTRIBUTE, XWikiLDAPConfig.DEFAULT_PHOTO_ATTRIBUTE, context);
+        String photoAttachmentName =
+            config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_PHOTO_ATTACHMENT_NAME, "ldapPhoto", context);
+        String ldapPhotoAttribute = config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_PHOTO_ATTRIBUTE,
+            XWikiLDAPConfig.DEFAULT_PHOTO_ATTRIBUTE, context);
 
         // Proceed only if any of conditions are true:
         // 1. User do not have avatar currently
         // 2. User have avatar and avatar file name is equals to PREF_LDAP_PHOTO_ATTACHMENT_NAME
-        if (StringUtils.isEmpty(userAvatar) || photoAttachmentName.equals(FilenameUtils.getBaseName(userAvatar)) || currentPhoto == null) {
+        if (StringUtils.isEmpty(userAvatar) || photoAttachmentName.equals(FilenameUtils.getBaseName(userAvatar))
+            || currentPhoto == null) {
             // Obtain photo from LDAP
             byte[] ldapPhoto = null;
-            List<XWikiLDAPSearchAttribute> ldapAttributes = searchUserAttributesByUid(
-                ldapUid, new String[]{ ldapPhotoAttribute }
-            );
+            List<XWikiLDAPSearchAttribute> ldapAttributes =
+                searchUserAttributesByUid(ldapUid, new String[] {ldapPhotoAttribute});
             if (ldapAttributes != null) {
                 // searchUserAttributesByUid method may return «dn» as 1st element
                 // Let's iterate over array and search ldapPhotoAttribute
@@ -1273,16 +1276,19 @@ public class XWikiLDAPUtils
                     if (!StringUtils.isEmpty(userAvatar) && currentPhoto != null) {
                         try {
                             // Compare current xwiki avatar and LDAP photo
-                            if (!IOUtils.contentEquals(currentPhoto.getContentInputStream(context), ldapPhotoInputStream)) {
+                            if (!IOUtils.contentEquals(currentPhoto.getContentInputStream(context),
+                                ldapPhotoInputStream)) {
                                 ldapPhotoInputStream.reset();
 
                                 // Store photo
-                                return addPhotoToProfile(userProfile, context, ldapPhotoInputStream, ldapPhoto.length, photoAttachmentFullName);
+                                return addPhotoToProfile(userProfile, context, ldapPhotoInputStream, ldapPhoto.length,
+                                    photoAttachmentFullName);
                             }
                         } catch (IOException ex) {
                             LOGGER.error(ex.getMessage());
                         }
-                    } else if (addPhotoToProfile(userProfile, context, ldapPhotoInputStream, ldapPhoto.length, photoAttachmentFullName)) {
+                    } else if (addPhotoToProfile(userProfile, context, ldapPhotoInputStream, ldapPhoto.length,
+                        photoAttachmentFullName)) {
                         PropertyClass avatarProperty = (PropertyClass) userClass.getField("avatar");
                         userObj.safeput("avatar", avatarProperty.fromString(photoAttachmentFullName));
                         return true;
@@ -1311,7 +1317,8 @@ public class XWikiLDAPUtils
      * @param attachmentName attachment name for provided photo.
      * @return true if photo was saved to user profile, false otherwise.
      */
-    protected boolean addPhotoToProfile(XWikiDocument userProfile, XWikiContext context, InputStream photoInputStream, int streamLength, String attachmentName)
+    protected boolean addPhotoToProfile(XWikiDocument userProfile, XWikiContext context, InputStream photoInputStream,
+        int streamLength, String attachmentName)
     {
         XWikiAttachment attachment;
         try {
@@ -1343,7 +1350,7 @@ public class XWikiLDAPUtils
         }
 
         Iterator<ImageReader> it = ImageIO.getImageReaders(imageStream);
-        if(!it.hasNext()) {
+        if (!it.hasNext()) {
             LOGGER.warn("No image readers found for provided stream.");
             return null;
         }

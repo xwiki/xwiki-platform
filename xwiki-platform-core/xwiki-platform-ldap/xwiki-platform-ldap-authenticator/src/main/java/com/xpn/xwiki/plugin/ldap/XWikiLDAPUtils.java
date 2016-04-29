@@ -61,8 +61,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.user.impl.LDAP.LDAPProfileXClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -1076,25 +1079,49 @@ public class XWikiLDAPUtils
     }
 
     private void set(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings,
-        BaseObject userObject, XWikiContext xcontext)
+        BaseObject userObject, XWikiContext xcontext) throws XWikiException
     {
         if (searchAttributes != null) {
-            // Convert LDAP attributes to a map (mostly to make easier to manipulate lists)
-            Map<String, Object> map = toMap(searchAttributes, userMappings);
+            // Convert LDAP attributes to a map usable with BaseClass#fromValueMap
+            Map<String, Object> map = toMap(searchAttributes, userMappings, xcontext);
 
             // Set properties in the user object
-            for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
-                Map.Entry<String, Object> entry = it.next();
-                String key = entry.getKey();
-                Object value = entry.getValue();
-
-                userObject.set(key, value, xcontext);
-            }
+            userObject.getXClass(xcontext).fromValueMap(map, userObject);
         }
     }
 
-    private Map<String, Object> toMap(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings)
+    private void setProperty(BaseObject userObject, String key, Object value, XWikiContext xcontext)
     {
+        BaseClass bclass = userObject.getXClass(xcontext);
+        PropertyClass pclass = (PropertyClass) bclass.get(key);
+
+        BaseProperty prop = null;
+        if (pclass != null) {
+            if (value instanceof String) {
+                // In case the LDAP side in a String go trough property class fromString to be safe
+                prop = pclass.fromString((String) value);
+            } else if (value instanceof Collection && pclass instanceof StringClass) {
+                // In case the LDAP side is a list and XWiki size is a String, assume we want the first element
+                prop = pclass.fromValue(((Collection) value).iterator().next());
+            } else {
+                // Default behavior: try to put whatever we get as it is
+                prop = pclass.fromValue(value);
+            }
+        }
+
+        // TODO: else generate new property based on the type of the value instead of relying on what is already
+        // there
+
+        if (prop != null) {
+            userObject.safeput(key, prop);
+        }
+    }
+
+    private Map<String, Object> toMap(List<XWikiLDAPSearchAttribute> searchAttributes, Map<String, String> userMappings,
+        XWikiContext xcontext) throws XWikiException
+    {
+        BaseClass userClass = xcontext.getWiki().getUserClass(xcontext);
+
         Map<String, Object> map = new HashMap<String, Object>();
         if (searchAttributes != null) {
             for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
@@ -1105,21 +1132,19 @@ public class XWikiLDAPUtils
                     continue;
                 }
 
-                Object existingValue = map.get(xattr);
-                if (existingValue != null) {
-                    if (existingValue instanceof String) {
-                        List<String> listValue = new ArrayList<>();
-                        listValue.add((String) existingValue);
-                        listValue.add(lval);
-                        map.put(xattr, listValue);
-                    } else if (existingValue instanceof List) {
-                        List<String> listValue = (List<String>) existingValue;
-                        listValue.add(lval);
+                PropertyClass pclass = (PropertyClass) userClass.get(xattr);
+
+                if (pclass != null) {
+                    if (pclass instanceof ListClass) {
+                        Object mapValue = map.get(xattr);
+                        if (mapValue == null) {
+                            mapValue = new ArrayList<>();
+                            map.put(xattr, mapValue);
+                        }
+                        ((List) mapValue).add(lval.toString());
                     } else {
                         map.put(xattr, lval);
                     }
-                } else {
-                    map.put(xattr, lval);
                 }
             }
         }
@@ -1147,7 +1172,7 @@ public class XWikiLDAPUtils
         LOGGER.debug("Start first synchronization of LDAP profile [{}] with new user profile based on mapping [{}]",
             searchAttributes, userMappings);
 
-        Map<String, Object> map = toMap(searchAttributes, userMappings);
+        Map<String, Object> map = toMap(searchAttributes, userMappings, context);
 
         // Mark user active
         map.put("active", "1");

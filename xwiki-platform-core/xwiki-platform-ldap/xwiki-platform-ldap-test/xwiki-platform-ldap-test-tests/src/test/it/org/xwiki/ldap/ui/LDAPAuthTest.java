@@ -114,6 +114,8 @@ public class LDAPAuthTest extends AbstractGuestTest
         page.setObjects(new Objects());
         page.getObjects().getObjectSummaries().add(obj);
         getUtil().rest().save(page);
+        // Wait for group cache invalidation
+        Thread.sleep(1000);
         getUtil().login(LDAPTestSetup.WILLIAMBUSH_UID, LDAPTestSetup.WILLIAMBUSH_PWD);
 
         // ///////////////////

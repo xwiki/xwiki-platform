@@ -62,6 +62,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
@@ -89,7 +90,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ReferenceComponentList
-@ComponentList(DefaultSyntaxFactory.class)
+@ComponentList({DefaultSyntaxFactory.class, StaticListMetaClass.class})
 public class XWikiDocumentMockitoTest
 {
     private static final String DOCWIKI = "wiki";
@@ -590,13 +591,14 @@ public class XWikiDocumentMockitoTest
     @Test
     public void testObjectNumbersAfterXMLRoundrip() throws XWikiException
     {
-        XWikiDocument tagDocument = new XWikiDocument();
-        tagDocument.setFullName(XWikiConstant.TAG_CLASS);
+        String wiki = oldcore.getXWikiContext().getWikiId();
+
+        XWikiDocument tagDocument = new XWikiDocument(new DocumentReference(wiki, "XWiki", "TagClass"));
         BaseClass tagClass = tagDocument.getXClass();
         tagClass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
         this.oldcore.getSpyXWiki().saveDocument(tagDocument, this.oldcore.getXWikiContext());
 
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("test", "test", "document"));
+        XWikiDocument doc = new XWikiDocument(new DocumentReference(wiki, "test", "document"));
         doReturn("iso-8859-1").when(this.oldcore.getSpyXWiki()).getEncoding();
 
         BaseObject object1 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
@@ -607,7 +609,7 @@ public class XWikiDocumentMockitoTest
         doc.removeXObject(object1);
 
         String docXML = doc.toXML(this.oldcore.getXWikiContext());
-        XWikiDocument docFromXML = new XWikiDocument();
+        XWikiDocument docFromXML = new XWikiDocument(doc.getDocumentReference());
         docFromXML.fromXML(docXML);
 
         List<BaseObject> objects = doc.getXObjects(tagDocument.getDocumentReference());

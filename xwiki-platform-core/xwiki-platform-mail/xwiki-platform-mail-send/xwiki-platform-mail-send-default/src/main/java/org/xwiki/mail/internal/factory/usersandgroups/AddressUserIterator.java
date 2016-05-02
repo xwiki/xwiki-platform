@@ -71,15 +71,10 @@ public class AddressUserIterator extends UserIterator<Address>
     @Override
     public boolean hasNext()
     {
-        boolean hasNext = false;
         if (this.lookaheadAddress == null) {
-            Address address = getNext();
-            if (address != null) {
-                this.lookaheadAddress = address;
-                hasNext = true;
-            }
+            this.lookaheadAddress = getNext();
         }
-        return hasNext;
+        return this.lookaheadAddress != null;
     }
 
     @Override

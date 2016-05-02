@@ -31,8 +31,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
@@ -197,15 +199,18 @@ public class ReferenceUserIteratorTest
 
         // It's a user reference
         BaseObject bo1 = mock(BaseObject.class);
-        when(document.getXObject(new DocumentReference("wiki", "XWiki", "XWikiUsers"))).thenReturn(bo1);
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(bo1);
 
         // It's also a group reference (with one user in it)
         List<BaseObject> memberObjects = new ArrayList<>();
         BaseObject bo2 = mock(BaseObject.class);
         when(bo2.getStringValue("member")).thenReturn("XWiki.user");
         memberObjects.add(bo2);
-        when(document.getXObjects(new DocumentReference("wiki", "XWiki", "XWikiGroups"))).thenReturn(
-            memberObjects);
+        when(document.getXObjects(
+            new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(memberObjects);
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
         when(this.resolver.resolve("XWiki.user", reference)).thenReturn(userReference);
         setUpUserPageMocks(userReference);
@@ -346,8 +351,9 @@ public class ReferenceUserIteratorTest
         bo = mock(BaseObject.class);
         when(bo.getStringValue("member")).thenReturn("XWiki.userpage");
         memberObjects.add(bo);
-        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
-            memberObjects);
+        when(document.getXObjects(
+            new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(memberObjects);
 
         DocumentReference userpageReference = new DocumentReference("groupwiki", "XWiki", "userpage");
         setUpUserPageMocks(userpageReference);
@@ -366,8 +372,9 @@ public class ReferenceUserIteratorTest
         bo = mock(BaseObject.class);
         when(bo.getStringValue("member")).thenReturn("XWiki.anotheruser");
         memberObjects.add(bo);
-        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
-            memberObjects);
+        when(document.getXObjects(
+            new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(memberObjects);
 
         DocumentReference anotheruserReference = new DocumentReference("groupwiki", "XWiki", "anotheruser");
         setUpUserPageMocks(anotheruserReference);
@@ -483,8 +490,9 @@ public class ReferenceUserIteratorTest
                 references[i].getLastSpaceReference().getName() + references[i].getName());
             memberObjects.add(bo);
         }
-        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
-            memberObjects);
+        when(document.getXObjects(
+            new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(memberObjects);
 
         for (int i = 1; i < references.length; i++) {
             setUpUserPageMocks(references[i]);
@@ -500,8 +508,9 @@ public class ReferenceUserIteratorTest
         when(document.isNew()).thenReturn(false);
         when(document.getDocumentReference()).thenReturn(userReference);
         BaseObject baseObject = mock(BaseObject.class);
-        when(document.getXObject(new DocumentReference(
-            userReference.getWikiReference().getName(), "XWiki", "XWikiUsers"))).thenReturn(baseObject);
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(baseObject);
         when(this.xwiki.getDocument(userReference, this.xwikiContext)).thenReturn(document);
     }
 

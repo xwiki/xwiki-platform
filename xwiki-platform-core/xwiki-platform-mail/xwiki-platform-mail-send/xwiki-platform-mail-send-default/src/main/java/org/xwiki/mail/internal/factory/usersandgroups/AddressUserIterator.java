@@ -97,29 +97,19 @@ public class AddressUserIterator extends UserIterator<Address>
     {
         Address address;
 
-        // Are there still group and user references to process?
-        // If not, are there still email addresses to process?
-        if (super.hasNext()) {
-            address = super.next();
-        } else if (this.addressIterator.hasNext()) {
-            address = this.addressIterator.next();
-        } else {
-            return null;
-        }
+        do {
+            // Are there still group and user references to process?
+            // If not, are there still email addresses to process?
+            if (super.hasNext()) {
+                address = super.next();
+            } else if (this.addressIterator.hasNext()) {
+                address = this.addressIterator.next();
+            } else {
+                return null;
+            }
+        } while(this.excludedAddresses.contains(address) || this.processedAddresses.contains(address));
 
-        // Handle excludes
-        if (this.excludedAddresses.contains(address)) {
-            return getNext();
-        }
-
-        // Handle duplicates:
-        // - If the address has already been returned, skip it!
-        // - Otherwise add it to the list of processed addresses.
-        if (this.processedAddresses.contains(address)) {
-            address = getNext();
-        } else {
-            this.processedAddresses.add(address);
-        }
+        this.processedAddresses.add(address);
 
         return address;
     }

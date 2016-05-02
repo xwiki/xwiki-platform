@@ -1494,8 +1494,10 @@ public class XWikiHibernateBaseStore implements Initializable
             return inputxcontext;
         }
 
-        if (xcontext != inputxcontext) {
-            LOGGER.warn("XWikiContext unsynchronized with the Execution Context has been passed", new Exception());
+        if (inputxcontext != null && xcontext != inputxcontext) {
+            LOGGER.warn(
+                "ExecutionContext and passed XWikiContext argument mismatched, for data safety, the XWikiContext from the ExecutionContext has been used.",
+                new Exception());
         }
 
         return xcontext;

@@ -50,10 +50,12 @@
           <!-- Copy the build configuration to the CKEditor sources. -->
           <execution>
             <id>copy-ckeditor-build-config</id>
+            <phase>process-resources</phase>
           </execution>
           <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
           <execution>
             <id>copy-ckeditor-resources</id>
+            <phase>prepare-package</phase>
           </execution>
         </executions>
       </plugin>

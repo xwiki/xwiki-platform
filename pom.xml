@@ -67,9 +67,23 @@
     <!-- Follow the specifications regarding the WebJar content path.
       (this property is defined in platform-core pom; remove this when the CKEditor is integrated in platform)-->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
-    <!-- Where to unpack the WebJars. -->
-    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>requirejs</artifactId>
+        <version>2.1.15</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>1.11.3</version>
+        <scope>runtime</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <pluginManagement>
       <plugins>
@@ -98,7 +112,8 @@
             <!-- Copy the build configuration to the CKEditor sources. -->
             <execution>
               <id>copy-ckeditor-build-config</id>
-              <phase>process-resources</phase>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
               <goals>
                 <goal>copy-resources</goal>
               </goals>
@@ -111,10 +126,11 @@
                 </resources>
               </configuration>
             </execution>
+            <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
             <execution>
-              <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
               <id>copy-ckeditor-resources</id>
-              <phase>prepare-package</phase>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
               <goals>
                 <goal>copy-resources</goal>
               </goals>

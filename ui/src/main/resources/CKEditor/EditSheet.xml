@@ -46,6 +46,8 @@
   {{html clean="false"}}
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
+    'plugins/xwiki-resource/resourcePicker.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   ## Tree styles needed for the document/attachment tree picker.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -184,16 +186,23 @@
   #set ($ckeditorPath = "${ckeditorPath}.js")
 #end
 #set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
+#set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle")
 */
 require.config({
   paths: {
-    ckeditor: "$!ckeditorPath"
+    ckeditor: '$!ckeditorPath',
+    resource: '$resourcePickerBundlePath',
+    resourcePicker: '$resourcePickerBundlePath',
+    entityResourcePicker: '$resourcePickerBundlePath',
+    entityResourceSuggester: '$resourcePickerBundlePath',
+    entityResourceDisplayer: '$resourcePickerBundlePath',
+    'bootstrap3-typeahead': "$!services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead')"
   },
   shim: {
     ckeditor: {
-      // Some of the plugins that are bundled with the CKEditor code use jQuery.
-      deps: ['jquery'],
-      exports: 'CKEDITOR'
+      exports: 'CKEDITOR',
+      // This includes dependencies of the plugins bundled with the CKEditor code.
+      deps: ['jquery', 'resource', 'resourcePicker']
     }
   }
 });
@@ -228,6 +237,8 @@ require.config({
         fileTools_defaultFileName: '__fileCreatedFromDataURI__',
         fullPage: true,
         height: 500,
+        linkShowAdvancedTab: false,
+        linkShowTargetTab: false,
         removeButtons: 'Find,Anchor',
         removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',
         toolbarGroups: [
@@ -254,19 +265,6 @@ require.config({
         },
         'xwiki-source': {
           htmlConverter: XWiki.currentDocument.getURL('get', 'sheet=CKEditor.HTMLConverter&amp;outputSyntax=plain')
-        },
-        'xwiki-tree': {
-          documentTreeURL: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
-            outputSyntax: 'plain',
-            showAttachments: false,
-            showTranslations: false,
-            showWikis: true
-          })),
-          attachmentTreeURL: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
-            outputSyntax: 'plain',
-            showTranslations: false,
-            showWikis: true
-          }))
         }
       });
     });
@@ -296,7 +294,9 @@ require.config({
     // Used to catch form action events fired from Prototype.js code (actionButtons.js).
     'xwiki-events-bridge',
     // Configures the path to the tree widget module and its dependencies.
-    "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+    "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})",
+    // Used on the link, image and macro dialogs to select pages and attachments.
+    'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer'
   ], function($, ckeditor, xwikiMeta) {
     // xwiki-meta module is available only since 6.3M2
     xwikiMeta = xwikiMeta || {
@@ -733,6 +733,7 @@ body &gt; .modal {
 
 .resourcePicker input[type="text"] {
   box-sizing: border-box;
+  padding: 6px;
 }
 
 .resourcePicker .input-group-btn {
@@ -765,10 +766,8 @@ body &gt; .modal {
 
 .resourcePicker .glyphicon {
   font-family: 'Glyphicons Halflings';
-}
-
-.resourcePicker .icon {
-  vertical-align: middle;
+  line-height: 1;
+  position: relative;
 }
 
 .resourcePicker .caret {
@@ -795,6 +794,48 @@ body &gt; .modal {
   margin: 2px 0 0;
   padding: 5px 0;
   position: absolute;
+}
+
+.resourcePicker .resource-hint.breadcrumb a,
+.resourcePicker .resource-hint.breadcrumb li.ellipsis {
+  font-size: smaller;
+}
+.resourcePicker .resource-hint.breadcrumb li.ellipsis {
+  color: inherit;
+}
+
+.resourcePicker .resourceDisplay {
+  box-sizing: border-box;
+}
+.resourcePicker .resourceDisplay.loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-repeat: no-repeat;
+}
+
+/**
+ * Link Options Toggle
+ */
+
+.linkOptionsToggle &gt; .cke_dialog_ui_labeled_label {
+  color: #777;
+  cursor: pointer;
+}
+.linkOptionsToggle .arrow {
+  display: inline-block;
+  height: 0;
+  width: 0;
+}
+.linkOptionsToggle .arrow-down {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #777;
+  margin-bottom: 1px;
+}
+.linkOptionsToggle .arrow-right {
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid #777;
+  border-top: 4px solid transparent;
+  margin-right: 4px;
 }</code>
     </property>
     <property>

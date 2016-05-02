@@ -37,6 +37,7 @@
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
+    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
     <webjars.unpack.contentDirectory>
       ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
     </webjars.unpack.contentDirectory>
@@ -78,6 +79,7 @@
           <execution>
             <!-- Copy the build configuration to the CKEditor sources. -->
             <id>copy-ckeditor-build-config</id>
+            <phase>process-resources</phase>
           </execution>
           <execution>
             <!-- Copy the custom plugins to the CKEditor sources so that they are included in the build. -->
@@ -91,6 +93,10 @@
               <resources>
                 <resource>
                   <directory>${webjars.unpack.contentDirectory}</directory>
+                  <excludes>
+                    <!-- The plugins are bundled with the CKEditor code. -->
+                    <exclude>**/plugin.min.js</exclude>
+                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -98,6 +104,7 @@
           <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
           <execution>
             <id>copy-ckeditor-resources</id>
+            <phase>prepare-package</phase>
           </execution>
         </executions>
       </plugin>

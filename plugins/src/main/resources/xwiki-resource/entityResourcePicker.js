@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-(function (){
+define('entityResourcePicker', ['jquery', 'resource', 'tree'], function($, $resource) {
   'use strict';
-  var $ = jQuery;
 
   var modalTemplate = 
     '<div class="ckeditor-modal modal" tabindex="-1" role="dialog" data-backdrop="static">' +
@@ -80,7 +79,7 @@
       return selectedNodes.size() > 0;
     };
 
-    modal.one('shown.bs.modal', function(event) {
+    modal.on('shown.bs.modal', function(event) {
       // Open to the specified node only once. Preserve the tree state otherwise.
       var openToNodeId = handler.openToNodeId;
       if (typeof openToNodeId === 'string' && openToNodeId !== modal.data('openTo')) {
@@ -138,7 +137,7 @@
 
   var getEntity = function(node) {
     return {
-      label: node.text,
+      title: node.text,
       reference: getEntityReference(node)
     };
   };
@@ -159,66 +158,51 @@
     return handler;
   };
 
-  var entityTypeToResourceType = ['wiki', 'space', 'doc', 'attach'];
-  var convertEntityReferenceToResourceReference = function(entityReference) {
-    var relativeReference = entityReference.relativeTo(XWiki.currentDocument.getDocumentReference());
-    return {
-      type: entityTypeToResourceType[entityReference.type],
-      reference: XWiki.Model.serialize(relativeReference)
-    };
-  };
-
-  var resourceTypeToEntityType = {
-    doc: 'document',
-    attach: 'attachment'
-  };
-  var convertResourceReferenceToEntityReference = function(resourceReference) {
-    var entityType = XWiki.EntityType.byName(resourceTypeToEntityType[resourceReference.type]);
-    return XWiki.Model.resolve(resourceReference.reference, entityType, XWiki.currentDocument.getDocumentReference());
-  };
-
   var convertEntityToResource = function(entity) {
     return $.extend({}, entity, {
-      reference: convertEntityReferenceToResourceReference(entity.reference),
+      reference: $resource.convertEntityReferenceToResourceReference(entity.reference),
       entityReference: entity.reference
     });
   };
 
   var createResourcePicker = function(modal, handler) {
     var entityTreePickerHandler = createEntityTreePicker(modal, {
-      entityType: resourceTypeToEntityType[handler.resourceType],
+      entityType: $resource.types[handler.resourceType].entityType,
       select: function(entities) {
         handler.select(entities.map(convertEntityToResource));
       }
     });
     handler.open = function(resourceReference) {
-      entityTreePickerHandler.open(convertResourceReferenceToEntityReference(resourceReference));
+      entityTreePickerHandler.open($resource.convertResourceReferenceToEntityReference(resourceReference));
     };
     return handler;
   };
 
-  var registerResourcePicker = function(editor, resourceType, title) {
-    if (editor._.resourcePickers[resourceType]) {
-      // A resource picker has already been registered for the specified resource type.
-      return;
-    }
+  var treeURL = {
+    doc: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
+      outputSyntax: 'plain',
+      showAttachments: false,
+      showTranslations: false,
+      showWikis: true
+    })),
+    attach: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
+      outputSyntax: 'plain',
+      showTranslations: false,
+      showWikis: true
+    }))
+  };
 
-    var entityType = resourceTypeToEntityType[resourceType];
-    var treeURL = (editor.config['xwiki-tree'] || {})[entityType + 'TreeURL'];
-    if (typeof treeURL !== 'string') {
-      return;
-    }
-
+  var registerResourcePicker = function(resourceType, title) {
     var modal = createModal({
       title: title,
       content: createTreeElement({
-        'data-url': treeURL
+        'data-url': treeURL[resourceType]
       }),
       acceptLabel: 'Select'
     });
 
     var picker = createResourcePicker(modal, {resourceType: resourceType});
-    editor._.resourcePickers[resourceType] = function(resourceReference) {
+    $resource.pickers[resourceType] = function(resourceReference) {
       var deferred = $.Deferred();
       picker.select = function(resources) {
         // We assume that only one resource can be selected.
@@ -229,14 +213,6 @@
     };
   };
 
-  CKEDITOR.plugins.add('xwiki-tree', {
-    requires: 'xwiki-resource',
-    init: function(editor) {
-      if (typeof $.fn.xtree === 'function') {
-        // Register the tree pickers only if the tree is available.
-        registerResourcePicker(editor, 'doc', 'Select Page');
-        registerResourcePicker(editor, 'attach', 'Select Attachment');
-      }
-    }
-  });
-})();
+  registerResourcePicker('doc', 'Select Page');
+  registerResourcePicker('attach', 'Select Attachment');
+});

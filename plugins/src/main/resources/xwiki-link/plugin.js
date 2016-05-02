@@ -151,55 +151,63 @@
     var dialogName = event.data.name;
     var dialogDefinition = event.data.definition;
     if (dialogName === 'link') {
-      var resourcePicker = createResourcePicker(event.editor);
-      replaceLinkTypeSelect(dialogDefinition, resourcePicker);
-
-      // Bind the value of the email address and url fields to the resource reference field.
-      // Hide the email address, url and protocol fields because we're using the resource picker instead.
-      var infoTab = dialogDefinition.getContents('info');
-      var resourcePlugin = CKEDITOR.plugins.xwikiResource;
-      resourcePlugin.bindResourcePicker(infoTab.get('emailAddress'), ['info', resourcePicker.id], true);
-      var urlField = infoTab.get('url');
-      resourcePlugin.bindResourcePicker(urlField, ['info', resourcePicker.id]);
-      infoTab.get('protocol').hidden = true;
-
-      // Add page link options.
-      infoTab.add({
-        type: 'vbox',
-        id: 'docOptions',
-        children: [
-          createQueryStringField({id: 'docQueryString'}, 'doc'),
-          createAnchorField({id: 'docAnchor'}, 'doc')
-        ]
-      });
-
-      // Add attachment link options.
-      infoTab.add({
-        type: 'vbox',
-        id: 'attachOptions',
-        children: [
-          createQueryStringField({id: 'attachQueryString'}, 'attach')
-        ]
-      });
-
-      // Bind the mail link options to the corresponding resource reference parameters.
-      bindToResourceParameter(infoTab.get('emailSubject'), 'subject', 'mailto');
-      bindToResourceParameter(infoTab.get('emailBody'), 'body', 'mailto');
-
-      // Remove the custom focus handler set by the link dialog because we want the first input (which is the resource
-      // picker) to be focused when the dialog is opened.
-      delete dialogDefinition.onFocus;
-
-      // The link dialog doesn't have a field to input or edit the link label (because the link label can be edited
-      // in-line) and it uses the link URL as the default label when there is no text or element (e.g. image) selected
-      // in the edited content. This is fine for the external (URL) links but for internal links it's nicer to use the
-      // resource label (e.g. the wiki page title or the attachment file name).
-      overwriteDefaultLinkLabel(dialogDefinition);
-
-      resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
-        ['info', resourcePicker.id], ['upload', 'uploadButton']);
+      enhanceLinkDialog(dialogDefinition, event.editor);
     }
   });
+
+  var enhanceLinkDialog = function(dialogDefinition, editor) {
+    var resourcePicker = createResourcePicker(editor);
+    replaceLinkTypeSelect(dialogDefinition, resourcePicker);
+
+    // Bind the value of the email address and url fields to the resource reference field.
+    // Hide the email address, url and protocol fields because we're using the resource picker instead.
+    var infoTab = dialogDefinition.getContents('info');
+    var resourcePlugin = CKEDITOR.plugins.xwikiResource;
+    resourcePlugin.bindResourcePicker(infoTab.get('emailAddress'), ['info', resourcePicker.id], true);
+    var urlField = infoTab.get('url');
+    resourcePlugin.bindResourcePicker(urlField, ['info', resourcePicker.id]);
+    infoTab.get('urlOptions').className = 'hidden';
+
+    // Add the link options toggle.
+    infoTab.add(createOptionsToggle(), 'urlOptions');
+    dialogDefinition.minHeight = 100;
+
+    // Add page link options.
+    infoTab.add({
+      type: 'vbox',
+      id: 'docOptions',
+      children: [
+        createQueryStringField({id: 'docQueryString'}, 'doc'),
+        createAnchorField({id: 'docAnchor'}, 'doc')
+      ]
+    });
+
+    // Add attachment link options.
+    infoTab.add({
+      type: 'vbox',
+      id: 'attachOptions',
+      children: [
+        createQueryStringField({id: 'attachQueryString'}, 'attach')
+      ]
+    });
+
+    // Bind the mail link options to the corresponding resource reference parameters.
+    bindToResourceParameter(infoTab.get('emailSubject'), 'subject', 'mailto');
+    bindToResourceParameter(infoTab.get('emailBody'), 'body', 'mailto');
+
+    // Remove the custom focus handler set by the link dialog because we want the first input (which is the resource
+    // picker) to be focused when the dialog is opened.
+    delete dialogDefinition.onFocus;
+
+    // The link dialog doesn't have a field to input or edit the link label (because the link label can be edited
+    // in-line) and it uses the link URL as the default label when there is no text or element (e.g. image) selected
+    // in the edited content. This is fine for the external (URL) links but for internal links it's nicer to use the
+    // resource label (e.g. the wiki page title or the attachment file name).
+    overwriteDefaultLinkLabel(dialogDefinition);
+
+    resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
+      ['info', resourcePicker.id], ['upload', 'uploadButton']);
+  };
 
   var replaceLinkTypeSelect = function(dialogDefinition, newElementDefinition) {
     var linkTypeDefinition = dialogDefinition.getContents('info').get('linkType');
@@ -228,14 +236,29 @@
         return data.resourceReference;
       },
       setup: function(data) {
-        this.setValue(data.resourceReference);
+        var resourceReference = data.resourceReference;
+        if (resourceReference && resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
+            this.resourceTypes.indexOf('doc') >= 0) {
+          // Convert the space resource reference to a document resource reference.
+          resourceReference = {
+            type: 'doc',
+            // We know the target document precisely (no ambiguity).
+            typed: true,
+            reference: resourceReference.reference + '.WebHome'
+          };
+        }
+        this.setValue(resourceReference);
       },
       commit: function(data) {
-        data.resourceReference = this.getValue();
-        data.resourceReference.typed = data.resourceReference.type !== 'doc' &&
-          (data.resourceReference.type !== 'url' || data.resourceReference.reference.indexOf('://') < 0);
+        var resourceReference = this.getValue();
+        if (typeof resourceReference.typed !== 'boolean') {
+          resourceReference.typed = resourceReference.type !== 'doc' &&
+            (resourceReference.type !== 'url' || resourceReference.reference.indexOf('://') < 0);
+        }
+        data.resourceReference = resourceReference;
       },
       onResourceTypeChange: function(event, data) {
+        this.base.onResourceTypeChange.apply(this, arguments);
         var dialog = this.getDialog();
         // Update the value of the link type select because it is used internally by the link dialog. By default there
         // are three link types available: url, anchor and email. We use only url and email because anchor has been
@@ -252,16 +275,64 @@
           var options = dialog.getContentElement('info', optionsId);
           if (options) {
             var container = options.getElement().getParent().getParent();
-            if (resourceType === data.newValue) {
-              container.show();
+            // Some resource types (e.g. URL) have their options hidden from the dialog definition.
+            if (resourceType === data.newValue && !options.getElement().hasClass('hidden')) {
+              container.addClass('linkOptions');
             } else {
-              container.hide();
+              container.removeClass('linkOptions').hide();
             }
           }
         });
+        dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
       }
     });
+  };
+
+  var createOptionsToggle = function() {
+    return {
+      id: 'optionsToggle',
+      type: 'html',
+      html: '<div class="linkOptionsToggle">' +
+              '<label class="cke_dialog_ui_labeled_label">' +
+                '<span class="arrow arrow-right"></span> Options' +
+              '</label>' +
+            '</div>',
+      onLoad: function() {
+        this.getElement().on('click', this.toggleLinkOptions, this);
+      },
+      toggleLinkOptions: function(event) {
+        var arrow = this.getArrow();
+        var linkOptions = this.getLinkOptions();
+        if (arrow.hasClass('arrow-down')) {
+          arrow.removeClass('arrow-down').addClass('arrow-right');
+          linkOptions.hide();
+        } else {
+          arrow.removeClass('arrow-right').addClass('arrow-down');
+          linkOptions.show();
+        }
+      },
+      sync: function() {
+        var arrow = this.getArrow();
+        var linkOptions = this.getLinkOptions();
+        if (linkOptions) {
+          this.getElement().show();
+          if (arrow.hasClass('arrow-down')) {
+            linkOptions.show();
+          } else {
+            linkOptions.hide();
+          }
+        } else {
+          this.getElement().hide();
+        }
+      },
+      getArrow: function() {
+        return this.getElement().findOne('.arrow');
+      },
+      getLinkOptions: function() {
+        return this.getDialog().getElement().findOne('.linkOptions');
+      }
+    };
   };
 
   var createAnchorField = function(definition, resourceType) {
@@ -330,8 +401,7 @@
         var range = editor.getSelection().getRanges()[0];
         if (range.collapsed) {
           // And there's no text or element (e.g. image) selected in the edited content..
-          var resourceReference = this.getValueOf('info', 'resourceReference');
-          var resourceLabel = CKEDITOR.plugins.xwikiResource.getResourceLabel(resourceReference);
+          var resourceLabel = this.getContentElement('info', 'resourceReference').getResourceLabel();
           var textNode = new CKEDITOR.dom.text(resourceLabel, editor.document);
           range.insertNode(textNode);
           range.selectNodeContents(textNode);

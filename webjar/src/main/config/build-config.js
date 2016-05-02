@@ -93,7 +93,6 @@ var CKBUILDER_CONFIG = {
     'xwiki-link': 1,
     'xwiki-macro': 1,
     'xwiki-save': 1,
-    'xwiki-source': 1,
-    'xwiki-tree': 1
+    'xwiki-source': 1
   }
 };

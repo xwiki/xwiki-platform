@@ -36,20 +36,28 @@
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- The place where the CKEditor base WebJar has been unpacked. -->
-    <ckeditor.base.path>
-      ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-base/${project.version}
-    </ckeditor.base.path>
-    <!-- The place where the jQuery WebJar has been unpacked. -->
-    <jquery.version>1.11.3</jquery.version>
-    <jquery.path>${webjars.unpack.directory}/META-INF/resources/webjars/jquery/${jquery.version}</jquery.path>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
-      <version>${jquery.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>bootstrap-3-typeahead</artifactId>
+      <version>4.0.0</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>application-ckeditor-base</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -71,37 +79,6 @@
           <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
         </configuration>
       </plugin>
-      <!-- Unpack the WebJar dependencies (CKEditor base, jQuery) to be able to use them in tests. -->
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-base-ckeditor-webjar</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xwiki.contrib</groupId>
-                  <artifactId>application-ckeditor-base</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.webjars</groupId>
-                  <artifactId>jquery</artifactId>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <outputDirectory>${webjars.unpack.directory}</outputDirectory>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
@@ -121,8 +98,11 @@
           <jsSrcDir>${project.basedir}/src/main/resources</jsSrcDir>
           <jsTestSrcDir>${project.basedir}/src/test/resources</jsTestSrcDir>
           <preloadSources>
-            <source>${jquery.path}/jquery.min.js</source>
-            <source>${ckeditor.base.path}/ckeditor.js</source>
+            <source>webjars/require.min.js</source>
+            <source>require-config.js</source>
+            <source>webjars/jquery.min.js</source>
+            <!-- We need the full path here because ckeditor.js loads other resources using relative paths. -->
+            <source>webjars/application-ckeditor-base/${project.version}/ckeditor.js</source>
           </preloadSources>
         </configuration>
       </plugin>
@@ -141,6 +121,46 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>1.5.1</version>
+        <executions>
+          <execution>
+            <!-- Minify the WebJar resources before packing the jar. -->
+            <id>minify-webjar-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
+              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <aggregations>
+            <!-- Aggregate the Resource Picker modules. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <output>${webjar.contentDirectory}/xwiki-resource/resourcePicker.bundle.js</output>
+              <includes>
+                <include>*.js</include>
+              </includes>
+              <excludes>
+                <exclude>plugin.js</exclude>
+              </excludes>
+            </aggregation>
+          </aggregations>
+          <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
+          <jswarn>false</jswarn>
+          <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
+            currently more widely used in the JavaScript world. -->
+          <suffix>.min</suffix>
+          <preProcessAggregates>true</preProcessAggregates>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

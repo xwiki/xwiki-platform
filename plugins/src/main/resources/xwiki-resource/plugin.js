@@ -17,82 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-(function (){
+require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
   'use strict';
-  var $ = jQuery;
-
-  var knownResourceTypes = {
-    attach: {
-      label: 'Attachment',
-      icon: 'glyphicon glyphicon-paperclip',
-      placeholder: 'Path.To.Page@attachment.png'
-    },
-    data: {
-      label: 'Data URI',
-      icon: 'glyphicon glyphicon-briefcase',
-      placeholder: 'image/png;base64,AAAAAElFTkSuQmCC'
-    },
-    doc: {
-      label: 'Page',
-      icon: 'glyphicon glyphicon-file',
-      placeholder: 'Path.To.Page',
-      allowEmptyReference: true
-    },
-    icon: {
-      label: 'Icon',
-      icon: 'glyphicon glyphicon-flag',
-      placeholder: 'help'
-    },
-    mailto: {
-      label: 'Mail',
-      icon: 'glyphicon glyphicon-envelope',
-      placeholder: 'user@example.org'
-    },
-    path: {
-      label: 'Path',
-      icon: 'glyphicon glyphicon-road',
-      placeholder: '/path/to/file'
-    },
-    unc: {
-      label: 'UNC Path',
-      icon: 'glyphicon glyphicon-hdd',
-      placeholder: '//server/share/path/to/file'
-    },
-    unknown: {
-      label: 'Unknown',
-      icon: 'glyphicon glyphicon-question-sign',
-      placeholder: ''
-    },
-    url: {
-      label: 'URL',
-      icon: 'glyphicon glyphicon-globe',
-      placeholder: 'http://www.example.org/image.png'
-    },
-    user: {
-      label: 'User',
-      icon: 'glyphicon glyphicon-user',
-      placeholder: 'alias'
-    }
-  };
 
   CKEDITOR.plugins.add('xwiki-resource', {
-    requires: 'xwiki-marker,xwiki-dialog',
-    init: function(editor) {
-      editor._.resourcePickers = {};
-    }
+    requires: 'xwiki-marker,xwiki-dialog'
   });
 
   CKEDITOR.plugins.xwikiResource = {
-    cachedResources: {},
-
-    cacheResource: function(resource) {
-      this.cachedResources[resource.reference.type + ':' + resource.reference.reference] = resource;
-    },
-
-    getCachedResource: function(resourceReference) {
-      return this.cachedResources[resourceReference.type + ':' + resourceReference.reference];
-    },
-
     parseResourceReference: function(serializedResourceReference) {
       var parts = serializedResourceReference.split('|-|');
       var resourceReference = {
@@ -155,24 +87,25 @@
         id: 'resourceReference',
         type: 'html',
         html: '<div>' +
-                '<label class="cke_dialog_ui_labeled_label">Location</label>' +
-                '<div class="resourcePicker input-group">' +
-                  '<input type="text" class="resourceReference" />' +
-                  '<div class="input-group-btn">'+
-                    '<button type="button" class="resourceType btn btn-default">' +
-                      '<span class="icon">' +
-                    '</button>' +
-                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
-                      '<span class="caret"></span>' +
-                    '</button>' +
-                    '<ul class="dropdown-menu dropdown-menu-right"></ul>' +
-                  '</div>' +
-                '</div>' +
+                '<label class="cke_dialog_ui_labeled_label"></label>' +
+                '<input type="text" />' +
               '</div>',
         onLoad: function() {
+          // Register the event listeners and create the resource picker. We register the changeResourceType listener
+          // before creating the resource picker because we need to catch the first changeResourceType event in order to
+          // update the label (it won't be fired again when we set the value of the resource input unless the resource
+          // type is different).
+          $(this.getElement().$).on('changeResourceType', $.proxy(this, 'onResourceTypeChange'))
+            .find('input').resourcePicker({resourceTypes: this.resourceTypes});
+          // We register the selectResource event listener after creating the resource picker because we don't care
+          // about the first selectResource event since we're going to trigger another one anyway by setting the value
+          // of the resource input when the dialog is shown.
+          $(this.getElement().$).on('selectResource', $.proxy(this, 'onSelectResource'));
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
-          [resourceTypeDropDownToggle, this.getTypeInput(), this.getReferenceInput()].forEach(function(field) {
+          var resourceTypeButton = this.getElement().findOne('button.resourceType');
+          var resourceReferenceInput = this.getElement().findOne('input.resourceReference');
+          [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
             dialog.addFocusable(field, 0);
             field._focusable = dialog._.focusList[0];
@@ -182,95 +115,79 @@
           }, this.getDialog());
           // Fix reference input id.
           var id = CKEDITOR.tools.getNextId();
-          this.getReferenceInput().setAttribute('id', id);
+          resourceReferenceInput.setAttribute('id', id);
           this.getElement().findOne('label').setAttribute('for', id);
-          // Populate the Resource Type drop down.
-          this.resourceTypes.forEach(this.addResourceType, this);
-          // Add the JavaScript behaviour.
-          var domElement = $(this.getElement().$);
-          addResourcePickerBehaviour(domElement);
-          // Listen to resource type changes in order to be able to show different options for different resource types.
-          domElement.on('changeResourceType', $.proxy(this, 'onResourceTypeChange'));
-          // Open the resource picker that corresponds to the selected resource type.
-          this.getTypeInput().on('click', $.proxy(this, 'openPicker'));
+          // Register the event listeners. Note that we register the event listeners after the resource picker was
+          // created because we don't care about the first changeResourceType and selectResource events since we're
+          // going to trigger them anyway when the dialog is shown by setting the value of the resource input.
+          $(this.getElement().$).on('changeResourceType', $.proxy(this, 'onResourceTypeChange'))
+            .on('selectResource', $.proxy(this, 'onSelectResource'));
         },
         validate: function() {
-          var reference = this.getReferenceInput().getValue();
-          if (reference === '') {
+          var resourceReference = this.getValue();
+          if (resourceReference.reference === '') {
             // Check if the selected resource type supports empty references.
-            var resourceType = knownResourceTypes[this.getTypeInput().getValue()];
-            if (resourceType.allowEmptyReference !== true) {
-              return 'The location is not specified.';
+            var resourceTypeConfig = $resource.types[resourceReference.type] || {};
+            if (resourceTypeConfig.allowEmptyReference !== true) {
+              return 'The ' + this.getLabelElement().getText() + ' is not specified.';
             }
           }
           return true;
         },
         getValue: function() {
-          return {
-            type: this.getTypeInput().getValue(),
-            reference: this.getReferenceInput().getValue()
+          var serializedResourceReference = this.getResourcePickerInput().getValue();
+          var separatorIndex = serializedResourceReference.indexOf(':');
+          var resourceReference = {
+            type: serializedResourceReference.substr(0, separatorIndex),
+            reference: serializedResourceReference.substr(separatorIndex + 1)
           };
+          if (this.selectedResource && this.selectedResource.reference.type === resourceReference.type &&
+              this.selectedResource.reference.reference === resourceReference.reference) {
+            // Preserve the typed field if the resource type and reference have not changed.
+            resourceReference.typed = this.selectedResource.reference.typed;
+          }
+          return resourceReference;
         },
         setValue: function(resourceReference) {
           // Reset the input if no resource reference is provided.
-          resourceReference = resourceReference || {type: this.resourceTypes[0]};
-          this.selectResourceType(resourceReference.type);
-          this.getReferenceInput().setValue(resourceReference.reference || '');
+          resourceReference = resourceReference || {
+            type: this.resourceTypes[0],
+            reference: ''
+          };
+          var serializedResourceReference = resourceReference.type + ':' + resourceReference.reference;
+          $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {
+            reference: resourceReference
+          });
         },
         //
         // Custom fields
         //
-        dropDownItemTemplate: new CKEDITOR.template('<li><a href="#{picker}" data-id="{id}" ' +
-          'data-placeholder="{placeholder}"><span class="icon {icon}"></span> {label}</a></li>'),
-        getTypeInput: function() {
-          return this.getElement().findOne('.resourceType');
+        getResourcePickerInput: function() {
+          return this.getElement().findOne('input');
         },
-        getReferenceInput: function() {
-          return this.getElement().findOne('.resourceReference');
-        },
-        selectResourceType: function(resourceTypeId) {
-          if (resourceTypeId === this.getTypeInput().getValue()) {
-            // The specified resource type is already selected.
-            return;
-          }
-          var resourceTypeAnchor = $(this.getElement().$).find('a').filter(function() {
-            return $(this).attr('data-id') === resourceTypeId;
-          });
-          if (resourceTypeAnchor.length === 0) {
-            // Unsupported resource type. We need to add it to the list before selecting it.
-            this.addResourceType(resourceTypeId);
-            resourceTypeAnchor = $(this.getElement().$).find('a').filter(function() {
-              return $(this).attr('data-id') === resourceTypeId;
-            });
-          }
-          resourceTypeAnchor.click();
-        },
-        addResourceType: function(resourceTypeId) {
-          var resourceType = knownResourceTypes[resourceTypeId] || {
-            label: resourceTypeId,
-            icon: 'glyphicon glyphicon-question-sign'
-          };
-          resourceType.id = resourceTypeId;
-          resourceType.picker = this.hasPicker(resourceTypeId) ? resourceTypeId : '';
-          var dropDownMenu = this.getElement().findOne('.dropdown-menu');
-          dropDownMenu.appendHtml(this.dropDownItemTemplate.output(resourceType));
+        getLabelElement: function() {
+          return this.getElement().findOne('.cke_dialog_ui_labeled_label');
         },
         onResourceTypeChange: function(event, data) {
-          // Do nothing by default.
+          // Update the label.
+          var resourceTypeConfig = $resource.types[data.newValue] || {label: data.newValue};
+          this.getLabelElement().setText(resourceTypeConfig.label);
         },
-        getPicker: function(resourceType) {
-          return this.getDialog().getParentEditor()._.resourcePickers[resourceType];
+        onSelectResource: function(event, resource) {
+          this.selectedResource = resource;
         },
-        hasPicker: function(resourceType) {
-          return typeof this.getPicker(resourceType) === 'function';
-        },
-        openPicker: function() {
+        getResourceLabel: function() {
           var resourceReference = this.getValue();
-          var picker = this.getPicker(resourceReference.type);
-          picker(resourceReference).done($.proxy(function(resource) {
-            CKEDITOR.plugins.xwikiResource.cacheResource(resource);
-            this.setValue(resource.reference);
-          }, this));
+          if (this.selectedResource && this.selectedResource.title &&
+              this.selectedResource.reference.type === resourceReference.type &&
+              this.selectedResource.reference.reference === resourceReference.reference) {
+            return this.selectedResource.title;
+          } else if (resourceReference.reference) {
+            return resourceReference.reference;
+          } else {
+            // Some resource types support empty (relative) references.
+            return 'type the link label';
+          }
         }
       };
       pickerDefinition = pickerDefinition || {};
@@ -288,15 +205,6 @@
         var dispatcherURL = editor.config['xwiki-resource'].dispatcher;
         dispatcherURL += dispatcherURL.indexOf('?') < 0 ? '?' : '&';
         return dispatcherURL + $.param(resourceReference);
-      }
-    },
-
-    getResourceLabel: function(resourceReference) {
-      var resource = this.getCachedResource(resourceReference);
-      if (resource && resource.label) {
-        return resource.label;
-      } else {
-        return resourceReference.reference;
       }
     },
 
@@ -343,29 +251,6 @@
     }
   };
 
-  var addResourcePickerBehaviour = function(picker) {
-    var resourceReferenceInput = picker.find('input.resourceReference');
-    var resourceTypeButton = picker.find('button.resourceType');
-    var resourceTypeIcon = resourceTypeButton.find('.icon');
-    picker.find('.dropdown-menu').on('click', 'a', function(event) {
-      event.preventDefault();
-      var selectedResourceType = $(event.target);
-      resourceReferenceInput.attr('placeholder', selectedResourceType.attr('data-placeholder'));
-      var oldValue = resourceTypeButton.val();
-      var newValue = selectedResourceType.attr('data-id');
-      resourceTypeButton.val(newValue);
-      resourceTypeButton.attr('title', selectedResourceType.text().trim());
-      var disabled = selectedResourceType.attr('href') === '#';
-      resourceTypeButton.prop('disabled', disabled);
-      if (disabled) {
-        // It seems that setting the property is not enough. CKEditor checks for a non-empty value.
-        resourceTypeButton.attr('disabled', 'disabled');
-      }
-      resourceTypeIcon.attr('class', selectedResourceType.find('.icon').attr('class'));
-      picker.triggerHandler('changeResourceType', {oldValue: oldValue, newValue: newValue});
-    });
-  };
-
   var parseQueryString = function(queryString) {
     var parameters = {};
     // Replace plus signs in the query string with spaces.
@@ -379,4 +264,4 @@
     });
     return parameters;
   };
-})();
+});

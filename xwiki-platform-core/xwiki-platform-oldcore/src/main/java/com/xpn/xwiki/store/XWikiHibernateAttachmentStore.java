@@ -96,9 +96,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean parentUpdate, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiAttachmentContent content = attachment.getAttachment_content();
         // Protect against a corrupted attachment. This can happen if an attachment is listed in the Attachment
         // table but not listed in the Attachment Content table! In this case don't save anything.
@@ -167,8 +169,10 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     @Override
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate,
-        XWikiContext context, boolean bTransaction) throws XWikiException
+        XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         if (attachments == null) {
             return;
         }
@@ -200,9 +204,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         String currentWiki = context.getWikiId();
 
         try {
@@ -257,9 +263,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
+    public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         String currentWiki = context.getWikiId();
 
         try {

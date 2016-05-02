@@ -238,8 +238,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public boolean isWikiNameAvailable(String wikiName, XWikiContext context) throws XWikiException
+    public boolean isWikiNameAvailable(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean available;
 
         boolean bTransaction = true;
@@ -287,8 +289,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void createWiki(String wikiName, XWikiContext context) throws XWikiException
+    public void createWiki(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
         String database = context.getWikiId();
         Statement stmt = null;
@@ -352,8 +356,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
+    public void deleteWiki(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
         String database = context.getWikiId();
         Statement stmt = null;
@@ -428,8 +434,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @throws XWikiException
      */
     @Override
-    public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public boolean exists(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -486,8 +494,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
@@ -839,8 +849,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // To change body of implemented methods use Options | File Templates.
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -859,7 +871,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             try {
                 session.load(doc, new Long(doc.getId()));
-                doc.setDatabase(context.getWikiId());
                 doc.setNew(false);
                 doc.setMostRecent(true);
                 // Fix for XWIKI-1651
@@ -1009,8 +1020,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public void deleteXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -1146,9 +1159,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void saveXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction)
+    public void saveXWikiCollection(BaseCollection object, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (object == null) {
                 return;
@@ -1276,9 +1291,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         loadXWikiCollectionInternal(object, null, context, bTransaction, alreadyLoaded);
     }
 
-    private void loadXWikiCollectionInternal(BaseCollection object1, XWikiDocument doc, XWikiContext context,
+    private void loadXWikiCollectionInternal(BaseCollection object1, XWikiDocument doc, XWikiContext inputxcontext,
         boolean bTransaction, boolean alreadyLoaded) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         BaseCollection object = object1;
         try {
             if (bTransaction) {
@@ -1421,9 +1438,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @deprecated This is internal to XWikiHibernateStore and may be removed in the future.
      */
     @Deprecated
-    public void deleteXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction, boolean evict)
+    public void deleteXWikiCollection(BaseCollection object, XWikiContext inputxcontext, boolean bTransaction, boolean evict)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         if (object == null) {
             return;
         }
@@ -1776,8 +1795,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     // ---------------------------------------
 
     @Override
-    public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
+    public XWikiLock loadLock(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiLock lock = null;
         try {
             if (bTransaction) {
@@ -1811,8 +1832,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void saveLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1845,8 +1868,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void deleteLock(XWikiLock lock, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1948,8 +1973,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     // ---------------------------------------
 
     @Override
-    public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<XWikiLink> loadLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         List<XWikiLink> links = new ArrayList<XWikiLink>();
         try {
             if (bTransaction) {
@@ -1983,8 +2010,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
-        XWikiContext context) throws XWikiException
+        XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // Note: Ideally the method should return a Set but it would break the current API.
 
         // TODO: We use a Set here so that we don't get duplicates. In the future, when we can reference a page in
@@ -2036,9 +2065,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     @Deprecated
     @Override
-    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
+    public List<String> loadBacklinks(String fullName, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         List<String> backlinkNames = new ArrayList<String>();
         List<DocumentReference> backlinkReferences =
             loadBacklinks(this.currentMixedDocumentReferenceResolver.resolve(fullName), bTransaction, context);
@@ -2049,8 +2080,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void saveLinks(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -2106,8 +2139,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
+    public void deleteLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -2142,8 +2177,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public List<String> getClassList(XWikiContext context) throws XWikiException
+    public List<String> getClassList(XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
         try {
             checkHibernate(context);
@@ -2301,8 +2338,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
-        XWikiContext context) throws XWikiException
+        XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
 
         if (sql == null) {
@@ -2392,8 +2431,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return str.toString();
     }
 
-    public List search(Query query, int nb, int start, XWikiContext context) throws XWikiException
+    public List search(Query query, int nb, int start, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         boolean bTransaction = true;
 
         if (query == null) {
@@ -2480,8 +2521,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @since 2.2M1
      */
     private List<DocumentReference> searchDocumentReferencesInternal(String sql, int nb, int start,
-        List<?> parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
 
         // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
@@ -2566,8 +2609,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
+        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // Search documents
         List documentDatas = new ArrayList();
         boolean bTransaction = true;
@@ -2809,8 +2854,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return sfactory;
     }
 
-    public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext context) throws XWikiException
+    public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // If we haven't turned of dynamic custom mappings we should not inject them
         if (context.getWiki().hasDynamicCustomMappings() == false) {
             return getSessionFactory();
@@ -2837,8 +2884,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // If we haven't turned of dynamic custom mappings we should not inject them
         if (context.getWiki().hasDynamicCustomMappings() == false) {
             return false;
@@ -2860,15 +2909,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * @param className the name of the class to map
      * @param custommapping the custom mapping to inject for this class
-     * @param context the current XWikiContext
+     * @param inputxcontext the current XWikiContext
      * @return a boolean indicating if the mapping has been added to the current hibernate configuration, and a reload
      *         of the factory is required.
      * @throws XWikiException if an error occurs
      * @since 4.0M1
      */
-    public boolean injectCustomMapping(String className, String custommapping, XWikiContext context)
+    public boolean injectCustomMapping(String className, String custommapping, XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // If we haven't turned of dynamic custom mappings we should not inject them
         if (!context.getWiki().hasDynamicCustomMappings()) {
             return false;
@@ -2887,8 +2938,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         if (!doc1class.hasExternalCustomMapping()) {
             return false;
         }

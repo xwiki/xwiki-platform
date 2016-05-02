@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
@@ -93,6 +94,9 @@ public class XWikiHibernateBaseStore implements Initializable
     @Inject
     private Execution execution;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
     /**
@@ -140,7 +144,7 @@ public class XWikiHibernateBaseStore implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        XWikiContext context = this.xcontextProvider.get();
         setPath(context.getWiki().Param("xwiki.store.hibernate.path", getPath()));
     }
 
@@ -242,7 +246,7 @@ public class XWikiHibernateBaseStore implements Initializable
      *
      * @throws org.hibernate.HibernateException
      */
-    private synchronized void initHibernate(XWikiContext context) throws HibernateException
+    private synchronized void initHibernate() throws HibernateException
     {
         getConfiguration().configure(getPath());
 
@@ -256,10 +260,12 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * This get's the current session. This is set in beginTransaction
      *
-     * @param context
+     * @param inputxcontext
      */
-    public Session getSession(XWikiContext context)
+    public Session getSession(XWikiContext inputxcontext)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         Session session = (Session) context.get("hibsession");
         // Make sure we are in this mode
         try {
@@ -277,10 +283,12 @@ public class XWikiHibernateBaseStore implements Initializable
      * Allows to set the current session in the context This is set in beginTransaction
      *
      * @param session
-     * @param context
+     * @param inputxcontext
      */
-    public void setSession(Session session, XWikiContext context)
+    public void setSession(Session session, XWikiContext inputxcontext)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         if (session == null) {
             context.remove("hibsession");
         } else {
@@ -291,10 +299,12 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Allows to get the current transaction from the context This is set in beginTransaction
      *
-     * @param context
+     * @param inputxcontext
      */
-    public Transaction getTransaction(XWikiContext context)
+    public Transaction getTransaction(XWikiContext inputxcontext)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         Transaction transaction = (Transaction) context.get("hibtransaction");
         return transaction;
     }
@@ -303,10 +313,12 @@ public class XWikiHibernateBaseStore implements Initializable
      * Allows to set the current transaction This is set in beginTransaction
      *
      * @param transaction
-     * @param context
+     * @param inputxcontext
      */
-    public void setTransaction(Transaction transaction, XWikiContext context)
+    public void setTransaction(Transaction transaction, XWikiContext inputxcontext)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         if (transaction == null) {
             context.remove("hibtransaction");
         } else {
@@ -317,12 +329,12 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Allows to shut down the hibernate configuration Closing all pools and connections
      *
-     * @param context
+     * @param inputxcontext
      * @throws HibernateException
      */
-    public void shutdownHibernate(XWikiContext context) throws HibernateException
+    public void shutdownHibernate(XWikiContext inputxcontext) throws HibernateException
     {
-        Session session = getSession(context);
+        Session session = getSession(inputxcontext);
         preCloseSession(session);
         closeSession(session);
 
@@ -339,27 +351,28 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Allows to update the schema to match the hibernate mapping
      *
-     * @param context
+     * @param inputxcontext
      * @throws HibernateException
      */
-    public void updateSchema(XWikiContext context) throws HibernateException
+    public void updateSchema(XWikiContext inputxcontext) throws HibernateException
     {
-        updateSchema(context, false);
+        updateSchema(inputxcontext, false);
     }
 
     /**
      * Allows to update the schema to match the hibernate mapping
      *
-     * @param context
+     * @param inputxcontext
      * @param force defines wether or not to force the update despite the xwiki.cfg settings
      * @throws HibernateException
      */
-    public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException
+    public synchronized void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // We don't update the schema if the XWiki hibernate config parameter says not to update
         if ((!force) && (context.getWiki() != null)
-            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
-        {
+            && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
             LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
             return;
         }
@@ -379,15 +392,17 @@ public class XWikiHibernateBaseStore implements Initializable
      *
      * @param wikiName the wiki name to convert.
      * @param databaseProduct the database engine type.
-     * @param context the XWiki context.
+     * @param inputxcontext the XWiki context.
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext context)
+    protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext inputxcontext)
     {
         if (wikiName == null) {
             return null;
         }
+
+        XWikiContext context = getXWikiContext(inputxcontext);
 
         XWiki wiki = context.getWiki();
 
@@ -429,19 +444,19 @@ public class XWikiHibernateBaseStore implements Initializable
      * Need hibernate to be initialized.
      *
      * @param wikiName the wiki name to convert.
-     * @param context the XWiki context.
+     * @param inputxcontext the XWiki context.
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    protected String getSchemaFromWikiName(String wikiName, XWikiContext context)
+    protected String getSchemaFromWikiName(String wikiName, XWikiContext inputxcontext)
     {
         if (wikiName == null) {
             return null;
         }
 
-        DatabaseProduct databaseProduct = getDatabaseProductName(context);
+        DatabaseProduct databaseProduct = getDatabaseProductName();
 
-        String schema = getSchemaFromWikiName(wikiName, databaseProduct, context);
+        String schema = getSchemaFromWikiName(wikiName, databaseProduct, inputxcontext);
 
         return schema;
     }
@@ -465,11 +480,13 @@ public class XWikiHibernateBaseStore implements Initializable
      * hibernate mapping config.
      *
      * @param config
-     * @param context
+     * @param inputxcontext
      * @throws HibernateException
      */
-    public String[] getSchemaUpdateScript(Configuration config, XWikiContext context) throws HibernateException
+    public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         String[] schemaSQL = null;
 
         Session session;
@@ -488,13 +505,10 @@ public class XWikiHibernateBaseStore implements Initializable
             String contextSchema = getSchemaFromWikiName(context);
 
             DatabaseProduct databaseProduct = getDatabaseProductName();
-            if (databaseProduct == DatabaseProduct.ORACLE
-                || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.H2
-                || databaseProduct == DatabaseProduct.DERBY
+            if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
-                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
-            {
+                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode())) {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
                 Iterator iter = config.getTableMappings();
@@ -590,10 +604,12 @@ public class XWikiHibernateBaseStore implements Initializable
      * Runs the update script on the current database
      *
      * @param createSQL
-     * @param context
+     * @param inputxcontext
      */
-    public void updateSchema(String[] createSQL, XWikiContext context) throws HibernateException
+    public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         // Updating the schema for custom mappings
         Session session;
         Connection connection;
@@ -648,11 +664,13 @@ public class XWikiHibernateBaseStore implements Initializable
      * Custom Mapping This function update the schema based on the dynamic custom mapping provided by the class
      *
      * @param bclass
-     * @param context
+     * @param inputxcontext
      * @throws com.xpn.xwiki.XWikiException
      */
-    public void updateSchema(BaseClass bclass, XWikiContext context) throws XWikiException, HibernateException
+    public void updateSchema(BaseClass bclass, XWikiContext inputxcontext) throws XWikiException, HibernateException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         String custommapping = bclass.getCustomMapping();
         if (!bclass.hasExternalCustomMapping()) {
             return;
@@ -678,7 +696,7 @@ public class XWikiHibernateBaseStore implements Initializable
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
         if (getSessionFactory() == null) {
-            initHibernate(context);
+            initHibernate();
         }
     }
 
@@ -699,11 +717,13 @@ public class XWikiHibernateBaseStore implements Initializable
      * Virtual Wikis Allows to switch database connection
      *
      * @param session
-     * @param context
+     * @param inputxcontext
      * @throws XWikiException
      */
-    public void setDatabase(Session session, XWikiContext context) throws XWikiException
+    public void setDatabase(Session session, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Switch database to [{}]", context.getWikiId());
@@ -736,8 +756,8 @@ public class XWikiHibernateBaseStore implements Initializable
             endTransaction(context, false); // close session with rollback to avoid further usage
             Object[] args = { context.getWikiId() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
-                "Exception while switching to database {0}", e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
+                e, args);
         }
     }
 
@@ -847,13 +867,14 @@ public class XWikiHibernateBaseStore implements Initializable
      * Begins a transaction with a specific SessionFactory.
      *
      * @param sfactory the session factory used to begin a new session if none are available
-     * @param context the current XWikiContext
+     * @param inputxcontext the current XWikiContext
      * @return true if a new transaction has been created, false otherwise.
      * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
      */
-    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context)
-        throws XWikiException
+    public boolean beginTransaction(SessionFactory sfactory, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         Transaction transaction = getTransaction(context);
         Session session = getSession(context);
 
@@ -991,11 +1012,13 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Ends a transaction and close the session.
      *
-     * @param context the current XWikiContext
+     * @param inputxcontext the current XWikiContext
      * @param commit should we commit or not
      */
-    public void endTransaction(XWikiContext context, boolean commit)
+    public void endTransaction(XWikiContext inputxcontext, boolean commit)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         Session session = null;
         try {
             session = getSession(context);
@@ -1019,8 +1042,8 @@ public class XWikiHibernateBaseStore implements Initializable
             }
         } catch (HibernateException e) {
             // Ensure the original cause will get printed.
-            throw new HibernateException("Failed to commit or rollback transaction. Root cause ["
-                + getExceptionMessage(e) + "]", e);
+            throw new HibernateException(
+                "Failed to commit or rollback transaction. Root cause [" + getExceptionMessage(e) + "]", e);
         } finally {
             closeSession(session);
         }
@@ -1107,10 +1130,12 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Cleanup all sessions Used at the shutdown time
      *
-     * @param context
+     * @param inputxcontext
      */
-    public void cleanUp(XWikiContext context)
+    public void cleanUp(XWikiContext inputxcontext)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             Session session = getSession(context);
             if (session != null) {
@@ -1195,19 +1220,16 @@ public class XWikiHibernateBaseStore implements Initializable
     protected String makeMapping(String className, String customMapping)
     {
         DatabaseProduct databaseProduct = getDatabaseProductName();
-        return new StringBuilder(2000)
-            .append("<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n")
+        return new StringBuilder(2000).append("<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n")
             .append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n")
-            .append("<hibernate-mapping>")
-            .append("<class entity-name=\"").append(className)
-            .append("\" table=\"").append(dynamicMappingTableName(className)).append("\">\n")
+            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("<class entity-name=\"").append(className).append("\" table=\"")
+            .append(dynamicMappingTableName(className)).append("\">\n")
             .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
             .append("   <column name=\"XWO_ID\" not-null=\"true\" ")
             .append((databaseProduct == DatabaseProduct.ORACLE) ? "sql-type=\"integer\" " : "")
-            .append("/>\n   <generator class=\"assigned\" />\n")
-            .append(" </id>\n").append(customMapping).append("</class>\n</hibernate-mapping>")
-            .toString();
+            .append("/>\n   <generator class=\"assigned\" />\n").append(" </id>\n").append(customMapping)
+            .append("</class>\n</hibernate-mapping>").toString();
     }
 
     /**
@@ -1250,13 +1272,15 @@ public class XWikiHibernateBaseStore implements Initializable
      * Execute method for operations in hibernate in an independent session (but not closing the current one if any).
      * Never throw any error, but there is no warranty that the operation has been completed successfully.
      *
-     * @param context - used everywhere.
+     * @param inputxcontext - used everywhere.
      * @param doCommit - should store commit changes(if any), or rollback it.
      * @param cb - callback to execute
      * @return {@link HibernateCallback#doInHibernate(Session)}, returns null if the callback throw an error.
      */
-    public <T> T failSafeExecute(XWikiContext context, boolean doCommit, HibernateCallback<T> cb)
+    public <T> T failSafeExecute(XWikiContext inputxcontext, boolean doCommit, HibernateCallback<T> cb)
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         final Session originalSession = getSession(context);
         final Transaction originalTransaction = getTransaction(context);
         setSession(null, context);
@@ -1277,15 +1301,16 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * Execute method for operations in hibernate. spring like.
      *
-     * @param context - used everywhere.
+     * @param inputxcontext - used everywhere.
      * @param doCommit - should store commit changes(if any), or rollback it.
      * @param cb - callback to execute
      * @return {@link HibernateCallback#doInHibernate(Session)}
      * @throws XWikiException if any error
      */
-    public <T> T execute(XWikiContext context, boolean doCommit, HibernateCallback<T> cb)
-        throws XWikiException
+    public <T> T execute(XWikiContext inputxcontext, boolean doCommit, HibernateCallback<T> cb) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         boolean bTransaction = false;
 
@@ -1379,8 +1404,7 @@ public class XWikiHibernateBaseStore implements Initializable
      *             {@link #failSafeExecuteWrite(XWikiContext, HibernateCallback)}
      */
     @Deprecated
-    public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
-        throws XWikiException
+    public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
     {
         return execute(context, true, cb);
     }
@@ -1454,5 +1478,26 @@ public class XWikiHibernateBaseStore implements Initializable
     protected Execution getExecution()
     {
         return this.execution;
+    }
+
+    protected XWikiContext getXWikiContext(XWikiContext inputxcontext)
+    {
+        // If not a component return input context
+        if (this.xcontextProvider == null) {
+            return inputxcontext;
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        // If no context can be found return input context
+        if (xcontext == null) {
+            return inputxcontext;
+        }
+
+        if (xcontext != inputxcontext) {
+            LOGGER.warn("XWikiContext unsynchronized with the Execution Context has been passed", new Exception());
+        }
+
+        return xcontext;
     }
 }

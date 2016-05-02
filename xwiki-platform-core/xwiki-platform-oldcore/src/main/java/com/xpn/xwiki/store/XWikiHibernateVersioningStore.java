@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,10 +56,6 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
-
-    /** Needed for computing the archive cache key. */
-    @Inject
-    private EntityReferenceSerializer<String> referenceSerializer;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -132,8 +126,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc != null) {
             return archiveDoc;
@@ -195,9 +191,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context)
+    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
         Version version = new Version(sversion);
 
@@ -220,9 +218,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext context)
+    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         executeWrite(context, true, new HibernateCallback<Object>()
         {
             @Override
@@ -240,9 +240,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context)
+    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
             archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc.getRCSVersion(),

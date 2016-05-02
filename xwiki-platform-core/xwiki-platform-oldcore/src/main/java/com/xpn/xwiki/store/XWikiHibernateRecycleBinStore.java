@@ -116,9 +116,11 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext context,
+    public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         final XWikiDeletedDocument trashdoc = new XWikiDeletedDocument(doc, deleter, date, context);
 
         executeWrite(context, new HibernateCallback<Object>()
@@ -133,9 +135,11 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocument restoreFromRecycleBin(final XWikiDocument doc, final long index, final XWikiContext context,
-        boolean bTransaction) throws XWikiException
+    public XWikiDocument restoreFromRecycleBin(final XWikiDocument doc, final long index,
+        final XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         return executeRead(context, new HibernateCallback<XWikiDocument>()
         {
             @Override

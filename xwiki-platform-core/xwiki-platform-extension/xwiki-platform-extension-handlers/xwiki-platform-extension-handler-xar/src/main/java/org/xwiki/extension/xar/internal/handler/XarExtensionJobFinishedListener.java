@@ -47,6 +47,7 @@ import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.JobFinishedEvent;
+import org.xwiki.job.event.JobFinishingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -70,7 +71,7 @@ public class XarExtensionJobFinishedListener implements EventListener
      * The list of events observed.
      */
     private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new JobFinishedEvent(InstallJob.JOBTYPE), new JobFinishedEvent(UninstallJob.JOBTYPE));
+        Arrays.<Event>asList(new JobFinishedEvent(InstallJob.JOBTYPE), new JobFinishingEvent(UninstallJob.JOBTYPE));
 
     @Inject
     private Execution execution;

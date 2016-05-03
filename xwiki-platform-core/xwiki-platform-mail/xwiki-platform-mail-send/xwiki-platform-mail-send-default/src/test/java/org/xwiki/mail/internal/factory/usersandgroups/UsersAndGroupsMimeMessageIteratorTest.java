@@ -35,8 +35,10 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
@@ -140,8 +142,9 @@ public class UsersAndGroupsMimeMessageIteratorTest
         when(document.isNew()).thenReturn(false);
         when(document.getDocumentReference()).thenReturn(userReference);
         BaseObject baseObject = mock(BaseObject.class);
-        when(document.getXObject(new DocumentReference(
-            userReference.getWikiReference().getName(), "XWiki", "XWikiUsers"))).thenReturn(baseObject);
+        when(document.getXObject(
+            new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
+            .thenReturn(baseObject);
         when(this.xwiki.getDocument(userReference, this.xwikiContext)).thenReturn(document);
         when(baseObject.getStringValue("email")).thenReturn(email);
     }

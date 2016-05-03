@@ -233,12 +233,15 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
     if (typeof displayer === 'function' && (resourceReference.reference.length > 0 ||
         $resource.types[resourceReference.type].allowEmptyReference)) {
       resourceReferenceInput.val('');
-      resourceDisplayContainer.addClass('loading').show();
+      resourceDisplayContainer.empty().addClass('loading').show();
       displayer(resourceReference).done(function(resourceDisplay) {
         // Empty the container before appending the resource display because we don't cancel the previous (unfinished)
         // display requests. The displayer could handle this itself but we would need to pass additional information
         // (something to identify the resource picker that made the display request).
-        resourceDisplayContainer.empty().removeClass('loading').append(resourceDisplay);
+        resourceDisplayContainer.empty().removeClass('loading').append(resourceDisplay).show();
+      }).fail(function() {
+        resourceReferenceInput.val(resourceReference.reference);
+        resourceDisplayContainer.hide();
       });
     } else {
       resourceDisplayContainer.hide();

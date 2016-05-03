@@ -213,6 +213,8 @@ define('entityResourcePicker', ['jquery', 'resource', 'tree'], function($, $reso
     };
   };
 
-  registerResourcePicker('doc', 'Select Page');
-  registerResourcePicker('attach', 'Select Attachment');
+  if (typeof $.fn.xtree === 'function') {
+    registerResourcePicker('doc', 'Select Page');
+    registerResourcePicker('attach', 'Select Attachment');
+  }
 });

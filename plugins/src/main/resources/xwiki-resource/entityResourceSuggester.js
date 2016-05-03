@@ -20,7 +20,7 @@
 define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource) {
   'use strict';
 
-  var search = function(query, input, deferred) {  
+  var search = function(query, input, deferred, entityType) {  
     $.post(new XWiki.Document('SuggestSolrService', 'XWiki').getURL('get'), {
       outputSyntax: 'plain',
       query: query.join('\n'),
@@ -31,7 +31,7 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
         var results = response.getElementsByTagName('rs');
         var suggestions = [];
         for (var i = 0; i < results.length; i++) {
-          suggestions.push(convertSearchResultToResource(results.item(i)));
+          suggestions.push(convertSearchResultToResource(results.item(i), entityType));
         }
         deferred.resolve(suggestions);
       } else {
@@ -42,17 +42,41 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
     });
   };
 
-  var convertSearchResultToResource = function(result) {
+  var convertSearchResultToResource = function(result, expectedEntityType) {
+    var entityReference, location, title = result.childNodes[0].nodeValue;
     var entityType = result.getAttribute('type');
-    var serializedEntityReference = result.getAttribute('id');
-    var entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
-    var resourceReference = $resource.convertEntityReferenceToResourceReference(entityReference);
+    if (entityType) {
+      var serializedEntityReference = result.getAttribute('id');
+      entityReference = XWiki.Model.resolve(serializedEntityReference, XWiki.EntityType.byName(entityType));
+      location = result.getAttribute('info');
+    } else {
+      // Before XWiki 7.2
+      var serializedDocumentReference = result.getAttribute('info');
+      entityReference = XWiki.Model.resolve(serializedDocumentReference, XWiki.EntityType.DOCUMENT);
+      // We show the document reference as location for both document and attachment search results.
+      location = getLocation(entityReference);
+      if (expectedEntityType === XWiki.EntityType.ATTACHMENT) {
+        entityReference = new XWiki.AttachmentReference(title, entityReference);
+      }
+    }
     return {
-      reference: resourceReference,
+      reference: $resource.convertEntityReferenceToResourceReference(entityReference),
       entityReference: entityReference,
-      title: result.childNodes[0].nodeValue,
-      location: result.getAttribute('info')
+      title: title,
+      location: location
     };
+  };
+
+  // Before XWiki 7.2
+  var getLocation = function(entityReference) {
+    var references = entityReference.getReversedReferenceChain();
+    if (references[0].type === XWiki.EntityType.WIKI && references[0].name === XWiki.currentWiki) {
+      // Show the local reference if possible.
+      references.shift();
+    }
+    return references.map(function(reference) {
+      return reference.name;
+    }).join(' / ');
   };
 
   var display = function(resource) {
@@ -92,7 +116,7 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
         input = '*:*';
         query.push('sort=date desc');
       }
-      search(query, input, deferred);
+      search(query, input, deferred, XWiki.EntityType.DOCUMENT);
       return deferred.promise();
     },
     display: display
@@ -117,7 +141,7 @@ define('entityResourceSuggester', ['jquery', 'resource'], function($, $resource)
         input = '*:*';
         query.push('sort=attdate_sort desc');
       }
-      search(query, input, deferred);
+      search(query, input, deferred, XWiki.EntityType.ATTACHMENT);
       return deferred.promise();
     },
     display: display

@@ -168,17 +168,10 @@ public class UserIterator<T> implements Iterator<T>
     @Override
     public boolean hasNext()
     {
-        boolean hasNext = false;
-        if (!this.userAndGroupIteratorStack.isEmpty()) {
-            if (this.lookaheadValue == null) {
-                T currentValue = getNext();
-                if (currentValue != null) {
-                    this.lookaheadValue = currentValue;
-                    hasNext = true;
-                }
-            }
+        if (this.lookaheadValue == null) {
+            this.lookaheadValue = getNext();
         }
-        return hasNext;
+        return this.lookaheadValue != null;
     }
 
     @Override

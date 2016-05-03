@@ -46,7 +46,6 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionReposito
 import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.job.Job;
 import org.xwiki.job.Request;
-import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.job.event.JobFinishingEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
@@ -71,7 +70,7 @@ public class XarExtensionJobFinishedListener implements EventListener
      * The list of events observed.
      */
     private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new JobFinishedEvent(InstallJob.JOBTYPE), new JobFinishingEvent(UninstallJob.JOBTYPE));
+        Arrays.<Event>asList(new JobFinishingEvent(InstallJob.JOBTYPE), new JobFinishingEvent(UninstallJob.JOBTYPE));
 
     @Inject
     private Execution execution;
@@ -104,9 +103,9 @@ public class XarExtensionJobFinishedListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        JobFinishedEvent jobFinishedEvent = (JobFinishedEvent) event;
+        JobFinishingEvent jobFinishingEvent = (JobFinishingEvent) event;
 
-        if (!jobFinishedEvent.getRequest().isRemote()) {
+        if (!jobFinishingEvent.getRequest().isRemote()) {
             ExecutionContext context = this.execution.getContext();
 
             if (context != null) {
@@ -138,7 +137,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                                 try {
                                     List<DocumentReference> references =
                                         packager.getDocumentReferences(previousWikiEntry.getValue().keySet(),
-                                            createPackageConfiguration(jobFinishedEvent.getRequest(),
+                                            createPackageConfiguration(jobFinishingEvent.getRequest(),
                                                 previousWikiEntry.getKey()));
 
                                     for (DocumentReference reference : references) {
@@ -218,7 +217,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                         }
 
                         // Ask confirmation
-                        if (!pages.isEmpty() && jobFinishedEvent.getRequest().isInteractive()) {
+                        if (!pages.isEmpty() && jobFinishingEvent.getRequest().isInteractive()) {
                             try {
                                 ((Job) source).getStatus().ask(question);
                             } catch (InterruptedException e) {
@@ -231,7 +230,7 @@ public class XarExtensionJobFinishedListener implements EventListener
 
                         // Delete pages
 
-                        PackageConfiguration configuration = createPackageConfiguration(jobFinishedEvent.getRequest());
+                        PackageConfiguration configuration = createPackageConfiguration(jobFinishingEvent.getRequest());
 
                         for (Map.Entry<DocumentReference, Boolean> entry : pages.entrySet()) {
                             if (entry.getValue()) {

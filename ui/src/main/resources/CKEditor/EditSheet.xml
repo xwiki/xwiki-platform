@@ -51,7 +51,7 @@
   #if ("$!resourcePickerStyles" == '')
     ## Before XWiki 6.3RC1
     #set ($resourcePickerStyles = $services.webjars.url(
-      'application-ckeditor-webjar/1.5-SNAPSHOT/plugins/xwiki-resource/resourcePicker.min.css'
+      'application-ckeditor-webjar/1.5/plugins/xwiki-resource/resourcePicker.min.css'
     ))
   #end
   #set ($discard = $xwiki.linkx.use($resourcePickerStyles, {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -187,7 +187,7 @@
 #set ($bootstrap3typeaheadPath = $services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead'))
 #if ("$!ckeditorPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.5-SNAPSHOT/ckeditor.js'))
+  #set ($ckeditorPath = $services.webjars.url('application-ckeditor-webjar/1.5/ckeditor.js'))
   #set ($bootstrap3typeaheadPath = $services.webjars.url('bootstrap-3-typeahead/4.0.0/bootstrap3-typeahead.js'))
 #elseif ($ckeditorPath.indexOf('?') &gt;= 0)
   ## Before 7.1M1 the WebJar resource path was included in the query string which means we have to specify the '.js'
@@ -667,7 +667,7 @@ require(['jquery'], function($) {
 #set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono'))
 #if ("$!ckeditorSkinPath" == '')
   ## Before 6.3RC1
-  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.5-SNAPSHOT/skins/moono'))
+  #set ($ckeditorSkinPath = $services.webjars.url('application-ckeditor-webjar/1.5/skins/moono'))
 #end
 #if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
   ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving

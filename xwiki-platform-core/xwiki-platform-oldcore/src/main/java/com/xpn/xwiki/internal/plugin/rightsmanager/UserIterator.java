@@ -69,7 +69,9 @@ public class UserIterator<T> implements Iterator<T>
 
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
-    private XWikiContext xwikiContext;
+    private final Execution execution;
+
+    private final XWikiContext xwikiContext;
 
     private List<DocumentReference> userAndGroupReferences;
 
@@ -99,7 +101,8 @@ public class UserIterator<T> implements Iterator<T>
     {
         initialize(userAndGroupReferences, excludedUserAndGroupReferences, userDataExtractor,
             explicitDocumentReferenceResolver);
-        this.xwikiContext = getXWikiContext(execution);
+        this.execution = execution;
+        this.xwikiContext = null;
     }
 
     /**
@@ -115,7 +118,8 @@ public class UserIterator<T> implements Iterator<T>
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
     {
         initialize(userOrGroupReference, userDataExtractor, explicitDocumentReferenceResolver);
-        this.xwikiContext = getXWikiContext(execution);
+        this.execution = execution;
+        this.xwikiContext = null;
     }
 
     /**
@@ -134,6 +138,7 @@ public class UserIterator<T> implements Iterator<T>
     {
         initialize(userAndGroupReferences, excludedUserAndGroupReferences, userDataExtractor,
             explicitDocumentReferenceResolver);
+        this.execution = null;
         this.xwikiContext = xwikiContext;
     }
 
@@ -150,6 +155,7 @@ public class UserIterator<T> implements Iterator<T>
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
         initialize(userOrGroupReference, userDataExtractor, explicitDocumentReferenceResolver);
+        this.execution = null;
         this.xwikiContext = xwikiContext;
     }
 
@@ -356,11 +362,10 @@ public class UserIterator<T> implements Iterator<T>
 
     protected XWikiContext getXwikiContext()
     {
-        return this.xwikiContext;
-    }
+        if (execution == null) {
+            return this.xwikiContext;
+        }
 
-    private XWikiContext getXWikiContext(Execution execution)
-    {
         XWikiContext context = null;
         ExecutionContext executionContext = execution.getContext();
         if (executionContext != null) {

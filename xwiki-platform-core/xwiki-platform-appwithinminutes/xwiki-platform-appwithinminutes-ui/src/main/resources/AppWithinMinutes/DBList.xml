@@ -51,7 +51,7 @@
     <validationScript/>
     <databaseList>
       <cache>0</cache>
-      <classname>Blog.BlogPostClass</classname>
+      <classname></classname>
       <customDisplay/>
       <disabled>0</disabled>
       <displayType>select</displayType>

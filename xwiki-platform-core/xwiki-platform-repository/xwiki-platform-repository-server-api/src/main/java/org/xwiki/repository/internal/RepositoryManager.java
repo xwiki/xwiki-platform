@@ -54,6 +54,7 @@ import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionIssueManagement;
+import org.xwiki.extension.ExtensionNotFoundException;
 import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
@@ -539,7 +540,7 @@ public class RepositoryManager implements Initializable, Disposable
         Version lastVersion = getVersions(extensionId, repository, type, versions);
 
         if (lastVersion == null) {
-            throw new ResolveException(
+            throw new ExtensionNotFoundException(
                 "Can't find any version for the extension [" + extensionId + "] on repository [" + repository + "]");
         } else if (versions.isEmpty()) {
             // If no valid version import the last version
@@ -1013,8 +1014,8 @@ public class RepositoryManager implements Initializable, Disposable
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_ID, extension.getId().getId());
 
         // Features
-        needSave |= updateFeatures(XWikiRepositoryModel.PROP_VERSION_FEATURES, versionObject,
-            extension.getExtensionFeatures());
+        needSave |=
+            updateFeatures(XWikiRepositoryModel.PROP_VERSION_FEATURES, versionObject, extension.getExtensionFeatures());
 
         // Repositories
         List<String> repositories = XWikiRepositoryModel.toStringList(extension.getRepositories());

@@ -299,6 +299,11 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
                 doc = this.store.loadXWikiDoc(doc, context);
                 doc.setStore(this.store);
 
+                // Recalculate the key in case it's not exactly the same as the one from the passed XWikiDocument
+                // TODO: ideally we modify store implementation to search in passed document wiki instead of context
+                // wiki
+                key = doc.getKey();
+
                 LOGGER.debug("Cache: Got doc {} from storage", key);
 
                 if (doc.isNew()) {

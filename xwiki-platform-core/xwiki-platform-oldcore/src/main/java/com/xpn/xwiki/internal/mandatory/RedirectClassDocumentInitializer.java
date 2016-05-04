@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -36,16 +37,22 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 8.1RC1
  */
 @Component
-@Named("XWiki.Redirect")
+@Named("XWiki.RedirectClass")
 @Singleton
 public class RedirectClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The local reference of the redirect class.
+     */
+    public static final LocalDocumentReference REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "RedirectClass");
+
     /**
      * Default constructor.
      */
     public RedirectClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, "Redirect");
+        super(REFERENCE);
     }
 
     @Override

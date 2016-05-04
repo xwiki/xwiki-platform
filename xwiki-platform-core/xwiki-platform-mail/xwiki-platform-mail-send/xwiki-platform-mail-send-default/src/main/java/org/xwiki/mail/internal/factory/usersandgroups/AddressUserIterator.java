@@ -107,7 +107,7 @@ public class AddressUserIterator extends UserIterator<Address>
             } else {
                 return null;
             }
-        } while(this.excludedAddresses.contains(address) || this.processedAddresses.contains(address));
+        } while (this.excludedAddresses.contains(address) || this.processedAddresses.contains(address));
 
         this.processedAddresses.add(address);
 

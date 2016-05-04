@@ -42,6 +42,16 @@
       ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
     </webjars.unpack.contentDirectory>
   </properties>
+  <dependencies>
+    <!-- Even though we bundle the custom plugins with the CKEditor code (the plugins WebJar is merged with the CKEditor
+      WebJar) we still need to declare this dependency in order to brind the transitive dependencies that our custom
+      plugins may have (the alternative is to duplicate the dependencies here, which is too fragile). -->
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>application-ckeditor-plugins</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <!-- Download the CKEditor sources for the version (tag) we want to use. -->

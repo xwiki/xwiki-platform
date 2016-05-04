@@ -126,7 +126,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
+    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext)
+        throws XWikiException
     {
         XWikiContext context = getXWikiContext(inputxcontext);
 
@@ -304,8 +305,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
-        throws XWikiException
+    public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {

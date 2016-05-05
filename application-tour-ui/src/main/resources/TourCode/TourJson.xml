@@ -53,15 +53,23 @@
     ## -------------------------
     #foreach ($tourRef in $query.execute())
       #set ($tourDoc = $xwiki.getDocument($tourRef))
+      #set ($tourObj = $tourDoc.getObject('TourCode.TourClass'))
+      #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))
       ## Verify that the user who has saved this tour has the edit right on the target page
       #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))
-        #set ($tour = { 'name': $tourRef, 'steps': [] })
+        #set ($tour = { 'name': $tourRef, 'basePath': $path, 'steps': [] })
         #set ($discard = $tours.add($tour))
         ## -------------------------
         ## Get the tour steps
         ## -------------------------
         #foreach($stepObj in $tourDoc.getObjects('TourCode.StepClass'))
           #set ($backdrop = $tourDoc.getValue('backdrop', $stepObj) == 1)
+          ## If the targetPage value of a step is empty, the path is inherited from the previous step
+          ## for the first step, the path is inherited from the tour configuration
+          ## this way the tour stays in the same wiki page
+          #if ("$tourDoc.getValue('targetPage', $stepObj)" != '')
+            #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $stepObj)))
+          #end
           ## ------------------------------
           ## Render the content of the step
           ## ------------------------------
@@ -77,7 +85,8 @@
                           'content'  : $content,
                           'placement': $tourDoc.getValue('placement', $stepObj),
                           'order'    : $tourDoc.getValue('order', $stepObj),
-                          'backdrop' : $backdrop })
+                          'backdrop' : $backdrop,
+                          'path'     : $path })
           #set ($discard = $tour.steps.add($step))
         #end
         ##--------------------------------------------------------

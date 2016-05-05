@@ -77,6 +77,14 @@ public class TourApplicationTest extends AbstractTest
         obj2.setFieldValue(obj2.byPropertyName("content"), "Step 2");
         obj2.setFieldValue(obj2.byPropertyName("order"), "2");
         obj2.setCheckBox(obj2.byPropertyName("backdrop"), true);
+        // Object 4 used to test the Multipage feature ('targetPage' field)
+        ObjectEditPane obj4 = objectEditPage.addObject("TourCode.StepClass");
+        obj4.setFieldValue(obj4.byPropertyName("element"), "body");
+        obj4.setFieldValue(obj4.byPropertyName("title"), "Title 4");
+        obj4.setFieldValue(obj4.byPropertyName("content"), "Step 4");
+        obj4.setFieldValue(obj4.byPropertyName("order"), "4");
+        obj4.setCheckBox(obj4.byPropertyName("backdrop"), true);
+        obj4.setFieldValue(obj4.byPropertyName("targetPage"), "TourCode.TourClass");
         objectEditPage.clickSaveAndView();
         
         tourHomePage = TourHomePage.gotoPage();
@@ -133,50 +141,61 @@ public class TourApplicationTest extends AbstractTest
         homePage.nextStep();
         assertEquals("Title 3", homePage.getStepTitle());
         assertEquals("Step 3", homePage.getStepDescription());
-        assertFalse(homePage.hasNextStep());
+        assertTrue(homePage.hasNextStep());
         assertTrue(homePage.hasPreviousStep());
-        assertTrue(homePage.hasEndButton());
+        assertFalse(homePage.hasEndButton());
+
+        // Step 4
+        homePage.nextStep();
+        // Use a second page to test the Multipage feature
+        PageWithTour secondPage = new PageWithTour();
+        assertTrue(secondPage.getUrl().endsWith("TourCode/TourClass"));
+        assertEquals("Title 4", secondPage.getStepTitle());
+        assertEquals("Step 4", secondPage.getStepDescription());
+        assertFalse(secondPage.hasNextStep());
+        assertTrue(secondPage.hasPreviousStep());
+        assertTrue(secondPage.hasEndButton());
         
         // End
-        homePage.end();
-        assertFalse(homePage.isTourDisplayed());
-        assertTrue(homePage.hasResumeButton());
+        secondPage.end();
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
         
-        // Resume (to step 3)
-        homePage.resume();
-        assertTrue(homePage.isTourDisplayed());
-        assertFalse(homePage.hasResumeButton());
-        assertEquals("Title 3", homePage.getStepTitle());
-        assertEquals("Step 3", homePage.getStepDescription());
-        assertFalse(homePage.hasNextStep());
-        assertTrue(homePage.hasPreviousStep());
-        assertTrue(homePage.hasEndButton());
+        // Resume (to step 4)
+        secondPage.resume();
+        assertTrue(secondPage.isTourDisplayed());
+        assertFalse(secondPage.hasResumeButton());
+        assertEquals("Title 4", secondPage.getStepTitle());
+        assertEquals("Step 4", secondPage.getStepDescription());
+        assertFalse(secondPage.hasNextStep());
+        assertTrue(secondPage.hasPreviousStep());
+        assertTrue(secondPage.hasEndButton());
         
         // Close
-        homePage.close();
-        assertFalse(homePage.isTourDisplayed());
-        assertTrue(homePage.hasResumeButton());
+        secondPage.close();
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
         
         // Go to an other page and then go back
         TourHomePage.gotoPage();
-        homePage = PageWithTour.gotoPage("Main", "WebHome");
-        assertFalse(homePage.isTourDisplayed());
-        assertTrue(homePage.hasResumeButton());
+        secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
 
-        // Resume (to step 3)
-        homePage.resume();
-        assertTrue(homePage.isTourDisplayed());
-        assertFalse(homePage.hasResumeButton());
-        assertEquals("Title 3", homePage.getStepTitle());
-        assertEquals("Step 3", homePage.getStepDescription());
-        assertFalse(homePage.hasNextStep());
-        assertTrue(homePage.hasPreviousStep());
-        assertTrue(homePage.hasEndButton());
+        // Resume (to step 4)
+        secondPage.resume();
+        assertTrue(secondPage.isTourDisplayed());
+        assertFalse(secondPage.hasResumeButton());
+        assertEquals("Title 4", secondPage.getStepTitle());
+        assertEquals("Step 4", secondPage.getStepDescription());
+        assertFalse(secondPage.hasNextStep());
+        assertTrue(secondPage.hasPreviousStep());
+        assertTrue(secondPage.hasEndButton());
 
         // Close
-        homePage.close();
-        assertFalse(homePage.isTourDisplayed());
-        assertTrue(homePage.hasResumeButton());
+        secondPage.close();
+        assertFalse(secondPage.isTourDisplayed());
+        assertTrue(secondPage.hasResumeButton());
         
         // Go back to the tour homepage
         TourHomePage tourHomePage = TourHomePage.gotoPage();

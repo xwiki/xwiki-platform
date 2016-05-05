@@ -34,6 +34,11 @@ public class PageWithTour extends ViewPage
         getUtil().gotoPage(space, page);
         return new PageWithTour();
     }
+
+    public String getUrl()
+    {
+        return getDriver().getCurrentUrl();
+    }
     
     public boolean isTourDisplayed()
     {

@@ -1359,7 +1359,7 @@ public class XWiki extends Api
         } catch (Exception e) {
             LOGGER.error("Failed to create user", e);
 
-            return -2;
+            return -10;
         }
 
     }

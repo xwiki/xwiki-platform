@@ -248,7 +248,6 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       // Create the tour
       var tourName = escapeTourName('tour_' + jsonData.name);
       var tour     = new Tour({
-        basePath: jsonData.basePath,
         name    : tourName,
         storage : window.localStorage,
         onEnd   : function() { createResumeButton(tour, true) },

@@ -57,7 +57,7 @@
       #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))
       ## Verify that the user who has saved this tour has the edit right on the target page
       #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))
-        #set ($tour = { 'name': $tourRef, 'basePath': $path, 'steps': [] })
+        #set ($tour = { 'name': $tourRef, 'steps': [] })
         #set ($discard = $tours.add($tour))
         ## -------------------------
         ## Get the tour steps

@@ -83,6 +83,7 @@ rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filter Hidden 
 rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Set this parameter to false if you want to include the hidden documents in the tree. Otherwise, if the value is true, the hidden documents are excluded or included based on current user's preferences.
 
 index.documentTree.empty=No pages found
+index.documentTree.more={0} more ...
 
 ## Deprecated translation keys
 

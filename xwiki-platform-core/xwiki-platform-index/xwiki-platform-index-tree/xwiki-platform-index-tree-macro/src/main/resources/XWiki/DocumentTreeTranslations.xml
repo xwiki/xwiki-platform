@@ -85,6 +85,7 @@ rendering.macro.documentTree.parameter.limit.name=Limit
 rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 
 index.documentTree.empty=No pages found
+index.documentTree.more={0} more ...
 
 ## Deprecated translation keys
 

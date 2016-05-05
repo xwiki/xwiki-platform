@@ -117,6 +117,10 @@
     <property name="jdbc.batch_size">0</property>
 #end
 
+    <property name="hibernate.connection.charSet">UTF-8</property>
+    <property name="hibernate.connection.useUnicode">true</property>
+    <property name="hibernate.connection.characterEncoding">utf8</property>
+
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated

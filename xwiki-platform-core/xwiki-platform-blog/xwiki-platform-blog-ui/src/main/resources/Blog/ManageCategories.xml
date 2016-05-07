@@ -76,14 +76,16 @@
   #else
     #set($title = $escapetool.url($title))
     #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
+    #set($entry = $!{escapetool.url($request.entry)})
+    #set($entryObjNb = $!{escapetool.url($request.entryObjNb)})
     #if($request.ajax)
       #if("$!{request.mode}" == 'select')
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
       #else
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
       #end      
     #else ## request.ajax
-      #set($xredirect = $doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+      #set($xredirect = $doc.getURL('view', "entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
     #end
     $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
   #end ## empty title

@@ -59,6 +59,8 @@
     #foreach ($tourRef in $query.execute())
       #set ($tourDoc = $xwiki.getDocument($tourRef))
       #set ($tourObj = $tourDoc.getObject('TourCode.TourClass'))
+      ## the targetPage property takes precedence over targetClass property.
+      ## the targetClass property is used only when targetPage is empty.
       #if ("$!tourDoc.getValue('targetClass', $tourObj)" != '' &amp;&amp; "$!tourDoc.getValue('targetPage', $tourObj)" == '')
         #set ($path = $xwiki.getURL($targetDoc))
       #else

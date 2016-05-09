@@ -180,7 +180,7 @@ public class TourApplicationTest extends AbstractTest
         // Go to an other page and then go back
         TourHomePage.gotoPage();
         secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
-        assertFalse(secondPage.isTourDisplayed());;
+        assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
 
         // Resume (to step 4)

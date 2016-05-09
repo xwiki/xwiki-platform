@@ -42,7 +42,80 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+{{html wiki=true}}
+#set($isNewStep = true)
+#set($tourName = $request.tourName)
+#set($stepID = $request.stepID)
+#set($nbSteps = 0)
+#if ($tourName &amp;&amp; $tourName != '' &amp;&amp; $xwiki.exists($tourName))
+  #set($tourDoc = $xwiki.getDocument($tourName))
+  #set($nbSteps = $tourDoc.getObjects('TourCode.StepClass').size())
+  #if($stepID &amp;&amp; $stepID != '')
+    #set($stepObj = $tourDoc.getObject('TourCode.StepClass', $mathtool.toInteger($stepID)))
+    #if($stepObj)
+      #set($isNewStep = false)
+    #end
+  #end
+#end
+#if ($isNewStep)
+  #set($vdoc = $xwiki.getDocument('TourCode.StepTemplate'))
+  #set($vobj = $vdoc.getObject('TourCode.StepClass'))
+#else
+  #set($vdoc = $tourDoc)
+  #set($vobj = $stepObj)
+#end
+#set($class = $vobj.xWikiClass)
+#if ($isNewStep)
+  &lt;h3&gt;$services.localization.render('tour.steps.new_step')&lt;/h3&gt;
+#else
+  &lt;h3&gt;$services.localization.render('tour.steps.edit_step')&lt;/h3&gt;
+#end
+&lt;div id="stepForm" class="xform"&gt;
+  #foreach($prop in $class.properties)
+    #if($prop.getName().equals('order'))
+      &lt;dl&gt;
+        &lt;dt&gt;&lt;label&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="stepOrderSelect"&gt;
+            #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
+              &lt;option value="$i" #if ($vobj.getProperty('order').value == $i) selected #end &gt;$mathtool.add($i, 1)&lt;/option&gt;
+            #end
+            #if ($isNewStep)
+              &lt;option value="$nbSteps" selected &gt;$mathtool.add($nbSteps, 1)&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      &lt;/dl&gt;
+    #else
+      &lt;dl&gt;
+        &lt;dt&gt;&lt;label for="TourCode.StepClass_0_${prop.name}"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$vobj.get($prop.getName())&lt;/dd&gt;
+      &lt;/dl&gt;
+    #end
+  #end
+
+  #if ($xcontext.action == 'edit')
+    #if("!$request.tourName" != '')
+      &lt;input type="hidden" value="${escapetool.xml($request.tourName)}" id="tourName"/&gt;
+    #end
+    #if ($request.stepID)
+      &lt;input type="hidden" value="${escapetool.xml($request.stepID)}" id="stepID"/&gt;
+    #end
+    #if ($isNewStep)
+      &lt;input type="button" value="$services.localization.render('tour.steps.add_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
+    #else
+      &lt;input type="button" value="$services.localization.render('tour.steps.edit_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
+    #end
+  #end
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
   <object>
+    <name>TourCode.StepSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>de85aee8-fb4e-4642-8790-e094c499b2bd</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -123,88 +196,98 @@
     </property>
     <property>
       <code>var bstStepURL = "$xwiki.getURL('TourCode.StepSheet','edit','editor=inline&amp;xpage=plain')";
-var actionsURL = "$xwiki.getURL('TourCode.AjaxActions','view','xpage=plain')";
-var messages = {
-                  deleting: "${escapetool.javascript($services.localization.render('tour.steps.deleting'))} ...",
-                  deleteConfirm: "${escapetool.javascript($services.localization.render('tour.steps.delete_confirm'))} ?",
-                  deleteDone: "${escapetool.javascript($services.localization.render('tour.steps.delete_done'))} !"
-               }
+var messages   = {  deleting: "${escapetool.javascript($services.localization.render('tour.steps.deleting'))}",
+                    deleteConfirm: "${escapetool.javascript($services.localization.render('tour.steps.delete_confirm'))}",
+                    deleteDone: "${escapetool.javascript($services.localization.render('tour.steps.delete_done'))}"
+                 }
 
 require(['jquery'], function ($) {
-   'use strict';
+  'use strict';
 
-   // Initialize add new step button
-   $("#addStep").click(function() {
-      var BSTDocRef = $("#BSTDocRef").val();
-      $('.xdialog-modal-container').remove();
-      new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;BSTDocRef=' + BSTDocRef});
-   });
+  // Initialize add new step button
+  $('#addStep').click(function() {
+    var tourName = $('#tourName').val();
+    $('.xdialog-modal-container').remove();
+    new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;tourName=' + tourName});
+  });
 
-   // Initialize save step button
-   $("body").on("click", "#saveStepBtn", function() {
-      var parent = $(this).parent().parent();
-      var stepID = $("#stepID", parent).val();
-      var prefix = "TourCode.StepClass_";
-      var BSTDocRef = $("#BSTDocRef",parent).val();
-      var element = $("input[id^='" + prefix + "'][id$='_element']", parent).val();
-      var title = $("input[id^='" + prefix + "'][id$='_title']", parent).val();
-      var backdrop = $("input[id^='" + prefix + "'][id$='_backdrop']", parent).is(":checked");
-      var content = $("textarea[id^='" + prefix + "'][id$='_content']", parent).val();
-      var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
-      var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
-      var stepOrder = $("#stepOrderSelect").val();
-      var nbSteps = $("#nbsteps").val();
-      var step = {element: (element? element: ""),title: (title? title: ""), backdrop: (backdrop? backdrop :0), content: (content? content: ""), placement:(placement? placement: ""), targetPage:(targetPage? targetPage: ""), stepOrder:(stepOrder? stepOrder: ""), BSTDocRef: (BSTDocRef? BSTDocRef: ""), nbSteps:nbSteps, stepID: stepID, action:"editStep", xpage:"plain"};
-      $.ajax({
-	      url:"$xwiki.getURL('TourCode.AjaxActions')",
-	      type:'POST',
-	      data: step,
-	      success: function(rep) {
-          $('#stepsContainer').html(rep);
-        },
-        complete: function() {
-          // Close dialog box
-          $(".xdialog-close").click();
-        }
-      });
-   });
+  // Initialize save step button
+  $('body').on('click', '#saveStepBtn', function() {
+    var parent = $(this).parent().parent();
+    var stepID = $('#stepID', parent).val();
+    var prefix = 'TourCode.StepClass_';
+    var tourName = $("#tourName",parent).val();
+    var element = $("input[id^='" + prefix + "'][id$='_element']", parent).val();
+    var title = $("input[id^='" + prefix + "'][id$='_title']", parent).val();
+    var backdrop = $("input[id^='" + prefix + "'][id$='_backdrop']", parent).is(':checked');
+    var content = $("textarea[id^='" + prefix + "'][id$='_content']", parent).val();
+    var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
+    var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
+    var stepOrder = $('#stepOrderSelect').val();
+    var nbSteps = $('#nbsteps').val();
+    var step = {  element   : (element? element: ''),
+                  title     : (title? title: ''), 
+                  backdrop  : (backdrop? backdrop :0), 
+                  content   : (content? content: ''), 
+                  placement : (placement? placement: ''), 
+                  targetPage: (targetPage? targetPage: ''), 
+                  stepOrder : (stepOrder? stepOrder: ''), 
+                  tourName  : (tourName? tourName: ''), 
+                  nbSteps   : nbSteps, 
+                  stepID    : stepID, 
+                  action    :'editStep', 
+                  xpage     :'plain'
+               };
+    $.ajax({
+      url : "$xwiki.getURL('TourCode.AjaxActions')",
+      type: 'POST',
+      data: step,
+      success: function(rep) {
+        $('#stepsContainer').html(rep);
+      },
+      complete: function() {
+        // Close dialog box
+        $('.xdialog-close').click();
+      }
+    });
+  });
 
-   // Initialize step edit btns
-   $("body").on("click", ".editStep", function() {
-      $('.xdialog-modal-container').remove();
-      var BSTDocRef = $("#BSTDocRef").val();
-      var stepID = $(this).attr("data-step-id");
-      $('.xdialog-modal-container').remove();
-      new XWiki.widgets.StepPopup({
-        pageURL: bstStepURL + '&amp;BSTDocRef=' + encodeURIComponent(BSTDocRef) + '&amp;stepID=' + encodeURIComponent(stepID)
-      });
-   });
+  // Initialize step edit btns
+  $('body').on('click', '.editStep', function() {
+    $('.xdialog-modal-container').remove();
+    var tourName = $('#tourName').val();
+    var stepID = $(this).attr('data-step-id');
+    $('.xdialog-modal-container').remove();
+    new XWiki.widgets.StepPopup({
+      pageURL: bstStepURL + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID)
+    });
+  });
    
-   // Initialize step delete btns
-   $("body").on("click", ".deleteStep", function() {
-      $('.xdialog-modal-container').remove();
-      var BSTDocRef = $("#BSTDocRef").val();
-      var stepID = $(this).attr("data-step-id");
-      new XWiki.widgets.ConfirmationBox({
-        onYes: function() {
-          var notif = new XWiki.widgets.Notification(messages.deleting, 'inprogress');
-          $.ajax({
-	          url: actionsURL + "&amp;action=deleteStep" + "&amp;BSTDocRef=" + encodeURIComponent(BSTDocRef) + "&amp;stepID=" + encodeURIComponent(stepID),
-            type: 'POST',
-            success: function(rep) {
-              $('#stepsContainer').html(rep);
-            },
-            complete: function() {
-              notif.replace(new XWiki.widgets.Notification(messages.deleteDone, "done"));
-              //TODO: add "on failure"
-            }
-	        });
-        }},
-        {
-          confirmationText: messages.deleteConfirm
-        }
-      );
-   });
+  // Initialize step delete btns
+  $('body').on('click', '.deleteStep', function() {
+    $('.xdialog-modal-container').remove();
+    var tourName = $('#tourName').val();
+    var stepID = $(this).attr('data-step-id');
+    new XWiki.widgets.ConfirmationBox({
+      onYes: function() {
+        var notif = new XWiki.widgets.Notification(messages.deleting, 'inprogress');
+        $.ajax({
+          url : "$xwiki.getURL('TourCode.AjaxActions', 'view', 'xpage=plain')" + '&amp;action=deleteStep' + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID),
+          type: 'POST',
+          success: function(rep) {
+            $('#stepsContainer').html(rep);
+          },
+          complete: function() {
+            notif.replace(new XWiki.widgets.Notification(messages.deleteDone, 'done'));
+            //TODO: add "on failure"
+          }
+        });
+      }},
+      {
+        confirmationText: messages.deleteConfirm;
+      }
+    );
+  });
 });</code>
     </property>
     <property>
@@ -298,52 +381,51 @@ require(['jquery'], function ($) {
     </property>
     <property>
       <code>// Make sure the XWiki 'namespace' and the ModalPopup class exist.
-if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeof(XWiki.widgets.ModalPopup) == "undefined") {
- if (typeof console != "undefined" &amp;&amp; typeof console.warn == "function") {
-    console.warn("[MessageBox widget] Required class missing: XWiki.widgets.ModalPopup");
+if(typeof(XWiki) == 'undefined' || typeof(XWiki.widgets) == 'undefined' || typeof(XWiki.widgets.ModalPopup) == 'undefined') {
+  if (typeof console != 'undefined' &amp;&amp; typeof console.warn == 'function') {
+    console.warn('[MessageBox widget] Required class missing: XWiki.widgets.ModalPopup');
   }
 } else {
-
-XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
- /** Default parameters can be added to the custom class. */
-  defaultInteractionParameters : {
-  },
- /** Constructor. Registers the key listener that pops up the dialog. */
-  initialize : function($super, interactionParameters) {
-   this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-    // call constructor from ModalPopup with params content, shortcuts, options
-    $super(
-     this.createContent(this.interactionParameters),
+  XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
+    // Default parameters can be added to the custom class.
+    defaultInteractionParameters : {
+    },
+    // Constructor. Registers the key listener that pops up the dialog.
+    initialize : function($super, interactionParameters) {
+      this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+      // call constructor from ModalPopup with params content, shortcuts, options
+      $super(
+        this.createContent(this.interactionParameters),
+        {
+          'show'  : { method : this.showDialog,  keys : [] },
+          'close' : { method : this.closeDialog, keys : ['Esc'] }
+        },
+        {
+          displayCloseButton : true, 
+          verticalPosition : 'top',
+          backgroundColor : '#FFF'
+        }
+      );
+      this.showDialog();
+      this.setClass('my-modal-popup');
+    },
+    // Get the content of the modal dialog using ajax
+    createContent : function (data) {
+      var content =  new Element('div', {'class': 'modal-popup'});
+      // get page content for the pageURL
+      new Ajax.Request(data.pageURL,
       {
-       "show"  : { method : this.showDialog,  keys : [] },
-       "close" : { method : this.closeDialog, keys : ['Esc'] }
-      },
-      {
-         displayCloseButton : true, 
-         verticalPosition : "top",
-         backgroundColor : "#FFF"
+        method:'get',
+        onSuccess: function(transport){
+          var response = transport.responseText || 'no response text';
+          content.insert(response);
+        },
+        onFailure: function() { content.insert('Something went wrong...'); 
       }
-    );
-   this.showDialog();
-   this.setClass("my-modal-popup");
-  },
- /** Get the content of the modal dialog using ajax */
-  createContent : function (data) {
-    var content =  new Element('div', {'class': 'modal-popup'});
-    // get page content for the pageURL
-    new Ajax.Request(data.pageURL,
-    {
-      method:'get',
-      onSuccess: function(transport){
-        var response = transport.responseText || "no response text";
-        content.insert(response);
-      },
-      onFailure: function(){ content.insert('Something went wrong...'); 
+      });
+      return content;
     }
-    });
-    return content;
-  }
-});
+  });
 } // if the parent widget is defined</code>
     </property>
     <property>
@@ -478,69 +560,4 @@ XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity}}
-{{html wiki=true}}
-#set($isNewStep = true)
-#set($bSTDocRef = $request.BSTDocRef)
-#set($stepID = $request.stepID)
-#set($nbSteps = 0)
-#if ($bSTDocRef &amp;&amp; $bSTDocRef != "" &amp;&amp; $xwiki.exists($bSTDocRef))
-   #set($bSTDoc = $xwiki.getDocument($bSTDocRef))
-   #set($nbSteps = $bSTDoc.getObjects("TourCode.StepClass").size())
-   #if($stepID &amp;&amp; $stepID != "")
-      #set($stepObj = $bSTDoc.getObject("TourCode.StepClass", $mathtool.toInteger($stepID)))
-      #if($stepObj)
-         #set($isNewStep = false)
-      #end
-   #end
-#end
-#if ($isNewStep)
-   #set($vdoc = $xwiki.getDocument("TourCode.StepTemplate"))
-   #set($vobj = $vdoc.getObject('TourCode.StepClass'))
-#else
-   #set($vdoc = $bSTDoc)
-   #set($vobj = $stepObj)
-#end
-#set($class = $vobj.xWikiClass)
-#if ($isNewStep &amp;&amp; $isNewStep != "")
-   &lt;h3&gt;$services.localization.render('tour.steps.new_step')&lt;/h3&gt;
-#else
-   &lt;h3&gt;$services.localization.render('tour.steps.edit_step')&lt;/h3&gt;
-#end
-&lt;div id="stepForm" class="xform"&gt;
- #foreach($prop in $class.properties)
-    #if($prop.getName().equals("order"))
-       ; &lt;label&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;
-       &lt;dd&gt;
-       &lt;select id="stepOrderSelect"&gt;
-          #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
-             &lt;option value="$i" #if ($vobj.getProperty("order").value == $i) selected #end &gt;$mathtool.add($i, 1)&lt;/option&gt;
-          #end
-          #if ($isNewStep)
-             &lt;option value="$nbSteps" selected &gt;$mathtool.add($nbSteps, 1)&lt;/option&gt;
-          #end
-       &lt;/select&gt;
-       &lt;/dd&gt;
-    #else
-       ; &lt;label for="TourCode.StepClass_0_${prop.name}"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;
-       : $vobj.get($prop.getName())
-    #end
- #end
-
-#if ($context.action == "edit")
-   #if($request.BSTDocRef &amp;&amp; $request.BSTDocRef != "")
-      &lt;input type="hidden" value="$request.BSTDocRef" id="BSTDocRef"/&gt;
-   #end
-   #if ($request.stepID)
-      &lt;input type="hidden" value="$request.stepID" id="stepID"/&gt;
-   #end
-   #if ($isNewStep &amp;&amp; $isNewStep != "")
-      &lt;input type="button" value="$services.localization.render('tour.steps.add_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
-   #else
-      &lt;input type="button" value="$services.localization.render('tour.steps.edit_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
-   #end
-#end
-&lt;/div&gt;
-{{/html}}
-{{/velocity}}</content>
 </xwikidoc>

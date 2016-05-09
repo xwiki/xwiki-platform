@@ -44,18 +44,19 @@
   <hidden>true</hidden>
   <content>{{velocity output='false'}}
 #*
- * Sort a list of XWiki objects using an property as comparator.
+ * Sort a list of XWiki objects using a property as comparator.
  *
  * @param inputObjects the list of XWiki objects to sort.
- * @param propertyName the name of the XWiki object property to sort the inputObjects by. Multiple values for the same property are allowed.
- * @param outputObjects the list where to append the sorted objects. This list must not be null and should be empty before calling the macro.
+ * @param propertyName the name of the XWiki object property to sort the inputObjects by. Multiple values for the same
+ * property are allowed.
+ * @param outputObjects the list where to append the sorted objects. This list must not be null and should be empty
+ * before calling the macro.
  *#
 #macro (sortXWikiObjectsList $inputObjects $propertyName $outputObjects)
   #set ($objectsMap = {})
   #foreach ($object in $inputObjects)
-    #set ($key = $object.getProperty($propertyName).value)
-    #set ($sameKeyObjects = $objectsMap.get($key))
-    #if (!$sameKeyObjects)
+    #set ($key = $object.getValue($propertyName))
+    #if (!$objectsMap.get($key))
       #set ($sameKeyObjects = [])
       #set ($discard = $objectsMap.put($key, $sameKeyObjects))
     #end

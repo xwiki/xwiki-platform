@@ -76,6 +76,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     private static final Pattern LIKE_ESCAPE = Pattern.compile("[_%\\\\]");
 
+    private static final String LIKE_REPLACEMENT = "\\\\$0";
+
+    private static final String LIKE_APPEND = ".%";
+
     /**
      * Tag plugin constructor.
      * 
@@ -201,13 +205,42 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             where.append(')');
 
             // Make sure to escape the LIKE syntax
-            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll("\\\\$1");
+            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
 
             return getTagCountForQuery("", where.toString(),
-                Arrays.asList(spaceReference, escapedSpaceReference + ".%"), context);
+                Arrays.asList(spaceReference, escapedSpaceReference + LIKE_APPEND), context);
         }
 
         return getTagCount(context);
+    }
+
+
+    /**
+     * Get cardinality map of tags for a list of wiki spaces (including sub spaces).
+     * For example "'Main','Sandbox'" for all tags in the "Main" and "Sandbox" spaces,
+     * or "'Apo''stroph'" for all tags in the space "Apo'stroph".
+     * 
+     * @param spaces the list of space to get tags in, as a comma separated, quoted space references strings.
+     * @param context XWiki context.
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: space list parse error, DB problems, etc).
+     * @since 8.1
+     */
+    public Map<String, Integer> getTagCountForSpaces(String spaces, XWikiContext context) throws XWikiException
+    {
+        List<String> spaceRefList = TagParamUtils.spacesParameterToList(spaces);
+
+        List<Object> queryParameter = new ArrayList<>();
+        StringBuilder where = new StringBuilder();
+        where.append("(doc.space in (").append(spaces).append(')');
+        for (String spaceReference : spaceRefList) {
+            where.append(" OR doc.space LIKE ?");
+            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
+            queryParameter.add(escapedSpaceReference + LIKE_APPEND);
+        }
+        where.append(')');
+
+        return getTagCountForQuery("", where.toString(), queryParameter, context);
     }
 
     /**

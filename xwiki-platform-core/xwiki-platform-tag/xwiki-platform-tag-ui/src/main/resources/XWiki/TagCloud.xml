@@ -373,7 +373,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 
 ##If multiple spaces with "spaces" parameter
 #if( $tagCloudSpaces )
-  #set ($tagCount = $xwiki.tag.getTagCountForQuery("","doc.space IN($tagCloudSpaces)"))
+  #set ($tagCount = $xwiki.tag.getTagCountForSpaces($tagCloudSpaces))
 #else
   ##If only one space
   ## Get tag count map. Key: tag, value: number of occurrences.

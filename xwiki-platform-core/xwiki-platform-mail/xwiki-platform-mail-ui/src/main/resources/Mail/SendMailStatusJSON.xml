@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Mail.SendMailStatusJSON" locale="">
   <web>Mail</web>
   <name>SendMailStatusJSON</name>
   <language/>
@@ -109,45 +109,44 @@
   ## ===============
   ## JSON Generation
   ## ===============
-  {
+  #set ($rows = [])
+  #set ($resultmap = {
     'totalrows': $totalrows,
     'matchingtags': {},
     'tags' : [],
     'returnedrows': $results.size(),
     'offset': $mathtool.toInteger($request.offset),
-    'sort': "$request.sort",
-    'dir': "$request.dir",
+    'sort': $request.sort,
+    'dir': $request.dir,
     'reqNo': $mathtool.toInteger($request.reqNo),
-    'rows': [
-    #foreach($item in $results)
-      #if($velocityCount &gt; 1) , #end
-      {
-        #set($recipients = "$!item.recipients")
+    'rows': $rows })
+  #foreach($item in $results)
+    #set ($row = {
         'doc_viewable' : true,
-        'date' : "$xwiki.formatDate($!item.date)",
-        'batchId' : "$!item.batchId",
-        'type' : "$!item.type",
-        'recipients' : "$escapetool.javascript($recipients)",
-        'state' : "$!item.state",
-        #if ($xcontext.isMainWiki())'wiki' : "$!item.wiki",
-        #{end}
-        'error' : "$!item.errorSummary",
-        #if("$!item.state" != 'sent')
-          'actions' : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+        'date' : $xwiki.formatDate($!item.date),
+        'batchId' : $!item.batchId,
+        'type' : $!item.type,
+        'recipients' : $!item.recipients,
+        'state' : $!item.state,
+        'error' : $!item.errorSummary })
+    #if ($xcontext.isMainWiki())
+      #set($discard  = $row.put('wiki', $!item.wiki))
+    #end
+    #if("$!item.state" != 'sent')
+      #set($discard  = $row.put('actions', "&lt;form action='' enctype='multipart/form-data' method='post'&gt;
               &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
               &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
               &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
 &lt;/span&gt;
-            &lt;/form&gt;")}"
-        #else
-          'actions' : ''
-        #end  
-      }
+            &lt;/form&gt;" ))
+    #else
+      #set($discard  = $row.put('actions', ''))
     #end
-    ]
-  }
+    #set($discard = $rows.add($row))
+  #end
+  $jsontool.serialize($resultmap)
 #else
-  This page should be called by Mail.SenMailStatus with parameters.
+  This page should be called by Mail.SendMailStatus with parameters.
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -54,6 +54,8 @@
   #end
   ; &lt;label for="TourCode.TourClass_0_targetPage"&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
   : $doc.display('targetPage')
+  ; &lt;label for="TourCode.TourClass_0_targetClass"&gt;$escapetool.xml($doc.displayPrettyName('targetClass', false, false))&lt;/label&gt;
+  : $doc.display('targetClass')
 
 ## Display tour's steps
 &lt;dl&gt;

@@ -52,7 +52,8 @@ public class TourApplicationTest extends AbstractTest
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
         tourEditPage.setDescription("My nice description");
         tourEditPage.setIsActive(true);
-        tourEditPage.setTargetPage("Main.WebHome");
+        tourEditPage.setTargetPage("Tour.WebHome");
+        tourEditPage.setTargetClass("TourCode.TestClass");
         tourEditPage.clickSaveAndView();
         // Todo: replace by a nice UI
         ObjectEditPage objectEditPage = tourEditPage.editObjects();
@@ -88,7 +89,7 @@ public class TourApplicationTest extends AbstractTest
         objectEditPage.clickSaveAndView();
         
         tourHomePage = TourHomePage.gotoPage();
-        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Main.WebHome", true)));
+        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.WebHome", true, "TourCode.TestClass")));
     }
     
     private void cleanUp() throws Exception
@@ -103,7 +104,7 @@ public class TourApplicationTest extends AbstractTest
     {
         setUpTour();
 
-        PageWithTour homePage = PageWithTour.gotoPage("Main", "WebHome");
+        PageWithTour homePage = PageWithTour.gotoPage("Tour", "WebHome");
         assertTrue(homePage.isTourDisplayed());
         
         // Step 1
@@ -179,7 +180,7 @@ public class TourApplicationTest extends AbstractTest
         // Go to an other page and then go back
         TourHomePage.gotoPage();
         secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
-        assertFalse(secondPage.isTourDisplayed());
+        assertFalse(secondPage.isTourDisplayed());;
         assertTrue(secondPage.hasResumeButton());
 
         // Resume (to step 4)
@@ -192,8 +193,8 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(secondPage.hasPreviousStep());
         assertTrue(secondPage.hasEndButton());
 
-        // Close
-        secondPage.close();
+        // End
+        secondPage.end();
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
         
@@ -207,6 +208,7 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(homePage.hasNextStep());
         assertFalse(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
+        homePage.close();
         
         cleanUp();
     }

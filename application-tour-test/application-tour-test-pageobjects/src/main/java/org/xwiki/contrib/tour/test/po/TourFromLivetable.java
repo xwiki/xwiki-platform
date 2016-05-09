@@ -28,14 +28,17 @@ public class TourFromLivetable
     private String name;
     
     private String targetPage;
-    
+
     private boolean isActive;
 
-    public TourFromLivetable(String name, String targetPage, boolean isActive)
+    private String targetClass;
+
+    public TourFromLivetable(String name, String targetPage, boolean isActive, String targetClass)
     {
         this.name = name;
         this.targetPage = targetPage;
         this.isActive = isActive;
+        this.targetClass = targetClass;
     }
 
     public String getName()
@@ -53,12 +56,17 @@ public class TourFromLivetable
         return isActive;
     }
     
+    public String getTargetClass()
+    {
+        return targetClass;
+    }
+    
     @Override
     public boolean equals(Object o)
     {
         if (o instanceof TourFromLivetable) {
             TourFromLivetable t = (TourFromLivetable) o;
-            return t.name.equals(name) && t.targetPage.equals(targetPage) && t.isActive == isActive;
+            return t.name.equals(name) && t.targetPage.equals(targetPage) && t.isActive == isActive && t.targetClass.equals(targetClass);
         }
         return false;
     }

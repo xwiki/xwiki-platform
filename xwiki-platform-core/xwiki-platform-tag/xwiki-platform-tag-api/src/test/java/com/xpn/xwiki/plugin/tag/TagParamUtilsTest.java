@@ -20,10 +20,9 @@
 
 package com.xpn.xwiki.plugin.tag;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.hamcrest.Matchers;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -31,8 +30,8 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Unit tests for {@link TagParamUtils}.
  *
- * @version $Id $
- * @since 8.1
+ * @version $Id$
+ * @since 8.2M1
  */
 public class TagParamUtilsTest
 {
@@ -40,11 +39,13 @@ public class TagParamUtilsTest
     public void spacesParameterToList() throws Exception
     {
         Assert.assertThat(TagParamUtils.spacesParameterToList("'Space1','Space2'"),
-			  Matchers.contains("Space1", "Space2"));
+                Matchers.contains("Space1", "Space2"));
         Assert.assertThat(TagParamUtils.spacesParameterToList("'Space1', 'Space 2',  'Apo''strophe'"),
-			  Matchers.contains("Space1", "Space 2", "Apo'strophe"));
+                Matchers.contains("Space1", "Space 2", "Apo'strophe"));
         Assert.assertThat(TagParamUtils.spacesParameterToList("'single space'"),
-			  Matchers.contains("single space"));
+                Matchers.contains("single space"));
+        Assert.assertThat(TagParamUtils.spacesParameterToList(""),
+                Matchers.empty());
     }
 
     @Test
@@ -53,20 +54,20 @@ public class TagParamUtilsTest
 	try {
 	    TagParamUtils.spacesParameterToList(null);
 	    Assert.fail("npe expected");
-	} catch (NullPointerException npe) {}
+	} catch (IllegalArgumentException expected) {}
 
 	try {
 	    TagParamUtils.spacesParameterToList("'space1','space2");
 	    Assert.fail("XWikiException expected");
-	} catch (XWikiException xe) {}
+	} catch (XWikiException expected) {}
 	try {
 	    TagParamUtils.spacesParameterToList("'space1','space2',");
 	    Assert.fail("XWikiException expected");
-	} catch (XWikiException xe) {}
+	} catch (XWikiException expected) {}
 	try {
 	    TagParamUtils.spacesParameterToList("'space1', or 'space2'");
 	    Assert.fail("XWikiException expected");
-	} catch (XWikiException xe) {}
+	} catch (XWikiException expected) {}
     }
 
 

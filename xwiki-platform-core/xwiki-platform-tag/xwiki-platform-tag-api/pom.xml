@@ -30,6 +30,10 @@
   <artifactId>xwiki-platform-tag-api</artifactId>
   <name>XWiki Platform - Tag - API</name>
   <description>XWiki Platform - Tag - API</description>
+  <properties>
+    <!-- code coverage: it is not much, but it is a start -->
+    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

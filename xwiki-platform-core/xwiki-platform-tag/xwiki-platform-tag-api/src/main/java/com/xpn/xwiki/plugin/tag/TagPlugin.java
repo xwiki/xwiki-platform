@@ -224,7 +224,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param context XWiki context.
      * @return map of tags with their occurences counts
      * @throws XWikiException if search query fails (possible failures: space list parse error, DB problems, etc).
-     * @since 8.1
+     * @since 8.2M1
      */
     public Map<String, Integer> getTagCountForSpaces(String spaces, XWikiContext context) throws XWikiException
     {
@@ -232,13 +232,24 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         List<Object> queryParameter = new ArrayList<>();
         StringBuilder where = new StringBuilder();
-        where.append("(doc.space in (").append(spaces).append(')');
+        boolean first = true;
         for (String spaceReference : spaceRefList) {
-            where.append(" OR doc.space LIKE ?");
+            if (first) {
+                where.append("(doc.space = ? ");
+                first = false;
+            } else {
+                where.append(" OR doc.space = ? ");
+            }
+            queryParameter.add(spaceReference);
+            where.append("OR doc.space LIKE ?");
             String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
             queryParameter.add(escapedSpaceReference + LIKE_APPEND);
         }
-        where.append(')');
+        // if first is true the "for" loop never ran, and spaces is empty
+        // so only close brace if first is false
+        if (!first) {
+            where.append(')');
+        }
 
         return getTagCountForQuery("", where.toString(), queryParameter, context);
     }

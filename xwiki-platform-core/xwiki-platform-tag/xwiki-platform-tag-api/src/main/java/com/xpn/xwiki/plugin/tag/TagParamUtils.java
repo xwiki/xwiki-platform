@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
  * TagParamUtils handles queries allowing to search and count tags within the wiki.
  *
  * @version $Id$
- * @since 8.1
+ * @since 8.2M1
  */
 public final class TagParamUtils
 {
@@ -37,6 +37,7 @@ public final class TagParamUtils
      */
     private TagParamUtils()
     {
+        // no instances please, static utility
     }
 
     /**
@@ -47,10 +48,13 @@ public final class TagParamUtils
      * @param spaces string describing list of spaces
      * @return list of spaces
      * @throws com.xpn.xwiki.XWikiException if the string is not well formatted
-     * @throws NullPointerException if the string is null
+     * @throws IllegalArgumentException if the string is null
      */
     public static List<String> spacesParameterToList(String spaces) throws XWikiException
     {
+        if (spaces == null) {
+            throw new IllegalArgumentException("Parameter 'spaces' should not be null");
+        }
         return new HQLInListParser(spaces).getResults();
     }
 
@@ -91,11 +95,11 @@ public final class TagParamUtils
 
             if (inQuotes) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                                     String.format("missing closing quote in [%s]", spaces));
+                                     String.format("Missing closing quote in [%s]", spaces));
             }
-            if (commaSeen) {
+            if (commaSeen && !results.isEmpty()) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                                     String.format("unexpected comma at end of [%s]", spaces));
+                                     String.format("Unexpected comma at end of [%s]", spaces));
             }
         }
 
@@ -120,7 +124,7 @@ public final class TagParamUtils
             if (c == ',') {
                 if (commaSeen) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                                             String.format("unexpected comma at position %d in [%s]", pos, spaces));
+                                             String.format("Unexpected comma at position %d in [%s]", pos, spaces));
                 } else {
                     commaSeen = true;
                 }
@@ -130,11 +134,11 @@ public final class TagParamUtils
                     space = new StringBuilder();
                 } else {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                                             String.format("unexpected quote at position %d in [%s]", pos, spaces));
+                                             String.format("Unexpected quote at position %d in [%s]", pos, spaces));
                 }
             } else if (!Character.isWhitespace(c)) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                                         String.format("unexpected character `%s` at position %d in [%s]",
+                                         String.format("Unexpected character `%s` at position %d in [%s]",
                                                        c, pos, spaces));
             }
         }

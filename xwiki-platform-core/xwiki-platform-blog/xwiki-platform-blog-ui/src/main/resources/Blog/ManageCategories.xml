@@ -74,20 +74,33 @@
   #elseif (!$xwiki.getDocument($name).isNew())
     #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
   #else
-    #set($title = $escapetool.url($title))
-    #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
-    #set($entry = $!{escapetool.url($request.entry)})
-    #set($entryObjNb = $!{escapetool.url($request.entryObjNb)})
     #if($request.ajax)
+      #set($redirectParams = {
+        'xpage': 'plain',
+        'display': 'list',
+        'root': "$!{request.newCategoryParent}",
+        'entry': "$!{request.entry}",
+        'entryObjNb': "$!{request.entryObjNb}"
+      })
       #if("$!{request.mode}" == 'select')
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
-      #else
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
-      #end      
+        #set($discard = $redirectParams.put('listType', 'selectable'))
+      #end
+      #set($xredirect = $doc.getURL('view', $escapetool.url($redirectParams)))
     #else ## request.ajax
-      #set($xredirect = $doc.getURL('view', "entry=$!{entry}&amp;entryObjNb=$!{entryObjNb}"))
+      #set($xredirect = $doc.getURL('view', $escapetool.url({
+        'entry': "$!{request.entry}",
+        'entryObjNb': "$!{request.entryObjNb}"
+      })))
     #end
-    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
+    $response.sendRedirect($xwiki.getURL($name, 'save', $escapetool.url({
+      'template': "${blogCategoryTemplate}",
+      'parent': "${request.newCategoryParent}",
+      "${blogCategoryClassname}_0_name": $title,
+      "${blogCategoryClassname}_0_description": '',
+      'xredirect': $xredirect,
+      'xhidden': 1,
+      'form_token': "$!{services.csrf.getToken()}"
+    })))
   #end ## empty title
 #end
 #####################################################

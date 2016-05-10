@@ -42,7 +42,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="TourCode.Macros" /}}
+  <content>{{include reference="TourCode.Macros"/}}
 
 {{velocity}}
 {{html}}

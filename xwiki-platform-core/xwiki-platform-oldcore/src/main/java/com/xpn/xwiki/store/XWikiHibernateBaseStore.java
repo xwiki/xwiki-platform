@@ -1497,7 +1497,7 @@ public class XWikiHibernateBaseStore implements Initializable
         if (inputxcontext != null && xcontext != inputxcontext) {
             LOGGER.warn(
                 "ExecutionContext and passed XWikiContext argument mismatched, for data safety, the XWikiContext from the ExecutionContext has been used.",
-                new Exception());
+                new Exception("Stack trace"));
         }
 
         return xcontext;

@@ -42,9 +42,12 @@
   <content>{{velocity output="false"}}
 #macro (convert $text $toHTML)
   #if ($toHTML)
-    #set ($discard = $doc.setContent($text))
-    #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
-    #set ($output = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
+    ## The $source variable is used inside the content sheet.
+    #set ($source = {
+      'content': $text,
+      'syntax': $doc.syntax
+    })
+    #set ($output = $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent())
   #else
     #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
     #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))

@@ -43,7 +43,7 @@
   </developers>
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.xwiki.org/browse/CKE</url>
+    <url>http://jira.xwiki.org/browse/CKEDITOR</url>
   </issueManagement>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>

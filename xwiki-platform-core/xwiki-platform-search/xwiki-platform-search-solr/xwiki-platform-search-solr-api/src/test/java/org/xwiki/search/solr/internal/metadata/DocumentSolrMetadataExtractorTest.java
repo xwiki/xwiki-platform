@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.Locale;
 
 import javax.inject.Provider;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -72,9 +74,18 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for document meta data extraction.
@@ -94,8 +105,8 @@ public class DocumentSolrMetadataExtractorTest
      */
     private XWikiDocument document;
 
-    private DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"),
-        "WebHome");
+    private DocumentReference documentReference =
+        new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
 
     @Before
     public void setUp() throws Exception
@@ -172,8 +183,8 @@ public class DocumentSolrMetadataExtractorTest
 
         // Hierarchy
         when(localEntityReferenceSerializer.serialize(this.documentReference.getParent())).thenReturn("Path.To.Page");
-        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent())).thenReturn(
-            "Path.To");
+        when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent()))
+            .thenReturn("Path.To");
         when(localEntityReferenceSerializer.serialize(this.documentReference.getParent().getParent().getParent()))
             .thenReturn("Path");
 
@@ -216,7 +227,7 @@ public class DocumentSolrMetadataExtractorTest
         when(this.document.getComment()).thenReturn(comment);
 
         // XObjects.
-        when(this.document.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>> emptyMap());
+        when(this.document.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
 
         // Title
         String title = "title";
@@ -264,10 +275,10 @@ public class DocumentSolrMetadataExtractorTest
 
         assertEquals(Locale.US.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         assertEquals(Locale.US.getLanguage(), solrDocument.getFieldValue(FieldUtils.LANGUAGE));
-        Collection< ? > actualLocales = solrDocument.getFieldValues(FieldUtils.LOCALES);
+        Collection<?> actualLocales = solrDocument.getFieldValues(FieldUtils.LOCALES);
         // The order of the locales in the returned collection is nondeterministic.
-        assertTrue(actualLocales.size() == 2 && actualLocales.contains("")
-            && actualLocales.contains(Locale.US.toString()));
+        assertTrue(
+            actualLocales.size() == 2 && actualLocales.contains("") && actualLocales.contains(Locale.US.toString()));
         assertEquals(this.document.isHidden(), solrDocument.getFieldValue(FieldUtils.HIDDEN));
         assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 
@@ -295,9 +306,8 @@ public class DocumentSolrMetadataExtractorTest
     public void getDocumentThrowingException() throws Exception
     {
         DocumentReference frenchDocumentReference = new DocumentReference(this.documentReference, Locale.FRENCH);
-        XWikiException thrown =
-            new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
+        XWikiException thrown = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
         when(this.xcontext.getWiki().getDocument(frenchDocumentReference, this.xcontext)).thenThrow(thrown);
 
         try {
@@ -375,8 +385,8 @@ public class DocumentSolrMetadataExtractorTest
         commentFields.add(booleanField);
 
         DocumentReference commentsClassReference = new DocumentReference("wiki", "space", "commentsClass");
-        when(this.document.getXObjects()).thenReturn(
-            Collections.singletonMap(commentsClassReference, Arrays.asList(comment)));
+        when(this.document.getXObjects())
+            .thenReturn(Collections.singletonMap(commentsClassReference, Arrays.asList(comment)));
 
         EntityReferenceSerializer<String> localEntityReferenceSerializer =
             this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
@@ -385,8 +395,8 @@ public class DocumentSolrMetadataExtractorTest
         BaseClass xclass = mock(BaseClass.class);
         when(comment.getXClass(this.xcontext)).thenReturn(xclass);
         when(comment.getFieldList()).thenReturn(commentFields);
-        when(comment.getRelativeXClassReference()).thenReturn(
-            commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
+        when(comment.getRelativeXClassReference())
+            .thenReturn(commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
         StringClass stringClass = mock(StringClass.class);
         when(stringClass.getClassType()).thenReturn("String");
@@ -424,8 +434,8 @@ public class DocumentSolrMetadataExtractorTest
 
         // Make sure the password is not indexed (neither as a string nor as a localized text).
         assertNull(solrDocument.getFieldValue("property.space.commentsClass.password_string"));
-        assertNull(solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password",
-            Locale.US)));
+        assertNull(
+            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password", Locale.US)));
 
         // Check the sort fields.
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_sortString"));
@@ -440,16 +450,15 @@ public class DocumentSolrMetadataExtractorTest
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentSummary,
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(commentContent, commentSummary,
             commentAuthor, commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
         assertEquals(8, objectProperties.size());
 
-        objectProperties =
-            solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(
-            "comment : " + commentContent, "summary : " + commentSummary,
-            "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
-            "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
+        objectProperties = solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
+        MatcherAssert.assertThat(objectProperties,
+            Matchers.<Object>containsInAnyOrder("comment : " + commentContent, "summary : " + commentSummary,
+                "author : " + commentAuthor, "date : " + commentDate, "list : " + commentList.get(0),
+                "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
         assertEquals(8, objectProperties.size());
     }
 
@@ -472,14 +481,14 @@ public class DocumentSolrMetadataExtractorTest
 
         BaseClass xclass = mock(BaseClass.class);
         when(xobject.getXClass(this.xcontext)).thenReturn(xclass);
-        when(xobject.getFieldList()).thenReturn(Arrays.<Object> asList(listProperty));
-        when(xobject.getRelativeXClassReference()).thenReturn(
-            classReference.removeParent(classReference.getWikiReference()));
+        when(xobject.getFieldList()).thenReturn(Arrays.<Object>asList(listProperty));
+        when(xobject.getRelativeXClassReference())
+            .thenReturn(classReference.removeParent(classReference.getWikiReference()));
 
         StaticListClass staticListClass = mock(StaticListClass.class);
         when(xclass.get("color")).thenReturn(staticListClass);
-        when(staticListClass.getMap(xcontext)).thenReturn(
-            Collections.singletonMap("red", new ListItem("red", "Dark Red")));
+        when(staticListClass.getMap(xcontext))
+            .thenReturn(Collections.singletonMap("red", new ListItem("red", "Dark Red")));
 
         SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
 
@@ -495,29 +504,20 @@ public class DocumentSolrMetadataExtractorTest
             solrDocument.getFieldValues("property.Space.MyClass.color_sortString"));
     }
 
-    @Test
-    public void getDocumentWithAttachments() throws Exception
+    private XWikiAttachment createMockAttachment(String fileName, String mimeType, Date date, String content,
+        String authorAlias, String authorDisplayName) throws Exception
     {
-        Date logoDate = new Date(123);
-        XWikiAttachment logo = createMockAttachment("logo.png", "image/png", logoDate, 13, "foo", "Alice", "Shy Alice");
-        Date todoDate = new Date(456);
-        XWikiAttachment todo = createMockAttachment("todo.txt", "text/plain", todoDate, 27, "bar", "Bob", "Angry Bob");
-        when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment> asList(logo, todo));
-
-        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
-
-        assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
-        assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
-        assertEquals(Arrays.asList(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
-        assertEquals(Arrays.asList(13, 27), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
-        assertEquals(Arrays.asList("foo\n", "bar\n"), solrDocument.getFieldValues("attcontent_en_US"));
-        assertEquals(Arrays.asList("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
-            solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR));
-        assertEquals(Arrays.asList("Shy Alice", "Angry Bob"),
-            solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY));
+        return createMockAttachment(fileName, mimeType, date, content.getBytes(), authorAlias, authorDisplayName);
     }
 
-    private XWikiAttachment createMockAttachment(String fileName, String mimeType, Date date, int size, String content,
+    private XWikiAttachment createMockAttachment(String fileName, String mimeType, Date date, InputStream content,
+        String authorAlias, String authorDisplayName) throws Exception
+    {
+        return createMockAttachment(fileName, mimeType, date, IOUtils.toByteArray(content), authorAlias,
+            authorDisplayName);
+    }
+
+    private XWikiAttachment createMockAttachment(String fileName, String mimeType, Date date, byte[] content,
         String authorAlias, String authorDisplayName) throws Exception
     {
         XWikiAttachment attachment = mock(XWikiAttachment.class, fileName);
@@ -525,8 +525,8 @@ public class DocumentSolrMetadataExtractorTest
         when(attachment.getFilename()).thenReturn(fileName);
         when(attachment.getMimeType(this.xcontext)).thenReturn(mimeType);
         when(attachment.getDate()).thenReturn(date);
-        when(attachment.getFilesize()).thenReturn(size);
-        when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content.getBytes()));
+        when(attachment.getFilesize()).thenReturn(content.length);
+        when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content));
 
         String authorFullName = "XWiki." + authorAlias;
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
@@ -539,5 +539,97 @@ public class DocumentSolrMetadataExtractorTest
         when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
         return attachment;
+    }
+
+    // Attachments
+
+    private void assertAttachmentExtract(String expect, String filename) throws Exception
+    {
+        XWikiAttachment logo;
+        try (InputStream stream = getClass().getResourceAsStream("/files/" + filename)) {
+            logo = createMockAttachment(filename, "image/png", new Date(), stream, "Alice", "Shy Alice");
+            when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo));
+        }
+
+        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+
+        assertEquals("Wrong attachment content indexed", expect, solrDocument.getFieldValue("attcontent_en_US"));
+
+    }
+
+    @Test
+    public void getDocumentWithAttachments() throws Exception
+    {
+        Date logoDate = new Date(123);
+        XWikiAttachment logo = createMockAttachment("logo.png", "image/png", logoDate, "foo", "Alice", "Shy Alice");
+        Date todoDate = new Date(456);
+        XWikiAttachment todo = createMockAttachment("todo.txt", "text/plain", todoDate, "bar bar", "Bob", "Angry Bob");
+        when(this.document.getAttachmentList()).thenReturn(Arrays.<XWikiAttachment>asList(logo, todo));
+
+        SolrInputDocument solrDocument = this.mocker.getComponentUnderTest().getSolrDocument(this.documentReference);
+
+        assertEquals(Arrays.asList("logo.png", "todo.txt"), solrDocument.getFieldValues(FieldUtils.FILENAME));
+        assertEquals(Arrays.asList("image/png", "text/plain"), solrDocument.getFieldValues(FieldUtils.MIME_TYPE));
+        assertEquals(Arrays.asList(logoDate, todoDate), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_DATE));
+        assertEquals(Arrays.asList(3, 7), solrDocument.getFieldValues(FieldUtils.ATTACHMENT_SIZE));
+        assertEquals(Arrays.asList("foo\n", "bar bar\n"), solrDocument.getFieldValues("attcontent_en_US"));
+        assertEquals(Arrays.asList("wiki:XWiki.Alice", "wiki:XWiki.Bob"),
+            solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR));
+        assertEquals(Arrays.asList("Shy Alice", "Angry Bob"),
+            solrDocument.getFieldValues(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY));
+    }
+
+    @Test
+    public void testAttachmentExtractFromTxt() throws Exception
+    {
+        assertAttachmentExtract("text content\n", "txt.txt");
+    }
+
+    @Test
+    public void testAttachmentExtractFromMSOffice97() throws Exception
+    {
+        assertAttachmentExtract("MS Office 97 content\n\n", "msoffice97.doc");
+
+    }
+
+    @Test
+    public void testAttachmentExtractFromOpenXML() throws Exception
+    {
+        assertAttachmentExtract("OpenXML content\n", "openxml.docx");
+    }
+
+    @Test
+    public void testAttachmentExtractFromOpenDocument() throws Exception
+    {
+        assertAttachmentExtract("OpenDocument content\n", "opendocument.odt");
+    }
+
+    @Test
+    public void testAttachmentExtractFromPDF() throws Exception
+    {
+        assertAttachmentExtract("\nPDF content\n\n\n", "pdf.pdf");
+    }
+
+    @Test
+    public void testAttachmentExtractFromZIP() throws Exception
+    {
+        assertAttachmentExtract("\nzip.txt\nzip content\n\n\n\n", "zip.zip");
+    }
+
+    @Test
+    public void testAttachmentExtractFromHTML() throws Exception
+    {
+        assertAttachmentExtract("something\n", "html.html");
+    }
+
+    @Test
+    public void testAttachmentExtractFromClass() throws Exception
+    {
+        String expectedContent =
+            "public synchronized class HelloWorld {\n" +
+                "    public void HelloWorld();\n" +
+                "    public static void main(String[]);\n" +
+                "}\n\n";
+        assertAttachmentExtract(expectedContent, "HelloWorld.class");
     }
 }

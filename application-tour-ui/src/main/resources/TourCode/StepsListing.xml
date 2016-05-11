@@ -46,10 +46,10 @@
 
 {{velocity}}
 {{html}}
-#if (!$BSTDocRef)
-   #set($BSTDocRef = $doc.getFullName())
+#if (!$tourName)
+   #set($tourName = $doc.getFullName())
 #end
-#set($vdoc = $xwiki.getDocument($BSTDocRef))
+#set($vdoc = $xwiki.getDocument($tourName))
 #set($steps = $vdoc.getObjects('TourCode.StepClass'))
 #set ($sortedSteps = [])
 #sortXWikiObjectsList($steps, 'order', $sortedSteps)
@@ -121,7 +121,7 @@
       &lt;/table&gt;
       &lt;input type="hidden" value="$nbsteps" id="nbsteps"/&gt;
    &lt;/div&gt;
-   &lt;input type="hidden" value="$escapetool.xml($BSTDocRef)" id="BSTDocRef"/&gt;
+   &lt;input type="hidden" value="$escapetool.xml($tourName)" id="tourName"/&gt;
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>

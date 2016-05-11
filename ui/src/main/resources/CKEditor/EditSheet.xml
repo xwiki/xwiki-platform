@@ -833,6 +833,12 @@ body &gt; .modal {
   background-repeat: no-repeat;
 }
 
+td.cke_dialog_contents_body {
+  /* Make sure the resource type dropdown overflows outside the dialog body
+    (otherwise we get a vertical scroll bar when opening the dropdown). */
+  overflow: visible;
+}
+
 /**
  * Link Options Toggle
  */

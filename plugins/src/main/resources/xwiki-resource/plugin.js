@@ -158,6 +158,8 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           $(this.getResourcePickerInput().$).val(serializedResourceReference).trigger('selectResource', {
             reference: resourceReference
           });
+          // Clear the previously cached resource reference.
+          $(this.getElement().$).find('.resourcePicker').removeProp('previousResourceReference');
         },
         //
         // Custom fields

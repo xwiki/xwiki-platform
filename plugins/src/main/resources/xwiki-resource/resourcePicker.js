@@ -114,7 +114,9 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
       // Update the original resource reference input if there's no resource displayed or if the currently selected
       // resource type doesn't have an associated displayer.
       if (resourceDisplay.is(':hidden') || !$resource.displayers[resourceTypeButton.val()]) {
-        resourceDisplay.hide().empty();
+        // Don't hide the selected resource immediately because it moves the following buttons up and if the change
+        // event was triggered by a click on one of these buttons then the click event will be ignored.
+        resourceDisplay.hide($.proxy(resourceDisplay, 'empty'));
         // We don't fire the selectResource event because we don't need to update the resource picker display.
         resourcePicker.prev('input').val(resourceTypeButton.val() + ':' + resourceReferenceInput.val());
       }

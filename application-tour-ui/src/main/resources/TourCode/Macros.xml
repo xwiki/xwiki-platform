@@ -57,7 +57,7 @@
   #foreach ($object in $inputObjects)
     #set ($key = $object.getValue($propertyName))
     #set ($sameKeyObjects = $objectsMap.get($key))
-    #if (!$objectsMap.get($key))
+    #if (!$sameKeyObjects)
       #set ($sameKeyObjects = [])
       #set ($discard = $objectsMap.put($key, $sameKeyObjects))
     #end

@@ -30,7 +30,11 @@
   <artifactId>xwiki-platform-rendering-wikimacro-ui</artifactId>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - UI</name>
   <packaging>xar</packaging>
-  <description>XWiki Platform - Rendering - Wiki Macro Bridge - UI</description>
+  <description>Allows creating XWiki macros through wiki pages and display existing wiki macros</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Macro Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

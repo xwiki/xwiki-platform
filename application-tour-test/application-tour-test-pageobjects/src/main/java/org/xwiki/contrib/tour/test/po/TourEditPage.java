@@ -38,6 +38,9 @@ public class TourEditPage extends EditPage
     @FindBy(id = "TourCode.TourClass_0_targetPage")
     private WebElement targetPage;
     
+    @FindBy(id = "TourCode.TourClass_0_targetClass")
+    private WebElement targetClass;
+    
     public void setDescription(String description) 
     {
         this.description.clear();
@@ -55,5 +58,11 @@ public class TourEditPage extends EditPage
     {
         this.targetPage.clear();
         this.targetPage.sendKeys(targetPage);
+    }
+    
+    public void setTargetClass(String targetClass)
+    {
+        this.targetClass.clear();
+        this.targetClass.sendKeys(targetClass);
     }
 }

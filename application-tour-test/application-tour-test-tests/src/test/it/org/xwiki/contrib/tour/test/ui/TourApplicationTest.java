@@ -37,82 +37,79 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @version $Id: $
- * @since 0.2 
+ * @since 0.2
  */
 public class TourApplicationTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-            new SuperAdminAuthenticationRule(getUtil(), getDriver());
+        new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
-    private void setUpTour() throws Exception
+    private void setUpTour(TourEditPage tourEditPage, String description, boolean isActive, String targetPage,
+        String targetClass) throws Exception
+    {
+        tourEditPage.setDescription(description);
+        tourEditPage.setIsActive(isActive);
+        tourEditPage.setTargetPage(targetPage);
+        tourEditPage.setTargetClass(targetClass);
+        tourEditPage.clickSaveAndView();
+    }
+
+    private void setUpStep(ObjectEditPane obj, String element, String title, String content, String order,
+        Boolean backdrop, String targetPage)
+    {
+        obj.setFieldValue(obj.byPropertyName("element"), element);
+        obj.setFieldValue(obj.byPropertyName("title"), title);
+        obj.setFieldValue(obj.byPropertyName("content"), content);
+        obj.setFieldValue(obj.byPropertyName("order"), order);
+        obj.setCheckBox(obj.byPropertyName("backdrop"), backdrop);
+        obj.setFieldValue(obj.byPropertyName("targetPage"), targetPage);
+    }
+
+    private void cleanUp(String page) throws Exception
+    {
+        TourHomePage tourHomePage = TourHomePage.gotoPage();
+        ViewPage tourPage = tourHomePage.getTourPage(page);
+        tourPage.delete().clickYes();
+    }
+
+    @Test
+    public void testTour() throws Exception
     {
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
-        tourEditPage.setDescription("My nice description");
-        tourEditPage.setIsActive(true);
-        tourEditPage.setTargetPage("Main.WebHome");
-        tourEditPage.clickSaveAndView();
+        setUpTour(tourEditPage, "My nice description", true, "Tour.WebHome", "");
+
         // Todo: replace by a nice UI
         ObjectEditPage objectEditPage = tourEditPage.editObjects();
         ObjectEditPane obj1 = objectEditPage.addObject("TourCode.StepClass");
-        obj1.setFieldValue(obj1.byPropertyName("element"), "body");
-        // Test to put a translation key
-        obj1.setFieldValue(obj1.byPropertyName("title"), "tour.app.name");
-        // Test to use the translation macro
-        obj1.setFieldValue(obj1.byPropertyName("content"), "{{translation key=\"TourCode.TourClass_description\" /}}");
-        obj1.setFieldValue(obj1.byPropertyName("order"), "1");
-        obj1.setCheckBox(obj1.byPropertyName("backdrop"), true);
+        // Test to put a translation key, use the translation macro
+        setUpStep(obj1, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}", "1", true,
+            "");
         // I voluntary create the object 3 before the 2 to test the 'order' field
         ObjectEditPane obj3 = objectEditPage.addObject("TourCode.StepClass");
-        obj3.setFieldValue(obj3.byPropertyName("element"), "body");
-        obj3.setFieldValue(obj3.byPropertyName("title"), "Title 3");
-        obj3.setFieldValue(obj3.byPropertyName("content"), "Step 3");
-        obj3.setFieldValue(obj3.byPropertyName("order"), "3");
-        obj3.setCheckBox(obj3.byPropertyName("backdrop"), true);
+        setUpStep(obj3, "body", "Title 3", "Step 3", "3", true, "");
         ObjectEditPane obj2 = objectEditPage.addObject("TourCode.StepClass");
-        obj2.setFieldValue(obj2.byPropertyName("element"), "body");
-        obj2.setFieldValue(obj2.byPropertyName("title"), "Title 2");
-        obj2.setFieldValue(obj2.byPropertyName("content"), "Step 2");
-        obj2.setFieldValue(obj2.byPropertyName("order"), "2");
-        obj2.setCheckBox(obj2.byPropertyName("backdrop"), true);
+        setUpStep(obj2, "body", "Title 2", "Step 2", "2", true, "");
         // Object 4 used to test the Multipage feature ('targetPage' field)
         ObjectEditPane obj4 = objectEditPage.addObject("TourCode.StepClass");
-        obj4.setFieldValue(obj4.byPropertyName("element"), "body");
-        obj4.setFieldValue(obj4.byPropertyName("title"), "Title 4");
-        obj4.setFieldValue(obj4.byPropertyName("content"), "Step 4");
-        obj4.setFieldValue(obj4.byPropertyName("order"), "4");
-        obj4.setCheckBox(obj4.byPropertyName("backdrop"), true);
-        obj4.setFieldValue(obj4.byPropertyName("targetPage"), "TourCode.TourClass");
+        setUpStep(obj4, "body", "Title 4", "Step 4", "4", true, "TourCode.TourClass");
         objectEditPage.clickSaveAndView();
-        
-        tourHomePage = TourHomePage.gotoPage();
-        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Main.WebHome", true)));
-    }
-    
-    private void cleanUp() throws Exception
-    {
-        TourHomePage tourHomePage = TourHomePage.gotoPage();
-        ViewPage tourPage = tourHomePage.getTourPage("Test");
-        tourPage.delete().clickYes();
-    }
-    
-    @Test
-    public void testTour() throws Exception
-    {
-        setUpTour();
 
-        PageWithTour homePage = PageWithTour.gotoPage("Main", "WebHome");
+        tourHomePage = TourHomePage.gotoPage();
+        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.WebHome", true, "-")));
+
+        PageWithTour homePage = PageWithTour.gotoPage("Tour", "WebHome");
         assertTrue(homePage.isTourDisplayed());
-        
+
         // Step 1
         assertEquals("Tour", homePage.getStepTitle());
         assertEquals("Description", homePage.getStepDescription());
         assertTrue(homePage.hasNextStep());
         assertFalse(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
-        
+
         // Step 2
         homePage.nextStep();
         assertEquals("Title 2", homePage.getStepTitle());
@@ -120,7 +117,7 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(homePage.hasNextStep());
         assertTrue(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
-        
+
         // Go back to step 1
         homePage.previousStep();
         assertEquals("Tour", homePage.getStepTitle());
@@ -128,7 +125,7 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(homePage.hasNextStep());
         assertFalse(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
-        
+
         // Go back to step 2
         homePage.nextStep();
         assertEquals("Title 2", homePage.getStepTitle());
@@ -136,7 +133,7 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(homePage.hasNextStep());
         assertTrue(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
-        
+
         // Step 3
         homePage.nextStep();
         assertEquals("Title 3", homePage.getStepTitle());
@@ -155,12 +152,12 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(secondPage.hasNextStep());
         assertTrue(secondPage.hasPreviousStep());
         assertTrue(secondPage.hasEndButton());
-        
+
         // End
         secondPage.end();
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
-        
+
         // Resume (to step 4)
         secondPage.resume();
         assertTrue(secondPage.isTourDisplayed());
@@ -170,12 +167,12 @@ public class TourApplicationTest extends AbstractTest
         assertFalse(secondPage.hasNextStep());
         assertTrue(secondPage.hasPreviousStep());
         assertTrue(secondPage.hasEndButton());
-        
+
         // Close
         secondPage.close();
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
-        
+
         // Go to an other page and then go back
         TourHomePage.gotoPage();
         secondPage = PageWithTour.gotoPage("TourCode", "TourClass");
@@ -192,13 +189,13 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(secondPage.hasPreviousStep());
         assertTrue(secondPage.hasEndButton());
 
-        // Close
-        secondPage.close();
+        // End
+        secondPage.end();
         assertFalse(secondPage.isTourDisplayed());
         assertTrue(secondPage.hasResumeButton());
-        
+
         // Go back to the tour homepage
-        TourHomePage tourHomePage = TourHomePage.gotoPage();
+        TourHomePage.gotoPage();
         // Launch the tour
         homePage = tourHomePage.startTour("Test");
         // So the step 1 is active
@@ -207,8 +204,32 @@ public class TourApplicationTest extends AbstractTest
         assertTrue(homePage.hasNextStep());
         assertFalse(homePage.hasPreviousStep());
         assertFalse(homePage.hasEndButton());
-        
-        cleanUp();
+        homePage.close();
+
+        cleanUp("Test");
     }
 
+    @Test
+    public void testBindedToClassTour() throws Exception
+    {
+        // First, we need to create a tour
+        TourHomePage tourHomePage = TourHomePage.gotoPage();
+        TourEditPage tourEditPage = tourHomePage.addNewEntry("NewTest");
+        setUpTour(tourEditPage, "Description", true, "", "TourCode.TourClass");
+
+        // Todo: replace by a nice UI
+        ObjectEditPage objectEditPage = tourEditPage.editObjects();
+        ObjectEditPane obj1 = objectEditPage.addObject("TourCode.StepClass");
+        setUpStep(obj1, "body", "Tour Title", "Tour Content", "1", true, "");
+        objectEditPage.clickSaveAndView();
+
+        tourHomePage = TourHomePage.gotoPage();
+        assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("NewTest", "-", true, "TourCode.TourClass")));
+
+        PageWithTour homePage = PageWithTour.gotoPage("Tour", "NewTest");
+        assertTrue(homePage.isTourDisplayed());
+        homePage.end();
+
+        cleanUp("NewTest");
+    }
 }

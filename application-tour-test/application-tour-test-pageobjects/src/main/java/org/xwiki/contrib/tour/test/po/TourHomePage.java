@@ -66,8 +66,9 @@ public class TourHomePage extends ViewPage
     {
         WebElement name     = row.findElement(By.xpath("//td[contains(@class, 'doc_name')]/a"));
         WebElement isActive = row.findElement(By.className("isActive"));
-        WebElement target   = row.findElement(By.className("targetPage"));
-        return new TourFromLivetable(name.getText(), target.getText(), "Yes".equals(isActive.getText()));
+        WebElement targetPage   = row.findElement(By.className("targetPage"));
+        WebElement targetClass   = row.findElement(By.className("targetClass"));
+        return new TourFromLivetable(name.getText(), targetPage.getText(), "Yes".equals(isActive.getText()), targetClass.getText());
     }
     
     public List<TourFromLivetable> getTours()

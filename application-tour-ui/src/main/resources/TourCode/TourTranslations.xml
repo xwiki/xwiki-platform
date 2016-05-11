@@ -59,6 +59,7 @@ tour.livetable.emptyvalue=-
 tour.livetable.description=Description
 tour.livetable.isActive=Active
 tour.livetable.targetPage=Target Page
+tour.livetable.targetClass=Target Class
 
 # Tour popover
 tour.popover.previous=« Prev

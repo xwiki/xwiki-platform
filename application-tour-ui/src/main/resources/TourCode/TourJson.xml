@@ -46,15 +46,26 @@
   ##--------------------------------------------------------
   #set ($tours = [])
   #if ("$!request.tourDoc" != '')
-    #set ($query = $services.query.xwql('from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage)').bindValue('targetPage', $request.tourDoc).addFilter('unique'))
     #set ($targetRef = $services.model.resolveDocument($request.tourDoc))
+    #set ($targetDoc = $xwiki.getDocument($targetRef))
+    #set ($classes = [])
+    #foreach ($className in $targetDoc.getxWikiObjects().keySet())
+      #set ($discard = $classes.add($className))
+    #end
+    #set ($query = $services.query.xwql('from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage OR tour.targetClass IN (:classes))').bindValue('targetPage', $request.tourDoc).bindValue('classes', $classes).addFilter('unique'))
     ## -------------------------
     ## Get the different tours
     ## -------------------------
     #foreach ($tourRef in $query.execute())
       #set ($tourDoc = $xwiki.getDocument($tourRef))
       #set ($tourObj = $tourDoc.getObject('TourCode.TourClass'))
-      #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))
+      ## the targetPage property takes precedence over targetClass property.
+      ## the targetClass property is used only when targetPage is empty.
+      #if ("$!tourDoc.getValue('targetClass', $tourObj)" != '' &amp;&amp; "$!tourDoc.getValue('targetPage', $tourObj)" == '')
+        #set ($path = $xwiki.getURL($targetDoc))
+      #else
+        #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))
+      #end
       ## Verify that the user who has saved this tour has the edit right on the target page
       #if ($services.security.authorization.hasAccess('edit', $tourDoc.authorReference, $targetRef))
         #set ($tour = { 'name': $tourRef, 'steps': [] })

@@ -78,6 +78,19 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </isActive>
+    <targetClass>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>targetClass</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>Target Class</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </targetClass>
     <targetPage>
       <customDisplay/>
       <disabled>0</disabled>

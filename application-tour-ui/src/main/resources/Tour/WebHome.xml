@@ -44,6 +44,7 @@
   'doc.name': {"type": "text", "size":10,"link":"view"},
   'isActive': {"type": "text", "size":10, "sortable":true, "filterable": false},
   'targetPage': {"type":"text","size":10},
+  'targetClass': {"type":"text","size":10},
   '_actions': {"sortable":false,"filterable":false,"html":true,"actions":["edit","delete"]}
 })
 #set ($options = {
@@ -56,7 +57,11 @@
   'selectedColumn': 'doc.name',
   'defaultOrder': 'asc'
 })
-#set ($columns = ['doc.name', 'isActive', 'targetPage', '_actions'])
+#set ($columns = ['doc.name', 'isActive', 'targetPage'])
+#if ($isAdvancedUser)
+  #set ($discard = $columns.add('targetClass'))
+#end
+#set ($discard = $columns.add('_actions'))
 #livetable('tour' $columns $columnsProperties $options)
 {{/velocity}}</content>
   <object>
@@ -245,7 +250,7 @@
    */
   var addLaunchButton = function (row) {
     // Do not add the button if the tour is not active or if the target page is not set
-    if (row.find('.targetPage').text() == '' || row.find('.isActive').text() != '$escapetool.javascript($services.localization.render("yes"))') {
+    if (row.find('.targetPage').text() == '-' || row.find('.isActive').text() != '$escapetool.javascript($services.localization.render("yes"))') {
         return;
     }
     var targetPage = XWiki.Model.resolve(row.find('.targetPage').text(), XWiki.EntityType.DOCUMENT);

@@ -19,6 +19,8 @@
  */
 package org.xwiki.contrib.tour.test.po;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  * @version $Id: $
  * @since 0.2
@@ -66,7 +68,13 @@ public class TourFromLivetable
     {
         if (o instanceof TourFromLivetable) {
             TourFromLivetable t = (TourFromLivetable) o;
-            return t.name.equals(name) && t.targetPage.equals(targetPage) && t.isActive == isActive && t.targetClass.equals(targetClass);
+            return new EqualsBuilder()
+                    .append(t.name, name)
+                    .append(t.targetPage, targetPage)
+                    .append(t.targetClass, targetClass)
+                    .append(t.isActive, isActive)
+                    .isEquals();
+
         }
         return false;
     }

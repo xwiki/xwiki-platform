@@ -48,11 +48,21 @@
   #if ("$!request.tourDoc" != '')
     #set ($targetRef = $services.model.resolveDocument($request.tourDoc))
     #set ($targetDoc = $xwiki.getDocument($targetRef))
-    #set ($classes = [])
-    #foreach ($className in $targetDoc.getxWikiObjects().keySet())
-      #set ($discard = $classes.add($className))
+    #set ($classes = $targetDoc.getxWikiObjects().keySet())
+    ##-------------------
+    ## Compute the query
+    ##-------------------
+    #set ($extraClause = '')
+    #if (!$classes.isEmpty())
+      ## We need to put this request part in the $extraClause variable otherwise we end up with "tour.targetClass IN ()"
+      ## which causes an hibernate parser error reported in the logs.
+      ## Say differently, "()" cannot be empty in a "IN" clause.
+      #set ($extraClause = 'OR tour.targetClass IN (:classes)')
     #end
-    #set ($query = $services.query.xwql('from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage OR tour.targetClass IN (:classes))').bindValue('targetPage', $request.tourDoc).bindValue('classes', $classes).addFilter('unique'))
+    #set ($query = $services.query.xwql("from doc.object(TourCode.TourClass) as tour, doc.object(TourCode.StepClass) as step WHERE tour.isActive = 1 AND (tour.targetPage = :targetPage OR step.targetPage = :targetPage ${extraClause})").bindValue('targetPage', $request.tourDoc).addFilter('unique'))
+    #if (!$classes.isEmpty())
+      #set ($query = $query.bindValue('classes', $classes))
+    #end
     ## -------------------------
     ## Get the different tours
     ## -------------------------
@@ -62,6 +72,8 @@
       ## the targetPage property takes precedence over targetClass property.
       ## the targetClass property is used only when targetPage is empty.
       #if ("$!tourDoc.getValue('targetClass', $tourObj)" != '' &amp;&amp; "$!tourDoc.getValue('targetPage', $tourObj)" == '')
+        ## Path is the URL where the Tour should be visible. Here, $targetDoc is a page holding some objects concerned
+        ## by this tour so the URL should be the one of the document.
         #set ($path = $xwiki.getURL($targetDoc))
       #else
         #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $tourObj)))

@@ -258,7 +258,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       
       // Create the steps
       for (var i = 0; i &lt; jsonData.steps.length; i++) {
-        tour.addStep($.extend({}, jsonData.steps[i]))
+        tour.addStep(jsonData.steps[i]);
       }
       
       // Look if the tour should be started regardless of its status on the local storage

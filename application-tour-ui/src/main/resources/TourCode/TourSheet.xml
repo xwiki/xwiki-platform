@@ -64,7 +64,7 @@
   &lt;/dt&gt;
   &lt;dd&gt;
     #set($pageMode = $xcontext.action)
-    {{include reference="TourCode.StepsListing" /}}
+    {{include reference="TourCode.StepsListing"/}}
   &lt;/dd&gt;
 &lt;/dl&gt;
 

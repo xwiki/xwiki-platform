@@ -392,7 +392,6 @@ function displayMembers(row, i, table, form_token)
 /**
   * User and groups list element creator.
   * Used in adminglobalrights.vm, adminspacerights.vm, editrights.vm.
-  * @todo allows and denys should be arrays, not strings.
   */
 function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 {
@@ -454,10 +453,10 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
       // Set a data-title attribute for the responsive livetable (since Flamingo).
       td.setAttribute("data-title", translatedRights[right]);
       var r = 0;
-      if (allows.match("\\b" + right + "\\b")) {
-        r = 1;
-      } else if (denys.match("\\b" + right + "\\b")) {
+      if (denys.indexOf(right)>=0) {
         r = 2;
+      } else if (allows.indexOf(right)>=0) {
+        r = 1;
       }
       var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
       tr.appendChild(td);

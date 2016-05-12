@@ -88,15 +88,16 @@ $response.setContentType("application/x-json")
     #set($matchedCount = $rm.groupsApi.countAllMatchedGroups($filterMap))
   #end
 #end
+#set($rightsWithAllowPrecedence = [ 'admin', 'programming', 'register', 'createwiki' ])
 ### json starts
-{
-"totalrows": $matchedCount,
-"reqNo"    : $mathtool.toInteger($request.reqNo),
-"returnedrows": #if($matchedCount < $limit) $matchedCount #else $limit #end,
-"offset"   : $offset,
-"clsname"  : "$!{escapetool.javascript($clsname)}",
-"uorg"     : "$!{escapetool.javascript($uorg)}",
-"rows": [
+#set($userGroupsMap = {})
+#set($discard = $userGroupsMap.put("totalrows", $matchedCount))
+#set($discard = $userGroupsMap.put("reqNo"    , $mathtool.toInteger($request.reqNo)))
+#set($discard = $userGroupsMap.put("returnedrows", $mathtool.min($matchedCount, $limit)))
+#set($discard = $userGroupsMap.put("offset"   , $offset))
+#set($discard = $userGroupsMap.put("clsname"  , $clsname))
+#set($discard = $userGroupsMap.put("uorg"     , $uorg))
+#set($rows = [])
 #foreach($user in $users)
   #set($wikiname = $user.getWiki())
   #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
@@ -111,7 +112,6 @@ $response.setContentType("application/x-json")
   #end
   #set($allows = {})
   #set($denys = {})
-  #if($velocityCount > 1) , #end
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
     #set($pers = "$!obj.getProperty($uorg).getValue()")
@@ -120,25 +120,41 @@ $response.setContentType("application/x-json")
         #set($right = $right.trim())
         #if($right != "")
           #if($obj.getProperty('allow').getValue() == 1)
-            ## If the same right is specified both as allow and deny, deny is stronger.
-            #if(!$denys.containsKey($right)) #set($discard = $allows.put($right, "1")) #end
+            #if($rightsWithAllowPrecedence.contains($right))
+              ## If the same right is specified both as allow and deny, allow is stronger.
+              #set($discard = $allows.put($right, "1"))
+              #set($discard = $denys.remove($right))
+            #else
+              ## If the same right is specified both as allow and deny, deny is stronger.
+              #if(!$denys.containsKey($right)) #set($discard = $allows.put($right, "1")) #end
+            #end
           #else
-            #set($discard = $denys.put($right, "1"))
-            ## If the same right is specified both as allow and deny, deny is stronger.
-            #set($discard = "$!allows.remove($right)")
+            #if($rightsWithAllowPrecedence.contains($right))
+              ## If the same right is specified both as allow and deny, allow is stronger.
+              #if(!$allows.containsKey($right)) #set($discard = $deny.put($right, "1")) #end
+            #else
+              #set($discard = $denys.put($right, "1"))
+              ## If the same right is specified both as allow and deny, deny is stronger.
+              #set($discard = "$!allows.remove($right)")
+            #end
           #end
         #end
       #end
     #end
   #end ## foreach rights object
- {"username"   : "$!{escapetool.javascript($user.name)}",
-  "fullname"   : #if($wikiname=="xwiki") "$!{escapetool.javascript($user.getPrefixedFullName())}" #else "$!{escapetool.javascript($user.fullName)}" #end,
-  "wikiname"   : "$!{escapetool.javascript($wikiname)}",
-  "userurl"    : "$xwiki.getURL($user.fullName)",
-  "allows"     : "$allows.keySet()",
-  "denys"      : "$denys.keySet()",
-  "isuseringroup" : #if($uorg == "groups") $xwiki.getUser().isUserInGroup($user.fullName) #else false #end
- }
+  #set($row = {})
+  #set($discard = $row.put("username", $user.name))
+  #set($discard = $row.put("fullname", $username))
+  #set($discard = $row.put("wikiname", $wikiname))
+  #set($discard = $row.put("userurl" , $xwiki.getURL($user.fullName)))
+  #set($discard = $row.put("allows"  , $allows.keySet()))
+  #set($discard = $row.put("denys"   , $denys.keySet()))
+  #if ($uorg == "groups")
+    #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))
+  #else
+    #set($discard = $row.put("isuseringroup", false))
+  #end
+  #set($discard = $rows.add($row))
 #end ## foreach user in users
-]}
-### end of json
+#set($discard = $userGroupsMap.put("rows"     , $rows))
+$jsontool.serialize($userGroupsMap)

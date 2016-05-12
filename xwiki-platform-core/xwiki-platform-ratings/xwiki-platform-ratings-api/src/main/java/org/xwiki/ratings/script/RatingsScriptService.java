@@ -34,6 +34,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.AverageRatingApi;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
 
@@ -56,6 +57,9 @@ public class RatingsScriptService implements ScriptService
 
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
+
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
 
     @Inject
     @Named("current")
@@ -132,27 +136,28 @@ public class RatingsScriptService implements ScriptService
     @Deprecated
     public RatingApi setRating(Document doc, String author, int vote)
     {
-        DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
-        return setRating(documentRef, authorRef, vote);
+        DocumentReference documentReference = doc.getDocumentReference();
+        DocumentReference authorReference = this.userReferenceResolver.resolve(author);
+        return setRating(documentReference, authorReference, vote);
     }
 
     /**
      * Set a new rating.
      * 
-     * @param document the document which is being rated
+     * @param documentReference the documentReference which is being rated
      * @param author the author giving the rating
      * @param vote the number of stars given (from 1 to 5)
      * @return the new rating object
      */
-    public RatingApi setRating(DocumentReference document, DocumentReference author, int vote)
+    public RatingApi setRating(DocumentReference documentReference, DocumentReference author, int vote)
     {
         // TODO protect this with programming rights
         // and add a setRating(docName), not protected but for which the author is retrieved from getXWikiContext().
         setError(null);
 
         try {
-            return new RatingApi(this.ratingsManagerProvider.get(document).setRating(document, author, vote));
+            return new RatingApi(this.ratingsManagerProvider.get(documentReference).
+                setRating(documentReference, author, vote));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -170,24 +175,24 @@ public class RatingsScriptService implements ScriptService
     @Deprecated
     public RatingApi getRating(Document doc, String author)
     {
-        DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
-        return getRating(documentRef, authorRef);
+        DocumentReference documentReference = doc.getDocumentReference();
+        DocumentReference authorReference = this.userReferenceResolver.resolve(author);
+        return getRating(documentReference, authorReference);
     }
 
     /**
      * Retrieve a specific rating.
      * 
-     * @param document the document to which the rating belongs to
+     * @param documentReference the documentReference to which the rating belongs to
      * @param author the user that gave the rating
      * @return a rating object
      */
-    public RatingApi getRating(DocumentReference document, DocumentReference author)
+    public RatingApi getRating(DocumentReference documentReference, DocumentReference author)
     {
         setError(null);
 
         try {
-            Rating rating = this.ratingsManagerProvider.get(document).getRating(document, author);
+            Rating rating = this.ratingsManagerProvider.get(documentReference).getRating(documentReference, author);
             if (rating == null) {
                 return null;
             }
@@ -216,14 +221,14 @@ public class RatingsScriptService implements ScriptService
     /**
      * Get a list of ratings.
      * 
-     * @param document the document to which the ratings belong to
+     * @param documentReference the documentReference to which the ratings belong to
      * @param start the offset from which to start
      * @param count number of ratings to return
      * @return a list of rating objects
      */
-    public List<RatingApi> getRatings(DocumentReference document, int start, int count)
+    public List<RatingApi> getRatings(DocumentReference documentReference, int start, int count)
     {
-        return getRatings(document, start, count, true);
+        return getRatings(documentReference, start, count, true);
     }
 
     /**
@@ -245,18 +250,19 @@ public class RatingsScriptService implements ScriptService
     /**
      * Get a sorted list of ratings.
      * 
-     * @param document the document to which the ratings belong to
+     * @param documentReference the documentReference to which the ratings belong to
      * @param start the offset from which to start
      * @param count number of ratings to return
      * @param asc in ascending order or not
      * @return a list of rating objects
      */
-    public List<RatingApi> getRatings(DocumentReference document, int start, int count, boolean asc)
+    public List<RatingApi> getRatings(DocumentReference documentReference, int start, int count, boolean asc)
     {
         setError(null);
 
         try {
-            return wrapRatings(this.ratingsManagerProvider.get(document).getRatings(document, start, count, asc));
+            return wrapRatings(this.ratingsManagerProvider.get(documentReference).
+                getRatings(documentReference, start, count, asc));
         } catch (Exception e) {
             setError(e);
             return null;
@@ -280,16 +286,17 @@ public class RatingsScriptService implements ScriptService
     /**
      * Get average rating.
      * 
-     * @param document the document to which the average rating belongs to
+     * @param documentReference the documentReference to which the average rating belongs to
      * @param method the method of calculating the average
      * @return a average rating API object
      */
-    public AverageRatingApi getAverageRating(DocumentReference document, String method)
+    public AverageRatingApi getAverageRating(DocumentReference documentReference, String method)
     {
         setError(null);
 
         try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document, method));
+            return new AverageRatingApi(this.ratingsManagerProvider.get(documentReference).
+                getAverageRating(documentReference, method));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -312,15 +319,16 @@ public class RatingsScriptService implements ScriptService
     /**
      * Get average rating.
      * 
-     * @param document the document to which the average rating belongs to
+     * @param documentReference the documentReference to which the average rating belongs to
      * @return a average rating API object
      */
-    public AverageRatingApi getAverageRating(DocumentReference document)
+    public AverageRatingApi getAverageRating(DocumentReference documentReference)
     {
         setError(null);
 
         try {
-            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document));
+            return new AverageRatingApi(this.ratingsManagerProvider.get(documentReference).
+                getAverageRating(documentReference));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -376,8 +384,8 @@ public class RatingsScriptService implements ScriptService
      */
     public AverageRatingApi getUserReputation(String username)
     {
-        DocumentReference userRef = this.userReferenceResolver.resolve(username);
-        return getUserReputation(userRef);
+        DocumentReference userReference = this.userReferenceResolver.resolve(username);
+        return getUserReputation(userReference);
     }
 
     /**
@@ -396,5 +404,17 @@ public class RatingsScriptService implements ScriptService
             setError(e);
             return null;
         }
+    }
+
+    /**
+     * Get configuration document.
+     *
+     * @param documentReference the documentReference for which to return the configuration document
+     * @return the configuration document
+     * @since 8.1M2
+     */
+    public Document getConfigurationDocument(DocumentReference documentReference)
+    {
+        return ratingsConfiguration.getConfigurationDocument(documentReference).newDocument(getXWikiContext());
     }
 }

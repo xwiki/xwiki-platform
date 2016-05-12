@@ -54,6 +54,9 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
+
     /**
      * Retrieve the XWiki context from the current execution context.
      * 
@@ -79,11 +82,11 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
      * Retrieve an instance of the desired RatingsManager (default/separate). - default: save the rating information in
      * the same page - separate: save the rating information in a specified space
      *
-     * @param documentRef the document to which the ratings are associated to
+     * @param documentReference the document to which the ratings are associated to
      * @return the ratings manager selected by looking at the current configuration settings
      */
     @Override
-    public RatingsManager get(DocumentReference documentRef)
+    public RatingsManager get(DocumentReference documentReference)
     {
         String defaultHint = "default";
         String ratingsHint =
@@ -92,20 +95,11 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
                 defaultHint);
 
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, ratingDocument.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            XWikiDocument configDoc =
-                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
-                    : spaceConfigDoc;
-
-            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            XWikiDocument configurationDocument = ratingsConfiguration.getConfigurationDocument(documentReference);
+            if (!configurationDocument.isNew()
+                && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                    (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 ratingsHint = (hint == null) ? ratingsHint : hint;

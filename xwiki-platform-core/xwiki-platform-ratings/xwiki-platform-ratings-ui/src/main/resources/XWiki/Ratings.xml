@@ -394,9 +394,10 @@ position: relative;
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
-      <content>{{include reference='XWiki.RatingsMacros'/}}
-
-{{velocity}}
+      <content>{{velocity}}
+#if (!$isGuest)
+  {{include reference='XWiki.RatingsMacros'/}}
+#end
 #set($configClass     = 'XWiki.RatingsConfigClass')
 #set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
 #set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))

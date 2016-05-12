@@ -19,10 +19,13 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
+## for admin, register, programming and createwiki, allow preceedes over deny
 #if("$!request.section"=='wikis.rights')
   #set ($rightsLevels = {'createwiki': 0})
+  #set ($allowWins = [0])
 #else
   #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
+  #set ($allowWins = [5, 6, 7])
 #end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
@@ -61,27 +64,43 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #set ($saveUrl = $targetDocument.getURL('edit', "form_token=$!{services.csrf.getToken()}&xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
 
 ## get the rights for XWikiGuest
-#set($r = [])
-#foreach ($i in [0..$maxlevel])
-  #set ($discard = $r.add(0))
-#end
 #set ($guest = 'XWiki.XWikiGuest')
+#set ($allowGuest = {})
+#set ($denyGuest = {})
 #foreach ($obj in $targetDocument.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set ($pers = "$!obj.getProperty('users').getValue()")
   #if ($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?$"))
-    #if ($obj.getProperty('allow').getValue() == 1)
-      #set ($rightValue = 1)
-    #else
-      #set ($rightValue = 2)
-    #end
     #set ($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
     #foreach ($right in $specifiedRights)
       #if ($rightsLevels.containsKey($right) && $maxlevel >= $rightsLevels.get($right))
-        #set ($discard = $r.set($rightsLevels.get($right), $rightValue))
+        #if($obj.getProperty('allow').getValue() == 1)
+          #set($discard = $allowGuest.put($rightsLevels.get($right), "1"))
+        #else
+          #set($discard = $denyGuest.put($rightsLevels.get($right), "1"))
+        #end
       #end
     #end
   #end
 #end
+#set ($r = [])
+#foreach ($i in [0..$maxlevel])
+  #set ($value = 0)
+  #if ($allowWins.contains($i))
+    #if ($allowGuest.containsKey($i))
+      #set ($value = 1)
+    #elseif ($denyGuest.containsKey($i))
+      #set ($value = 2)
+    #end
+  #else
+    #if ($denyGuest.containsKey($i))
+      #set ($value = 2)
+    #elseif ($allowGuest.containsKey($i))
+      #set ($value = 1)
+    #end
+  #end
+  #set ($discard = $r.add($value))
+#end
+
 <div id="xwikieditcontent">
   <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor" != '') $editor#end">
     <tr>

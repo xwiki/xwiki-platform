@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -43,7 +42,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -90,8 +88,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
 
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new TemplateUpdatedEvent(),
-        new TemplateDeletedEvent());
+    private static final List<Event> EVENTS =
+        Arrays.<Event>asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
 
     /**
      * Used to access the current {@link org.xwiki.context.ExecutionContext}.
@@ -169,9 +167,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     {
         // The Velocity Context is set in VelocityExecutionContextInitializer, when the XWiki Request is initialized
         // so we are guaranteed it is defined when this method is called.
-        VelocityContext vcontext =
-            (VelocityContext) this.execution.getContext().getProperty(
-                VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+        VelocityContext vcontext = (VelocityContext) this.execution.getContext()
+            .getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
 
         // Copy current JSR223 ScriptContext binding.
         ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
@@ -297,16 +294,11 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                         try {
                             final VelocityEngine finalVelocityEngine = velocityEngine;
 
-                            this.suExecutor.call(new Callable<XDOM>()
-                            {
-                                @Override
-                                public XDOM call() throws Exception
-                                {
-                                    finalVelocityEngine.evaluate(new VelocityContext(), NullWriter.NULL_WRITER, "",
-                                        template.getContent().getContent());
+                            this.suExecutor.call(() -> {
+                                finalVelocityEngine.evaluate(new VelocityContext(), NullWriter.NULL_WRITER, "",
+                                    template.getContent().getContent());
 
-                                    return null;
-                                }
+                                return null;
                             }, template.getContent().getAuthorReference());
                         } catch (Exception e) {
                             this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);

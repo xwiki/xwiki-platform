@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +71,9 @@ public class SkinAction extends XWikiAction
     /** The directory where resources are placed in the webapp. */
     private static final String RESOURCES_DIRECTORY = "resources";
 
-    /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
+    /**
+     * The encoding to use when reading text resources from the filesystem and when sending css/javascript responses.
+     */
     private static final String ENCODING = "UTF-8";
 
     @Override
@@ -89,7 +90,7 @@ public class SkinAction extends XWikiAction
     public String render(String path, XWikiContext context) throws XWikiException, IOException
     {
         // This Action expects an incoming Entity URL of the type:
-        //   http://localhost:8080/xwiki/bin/skin/<path to resource on the filesystem, relative to the xwiki webapp>
+        // http://localhost:8080/xwiki/bin/skin/<path to resource on the filesystem, relative to the xwiki webapp>
         // Example 1 (fs skin file): .../bin/skin/skins/flamingo/style.css?...
         // Example 2 (fs resource file): .../bin/skin/resources/uicomponents/search/searchSuggest.css
         // Example 3 (wiki skin attachment or xproperty): .../bin/skin/XWiki/DefaultSkin/somefile.css
@@ -227,8 +228,8 @@ public class SkinAction extends XWikiAction
      * @throws XWikiException If the attachment cannot be loaded.
      * @throws IOException if the filename is invalid
      */
-    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context) throws XWikiException,
-        IOException
+    private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
+        throws XWikiException, IOException
     {
         LOGGER.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
         try {
@@ -236,9 +237,8 @@ public class SkinAction extends XWikiAction
                 LOGGER.debug("[{}] is not a document", doc.getDocumentReference().getName());
             } else {
                 return renderFileFromObjectField(filename, doc, context)
-                    || renderFileFromAttachment(filename, doc, context)
-                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(
-                        getSkinFilePath(filename, doc.getName()), context));
+                    || renderFileFromAttachment(filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
+                        && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
@@ -276,9 +276,8 @@ public class SkinAction extends XWikiAction
                     String rawContent = new String(data, ENCODING);
 
                     // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
-                    DocumentReference superadminUserReference =
-                        new DocumentReference(context.getMainXWiki(), XWiki.SYSTEM_SPACE,
-                            XWikiRightService.SUPERADMIN_USER);
+                    DocumentReference superadminUserReference = new DocumentReference(context.getMainXWiki(),
+                        XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
                     String evaluatedContent = evaluateVelocity(rawContent, path, superadminUserReference, context);
 
                     byte[] newdata = evaluatedContent.getBytes(ENCODING);
@@ -371,9 +370,7 @@ public class SkinAction extends XWikiAction
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         String namespace = serializer.serialize(reference);
 
-        String result = evaluateVelocity(content, namespace, author, context);
-
-        return result;
+        return evaluateVelocity(content, namespace, author, context);
     }
 
     private String evaluateVelocity(final String content, final String namespace, final DocumentReference author,
@@ -382,14 +379,8 @@ public class SkinAction extends XWikiAction
         String result = content;
 
         try {
-            result = Utils.getComponent(SUExecutor.class).call(new Callable<String>()
-            {
-                @Override
-                public String call() throws Exception
-                {
-                    return context.getWiki().evaluateVelocity(content, namespace);
-                }
-            }, author);
+            result = Utils.getComponent(SUExecutor.class)
+                .call(() -> context.getWiki().evaluateVelocity(content, namespace), author);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
             LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",

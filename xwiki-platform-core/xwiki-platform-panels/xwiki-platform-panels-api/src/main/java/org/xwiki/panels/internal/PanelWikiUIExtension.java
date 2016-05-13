@@ -22,7 +22,6 @@ package org.xwiki.panels.internal;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,18 +164,13 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
         // Perform panel transformations with the right of the panel author
         try {
-            this.suExecutor.call(new Callable<Void>()
-            {
-                @Override
-                public Void call() throws Exception
-                {
-                    TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
-                    transformationContext.setId(getRoleHint());
-                    ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
-                        transformationContext, transformedXDOM);
+            this.suExecutor.call(() -> {
+                TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
+                transformationContext.setId(getRoleHint());
+                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
+                    transformationContext, transformedXDOM);
 
-                    return null;
-                }
+                return null;
             }, getAuthorReference());
         } catch (Exception e) {
             LOGGER.error("Error while executing transformation for panel [{}]", this.documentReference.toString());

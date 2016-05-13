@@ -22,7 +22,6 @@ package org.xwiki.uiextension.internal;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,14 +177,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     {
         if (this.renderer != null) {
             try {
-                return this.suExecutor.call(new Callable<Block>()
-                {
-                    @Override
-                    public Block call() throws Exception
-                    {
-                        return renderer.execute();
-                    }
-                }, getAuthorReference());
+                return this.suExecutor.call(this.renderer::execute, getAuthorReference());
             } catch (Exception e) {
                 LOGGER.error("Error while executing transformation for extension [{}]", documentReference.toString());
             }

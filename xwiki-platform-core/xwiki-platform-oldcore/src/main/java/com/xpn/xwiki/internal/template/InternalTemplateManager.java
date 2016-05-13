@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,8 +101,8 @@ public class InternalTemplateManager
     /**
      * The reference of the superadmin user.
      */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE,
-        XWikiRightService.SUPERADMIN_USER);
+    private static final DocumentReference SUPERADMIN_REFERENCE =
+        new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
 
     @Inject
     private Environment environment;
@@ -447,8 +446,8 @@ public class InternalTemplateManager
 
         // Add short message
         Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
-        errorBlocks.add(new GroupBlock(Arrays.<Block>asList(new WordBlock("Failed to render step content")),
-            errorBlockParams));
+        errorBlocks.add(
+            new GroupBlock(Arrays.<Block>asList(new WordBlock("Failed to render step content")), errorBlockParams));
 
         // Add complete error
         StringWriter writer = new StringWriter();
@@ -591,15 +590,10 @@ public class InternalTemplateManager
                 final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
 
                 if (content.authorProvided) {
-                    this.suExecutor.call(new Callable<Void>()
-                    {
-                        @Override
-                        public Void call() throws Exception
-                        {
-                            render(template, content, writer);
+                    this.suExecutor.call(() -> {
+                        render(template, content, writer);
 
-                            return null;
-                        }
+                        return null;
                     }, content.getAuthorReference());
                 } else {
                     render(template, content, writer);
@@ -675,14 +669,7 @@ public class InternalTemplateManager
             final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
 
             if (content.authorProvided) {
-                return this.suExecutor.call(new Callable<XDOM>()
-                {
-                    @Override
-                    public XDOM call() throws Exception
-                    {
-                        return execute(template, content);
-                    }
-                }, content.getAuthorReference());
+                return this.suExecutor.call(() -> execute(template, content), content.getAuthorReference());
             } else {
                 return execute(template, content);
             }
@@ -743,8 +730,8 @@ public class InternalTemplateManager
     {
         String path = getResourcePath(suffixPath, templateName, true);
 
-        return path != null ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName,
-            this.environment)) : null;
+        return path != null
+            ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
     }
 
     private Template createTemplate(Resource<?> resource)

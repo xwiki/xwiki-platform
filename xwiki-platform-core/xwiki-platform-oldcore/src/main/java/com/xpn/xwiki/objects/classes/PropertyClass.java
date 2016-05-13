@@ -21,7 +21,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -61,8 +60,8 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
-    Comparable<PropertyClass>
+public class PropertyClass extends BaseCollection<ClassPropertyReference>
+    implements PropertyClassInterface, Comparable<PropertyClass>
 {
     /**
      * Logging helper object.
@@ -202,7 +201,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
@@ -211,7 +211,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
@@ -339,16 +340,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     private String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
         final XWikiContext context) throws Exception
     {
-        String result = Utils.getComponent(SUExecutor.class).call(new Callable<String>()
-        {
-            @Override
-            public String call() throws Exception
-            {
-                return context.getDoc().getRenderedContent(content, syntax, context);
-            }
-        }, authorReference);
-
-        return result;
+        return Utils.getComponent(SUExecutor.class)
+            .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference);
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.xwiki.test.annotation.AllComponents;
  */
 @RunWith(FilterTestSuite.class)
 @AllComponents
+//@FilterTestSuite.Scope(value = "confluencexml", pattern = "4.3.2.test")
 public class IntegrationTests
 {
 }

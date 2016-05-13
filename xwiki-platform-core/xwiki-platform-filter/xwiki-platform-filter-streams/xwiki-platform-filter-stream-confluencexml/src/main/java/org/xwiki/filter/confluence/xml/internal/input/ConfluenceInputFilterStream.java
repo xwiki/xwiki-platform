@@ -21,6 +21,7 @@ package org.xwiki.filter.confluence.xml.internal.input;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
@@ -34,6 +35,7 @@ import javax.inject.Named;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -59,7 +61,8 @@ import org.xwiki.rendering.syntax.Syntax;
 @Component
 @Named(ConfluenceInputFilterStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<ConfluenceInputProperties, ConfluenceFilter>
+public class ConfluenceInputFilterStream
+    extends AbstractBeanInputFilterStream<ConfluenceInputProperties, ConfluenceFilter>
 {
     @Inject
     private Logger logger;
@@ -144,12 +147,12 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
                 throw new FilterException("Failed to get group properties", e);
             }
 
-            String groupId = groupProperties.getString(ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(groupInt));
+            String groupName = groupProperties.getString(ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(groupInt));
             if (this.properties.isConvertToXWiki()) {
-                if (groupId.equals("confluence-administrators")) {
-                    groupId = "XWikiAdminGroup";
-                } else if (groupId.equals("confluence-users")) {
-                    groupId = "XWikiAllGroup";
+                if (groupName.equals("confluence-administrators")) {
+                    groupName = "XWikiAdminGroup";
+                } else if (groupName.equals("confluence-users")) {
+                    groupName = "XWikiAllGroup";
                 }
             }
 
@@ -167,7 +170,7 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
             }
 
             // > Group
-            proxyFilter.beginGroup(groupId, groupParameters);
+            proxyFilter.beginGroup(groupName, groupParameters);
 
             // Members users
             if (groupProperties.containsKey(ConfluenceXMLPackage.KEY_GROUP_MEMBERUSERS)) {
@@ -177,9 +180,8 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
                     FilterEventParameters memberParameters = new FilterEventParameters();
 
                     try {
-                        String memberId =
-                            this.confluencePackage.getUserProperties(memberInt).getString(
-                                ConfluenceXMLPackage.KEY_USER_NAME, String.valueOf(memberInt));
+                        String memberId = this.confluencePackage.getUserProperties(memberInt)
+                            .getString(ConfluenceXMLPackage.KEY_USER_NAME, String.valueOf(memberInt));
 
                         if (this.properties.isConvertToXWiki() && memberId.equals("admin")) {
                             memberId = "Admin";
@@ -194,16 +196,14 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
 
             // Members groups
             if (groupProperties.containsKey(ConfluenceXMLPackage.KEY_GROUP_MEMBERGROUPS)) {
-                List<Integer> groups =
-                    this.confluencePackage
-                        .getIntegertList(groupProperties, ConfluenceXMLPackage.KEY_GROUP_MEMBERGROUPS);
+                List<Integer> groups = this.confluencePackage.getIntegertList(groupProperties,
+                    ConfluenceXMLPackage.KEY_GROUP_MEMBERGROUPS);
                 for (Integer memberInt : groups) {
                     FilterEventParameters memberParameters = new FilterEventParameters();
 
                     try {
-                        String memberId =
-                            this.confluencePackage.getGroupProperties(memberInt).getString(
-                                ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(memberInt));
+                        String memberId = this.confluencePackage.getGroupProperties(memberInt)
+                            .getString(ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(memberInt));
 
                         if (this.properties.isConvertToXWiki()) {
                             if (memberId.equals("confluence-administrators")) {
@@ -221,7 +221,7 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
             }
 
             // < Group
-            proxyFilter.endGroup(groupId, groupParameters);
+            proxyFilter.endGroup(groupName, groupParameters);
         }
 
         // Generate documents events
@@ -242,8 +242,9 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
             proxyFilter.beginWikiSpace(spaceName, spaceParameters);
 
             // Main page
-            if (spaceProperties.containsKey(ConfluenceXMLPackage.KEY_SPACE_DESCRIPTION)) {
-                readPage(spaceProperties.getInt(ConfluenceXMLPackage.KEY_SPACE_DESCRIPTION), filter, proxyFilter);
+            Integer descriptionId = spaceProperties.getInteger(ConfluenceXMLPackage.KEY_SPACE_DESCRIPTION, null);
+            if (descriptionId != null) {
+                readPage(descriptionId, filter, proxyFilter);
             }
 
             // Other pages
@@ -336,8 +337,7 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
         }
     }
 
-    private void readPageRevision(Integer pageId, Object filter, ConfluenceFilter proxyFilter)
-        throws FilterException
+    private void readPageRevision(Integer pageId, Object filter, ConfluenceFilter proxyFilter) throws FilterException
     {
         PropertiesConfiguration pageProperties = getPageProperties(pageId);
 
@@ -433,7 +433,7 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
         }
 
         // Attachments
-        Map<String, PropertiesConfiguration> pageAttachments = new LinkedHashMap<String, PropertiesConfiguration>();
+        Map<String, PropertiesConfiguration> pageAttachments = new LinkedHashMap<>();
         for (int attachmentId : this.confluencePackage.getAttachments(pageId)) {
             PropertiesConfiguration attachmentProperties;
             try {
@@ -442,12 +442,12 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
                 throw new FilterException("Failed to get attachment properties", e);
             }
 
-            String attachmentName = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_NAME);
+            String attachmentName = this.confluencePackage.getAttachmentName(attachmentProperties);
 
             PropertiesConfiguration currentAttachmentProperties = pageAttachments.get(attachmentName);
             if (currentAttachmentProperties != null) {
-                int version = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
-                int currentVersion = currentAttachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
+                int version = this.confluencePackage.getAttachementVersion(attachmentProperties);
+                int currentVersion = this.confluencePackage.getAttachementVersion(currentAttachmentProperties);
 
                 if (version > currentVersion) {
                     pageAttachments.put(attachmentName, attachmentProperties);
@@ -465,23 +465,54 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
         proxyFilter.endWikiDocumentRevision(revision, documentRevisionParameters);
     }
 
-    private void readAttachment(int pageId, PropertiesConfiguration attachmentProperties,
-        Object filter, ConfluenceFilter proxyFilter) throws FilterException
+    private void readAttachment(int pageId, PropertiesConfiguration attachmentProperties, Object filter,
+        ConfluenceFilter proxyFilter) throws FilterException
     {
+        String contentStatus = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTSTATUS, null);
+        if (StringUtils.equals(contentStatus, "deleted")) {
+            // The actual deleted attachment is not in the exported package so we can't really do anything with it
+            return;
+        }
+
         int attachmentId = attachmentProperties.getInt("id");
 
-        String attachmentName = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_NAME);
-        long attachmentSize = attachmentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_SIZE);
+        String attachmentName = this.confluencePackage.getAttachmentName(attachmentProperties);
 
-        int version = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
+        long attachmentSize;
+        String mediaType = null;
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTPROPERTIES)) {
+            PropertiesConfiguration attachmentContentProperties =
+                getContentProperties(attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTPROPERTIES);
+
+            attachmentSize = attachmentContentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_FILESIZE);
+            if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTTYPE)) {
+                mediaType =
+                    attachmentContentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_MEDIA_TYPE);
+            }
+        } else {
+            attachmentSize = attachmentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_SIZE);
+            if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTTYPE)) {
+                mediaType = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENTTYPE);
+            }
+        }
+
+        Integer version = this.confluencePackage.getAttachementVersion(attachmentProperties);
+
         int originalRevisionId =
-            attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_ORIGINAL_REVISION, attachmentId);
-        File contentFile = this.confluencePackage.getAttachmentFile(pageId, originalRevisionId, version);
+            this.confluencePackage.getAttachmentOriginalVersionId(attachmentProperties, attachmentId);
+        File contentFile;
+        try {
+            contentFile = this.confluencePackage.getAttachmentFile(pageId, originalRevisionId, version);
+        } catch (FileNotFoundException e) {
+            throw new FilterException(
+                String.format("Filed to find file corresponding to version [%s] attachment [%s] in page [%s]", version,
+                    attachmentName, pageId),
+                e);
+        }
 
         FilterEventParameters attachmentParameters = new FilterEventParameters();
-        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_TYPE)) {
-            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CONTENT_TYPE,
-                attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_TYPE));
+        if (mediaType != null) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CONTENT_TYPE, mediaType);
         }
         if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_AUTHOR)) {
             attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_AUTHOR,
@@ -489,8 +520,8 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
         }
         if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE)) {
             try {
-                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_DATE, this.confluencePackage.getDate(
-                    attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE));
+                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_DATE, this.confluencePackage
+                    .getDate(attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE));
             } catch (ParseException e) {
                 if (this.properties.isVerbose()) {
                     this.logger.error("Failed to parse date", e);
@@ -505,8 +536,8 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
         }
         if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE)) {
             try {
-                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, this.confluencePackage.getDate(
-                    attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE));
+                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, this.confluencePackage
+                    .getDate(attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE));
             } catch (ParseException e) {
                 if (this.properties.isVerbose()) {
                     this.logger.error("Failed to parse date", e);
@@ -530,6 +561,16 @@ public class ConfluenceInputFilterStream extends AbstractBeanInputFilterStream<C
             }
         } catch (Exception e) {
             throw new FilterException("Failed to read attachment", e);
+        }
+    }
+
+    public PropertiesConfiguration getContentProperties(PropertiesConfiguration properties, String key)
+        throws FilterException
+    {
+        try {
+            return this.confluencePackage.getContentProperties(properties, key);
+        } catch (Exception e) {
+            throw new FilterException("Failed to parse content properties", e);
         }
     }
 }

@@ -104,7 +104,7 @@
   #set ($discard = $configDoc.save('Migrated Mail configuration found in XWikiPreferences', true))
 #end
 ## =======================================================
-## Step 1: Display form
+## Step 2: Display form
 ## =======================================================
 #set ($params = {
   'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties', 'sendWaitTime', 'discardSuccessStatuses']

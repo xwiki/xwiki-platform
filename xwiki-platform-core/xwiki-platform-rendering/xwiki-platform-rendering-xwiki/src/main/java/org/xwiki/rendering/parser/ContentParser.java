@@ -26,7 +26,7 @@ import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * A bridge between platform and rendering from centralising parsing needs.
+ * A bridge between platform and rendering for centralising parsing needs.
  *
  * @version $Id$
  * @since 6.0M2

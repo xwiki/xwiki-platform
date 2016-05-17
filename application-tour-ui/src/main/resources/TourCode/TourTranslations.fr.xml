@@ -63,6 +63,7 @@ tour.livetable.description=Description
 tour.livetable.doc.name=Nom
 tour.livetable.emptyvalue=-
 tour.livetable.isActive=Actif
+tour.livetable.targetClass=Classe cible
 tour.livetable.targetPage=Page cible
 tour.popover.end=Terminer
 tour.popover.next=Suivant »
@@ -80,5 +81,8 @@ tour.steps.edit_step=Modifier l'étape
 tour.steps.new_step=Nouvelle étape
 tour.steps.no=Non
 tour.steps.yes=Oui
+tour.upgrade.successList=Les pages suivantes ont été converties avec succès \:
+tour.upgrade.successNothing=Aucune page n'a besoin d'être mise à jour \!
+tour.upgrade.title=Mise à jour
 </content>
 </xwikidoc>

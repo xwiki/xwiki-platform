@@ -55,6 +55,10 @@
     <url>https://github.com/xwiki-contrib/application-tour/tree/master</url>
     <tag>HEAD</tag>
   </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/browse/TOUR</url>
+  </issueManagement>
   <distributionManagement>
    <repository>
      <id>xwiki-staging</id>

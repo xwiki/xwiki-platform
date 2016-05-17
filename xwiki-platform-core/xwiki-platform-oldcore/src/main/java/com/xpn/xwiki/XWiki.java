@@ -2167,8 +2167,7 @@ public class XWiki implements EventListener
 
     public String getSpaceCopyright(XWikiContext context)
     {
-        String defaultValue = "Copyright 2004-" + Calendar.getInstance().get(Calendar.YEAR) + " XWiki";
-        return getSpacePreference("webcopyright", defaultValue, context);
+        return getSpacePreference("webcopyright", "", context);
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)

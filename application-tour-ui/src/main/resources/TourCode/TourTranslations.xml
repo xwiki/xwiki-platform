@@ -86,7 +86,12 @@ tour.steps.deleting=Deleting step...
 tour.steps.yes=Yes
 tour.steps.no=No
 tour.steps.edit=Edit
-tour.steps.delete=Delete</content>
+tour.steps.delete=Delete
+
+# Upgrade
+tour.upgrade.title = Upgrade
+tour.upgrade.successList = Successfully converted the following pages:
+tour.upgrade.successNothing = You have nothing to upgrade!</content>
   <object>
     <name>TourCode.TourTranslations</name>
     <number>0</number>

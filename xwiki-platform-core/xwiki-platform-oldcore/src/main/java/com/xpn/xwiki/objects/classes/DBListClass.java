@@ -286,7 +286,7 @@ public class DBListClass extends ListClass
                     String classType = null;
                     try {
                         classType = getPropertyType(classname, idField, context);
-                    } catch (XWikiException e) {
+                    } catch (Exception e) {
                         return null;
                     }
                     fromStatements.add(classType + " as idprop");
@@ -305,7 +305,7 @@ public class DBListClass extends ListClass
                         String classType = null;
                         try {
                             classType = getPropertyType(classname, valueField, context);
-                        } catch (XWikiException e) {
+                        } catch (Exception e) {
                             return null;
                         }
                         fromStatements.add(classType + " as valueprop");
@@ -609,7 +609,7 @@ public class DBListClass extends ListClass
         }
     }
 
-    private String getPropertyType(String className, String propertyName, XWikiContext context) throws XWikiException
+    private String getPropertyType(String className, String propertyName, XWikiContext context) throws Exception
     {
         PropertyClass pc = null;
         try {
@@ -617,6 +617,6 @@ public class DBListClass extends ListClass
         } catch (XWikiException e) {
             LOGGER.error("Failed to get property [{}] for document [{}]", propertyName, className, e);
         }
-        return pc.newProperty().getClass().getName();
+        return pc == null ? null : pc.newProperty().getClass().getName();
     }
 }

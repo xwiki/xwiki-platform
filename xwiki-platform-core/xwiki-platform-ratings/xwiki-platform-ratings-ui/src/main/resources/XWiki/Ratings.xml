@@ -394,27 +394,33 @@ position: relative;
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
-      <content>{{include reference='XWiki.RatingsMacros'/}}
-
-{{velocity}}
-#set($configClass     = 'XWiki.RatingsConfigClass')
-#set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
-#set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))
-##
-#if($xwiki.exists($webPrefDoc) &amp;&amp; $webPrefDoc.getObjectNumbers($configClass) &gt; 0)
-  #set($configObj = $webPrefDoc.getObject($configClass))
-#else
-  #set($configObj = $globalConfigDoc.getObject($configClass))
-#end
-##
-#set($displayRatings = $configObj.getProperty('displayRatings').value == 1)
-#set($excludedPages  = $stringtool.split($configObj.getProperty('excludedPages').value, ','))
-#set($excludedPages  = $stringtool.stripAll($excludedPages))
-##
-#if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
-  #displayFullRating($doc.getDocumentReference() "")
-#end
-{{/velocity}}</content>
+      <content>{{velocity}}
+        #set($canView = $services.security.authorization.hasAccess("view", "XWiki.RatingsMacros"))
+        #if($canView)
+          {{include reference='XWiki.RatingsMacros'/}}
+        #end
+        {{/velocity}}
+        {{velocity}}
+        #if($canView)
+          #set($configClass     = 'XWiki.RatingsConfigClass')
+          #set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
+          #set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))
+          ##
+          #if($xwiki.exists($webPrefDoc) &amp;&amp; $webPrefDoc.getObjectNumbers($configClass) &gt; 0)
+            #set($configObj = $webPrefDoc.getObject($configClass))
+          #else
+            #set($configObj = $globalConfigDoc.getObject($configClass))
+          #end
+          ##
+          #set($displayRatings = $configObj.getProperty('displayRatings').value == 1)
+          #set($excludedPages  = $stringtool.split($configObj.getProperty('excludedPages').value, ','))
+          #set($excludedPages  = $stringtool.stripAll($excludedPages))
+          ##
+          #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
+            #displayFullRating($doc.getDocumentReference() "")
+          #end
+        #end
+        {{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.template.title.before</extensionPointId>

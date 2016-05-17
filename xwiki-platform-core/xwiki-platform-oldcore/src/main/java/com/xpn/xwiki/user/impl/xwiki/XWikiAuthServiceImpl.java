@@ -324,7 +324,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (principal != null) {
             // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
             // as the current wiki.
-            // TODO: Warning the code below will fail if current doc's wiki != current wiki.
             DocumentReference userDocumentReference =
                 this.currentDocumentReferenceResolver.resolve(principal.getName());
             contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);

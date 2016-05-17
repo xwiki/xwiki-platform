@@ -19,8 +19,6 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
-import java.net.URL;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -65,8 +63,10 @@ public class XWikiContextCacheKeyFactory
         //       '../../style.css'
         // It is clear that we cannot cache the same results from a request coming from a subdirectory or an other, but
         // we have no API to get the internal state of the URL Factory. So we use this 'trick' to handle it.
-        URL urlFactoryGeneratedURL = urlFactory.createSkinURL("style.css", "skin", xcontext);
-        
-        return String.format("XWikiContext[URLFactory[%s, %s]]", urlFactoryName, urlFactoryGeneratedURL.toString());
+        // Note: only the "path" part of the URL is needed. Otherwise, the cache cannot be share between requests
+        // having 2 different hosts: e.g. http://localhost and http://external-url/
+        String urlFactoryGeneratedURL = urlFactory.createSkinURL("style.css", "skin", xcontext).getPath();
+
+        return String.format("XWikiContext[URLFactory[%s, %s]]", urlFactoryName, urlFactoryGeneratedURL);
     }
 }

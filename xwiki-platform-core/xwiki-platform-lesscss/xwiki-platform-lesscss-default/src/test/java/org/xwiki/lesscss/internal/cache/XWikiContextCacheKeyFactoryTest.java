@@ -66,10 +66,10 @@ public class XWikiContextCacheKeyFactoryTest
         when(xcontext.getURLFactory()).thenReturn(urlFactory);
         
         when(urlFactory.createSkinURL(anyString(), anyString(), any(XWikiContext.class))).thenReturn(
-                new URL("http://url"));
+                new URL("http://host/path"));
         
         // Test
-        assertEquals("XWikiContext[URLFactory[" + urlFactory.getClass().getName() + ", http://url]]",
+        assertEquals("XWikiContext[URLFactory[" + urlFactory.getClass().getName() + ", /path]]",
                 mocker.getComponentUnderTest().getCacheKey());
     }
 }

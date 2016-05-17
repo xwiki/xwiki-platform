@@ -7,11 +7,14 @@
   #end
   #if ("$!version" != "")
     ## The version information coming from preferences is usually Velocity code, so make sure to evaluate it.
-    #set ($version = "#evaluate($version)")
+    <div id="xwikiplatformversion">#evaluate($version)</div>
   #else
-    #set ($version = $!xwiki.version)
+    <div id="xwikiplatformversion">
+      <a href="$services.extension.core.repository.environmentExtension.website">
+        $services.extension.core.repository.environmentExtension.name $xwiki.getVersion()
+      </a>
+    </div>
   #end
-  <div id="xwikiplatformversion">$version</div>
 </div>
 #end
 ### TODO: Format the footer for pdf output

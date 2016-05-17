@@ -2889,7 +2889,7 @@ In order to activate your account, please follow this link:
 ${host}${xwiki.getURL('XWiki.AccountValidation', 'view', "validkey=${validkey}&amp;xwikiname=${xwikiname}")}</validation_email_content>
     </property>
     <property>
-      <version>$services.extension.core.repository.environmentExtension.name $xwiki.getVersion()</version>
+      <version></version>
     </property>
     <property>
       <webcopyright/>

@@ -31,6 +31,8 @@
   <name>XWiki Platform - Web Resources</name>
   <packaging>war</packaging>
   <description>Web Resources for the XWiki platform</description>
+  <!-- Explicitly put product home page so that it's found by core extension scanner no mater what -->
+  <url>http://www.xwiki.org</url>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -202,6 +202,7 @@ public class XWikiAttachment implements Cloneable
         attachment.setComment(getComment());
         attachment.setDate(getDate());
         attachment.setFilename(getFilename());
+        attachment.setMimeType(getMimeType());
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
         attachment.setMetaDataDirty(isMetaDataDirty());
@@ -1017,6 +1018,12 @@ public class XWikiAttachment implements Cloneable
 
         if (getFilesize() != attachment.getFilesize()) {
             setFilesize(attachment.getFilesize());
+            modified = true;
+        }
+
+        if (StringUtils.equals(getMimeType(), attachment.getMimeType())) {
+            setMimeType(attachment.getMimeType());
+            modified = true;
         }
 
         try {

@@ -701,6 +701,17 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-refactoring-default", getXWikiPlatformVersion(), null, "jar"));
 
+        // Rendering Script Service is used in several places and it requires a rendering configuration implementation
+        // to work. In addition WikiModel component implementation also requires a rendering configuration
+        // implementation to work.
+        // In addition, by default the Macro and Icon transformations are enabled and thus require configuration
+        // component implementations. The Macro one is drawn transitively from other dependencies but this is not the
+        // case for the Icon Transformation and thus we need to add it manually.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-rendering-configuration-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-rendering-transformation-icon", getXWikiPlatformVersion(), null, "jar"));
+
         // Get the platform's pom.xml to get the versions of some needed externals dependencies, so that we do not
         // hardcode them.
         MavenProject platformPomProject = getPlatformPOMProject();

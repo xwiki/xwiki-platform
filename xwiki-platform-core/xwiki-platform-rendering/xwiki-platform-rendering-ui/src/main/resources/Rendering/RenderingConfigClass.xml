@@ -31,7 +31,7 @@
   <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1463506425000</date>
+  <date>1463579385000</date>
   <contentUpdateDate>1463496105000</contentUpdateDate>
   <version>1.1</version>
   <title>Rendering Configuration Class</title>
@@ -54,7 +54,7 @@
       <customDisplay>{{velocity}}
 #if ($type == 'edit')
   {{html}}
-  #foreach ($syntax in $services.rendering.getAvailableParserSyntaxes())
+  #foreach ($syntax in $sorttool.sort($services.rendering.getAvailableParserSyntaxes()))
     #set ($checked = '')
     #if ($value.contains($syntax.toIdString()))
       #set ($checked = 'checked')

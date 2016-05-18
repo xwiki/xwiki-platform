@@ -791,9 +791,9 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}", new Object[] {getFilename(),
-            getDoc().getDocumentReference(), ex.getMessage()});
-            return new Version[] {new Version(this.getVersion())};
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
+                new Object[] { getFilename(), getDoc().getDocumentReference(), ex.getMessage() });
+            return new Version[] { new Version(this.getVersion()) };
         }
     }
 
@@ -877,9 +877,11 @@ public class XWikiAttachment implements Cloneable
             try {
                 context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
             } catch (Exception ex) {
-                LOGGER.warn("Failed to load content for attachment [{}@{}]. "
-                    + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
-                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage()});
+                LOGGER.warn(
+                    "Failed to load content for attachment [{}@{}]. "
+                        + "This attachment is broken, please consider re-uploading it. Internal error: {}",
+                    new Object[] { getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
+                    ex.getMessage() });
             }
         }
     }
@@ -891,9 +893,11 @@ public class XWikiAttachment implements Cloneable
                 this.attachment_archive =
                     context.getWiki().getAttachmentVersioningStore().loadArchive(this, context, true);
             } catch (Exception ex) {
-                LOGGER.warn("Failed to load archive for attachment [{}@{}]. "
-                    + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
-                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage()});
+                LOGGER.warn(
+                    "Failed to load archive for attachment [{}@{}]. "
+                        + "This attachment is broken, please consider re-uploading it. Internal error: {}",
+                    new Object[] { getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>",
+                    ex.getMessage() });
             }
         }
 
@@ -1105,9 +1109,8 @@ public class XWikiAttachment implements Cloneable
         if (StringUtils.isEmpty(userString)) {
             userReference = null;
         } else {
-            userReference =
-                getExplicitReferenceDocumentReferenceResolver().resolve(
-                    getXClassEntityReferenceResolver().resolve(userString, EntityType.DOCUMENT), getReference());
+            userReference = getExplicitReferenceDocumentReferenceResolver()
+                .resolve(getXClassEntityReferenceResolver().resolve(userString, EntityType.DOCUMENT), getReference());
 
             if (userReference.getName().equals(XWikiRightService.GUEST_USER)) {
                 userReference = null;

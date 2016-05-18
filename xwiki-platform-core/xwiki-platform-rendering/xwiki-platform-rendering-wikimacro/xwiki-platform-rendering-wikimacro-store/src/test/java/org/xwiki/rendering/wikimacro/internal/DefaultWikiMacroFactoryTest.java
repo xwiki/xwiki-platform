@@ -29,7 +29,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
-import org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory;
 
 /**
  * Unit test for {@link DefaultWikiMacroFactory}.

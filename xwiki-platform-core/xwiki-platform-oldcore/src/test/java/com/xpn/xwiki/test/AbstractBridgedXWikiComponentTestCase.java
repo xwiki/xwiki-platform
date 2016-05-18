@@ -34,6 +34,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -150,6 +151,12 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
                     return getContext().getMainXWiki();
                 }
             });
+
+        // In order not to create a cyclic dependency we have the platform-rendering-xwiki module (which contains
+        // XWikiWikiModel requires for oldcore testing) not depend on platform-rendering-configuration-default. As a
+        // consequence we need to provide a mock ExtendedRenderingConfiguration component as otherwise injecting
+        // WikiModel would fail (since XWikiWikiModel depends on ExtendedRenderingConfiguration).
+        registerMockComponent(ExtendedRenderingConfiguration.class);
     }
 
     @Override

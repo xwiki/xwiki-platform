@@ -25,7 +25,7 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
 
 /**
  * Stubbed {@link org.xwiki.rendering.configuration.RenderingConfiguration} to control the list of Transformations
@@ -36,7 +36,7 @@ import org.xwiki.rendering.internal.configuration.DefaultXWikiRenderingConfigura
  */
 @Component
 @Singleton
-public class StubRenderingConfiguration extends DefaultXWikiRenderingConfiguration
+public class StubRenderingConfiguration extends XWikiRenderingConfiguration
 {
     @Override
     public List<String> getTransformationNames()

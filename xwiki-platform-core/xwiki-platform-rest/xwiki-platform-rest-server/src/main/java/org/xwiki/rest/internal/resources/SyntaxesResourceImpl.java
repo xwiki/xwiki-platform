@@ -19,11 +19,13 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Syntaxes;
 import org.xwiki.rest.resources.SyntaxesResource;
 
@@ -34,11 +36,16 @@ import org.xwiki.rest.resources.SyntaxesResource;
 @Named("org.xwiki.rest.internal.resources.SyntaxesResourceImpl")
 public class SyntaxesResourceImpl extends XWikiResource implements SyntaxesResource
 {
+    @Inject
+    private ExtendedRenderingConfiguration renderingConfiguration;
+
     @Override
     public Syntaxes getSyntaxes()
     {
         Syntaxes syntaxes = objectFactory.createSyntaxes();
-        syntaxes.getSyntaxes().addAll(Utils.getXWiki(componentManager).getConfiguredSyntaxes());
+        for (Syntax syntax : this.renderingConfiguration.getConfiguredSyntaxes()) {
+            syntaxes.getSyntaxes().add(syntax.toIdString());
+        }
 
         return syntaxes;
     }

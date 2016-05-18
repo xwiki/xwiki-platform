@@ -31,6 +31,10 @@
   <name>XWiki Platform - Test - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Test - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-test-integration</module>

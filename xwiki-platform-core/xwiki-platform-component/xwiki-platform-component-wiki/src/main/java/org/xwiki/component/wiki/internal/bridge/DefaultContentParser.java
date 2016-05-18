@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 

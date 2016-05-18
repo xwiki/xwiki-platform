@@ -46,14 +46,17 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-parser</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -85,7 +88,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Used to mock XWiki class -->
     <dependency>
       <groupId>org.jmock</groupId>

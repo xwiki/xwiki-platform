@@ -32,6 +32,9 @@
   <packaging>pom</packaging>
   <description>Transformations implementations depending on the XWiki Platform</description>
   <modules>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-rendering-transformation-api</module>
+    <module>xwiki-platform-rendering-transformation-icon</module>
     <module>xwiki-platform-rendering-transformation-macro</module>
   </modules>
 </project>

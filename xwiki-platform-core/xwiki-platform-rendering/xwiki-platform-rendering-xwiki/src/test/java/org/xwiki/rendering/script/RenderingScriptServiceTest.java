@@ -40,11 +40,10 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.script.RenderingScriptService}.
+ * Unit tests for {@link RenderingScriptService}.
  *
  * @version $Id$
  * @since 3.2M3

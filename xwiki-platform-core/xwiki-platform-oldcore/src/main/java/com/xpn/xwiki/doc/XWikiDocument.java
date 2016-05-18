@@ -80,6 +80,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -117,11 +118,10 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
-import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -313,7 +313,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private static EntityReferenceResolver<ResourceReference> getResourceReferenceEntityReferenceResolver()
     {
-        return Utils.getComponent(DefaultResourceReferenceEntityReferenceResolver.TYPE_RESOURCEREFERENCE);
+        return Utils.getComponent(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
     }
 
     private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()

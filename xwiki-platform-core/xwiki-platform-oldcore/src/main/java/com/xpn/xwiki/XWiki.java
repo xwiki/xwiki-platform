@@ -6490,7 +6490,10 @@ public class XWiki implements EventListener
     /**
      * @return the ids of configured syntaxes for this wiki (e.g. {@code xwiki/2.0}, {@code xwiki/2.1},
      *         {@code mediawiki/1.0}, etc)
+     * @deprecated since 8.2M1, use the XWiki Rendering Configuration component or the Rendering Script Service one
+     *             instead
      */
+    @Deprecated
     public List<String> getConfiguredSyntaxes()
     {
         return this.configuredSyntaxes;

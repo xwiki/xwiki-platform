@@ -77,12 +77,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-xwiki</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- The icon script service is used to add a tree icon before the message displayed in edit mode. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

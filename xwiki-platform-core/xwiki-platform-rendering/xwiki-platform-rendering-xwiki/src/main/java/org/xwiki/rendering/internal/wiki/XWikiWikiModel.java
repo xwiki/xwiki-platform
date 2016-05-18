@@ -48,7 +48,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -92,7 +92,7 @@ public class XWikiWikiModel implements WikiModel
      * The component used to access configuration parameters.
      */
     @Inject
-    private XWikiRenderingConfiguration xwikiRenderingConfiguration;
+    private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
     /**
      * The component used to access the underlying XWiki model.
@@ -168,7 +168,7 @@ public class XWikiWikiModel implements WikiModel
         }
 
         // Handle attachment references
-        if (this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
+        if (this.extendedRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
             Map<String, Object> urlParameters = getImageURLParameters(parameters);
             if (!urlParameters.isEmpty()) {
                 // Handle scaled image attachments.
@@ -303,11 +303,11 @@ public class XWikiWikiModel implements WikiModel
             } else {
                 // If image width and height are unspecified or if they are not expressed in pixels then limit the image
                 // size to best fit the rectangle specified in the configuration (keeping aspect ratio).
-                int widthLimit = this.xwikiRenderingConfiguration.getImageWidthLimit();
+                int widthLimit = this.extendedRenderingConfiguration.getImageWidthLimit();
                 if (widthLimit > 0) {
                     queryString.put(WIDTH, widthLimit);
                 }
-                int heightLimit = this.xwikiRenderingConfiguration.getImageHeightLimit();
+                int heightLimit = this.extendedRenderingConfiguration.getImageHeightLimit();
                 if (heightLimit > 0) {
                     queryString.put(HEIGHT, heightLimit);
                 }

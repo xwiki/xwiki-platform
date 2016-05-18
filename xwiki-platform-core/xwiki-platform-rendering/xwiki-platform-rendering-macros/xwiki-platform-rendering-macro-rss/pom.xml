@@ -31,7 +31,7 @@
   <name>XWiki Platform - Rendering - Macro - RSS</name>
   <description>Displays the contents of a RSS feed</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>RSS Macro</xwiki.extension.name>
   </properties>

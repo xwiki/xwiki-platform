@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -64,12 +65,6 @@ public class RenderingScriptService implements ScriptService
     private Provider<ComponentManager> componentManagerProvider;
 
     /**
-     * @see #getDefaultTransformationNames()
-     */
-    @Inject
-    private RenderingConfiguration configuration;
-
-    /**
      * @see #resolveSyntax(String)
      */
     @Inject
@@ -77,6 +72,12 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private RenderingConfiguration baseConfiguration;
+
+    @Inject
+    private ExtendedRenderingConfiguration extendedConfiguration;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -122,7 +123,7 @@ public class RenderingScriptService implements ScriptService
      */
     public List<String> getDefaultTransformationNames()
     {
-        return this.configuration.getTransformationNames();
+        return this.baseConfiguration.getTransformationNames();
     }
 
     /**
@@ -227,6 +228,26 @@ public class RenderingScriptService implements ScriptService
         }
 
         return String.valueOf(result);
+    }
+
+    /**
+     * @return the list of Rendering Syntaxes that are configured for the current wiki (i.e. that are proposed to the
+     *         user when editing wik pages)
+     * @since 8.2M1
+     */
+    public List<Syntax> getConfiguredSyntaxes()
+    {
+        return this.extendedConfiguration.getConfiguredSyntaxes();
+    }
+
+    /**
+     * @return the list of Rendering Syntaxes that are disabled for the current wiki (i.e. that should not be proposed
+     *         to the user when editing wiki pages)
+     * @since 8.2M1
+     */
+    public List<Syntax> getDisabledSyntaxes()
+    {
+        return this.extendedConfiguration.getDisabledSyntaxes();
     }
 
     private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException

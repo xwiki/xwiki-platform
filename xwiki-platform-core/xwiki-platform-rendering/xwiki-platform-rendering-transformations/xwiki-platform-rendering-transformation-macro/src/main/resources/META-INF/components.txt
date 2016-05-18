@@ -1,3 +1,4 @@
+500:org.xwiki.rendering.internal.transformation.macro.XWikiMacroTransformationConfiguration
 org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver
 org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver
 org.xwiki.rendering.internal.transformation.macro.CurrentMacroAttachmentReferenceResolver

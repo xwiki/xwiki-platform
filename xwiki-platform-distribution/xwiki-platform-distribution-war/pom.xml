@@ -224,10 +224,22 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Wiki macros support -->
+    <!-- Platform Rendering -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-transformation-icon</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

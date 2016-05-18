@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
   <name>XWiki Platform - Rendering - Transformations - Macro</name>
-  <description>Tools to help write Macros</description>
+  <description>Platform-specific implementation for Macro Transformations</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
   </properties>

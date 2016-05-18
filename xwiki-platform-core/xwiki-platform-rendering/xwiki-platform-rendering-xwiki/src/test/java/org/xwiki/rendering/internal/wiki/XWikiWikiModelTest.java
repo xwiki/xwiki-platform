@@ -34,7 +34,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
@@ -179,7 +179,7 @@ public class XWikiWikiModelTest
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited() throws Exception
     {
-        XWikiRenderingConfiguration configuration = this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        ExtendedRenderingConfiguration configuration = this.mocker.getInstance(ExtendedRenderingConfiguration.class);
         when(configuration.getImageWidthLimit()).thenReturn(200);
         when(configuration.getImageHeightLimit()).thenReturn(170);
         Map<String, String> parameters = Collections.emptyMap();
@@ -197,8 +197,8 @@ public class XWikiWikiModelTest
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited() throws Exception
     {
-        final XWikiRenderingConfiguration configuration =
-            this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        final ExtendedRenderingConfiguration configuration =
+            this.mocker.getInstance(ExtendedRenderingConfiguration.class);
         when(configuration.getImageWidthLimit()).thenReturn(25);
         when(configuration.getImageHeightLimit()).thenReturn(-1);
         Map<String, String> parameters = new HashMap<String, String>();
@@ -217,8 +217,8 @@ public class XWikiWikiModelTest
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited() throws Exception
     {
-        final XWikiRenderingConfiguration configuration =
-            this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        final ExtendedRenderingConfiguration configuration =
+            this.mocker.getInstance(ExtendedRenderingConfiguration.class);
         when(configuration.getImageWidthLimit()).thenReturn(-1);
         when(configuration.getImageHeightLimit()).thenReturn(-1);
         Map<String, String> parameters = new HashMap<String, String>();
@@ -302,7 +302,7 @@ public class XWikiWikiModelTest
     {
         AttachmentReference attachmentReference =
             new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
-        XWikiRenderingConfiguration configuration = this.mocker.getInstance((Type) XWikiRenderingConfiguration.class);
+        ExtendedRenderingConfiguration configuration = this.mocker.getInstance(ExtendedRenderingConfiguration.class);
         when(configuration.isImageDimensionsIncludedInImageURL()).thenReturn(
             expectedIsImageDimensionsIncludedInImageURL);
         when(this.referenceResolver.resolve(imageReference, EntityType.ATTACHMENT)).thenReturn(attachmentReference);

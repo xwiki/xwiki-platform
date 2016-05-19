@@ -1,0 +1,112 @@
+#template('colorThemeInit.vm')
+
+.macro-selector.loading,
+.macro-editor.loading {
+  min-height: 1em;
+}
+
+.macro-selector > .errormessage,
+.macro-editor > .errormessage {
+  margin-bottom: 0;
+}
+
+ul.macro-list {
+  height: 300px;
+  margin: 5px 0;
+  overflow: auto;
+  padding: 0;
+  position: relative;
+}
+
+ul.macro-list > li {
+  cursor: pointer;
+  padding: 6px 12px;
+}
+ul.macro-list > li.selected {
+  background-color: $theme.highlightColor;
+}
+
+ul.macro-list .macro-name,
+ul.macro-parameters .macro-parameter-name {
+  color: $theme.textColor;
+}
+
+ul.macro-list .macro-description,
+.macro-editor .macro-description,
+ul.macro-parameters .macro-parameter-description,
+ul.macro-parameters > li.more,
+ul.macro-parameters > li.empty {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+}
+
+.macro-name::first-letter,
+.macro-description::first-letter,
+.macro-parameter-name::first-letter,
+.macro-parameter-description::first-letter {
+  text-transform: capitalize;
+}
+
+.macro-editor .macro-name {
+  font-size: larger;
+}
+
+ul.macro-parameters {
+  border-top: 1px dashed $theme.borderColor;
+  list-style: none;
+  margin: .5em 0;
+  padding: 0;
+}
+
+ul.macro-parameters > li {
+  padding: .5em 0;
+}
+
+.macro-parameter.mandatory .macro-parameter-name:after {
+  color: $theme.notificationErrorColor;
+  content: ' *';
+}
+
+.macro-parameter[data-type="boolean"] {
+  position: relative;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-name {
+  margin-left: 24px;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-field {
+  position: absolute;
+  top: .5em;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-field input {
+  margin: 0;
+  padding: 0;
+}
+
+.macro-parameter-description {
+  margin-bottom: 5px;
+}
+
+ul.macro-parameters > .more {
+  cursor: pointer;
+}
+ul.macro-parameters > .more a {
+  color: $theme.textSecondaryColor;
+}
+
+ul.macro-parameters .arrow {
+  display: inline-block;
+  height: 0;
+  width: 0;
+}
+ul.macro-parameters .arrow-down {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid $theme.textSecondaryColor;
+  margin-bottom: 1px;
+}
+ul.macro-parameters .arrow-right {
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid $theme.textSecondaryColor;
+  border-top: 4px solid transparent;
+  margin-right: 4px;
+}

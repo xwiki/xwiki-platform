@@ -39,22 +39,30 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
+#macro (importCSS $groupId $artifactId $version $path $evaluate)
+  #set ($url = $services.webjars.url("$groupId:$artifactId", $path, {'evaluate': $evaluate}))
+  #if ("$!url" == '')
+    ## Before XWiki 6.3RC1
+    #set ($url = $services.webjars.url("$artifactId/$version/$path"))
+  #end
+  #set ($discard = $xwiki.linkx.use($url, {'type': 'text/css', 'rel': 'stylesheet'}))
+#end
+
+#macro (importCKEditorCSS $path $evaluate)
+  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' '1.7-SNAPSHOT' $path $evaluate)
+#end
+{{/velocity}}
+
+{{velocity}}
 #if ($doc.fullName == 'CKEditor.EditSheet')
   This is a sheet for editing the document content using [[CKEditor&gt;&gt;http://ckeditor.com/]].
 #else
   {{html clean="false"}}
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
-  #set ($resourcePickerStyles = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
-    'plugins/xwiki-resource/resourcePicker.min.css', {'evaluate': true}))
-  #if ("$!resourcePickerStyles" == '')
-    ## Before XWiki 6.3RC1
-    #set ($resourcePickerStyles = $services.webjars.url(
-      'application-ckeditor-webjar/1.7-SNAPSHOT/plugins/xwiki-resource/resourcePicker.min.css'
-    ))
-  #end
-  #set ($discard = $xwiki.linkx.use($resourcePickerStyles, {'type': 'text/css', 'rel': 'stylesheet'}))
+  #importCKEditorCSS('plugins/xwiki-resource/resourcePicker.min.css' true)
+  #importCKEditorCSS('plugins/xwiki-macro/macroWizard.min.css' true)
   ## Tree styles needed for the document/attachment tree picker.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -200,10 +208,14 @@
 #end
 #set ($ckeditorBasePath = $stringtool.removeEnd($stringtool.removeEnd($ckeditorPath, '.js'), 'ckeditor'))
 #set ($resourcePickerBundlePath = "${ckeditorBasePath}plugins/xwiki-resource/resourcePicker.bundle.min")
+#set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle.min")
+#set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
 #if ($resourcePickerBundlePath.indexOf('?') &gt;= 0)
   ## Before 7.1M1 the WebJar resource path was included in the query string which means we have to specify the '.js'
   ## extension (Require.js doesn't add it in this case).
   #set ($resourcePickerBundlePath = "${resourcePickerBundlePath}.js")
+  #set ($macroWizardBundlePath = "${macroWizardBundlePath}.js")
+  #set ($modalPath = "${modalPath}.js")
 #end
 */
 require.config({
@@ -214,6 +226,8 @@ require.config({
     entityResourcePicker: '$!resourcePickerBundlePath',
     entityResourceSuggester: '$!resourcePickerBundlePath',
     entityResourceDisplayer: '$!resourcePickerBundlePath',
+    modal: '$!modalPath',
+    macroWizard: '$!macroWizardBundlePath',
     'bootstrap3-typeahead': '$!bootstrap3typeaheadPath',
     'autosave': "$xwiki.getSkinFile('js/xwiki/editors/autosave', true)"
   },
@@ -221,7 +235,7 @@ require.config({
     ckeditor: {
       exports: 'CKEDITOR',
       // This includes dependencies of the plugins bundled with the CKEditor code.
-      deps: ['jquery', 'resource', 'resourcePicker']
+      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard']
     }
   }
 });
@@ -863,6 +877,21 @@ td.cke_dialog_contents_body {
   border-left: 4px solid #777;
   border-top: 4px solid transparent;
   margin-right: 4px;
+}
+
+/**
+ * Macro tool bar icon (Glyphicon)
+ */
+.cke_button_icon.cke_button__xwiki-macro_icon {
+  font-family: 'Glyphicons Halflings';
+  position: relative;
+  top: 1px;
+}
+.cke_button_icon.cke_button__xwiki-macro_icon::before {
+  content: "\e019";
+  display: inline-block;
+  text-align: center;
+  width: 16px;
 }</code>
     </property>
     <property>

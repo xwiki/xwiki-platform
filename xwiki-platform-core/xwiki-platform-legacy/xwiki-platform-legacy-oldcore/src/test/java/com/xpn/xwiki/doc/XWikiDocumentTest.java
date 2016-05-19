@@ -30,6 +30,8 @@ import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
@@ -164,6 +166,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
 
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
+
+        // Set the default link label generator format to %np for some tests below.
+        // We need to do this since we don't depend on xwiki-platform-rendering-configuration-default (which contains
+        // an overridden RenderingConfiguration impl that sets the format to %np by default).
+        DefaultRenderingConfiguration renderingConfiguration =
+            getComponentManager().getInstance(RenderingConfiguration.class);
+        renderingConfiguration.setLinkLabelFormat("%np");
     }
 
     @Override

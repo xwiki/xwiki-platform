@@ -1,5 +1,5 @@
 ##@Deprecated Use packagedescriptor.vm instead
-$response.setContentType("application/x-json")
+$response.setContentType("application/json")
 #if("$!request.document" == "")
  #set($packageDoc = $doc)
 #else 

@@ -1,5 +1,5 @@
 #template('xwikivars.vm')
-$response.setContentType('application/x-json')
+$response.setContentType('application/json')
 #set ($offset = $mathtool.toInteger($request.offset))
 #set ($limit = $mathtool.toInteger($request.limit))
 #set ($order = "$!request.dir" != 'desc')

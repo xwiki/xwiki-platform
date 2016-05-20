@@ -30,10 +30,10 @@
   <artifactId>xwiki-platform-rendering-ui</artifactId>
   <name>XWiki Platform - Rendering - UI</name>
   <packaging>xar</packaging>
-  <description>Administration UI for Rendering</description>
+  <description>Select the markup syntaxes that can be used to write page content</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Rendering Application</xwiki.extension.name>
+    <xwiki.extension.name>Rendering Administration Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

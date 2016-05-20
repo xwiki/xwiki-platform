@@ -110,7 +110,7 @@ public class XWikiExecutor
      */
     private boolean hasXWikiBeenStartedProperly;
 
-    private class Response
+    public class Response
     {
         public boolean timedOut;
 
@@ -510,7 +510,7 @@ public class XWikiExecutor
         }
     }
 
-    private String getURL()
+    public String getURL()
     {
         // We use "get" action for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin

@@ -39,7 +39,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>Rendering.RenderingConfigClass_disabledSyntaxes=Disabled Syntaxes
+  <content>admin.syntaxes=Syntaxes
+Rendering.RenderingConfigClass_disabledSyntaxes=Disabled Syntaxes
 Rendering.RenderingConfigClass_disabledSyntaxes.hint=The list of markup syntaxes in which pages cannot be written in
 </content>
   <object>

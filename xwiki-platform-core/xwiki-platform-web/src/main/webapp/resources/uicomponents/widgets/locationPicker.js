@@ -348,20 +348,31 @@ require(['jquery'], function($) {
   };
 
   var setAllowedValues = function(validator, values, failureMessage) {
-    // Clean any previous existing inclusion validators, using the previous inclusion parameters (if available).
-    if (validator._inclusionParams) {
-      validator.remove(Validate.Inclusion, validator._inclusionParams);
-      delete validator._inclusionParams;
+    // Clean any previous existing values validators, using the previous parameters (if available).
+    if (validator._customValuesParams) {
+      validator.remove(Validate.Custom, validator._customValuesParams);
+      delete validator._customValuesParams;
     }
 
-    // If any values are specified, add an inclusion validator.
+    // If any values are specified, add a custom validator.
     if (values.length > 0) {
       // Store the parameters so we can later be able to remove them in a future call.
-      validator._inclusionParams = {
-        within: values,
-        failureMessage: failureMessage
+      validator._customValuesParams = {
+        failureMessage: failureMessage,
+        against: function(value) {
+          for (var i=0; i<values.length; i++) {
+            var allowedValue = values[i];
+            // Must be exactly one of the allowed values of prefixed by the allowed value followed by a dot (i.e. parent space).
+            if (allowedValue === value || value.indexOf(allowedValue + '.') === 0) {
+              return true;
+            }
+          }
+
+          // Does not validate for any of the allowed values.
+          return false;
+        }
       };
-      validator.add(Validate.Inclusion, validator._inclusionParams);
+      validator.add(Validate.Custom, validator._customValuesParams);
     }
   };
 

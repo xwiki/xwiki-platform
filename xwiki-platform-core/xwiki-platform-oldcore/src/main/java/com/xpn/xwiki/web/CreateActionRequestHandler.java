@@ -401,10 +401,6 @@ public class CreateActionRequestHandler
             DocumentReferenceResolver<String> resolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
 
-            EntityReferenceSerializer<String> localSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
-            String spaceStringReference = localSerializer.serialize(spaceReference);
-
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
             Query query =
                 queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
@@ -417,16 +413,12 @@ public class CreateActionRequestHandler
 
             List<String> templateProviderDocNames = query.execute();
             for (String templateProviderName : templateProviderDocNames) {
-                // get the document
+                // get the document and template provider object
                 DocumentReference reference = resolver.resolve(templateProviderName);
                 XWikiDocument templateDoc = wiki.getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
 
-                // Check the allowed spaces list.
-                @SuppressWarnings("unchecked")
-                List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
-                // If no explicit allowed space are set or, if there are and the current space is in the list
-                if (allowedSpaces.size() == 0 || allowedSpaces.contains(spaceStringReference)) {
+                if (isTemplateProviderAllowedInSpace(templateObject, spaceReference)) {
                     // create a Document and put it in the list
                     templates.add(new Document(templateDoc, context));
                 }
@@ -436,6 +428,31 @@ public class CreateActionRequestHandler
         }
 
         return templates;
+    }
+
+    private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference)
+    {
+        // Check the allowed spaces list.
+        List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
+        if (allowedSpaces.size() > 0) {
+            EntityReferenceSerializer<String> localSerializer =
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+            String spaceStringReference = localSerializer.serialize(spaceReference);
+
+            for (String allowedSpace : allowedSpaces) {
+                // Exact match or parent space (i.e. prefix) match.
+                if (allowedSpace.equals(spaceStringReference)
+                    || StringUtils.startsWith(spaceStringReference, String.format("%s.", allowedSpace))) {
+                    return true;
+                }
+            }
+
+            // No match, not allowed.
+            return false;
+        }
+
+        // No explicit spaces to check, allowed by default.
+        return true;
     }
 
     /**
@@ -508,30 +525,23 @@ public class CreateActionRequestHandler
     {
         // Check that the chosen space is allowed with the given template, if not:
         // - Cancel the redirect
-        // - set an error on the context, to be read by the create.vm
+        // - Set an error on the context, to be read by the create.vm
         if (templateProvider != null) {
-            @SuppressWarnings("unchecked")
-            List<String> allowedSpaces = templateProvider.getListValue(SPACES_PROPERTY);
-            // if there is no allowed spaces set, all spaces are allowed
-            if (allowedSpaces.size() > 0) {
-                EntityReferenceSerializer<String> localSerializer =
-                    Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
-                String localSerializedSpace = localSerializer.serialize(spaceReference);
-                if (!allowedSpaces.contains(localSerializedSpace)) {
-                    // put an exception on the context, for create.vm to know to display an error
-                    Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
-                    XWikiException exception =
-                        new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                            "Template {0} cannot be used in space {1} when creating page {2}", null, args);
-                    VelocityContext vcontext = getVelocityContext();
-                    vcontext.put(EXCEPTION, exception);
-                    vcontext.put("createAllowedSpaces", allowedSpaces);
-                    return false;
-                }
+            if (!isTemplateProviderAllowedInSpace(templateProvider, spaceReference)) {
+                // put an exception on the context, for create.vm to know to display an error
+                Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
+                XWikiException exception =
+                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                VelocityContext vcontext = getVelocityContext();
+                vcontext.put(EXCEPTION, exception);
+                vcontext.put("createAllowedSpaces", templateProvider.getListValue(SPACES_PROPERTY));
+                return false;
             }
         }
-        // if no template is specified, creation is allowed
+
+        // For all other cases, creation is allowed.
         return true;
     }
 

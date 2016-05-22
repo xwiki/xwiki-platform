@@ -122,21 +122,22 @@ public class DefaultHTMLConverter implements HTMLConverter
      * syntax.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
     {
         try {
             // Clean
-            String html = htmlCleaner.clean(dirtyHTML);
+            String html = this.htmlCleaner.clean(dirtyHTML);
 
             // Parse & Render
             // Note that transformations are not executed when converting XHTML to source syntax.
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory printRendererFactory =
-                componentManager.getInstance(PrintRendererFactory.class, syntaxId);
-            xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
+                this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
+            this.xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
 
             return printer.toString();
         } catch (Exception e) {
@@ -150,7 +151,7 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Parse
-            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            Parser parser = this.contextComponentManager.getInstance(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
             // Execute the macro transformation
@@ -172,15 +173,15 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Clean
-            String html = htmlCleaner.clean(dirtyHTML);
+            String html = this.htmlCleaner.clean(dirtyHTML);
 
             // Parse
-            XDOM xdom = xhtmlParser.parse(new StringReader(html));
+            XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
 
             // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
             // data is used as the default syntax for macro content. We have to change this to the specified syntax
             // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
-            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+            Syntax syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
             // Execute the macro transformation
@@ -188,7 +189,7 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            xhtmlRenderer.render(xdom, printer);
+            this.xhtmlRenderer.render(xdom, printer);
 
             return printer.toString();
         } catch (Exception e) {
@@ -208,6 +209,6 @@ public class DefaultHTMLConverter implements HTMLConverter
         // in the first one...
         txContext.setId(TRANSFORMATION_ID);
 
-        ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
+        ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation, txContext, xdom);
     }
 }

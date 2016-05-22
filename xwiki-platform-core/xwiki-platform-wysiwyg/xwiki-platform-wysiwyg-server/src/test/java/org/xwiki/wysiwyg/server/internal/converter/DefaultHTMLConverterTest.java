@@ -23,9 +23,11 @@ import java.io.StringReader;
 import java.util.Collections;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.Block;
@@ -68,9 +70,15 @@ public class DefaultHTMLConverterTest
         DefaultHTMLConverter.class);
 
     @AfterComponent
-    public void overideComponent() throws Exception
+    public void overrideComponent() throws Exception
     {
         mocker.registerComponent(RenderingContext.class, mock(MutableRenderingContext.class));
+    }
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.mocker.registerComponent(ComponentManager.class, "context", this.mocker);
     }
 
     /**

@@ -66,7 +66,8 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      * The component manager. We need it because we have to access components dynamically.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     @Inject
     private ContextualAuthorizationManager authorization;
@@ -97,8 +98,8 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         }
 
         try {
-            this.componentManager.getInstance(Parser.class, syntaxId);
-            this.componentManager.getInstance(PrintRendererFactory.class, syntaxId);
+            this.contextComponentManager.getInstance(Parser.class, syntaxId);
+            this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
             return true;
         } catch (Exception e) {
             return false;

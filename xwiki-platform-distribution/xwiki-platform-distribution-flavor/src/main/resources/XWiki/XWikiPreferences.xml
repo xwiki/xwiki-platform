@@ -2741,6 +2741,7 @@
       <confirmation_email_content>#set ($wikiname = $request.serverName)
 #set ($host = ${request.getRequestURL()})
 #set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Content-Type: text/plain; charset=utf-8
 Subject: Your account on ${wikiname} has been activated
 
 Hello ${xwiki.getUserName("$xwikiname", false)},
@@ -2879,6 +2880,7 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <validation_email_content>#set ($wikiname = $request.serverName)
 #set ($host = ${request.getRequestURL()})
 #set ($host = ${host.substring(0, ${host.indexOf('/', ${mathtool.add(${host.indexOf('//')}, 2)})})})
+Content-Type: text/plain; charset=utf-8
 Subject: Validate your account on ${wikiname}
 
 Hello ${xwiki.getUserName("XWiki.$xwikiname", false)},

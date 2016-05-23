@@ -277,7 +277,7 @@
           </dd>
         #else
           ## Pass along the "tocreate" parameter, as it was determined by the create action based on the first request.
-          <input type="hidden" name="tocreate" value="#if($isSpace)nonterminal#{else}terminal#end"/>
+          <dd><input type="hidden" name="tocreate" value="#if($isSpace)nonterminal#{else}terminal#end"/></dd>
         #end
       </dl>
     </div>

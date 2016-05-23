@@ -82,7 +82,11 @@
       &lt;/dt&gt;
       &lt;dd&gt;
         #if ($isEditing)
-          {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('name'){{/html}}{{html clean='false'}}
+          {{/html}}
+
+          {{html wiki='true' clean='false'}}$!providerObj.get('name'){{/html}}
+
+          {{html clean='false'}}
         #else
           &lt;p&gt;$!escapetool.xml($services.localization.render($providerObj.getValue('name')))&lt;/p&gt;
         #end
@@ -100,7 +104,11 @@
         #else
           #set ($templateDocName = $providerObj.getValue('template'))
           #if ("$!templateDocName" != '')
-            {{/html}}{{html wiki='true' clean='false'}}[[$templateDocName&gt;&gt;$templateDocName]]{{/html}}{{html clean='false'}}
+            {{/html}}
+
+            {{html wiki='true' clean='false'}}[[$templateDocName&gt;&gt;$templateDocName]]{{/html}}
+
+            {{html clean='false'}}
           #end
         #end
       &lt;/dd&gt;
@@ -113,7 +121,11 @@
           &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.templateprovider.terminal.hint'))&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
-          {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('terminal'){{/html}}{{html clean='false'}}
+{{/html}}
+
+{{html wiki='true' clean='false'}}$!providerObj.get('terminal'){{/html}}
+
+{{html clean='false'}}
         &lt;/dd&gt;
       #end
       ##
@@ -126,7 +138,11 @@
         #end
       &lt;/dt&gt;
       &lt;dd&gt;
-        {{/html}}{{html wiki='true' clean='false'}}$!providerObj.get('action'){{/html}}{{html clean='false'}}
+{{/html}}
+
+{{html wiki='true' clean='false'}}$!providerObj.get('action'){{/html}}
+
+{{html clean='false'}}
       &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
@@ -152,9 +168,13 @@
           &lt;input id="XWiki.TemplateProviderClass_0_spaces" name="XWiki.TemplateProviderClass_0_spaces"
             value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
 
-          {{/html}}{{html wiki='true' clean='false'}}
+          {{/html}}
+
+          {{html wiki='true' clean='false'}}
             {{documentTree showTerminalDocuments='false' checkboxes='true' links='false' showTranslations='false' showAttachments='false' /}}
-          {{/html}}{{html clean='false'}}
+          {{/html}}
+
+          {{html clean='false'}}
         #else
           #set ($spacesValues = $providerObj.getValue('spaces'))
           #if ($spacesValues &amp;&amp; !$spacesValues.isEmpty())

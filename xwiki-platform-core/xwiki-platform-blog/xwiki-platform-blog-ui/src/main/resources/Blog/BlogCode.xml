@@ -730,7 +730,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #else
     {{translation key='xe.blog.code.createdby'/}} ##
   #end
-  {{html wiki="false" clean="false"}}&lt;address class='author vcard'&gt;#userfn($entryDoc.creator)&lt;/address&gt;{{/html}} ##
+  {{html wiki="false" clean="false"}}&lt;span class='author vcard'&gt;#userfn($entryDoc.creator)&lt;/span&gt;{{/html}} ##
   #getEntryDate($entryDoc $entryObj $entryDate)
   #listCategories($entryObj) #*
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that

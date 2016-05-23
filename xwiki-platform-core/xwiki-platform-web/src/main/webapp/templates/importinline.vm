@@ -47,10 +47,10 @@
           <fieldset id="attachform">
             ## Temporarily disabled, until we fix attachment name handling
             ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
-            <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="30"/></div>
+            <div><input id="xwikiuploadname" type="hidden" name="filename" value="" /></div>
             <div class="package-upload">
                <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
-               <input id="xwikiuploadfile" type="file" name="filepath" size="30" class="uploadFileInput"/>
+               <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput"/>
                <span class="buttonwrapper">
                  <input type="submit" value="Upload" class="button" />
                </span>

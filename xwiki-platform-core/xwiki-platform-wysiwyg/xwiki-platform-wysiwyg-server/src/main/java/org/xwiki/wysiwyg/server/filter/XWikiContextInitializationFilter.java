@@ -70,7 +70,7 @@ public class XWikiContextInitializationFilter implements Filter
     @Override
     public void destroy()
     {
-        filterConfig = null;
+        this.filterConfig = null;
     }
 
     @Override
@@ -96,9 +96,9 @@ public class XWikiContextInitializationFilter implements Filter
         this.filterConfig = filterConfig;
 
         try {
-            mode = Integer.parseInt(filterConfig.getInitParameter("mode"));
+            this.mode = Integer.parseInt(filterConfig.getInitParameter("mode"));
         } catch (Exception e) {
-            mode = -1;
+            this.mode = -1;
         }
     }
 
@@ -114,16 +114,17 @@ public class XWikiContextInitializationFilter implements Filter
         try {
             // Not all request types specify an action (e.g. GWT-RPC) so we default to the empty string.
             String action = "";
-            XWikiServletContext xwikiEngine = new XWikiServletContext(filterConfig.getServletContext());
+            XWikiServletContext xwikiEngine = new XWikiServletContext(this.filterConfig.getServletContext());
             XWikiServletRequest xwikiRequest = new XWikiServletRequest((HttpServletRequest) request);
             XWikiServletResponse xwikiResponse = new XWikiServletResponse((HttpServletResponse) response);
 
             // Create the XWiki context.
             XWikiContext context = Utils.prepareContext(action, xwikiRequest, xwikiResponse, xwikiEngine);
 
-            // Overwrite the context mode if the mode filter initialization parameter is specified.
-            if (mode >= 0) {
-                context.setMode(mode);
+            // Overwrite the context mode set in the prepareContext() call just above if the mode filter initialization
+            // parameter is specified.
+            if (this.mode >= 0) {
+                context.setMode(this.mode);
             }
 
             // Initialize the Container component which is the new way of transporting the Context in the new component

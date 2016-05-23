@@ -310,6 +310,7 @@ public class JavaIntegrationTest
         message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
         message.setText("Test message Id support");
         message.setHeader("Message-ID", "<custom@domain>");
+        message.setSubject("subject");
 
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
         this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);

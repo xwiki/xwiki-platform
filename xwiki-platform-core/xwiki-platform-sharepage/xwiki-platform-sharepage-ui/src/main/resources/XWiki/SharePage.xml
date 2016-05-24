@@ -180,16 +180,21 @@
   });
 
   XWiki.SharePage = Class.create({
-    initialize : function () {
+    initialize : function (parentContainer) {
       this.input = $('shareTarget');
+
       if (!this.input) {
         return;
       }
 
-      new UserAndEmailPicker(this.input, {
+      var userEmailOptions = {
         script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&amp;uorg=user&amp;'),
         shownoresults : false
-      });
+      };
+      if (parentContainer) {
+        userEmailOptions.parentContainer = parentContainer;
+      }
+      new UserAndEmailPicker(this.input, userEmailOptions);
       this.input.focus();
 
       document.observe('xwiki:multisuggestpicker:selectionchanged', this._onSelectionChanged.bindAsEventListener(this));
@@ -248,7 +253,7 @@
         dialog.showDialog();
         loading.up().up().addClassName('share-dialog');
         new Ajax.Updater(loading.up(), XWiki.currentDocument.getURL('get', 'xpage=shareinline'), {
-          onComplete : function() { new XWiki.SharePage(); }
+          onComplete : function() { new XWiki.SharePage(dialog.dialogBox); }
         });
       });
     }
@@ -738,6 +743,11 @@ Ce message a été généré par XWiki depuis ${request.serverName} au nom de ${
     </property>
     <property>
       <code>#template("colorThemeInit.vm")
+.share-dialog {
+  /* this creates issues if the screen is smaller than the dialog box, the bottom of the box will not be visible.
+     But we need this in order to show the suggestions if the suggestions are longer than the dialog (same as XWIKI-11089) */
+  overflow: visible;
+}
 .share-dialog .mail-preview {
   background-color: $theme.backgroundSecondaryColor;
   border: 1px solid $theme.borderColor;

@@ -50,12 +50,10 @@
 #set($SUPPORTED_SYNTAX_ORDER = ['1.0', '2.0', '2.1'])
 ##
 ## filter all syntaxes that are not installed/configured
-#set($configuredSyntaxIds = $xwiki.getConfiguredSyntaxes())
+#set($configuredSyntaxes = $services.rendering.getConfiguredSyntaxes())
 #set($enabledSyntaxIds = [])
-#foreach($syntax in $services.rendering.getAvailableParserSyntaxes())
-  #if($configuredSyntaxIds.contains($syntax.toIdString()))
-    #set($discard = $enabledSyntaxIds.add($syntax.toIdString()))
-  #end
+#foreach($syntax in $configuredSyntaxes)
+  #set($discard = $enabledSyntaxIds.add($syntax.toIdString()))
 #end
 #set($unavailableSyntaxes=[])
 #foreach($supportedSyntax in $SUPPORTED_SYNTAX_ORDER)

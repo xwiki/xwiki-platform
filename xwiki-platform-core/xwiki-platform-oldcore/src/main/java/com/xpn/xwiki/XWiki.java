@@ -315,7 +315,7 @@ public class XWiki implements EventListener
 
     private MetaClass metaclass;
 
-    private String version = null;
+    private String version;
 
     private XWikiEngineContext engine_context;
 
@@ -1831,11 +1831,6 @@ public class XWiki implements EventListener
         Collections.sort(result);
         return result;
     }
-
-    /*
-     * public String[] getClassList() throws XWikiException { List list = store.getClassList(); String[] array = new
-     * String[list.size()]; for (int i=0;i<list.size();i++) array[i] = (String)list.get(i); return array; }
-     */
 
     public <T> List<T> search(String sql, XWikiContext context) throws XWikiException
     {

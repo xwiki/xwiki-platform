@@ -62,6 +62,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
@@ -158,6 +159,10 @@ public class XWikiDocumentMockitoTest
             this.oldcore.getMocker().getInstance(EntityReferenceSerializer.TYPE_STRING);
 
         this.oldcore.getXWikiContext().setWikiId(DOCWIKI);
+
+        // Reset the cached (static) MetaClass instance because it may have been initialized during the execution of the
+        // previous test classes, so before the StaticListMetaClass component needed by this test class was loaded.
+        MetaClass.setMetaClass(null);
     }
 
     @Test

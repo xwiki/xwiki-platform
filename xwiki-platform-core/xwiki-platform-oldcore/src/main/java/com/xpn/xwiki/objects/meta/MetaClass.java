@@ -56,7 +56,7 @@ public class MetaClass extends BaseClass
     /**
      * A cached instance of this class that can be used to quickly lookup XClass property types.
      */
-    private static MetaClass metaClass = new MetaClass();
+    private static MetaClass metaClass;
 
     /**
      * Creates a new instance that has a property for each available property type.
@@ -115,6 +115,9 @@ public class MetaClass extends BaseClass
      */
     public static MetaClass getMetaClass()
     {
+        if (metaClass == null) {
+            metaClass = new MetaClass();
+        }
         return metaClass;
     }
 

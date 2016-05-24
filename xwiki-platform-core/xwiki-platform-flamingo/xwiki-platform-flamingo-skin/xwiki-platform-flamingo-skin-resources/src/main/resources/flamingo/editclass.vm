@@ -9,7 +9,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #set($hiddenProperties = ['tooltip', 'unmodifiable', 'contenttype', 'disabled'])
 ## Some additional details for a few unclear meta-properties
 #set($propertyDetails = {
-  'values' : "(separated by '|'; Example: <tt>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</tt>)",
+  'values' : "(separated by '|'; Example: <span class='monospace'>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</span>)",
   'size' : 'of the corresponding form element in edit mode'
 })
 ##
@@ -75,7 +75,14 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
           #set($propDef = $field.xWikiClass.get($classprop))
           #if($hiddenProperties.indexOf($propDef.name) == -1)
             #if($propDef.type.indexOf('Boolean') != -1)
-              <dt class="boolean-property"><label class="hidden" for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())}</label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
+              <dt class="boolean-property">
+                <label for="${field.name}_$classprop">
+                  $doc.displayEdit($propDef, "${field.name}_", $field)
+                  $escapetool.xml($propDef.prettyName)
+                </label>
+              </dt>
+              ## The empty DD is needed in order to have valid HTML.
+              <dd></dd>
             #else
               <dt><label for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())} $!{propertyDetails.get($classprop)}</label></dt>
               <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>

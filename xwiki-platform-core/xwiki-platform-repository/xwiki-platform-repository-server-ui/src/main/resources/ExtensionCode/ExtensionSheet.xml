@@ -160,8 +160,6 @@
       ##------- Extension Manager -----------------
       #if ($doc.getValue('validExtension') == 1)
 
-
-
         {{success}}**Installable with the Extension Manager**{{/success}}
       #end
       ##------------------------
@@ -471,10 +469,6 @@
     </property>
     <property>
       <code>#template('colorThemeInit.vm')
-
-.box, div.floatinginfobox {
-  background-color: #fafafa;
-}
 
 .box.floatinginfobox {
   margin-top: 0;

@@ -481,47 +481,6 @@
                 },
                 "ignore": [
                   {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.List<? extends org.xwiki.extension.ExtensionDependency> org.xwiki.extension.AbstractExtension::getDependencies()",
-                    "new": "method java.util.List<org.xwiki.extension.ExtensionDependency> org.xwiki.extension.AbstractExtension::getDependencies()",
-                    "justification": "? return type makes signature more complex for nothing"
-                  },
-                  {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.Collection<? extends org.xwiki.extension.ExtensionDependency> org.xwiki.extension.Extension::getDependencies()",
-                    "new": "method java.util.Collection<org.xwiki.extension.ExtensionDependency> org.xwiki.extension.Extension::getDependencies()",
-                    "justification": "? return type makes signature more complex for nothing"
-                  },
-                  {
-                    "code": "java.method.returnTypeTypeParametersChanged",
-                    "old": "method java.util.Collection<? extends org.xwiki.extension.ExtensionDependency> org.xwiki.extension.wrap.WrappingExtension<E extends org.xwiki.extension.Extension>::getDependencies()",
-                    "new": "method java.util.Collection<org.xwiki.extension.ExtensionDependency> org.xwiki.extension.wrap.WrappingExtension<E extends org.xwiki.extension.Extension>::getDependencies()",
-                    "justification": "? return type makes signature more complex for nothing"
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method org.xwiki.test.ui.po.CopyStatusPage org.xwiki.test.ui.po.CopyOverwritePromptPage::clickCopyButton()",
-                    "new": "method org.xwiki.test.ui.po.CopyOrRenameStatusPage org.xwiki.test.ui.po.CopyOverwritePromptPage::clickCopyButton()",
-                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method org.xwiki.test.ui.po.CopyStatusPage org.xwiki.test.ui.po.CopyPage::clickCopyButton()",
-                    "new": "method org.xwiki.test.ui.po.CopyOrRenameStatusPage org.xwiki.test.ui.po.CopyPage::clickCopyButton()",
-                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
-                  },
-                  {
-                    "code": "java.class.removed",
-                    "old": "class org.xwiki.test.ui.po.CopyStatusPage",
-                    "justification": "CopyStatusPage page object was renamed to CopyOrRenameStatusPage since it is needed in both places."
-                  },
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method void org.xwiki.test.ui.TestUtils::setDefaultCredentials(org.apache.commons.httpclient.UsernamePasswordCredentials)",
-                    "new": "method org.apache.commons.httpclient.UsernamePasswordCredentials org.xwiki.test.ui.TestUtils::setDefaultCredentials(org.apache.commons.httpclient.UsernamePasswordCredentials)",
-                    "justification": "Minor change unlikely to break anything in practice"
-                  },
-                  {
                     "code": "java.class.removed",
                     "old": "class org.xwiki.rendering.parser.ContentParser",
                     "justification": "No actual breakage. Class was moved to another module"

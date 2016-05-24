@@ -312,7 +312,7 @@ public class XWiki implements EventListener
     /** Lock object used for the lazy initialization of the URL Factory service. */
     private final Object URLFACTORY_SERVICE_LOCK = new Object();
 
-    private MetaClass metaclass = MetaClass.getMetaClass();
+    private MetaClass metaclass;
 
     private String version = null;
 
@@ -1813,6 +1813,9 @@ public class XWiki implements EventListener
 
     public MetaClass getMetaclass()
     {
+        if (this.metaclass == null) {
+            this.metaclass = MetaClass.getMetaClass();
+        }
         return this.metaclass;
     }
 

@@ -354,35 +354,6 @@ xwiki.authentication.unauthorized_code=200
 # xwiki.authentication.createuser=empty
 
 #---------------------------------------
-# XWiki Syntax 1.0 Rendering Engine
-#
-
-#-# Disable particular renderers.
-#-# Macro mapping
-# xwiki.render.macromapping=1
-#-# Velocity interpreter
-# xwiki.render.velocity=1
-#-# Groovy interpreter
-# xwiki.render.groovy=1
-#-# Plugin rendering
-# xwiki.render.plugin=1
-#-# Radeox wiki renderer
-# xwiki.render.wiki=1
-#-# Simple wiki syntax rendering 
-# xwiki.render.wikiwiki=0
-
-#-# [Since 2.4M1]
-#-# Rendering order: content will be rendered by the first renderer on the list, output rendered by the second, etc.
-#xwiki.render.renderingorder=macromapping, groovy, velocity, plugin, wiki, wikiwiki
-
-#-# Maximum number of documents to keep in the rendered cache
-# xwiki.render.cache.capacity=100
-
-#-# Default target for external links. Use _blank to open external links in a new tab/window.
-# xwiki.render.externallinks.defaulttarget=
-
-
-#---------------------------------------
 # Editing
 #
 

@@ -70,7 +70,8 @@
   ## option would be to specify which Rendering Transformations to execute in the query string (XWIKI-13167).
   ## See CKEDITOR-51: Icon transformations are saved by CKEditor
   #set ($discard = $response.writer.print($output))
-  #set ($discard = $response.setContentLength($output.length()))
+  ## The content length is measured in bytes and one character can use more than one byte.
+  #set ($discard = $response.setContentLength($output.getBytes('utf-8').size()))
 #else
   The service used by the CKEditor source plugin to convert between HTML and wiki syntax.
 #end

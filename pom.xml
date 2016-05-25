@@ -59,7 +59,7 @@
     </repository>
   </distributionManagement>
   <properties>
-    <ckeditor.version>4.5.8</ckeditor.version>
+    <ckeditor.version>4.5.9</ckeditor.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>

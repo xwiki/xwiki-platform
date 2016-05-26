@@ -1115,7 +1115,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if ((customClass == null) || (customClass.equals(""))) {
                 return new BaseObject();
             } else {
-                return (BaseObject) Class.forName(getCustomClass()).newInstance();
+                return (BaseObject) Class
+                    .forName(getCustomClass(), true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
             Object[] args = { customClass };

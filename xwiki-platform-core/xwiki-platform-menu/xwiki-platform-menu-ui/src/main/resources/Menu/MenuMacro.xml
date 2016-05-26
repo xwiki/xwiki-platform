@@ -563,7 +563,12 @@ $xwiki.getDocument('MenuTemplate').content
       <cache>long</cache>
     </property>
     <property>
-      <code>.menu {
+      <code>@media print {
+  .menu {
+    display: none;
+  }
+}
+.menu {
   &amp;.menu-vertical {
     ul {
       list-style-type: none;

@@ -10,9 +10,14 @@
     <div id="xwikiplatformversion">#evaluate($version)</div>
   #else
     <div id="xwikiplatformversion">
-      <a href="$services.extension.core.repository.environmentExtension.website">
-        $services.extension.core.repository.environmentExtension.name $xwiki.getVersion()
-      </a>
+      #set($productURL = $services.extension.core.repository.environmentExtension.website)
+      #if ($productURL)
+        <a href="$services.extension.core.repository.environmentExtension.website">
+      #end
+          $services.extension.core.repository.environmentExtension.name $xwiki.getVersion()
+      #if ($productURL)
+        </a>
+      #end
     </div>
   #end
 </div>

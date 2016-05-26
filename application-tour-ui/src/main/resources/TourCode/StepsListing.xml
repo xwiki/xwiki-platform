@@ -89,7 +89,7 @@
                &lt;tr&gt;
                   &lt;td&gt;$!mathtool.add($order, 1)&lt;/td&gt;
                   &lt;td&gt;$!element&lt;/td&gt;
-                  &lt;td&gt;$!title&lt;/td&gt;
+                  &lt;td&gt;$services.localization.render($!title)&lt;/td&gt;
                   &lt;td&gt;
                   #if($backdrop == 0)
                      $services.localization.render('tour.steps.no')

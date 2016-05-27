@@ -40,13 +40,15 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#macro (convert $text $toHTML)
+#macro (convert $text $toHTML $fromHTML)
   #if ($toHTML)
     ## The $source variable is used inside the content sheet.
-    #set ($source = {
-      'content': $text,
-      'syntax': $doc.syntax
-    })
+    #set ($source = {'syntax': $doc.syntax})
+    #if ($fromHTML)
+      #set ($source.html = $text)
+    #else
+      #set ($source.content = $text)
+    #end
     #set ($output = $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent())
   #else
     #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
@@ -62,10 +64,11 @@
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#if ("$!request.convert" != '')
+#set ($toHTML = $request.toHTML == 'true')
+#set ($fromHTML = $request.fromHTML == 'true')
+#if ($toHTML || $fromHTML)
   #set ($text = "$!request.text")
-  #set ($toHTML = $request.convert == 'true')
-  #set ($output = "#convert($text $toHTML)")
+  #set ($output = "#convert($text $toHTML $fromHTML)")
   ## We write the output directly to the response to avoid the execution of the Rendering Transformations. Another
   ## option would be to specify which Rendering Transformations to execute in the query string (XWIKI-13167).
   ## See CKEDITOR-51: Icon transformations are saved by CKEditor

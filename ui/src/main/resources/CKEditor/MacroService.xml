@@ -81,8 +81,11 @@
   #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
   #set ($macroIdFactory = $services.component.getInstance('org.xwiki.rendering.macro.MacroIdFactory'))
   #set ($macroId = $macroIdFactory.createMacroId($macroIdAsString))
-  #set ($macroDescriptor = $macroManager.getMacro($macroId).descriptor)
+  #set ($macro = $macroManager.getMacro($macroId))
+  #set ($macroDescriptor = $macro.descriptor)
   #set ($data = $jsontool.parse($jsontool.serialize($macroDescriptor)))
+  ## Specify whether the macro can be inserted in-line or not.
+  #set ($data.supportsInlineMode = $macro.supportsInlineMode())
   ## Translate the macro name and description.
   #set ($macroTranslationKey = "rendering.macro.$macroId")
   #set ($data.name = "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)")

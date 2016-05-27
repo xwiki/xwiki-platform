@@ -34,7 +34,7 @@ define('macroWizard', ['macroSelector', 'macroEditor'], function(selectMacro, ed
   },
 
   editMacroWizard = function(macroCall, syntaxId) {
-    editMacro({
+    return editMacro({
       macroCall: macroCall,
       syntaxId: syntaxId
     }).then(selectOtherMacroOrFinish);

@@ -93,7 +93,8 @@
       var thisPlugin = this;
       var config = editor.config['xwiki-source'] || {};
       jQuery.post(config.htmlConverter, {
-        convert: toHTML,
+        fromHTML: !toHTML,
+        toHTML: toHTML,
         text: editor._.previousModeData
       }).done(function(data) {
         editor.setData(data, {

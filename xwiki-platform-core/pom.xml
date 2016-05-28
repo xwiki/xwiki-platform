@@ -540,7 +540,6 @@
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
-    <module>xwiki-platform-jira</module>
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>

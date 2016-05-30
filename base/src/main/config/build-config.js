@@ -69,6 +69,7 @@ var CKBUILDER_CONFIG = {
     liststyle: 1,
     magicline: 1,
     maximize: 1,
+    notification: 1,
     pastefromword: 1,
     pastetext: 1,
     removeformat: 1,

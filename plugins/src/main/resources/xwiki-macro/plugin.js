@@ -19,8 +19,9 @@
  */
 (function() {
   'use strict';
+  var $ = jQuery;
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,xwiki-marker',
+    requires: 'widget,notification,xwiki-marker,xwiki-source',
     init : function(editor) {
       var macroPlugin = this;
 
@@ -114,25 +115,89 @@
         }
         macro.add(stopMacroComment);
         return macro;
-      };      
+      };
+
+      editor.ui.addButton('xwiki-macro', {
+        label: 'XWiki Macro',
+        command: 'xwiki-macro',
+        toolbar: 'insert,40'
+      });
 
       // See http://docs.ckeditor.com/#!/api/CKEDITOR.plugins.widget.definition
       editor.widgets.add('xwiki-macro', {
         requiredContent: 'div(macro)[data-macro]; span(macro)[data-macro]',
+        template: '<span class="macro" data-macro=""><span class="macro-placeholder">macro:name</span></span>',
+        dialog: 'xwiki-macro',
+        pathName: 'macro',
         upcast: function(element) {
           return (element.name == 'div' || element.name == 'span') &&
             element.hasClass('macro') && element.attributes['data-macro'];
         },
         downcast: unWrapMacroOutput,
-        pathName: 'macro'
+        init: function() {
+          this.setData(macroPlugin.parseMacroCall(this.element.getAttribute('data-macro')));
+        },
+        data: function(event) {
+          this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
+          this.pathName = 'macro:' + this.data.name;
+          // The elementspath plugin takes the path name from the 'data-cke-display-name' attribute which is set by the
+          // widget plugin only once, based on the initial pathName property from the widget definition. We have to
+          // update the attribute ourselves in order to have a dynamic path name (since the user can change the macro).
+          this.wrapper.data('cke-display-name', this.pathName);
+          $(this.element.$).find('.macro-placeholder').text(this.pathName);
+        },
+        edit: function(event) {
+          var widget = this;
+          // Override the next call to openDialog in order to hook our custom dialog.
+          var openDialog = this.editor.openDialog;
+          this.editor.openDialog = function(dialogName, callback) {
+            // Restore the original function.
+            this.openDialog = openDialog;
+            // Create a fake CKEditor dialog in order for the widget to add its listeners.
+            var dialog = {};
+            CKEDITOR.event.implementOn(dialog);
+            widget.fire('dialog', dialog);
+            // Show our custom dialog.
+            require(['macroWizard'], function(macroWizard) {
+              macroWizard(widget.data).done(function(macroCall) {
+                // Prevent the editor from recording a history entry where the macro data is updated but the macro
+                // output is not refreshed. The lock is removed by the call to setLoading(false) after the macro output
+                // is refreshed.
+                editor.fire('lockSnapshot', {dontUpdate: true});
+                widget.setData(macroCall);
+                dialog.fire('ok');
+                setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
+              }).fail(function() {
+                dialog.fire('cancel');
+              }).always(function() {
+                dialog.fire('hide');
+              });
+            });
+          };
+        }
       });
 
-      editor.widgets.onWidget('xwiki-macro', 'ready', function(event) {
-        var macroCall = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
-        this.pathName += ':' + macroCall.name;
-        // The elementspath plugin takes the path name from the 'data-cke-display-name' attribute which is already set
-        // by the widget plugin when this event is fired.
-        this.wrapper.data('cke-display-name', this.pathName);
+      editor.addCommand('xwiki-refresh', {
+        async: true,
+        exec: function(editor) {
+          var command = this;
+          editor.plugins['xwiki-source'].setLoading(editor, true);
+          var config = editor.config['xwiki-source'] || {};
+          $.post(config.htmlConverter, {
+            fromHTML: true,
+            toHTML: true,
+            text: editor.getData()
+          }).done(function(html) {
+            editor.setData(html, {callback: $.proxy(command, 'done', true)});
+          }).fail($.proxy(this, 'done'));
+        },
+        done: function(success) {
+          editor.plugins['xwiki-source'].setLoading(editor, false);
+          if (!success) {
+            editor.showNotification('Failed to refresh the edited content.', 'warning');
+          }
+          editor.fire('afterCommandExec', {name: this.name, command: this});
+        }
       });
     },
 

@@ -49,7 +49,8 @@
   #end
   #if ($data)
     #set ($discard = $response.setContentType('application/json'))
-    #if ($data.getClass().getSimpleName() == 'JSONObject')
+    ## We would have used getSimpleName() but it's not accessible before XWiki 6.4.3 (XWIKI-11916).
+    #if ($data.getClass().getName().endsWith('.JSONObject'))
       $data
     #else
       $jsontool.serialize($data)

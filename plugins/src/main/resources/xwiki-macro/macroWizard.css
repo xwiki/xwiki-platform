@@ -23,11 +23,13 @@ ul.macro-list > li {
   padding: 6px 12px;
 }
 ul.macro-list > li.selected {
+  background-color: #EEE;
   background-color: $theme.highlightColor;
 }
 
 ul.macro-list .macro-name,
 ul.macro-parameters .macro-parameter-name {
+  color: #333;
   color: $theme.textColor;
 }
 
@@ -36,6 +38,7 @@ ul.macro-list .macro-description,
 ul.macro-parameters .macro-parameter-description,
 ul.macro-parameters > li.more,
 ul.macro-parameters > li.empty {
+  color: #656565;
   color: $theme.textSecondaryColor;
   font-size: smaller;
 }
@@ -52,6 +55,7 @@ ul.macro-parameters > li.empty {
 }
 
 ul.macro-parameters {
+  border-top: 1px dashed #E8E8E8;
   border-top: 1px dashed $theme.borderColor;
   list-style: none;
   margin: .5em 0;
@@ -63,6 +67,7 @@ ul.macro-parameters > li {
 }
 
 .macro-parameter.mandatory .macro-parameter-name:after {
+  color: #CC3333;
   color: $theme.notificationErrorColor;
   content: ' *';
 }
@@ -90,6 +95,7 @@ ul.macro-parameters > .more {
   cursor: pointer;
 }
 ul.macro-parameters > .more a {
+  color: #656565;
   color: $theme.textSecondaryColor;
 }
 
@@ -101,11 +107,13 @@ ul.macro-parameters .arrow {
 ul.macro-parameters .arrow-down {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
+  border-top: 4px solid #656565;
   border-top: 4px solid $theme.textSecondaryColor;
   margin-bottom: 1px;
 }
 ul.macro-parameters .arrow-right {
   border-bottom: 4px solid transparent;
+  border-left: 4px solid #656565;
   border-left: 4px solid $theme.textSecondaryColor;
   border-top: 4px solid transparent;
   margin-right: 4px;

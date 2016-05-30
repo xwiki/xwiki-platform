@@ -899,7 +899,9 @@ td.cke_dialog_contents_body {
 /**
  * Macro tool bar icon (Glyphicon)
  */
-.cke_button_icon.cke_button__xwiki-macro_icon {
+a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon {
+  /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
+  background-image: none !important;
   font-family: 'Glyphicons Halflings';
   position: relative;
   top: 1px;

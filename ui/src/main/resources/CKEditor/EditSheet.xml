@@ -434,7 +434,24 @@ require.config({
       <cache>long</cache>
     </property>
     <property>
-      <code>// Polyfill for the xwiki:actions:beforeSave and xwiki:actions:beforePreview events (available since 7.4.1)
+      <code>// Fix the path to the arrow icon that indicates the presence of a sub-menu in the context menu.
+if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
+  // The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
+  // relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).
+  require(['ckeditor'], function(ckeditor) {
+    ckeditor.on('instanceReady', function(event) {
+      if (event.editor.contextMenu) {
+        event.editor.contextMenu._.panelDefinition.css.push(
+          '.cke_menuarrow {' +
+            'background-image: url("' + CKEDITOR_BASEPATH + 'skins/moono/images/arrow.png") !important;' +
+          '}'
+        );
+      }
+    });
+  });
+}
+
+// Polyfill for the xwiki:actions:beforeSave and xwiki:actions:beforePreview events (available since 7.4.1)
 // We have to use Prototype.js because it is loaded before jQuery and we need to register our save and preview listeners
 // before the actionButtons.js does it, as otherwise the CKEditor doesn't get the chance to update the text area before
 // the form is submitted.

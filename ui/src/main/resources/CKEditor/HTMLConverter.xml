@@ -39,29 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-#macro (convert $text $toHTML $fromHTML)
-  #if ($toHTML)
-    ## The $source variable is used inside the content sheet.
-    #set ($source = {'syntax': $doc.syntax})
-    #if ($fromHTML)
-      #set ($source.html = $text)
-    #else
-      #set ($source.content = $text)
-    #end
-    #set ($output = $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent())
-  #else
-    #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
-    #set ($output = $services.rendering.render($xdom, $doc.syntax.toIdString()))
-  #end
-  #if ("$!output" != '' || $output == '')
-    $output
-  #else
-    ## The output is null so an exception must have been thrown.
-    $response.sendError(500)
-  #end
-#end
-{{/velocity}}
+  <content>{{include reference="CKEditor.HTMLConverterMacros"/}}
 
 {{velocity wiki="false"}}
 #set ($toHTML = $request.toHTML == 'true')

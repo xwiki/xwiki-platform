@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
+  <content>{{include reference="CKEditor.HTMLConverterMacros"/}}
+
+{{velocity output="false"}}
 #macro (importCSS $groupId $artifactId $version $path $evaluate)
   #set ($url = $services.webjars.url("$groupId:$artifactId", $path, {'evaluate': $evaluate}))
   #if ("$!url" == '')
@@ -85,21 +87,7 @@
   &lt;/div&gt;
   ## The xwikieditcontent id is needed for the auto-save feature.
   &lt;div id="xwikieditcontent"&gt;
-    #set ($content = $services.wysiwyg.render('CKEditor.ContentSheet'))
-    #if ("$!content" == '' &amp;&amp; $content != '')
-      ## $content is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
-      #set ($sheet = $xwiki.getDocument('CKEditor.ContentSheet'))
-      #set ($content = $doc.getRenderedContent($sheet.content, $sheet.syntax.toIdString()))
-      #set ($skinExtensionHooks = {
-        'ssx': 'CssSkinExtensionPlugin',
-        'ssfx': 'CssSkinFileExtensionPlugin',
-        'ssrx': 'CssResourceSkinExtensionPlugin'
-      })
-      #foreach ($entry in $skinExtensionHooks.entrySet())
-        #set ($content = $content.replace("&lt;!-- com.xpn.xwiki.plugin.skinx.$entry.value --&gt;",
-          $xwiki.get($entry.key).importString))
-      #end
-    #end
+    #set ($content = "#renderContentSheet")
     &lt;textarea id="content" name="content" class="ckeditor-textarea loading"
       spellcheck="false"&gt;$escapetool.xml($content)&lt;/textarea&gt;
     &lt;input value="content" name="RequiresHTMLConversion" type="hidden"/&gt;

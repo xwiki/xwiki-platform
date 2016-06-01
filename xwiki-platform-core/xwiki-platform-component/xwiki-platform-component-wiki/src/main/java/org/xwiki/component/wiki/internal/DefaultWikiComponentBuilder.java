@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -60,11 +61,9 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     @Inject
     private Logger logger;
 
-    /**
-     * Used to retrieve parsers dynamically depending on documents syntax.
-     */
     @Inject
-    private ComponentManager rootComponentManager;
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     /**
      * Used to access the current {@link XWikiContext}.
@@ -122,7 +121,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
         rawComponent.setSyntax(componentBridge.getSyntax(reference));
 
         // Create the method invocation handler of the proxy
-        InvocationHandler handler = new DefaultWikiComponentInvocationHandler(rawComponent, rootComponentManager);
+        InvocationHandler handler = new DefaultWikiComponentInvocationHandler(rawComponent, contextComponentManager);
 
         // Prepare a list containing the interfaces the component implements
         List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();

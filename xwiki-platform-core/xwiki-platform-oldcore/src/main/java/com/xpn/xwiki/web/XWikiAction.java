@@ -729,10 +729,12 @@ public abstract class XWikiAction extends Action
         String url = context.getWiki().getURL(locationReference, context.getAction(),
                     context.getRequest().getQueryString(), null, context);
 
-        // Send the permanent redirection.
-        XWikiResponse response = context.getResponse();
-        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-        response.setHeader("Location", url);
+        // Send the redirection
+        try {
+            context.getResponse().sendRedirect(url);
+        } catch (IOException e) {
+            throw new XWikiException("Failed to redirect.", e);
+        }
 
         return true;
     }

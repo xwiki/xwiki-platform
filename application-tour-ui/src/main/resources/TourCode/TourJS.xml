@@ -133,9 +133,9 @@
 require.config({
   paths: {
     #if ("$!request.minify" == 'false')
-      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.js')"
+      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.js', {'wiki':$xcontext.database})"
     #else
-      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.min.js')"
+      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.min.js', {'wiki':$xcontext.database})"
     #end
   },
   shim: {
@@ -239,7 +239,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    */
   var createTour = function (jsonData) {
     // Add stylesheet only when needed
-    var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css')";
+    var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css', {'wiki':$xcontext.database})";
     $('&lt;link&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
     
     // Require 'bootstrap-tour' only when needed

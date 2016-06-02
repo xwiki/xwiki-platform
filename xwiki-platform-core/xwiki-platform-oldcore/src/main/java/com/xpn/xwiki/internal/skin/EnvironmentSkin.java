@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.inject.Provider;
 
@@ -132,10 +133,10 @@ public class EnvironmentSkin extends AbstractSkin
     private String getResourcePath(String resource, boolean testExist)
     {
         String skinFolder = getSkinFolder();
-        String resourcePath = getSkinFolder() + resource;
+        String resourcePath = skinFolder + resource;
 
         // Prevent inclusion of templates from other directories
-        String normalizedResource = URI.create(resourcePath).normalize().toString();
+        Path normalizedResource = Paths.get(resourcePath).normalize();
         if (!normalizedResource.startsWith(skinFolder)) {
             LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", normalizedResource);
 

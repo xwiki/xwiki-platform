@@ -20,11 +20,14 @@
 package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -230,30 +233,30 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
-        addAction(newpath, spaceReference, action, context);
-        addSpaces(newpath, spaceReference, action, context);
-        addName(newpath, name, action, context);
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
-            newpath.append("?");
-            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append("?");
+            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
-            newpath.append("#");
-            newpath.append(encode(anchor, context));
+            path.append("#");
+            path.append(encode(anchor, context));
         }
 
         URL result;
         try {
-            result = normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
+            result = normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             result = null;
@@ -262,17 +265,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return result;
     }
 
-    private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)
+    private void addServletPath(StringBuilder path, String xwikidb, XWikiContext context)
     {
         if (xwikidb == null) {
             xwikidb = context.getWikiId();
         }
 
-        String spath = context.getWiki().getServletPath(xwikidb, context);
-        newpath.append(spath);
+        path.append(context.getWiki().getServletPath(xwikidb, context));
     }
 
-    private void addAction(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)
+    private void addAction(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
         boolean showViewAction = context.getWiki().showViewAction(context);
 
@@ -284,45 +286,52 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             && this.actionLister.listActions().contains(
                 spaceReference.extractFirstReference(EntityType.SPACE).getName())))
         {
-            newpath.append(action);
-            newpath.append("/");
+            path.append(action).append("/");
         }
     }
 
-    private void addSpaces(StringBuffer newpath, EntityReference spaceReference, String action, XWikiContext context)
+    private void addSpaces(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
         for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
-            appendSpacePathSegment(newpath, reference, context);
+            appendSpacePathSegment(path, reference, context);
         }
     }
 
-    private void appendSpacePathSegment(StringBuffer newpath, EntityReference spaceReference, XWikiContext context)
+    private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference, XWikiContext context)
     {
-        newpath.append(encode(spaceReference.getName(), context));
-        newpath.append('/');
+        path.append(encode(spaceReference.getName(), context)).append('/');
     }
 
-    private void addName(StringBuffer newpath, String name, String action, XWikiContext context)
+    private void addName(StringBuilder path, String name, String action, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
             || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
-            newpath.append(encode(name, context));
+            path.append(encode(name, context));
         }
     }
 
-    protected void addFileName(StringBuffer newpath, String filename, XWikiContext context)
+    protected void addFileName(StringBuilder path, String fileName, XWikiContext context)
     {
-        addFileName(newpath, filename, true, context);
+        addFileName(path, fileName, true, context);
     }
 
-    protected void addFileName(StringBuffer newpath, String filename, boolean encode, XWikiContext context)
+    protected void addFileName(StringBuilder path, String fileName, boolean encode, XWikiContext context)
     {
-        newpath.append("/");
+        path.append("/");
         if (encode) {
-            newpath.append(encode(filename, context).replace("+", "%20"));
+            // Encode the given file name as a single path segment.
+            path.append(encode(fileName, context).replace("+", "%20"));
         } else {
-            newpath.append(filename);
+            try {
+                // The given file name is actually a file path and so we need to encode each path segment separately.
+                path.append(new URI(null, null, fileName, null));
+            } catch (URISyntaxException e) {
+                LOGGER.debug("Failed to encode the file path [{}]. Root cause: [{}]", fileName,
+                    ExceptionUtils.getRootCauseMessage(e));
+                // Use the raw file path as a fall-back.
+                path.append(fileName);
+            }
         }
     }
 
@@ -341,12 +350,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append("skins/");
-        newpath.append(skin);
-        addFileName(newpath, filename, false, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        path.append("skins/");
+        path.append(skin);
+        addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -356,18 +365,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
-        addAction(newpath, null, "skin", context);
-        addSpaces(newpath, spaceReference, "skin", context);
-        addName(newpath, name, "skin", context);
-        addFileName(newpath, filename, false, context);
+        addAction(path, null, "skin", context);
+        addSpaces(path, spaceReference, "skin", context);
+        addName(path, name, "skin", context);
+        addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -377,28 +386,28 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
+        StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
-            addServletPath(newpath, context.getWikiId(), context);
-            addAction(newpath, null, "skin", context);
+            addServletPath(path, context.getWikiId(), context);
+            addAction(path, null, "skin", context);
         }
-        newpath.append("resources");
-        addFileName(newpath, filename, false, context);
+        path.append("resources");
+        addFileName(path, filename, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
         }
     }
 
-    public URL createTemplateURL(String filename, XWikiContext context)
+    public URL createTemplateURL(String fileName, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append("templates");
-        addFileName(newpath, filename, false, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        path.append("templates");
+        addFileName(path, fileName, false, context);
         try {
-            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -429,24 +438,24 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
-        addAction(newpath, spaceReference, action, context);
-        addSpaces(newpath, spaceReference, action, context);
-        addName(newpath, name, action, context);
-        addFileName(newpath, filename, context);
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
+        addFileName(path, filename, context);
 
         if (!StringUtils.isEmpty(querystring)) {
-            newpath.append("?");
-            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append("?");
+            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (Exception e) {
             return null;
         }
@@ -490,16 +499,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         long recycleId, String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
 
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
-        addAction(newpath, spaceReference, action, context);
-        addSpaces(newpath, spaceReference, action, context);
-        addName(newpath, name, action, context);
-        addFileName(newpath, filename, context);
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
+        addFileName(path, filename, context);
 
         String qstring = "rev=" + revision;
         if (recycleId >= 0) {
@@ -508,11 +517,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             qstring += "&" + querystring;
         }
-        newpath.append("?");
-        newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
+        path.append("?");
+        path.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
 
         try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -558,21 +567,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     relativeURL = surl;
                 } else {
                     // Internal XWiki URL: convert to relative.
-                    StringBuffer sbuf = new StringBuffer(url.getPath());
+                    StringBuilder relativeURLBuilder = new StringBuilder(url.getPath());
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
-                        sbuf.append("?");
-                        sbuf.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
-                        // sbuf.append(querystring.replaceAll("&","&amp;"));
+                        relativeURLBuilder.append("?").append(
+                            StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
                     }
 
                     String anchor = url.getRef();
                     if (!StringUtils.isEmpty(anchor)) {
-                        sbuf.append("#");
-                        sbuf.append(anchor);
+                        relativeURLBuilder.append("#").append(anchor);
                     }
 
-                    relativeURL = sbuf.toString();
+                    relativeURL = relativeURLBuilder.toString();
                 }
             }
         } catch (Exception e) {

@@ -188,7 +188,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             getFilesystemExportContext().addNeededSkin(skin);
 
-            StringBuffer newPath = new StringBuffer("file://");
+            StringBuilder newPath = new StringBuilder("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -267,7 +267,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 followCssImports(file, spaces, name, wikiId, context);
             }
 
-            StringBuffer newPath = new StringBuffer("file://");
+            StringBuilder newPath = new StringBuilder("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -401,7 +401,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 }
             }
 
-            StringBuffer newPath = new StringBuffer("file://");
+            StringBuilder newPath = new StringBuilder("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -494,7 +494,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             fos.close();
         }
 
-        StringBuffer newPath = new StringBuffer("file://");
+        StringBuilder newPath = new StringBuilder("file://");
 
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
         adjustCSSPath(newPath);
@@ -548,7 +548,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return path;
     }
 
-    private void adjustCSSPath(StringBuffer path)
+    private void adjustCSSPath(StringBuilder path)
     {
         path.append(StringUtils.repeat("../", getFilesystemExportContext().getCSSParentLevel()));
     }

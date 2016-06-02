@@ -563,4 +563,12 @@ public class XWikiServletURLFactoryTest
         URL url = this.urlFactory.createURL("view.space2", "page", "view", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/view/space2/page"), url);
     }
+
+    @Test
+    public void createResourceURL() throws Exception
+    {
+        // Verify that the URL factory encodes each path segment.
+        URL url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e"), url);
+    }
 }

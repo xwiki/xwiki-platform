@@ -210,7 +210,8 @@
 &lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
 {{/html}}
-: ## Keep empty for HTML validation.
+: #* Keep empty for HTML validation. *#
+
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)
   ; $services.localization.render('panels.documentInformation.includesCount', [$pages.size()])

@@ -1,9 +1,5 @@
 #set ($editors = $xcontext.getEditorWysiwyg())
-#if ($editors)
-  #if ($services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
-    ## Load the rich text object properties using a compact WYSIWYG editor.
-    #wysiwyg_editProperties($doc $editors false)
-  #else
-    $response.sendRedirect($doc.getURL('edit', 'editor=wiki'))
-  #end
+#if ($editors && $services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
+  ## Load the rich text object properties using a compact WYSIWYG editor.
+  #wysiwyg_editProperties($doc $editors false)
 #end

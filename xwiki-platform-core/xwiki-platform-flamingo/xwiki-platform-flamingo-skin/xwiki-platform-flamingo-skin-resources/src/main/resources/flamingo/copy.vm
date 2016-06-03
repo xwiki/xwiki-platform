@@ -143,9 +143,10 @@
       #getNestedDocumentReference($sourcewiki $sourcespace $sourcepage $locale true $sourceDocReference)
       #getNestedDocumentReference($targetwiki $targetspace $targetpage $locale $terminal $targetDocReference)
       ##-----------------------------------------------------------
-      ## If the target document already exists, warn the user
+      ## If the target document already exists and is not a redirect placeholder, warn the user.
       ##-----------------------------------------------------------
-      #if ($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
+      #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
+          && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
         #warning($services.localization.render('core.copy.alreadyExists',
           [$services.model.serialize($targetDocReference, 'compactwiki')]))
         <form action="$xwiki.relativeRequestURL" id="copy" class="xform third" method="post">

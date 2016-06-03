@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -55,6 +56,13 @@ public class SaveAction extends PreviewAction
     public static final String ACTION_NAME = "save";
 
     protected static final String ASYNC_PARAM = "async";
+
+    /**
+     * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
+     * redirecting the user to a different page (e.g. when a page has been moved).
+     */
+    private static final EntityReference REDIRECT_CLASS = new EntityReference("RedirectClass", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
 
     public SaveAction()
     {
@@ -174,6 +182,12 @@ public class SaveAction extends PreviewAction
                 vcontext.put("editor", "inline");
                 return true;
             }
+        }
+
+        // Remove the redirect object if the save request doesn't update it. This allows users to easily overwrite
+        // redirect place-holders that are created when we move pages around.
+        if (tdoc.getXObject(REDIRECT_CLASS) != null && request.getParameter("XWiki.RedirectClass_0_location") == null) {
+            tdoc.removeXObjects(REDIRECT_CLASS);
         }
 
         // We get the comment to be used from the document

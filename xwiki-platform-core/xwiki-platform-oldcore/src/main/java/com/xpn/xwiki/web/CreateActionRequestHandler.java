@@ -124,6 +124,13 @@ public class CreateActionRequestHandler
         EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /**
+     * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
+     * redirecting the user to a different page (e.g. when a page has been moved).
+     */
+    private static final EntityReference REDIRECT_CLASS = new EntityReference("RedirectClass", EntityType.DOCUMENT,
+        new EntityReference("XWiki", EntityType.SPACE));
+
+    /**
      * The property name for the spaces in the template provider object.
      */
     private static final String SPACES_PROPERTY = "spaces";
@@ -584,8 +591,8 @@ public class CreateActionRequestHandler
      */
     private boolean isEmptyDocument(XWikiDocument document)
     {
-        // if it's a new document, it's fine
-        if (document.isNew()) {
+        // If it's a new document or a redirect placeholder, it's fine.
+        if (document.isNew() || document.getXObject(REDIRECT_CLASS) != null) {
             return true;
         }
 

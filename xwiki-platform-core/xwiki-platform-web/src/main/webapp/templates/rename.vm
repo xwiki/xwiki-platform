@@ -41,7 +41,8 @@
         #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL $terminal
           $newDocReference)
         #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
-        #if ($xwiki.exists($newDocReference))
+        ## Allow users to overwrite existing documents if they are redirect placeholders.
+        #if ($xwiki.exists($newDocReference) && !$xwiki.getDocument($newDocReference).getObject('XWiki.RedirectClass'))
           $response.setStatus(409)
           #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)},
             $xwiki.getURL($newDocReference)]))

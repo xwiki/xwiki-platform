@@ -121,14 +121,14 @@ public class CreateActionRequestHandler
      * The template provider class, to create documents from templates.
      */
     private static final EntityReference TEMPLATE_PROVIDER_CLASS = new EntityReference("TemplateProviderClass",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
      * redirecting the user to a different page (e.g. when a page has been moved).
      */
     private static final EntityReference REDIRECT_CLASS = new EntityReference("RedirectClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * The property name for the spaces in the template provider object.

@@ -308,7 +308,7 @@ public class MailStatus
     /**
      * Used by Hibernate to load that property from the database.
      *
-     * @param wiki see {@link #getWiki()()}
+     * @param wiki see {@link #getWiki()}
      */
     public void setWiki(String wiki)
     {

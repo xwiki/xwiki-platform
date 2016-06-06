@@ -31,6 +31,9 @@
   <name>XWiki Platform - Legacy - Model</name>
   <packaging>jar</packaging>
   <description>Legacy package for xwiki-platform-model</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.34</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

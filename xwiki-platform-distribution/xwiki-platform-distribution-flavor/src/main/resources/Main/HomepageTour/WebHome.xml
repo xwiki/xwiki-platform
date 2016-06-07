@@ -1369,16 +1369,14 @@ $services.localization.render('main.homepageTour.tourComplete.contentB', ['[[', 
     </property>
     <property>
       <code>/*This code should be removed when http://jira.xwiki.org/browse/TOUR-36 is fixed*/
-/*START Workaround for TOUR-36*/
-{{velocity}}
-/*Get colors from the current Color Theme*/
-#set($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
-#set($currentThemeDoc = $xwiki.getDocument($currentTheme))
-/*#set($currentThemeObj = $currentThemeDoc.getObject('FlamingoThemesCode.ThemeClass'))*/
-{{velocity}}
 /* In some places, the bootstrap-tour generates some unwanted results(same color for icons and the background of their wrapper container) 
    and for now this hack will solve it. However this should be fixed ASAP in our Tour Application.
 */
+/*START Workaround for TOUR-36*/
+/*Get colors from the current Color Theme*/
+#set($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
+#set($currentThemeDoc = $xwiki.getDocument($currentTheme))
+
 #docextrapanes {
   background-color: $currentThemeDoc.getValue('xwiki-page-content-bg');
 }

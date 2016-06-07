@@ -1555,8 +1555,8 @@ ${Msz}Mb##
                 <td class="xwiki-livetable-display-header-filter">
                 <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'>
                   <option value=''>$services.localization.render('platform.livetable.selectAll')</option>
-                  <option value='0'>$services.localization.render('platform.livetable.false')</option></option>
-                  <option value='1'>$services.localization.render('platform.livetable.true')</option>
+                  <option value='0'>$services.localization.render('no')</option></option>
+                  <option value='1'>$services.localization.render('yes')</option>
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)

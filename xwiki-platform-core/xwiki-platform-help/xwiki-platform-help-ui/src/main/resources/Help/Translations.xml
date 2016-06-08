@@ -42,7 +42,11 @@
   <content>help.tipsPanel.title=Tips
 help.tipsPanel.noTipMessage=No Tip available!
 help.tipsPanel.gettingStartedTip=If you're starting with XWiki, check out the [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].</content>
+help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.supportPanel.title=Need help?
+help.supportPanel.description=If you need help with XWiki you can contact:
+help.supportPanel.option1=Professional Support
+help.supportPanel.option2=Community Support</content>
   <object>
     <name>Help.Translations</name>
     <number>0</number>

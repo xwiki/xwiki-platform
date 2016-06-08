@@ -13,15 +13,23 @@
 }
 
 .edit_section a, .edit_section span {
-  background: transparent url(@xwiki-icon-edit-section) no-repeat left top;
+  background-color: @xwiki-page-content-bg;
+  background: @xwiki-page-content-bg linear-gradient(45deg, @xwiki-page-content-bg 50%, @xwiki-background-secondary-color 50%);
+  color: @text-color;
   height: 20px;
   margin: 0;
   overflow: hidden;
-  padding: 0;
+  padding: 3px 5px;
   position: absolute;
   right: 0;
-  text-indent: -1000em;
+  text-indent: 0;
   top: 0;
   visibility:visible;
   width: 20px;
+}
+
+.edit_section a:before {
+  content: @xwiki-icon-edit-section;
+  font: normal normal normal 12px/1 FontAwesome;
+  display: block;
 }

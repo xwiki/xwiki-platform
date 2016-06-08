@@ -57,6 +57,19 @@ var testUtils = (function() {
         }
       });
       return deferred.promise();
+    },
+
+    assertData: function(editor, inputData, expectedData, fullData) {
+      var deferred = jQuery.Deferred();
+      editor.setData(inputData, {
+        callback: function() {
+          editor.config.fullData = !!fullData;
+          expect(editor.getData()).toBe(expectedData);
+          editor.config.fullData = false;
+          deferred.resolve();
+        }
+      });
+      return deferred.promise();
     }
   };
 })();

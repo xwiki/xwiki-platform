@@ -34,6 +34,42 @@ describe('XWiki Filter Plugin for CKEditor', function() {
       '<p>before</p><div class="wikimodel-emptyline"></div><p>after</p>').then(done);
   });
 
+  it('converts empty lines to empty paragraphs and back', function(done) {
+    testUtils.assertData(editor, [
+      '<table>',
+        '<tbody>',
+          '<tr>',
+            '<td>',
+              '<p>abc</p>',
+              '<p><br/></p>',
+            '</td>',
+            '<td>',
+              '<p>before</p>',
+              '<p><br/></p>',
+              '<p>after</p>',
+            '</td>',
+          '</tr>',
+        '</tbody>',
+      '</table>'
+    ].join('\n'), [
+      '<table>',
+        '<tbody>',
+          '<tr>',
+            '<td>',
+              '<p>abc</p>',
+              '<p> </p>',
+            '</td>',
+            '<td>',
+              '<p>before</p>',
+              '<div class="wikimodel-emptyline"></div>',
+              '<p>after</p>',
+            '</td>',
+          '</tr>',
+        '</tbody>',
+      '</table>'
+    ].join('')).then(done);
+  });
+
   it('submits only significant content', function() {
     editor.config.fullPage = true;
     editor.config.fullData = false;

@@ -47,7 +47,10 @@
       var replaceEmptyParagraphsWithEmptyLines = {
         elements: {
           p: function(element) {
-            if (isEmptyParagraph(element)) {
+            var index = element.getIndex();
+            // Empty lines are used to separate blocks of content so normally they are not the first or the last child.
+            // See CKEDITOR-87: Table copy-pasted from a Word file into CKEditor does not display properly on page view.
+            if (index > 0 && index < element.parent.children.length - 1 && isEmptyParagraph(element)) {
               element.name = 'div';
               element.attributes['class'] = 'wikimodel-emptyline';
               // Skip the subsequent rules as we changed the element name.

@@ -78,7 +78,7 @@
     &lt;/div&gt;
   #end
   &lt;div class="row"&gt;
-    &lt;div id="editMeta" class="col-xs-12 col-md-7 col-md-pull-5"&gt;
+    &lt;div id="editMeta" class="col-xs-12 col-md-7"&gt;
       ## Add support for editing the page title (which is not available by default in Inline Form edit mode).
       #set ($editor = 'wiki')
       #template('editmeta.vm')
@@ -575,11 +575,12 @@ require(['jquery'], function($) {
 
 // Fix the layout to be consistent with the Wiki edit mode (tested with the Flamingo Skin).
 require(['jquery'], function($) {
-  // Remove the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
-  // edit mode. Note that we also remove the editMeta element because the edit sheet adds an element with the same id.
-  $('#document-title').parent('#editMeta').remove();
+  // Hide the page title because the edit form has an input field to edit the title. This is consistent with the Wiki
+  // edit mode. Remove the 'editMeta' id because the edit sheet adds an element with the same id.
+  // NOTE: In order to rely on Chrome's Back-Forward cache we must not remove or move form elements. We can only hide.
+  $('#document-title').parent('#editMeta').removeAttr('id').parent('.row').hide();
   // Move the content menu before the editMeta element so that they are displayed on the same row.
-  $('#contentmenu').parent('.col-md-5').addClass('col-md-push-7').insertBefore('#editMeta');
+  $('#editMeta').addClass('col-md-pull-5').before($('#contentmenu').parent('.col-md-5').addClass('col-md-push-7'));
 });</code>
     </property>
     <property>

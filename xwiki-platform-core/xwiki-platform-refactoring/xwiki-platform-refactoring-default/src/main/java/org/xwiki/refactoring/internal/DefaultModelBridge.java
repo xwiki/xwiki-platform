@@ -83,7 +83,10 @@ public class DefaultModelBridge implements ModelBridge
     private QueryManager queryManager;
 
     /**
-     * Used to serialize a space reference in order to query the child documents.
+     * Used to serialize a space reference in order to query the child documents and to serialize the redirect location.
+     * 
+     * @see #createRedirect(DocumentReference, DocumentReference)
+     * @see #getDocumentReferences(SpaceReference)
      */
     @Inject
     @Named("local")
@@ -213,7 +216,7 @@ public class DefaultModelBridge implements ModelBridge
             try {
                 XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
-                String location = this.compactEntityReferenceSerializer.serialize(newReference, oldReference);
+                String location = this.localEntityReferenceSerializer.serialize(newReference);
                 oldDocument.getXObject(redirectClassReference, number).setStringValue("location", location);
                 oldDocument.setHidden(true);
                 xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);

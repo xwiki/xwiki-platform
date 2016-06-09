@@ -38,7 +38,6 @@ import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer;
 import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -73,11 +72,6 @@ public class WatchListJob extends AbstractJob implements Job
     private BaseObject watchListJobObject;
 
     /**
-     * XWiki context.
-     */
-    private XWikiContext context;
-
-    /**
      * Caller component.
      */
     private WatchList watchlist;
@@ -92,11 +86,10 @@ public class WatchListJob extends AbstractJob implements Job
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
 
-        this.context = (XWikiContext) data.get("context");
         this.watchlist = Utils.getComponent(WatchList.class);
         this.schedulerJobObject = (BaseObject) data.get("xjob");
         this.watchListJobObject =
-            this.context.getWiki().getDocument(this.schedulerJobObject.getDocumentReference(), this.context)
+            getXWikiContext().getWiki().getDocument(this.schedulerJobObject.getDocumentReference(), getXWikiContext())
                 .getXObject(WatchListJobClassDocumentInitializer.DOCUMENT_REFERENCE);
     }
 
@@ -125,7 +118,7 @@ public class WatchListJob extends AbstractJob implements Job
     private void setPreviousFireTime() throws XWikiException
     {
         XWikiDocument doc =
-            this.context.getWiki().getDocument(this.watchListJobObject.getDocumentReference(), this.context);
+            getXWikiContext().getWiki().getDocument(this.watchListJobObject.getDocumentReference(), getXWikiContext());
 
         this.watchListJobObject.setDateValue(WatchListJobClassDocumentInitializer.LAST_FIRE_TIME_FIELD, new Date());
 
@@ -133,7 +126,7 @@ public class WatchListJob extends AbstractJob implements Job
         doc.setMetaDataDirty(false);
         doc.setContentDirty(false);
 
-        this.context.getWiki().saveDocument(doc, "Updated last fire time", true, this.context);
+        getXWikiContext().getWiki().saveDocument(doc, "Updated last fire time", true, getXWikiContext());
     }
 
     /**

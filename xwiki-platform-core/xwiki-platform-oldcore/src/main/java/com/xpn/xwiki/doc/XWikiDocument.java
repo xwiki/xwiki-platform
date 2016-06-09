@@ -1132,15 +1132,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getRenderingContext().getTargetSyntax();
     }
 
-    public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
+    /**
+     * Parse, execute and render the document.
+     * 
+     * @param targetSyntax the syntax to use to render the document
+     * @param executionContextIsolated see {@link DocumentDisplayerParameters#isExecutionContextIsolated()}
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param transformationContextRestricted see
+     *            {@link DocumentDisplayerParameters#isTransformationContextRestricted()}
+     * @return the result of the document execution rendered in the passed syntax
+     * @throws XWikiException when failing to display the document
+     */
+    private String display(Syntax targetSyntax, boolean executionContextIsolated, boolean transformationContextIsolated,
+        boolean transformationContextRestricted) throws XWikiException
     {
-        return getRenderedContent(targetSyntax, true, context);
-    }
-
-    public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context)
-        throws XWikiException
-    {
-        // Note: We are currently duplicating code from the other getRendered signature because some calling
+        // Note: We are currently duplicating code from getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
@@ -1154,27 +1160,46 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent",
                 "Get translated content");
 
-            XWikiDocument tdoc = getTranslatedDocument(context);
+            XWikiContext xcontext = getXWikiContext();
+
+            XWikiDocument tdoc = getTranslatedDocument(xcontext);
             String translatedContent = tdoc.getContent();
 
             getProgress().startStep(getDocumentReference(), "document.progress.render.cache",
                 "Try to get content from the cache");
 
             String renderedContent =
-                getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, context);
+                getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, xcontext);
 
             if (renderedContent == null) {
                 getProgress().startStep(getDocumentReference(), "document.progress.render.execute", "Execute content");
 
-                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-                parameters.setTransformationContextIsolated(isolateVelocityMacros);
-                // Render the translated content (matching the current language) using this document's syntax.
-                parameters.setContentTranslated(tdoc != this);
-                parameters.setTargetSyntax(targetSyntax);
-                XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
-                renderedContent = renderXDOM(contentXDOM, targetSyntax);
+                // Make sure the context secure document is the current document so that it's executed with its own
+                // rights
+                Object currrentSdoc = xcontext.get("sdoc");
+                try {
+                    xcontext.put("sdoc", this);
+
+                    // Configure display
+                    DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                    parameters.setExecutionContextIsolated(executionContextIsolated);
+                    parameters.setTransformationContextIsolated(transformationContextIsolated);
+                    parameters.setTransformationContextRestricted(transformationContextRestricted);
+                    // Render the translated content (matching the current language) using this document's syntax.
+                    parameters.setContentTranslated(tdoc != this);
+                    parameters.setTargetSyntax(targetSyntax);
+
+                    // Execute display
+                    XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
+
+                    // Render the result
+                    renderedContent = renderXDOM(contentXDOM, targetSyntax);
+                } finally {
+                    xcontext.put("sdoc", currrentSdoc);
+                }
+
                 getRenderingCache().setRenderedContent(getDocumentReference(), translatedContent, renderedContent,
-                    context);
+                    xcontext);
             }
 
             return renderedContent;
@@ -1182,6 +1207,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getProgress().popLevelProgress(getDocumentReference());
             getProgress().endStep(getDocumentReference());
         }
+    }
+
+    public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, true, context);
+    }
+
+    public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context)
+        throws XWikiException
+    {
+        return display(targetSyntax, false, isolateVelocityMacros, false);
     }
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
@@ -1220,6 +1256,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 2.0M3
      */
@@ -1233,53 +1270,28 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 4.2M1
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
         boolean restrictedTransformationContext, XWikiContext context)
     {
-        String result = getRenderingCache().getRenderedContent(getDocumentReference(), text, context);
+        try {
+            // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
+            XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
+            fakeDocument.setSyntax(getSyntaxFactory().createSyntaxFromIdString(sourceSyntaxId));
+            fakeDocument.setContent(text);
 
-        if (result == null) {
-            Map<String, Object> backup = null;
-            try {
-                // We have to render the given text in the context of this document. Check if this document is already
-                // on the context (same Java object reference). We don't check if the document references are equal
-                // because this document can have temporary changes that are not present on the context document even if
-                // it has the same document reference.
-                if (context.getDoc() != this) {
-                    backup = new HashMap<String, Object>();
-                    backupContext(backup, context);
-                    setAsContextDoc(context);
-                }
-
-                // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
-                XWikiDocument fakeDocument = new XWikiDocument(getDocumentReference());
-                fakeDocument.setSyntax(getSyntaxFactory().createSyntaxFromIdString(sourceSyntaxId));
-                fakeDocument.setContent(text);
-
-                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-                parameters.setTransformationContextIsolated(true);
-                parameters.setTransformationContextRestricted(restrictedTransformationContext);
-                parameters.setTargetSyntax(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId));
-                XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
-                result = renderXDOM(contentXDOM, getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId));
-
-                getRenderingCache().setRenderedContent(getDocumentReference(), text, result, context);
-            } catch (Exception e) {
-                // Failed to render for some reason. This method should normally throw an exception but this
-                // requires changing the signature of calling methods too.
-                LOGGER.warn("Failed to render content [" + text + "]", e);
-                result = "";
-            } finally {
-                if (backup != null) {
-                    restoreContext(backup, context);
-                }
-            }
+            return display(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), true, true,
+                restrictedTransformationContext);
+        } catch (Exception e) {
+            // Failed to render for some reason. This method should normally throw an exception but this
+            // requires changing the signature of calling methods too.
+            LOGGER.warn("Failed to render content [" + text + "]", e);
         }
 
-        return result;
+        return "";
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException

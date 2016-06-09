@@ -1680,6 +1680,7 @@ $xwiki.ssx.use('Main.Activity')##
   ##
   ## Get distinct pages with activity
   ## -------------------------------------------------------------------
+  #set ($noEventsShown = true)
   #set ($pages = $xwiki.activitystream.searchDailyPages("$!filterClause", $filterParameters, $aEntries, 0))
   #if ($pages.size() &gt; 0)
     #foreach ($page in $pages)
@@ -1710,13 +1711,15 @@ $xwiki.ssx.use('Main.Activity')##
           #isPageEntryExpandable()
           #getUniqueEventUsers()
           #displayEvents()
+          #set($noEventsShown = false)
         #end
       #end
     #end
     #if ($closeList)## close the last event list
       &lt;/ul&gt;
     #end
-  #else
+  #end
+  #if ($noEventsShown)
     &lt;span class="noitems"&gt;$services.localization.render('xe.activity.noentries')&lt;/span&gt;
   #end
   ##

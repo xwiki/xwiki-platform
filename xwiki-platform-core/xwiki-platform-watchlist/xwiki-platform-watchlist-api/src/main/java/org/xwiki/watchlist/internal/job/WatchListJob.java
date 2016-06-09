@@ -31,9 +31,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.watchlist.internal.DefaultWatchListNotifier;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 import org.xwiki.watchlist.internal.api.WatchList;
@@ -94,49 +91,13 @@ public class WatchListJob extends AbstractJob implements Job
     public void init(JobExecutionContext jobContext) throws Exception
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
-        // clone the context to make sure we have a new one per run
-        this.context = ((XWikiContext) data.get("context")).clone();
-        // clean up the database connections
-        this.context.getWiki().getStore().cleanUp(this.context);
+
+        this.context = (XWikiContext) data.get("context");
         this.watchlist = Utils.getComponent(WatchList.class);
         this.schedulerJobObject = (BaseObject) data.get("xjob");
         this.watchListJobObject =
             this.context.getWiki().getDocument(this.schedulerJobObject.getDocumentReference(), this.context)
                 .getXObject(WatchListJobClassDocumentInitializer.DOCUMENT_REFERENCE);
-        initializeComponents(this.context);
-    }
-
-    /**
-     * Initialize container context.
-     *
-     * @param xcontext the XWiki context
-     * @throws Exception if the execution context initialization fails
-     */
-    protected void initializeComponents(XWikiContext xcontext) throws Exception
-    {
-        try {
-            ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
-            ExecutionContext econtext = new ExecutionContext();
-
-            // Bridge with old XWiki Context, required for old code.
-            xcontext.declareInExecutionContext(econtext);
-
-            ecim.initialize(econtext);
-        } catch (Exception e) {
-            throw new Exception("Failed to initialize Execution Context", e);
-        }
-    }
-
-    /**
-     * Clean the container context.
-     */
-    protected void cleanupComponents()
-    {
-        Execution execution = Utils.getComponent(Execution.class);
-
-        // We must ensure we clean the ThreadLocal variables located in the Execution component as otherwise we will
-        // have a potential memory leak.
-        execution.removeContext();
     }
 
     /**
@@ -244,9 +205,6 @@ public class WatchListJob extends AbstractJob implements Job
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
             LOGGER.error("Exception while running job", e);
-        } finally {
-            this.context.getWiki().getStore().cleanUp(this.context);
-            cleanupComponents();
         }
     }
 }

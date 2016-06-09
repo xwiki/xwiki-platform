@@ -58,8 +58,9 @@ public abstract class AbstractJob implements Job
 
             ExecutionContext context = new ExecutionContext();
 
-            // Bridge with old XWiki Context, required for old code.
-            context.setProperty("xwikicontext", xwikiContext);
+            // Bridge with old XWiki Context, required for old code
+            // Clone the XWikiContex to have a new one for each run
+            xwikiContext.clone().declareInExecutionContext(context);
 
             ecim.initialize(context);
         } catch (ExecutionContextException e) {

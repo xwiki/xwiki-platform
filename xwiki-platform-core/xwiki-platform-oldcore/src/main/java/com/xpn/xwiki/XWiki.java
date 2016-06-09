@@ -2099,14 +2099,12 @@ public class XWiki implements EventListener
 
     public String getSkinPreference(String prefname, String default_value, XWikiContext context)
     {
-        WikiSkin wikiSkin = null;
-
         for (Skin skin = getInternalSkinManager().getCurrentSkin(true); skin != null; skin = skin.getParent()) {
             if (skin instanceof WikiSkin) {
                 String value = getWikiSkinUtils().getSkinProperty(skin.getId(), prefname);
 
                 // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-                if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
+                if (!StringUtils.isEmpty(value) && !NO_VALUE.equals(value)) {
                     return value;
                 }
             }

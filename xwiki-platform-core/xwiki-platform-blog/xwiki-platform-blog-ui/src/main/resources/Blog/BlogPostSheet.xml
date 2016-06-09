@@ -57,6 +57,12 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
   #displayBlog([$tdoc] 'single' false false)
 #else
+  #if ("$!request.title" != '')
+    ## Use the page title specified on the request, if available, as blog post title. This is needed for instance when
+    ## we create the blog post using the Create Page wizard with the blog post template provider (the user is specifying
+    ## the page title).
+    #set ($discard = $entryObj.set('title', $request.title))
+  #end
   ; {{translation key='xe.blog.sheet.title'/}}
   : $doc.display('title', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.content'/}}

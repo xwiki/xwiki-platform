@@ -373,6 +373,16 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }
 
+    public void testGetRenderedContentRights() throws XWikiException
+    {
+        getContext().remove("sdoc");
+
+        this.document.setContent("{{velocity}}$xcontext.sdoc{{/velocity}}");
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+
+        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
+    }
+
     public void testGetRenderedContentWithSourceSyntax()
     {
         this.document.setSyntax(Syntax.XWIKI_1_0);

@@ -630,11 +630,11 @@
         #end
       #else
         #set ($filterValues = $request.getParameterValues($colname))
-	#set ($multilistsize = $filterValues.size())
-	#if ($multilistsize &gt; 1)
-	  #set($filterValue=$filterValues)
-	#end
-	#livetable_filterProperty($colName $filterValue $multilistsize)
+        #set ($multilistsize = $filterValues.size())
+        #if ($multilistsize &gt; 1)
+          #set($filterValue=$filterValues)
+        #end
+        #livetable_filterProperty($colName $filterValue $multilistsize)
       #end
     #end
   #end

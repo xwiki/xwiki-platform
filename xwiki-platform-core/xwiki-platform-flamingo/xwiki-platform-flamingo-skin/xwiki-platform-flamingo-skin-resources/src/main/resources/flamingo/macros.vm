@@ -282,7 +282,7 @@
                   class='xwiki-livetable-multilist' multiple='multiple'>
                 #else
                   ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
-                  <option disabled>────</option>
+                  <option disabled='disabled'>────</option>
                 #end
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)

@@ -1282,7 +1282,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             fakeDocument.setSyntax(getSyntaxFactory().createSyntaxFromIdString(sourceSyntaxId));
             fakeDocument.setContent(text);
 
-            return display(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), true, true,
+            return fakeDocument.display(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), true, true,
                 restrictedTransformationContext);
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this

@@ -208,14 +208,6 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #if ($request.debug) ##Mode Debug
-    Final queries computed:
-    \$sql: "$sql" 
-    \$className: $className 
-    \$sqlParams: $sqlParams
-    \$tagsMatchingParams: $tagsMatchingParams
-    \$allMatchingParams: $allMatchingParams
-   #end
   #if($orderSql != '')
     #set($sql = "$sql $!{orderSql}")
   #end

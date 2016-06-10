@@ -28,6 +28,6 @@
  *#
 #macro(displayDrawerActivator)
   <li>
-    <a class="icon-navbar drawer-toggle" id="tmDrawerActivator"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+    <a class="icon-navbar drawer-toggle" id="tmDrawerActivator" title="$services.localization.render('core.menu.drawer')"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
   </li>
 #end

@@ -208,12 +208,18 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
+  #if ($request.debug) ##Mode Debug
+    Final queries computed:
+    \$sql: "$sql" 
+    \$className: $className 
+    \$sqlParams: $sqlParams
+    \$tagsMatchingParams: $tagsMatchingParams
+    \$allMatchingParams: $allMatchingParams
+   #end
   #if($orderSql != '')
     #set($sql = "$sql $!{orderSql}")
   #end
 #end
-
-
 #**
  * Adds TagCloud information to the JSON returned by a live table data call.
  * NOTE: This macro uses Velocity variables defined by gridresultwithfilter_buildQuery.
@@ -623,7 +629,12 @@
           #set ($discard = $whereParams.add("%$filterValue%"))
         #end
       #else
-        #livetable_filterProperty($colName $filterValue)
+        #set ($filterValues = $request.getParameterValues($colname))
+	#set ($multilistsize = $filterValues.size())
+	#if ($multilistsize > 1)
+	  #set($filterValue=$filterValues)
+	#end
+	#livetable_filterProperty($colName $filterValue $multilistsize)
       #end
     #end
   #end
@@ -764,28 +775,35 @@
       #set ($matchType = 'partial')
     #end
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType)")
+  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $multilistsize)")
   #set ($whereSql = "${whereSql} and $filterQuery.trim()")
-  #livetable_addFilterParam($filterValue $matchType $whereParams)
+  #livetable_addFilterParam($filterValue $matchType $whereParams $multilistsize)
 #end
 
 
-#macro (livetable_getFilterQuery $column $matchType $isList)
+#macro (livetable_getFilterQuery $column $matchType $isList $multilistsize)
   #if ($matchType == 'partial' || $matchType == 'prefix')
     upper($column) like upper(?)
   #elseif ($isList)
     ? in elements($column)
+  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+    $column in (? , ?)
+    $column in ( $stringtool.repeat('?', ', ', $multilistsize) )
   #else
     $column = ?
   #end
 #end
 
 
-#macro (livetable_addFilterParam $filterValue $matchType $params)
+#macro (livetable_addFilterParam $filterValue $matchType $params $multilistsize)
   #if ($matchType == 'partial')
     #set ($discard = $params.add("%$!filterValue%"))
   #elseif ($matchType == 'prefix')
     #set ($discard = $params.add("$!filterValue%"))
+  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+    #foreach ($filterValue in $filterValues)
+      #set ($discard = $params.add($filterValue))
+    #end
   #else
     #set ($discard = $params.add($filterValue))
   #end

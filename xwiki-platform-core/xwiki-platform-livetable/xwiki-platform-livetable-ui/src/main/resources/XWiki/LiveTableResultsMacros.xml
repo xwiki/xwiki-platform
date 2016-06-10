@@ -631,7 +631,7 @@
       #else
         #set ($filterValues = $request.getParameterValues($colname))
 	#set ($multilistsize = $filterValues.size())
-	#if ($multilistsize > 1)
+	#if ($multilistsize &gt; 1)
 	  #set($filterValue=$filterValues)
 	#end
 	#livetable_filterProperty($colName $filterValue $multilistsize)
@@ -786,7 +786,7 @@
     upper($column) like upper(?)
   #elseif ($isList)
     ? in elements($column)
-  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+  #elseif (($multilistsize &gt; 1) &amp;&amp; ($matchType == 'exact'))
     $column in (? , ?)
     $column in ( $stringtool.repeat('?', ', ', $multilistsize) )
   #else
@@ -800,7 +800,7 @@
     #set ($discard = $params.add("%$!filterValue%"))
   #elseif ($matchType == 'prefix')
     #set ($discard = $params.add("$!filterValue%"))
-  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+  #elseif (($multilistsize &gt; 1) &amp;&amp; ($matchType == 'exact'))
     #foreach ($filterValue in $filterValues)
       #set ($discard = $params.add($filterValue))
     #end

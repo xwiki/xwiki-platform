@@ -84,8 +84,6 @@ public class DefaultModelBridge implements ModelBridge
 
     /**
      * Used to serialize a space reference in order to query the child documents.
-     * 
-     * @see #getDocumentReferences(SpaceReference)
      */
     @Inject
     @Named("local")

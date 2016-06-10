@@ -1140,11 +1140,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
      * @param transformationContextRestricted see
      *            {@link DocumentDisplayerParameters#isTransformationContextRestricted()}
+     * @param translate get translated content of the document
      * @return the result of the document execution rendered in the passed syntax
      * @throws XWikiException when failing to display the document
      */
     private String display(Syntax targetSyntax, boolean executionContextIsolated, boolean transformationContextIsolated,
-        boolean transformationContextRestricted) throws XWikiException
+        boolean transformationContextRestricted, boolean translate) throws XWikiException
     {
         // Note: We are currently duplicating code from getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
@@ -1162,7 +1163,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             XWikiContext xcontext = getXWikiContext();
 
-            XWikiDocument tdoc = getTranslatedDocument(xcontext);
+            XWikiDocument tdoc = translate ? getTranslatedDocument(xcontext) : this;
             String translatedContent = tdoc.getContent();
 
             getProgress().startStep(getDocumentReference(), "document.progress.render.cache",
@@ -1217,7 +1218,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context)
         throws XWikiException
     {
-        return display(targetSyntax, false, isolateVelocityMacros, false);
+        return display(targetSyntax, false, isolateVelocityMacros, false, true);
     }
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
@@ -1284,7 +1285,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             fakeDocument.setContent(text);
 
             return fakeDocument.display(getSyntaxFactory().createSyntaxFromIdString(targetSyntaxId), true, true,
-                restrictedTransformationContext);
+                restrictedTransformationContext, false);
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.

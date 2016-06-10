@@ -786,7 +786,7 @@
     upper($column) like upper(?)
   #elseif ($isList)
     ? in elements($column)
-  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+  #elseif (($multilistsize > 1) &amp;&amp; ($matchType == 'exact'))
     $column in (? , ?)
     $column in ( $stringtool.repeat('?', ', ', $multilistsize) )
   #else
@@ -800,7 +800,7 @@
     #set ($discard = $params.add("%$!filterValue%"))
   #elseif ($matchType == 'prefix')
     #set ($discard = $params.add("$!filterValue%"))
-  #elseif (($multilistsize > 1) && ($matchType == 'exact'))
+  #elseif (($multilistsize > 1) &amp;&amp; ($matchType == 'exact'))
     #foreach ($filterValue in $filterValues)
       #set ($discard = $params.add($filterValue))
     #end

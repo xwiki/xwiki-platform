@@ -33,7 +33,7 @@
   <date>1321284472000</date>
   <contentUpdateDate>1321284472000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('xe.home.title')</title>
+  <title>Home</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>

@@ -2777,10 +2777,10 @@ Your account on ${wikiname} has been successfully activated. You can now login a
       <languages>en</languages>
     </property>
     <property>
-      <leftPanels>Panels.Applications</leftPanels>
+      <leftPanels>Panels.Applications,Panels.Navigation</leftPanels>
     </property>
     <property>
-      <leftPanelsWidth>Small</leftPanelsWidth>
+      <leftPanelsWidth>Medium</leftPanelsWidth>
     </property>
     <property>
       <meta>&lt;meta name="revisit-after" content="7 days" /&gt;

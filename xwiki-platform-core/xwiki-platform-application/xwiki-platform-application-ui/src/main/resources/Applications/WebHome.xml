@@ -40,4 +40,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
+  <content>{{include reference="Applications.Macros" /}}
+
+{{velocity}}
+#set ($discard = $xwiki.ssx.use('Panels.Applications'))
+{{html}}
+&lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+  #displayAppPanelEntries('org.xwiki.platform.panels.Applications', '')
+&lt;/ul&gt;
+{{/html}}
+
+{{/velocity}}
+</content>
 </xwikidoc>

@@ -36,7 +36,7 @@
   <title>Home</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>{{box cssClass="floatinginfobox"}}{{html clean="false"}}&lt;iframe width="100%" height="169px" src="https://www.youtube.com/embed/9QTWrZ7OfzI" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;{{/html}}
 {{/box}}
@@ -64,7 +64,7 @@ You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content an
 |(((
 = Extend your wiki =
 
-To extend the power and functionalities of your wiki with the features that //you// need, head over to the [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||querystring="&amp;editor=globaladmin&amp;section=XWiki.AddExtensions"]] where you can search for and install extensions.
+To extend the power and functionalities of your wiki with the features that //you// need, head over to the {{velocity}}[[Extension Manager>>path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')]]{{/velocity}} where you can search for and install extensions.
 
 To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
 )))|(((

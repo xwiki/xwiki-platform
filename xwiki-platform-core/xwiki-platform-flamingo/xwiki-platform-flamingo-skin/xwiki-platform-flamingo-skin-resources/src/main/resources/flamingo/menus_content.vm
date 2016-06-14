@@ -46,11 +46,11 @@
  *
  * @since 7.3M2
  *#
-#macro(displayMenu $id $icon $content)
+#macro(displayMenu $id $icon $content $titleKey)
   #set ($content = $content.toString())
   #if ($stringtool.isNotBlank($content))
     <div class="dropdown" id="$id">
-      <a href="" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-$icon"></span></a>
+      <a href="" data-toggle="dropdown" role="button" title="$services.localization.render(${titleKey})"><span class="glyphicon glyphicon-$icon"></span></a>
       <ul class="dropdown-menu">
         $content
       </ul>
@@ -107,7 +107,7 @@
  *#
 #macro(displayCreateButton)
   <div class="dropdown" id="tmCreate">
-    <a href="$doc.getURL('create')" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+    <a href="$doc.getURL('create')" role="button" title="$services.localization.render('core.menu.create')"><span class="glyphicon glyphicon-plus"></span></a>
   </div>
 #end
 
@@ -181,7 +181,7 @@
   ## Display the menu
   ##
   <div class="dropdown" id="tmEdit">
-    <a href="$defaultEditURL" #if ($menuHasContent)data-toggle="dropdown"#end role="button"><span class="glyphicon glyphicon-pencil"></span></a>
+    <a href="$defaultEditURL" #if ($menuHasContent)data-toggle="dropdown"#end role="button" title="$services.localization.render('core.menu.edit')"><span class="glyphicon glyphicon-pencil"></span></a>
     #if ($menuHasContent)
       <ul class="dropdown-menu">
         $menuContent
@@ -217,7 +217,7 @@
   ##
   ## Display the menu only if there is some content
   ##
-  #displayMenu('tmAdminActions', 'cog', $menuContent)
+  #displayMenu('tmAdminActions', 'cog', $menuContent, 'core.menu.actions')
 #end
 
 #**
@@ -282,7 +282,7 @@
   ##
   ## Display the menu if it has some content
   ##
-  #displayMenu('tmMoreActions', 'option-vertical', $menuContent)
+  #displayMenu('tmMoreActions', 'option-vertical', $menuContent, 'core.menu.moreactions')
 #end
 
 #**

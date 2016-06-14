@@ -30,8 +30,8 @@
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1465822369000</date>
-  <contentUpdateDate>1465822369000</contentUpdateDate>
+  <date>1465895028000</date>
+  <contentUpdateDate>1465895028000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <comment/>
@@ -622,9 +622,6 @@
       #else
         #set ($filterValues = $request.getParameterValues($colname))
         #set ($multilistsize = $filterValues.size())
-        #if ($multilistsize &gt; 1)
-          #set($filterValue=$filterValues)
-        #end
         #livetable_filterProperty($colName $filterValue $multilistsize)
       #end
     #end

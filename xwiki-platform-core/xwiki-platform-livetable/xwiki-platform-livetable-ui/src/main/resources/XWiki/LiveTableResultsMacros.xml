@@ -30,8 +30,8 @@
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1465895028000</date>
-  <contentUpdateDate>1465895028000</contentUpdateDate>
+  <date>1465980426000</date>
+  <contentUpdateDate>1465980426000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <comment/>
@@ -621,8 +621,8 @@
         #end
       #else
         #set ($filterValues = $request.getParameterValues($colname))
-        #set ($multilistsize = $filterValues.size())
-        #livetable_filterProperty($colName $filterValue $multilistsize)
+        #set ($valueCount = $filterValues.size())
+        #livetable_filterProperty($colName $filterValue $valueCount)
       #end
     #end
   #end
@@ -763,34 +763,32 @@
       #set ($matchType = 'partial')
     #end
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $multilistsize)")
+  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount)")
   #set ($whereSql = "${whereSql} and $filterQuery.trim()")
-  #livetable_addFilterParam($filterValue $matchType $whereParams $multilistsize)
+  #foreach ($filterValue in $filterValues)
+    #livetable_addFilterParam($filterValue $matchType $whereParams)
+  #end
 #end
 
 
-#macro (livetable_getFilterQuery $column $matchType $isList $multilistsize)
+#macro (livetable_getFilterQuery $column $matchType $isList $valueCount)
   #if ($matchType == 'partial' || $matchType == 'prefix')
     upper($column) like upper(?)
   #elseif ($isList)
     ? in elements($column)
-  #elseif (($multilistsize &gt; 1) &amp;&amp; ($matchType == 'exact'))
-    $column in ( $stringtool.repeat('?', ', ', $multilistsize) )
+  #elseif (($valueCount &gt; 1) &amp;&amp; ($matchType == 'exact'))
+    $column in ( $stringtool.repeat('?', ', ', $valueCount) )
   #else
     $column = ?
   #end
 #end
 
 
-#macro (livetable_addFilterParam $filterValue $matchType $params $multilistsize)
+#macro (livetable_addFilterParam $filterValue $matchType $params)
   #if ($matchType == 'partial')
     #set ($discard = $params.add("%$!filterValue%"))
   #elseif ($matchType == 'prefix')
     #set ($discard = $params.add("$!filterValue%"))
-  #elseif (($multilistsize &gt; 1) &amp;&amp; ($matchType == 'exact'))
-    #foreach ($filterValue in $filterValues)
-      #set ($discard = $params.add($filterValue))
-    #end
   #else
     #set ($discard = $params.add($filterValue))
   #end

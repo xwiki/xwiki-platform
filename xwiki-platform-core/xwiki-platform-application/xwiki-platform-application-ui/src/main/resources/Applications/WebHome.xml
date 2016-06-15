@@ -142,7 +142,7 @@
 #set ($discard = $xwiki.ssx.use('Panels.Applications'))
 {{html}}
   &lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
-    #displayAppPanelEntries('org.xwiki.platform.panels.Applications', '')
+    #displayAppEntries('org.xwiki.platform.panels.Applications', '')
   &lt;/ul&gt;
 {{/html}}
 

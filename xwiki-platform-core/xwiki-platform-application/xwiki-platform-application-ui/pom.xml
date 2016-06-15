@@ -30,23 +30,5 @@
   <artifactId>xwiki-platform-application-ui</artifactId>
   <name>XWiki Platform - Application - UI</name>
   <packaging>xar</packaging>
-  <description>Contains the Applications Index</description>
-  <build>
-    <!-- Needed to add support for the XAR packaging -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
-    <plugins>
-      <!-- The XAR packaging uses the XAR plugin and thus we need to define what version to use -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <version>${commons.version}</version>
-      </plugin>
-    </plugins>
-  </build>
+  <description>Displays the list of installed Applications</description>
 </project>

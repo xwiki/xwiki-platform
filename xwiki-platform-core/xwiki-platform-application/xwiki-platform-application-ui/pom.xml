@@ -31,4 +31,22 @@
   <name>XWiki Platform - Application - UI</name>
   <packaging>xar</packaging>
   <description>Displays the list of installed Applications</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Application Index Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
 </project>

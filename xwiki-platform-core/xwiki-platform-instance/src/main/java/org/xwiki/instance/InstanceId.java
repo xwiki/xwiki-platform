@@ -82,6 +82,20 @@ public class InstanceId
     @Override
     public boolean equals(Object o)
     {
-        return this.uuid.equals(o);
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || !(o instanceof InstanceId)) {
+            return false;
+        }
+
+        InstanceId instanceId = (InstanceId) o;
+
+        if (uuid == null) {
+            return instanceId.uuid == null;
+        }
+
+        return uuid.equals(instanceId.uuid);
     }
 }

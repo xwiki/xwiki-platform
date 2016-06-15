@@ -1447,7 +1447,7 @@ ${Msz}Mb##
               #else
                 #set($isFilterable = false)
               #end
-              #if("$!colprop.type" == 'list' && $isFilterable)
+              #if(("$!colprop.type" == 'list' || "$!colprop.type" == 'multilist' )&& $isFilterable)
                 <td class="xwiki-livetable-display-header-filter">
                 #if($colprop.get('class'))
                   #set($propClassName = $colprop.get('class'))
@@ -1457,7 +1457,13 @@ ${Msz}Mb##
                 #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
                 #set($list = '')
                 #set($list = $class.get($colname).getListValues())
-                <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
+                <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'
+                #if("$!colprop.type" == 'multilist')
+                  class='xwiki-livetable-multilist' multiple='multiple' size='1'>
+                #else
+                  ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
+                  <option disabled='disabled'>────</option>
+                #end
                 #set($map = $class.get($colname).getMapValues())
                 #foreach($listitem in $list)
                   #set ($l10n_key = "${propClassName}_${colname}_${listitem}")

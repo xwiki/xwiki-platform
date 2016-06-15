@@ -48,7 +48,7 @@
       'xhtml/1.0'))
   #end
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")" title="$escapetool.xml($params.label)"&gt;
+    &lt;a href="$xwiki.getURL($params.target, 'view', $!{params.targetQueryString})" title="$escapetool.xml($params.label)"&gt;
       &lt;span class="application-img"&gt;$icon&lt;/span&gt;
       &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
     &lt;/a&gt;

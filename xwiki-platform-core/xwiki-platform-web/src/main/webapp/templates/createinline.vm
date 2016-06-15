@@ -147,11 +147,15 @@
         ## Display the template provider field option in the form.
         ##
         #set ($inputId = "xwiki-create-form-${velocityCount}")
+        #set ($icon = $tpobj.getValue('icon'))
+        #if ("$!icon" == '')
+          #set($icon = 'file-white')
+        #end
         #set ($discard = $templateOptions.add({
-          'name': $services.localization.render($tpobj.getProperty('name').value),
+          'name': $services.localization.render($tpobj.getValue('name')),
           'value': "$tpdocRef",
-          'description': '',
-          'icon':'file-white',
+          'description': $services.localization.render($tpobj.getValue('description')),
+          'icon': $icon,
           'data': {
             'allowed-spaces': $jsAllowedSpacesArray,
             'allowed-spaces-message': $message,

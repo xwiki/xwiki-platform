@@ -46,8 +46,13 @@ public class ApplicationsPanelAdministrationTest extends AbstractTest
         goToAppPanelAdminPage();
 
         ApplicationsPanelAdministrationPage appPanelAdminPage = new ApplicationsPanelAdministrationPage();
-        assertFalse(appPanelAdminPage.getApplicationsInBar().isEmpty());
-        assertTrue(appPanelAdminPage.getApplicationsNotInBar().isEmpty());
+        assertTrue(appPanelAdminPage.getApplicationsInBar().isEmpty());
+        assertFalse(appPanelAdminPage.getApplicationsNotInBar().isEmpty());
+
+        // Add an app from the bar
+        appPanelAdminPage.addApplicationInBar("Panels");
+        assertTrue(appPanelAdminPage.getApplicationsInBar().contains("Panels"));
+        assertFalse(appPanelAdminPage.getApplicationsNotInBar().contains("Panels"));
         
         // Remove an app from the bar
         appPanelAdminPage.removeApplicationFromBar("Panels");
@@ -56,13 +61,8 @@ public class ApplicationsPanelAdministrationTest extends AbstractTest
         
         // Try the "revert" action
         appPanelAdminPage.revert();
-        assertFalse(appPanelAdminPage.getApplicationsInBar().isEmpty());
-        assertTrue(appPanelAdminPage.getApplicationsNotInBar().isEmpty());
-
-        // Remove an app from the bar
-        appPanelAdminPage.removeApplicationFromBar("Panels");
-        assertFalse(appPanelAdminPage.getApplicationsInBar().contains("Panels"));
-        assertTrue(appPanelAdminPage.getApplicationsNotInBar().contains("Panels"));
+        assertTrue(appPanelAdminPage.getApplicationsInBar().isEmpty());
+        assertFalse(appPanelAdminPage.getApplicationsNotInBar().isEmpty());
         
         // Save
         appPanelAdminPage.save();

@@ -122,18 +122,16 @@
       </scope>
     </class>
     <property>
-      <content>{{velocity}}
+      <content>{{velocity}}{{html clean="false"}}
   ##
   ## Application Index
   ##
   #set($applicationIndexRef = $services.model.createDocumentReference('', 'Applications', 'WebHome'))
   #if ($services.security.authorization.hasAccess('view', $applicationIndexRef))
-    {{html}}
       #template('drawer_macros.vm')
       #drawerItem($xwiki.getURL($applicationIndexRef), 'th', $escapetool.xml($services.localization.render('application.index.drawer')), 'tmMainApplicationIndex')
-    {{/html}}
   #end
-{{/velocity}}
+{{/html}}{{/velocity}}
 </content>
     </property>
     <property>

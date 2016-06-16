@@ -205,25 +205,63 @@ describe('EntityReference', function() {
   });
 
   describe('Misc', function() {
-    function execute(reference, baseReference, expected) {
+    var attach = function(serializedReference) {
+      return XWiki.Model.resolve(serializedReference, XWiki.EntityType.ATTACHMENT);
+    };
+    var doc = function(serializedReference) {
+      return XWiki.Model.resolve(serializedReference, XWiki.EntityType.DOCUMENT);
+    };
+    var space = function(serializedReference) {
+      return XWiki.Model.resolve(serializedReference, XWiki.EntityType.SPACE);
+    };
+    var wiki = function(wikiName) {
+      return new XWiki.WikiReference(wikiName);
+    };
+
+    var assertRelativeTo = function(reference, baseReference, expected) {
       expect(XWiki.Model.serialize(reference.relativeTo(baseReference))).toEqual(expected);
-    }
+    };
+
+    var applyAssertRelativeTo = function(currentValue, index, array) {
+      assertRelativeTo.apply(this, currentValue);
+    };
+
     it('relativeTo', function() {
-      var reference = new XWiki.DocumentReference('wiki', 'space', 'page');
-      execute(reference, reference, '');
-      execute(reference, reference.parent, 'page');
-      execute(reference, reference.parent.parent, 'space.page');
-      execute(reference, null, 'wiki:space.page');
-      execute(reference, new XWiki.WikiReference('xwiki'), 'wiki:space.page');
-      execute(reference, new XWiki.SpaceReference('wiki', 'Space'), 'space.page');
-      execute(reference, new XWiki.DocumentReference('wiki', 'space', 'Page'), 'page');
-      execute(reference, new XWiki.DocumentReference('wiki', 'Space', 'page'), 'space.page');
-      execute(reference.parent, reference, '');
-      execute(reference.parent.parent, reference, '');
-      execute(reference.parent, new XWiki.DocumentReference('wiki', 'space', 'Page'), '');
-      execute(reference.parent, new XWiki.DocumentReference('wiki', 'Space', 'page'), 'space');
-      execute(reference.parent, new XWiki.DocumentReference('xwiki', 'space', 'page'), 'wiki:space');
+      [
+        // Absolute base reference.
+        [doc('wiki:Path.To.Page'), attach('wiki:Path.To.Page@file'), ''],
+        [doc('wiki:Path.To.Page'), doc('wiki:Path.To.Page'), ''],
+        [doc('wiki:Path.To.Page'), space('wiki:Path.To'), 'Page'],
+        [doc('wiki:Path.To.Page'), space('wiki:Path'), 'To.Page'],
+        [doc('wiki:Path.To.Page'), wiki('wiki'), 'Path.To.Page'],
+
+        [doc('wiki:Path.To.Page'), wiki('xwiki'), 'wiki:Path.To.Page'],
+        [doc('wiki:Path.To.Page'), doc('wiki:Some.Other.Page'), 'Path.To.Page'],
+        [doc('wiki:Path.To.Page'), doc('wiki:Path.Of.Page'), 'Path.To.Page'],
+        [doc('wiki:Path.To.Page'), doc('wiki:Path.Page'), 'To.Page'],
+        [doc('wiki:Path.To.Page'), doc('wiki:Path.To.OtherPage'), 'Page'],
+        [doc('wiki:Path.To.Page'), space('wiki:Path.Space'), 'Path.To.Page'],
+        [doc('wiki:Path.To.Page'), space('wiki:Path.From.Page'), 'Path.To.Page'],
+
+        [space('wiki:Path.To.Space'), doc('wiki:Path.To.Space.Home'), ''],
+        [space('wiki:Path.To.Space'), doc('wiki:Path.To.Page'), 'Space'],
+        [space('wiki:Path.To.Space'), doc('wiki:Path.Page'), 'To.Space'],
+        [space('wiki:Path.To.Space'), doc('wiki:Path.Of.Page'), 'Path.To.Space'],
+
+        [wiki('wiki'), doc('wiki:Path.To.Page'), ''],
+        [wiki('wiki'), space('xwiki:Home'), 'wiki'],
+
+        // Relative base reference.
+        [doc('wiki:Path.To.Page'), attach('file'), ''],
+        [doc('wiki:Path.To.Page'), attach('OtherPage@file'), 'Page'],
+        [doc('wiki:Path.To.Page'), attach('Path.OtherPage@file'), 'To.Page'],
+        [doc('wiki:Path.To.Page'), attach('Path.Of.Page@file'), 'Path.To.Page'],
+        [doc('wiki:Path.To.Page'), doc('Page'), ''],
+        [doc('wiki:Path.To.Page'), space('Path.To'), 'Page'],
+        [doc('wiki:Path.To.Page'), space('Path'), 'To.Page'],
+      ].map(applyAssertRelativeTo);
     });
+
     it('constructor', function() {
         // Construct a Nested Space reference
         var reference = new XWiki.SpaceReference('wiki', ['space1', 'space2']);

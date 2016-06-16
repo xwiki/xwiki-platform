@@ -95,26 +95,24 @@ XWiki.EntityReference = Class.create({
   relativeTo: function(baseReference) {
     var components = this.getReversedReferenceChain();
     var baseComponents = baseReference ? baseReference.getReversedReferenceChain() : [];
-    while (components.length > 0 && baseComponents.length > 0 && components[0].type != baseComponents[0].type) {
-      components[0].type > baseComponents[0].type ? baseComponents.shift() : components.shift();
+    var i = j = 0;
+    while (i < components.length && j < baseComponents.length && components[i].type != baseComponents[j].type) {
+      components[i].type > baseComponents[j].type ? j++ : i++;
     }
-    while (components.length > 0 && baseComponents.length > 0 && components[0].type === baseComponents[0].type
-      && components[0].name === baseComponents[0].name) {
-      components.shift();
-      baseComponents.shift();
+    while (i < components.length && j < baseComponents.length && components[i].type === baseComponents[j].type
+      && components[i].name === baseComponents[j].name) {
+      i++;
+      j++;
     }
-    if (components.length === 0) {
-      return new XWiki.EntityReference('', this.type);
-    } else {
-      components = components.reverse();
-      for (var i = 0; i < components.length; i++) {
-        components[i] = new XWiki.EntityReference(components[i].name, components[i].type);
-        if (i > 0) {
-          components[i - 1].parent = components[i];
-        }
-      }
-      return components[0];
+    if (j < baseComponents.length && j > 0 && baseComponents[j].type === baseComponents[j - 1].type && i > 0) {
+      // If the current base entity type has not been fully matched then we need to add back the previously matched entity.
+      for(i--; i > 0 && components[i].type === components[i - 1].type; i--);
     }
+    var relativeReference;
+    for (; i < components.length; i++) {
+      relativeReference = new XWiki.EntityReference(components[i].name, components[i].type, relativeReference);
+    }
+    return relativeReference || new XWiki.EntityReference('', this.type);
   },
 
   getReversedReferenceChain: function() {

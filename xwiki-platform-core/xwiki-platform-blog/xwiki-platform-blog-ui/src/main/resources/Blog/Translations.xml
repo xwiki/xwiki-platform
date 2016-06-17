@@ -39,7 +39,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>blog.templateProvider.blogpost.description=Communicate news</content>
+  <content>blog.templateProvider.blogpost.name=Blog Post
+blog.templateProvider.blogpost.description=Communicate news</content>
   <object>
     <name>Blog.Translations</name>
     <number>0</number>

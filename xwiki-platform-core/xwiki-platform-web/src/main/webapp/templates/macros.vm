@@ -1447,7 +1447,7 @@ ${Msz}Mb##
               #else
                 #set($isFilterable = false)
               #end
-              #if(("$!colprop.type" == 'list' || "$!colprop.type" == 'multilist' )&& $isFilterable)
+              #if(("$!colprop.type" == 'list' || "$!colprop.type" == 'multilist') && $isFilterable)
                 <td class="xwiki-livetable-display-header-filter">
                 #if($colprop.get('class'))
                   #set($propClassName = $colprop.get('class'))
@@ -1459,7 +1459,7 @@ ${Msz}Mb##
                 #set($list = $class.get($colname).getListValues())
                 <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name='${colname}'
                 #if("$!colprop.type" == 'multilist')
-                  class='xwiki-livetable-multilist' multiple='multiple' size='1'>
+                  class='xwiki-livetable-multilist' multiple='multiple'>
                 #else
                   ><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
                   <option disabled='disabled'>────</option>

@@ -75,6 +75,24 @@
         <values>edit|saveandedit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </action>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>6</number>
+        <prettyName>description</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </description>
+      <icon>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>7</number>
+        <prettyName>icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
       <name>
         <customDisplay/>
         <disabled>0</disabled>
@@ -142,6 +160,12 @@
     </class>
     <property>
       <action>edit</action>
+    </property>
+    <property>
+      <description>blog.templateProvider.blogpost.description</description>
+    </property>
+    <property>
+      <icon>file-text</icon>
     </property>
     <property>
       <name>blog.templateProvider.blogpost.name</name>

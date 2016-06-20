@@ -296,7 +296,7 @@
 
     #if ($extension.issueManagement.getURL())
       <dt>$services.localization.render('extensions.info.issueManagement')</dt>
-      <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
+      <dd><a href="$extension.issueManagement.getURL()">#if($extension.issueManagement.system)$escapetool.xml($extension.issueManagement.system)#else$escapetool.xml($extension.issueManagement.getURL())#end</a></dd>
     #end
 
     #if ($extension.isInstalled())

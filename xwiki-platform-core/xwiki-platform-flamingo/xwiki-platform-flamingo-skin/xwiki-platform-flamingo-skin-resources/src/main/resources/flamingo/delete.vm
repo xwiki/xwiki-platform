@@ -58,7 +58,7 @@
 #######################################################
 #macro(displayProgressBar)
   #set($discard = $xwiki.jsfx.use("delete${jsExtension}", true))
-  #set($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
+  #set($discard = $xwiki.ssfx.use('uicomponents/job/job.css', true))
   #set($jobId = $request.jobId)
   <div class="ui-progress" id="delete-progress-bar-container">
     <p>$services.localization.render('core.delete.waitmessage')</p>

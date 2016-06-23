@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>Main</web>
+  <name>WebHome</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1252454400000</creationDate>
+  <date>1321284472000</date>
+  <contentUpdateDate>1321284472000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Home</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{box cssClass="floatinginfobox"}}
+{{html clean="false"}}&lt;iframe src="https://www.youtube.com/embed/0x_UkBOoLSk" allowfullscreen&gt;&lt;/iframe&gt;{{/html}}
+{{/box}}
+
+= Bienvenue sur votre Wiki =
+
+XWiki est le meilleur outil pour organiser votre connaissance. Un //Wiki// est organisé suivant une hiérarchie de //pages//. Vous pouvez créer de multiples wikis, chacun avec son propre ensemble de pages.
+
+XWiki peut-être utilisé comme base de connaissance (pour le support, la documentation, les ventes, etc.), pour créer des espaces collaboratifs, ou aussi pour un intranet complet.
+
+= Les bases =
+
+Pour utiliser votre Wiki au maximum de son potentiel, identifiez-vous et:
+
+Utilisez le bouton {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} ci-dessus pour //editer// cette page et commencer à adapter ce Wiki à vos besoins.
+
+Utilisez le bouton {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} ci-dessus et //ajoutez// de nouvelles pages à votre Wiki et créez la //hiérarchie// la meilleure pour organiser votre contenu.
+
+Utilisez le fil d'Ariane {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
+
+Vous pouvez aussi utiliser le [[bac à sable&gt;&gt;Sandbox.WebHome]] pour plus de contenu exemple ainsi que comme endroit pour expérimenter avec les fonctionnalités de votre Wiki.
+
+ {{box}}Apprenez à utiliser XWiki avec le {{velocity}}[[Guide "Getting Started" (en anglais)&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+
+|(((
+= Etendez votre Wiki =
+
+Pour étendre les fonctionalitiés de votre Wiki avec les modules dont //vous// avez besoin, aller sur le {{velocity}}[[gestionnaire d'extensions&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')]]{{/velocity}} ou vous pouvez rechercher et installer des extensions.
+
+Pour naviguer dans les 900+ extensions contribuées par la communauté XWiki, visitez la [[galerie d'extensions&gt;&gt;http://extensions.xwiki.org]].
+)))|(((
+= Créez votre application =
+
+Pour aller plus loin que les extensions existantes, définissez vos //propres structures// pour vos contenus en fonction de //vos// besoins et créez //vos// propres applications avec [["App Within Minutes"&gt;&gt;AppWithinMinutes.WebHome]] (AWM). 
+
+AWM vous aide et simplifie pour vous et vos utilisateurs la création et la gestion de vos informations.
+)))</content>
+</xwikidoc>

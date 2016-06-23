@@ -295,7 +295,7 @@
                 #end
                 </select>
                 </td>
-              #elseif("$!colprop.type" == 'listboolean' && $isFilterable)
+              #elseif("$!colprop.type" == 'boolean' && $isFilterable)
                 <td class="xwiki-livetable-display-header-filter">
                   <select id="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}" name="${colname}">
                     <option value=''>$services.localization.render('platform.livetable.selectAll')</option>

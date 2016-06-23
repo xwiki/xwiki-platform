@@ -28,6 +28,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 
 import org.apache.commons.io.output.NullWriter;
@@ -162,6 +163,20 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         });
     }
 
+    private void copyScriptContext(VelocityContext vcontext, ScriptContext scriptContext, int scope)
+    {
+        Bindings bindings = scriptContext.getBindings(scope);
+        if (bindings != null) {
+            for (Map.Entry<String, Object> entry : bindings.entrySet()) {
+                // Not ideal since it does not allow to modify a binding but it's too dangerous for existing velocity
+                // scripts otherwise.
+                if (!vcontext.containsKey(entry.getKey())) {
+                    vcontext.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+
     @Override
     public VelocityContext getVelocityContext()
     {
@@ -172,13 +187,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
         // Copy current JSR223 ScriptContext binding.
         ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
-        for (Map.Entry<String, Object> entry : scriptContext.getBindings(ScriptContext.ENGINE_SCOPE).entrySet()) {
-            // Not ideal since it does not allow to modify a binding but it's too dangerous for existing velocity
-            // scripts otherwise.
-            if (!vcontext.containsKey(entry.getKey())) {
-                vcontext.put(entry.getKey(), entry.getValue());
-            }
-        }
+        copyScriptContext(vcontext, scriptContext, ScriptContext.GLOBAL_SCOPE);
+        copyScriptContext(vcontext, scriptContext, ScriptContext.ENGINE_SCOPE);
 
         XWikiContext xcontext = this.xcontextProvider.get();
 

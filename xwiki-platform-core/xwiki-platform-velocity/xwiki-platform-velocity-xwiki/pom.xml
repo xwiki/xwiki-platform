@@ -24,35 +24,26 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-velocity</artifactId>
     <version>8.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-velocity</artifactId>
-  <name>XWiki Platform - Velocity - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Velocity - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-velocity-webapp</module>
-    <module>xwiki-platform-velocity-xwiki</module>
-  </modules>
+  <artifactId>xwiki-platform-velocity-xwiki</artifactId>
+  <name>XWiki Platform - Velocity - Platform Implementation</name>
+  <packaging>jar</packaging>
+  <description>Override Commons for Platform-specific features (e.g. support dynamic locales in generic Velocity Tools)</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity-tools</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
+      <version>${commons.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

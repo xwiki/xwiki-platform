@@ -19,38 +19,38 @@
  */
 package org.xwiki.velocity.internal;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Locale;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
+import javax.inject.Provider;
+
+import org.apache.velocity.tools.generic.MathTool;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Override the default {@link org.xwiki.velocity.VelocityConfiguration} implementation in order to replace some of the
- * Velocity Tools by customized versions to properly handle locales (the default Velocity Tools can only have a single
- * locale configured and in XWiki we need to set the locale from the executing XWiki Context).
+ * Extend the Velocity Tool-provided MathTool to use the current context locale.
  *
  * @version $Id$
  * @since 8.2RC1
  */
-@Component
-@Singleton
-public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
+public class XWikiMathTool extends MathTool
 {
-    @Inject
     private Provider<XWikiContext> contextProvider;
 
-    @Override
-    public void initialize() throws InitializationException
+    /**
+     * @param contextProvider the provider to get the {@link XWikiContext} dynamically at runtime
+     */
+    public XWikiMathTool(Provider<XWikiContext> contextProvider)
     {
-        super.initialize();
+        this.contextProvider = contextProvider;
+    }
 
-        // Override some tools
-        this.defaultTools.put("numbertool", new XWikiNumberTool(this.contextProvider));
-        this.defaultTools.put("datetool", new XWikiDateTool(this.contextProvider));
-        this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
+    /**
+     * @return the current locale from the XWiki context
+     */
+    @Override
+    public Locale getLocale()
+    {
+        return this.contextProvider.get().getLocale();
     }
 }

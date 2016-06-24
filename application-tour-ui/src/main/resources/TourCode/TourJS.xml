@@ -258,7 +258,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       
       // Create the steps
       for (var i = 0; i &lt; jsonData.steps.length; i++) {
-        tour.addStep(jsonData.steps[i]);
+        // depending on rights, some users may not see all the buttons presented in the tour and we don't need to display the steps is that cases
+        // the target element must exists in the DOM or its value must be empty (placing step in the middle of the page)
+        if ($(jsonData.steps[i].element).length || jsonData.steps[i].element == '') {
+          tour.addStep(jsonData.steps[i]);
+        }
       }
       
       // Look if the tour should be started regardless of its status on the local storage

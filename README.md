@@ -1,17 +1,16 @@
 # Tour Application
 This application provides for the users a possibility to create bootstrap-tours for every page they want.
 
-* Extension Page: http://extensions.xwiki.org/xwiki/bin/view/Extension/Tour+Application.
-* Bug Tracker: http://jira.xwiki.org/browse/TOUR.
+* Project Lead: [Guillaume Delhumeau](http://www.xwiki.org/xwiki/bin/view/XWiki/gdelhumeau)
+* [Documentation & Download](http://extensions.xwiki.org/xwiki/bin/view/Extension/Tour+Application)
+* [Issue Tracker](http://jira.xwiki.org/browse/TOUR)
+* Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists>), [IRC]( http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
+* [Development Practices](http://dev.xwiki.org)
+*  Minimal XWiki version supported: XWiki 6.4.1
 * License: LGPL 2.1+.
-
-## Status
-[![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib%20-%20Tour%20Application)](http://ci.xwiki.org/job/Contrib%20-%20Tour%20Application/)
-
-## Translations
-You can contribute to translate this application in various languages on http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication.
-
-You don't need to have technical knowledge to contribute to the translations, feel free to do it!
+* [Translations](http://l10n.xwiki.org/xwiki/bin/view/Contrib/TourApplication) You don't need to have technical knowledge to contribute to the translations, feel free to do it!
+* Sonar Dashboard: N/A
+* Continuous Integration Status: [![Build Status](http://ci.xwiki.org/buildStatus/icon?job=Contrib%20-%20Tour%20Application)](http://ci.xwiki.org/job/Contrib%20-%20Tour%20Application/)
 
 ## Developers
 

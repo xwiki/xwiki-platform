@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,25 +25,27 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.AbstractSpacesConfigurationSource;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Configuration Source that looks for editor bindings in the space preferences page for each of the ancestor spaces of
+ * the current document, starting from its parent space and moving upwards.
+ * 
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
 @Component
-@Named("spaces")
+@Named("editorBindings/spaces")
 @Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+public class SpacesEditorBindingsSource extends AbstractSpacesConfigurationSource
 {
     @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    @Named("editorBindings/space")
+    private ConfigurationSource spaceEditorBindingsSource;
 
     @Override
     protected ConfigurationSource getSpaceConfigurationSource()
     {
-        return this.spacePreferencesSource;
+        return this.spaceEditorBindingsSource;
     }
 }

@@ -17,33 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit.script;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.edit.Editor;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Edit script service specialized in {@link XDOM} {@link Editor}s.
+ * 
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
 @Component
-@Named("spaces")
 @Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+@Named(EditScriptService.ROLE_HINT + ".xdom")
+@Unstable
+public class XDOMEditScriptService extends AbstractTypedEditScriptService<XDOM>
 {
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
-
-    @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
-    {
-        return this.spacePreferencesSource;
-    }
 }

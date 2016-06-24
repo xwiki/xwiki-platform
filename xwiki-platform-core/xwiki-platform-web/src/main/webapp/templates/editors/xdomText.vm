@@ -1,0 +1,4 @@
+#template("simpleedittoolbar.vm")
+#set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
+<textarea id="$!escapetool.xml($edit.parameters.id)" name="$!escapetool.xml($edit.parameters.name)"
+  >$!escapetool.xml($services.rendering.render($edit.data, $syntaxId))</textarea>

@@ -17,33 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Map;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Base interface for editors.
+ * 
+ * @param <D> the type of data that can be edited by this editor
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
-@Component
-@Named("spaces")
-@Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+@Role
+@Unstable
+public interface Editor<D>
 {
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    /**
+     * @return this editor's descriptor
+     */
+    EditorDescriptor getDescriptor();
 
-    @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
-    {
-        return this.spacePreferencesSource;
-    }
+    /**
+     * Generates the HTML code needed to edit the given data.
+     * 
+     * @param data the data to edit
+     * @param parameters editor parameters
+     * @return the HTML code that displays the editor
+     * @throws EditException if the editor fails to be rendered
+     */
+    String render(D data, Map<String, Object> parameters) throws EditException;
 }

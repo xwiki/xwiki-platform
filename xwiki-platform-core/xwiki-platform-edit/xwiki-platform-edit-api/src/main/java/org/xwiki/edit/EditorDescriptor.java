@@ -17,33 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.stability.Unstable;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Describes an {@link Editor}.
+ * 
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
-@Component
-@Named("spaces")
-@Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+@Unstable
+public interface EditorDescriptor
 {
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    /**
+     * @return the editor identifier (normally the editor component hint)
+     */
+    String getId();
 
-    @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
-    {
-        return this.spacePreferencesSource;
-    }
+    /**
+     * @return the editor name
+     */
+    String getName();
+
+    /**
+     * @return the editor description
+     */
+    String getDescription();
+
+    /**
+     * @return the editor icon
+     */
+    String getIcon();
+
+    /**
+     * @return the editor category
+     */
+    String getCategory();
 }

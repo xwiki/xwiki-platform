@@ -17,33 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.edit.AbstractEditorTemplate;
+import org.xwiki.edit.DefaultEditorDescriptor;
+import org.xwiki.edit.Editor;
+import org.xwiki.edit.EditorDescriptor;
+import org.xwiki.rendering.block.XDOM;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * {@link XDOM} Text {@link Editor}.
+ * 
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
 @Component
-@Named("spaces")
 @Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+@Named(TextXDOMEditor.ROLE_HINT)
+public class TextXDOMEditor extends AbstractEditorTemplate<XDOM>
 {
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    /**
+     * The editor component hint.
+     */
+    public static final String ROLE_HINT = "Text";
+
+    private EditorDescriptor descriptor = new DefaultEditorDescriptor(ROLE_HINT, null, ROLE_HINT);
 
     @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
+    public String getTemplate()
     {
-        return this.spacePreferencesSource;
+        return "editors/xdomText.vm";
+    }
+
+    @Override
+    public EditorDescriptor getDescriptor()
+    {
+        return this.descriptor;
     }
 }

@@ -1,0 +1,7 @@
+org.xwiki.edit.internal.AllEditorBindingsSource
+org.xwiki.edit.internal.EditorBindingClassDocumentInitializer
+org.xwiki.edit.internal.SpaceEditorBindingsSource
+org.xwiki.edit.internal.SpacesEditorBindingsSource
+org.xwiki.edit.internal.UserEditorBindingsSource
+org.xwiki.edit.internal.WikiEditorBindingsSource
+org.xwiki.edit.internal.WikiEditorSource

@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,34 +18,21 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.configuration.internal;
+-->
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-
-/**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
- * @version $Id$
- * @since 7.4M1
- */
-@Component
-@Named("spaces")
-@Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
-{
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
-
-    @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
-    {
-        return this.spacePreferencesSource;
-    }
-}
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-core</artifactId>
+    <version>8.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-edit</artifactId>
+  <name>XWiki Platform - Edit</name>
+  <packaging>pom</packaging>
+  <description>Top level POM for the Edit module</description>
+  <modules>
+    <module>xwiki-platform-edit-api</module>
+    <module>xwiki-platform-edit-default</module>
+  </modules>
+</project>

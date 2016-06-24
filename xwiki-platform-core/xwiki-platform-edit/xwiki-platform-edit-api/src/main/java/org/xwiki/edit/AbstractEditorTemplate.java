@@ -17,33 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.stability.Unstable;
+import org.xwiki.template.TemplateManager;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Base class for editors that are based on a template.
+ * 
+ * @param <D> the type of data that can be edited by this editor
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
-@Component
-@Named("spaces")
-@Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+@Unstable
+public abstract class AbstractEditorTemplate<D> extends AbstractEditor<D>
 {
     @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    private TemplateManager templates;
+
+    /**
+     * @return the path to the template that generates the HTML code that displays the editor
+     */
+    public abstract String getTemplate();
 
     @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
+    public String render() throws EditException
     {
-        return this.spacePreferencesSource;
+        try {
+            return this.templates.render(getTemplate());
+        } catch (Exception e) {
+            throw new EditException("Failed to render the editor template.", e);
+        }
     }
 }

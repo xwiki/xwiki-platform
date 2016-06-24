@@ -17,33 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.edit.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Composite Configuration Source that looks in the current space and all its parent spaces.
- *
+ * Configuration Source that looks for editor bindings in the user preferences page.
+ * 
  * @version $Id$
- * @since 7.4M1
+ * @since 8.2RC1
  */
 @Component
-@Named("spaces")
+@Named("editorBindings/user")
 @Singleton
-public class SpacesConfigurationSource extends AbstractSpacesConfigurationSource
+public class UserEditorBindingsSource extends AbstractEditorBindingsSource
 {
     @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    private DocumentAccessBridge documentAccessBridge;
 
     @Override
-    protected ConfigurationSource getSpaceConfigurationSource()
+    protected String getCacheId()
     {
-        return this.spacePreferencesSource;
+        return "configuration.editorBindings.user";
+    }
+
+    @Override
+    protected DocumentReference getDocumentReference()
+    {
+        return this.documentAccessBridge.getCurrentUserReference();
     }
 }

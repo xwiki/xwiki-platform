@@ -1064,8 +1064,9 @@ document.observe('xwiki:dom:loaded', function() {
     width: 65%;
 }
 
-dl.rights-settings {
+rights-settings {
   margin-top: 20px;
+  margin-left: 5px;
 }
 
 .rights-settings dt {

@@ -1064,9 +1064,18 @@ document.observe('xwiki:dom:loaded', function() {
     width: 65%;
 }
 
+rights-settings {
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
 .rights-settings dt {
   /* The labels for the general rights settings are long and thus look bad when displayed with bold text. */
   font-weight: normal;
+}
+
+.rights-settings dt input {
+  vertical-align: top;
 }</code>
     </property>
     <property>

@@ -22,8 +22,8 @@ package org.xwiki.bridge.event;
 import org.xwiki.observation.event.Event;
 
 /**
- * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
- * specific event corresponds to only one {@link #actionName action type}.
+ * An event triggered whenever a client request (action) is processed, like {@code /upload/} or {@code /view/}. A
+ * specific event corresponds to only one {@link #getActionName()} action type.
  * 
  * @version $Id$
  * @since 3.2M3
@@ -33,7 +33,7 @@ public interface ActionExecutionEvent extends Event
     /**
      * Gets the name of the action causing this event.
      * 
-     * @return the action causing this event, like <code>upload</code> or <code>login</code>
+     * @return the action causing this event, like {@code upload} or {@code login}
      */
     String getActionName();
 }

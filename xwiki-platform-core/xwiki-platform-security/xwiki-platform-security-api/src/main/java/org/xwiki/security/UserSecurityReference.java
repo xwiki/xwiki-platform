@@ -26,7 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
  * to the DocumentReference of the user's profile document. By inheritance, the null user is represented by
  * the main wiki reference but with a null original reference.
  *
- * @see {@link SecurityReferenceFactory}
+ * @see SecurityReferenceFactory
  * @version $Id$
  * @since 4.0M2
  */

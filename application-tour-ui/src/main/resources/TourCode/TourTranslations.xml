@@ -48,7 +48,7 @@ TourCode.TourClass_isActive=Active
 TourCode.TourClass_targetPage=Target Page
 
 # Live table generic keys
-tour.livetable.doc.name=Tour name
+tour.livetable.doc.title=Tour name
 tour.livetable._actions=Actions
 tour.livetable._actions.edit=Edit
 tour.livetable._actions.delete=Delete

@@ -32,8 +32,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1393442253000</creationDate>
-  <date>1445241212000</date>
-  <contentUpdateDate>1445241212000</contentUpdateDate>
+  <date>1464963428000</date>
+  <contentUpdateDate>1464963428000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -41,11 +41,17 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
 panels._actions=Ações
+panels.available=Painéis Disponíveis
+panels.category=Categoria
+panels.children.title=Subpáginas
 panels.description=Descrição
+panels.documentInformation.configureSyntaxes=Configurar mais sintaxes
 panels.name=Nome
+panels.siblings.title=Páginas do Nível
+panels.type=Tipo
 </content>
 </xwikidoc>

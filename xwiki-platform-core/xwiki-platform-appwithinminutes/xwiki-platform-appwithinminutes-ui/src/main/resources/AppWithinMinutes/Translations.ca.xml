@@ -21,19 +21,19 @@
 -->
 
 <xwikidoc>
-  <web>Index</web>
+  <web>AppWithinMinutes</web>
   <name>Translations</name>
-  <language>sk</language>
+  <language>ca</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Index.WebHome</parent>
+  <parent>AppWithinMinutes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1425563685000</creationDate>
-  <date>1425564037000</date>
-  <contentUpdateDate>1425564037000</contentUpdateDate>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -43,13 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
-index.spacesMacro.createSpace.defaultSpaceName=Názov priestoru
-index.spacesMacro.createSpace.link=Vytvoriť nový priestor
-index.spacesMacro.createSpace.submit=Vytvoriť
-index.spacesMacro.spaceAdministration.title=Pozri v správe priestoru
-index.spacesMacro.spaceIndex.alt=Index priestoru
-index.spacesMacro.spaceIndex.title=Pozri index priestoru
-index.spacesMacro.title=Priestory
+  <content>## XWiki Translation for language ca generated from http://www.l10n.xwiki.org
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Avui
 </content>
 </xwikidoc>

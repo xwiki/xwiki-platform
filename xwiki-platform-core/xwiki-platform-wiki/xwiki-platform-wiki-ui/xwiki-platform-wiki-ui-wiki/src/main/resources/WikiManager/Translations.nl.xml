@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language nl generated from http://www.l10n.xwiki.org
 WikiManager.WikiCandidateMemberClass_status_accepted=Geaccepteerd
@@ -123,6 +123,7 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=De weergavenaam van de wiki.
 platform.wiki.currentwiki.prop.wikiprettyname.label=Weergavenaam
 platform.wiki.currentwiki.welcome=Welkom op de {0}{1}{2} wiki.
 platform.wiki.currentwiki.wikiusers.title=Wiki gebruikers
+platform.wiki.drawer.homeWiki=Home
 platform.wiki.panel.title=Wiki informatie
 </content>
 </xwikidoc>

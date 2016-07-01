@@ -144,6 +144,46 @@
 
 {{html clean='false'}}
       &lt;/dd&gt;
+      ##
+      ## Description
+      ##
+      &lt;dt&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_description"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.description'))&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if($isEditing)
+          {{/html}}
+
+          {{html wiki='true' clean='false'}}$!providerObj.get('description'){{/html}}
+
+          {{html clean='false'}}
+        #else
+          $!escapetool.xml($services.localization.render($!providerObj.getValue('description')))
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Icon
+      ##
+      &lt;dt&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_icon"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.icon'))&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if($isEditing)
+          ## get the current IconTheme and create a link to it in order to see the full list of available icons
+          ## it would be great to use IconPicker, but it can't be used in edit mode.
+          #set ($currentIconTheme = $xwiki.getXWikiPreference('iconTheme'))
+          {{/html}}
+
+          {{html wiki='true' clean='false'}}
+          &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.icon.info', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
+
+          $!providerObj.get('icon'){{/html}}
+
+          {{html clean='false'}}
+        #else
+          $services.icon.renderHTML($!providerObj.getValue('icon'))
+        #end
+      &lt;/dd&gt;
     &lt;/dl&gt;
   &lt;/div&gt;
   ##

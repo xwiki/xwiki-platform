@@ -66,7 +66,7 @@ public interface Query
 
     /**
      * @param wiki virtual wiki to run the query. null is a current wiki.
-     * @return this query.
+     * @return this query
      */
     Query setWiki(String wiki);
 
@@ -81,7 +81,7 @@ public interface Query
      *
      * @param var variable in query statement (:var).
      * @param val value of the variable.
-     * @return this query.
+     * @return this query
      */
     Query bindValue(String var, Object val);
 
@@ -92,7 +92,7 @@ public interface Query
      * @param index index of positional parameter. Index starting number depends on the query language. According to the
      * JPQL standard index should start from 1.
      * @param val value of the variable.
-     * @return this query.
+     * @return this query
      */
     Query bindValue(int index, Object val);
 
@@ -101,7 +101,7 @@ public interface Query
      * values in one call instead of multiple calls to {@link #bindValue(int, Object)}.
      *
      * @param values list of positional parameters values.
-     * @return this query.
+     * @return this query
      * @see #bindValue(int, Object)
      */
     Query bindValues(List<Object> values);
@@ -119,30 +119,30 @@ public interface Query
     Map<Integer, Object> getPositionalParameters();
 
     /**
-     * @param filter the {@link QueryFilter} to add to this query.
-     * @return this query.
+     * @param filter the {@link QueryFilter} to add to this query
+     * @return this query
      */
     Query addFilter(QueryFilter filter);
 
     /**
-     * @return the list of {@link QueryFilter}s that will be applied to this query.
+     * @return the list of {@link QueryFilter}s that will be applied to this query
      */
     List<QueryFilter> getFilters();
 
     /**
-     * @param limit limit of result list to set (so {@link #execute()}.size() will be <= limit).
-     * @return this query.
+     * @param limit see {@link #getLimit()}
+     * @return this query
      */
     Query setLimit(int limit);
 
     /**
-     * @param offset offset of query result to set (skip first "offset" rows).
-     * @return this query.
+     * @param offset offset of query result to set (skip first "offset" rows)
+     * @return this query
      */
     Query setOffset(int offset);
 
     /**
-     * @return limit limit of result list.
+     * @return limit the limit of result list to set ({@code execute().size() <= limit})
      * @see #setLimit(int)
      */
     int getLimit();

@@ -679,7 +679,6 @@ public class XarPackage
      * Write the package descriptor to the passed XML stream.
      * 
      * @param writer the XML stream where to write
-     * @throws XarException when failing to parse the descriptor
      * @throws XMLStreamException when failing to write the file
      */
     public void write(XMLStreamWriter writer) throws XMLStreamException

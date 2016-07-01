@@ -55,10 +55,12 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -108,11 +110,16 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     @Inject
     private Logger logger;
 
+    @Inject
+    private RenderingContext renderingContext;
+
     private DocumentInstanceOutputProperties properties;
 
     private WrappingListener contentListener = new WrappingListener();
 
     private DefaultWikiPrinter currentWikiPrinter;
+
+    private Syntax previousTargetSyntax;
 
     private EntityReference currentEntityReference;
 
@@ -348,15 +355,17 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             if (componentManager.hasComponent(PrintRendererFactory.class, this.document.getSyntax().toIdString())) {
                 PrintRendererFactory rendererFactory;
                 try {
-                    rendererFactory =
-                        componentManager
-                            .getInstance(PrintRendererFactory.class, this.document.getSyntax().toIdString());
+                    rendererFactory = componentManager.getInstance(PrintRendererFactory.class,
+                        this.document.getSyntax().toIdString());
                 } catch (ComponentLookupException e) {
-                    throw new FilterException(String.format("Failed to find PrintRendererFactory for syntax [%s]",
-                        this.document.getSyntax()), e);
+                    throw new FilterException(
+                        String.format("Failed to find PrintRendererFactory for syntax [%s]", this.document.getSyntax()),
+                        e);
                 }
 
                 this.currentWikiPrinter = new DefaultWikiPrinter();
+                this.previousTargetSyntax = this.renderingContext.getTargetSyntax();
+                ((MutableRenderingContext) this.renderingContext).setTargetSyntax(rendererFactory.getSyntax());
                 this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
             }
         }
@@ -370,6 +379,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             this.document.setContent(this.currentWikiPrinter.getBuffer().toString());
 
             this.contentListener.setWrappedListener(null);
+            ((MutableRenderingContext) this.renderingContext).setTargetSyntax(this.previousTargetSyntax);
             this.currentWikiPrinter = null;
         }
 

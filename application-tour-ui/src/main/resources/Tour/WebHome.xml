@@ -55,7 +55,8 @@
   'rowCount': 15,
   'maxPages': 10,
   'selectedColumn': 'doc.title',
-  'defaultOrder': 'asc'
+  'defaultOrder': 'asc',
+  'queryFilters': 'currentlanguage'
 })
 #set ($columns = ['doc.title', 'isActive', 'targetPage'])
 #if ($isAdvancedUser)

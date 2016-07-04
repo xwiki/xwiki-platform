@@ -148,14 +148,14 @@
       ## Description
       ##
       &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_description"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.description'))&lt;/label&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_description"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.description'))&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         #if($isEditing)
           {{/html}}
 
-          {{html wiki='true' clean='false'}}
-            &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.description.hint')&lt;/span&gt;
+          {{html wiki=true clean='false'}}
+            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.description.hint')&lt;/span&gt;
             $!providerObj.get('description')
           {{/html}}
 
@@ -168,7 +168,7 @@
       ## Icon
       ##
       &lt;dt&gt;
-        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_icon"#end&gt;$escapetool.xml($services.localization.render('xe.templateprovider.icon'))&lt;/label&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_icon"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.icon'))&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
         #if($isEditing)
@@ -178,7 +178,7 @@
           {{/html}}
 
           {{html wiki='true' clean='false'}}
-            &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.icon.hint', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.icon.hint', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
             $!providerObj.get('icon')
           {{/html}}
 

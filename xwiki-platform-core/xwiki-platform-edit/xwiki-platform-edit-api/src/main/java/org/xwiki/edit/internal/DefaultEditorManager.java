@@ -21,6 +21,7 @@ package org.xwiki.edit.internal;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,23 +55,16 @@ public class DefaultEditorManager implements EditorManager
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    @Inject
-    @Named("wiki")
-    private EditorSource wikiEditorSource;
-
     @Override
     public <D> List<Editor<D>> getEditors(Type dataType)
     {
-        List<Editor<D>> editors = new ArrayList<>();
         DefaultParameterizedType editorType = new DefaultParameterizedType(null, Editor.class, dataType);
         try {
-            editors.addAll(this.componentManagerProvider.get().getInstanceList(editorType));
+            return this.componentManagerProvider.get().getInstanceList(editorType);
         } catch (ComponentLookupException e) {
             // No editors found.
+            return Collections.emptyList();
         }
-        // Include the editors defined in wiki pages.
-        editors.addAll(this.wikiEditorSource.getEditors(dataType));
-        return editors;
     }
 
     @Override
@@ -92,8 +86,8 @@ public class DefaultEditorManager implements EditorManager
         try {
             return this.componentManagerProvider.get().getInstance(editorType, hint);
         } catch (ComponentLookupException e) {
-            // No such editor component found. Fall back on the editors defined in wiki pages.
-            return this.wikiEditorSource.getEditor(dataType, hint);
+            // No such editor component found.
+            return null;
         }
     }
 

@@ -46,23 +46,6 @@ public abstract class AbstractEditor<D> implements Editor<D>
     @Inject
     private ScriptContextManager scripts;
 
-    /**
-     * Default constructor, for editors that are components.
-     */
-    public AbstractEditor()
-    {
-    }
-
-    /**
-     * Constructor for editors that are not components.
-     * 
-     * @param script the script context manager
-     */
-    protected AbstractEditor(ScriptContextManager scripts)
-    {
-        this.scripts = scripts;
-    }
-
     @Override
     public String render(D data, Map<String, Object> parameters) throws EditException
     {

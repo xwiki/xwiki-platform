@@ -36,20 +36,22 @@
   </properties>
   <dependencies>
     <dependency>
+      <!-- We implement the edit APIs -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- We implement configuration sources that look for editor bindings in the wiki. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <!-- For the XDOM editor configuration. -->
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
-      <version>${rendering.version}</version>
+      <!-- Editors can be defined in wiki pages, in which case they are registered automatically as components. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-wiki</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

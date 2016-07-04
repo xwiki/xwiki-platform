@@ -44,6 +44,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 {{html wiki=true}}
+#set($isEditing = $xcontext.action == 'edit')
 #set($isNewStep = true)
 #set($tourName = $request.tourName)
 #set($stepID = $request.stepID)
@@ -91,7 +92,7 @@
       &lt;/dl&gt;
     #else
       &lt;dl&gt;
-        &lt;dt&gt;&lt;label for="TourCode.StepClass_0_${prop.name}"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;&lt;label #if($isEditing)for="TourCode.StepClass_0_${prop.name}"#end&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$vobj.get($prop.getName())&lt;/dd&gt;
       &lt;/dl&gt;
     #end

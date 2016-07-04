@@ -55,10 +55,12 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -108,11 +110,16 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     @Inject
     private Logger logger;
 
+    @Inject
+    private RenderingContext renderingContext;
+
     private DocumentInstanceOutputProperties properties;
 
     private WrappingListener contentListener = new WrappingListener();
 
     private DefaultWikiPrinter currentWikiPrinter;
+
+    private Syntax previousTargetSyntax;
 
     private EntityReference currentEntityReference;
 
@@ -279,15 +286,14 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     @Override
     public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
     {
-        this.document =
-            new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference, this.properties != null
-                ? this.properties.getDefaultReference() : null), this.currentLocale);
+        this.document = new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference,
+            this.properties != null ? this.properties.getDefaultReference() : null), this.currentLocale);
 
-        this.document.setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters,
-            null));
+        this.document
+            .setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters, null));
         if (this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
-            this.document.setCreator(getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
-                this.currentLocaleParameters, null));
+            this.document.setCreator(
+                getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters, null));
         }
         this.document.setDefaultLocale(this.currentDefaultLocale);
 
@@ -348,15 +354,17 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             if (componentManager.hasComponent(PrintRendererFactory.class, this.document.getSyntax().toIdString())) {
                 PrintRendererFactory rendererFactory;
                 try {
-                    rendererFactory =
-                        componentManager
-                            .getInstance(PrintRendererFactory.class, this.document.getSyntax().toIdString());
+                    rendererFactory = componentManager.getInstance(PrintRendererFactory.class,
+                        this.document.getSyntax().toIdString());
                 } catch (ComponentLookupException e) {
-                    throw new FilterException(String.format("Failed to find PrintRendererFactory for syntax [%s]",
-                        this.document.getSyntax()), e);
+                    throw new FilterException(
+                        String.format("Failed to find PrintRendererFactory for syntax [%s]", this.document.getSyntax()),
+                        e);
                 }
 
                 this.currentWikiPrinter = new DefaultWikiPrinter();
+                this.previousTargetSyntax = this.renderingContext.getTargetSyntax();
+                ((MutableRenderingContext) this.renderingContext).setTargetSyntax(rendererFactory.getSyntax());
                 this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
             }
         }
@@ -370,6 +378,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             this.document.setContent(this.currentWikiPrinter.getBuffer().toString());
 
             this.contentListener.setWrappedListener(null);
+            ((MutableRenderingContext) this.renderingContext).setTargetSyntax(this.previousTargetSyntax);
             this.currentWikiPrinter = null;
         }
 
@@ -476,12 +485,12 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
                 } else {
                     this.logger.warn("Unknown property type [{}]", type);
 
-                    return ;
+                    return;
                 }
             }
         } catch (ComponentLookupException e) {
-            throw new FilterException(String.format(
-                "Failed to get instance of the property class provider for type [%s]", type), e);
+            throw new FilterException(
+                String.format("Failed to get instance of the property class provider for type [%s]", type), e);
         }
 
         this.currentClassPropertyMeta = provider.getDefinition();
@@ -497,8 +506,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     }
 
     @Override
-    public void endWikiClassProperty(String name, String type, FilterEventParameters parameters)
-        throws FilterException
+    public void endWikiClassProperty(String name, String type, FilterEventParameters parameters) throws FilterException
     {
         this.currentClassPropertyMeta = null;
         this.currentClassProperty = null;
@@ -575,8 +583,9 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
                 try {
                     return xcontext.getWiki().getXClass(this.currentXObject.getXClassReference(), xcontext);
                 } catch (XWikiException e) {
-                    throw new FilterException("Unexpected error when trying to get class ["
-                        + this.currentXObject.getXClassReference() + "]", e);
+                    throw new FilterException(
+                        "Unexpected error when trying to get class [" + this.currentXObject.getXClassReference() + "]",
+                        e);
                 }
             }
         }
@@ -585,8 +594,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     }
 
     @Override
-    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters)
-        throws FilterException
+    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {
         PropertyClassInterface propertyclass = (PropertyClassInterface) getCurrentXClass().safeget(name);
 

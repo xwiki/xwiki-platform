@@ -46,9 +46,10 @@ public interface SkinExtension
      * the resulting URL, while Link extensions use the parameters as attributes of the link tag. A resource is
      * registered only once per request, further calls will not result in additional links, even if it is pulled with
      * different parameters. If more than one calls per request are made, the parameters used are the ones from the last
-     * call (or none, if the last call did not specify any parameters). <br />
+     * call (or none, if the last call did not specify any parameters).
+     * <br>
      * TODO: document here the parameters that can be used and their meaning.
-     * 
+     *
      * @param resource The name of the resource to pull.
      * @param parameters The parameters for this resource.
      */

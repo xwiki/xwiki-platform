@@ -76,7 +76,7 @@ public class XarEntry extends LocalDocumentReference
     /**
      * @param reference the reference of the document
      * @param name the name of the entry (ZIP style)
-     * @param defaultAction the default action associated to a XAR entry
+     * @param defaultAction the default action associated to a XAR entry (not used at the moment)
      */
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction)
     {

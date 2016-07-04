@@ -285,7 +285,7 @@ public class XarPackage
     }
 
     /**
-     * @param preserveVersion true if the history should be preserved by default
+     * @param packagePreserveVersion true if the history should be preserved by default
      */
     public void setPackagePreserveVersion(boolean packagePreserveVersion)
     {
@@ -401,6 +401,7 @@ public class XarPackage
      * Add a new entry to the package.
      * 
      * @param reference the entry reference since 7.2M1
+     * @param action the default action associated to this XAR (not used at the moment)
      */
     public void addPackageFile(LocalDocumentReference reference, int action)
     {
@@ -423,6 +424,7 @@ public class XarPackage
      * Add a new entry to the package.
      * 
      * @param reference the entry reference
+     * @param entryName the name of the entry (ZIP style)
      * @since 7.2M1
      */
     public void addEntry(LocalDocumentReference reference, String entryName)
@@ -434,6 +436,8 @@ public class XarPackage
      * Add a new entry to the package.
      * 
      * @param reference the entry reference
+     * @param entryName the name of the entry (ZIP style)
+     * @param action the default action associated to this XAR (not used at the moment)
      * @since 7.2M1
      */
     public void addEntry(LocalDocumentReference reference, String entryName, int action)
@@ -674,9 +678,8 @@ public class XarPackage
     /**
      * Write the package descriptor to the passed XML stream.
      * 
-     * @param stream the XML stream where to write
-     * @throws XarException when failing to parse the descriptor
-     * @throws IOException when failing to read the file
+     * @param writer the XML stream where to write
+     * @throws XMLStreamException when failing to write the file
      */
     public void write(XMLStreamWriter writer) throws XMLStreamException
     {

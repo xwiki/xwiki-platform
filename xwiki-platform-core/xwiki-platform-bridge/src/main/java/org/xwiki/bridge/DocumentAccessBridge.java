@@ -363,7 +363,7 @@ public interface DocumentAccessBridge
      * @param propertyName name of the property to set.
      * @param propertyValue value of the property to set.
      * @throws Exception if the document cannot be accessed.
-     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)
+     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)}
      */
     @Deprecated
     void setProperty(String documentReference, String className, String propertyName, Object propertyValue)

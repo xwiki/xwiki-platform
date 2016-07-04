@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Dashboard.WebHome" locale="">
   <web>Dashboard</web>
   <name>WebHome</name>
   <language/>
@@ -162,7 +162,7 @@
       <content>{{documentTree showTranslations="false" showAttachments="false" /}}</content>
     </property>
     <property>
-      <position>1, 2</position>
+      <position>1, 1</position>
     </property>
     <property>
       <title>$services.localization.render('platform.dashboard.wiki.pages')</title>
@@ -225,7 +225,7 @@
       <content>{{tagcloud/}}</content>
     </property>
     <property>
-      <position>1, 3</position>
+      <position>1, 2</position>
     </property>
     <property>
       <title>$services.localization.render('platform.dashboard.wiki.tagcloud')</title>
@@ -292,69 +292,6 @@
     </property>
     <property>
       <title>$services.localization.render('platform.dashboard.wiki.activity')</title>
-    </property>
-  </object>
-  <object>
-    <name>Dashboard.WebHome</name>
-    <number>3</number>
-    <className>XWiki.GadgetClass</className>
-    <guid>b180bc56-ce23-436c-9c6f-c08a4ff444a7</guid>
-    <class>
-      <name>XWiki.GadgetClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <editor>---</editor>
-        <name>content</name>
-        <number>2</number>
-        <picker>0</picker>
-        <prettyName>content</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <position>
-        <disabled>0</disabled>
-        <name>position</name>
-        <number>3</number>
-        <picker>0</picker>
-        <prettyName>position</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </position>
-      <title>
-        <disabled>0</disabled>
-        <name>title</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>title</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </title>
-    </class>
-    <property>
-      <content>{{display reference="Main.Welcome"/}}</content>
-    </property>
-    <property>
-      <position>1, 1</position>
-    </property>
-    <property>
-      <title>$services.localization.render('platform.dashboard.wiki.welcome')</title>
     </property>
   </object>
   <object>

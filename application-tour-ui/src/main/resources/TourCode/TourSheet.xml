@@ -45,6 +45,8 @@
 #set ($isEditing = $xcontext.action == 'edit')
 (% class="xform" %)
 (((
+  ## Mark tour as hidden
+  &lt;input type="hidden" name="xhidden" id="xhidden" value="1"&gt;
   ; &lt;label #if($isEditing)for="TourCode.TourClass_0_description"#end&gt;$escapetool.xml($doc.displayPrettyName('description', false, false))&lt;/label&gt;
   : $doc.display('description')
   #if ($isEditing)

@@ -32,7 +32,7 @@ import org.xwiki.template.TemplateManager;
  * @since 8.2RC1
  */
 @Unstable
-public abstract class AbstractEditorTemplate<D> extends AbstractEditor<D>
+public abstract class AbstractTemplateEditor<D> extends AbstractEditor<D>
 {
     @Inject
     private TemplateManager templates;
@@ -40,13 +40,13 @@ public abstract class AbstractEditorTemplate<D> extends AbstractEditor<D>
     /**
      * @return the path to the template that generates the HTML code that displays the editor
      */
-    public abstract String getTemplate();
+    public abstract String getTemplateName();
 
     @Override
     public String render() throws EditException
     {
         try {
-            return this.templates.render(getTemplate());
+            return this.templates.render(getTemplateName());
         } catch (Exception e) {
             throw new EditException("Failed to render the editor template.", e);
         }

@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.edit.AbstractEditorTemplate;
+import org.xwiki.edit.AbstractTemplateEditor;
 import org.xwiki.edit.DefaultEditorDescriptor;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
@@ -38,7 +38,7 @@ import org.xwiki.rendering.block.XDOM;
 @Component
 @Singleton
 @Named(GwtXdomEditor.ROLE_HINT)
-public class GwtXdomEditor extends AbstractEditorTemplate<XDOM>
+public class GwtXdomEditor extends AbstractTemplateEditor<XDOM>
 {
     /**
      * The editor component hint.
@@ -48,7 +48,7 @@ public class GwtXdomEditor extends AbstractEditorTemplate<XDOM>
     private EditorDescriptor descriptor = new DefaultEditorDescriptor(ROLE_HINT, null, "Wysiwyg");
 
     @Override
-    public String getTemplate()
+    public String getTemplateName()
     {
         return String.format("editors/%s.vm", ROLE_HINT);
     }

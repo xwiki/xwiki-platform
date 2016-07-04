@@ -154,7 +154,10 @@
         #if($isEditing)
           {{/html}}
 
-          {{html wiki='true' clean='false'}}$!providerObj.get('description'){{/html}}
+          {{html wiki='true' clean='false'}}
+            &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.description.hint')&lt;/span&gt;
+            $!providerObj.get('description')
+          {{/html}}
 
           {{html clean='false'}}
         #else
@@ -175,9 +178,9 @@
           {{/html}}
 
           {{html wiki='true' clean='false'}}
-          &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.icon.info', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
-
-          $!providerObj.get('icon'){{/html}}
+            &lt;span class="xHint"&gt;$services.localization.render('xe.templateprovider.icon.hint', ['[[', "&gt;&gt;${currentIconTheme}]]"])&lt;/span&gt;
+            $!providerObj.get('icon')
+          {{/html}}
 
           {{html clean='false'}}
         #else

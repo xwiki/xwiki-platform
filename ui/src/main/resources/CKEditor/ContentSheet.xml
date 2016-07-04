@@ -59,9 +59,9 @@
         #set ($source = $tdoc)
       #end
       #if ($source.html)
-        $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString())
+        $!services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString())
       #else
-        $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString())
+        $!services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString())
       #end
     &lt;/body&gt;
   &lt;/html&gt;

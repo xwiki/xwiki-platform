@@ -20,6 +20,7 @@
 package org.xwiki.ratings.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -172,21 +173,19 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             LOGGER.debug("Calling separate page manager code for ratings");
         }
 
-        String sql =
-            ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className='"
-                + getRatingsClassName()
-                + "' and obj.id=parentprop.id.id and parentprop.id.name='"
-                + RATING_CLASS_FIELDNAME_PARENT
-                + "' and parentprop.value='"
-                + entityReferenceSerializer.serialize(documentRef)
-                + "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
-                + getRatingsClassName()
-                + "' and obj2.id=statusprop.id.id and statusprop.id.name='status' and (statusprop.value='moderated' or statusprop.value='refused') and obj.id=obj2.id) order by doc.date "
-                + (asc ? "asc" : "desc");
+        String sql = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?"
+            + " and obj.id=parentprop.id.id and parentprop.id.name=?" + " and parentprop.value=?"
+            + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?"
+            + " and obj2.id=statusprop.id.id and statusprop.id.name=? and (statusprop.value=? or statusprop.value= ?) and obj.id=obj2.id) order by doc.date "
+            + (asc ? "asc" : "desc");
+
+        List<?> params = new ArrayList<String>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
+            entityReferenceSerializer.serialize(documentRef), getRatingsClassName(), "status", "moderated", "refused"));
+
         List<Rating> ratings = new ArrayList<Rating>();
         try {
             List<DocumentReference> ratingPageReferenceList =
-                getXWiki().getStore().searchDocumentReferences(sql, count, start, getXWikiContext());
+                getXWikiContext().getWiki().getStore().searchDocumentReferences(sql, params, getXWikiContext());
 
             for (DocumentReference ratingPageReference : ratingPageReferenceList) {
                 ratings.add(getRatingFromDocument(documentRef,
@@ -202,19 +201,17 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     @Override
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
-        String sql =
-            ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className='"
-                + getRatingsClassName()
-                + "' and obj.id=parentprop.id.id and parentprop.id.name='"
-                + RATING_CLASS_FIELDNAME_PARENT
-                + "' and parentprop.value='"
-                + entityReferenceSerializer.serialize(documentRef)
-                + "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
-                + getRatingsClassName()
-                + "' and obj2.id=statusprop.id.id and statusprop.id.name='status' and (statusprop.value='moderated' or statusprop.value='refused') and obj.id=obj2.id) order by doc.date desc";
+        String sql = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?"
+            + " and obj.id=parentprop.id.id and parentprop.id.name=?" + " and parentprop.value=?"
+            + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?"
+            + " and obj2.id=statusprop.id.id and statusprop.id.name=? and (statusprop.value=? or statusprop.value=?) and obj.id=obj2.id) order by doc.date desc";
+        
+        List<?> params = new ArrayList<String>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
+            entityReferenceSerializer.serialize(documentRef), getRatingsClassName(), "status", "moderated", "refused"));
+
         try {
             List<DocumentReference> ratingPageReferenceList =
-                getXWiki().getStore().searchDocumentReferences(sql, 1, id, getXWikiContext());
+                getXWikiContext().getWiki().getStore().searchDocumentReferences(sql, 1, id, params, getXWikiContext());
             if ((ratingPageReferenceList == null) || (ratingPageReferenceList.size() == 0)) {
                 return null;
             } else {

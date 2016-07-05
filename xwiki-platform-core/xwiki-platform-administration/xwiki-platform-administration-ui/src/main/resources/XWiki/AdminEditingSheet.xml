@@ -83,6 +83,9 @@
     &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
     &lt;input type="hidden" name="${editorBindingClassName}_${objectNumber}_dataType" value="$dataTypeValue" /&gt;
     &lt;select id="$fieldName" name="$fieldName"&gt;
+      ## This option is needed in order to allow the user to reset the default editor and inherit the configuration from
+      ## the parent configuration source.
+      &lt;option value=""&gt;---&lt;/option&gt;
       #foreach ($editor in $editors)
         #set ($editorDescriptor = $editor.descriptor)
         &lt;option value="$escapetool.xml($editorDescriptor.id)" #if ($editorDescriptor.id == $defaultEditor)

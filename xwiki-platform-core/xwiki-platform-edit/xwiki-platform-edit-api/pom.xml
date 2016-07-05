@@ -48,12 +48,6 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <!-- For the editors that use templates to generate the HTML. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-template-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <!-- For the edit script service. -->
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>
@@ -64,6 +58,18 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-api</artifactId>
       <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <!-- For the editors that use templates to generate the HTML. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- For translating the editor name and description. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

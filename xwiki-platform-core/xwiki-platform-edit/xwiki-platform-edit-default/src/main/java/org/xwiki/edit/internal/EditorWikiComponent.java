@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -36,8 +38,10 @@ import org.xwiki.edit.AbstractEditor;
 import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
+import org.xwiki.edit.EditorDescriptorBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -59,6 +63,14 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     private static final LocalDocumentReference EDITOR_CLASS_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
         "EditorClass");
 
+    /**
+     * The {@link XWikiContext} key that holds the security document.
+     */
+    private static final String SECURITY_DOCUMENT = "sdoc";
+
+    @Inject
+    private Logger logger;
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -70,7 +82,8 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
 
     private WikiComponentScope scope;
 
-    private EditorDescriptor descriptor;
+    @Inject
+    private EditorDescriptorBuilder descriptorBuilder;
 
     @Override
     public DocumentReference getAuthorReference()
@@ -87,7 +100,7 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Override
     public String getRoleHint()
     {
-        return getDescriptor().getId();
+        return this.descriptorBuilder.getId();
     }
 
     @Override
@@ -105,17 +118,39 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Override
     public EditorDescriptor getDescriptor()
     {
-        return this.descriptor;
+        try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
+            XWikiDocument translatedEditorDocument = editorDocument.getTranslatedDocument(xcontext);
+            this.descriptorBuilder.setName(translatedEditorDocument.getRenderedTitle(Syntax.PLAIN_1_0, xcontext));
+            this.descriptorBuilder.setDescription(translatedEditorDocument.getRenderedContent(Syntax.PLAIN_1_0,
+                xcontext));
+
+        } catch (XWikiException e) {
+            this.logger.warn("Failed to read the editor name and description. Root cause: "
+                + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return this.descriptorBuilder.build();
     }
 
     @Override
     protected String render() throws EditException
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument previousSecurityDocument = (XWikiDocument) xcontext.get(SECURITY_DOCUMENT);
         try {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            return xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext).getRenderedContent(xcontext);
+            XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
+            BaseObject editorObject = editorDocument.getXObject(EDITOR_CLASS_REFERENCE);
+            String editorCode = editorObject.getStringValue("code");
+            // Make sure the editor code is executed with the rights of the editor document author.
+            xcontext.put(SECURITY_DOCUMENT, editorDocument);
+            // Execute the editor code in the context of the current document (because the editor code needs to access
+            // the data that has been put on the script context).
+            return xcontext.getDoc().getRenderedContent(editorCode, editorDocument.getSyntax().toIdString(), xcontext);
         } catch (Exception e) {
             throw new EditException("Failed to render the editor code.", e);
+        } finally {
+            xcontext.put(SECURITY_DOCUMENT, previousSecurityDocument);
         }
     }
 
@@ -156,7 +191,10 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
 
     private void initialize(BaseObject editorObject) throws WikiComponentException
     {
-        this.descriptor = new WikiEditorDescriptor(editorObject);
+        this.descriptorBuilder.setId(editorObject.getStringValue("roleHint"));
+        this.descriptorBuilder.setIcon(editorObject.getStringValue("icon"));
+        this.descriptorBuilder.setCategory(editorObject.getStringValue("category"));
+
         this.scope = WikiComponentScope.fromString(editorObject.getStringValue("scope"));
 
         String dataTypeName = editorObject.getStringValue("dataType");

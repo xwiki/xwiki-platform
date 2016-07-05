@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.edit;
+package org.xwiki.edit.internal;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.edit.EditorDescriptor;
 
 /**
  * Default {@link EditorDescriptor} implementation.
@@ -27,10 +27,13 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 8.2RC1
  */
-@Unstable
 public class DefaultEditorDescriptor implements EditorDescriptor
 {
     private final String id;
+
+    private final String name;
+
+    private final String description;
 
     private final String icon;
 
@@ -40,33 +43,16 @@ public class DefaultEditorDescriptor implements EditorDescriptor
      * Creates a new descriptor for the specified editor.
      * 
      * @param id the editor id (usually the editor component hint)
-     */
-    public DefaultEditorDescriptor(String id)
-    {
-        this(id, null, null);
-    }
-
-    /**
-     * Creates a new descriptor for the specified editor.
-     * 
-     * @param id the editor id (usually the editor component hint)
-     * @param icon the editor icon
-     */
-    public DefaultEditorDescriptor(String id, String icon)
-    {
-        this(id, icon, null);
-    }
-
-    /**
-     * Creates a new descriptor for the specified editor.
-     * 
-     * @param id the editor id (usually the editor component hint)
+     * @param name the editor pretty name
+     * @param description the editor short description
      * @param icon the editor icon
      * @param category the editor category
      */
-    public DefaultEditorDescriptor(String id, String icon, String category)
+    public DefaultEditorDescriptor(String id, String name, String description, String icon, String category)
     {
         this.id = id;
+        this.name = name;
+        this.description = description;
         this.icon = icon;
         this.category = category;
     }
@@ -80,13 +66,13 @@ public class DefaultEditorDescriptor implements EditorDescriptor
     @Override
     public String getName()
     {
-        return String.format("edit.editor.%s.name", getId());
+        return this.name;
     }
 
     @Override
     public String getDescription()
     {
-        return String.format("edit.editor.%s.description", getId());
+        return this.description;
     }
 
     @Override

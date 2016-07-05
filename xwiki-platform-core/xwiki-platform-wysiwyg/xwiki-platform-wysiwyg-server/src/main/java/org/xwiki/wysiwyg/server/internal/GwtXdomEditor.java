@@ -19,14 +19,17 @@
  */
 package org.xwiki.wysiwyg.server.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.edit.AbstractTemplateEditor;
-import org.xwiki.edit.DefaultEditorDescriptor;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
+import org.xwiki.edit.EditorDescriptorBuilder;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -38,14 +41,15 @@ import org.xwiki.rendering.block.XDOM;
 @Component
 @Singleton
 @Named(GwtXdomEditor.ROLE_HINT)
-public class GwtXdomEditor extends AbstractTemplateEditor<XDOM>
+public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initializable
 {
     /**
      * The editor component hint.
      */
     public static final String ROLE_HINT = "xdomWysiwygGwt";
 
-    private EditorDescriptor descriptor = new DefaultEditorDescriptor(ROLE_HINT, null, "Wysiwyg");
+    @Inject
+    private EditorDescriptorBuilder editorDescriptorBuilder;
 
     @Override
     public String getTemplateName()
@@ -56,6 +60,13 @@ public class GwtXdomEditor extends AbstractTemplateEditor<XDOM>
     @Override
     public EditorDescriptor getDescriptor()
     {
-        return this.descriptor;
+        // Re-build the descriptor for the current localization context.
+        return this.editorDescriptorBuilder.build();
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.editorDescriptorBuilder.setId(ROLE_HINT).setCategory("Wysiwyg");
     }
 }

@@ -88,6 +88,16 @@ public class InlineAction extends XWikiAction
 
             doc2.readFromForm((EditForm) form, context);
 
+            // Set the current user as creator, author and contentAuthor when the edited document is newly created
+            // to avoid using XWikiGuest instead (because those fields were not previously initialized).
+            // This is needed for the script right, as guest doesn't have it and this would block the execution of
+            // scripts in newly created documents even if the user creating the document has the right.
+            if (doc2.isNew()) {
+                doc2.setCreatorReference(context.getUserReference());
+                doc2.setAuthorReference(context.getUserReference());
+                doc2.setContentAuthorReference(context.getUserReference());
+            }
+
             /* Setup a lock */
             try {
                 XWikiLock lock = doc.getLock(context);

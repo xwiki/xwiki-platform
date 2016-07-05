@@ -33,7 +33,6 @@ import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 
 /**
  * @param <E>
- * @param <P>
  * @param <F>
  * @version $Id$
  * @since 6.2M1

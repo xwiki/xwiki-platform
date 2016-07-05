@@ -39,16 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="CKEditor.VelocityMacros"/}}
-
-{{velocity}}
-{{html clean="false"}}
-#set ($fieldName = $edit.parameters.name)
-#set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
-#set ($fieldValue = "$!services.rendering.render($edit.data, $syntaxId)")
-#ckeditor($fieldName $fieldValue)
-{{/html}}
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>CKEditor.WebHome</name>
     <number>0</number>
@@ -76,6 +67,21 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </category>
+      <code>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>code</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
       <dataType>
         <customDisplay/>
         <disabled>0</disabled>
@@ -89,19 +95,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </dataType>
-      <description>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>3</number>
-        <picker>0</picker>
-        <prettyName>Description</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </description>
       <icon>
         <customDisplay/>
         <disabled>0</disabled>
@@ -154,10 +147,19 @@
       <category>Wysiwyg</category>
     </property>
     <property>
-      <dataType>org.xwiki.rendering.block.XDOM</dataType>
+      <code>{{include reference="CKEditor.VelocityMacros"/}}
+
+{{velocity}}
+{{html clean="false"}}
+#set ($fieldName = $edit.parameters.name)
+#set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
+#set ($fieldValue = "$!services.rendering.render($edit.data, $syntaxId)")
+#ckeditor($fieldName $fieldValue)
+{{/html}}
+{{/velocity}}</code>
     </property>
     <property>
-      <description/>
+      <dataType>org.xwiki.rendering.block.XDOM</dataType>
     </property>
     <property>
       <icon/>

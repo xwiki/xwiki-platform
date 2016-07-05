@@ -29,8 +29,16 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.DefaultFilterStreamBeanDescriptor;
 import org.xwiki.filter.instance.input.AbstractEntityEventGenerator;
+import org.xwiki.filter.instance.input.EntityEventGenerator;
 import org.xwiki.properties.BeanManager;
 
+/**
+ * @param <E> the type of the entity (XWikiDocument, BaseObject, BaseClass, etc.)
+ * @param <F> the type of the filter declaring the events supported by this {@link EntityEventGenerator}
+ * @param <P> the type of the properties bean
+ * @version $Id$
+ * @since 6.2M1
+ */
 public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends AbstractEntityEventGenerator<E, F>
 {
     @Inject
@@ -54,9 +62,8 @@ public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends Abstract
 
         // Initialize FilterStream Descriptor.
         DefaultFilterStreamBeanDescriptor descriptor =
-            new DefaultFilterStreamBeanDescriptor(getName(), getDescription(),
-                this.beanManager.getBeanDescriptor(!this.propertiesType.isInterface() ? this.propertiesType
-                    : Object.class));
+            new DefaultFilterStreamBeanDescriptor(getName(), getDescription(), this.beanManager
+                .getBeanDescriptor(!this.propertiesType.isInterface() ? this.propertiesType : Object.class));
 
         setDescriptor(descriptor);
     }

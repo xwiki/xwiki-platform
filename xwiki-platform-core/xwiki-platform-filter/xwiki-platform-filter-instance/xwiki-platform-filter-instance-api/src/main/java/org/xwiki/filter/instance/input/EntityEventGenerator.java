@@ -26,7 +26,7 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 
 /**
- * @param <E>
+ * @param <E> the type of the entity (XWikiDocument, BaseObject, BaseClass, etc.)
  * @version $Id$
  * @since 6.2M1
  */

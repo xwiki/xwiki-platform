@@ -32,8 +32,8 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 
 /**
- * @param <E>
- * @param <F>
+ * @param <E> the type of the entity (XWikiDocument, BaseObject, BaseClass, etc.)
+ * @param <F> the type of the filter declaring the events supported by this {@link EntityEventGenerator}
  * @version $Id$
  * @since 6.2M1
  */

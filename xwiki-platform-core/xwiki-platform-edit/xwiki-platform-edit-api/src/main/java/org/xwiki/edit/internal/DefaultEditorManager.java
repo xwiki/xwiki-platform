@@ -83,9 +83,15 @@ public class DefaultEditorManager implements EditorManager
     public <D> Editor<D> getEditor(Type dataType, String hint)
     {
         DefaultParameterizedType editorType = new DefaultParameterizedType(null, Editor.class, dataType);
-        try {
-            return this.componentManagerProvider.get().getInstance(editorType, hint);
-        } catch (ComponentLookupException e) {
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        if (componentManager.hasComponent(editorType, hint)) {
+            try {
+                return componentManager.getInstance(editorType, hint);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException(String.format("Failed to look up the [%s] editor with hint [%s]",
+                    dataType.getTypeName(), hint), e);
+            }
+        } else {
             // No such editor component found.
             return null;
         }

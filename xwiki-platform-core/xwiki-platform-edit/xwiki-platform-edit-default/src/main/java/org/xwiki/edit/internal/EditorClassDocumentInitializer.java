@@ -64,7 +64,7 @@ public class EditorClassDocumentInitializer extends AbstractMandatoryDocumentIni
 
         needsUpdate |= bclass.addTextField("dataType", "Data Type", 30);
         needsUpdate |= bclass.addTextField("roleHint", "Role Hint", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 40, 20);
+        needsUpdate |= bclass.addTextAreaField("code", "Code", 40, 20, "Text");
         needsUpdate |= bclass.addTextField("icon", "Icon", 30);
         needsUpdate |= bclass.addTextField("category", "Category", 30);
         needsUpdate |= bclass.addStaticListField("scope", "Scope", "wiki=Current Wiki|user=Current User|global=Global");

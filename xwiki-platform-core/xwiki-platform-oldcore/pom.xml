@@ -477,6 +477,11 @@
       <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>

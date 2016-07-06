@@ -1,16 +1,17 @@
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
+#textArea
 #set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
-<textarea id="$!escapetool.xml($edit.parameters.id)" name="$!escapetool.xml($edit.parameters.name)"
-  >$!escapetool.xml($services.rendering.render($edit.data, $syntaxId))</textarea>
-#set ($sourceDocument = $edit.parameters.sourceDocument)
-#if (!$sourceDocument)
-  #set ($sourceDocumentReference = $edit.data.metaData.getMetaData('source'))
-  #if ($sourceDocumentReference)
-    #set ($sourceDocument = $xwiki.getDocument($sourceDocumentReference))
-  #else
-    #set ($sourceDocument = $tdoc)
+#if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+  #set ($sourceDocument = $edit.parameters.sourceDocument)
+  #if (!$sourceDocument)
+    #set ($sourceDocumentReference = $edit.data.metaData.getMetaData('source'))
+    #if ($sourceDocumentReference)
+      #set ($sourceDocument = $xwiki.getDocument($sourceDocumentReference))
+    #else
+      #set ($sourceDocument = $tdoc)
+    #end
   #end
+  #set ($full = $edit.parameters.full == true)
+  #wysiwyg_editProperty($sourceDocument $edit.parameters.name $full)
 #end
-#set ($full = $edit.parameters.full == true)
-#wysiwyg_editProperty($sourceDocument $edit.parameters.name $full)

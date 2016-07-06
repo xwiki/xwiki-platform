@@ -66,7 +66,8 @@ public class XDOMEditorConfiguration implements EditorConfiguration<XDOM>
                 defaultEditor = this.xwikiConfig.getProperty("xwiki.editor", String.class);
             }
         }
-        return defaultEditor;
+        // We need to keep the value case insensitive for backwards compatibility.
+        return StringUtils.lowerCase(defaultEditor);
     }
 
     @Override

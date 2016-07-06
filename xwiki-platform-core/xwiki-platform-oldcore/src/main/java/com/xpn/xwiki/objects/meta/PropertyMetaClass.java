@@ -106,6 +106,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         TextAreaClass customDisplayClass = new TextAreaClass(this);
         customDisplayClass.setName("customDisplay");
         customDisplayClass.setPrettyName("Custom Display");
+        customDisplayClass.setEditor("Text");
         customDisplayClass.setRows(5);
         customDisplayClass.setSize(80);
         safeput(customDisplayClass.getName(), customDisplayClass);

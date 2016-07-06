@@ -114,7 +114,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
         needsUpdate |= bclass.addTextField("title", "Title", 30);
         needsUpdate |= bclass.addTextField("version", "Version", 30);
-        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
+        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8, "PureText");
         needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
 
         // mail
@@ -124,7 +124,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
         needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
         needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
-        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6);
+        needsUpdate |=
+            bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6, "PureText");
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);

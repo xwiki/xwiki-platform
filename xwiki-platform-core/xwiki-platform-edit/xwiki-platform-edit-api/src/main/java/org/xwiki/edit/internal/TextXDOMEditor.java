@@ -46,7 +46,7 @@ public class TextXDOMEditor extends AbstractTemplateEditor<XDOM> implements Init
     /**
      * The editor component hint.
      */
-    public static final String ROLE_HINT = "Text";
+    public static final String ROLE_HINT = "text";
 
     @Inject
     private EditorDescriptorBuilder editorDescriptorBuilder;

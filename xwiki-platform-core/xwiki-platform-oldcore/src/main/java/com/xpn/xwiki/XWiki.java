@@ -1216,13 +1216,14 @@ public class XWiki implements EventListener
 
     /**
      * @return the full list of all wiki names of all defined wikis. The wiki names are computed from the names of
-     *         documents having a XWiki.XWikiServerClass object attached to them by removing the "XWiki.XWikiServer"
-     *         prefix and making it lower case. For example a page named "XWiki.XWikiServerMyDatabase" would return
-     *         "mydatabase" as the wiki name. This list will also contain the main wiki.
-     *         <p/>
-     *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However, if
-     *         configured accordingly, the database can be diferent from the wiki name, like for example when setting a
-     *         wiki database prefix.
+     *         documents having a {@code XWiki.XWikiServerClass} object attached to them by removing the
+     *         {@code XWiki.XWikiServer} prefix and making it lower case. For example a page named
+     *         {@code XWiki.XWikiServerMyDatabase} would return {@code mydatabase} as the wiki name. This list will
+     *         also contain the main wiki.
+     *         <p>
+     *         Note: the wiki name is commonly also the name of the database where the wiki's data is stored. However,
+     *         if configured accordingly, the database can be diferent from the wiki name, like for example when
+     *         setting a wiki database prefix.
      * @deprecated since 5.3, use {@link WikiDescriptorManager#getAllIds()} instead
      */
     @Deprecated
@@ -5114,7 +5115,7 @@ public class XWiki implements EventListener
      * @param userReference
      * @param format a Velocity scnippet used to format the user name
      * @param link true if a full html link snippet should be returned
-     * @param escapeXML true if the returned name should be escaped (forced true if <code>link</link> is true)
+     * @param escapeXML true if the returned name should be escaped (forced true if {@code link} is true)
      * @param context the XWiki context
      * @return the display user name or a html snippet with the link to the passed user
      * @since 6.4RC1
@@ -6757,8 +6758,8 @@ public class XWiki implements EventListener
      * Search attachments by passing HQL where clause values as parameters. You can specify properties of the "attach"
      * (the attachment) or "doc" (the document it is attached to)
      *
-     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param parametrizedSqlClause The HQL where clause. For example {@code where doc.fullName
+     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
      * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.

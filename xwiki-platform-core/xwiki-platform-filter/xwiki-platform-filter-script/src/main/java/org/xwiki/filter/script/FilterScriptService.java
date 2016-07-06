@@ -81,6 +81,8 @@ public class FilterScriptService extends AbstractFilterScriptService
     @Named(FilterStreamConverterJob.JOBTYPE)
     private Provider<Job> jobProvider;
 
+    private Job lastJob;
+
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
@@ -89,8 +91,8 @@ public class FilterScriptService extends AbstractFilterScriptService
     /**
      * @since 6.2M1
      */
-    public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
-        Map<String, Object> outputProperties)
+    public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties,
+        FilterStreamType outputType, Map<String, Object> outputProperties)
     {
         return convert(inputType, inputProperties, outputType, outputProperties, true);
     }
@@ -109,7 +111,7 @@ public class FilterScriptService extends AbstractFilterScriptService
     {
         resetError();
 
-        Job job = null;
+        this.lastJob = null;
 
         try {
             this.authorization.checkAccess(Right.PROGRAM);
@@ -118,18 +120,18 @@ public class FilterScriptService extends AbstractFilterScriptService
                 new FilterStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
 
             if (async) {
-                job = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
+                this.lastJob = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
             } else {
                 // Not using the job executor to make sure to be executed the current thread
-                job = this.jobProvider.get();
-                job.initialize(request);
-                job.run();
+                this.lastJob = this.jobProvider.get();
+                this.lastJob.initialize(request);
+                this.lastJob.run();
             }
         } catch (Exception e) {
             setError(e);
         }
 
-        return job;
+        return this.lastJob;
     }
 
     /**
@@ -137,19 +139,7 @@ public class FilterScriptService extends AbstractFilterScriptService
      */
     public Job getCurrentJob()
     {
-        resetError();
-
-        Job job = null;
-
-        try {
-            this.authorization.checkAccess(Right.PROGRAM);
-
-            return this.jobExecutor.getCurrentJob(FilterStreamConverterJob.ROOT_GROUP);
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return job;
+        return this.lastJob;
     }
 
     /**
@@ -161,7 +151,7 @@ public class FilterScriptService extends AbstractFilterScriptService
 
         try {
             List<ComponentDescriptor<FilterStreamFactory>> descriptors =
-                this.componentManagerProvider.get().<FilterStreamFactory> getComponentDescriptorList(factoryType);
+                this.componentManagerProvider.get().<FilterStreamFactory>getComponentDescriptorList(factoryType);
 
             List<FilterStreamType> types = new ArrayList<FilterStreamType>(descriptors.size());
             for (ComponentDescriptor<FilterStreamFactory> descriptor : descriptors) {
@@ -203,7 +193,7 @@ public class FilterScriptService extends AbstractFilterScriptService
 
         try {
             return this.componentManagerProvider.get()
-                .<FilterStreamFactory> getInstance(factoryType, inputType.serialize()).getDescriptor();
+                .<FilterStreamFactory>getInstance(factoryType, inputType.serialize()).getDescriptor();
         } catch (Exception e) {
             setError(e);
         }

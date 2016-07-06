@@ -39,4 +39,19 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class XDOMEditScriptService extends AbstractTypedEditScriptService<XDOM>
 {
+    /**
+     * @return the default {@link XDOM} editor in the "Text" category
+     */
+    public Editor<XDOM> getDefaultTextEditor()
+    {
+        return getDefaultEditor("text");
+    }
+
+    /**
+     * @return the default {@link XDOM} editor in the "WYSIWYG" category
+     */
+    public Editor<XDOM> getDefaultWysiwygEditor()
+    {
+        return getDefaultEditor("wysiwyg");
+    }
 }

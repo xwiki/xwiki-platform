@@ -25,11 +25,13 @@
     </div>
     <div id="xwikitext">
       <div id="xwikieditcontent">
-        ## The editor will replace the following text area with its own widget.
-        ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
-        $xwiki.getTextArea($tdoc.content)
-        ## Edit the document content using a fully-fledged editor.
-        #wysiwyg_editProperty($tdoc 'content' true)
+        $!services.edit.xdom.defaultWysiwygEditor.render($tdoc.getXDOM(), {
+          'id': 'content',
+          'name': 'content',
+          'rows': 25,
+          'cols': 80,
+          'full': true
+        })
       </div>
     </div>
   </div>

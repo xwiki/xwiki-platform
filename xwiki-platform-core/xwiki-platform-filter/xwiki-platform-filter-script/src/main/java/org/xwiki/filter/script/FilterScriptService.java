@@ -122,7 +122,7 @@ public class FilterScriptService extends AbstractFilterScriptService
             if (async) {
                 this.lastJob = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
             } else {
-                // Not using the job executor to make sure to be executed the current thread
+                // Not using the job executor to make sure to be executed in the current thread
                 this.lastJob = this.jobProvider.get();
                 this.lastJob.initialize(request);
                 this.lastJob.run();

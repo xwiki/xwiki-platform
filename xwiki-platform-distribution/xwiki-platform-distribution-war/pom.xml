@@ -424,6 +424,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Edit API Implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Wysiwyg -->
     <!-- Add the GWT JAR so that the XWiki GWT Servlet can be activated by default in web.xml -->
     <dependency>

@@ -1,3 +1,4 @@
+#template('editors/xdom_macros.vm')
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
 #textArea

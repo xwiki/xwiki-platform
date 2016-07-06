@@ -104,6 +104,7 @@ import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.edit.EditConfiguration;
 import org.xwiki.job.Job;
 import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
@@ -135,6 +136,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
@@ -399,6 +401,8 @@ public class XWiki implements EventListener
 
     private ConfigurationSource spaceConfiguration;
 
+    private EditConfiguration editConfiguration;
+
     private ObservationManager observationManager;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -459,6 +463,15 @@ public class XWiki implements EventListener
         }
 
         return this.userConfiguration;
+    }
+
+    private EditConfiguration getEditConfiguration()
+    {
+        if (this.editConfiguration == null) {
+            this.editConfiguration = Utils.getComponent(EditConfiguration.class);
+        }
+
+        return this.editConfiguration;
     }
 
     private InternalSkinManager getInternalSkinManager()
@@ -5919,17 +5932,9 @@ public class XWiki implements EventListener
 
     public String getEditorPreference(XWikiContext context)
     {
-        String pref = getUserPreference("editor", context);
-        // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-        if (pref.equals(NO_VALUE)) {
-            pref = getSpacePreference("editor", context);
-        }
+        String defaultXDOMEditor = getEditConfiguration().getDefaultEditor(XDOM.class);
 
-        if (pref.equals("")) {
-            pref = getConfiguration().getProperty("xwiki.editor", "");
-        }
-
-        return pref.toLowerCase();
+        return defaultXDOMEditor == null ? "" : defaultXDOMEditor.toLowerCase();
     }
 
     /**

@@ -40,9 +40,70 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-### Administer the wiki editor preferences, at global level
+##
+## Administer the wiki editor preferences, at global level
+##
+
+#macro (maybeConfigureDefaultWysiwygEditor)
+  #maybeConfigureDefaultEditor('org.xwiki.rendering.block.XDOM' 'wysiwyg')
+#end
+
+#macro (maybeConfigureDefaultEditor $dataType $category)
+  #set ($editorBindingClassName = 'XWiki.EditorBindingClass')
+  #if ("$!category" != '')
+    #set ($dataTypeValue = "$dataType$escapetool.h$category")
+  #else
+    #set ($dataTypeValue = $dataType)
+  #end
+  #set ($editorBindingObject = $doc.getObject($editorBindingClassName, 'dataType', $dataTypeValue))
+  #if (!$editorBindingObject)
+    #set ($editorBindingObject = $doc.newObject($editorBindingClassName))
+    #set ($discard = $editorBindingObject.set('dataType', $dataTypeValue))
+  #end
+  #set ($objectNumber = $editorBindingObject.number)
+  #set ($fieldName = "${editorBindingClassName}_${objectNumber}_roleHint")
+  #set ($defaultEditor = $request.getParameter($fieldName))
+  #if ("$!defaultEditor" == '')
+    #set ($defaultEditor = $editorBindingObject.getValue('roleHint'))
+  #end
+  #set ($editors = $services.edit.getEditors($dataType, $category))
+  #if ("$!defaultEditor" != '' || ($editors &amp;&amp; $editors.size() &gt; 0))
+    #configureDefaultEditor($editors $defaultEditor)
+  #end
+#end
+
+#macro (configureDefaultEditor $editors $defaultEditor)
+  &lt;dt&gt;
+    &lt;label for="$fieldName"&gt;
+      $services.localization.render("edit.defaultEditor.$dataTypeValue.replace('#', '.')")
+    &lt;/label&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    ## Add the configuration object if it doesn't exist.
+    &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
+    &lt;input type="hidden" name="${editorBindingClassName}_${objectNumber}_dataType" value="$dataTypeValue" /&gt;
+    &lt;select id="$fieldName" name="$fieldName"&gt;
+      ## This option is needed in order to allow the user to reset the default editor and inherit the configuration from
+      ## the parent configuration source.
+      &lt;option value=""&gt;---&lt;/option&gt;
+      #foreach ($editor in $editors)
+        #set ($editorDescriptor = $editor.descriptor)
+        &lt;option value="$escapetool.xml($editorDescriptor.id)" #if ($editorDescriptor.id == $defaultEditor)
+          selected="selected"#end&gt;$escapetool.xml($editorDescriptor.name)&lt;/option&gt;
+      #end
+      #if ("$!defaultEditor" != '' &amp;&amp; !$services.edit.getEditor($dataType, $defaultEditor))
+        ## The configured default editor is not available any more.
+        &lt;option value="$escapetool.xml($defaultEditor)" selected="selected"&gt;
+          $escapetool.xml($defaultEditor)
+        &lt;/option&gt;
+      #end
+    &lt;/select&gt;
+  &lt;/dd&gt;
+#end
+
 #set ($params = {
-  'editor': ['editor', 'core.defaultDocumentSyntax', 'xwiki.title.mandatory'],
+  'editor': ['editor', {'html': "#maybeConfigureDefaultWysiwygEditor"}, 'core.defaultDocumentSyntax',
+    'xwiki.title.mandatory'],
   'versioning': ['editcomment', 'editcomment_mandatory', 'minoredit']
 })
 {{/velocity}}

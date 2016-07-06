@@ -1,0 +1,28 @@
+#macro (getTextAreaAttributes $parameters $attributes)
+  #if ("$!parameters.id" != '')
+    #set ($attributes.id = $parameters.id)
+  #end
+  #if ("$!parameters.name" != '')
+    #set ($attributes.name = $parameters.name)
+  #end
+  #if ("$!parameters.cols" != '')
+    #set ($attributes.cols = $parameters.cols)
+  #end
+  #if ("$!parameters.rows" != '')
+    #set ($attributes.rows = $parameters.rows)
+  #end
+  #if ("$!parameters.disabled" == 'true')
+    #set ($attributes.disabled = 'disabled')
+  #end
+#end
+#macro (printAttributes $attributes)
+  #foreach ($entry in $attributes.entrySet())
+    $entry.key="$!escapetool.xml($entry.value)"
+  #end
+#end
+#macro (textArea)
+  #set ($attributes = {})
+  #getTextAreaAttributes($edit.parameters $attributes)
+  #set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
+  <textarea #printAttributes($attributes)>$!escapetool.xml($services.rendering.render($edit.data, $syntaxId))</textarea>
+#end

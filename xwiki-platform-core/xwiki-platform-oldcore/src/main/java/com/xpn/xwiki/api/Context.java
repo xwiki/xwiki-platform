@@ -413,12 +413,14 @@ public class Context extends Api
     }
 
     /**
-     * Returns the list of textarea fields that use the WYSIWYG editor. This list is automatically built when displaying
-     * textarea properties.
+     * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
+     * TextArea properties.
      *
-     * @return A string containing a comma-separated list of textarea field names for which the WYSIWYG editor should be
-     *         enabled.
+     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
+     *         enabled
      */
+    @Deprecated
     public String getEditorWysiwyg()
     {
         return getXWikiContext().getEditorWysiwyg();

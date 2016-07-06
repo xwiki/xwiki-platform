@@ -701,6 +701,10 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-refactoring-default", getXWikiPlatformVersion(), null, "jar"));
 
+        // Editing wiki pages is a core action and so we need to provide an implementation for the edit API.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-edit-default", getXWikiPlatformVersion(), null, "jar"));
+
         // Rendering Script Service is used in several places and it requires a rendering configuration implementation
         // to work. In addition WikiModel component implementation also requires a rendering configuration
         // implementation to work.

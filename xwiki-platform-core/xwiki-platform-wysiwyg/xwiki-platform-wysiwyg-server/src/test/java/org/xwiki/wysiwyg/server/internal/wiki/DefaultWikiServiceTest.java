@@ -19,6 +19,8 @@
  */
 package org.xwiki.wysiwyg.server.internal.wiki;
 
+import java.util.Arrays;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -27,6 +29,7 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 
 import static org.junit.Assert.*;
@@ -59,5 +62,14 @@ public class DefaultWikiServiceTest
         when(converter.convert(wikiPageReference)).thenReturn(documentReference);
 
         assertEquals(uploadURL, mocker.getComponentUnderTest().getUploadURL(wikiPageReference));
+    }
+
+    @Test
+    public void getVirtualWikiNames() throws Exception
+    {
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("foo", "bar"));
+
+        assertEquals(Arrays.asList("bar", "foo"), this.mocker.getComponentUnderTest().getVirtualWikiNames());
     }
 }

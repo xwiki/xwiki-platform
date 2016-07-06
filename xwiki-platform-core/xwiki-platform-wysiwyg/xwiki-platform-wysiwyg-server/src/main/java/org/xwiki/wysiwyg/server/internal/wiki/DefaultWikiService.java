@@ -20,15 +20,14 @@
 package org.xwiki.wysiwyg.server.internal.wiki;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.wiki.Attachment;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPage;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
@@ -51,10 +50,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultWikiService extends AbstractWikiService
 {
-    /** Execution context handler, needed for accessing the XWikiContext. */
-    @Inject
-    private Execution execution;
-
     /**
      * The component used to serialize an entity reference relative to another entity reference.
      */
@@ -62,44 +57,20 @@ public class DefaultWikiService extends AbstractWikiService
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
-    /**
-     * @return the XWiki context
-     * @deprecated avoid using this method; try using the document access bridge instead
-     */
-    @Deprecated
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-    }
-
-    @Override
-    public List<String> getVirtualWikiNames()
-    {
-        List<String> virtualWikiNamesList = new ArrayList<String>();
-        try {
-            virtualWikiNamesList = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(getXWikiContext());
-            // put the current, default database if nothing is inside
-            if (virtualWikiNamesList.size() == 0) {
-                virtualWikiNamesList.add(getXWikiContext().getWikiId());
-            }
-            Collections.sort(virtualWikiNamesList);
-        } catch (Exception e) {
-            this.logger.error(e.getLocalizedMessage(), e);
-        }
-        return virtualWikiNamesList;
-    }
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     protected String getCurrentUserRelativeTo(String wikiName)
     {
-        return compactEntityReferenceSerializer.serialize(getXWikiContext().getUserReference(), new WikiReference(
-            wikiName));
+        return compactEntityReferenceSerializer.serialize(this.xcontextProvider.get().getUserReference(),
+            new WikiReference(wikiName));
     }
 
     @Override
     protected List<WikiPage> getWikiPages(List<DocumentReference> documentReferences)
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
         List<WikiPage> wikiPages = new ArrayList<WikiPage>();
         for (DocumentReference documentReference : documentReferences) {
             try {
@@ -120,7 +91,7 @@ public class DefaultWikiService extends AbstractWikiService
     public List<Attachment> getAttachments(WikiPageReference reference)
     {
         try {
-            XWikiContext context = getXWikiContext();
+            XWikiContext context = this.xcontextProvider.get();
             List<Attachment> attachments = new ArrayList<Attachment>();
             DocumentReference documentReference = entityReferenceConverter.convert(reference);
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);

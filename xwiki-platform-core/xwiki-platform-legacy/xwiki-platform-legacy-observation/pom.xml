@@ -31,6 +31,9 @@
   <name>XWiki Platform - Legacy - Observation</name>
   <packaging>jar</packaging>
   <description>Legacy package for xwiki-platform-observation</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

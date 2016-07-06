@@ -56,7 +56,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     private boolean versionPreserved = true;
 
     /**
-     * @see #isPreserveAuthor()
+     * @see #isAuthorPreserved()
      */
     private boolean authorPreserved = true;
 
@@ -166,8 +166,8 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @param authorPreserved Indicate if the authors coming from the events should be kept. Not taken into account if
-     *            {@link #setAuthor(org.xwiki.model.reference.DocumentReference)} is used.
+     * @param authorPreserved indicate if the authors coming from the events should be kept. Not taken into account if
+     *        {@link #setAuthor(org.xwiki.model.reference.DocumentReference)} is used.
      */
     public void setAuthorPreserved(boolean authorPreserved)
     {

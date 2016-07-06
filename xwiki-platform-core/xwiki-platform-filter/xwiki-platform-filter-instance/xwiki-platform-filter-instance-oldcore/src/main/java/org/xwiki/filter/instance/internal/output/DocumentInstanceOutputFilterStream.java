@@ -189,6 +189,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             if (this.properties.isAuthorPreserved()
                 && parameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
                 document.setAuthorReference(inputDocument.getAuthorReference());
+            } else if (this.properties.isAuthorSet()) {
+                document.setAuthorReference(this.properties.getAuthor());
             } else {
                 document.setAuthorReference(xcontext.getUserReference());
             }

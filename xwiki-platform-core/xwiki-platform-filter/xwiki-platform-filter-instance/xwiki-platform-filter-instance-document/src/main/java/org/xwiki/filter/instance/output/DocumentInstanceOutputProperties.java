@@ -19,6 +19,7 @@
  */
 package org.xwiki.filter.instance.output;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
@@ -54,6 +55,16 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @see #isVersionPreserved()
      */
     private boolean versionPreserved = true;
+
+    /**
+     * @see #getAuthor()
+     */
+    private DocumentReference author;
+
+    /**
+     * @see #isAuthorSet()
+     */
+    private boolean authorSet;
 
     /**
      * @see #isAuthorPreserved()
@@ -156,18 +167,48 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate if the authors coming from the events should be kept.
+     * @return the author to use when saving documents
+     * @since 8.2
+     */
+    @PropertyName("Save author")
+    @PropertyDescription("The author to use when saving documents")
+    public DocumentReference getAuthor()
+    {
+        return this.author;
+    }
+
+    /**
+     * @param author the author to use when saving documents
+     * @since 8.2
+     */
+    public void setAuthor(DocumentReference author)
+    {
+        this.author = author;
+        this.authorSet = true;
+    }
+
+    /**
+     * @return true if the author have been explicitly set
+     * @since 8.2
+     */
+    public boolean isAuthorSet()
+    {
+        return this.authorSet;
+    }
+
+    /**
+     * @return true if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
     @PropertyDescription("Indicate if the authors comming from the events should be kept")
     public boolean isAuthorPreserved()
     {
-        return authorPreserved;
+        return !isAuthorSet() && this.authorPreserved;
     }
 
     /**
      * @param authorPreserved indicate if the authors coming from the events should be kept. Not taken into account if
-     *        {@link #setAuthor(org.xwiki.model.reference.DocumentReference)} is used.
+     *            {@link #setAuthor(DocumentReference)} is used.
      */
     public void setAuthorPreserved(boolean authorPreserved)
     {
@@ -182,7 +223,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     @PropertyDescription("Indicate if an exception should be thrown if a document save fail")
     public boolean isStoppedWhenSaveFail()
     {
-        return stoppedWhenSaveFail;
+        return this.stoppedWhenSaveFail;
     }
 
     /**

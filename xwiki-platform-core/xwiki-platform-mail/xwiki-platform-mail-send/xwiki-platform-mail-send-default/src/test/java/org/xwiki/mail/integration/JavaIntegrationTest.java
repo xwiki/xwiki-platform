@@ -41,7 +41,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -74,7 +73,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -122,9 +121,12 @@ public class JavaIntegrationTest
         ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWikiId()).thenReturn("wiki");
+
         Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
             XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(xcontext);
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);

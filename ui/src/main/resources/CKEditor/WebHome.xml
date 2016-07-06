@@ -70,7 +70,7 @@
       <code>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>Text</editor>
         <name>code</name>
         <number>3</number>
         <picker>0</picker>
@@ -144,17 +144,27 @@
       </scope>
     </class>
     <property>
-      <category>Wysiwyg</category>
+      <category>wysiwyg</category>
     </property>
     <property>
       <code>{{include reference="CKEditor.VelocityMacros"/}}
 
+{{template name="editors/xdom_macros.vm"/}}
+
 {{velocity}}
 {{html clean="false"}}
-#set ($fieldName = $edit.parameters.name)
 #set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
-#set ($fieldValue = "$!services.rendering.render($edit.data, $syntaxId)")
-#ckeditor($fieldName $fieldValue)
+#if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+  #set ($parameters = {
+    'content': "$!services.rendering.render($edit.data, $syntaxId)",
+    'attributes': {}
+  })
+  #getTextAreaAttributes($edit.parameters $parameters.attributes)
+  #ckeditor($parameters)
+#else
+  ## Fall back on a plain text area.
+  #textArea
+#end
 {{/html}}
 {{/velocity}}</code>
     </property>

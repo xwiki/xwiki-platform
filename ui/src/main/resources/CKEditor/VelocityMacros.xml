@@ -105,16 +105,22 @@
     'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
 #end
 
-#macro (ckeditor $name $text)
+#macro (ckeditor $parameters)
   #importCKEditorResources
-  #set ($escapedName = $escapetool.xml($name))
   #set ($source = {
     'syntax': $doc.syntax,
-    'content': $text
+    'content': $parameters.content
   })
   #set ($content = "#renderContentSheet")
-  &lt;textarea id="$!escapedName" name="$!escapedName" class="ckeditor-textarea loading"
-    spellcheck="false"&gt;$!escapetool.xml($content)&lt;/textarea&gt;
+  #set ($discard = $parameters.attributes.put('class',
+    "$!parameters.attributes.get('class') ckeditor-textarea loading"))
+  #set ($parameters.attributes.spellcheck = false)
+  &lt;textarea
+    #foreach ($entry in $parameters.attributes.entrySet())
+      $entry.key="$!escapetool.xml($entry.value)"
+    #end
+  &gt;$!escapetool.xml($content)&lt;/textarea&gt;
+  #set ($escapedName = $escapetool.xml($parameters.attributes.name))
   &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
   &lt;input value="$!escapetool.xml($doc.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
   ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of

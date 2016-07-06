@@ -63,7 +63,14 @@
   &lt;/div&gt;
   ## The xwikieditcontent id is needed for the auto-save feature.
   &lt;div id="xwikieditcontent"&gt;
-    #ckeditor('content' $tdoc.content)
+    #set ($parameters = {
+      'content': $tdoc.content,
+      'attributes': {
+        'id': 'content',
+        'name': 'content'
+      }
+    })
+    #ckeditor($parameters)
   &lt;/div&gt;
   {{/html}}
 #end

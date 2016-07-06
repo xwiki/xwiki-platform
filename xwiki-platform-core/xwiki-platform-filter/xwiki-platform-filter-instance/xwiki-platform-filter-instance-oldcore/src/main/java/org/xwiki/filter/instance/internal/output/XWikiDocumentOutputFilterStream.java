@@ -125,6 +125,8 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
     private Locale currentLocale;
 
+    private String currentVersion;
+
     private FilterEventParameters currentLocaleParameters;
 
     private Locale currentDefaultLocale;
@@ -253,44 +255,14 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
         this.currentEntityReference = this.currentEntityReference.getParent();
     }
 
-    @Override
-    public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
-    {
-        this.currentEntityReference = new EntityReference(name, EntityType.DOCUMENT, this.currentEntityReference);
-
-        this.currentDefaultLocale = get(Locale.class, WikiDocumentFilter.PARAMETER_LOCALE, parameters, null);
-    }
-
-    @Override
-    public void endWikiDocument(String name, FilterEventParameters parameters) throws FilterException
-    {
-        this.currentEntityReference = this.currentEntityReference.getParent();
-
-        this.currentDefaultLocale = null;
-    }
-
-    @Override
-    public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
-    {
-        this.currentLocale = locale;
-        this.currentLocaleParameters = parameters;
-    }
-
-    @Override
-    public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
-    {
-        this.currentLocale = null;
-        this.currentLocaleParameters = null;
-    }
-
-    @Override
-    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    private void begin(FilterEventParameters parameters) throws FilterException
     {
         this.document = new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference,
             this.properties != null ? this.properties.getDefaultReference() : null), this.currentLocale);
 
         this.document
             .setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters, null));
+
         if (this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
             this.document.setCreator(
                 getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters, null));
@@ -322,11 +294,11 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
             }
         }
 
-        if (version != null && this.properties.isVersionPreserved()) {
-            if (VALID_VERSION.matcher(version).matches()) {
-                this.document.setVersion(version);
-            } else if (NumberUtils.isDigits(version)) {
-                this.document.setVersion(version + ".1");
+        if (this.currentVersion != null && this.properties.isVersionPreserved()) {
+            if (VALID_VERSION.matcher(this.currentVersion).matches()) {
+                this.document.setVersion(this.currentVersion);
+            } else if (NumberUtils.isDigits(this.currentVersion)) {
+                this.document.setVersion(this.currentVersion + ".1");
             } else {
                 // TODO: log something, probably a warning
             }
@@ -339,8 +311,15 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
         // Content
 
+        // Remember the current rendering context target syntax
+        this.previousTargetSyntax = this.renderingContext.getTargetSyntax();
+
         if (parameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT)) {
             this.document.setContent(getString(WikiDocumentFilter.PARAMETER_CONTENT, parameters, null));
+
+            // Cancel any existing content listener
+            this.currentWikiPrinter = null;
+            this.contentListener.setWrappedListener(null);
         } else {
             if (this.properties != null && this.properties.getDefaultSyntax() != null) {
                 this.document.setSyntax(this.properties.getDefaultSyntax());
@@ -363,25 +342,85 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
                 }
 
                 this.currentWikiPrinter = new DefaultWikiPrinter();
-                this.previousTargetSyntax = this.renderingContext.getTargetSyntax();
                 ((MutableRenderingContext) this.renderingContext).setTargetSyntax(rendererFactory.getSyntax());
                 this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
             }
         }
     }
 
-    @Override
-    public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    private void end(FilterEventParameters parameters)
     {
         // Set content
         if (this.currentWikiPrinter != null) {
             this.document.setContent(this.currentWikiPrinter.getBuffer().toString());
 
             this.contentListener.setWrappedListener(null);
-            ((MutableRenderingContext) this.renderingContext).setTargetSyntax(this.previousTargetSyntax);
             this.currentWikiPrinter = null;
         }
 
+        // Reset
+        ((MutableRenderingContext) this.renderingContext).setTargetSyntax(this.previousTargetSyntax);
+    }
+
+    @Override
+    public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
+    {
+        this.currentEntityReference = new EntityReference(name, EntityType.DOCUMENT, this.currentEntityReference);
+
+        this.currentDefaultLocale = get(Locale.class, WikiDocumentFilter.PARAMETER_LOCALE, parameters, null);
+        this.currentLocale = Locale.ROOT;
+        this.currentLocaleParameters = parameters;
+
+        begin(parameters);
+    }
+
+    @Override
+    public void endWikiDocument(String name, FilterEventParameters parameters) throws FilterException
+    {
+        end(parameters);
+
+        this.currentEntityReference = this.currentEntityReference.getParent();
+
+        // Reset
+        this.currentLocaleParameters = null;
+        this.currentLocale = null;
+        this.currentDefaultLocale = null;
+    }
+
+    @Override
+    public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
+    {
+        this.currentLocale = locale;
+        this.currentLocaleParameters = parameters;
+
+        begin(parameters);
+    }
+
+    @Override
+    public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
+    {
+        end(parameters);
+
+        // Reset
+        this.currentLocale = null;
+        this.currentLocaleParameters = null;
+    }
+
+    @Override
+    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    {
+        this.currentVersion = version;
+
+        begin(parameters);
+    }
+
+    @Override
+    public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    {
+        end(parameters);
+
+        // Reset
+        this.currentVersion = null;
     }
 
     @Override

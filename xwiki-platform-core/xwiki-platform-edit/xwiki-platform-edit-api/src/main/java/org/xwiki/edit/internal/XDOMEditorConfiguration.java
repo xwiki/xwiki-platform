@@ -26,15 +26,18 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.edit.EditConfiguration;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorConfiguration;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * Configures the default {@link XDOM} {@link Editor}. It overwrites the default {@link EditConfiguration} in order to
- * preserve backward compatibility (because it looks for configuration properties that existed before the edit module
- * was written).
+ * Custom configuration for {@link XDOM} {@link Editor}s, which serves two roles:
+ * <ul>
+ * <li>preserves backward compatibility (because it looks for configuration properties that existed before the edit
+ * module was written)</li>
+ * <li>provides the default editor when there's no one configured</li>
+ * </ul>
+ * .
  * 
  * @version $Id$
  * @since 8.2RC1
@@ -63,7 +66,7 @@ public class XDOMEditorConfiguration implements EditorConfiguration<XDOM>
         if (StringUtils.isEmpty(defaultEditor)) {
             defaultEditor = this.documentsConfig.getProperty(propertyName, String.class);
             if (StringUtils.isEmpty(defaultEditor)) {
-                defaultEditor = this.xwikiConfig.getProperty("xwiki.editor", String.class);
+                defaultEditor = this.xwikiConfig.getProperty("xwiki.editor", TextXDOMEditor.ROLE_HINT);
             }
         }
         // We need to keep the value case insensitive for backwards compatibility.
@@ -73,7 +76,12 @@ public class XDOMEditorConfiguration implements EditorConfiguration<XDOM>
     @Override
     public String getDefaultEditor(String category)
     {
-        // Fall-back on the default edit configuration.
-        return null;
+        if (StringUtils.isEmpty(category)) {
+            return getDefaultEditor();
+        } else if (TextXDOMEditor.ROLE_HINT.equals(category)) {
+            return TextXDOMEditor.ROLE_HINT;
+        } else {
+            return null;
+        }
     }
 }

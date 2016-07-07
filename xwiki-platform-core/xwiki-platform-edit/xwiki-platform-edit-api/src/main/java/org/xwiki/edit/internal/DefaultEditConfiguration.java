@@ -60,27 +60,25 @@ public class DefaultEditConfiguration implements EditConfiguration
     @Override
     public String getDefaultEditor(Type dataType)
     {
-        String defaultEditor = null;
-        EditorConfiguration<?> customConfig = getCustomConfiguration(dataType);
-        if (customConfig != null) {
-            defaultEditor = customConfig.getDefaultEditor();
-        }
-        if (StringUtils.isEmpty(defaultEditor)) {
-            defaultEditor = getDefaultEditor(dataType.getTypeName());
-        }
-        return defaultEditor;
+        return getDefaultEditor(dataType, null);
     }
 
     @Override
     public String getDefaultEditor(Type dataType, String category)
     {
-        String defaultEditor = null;
-        EditorConfiguration<?> customConfig = this.getCustomConfiguration(dataType);
-        if (customConfig != null) {
-            defaultEditor = customConfig.getDefaultEditor(category);
+        String dataTypeName = dataType.getTypeName();
+        if (!StringUtils.isEmpty(category)) {
+            dataTypeName += "#" + category;
         }
+        // Get the default editor configured using the standard configuration properties and sources.
+        String defaultEditor = getDefaultEditor(dataTypeName);
         if (StringUtils.isEmpty(defaultEditor)) {
-            defaultEditor = getDefaultEditor(String.format("%s#%s", dataType.getTypeName(), category));
+            // A custom configuration can look for the default editor in custom configuration sources, using custom
+            // properties, or it can simply return the default editor where there's no one configured.
+            EditorConfiguration<?> customConfig = getCustomConfiguration(dataType);
+            if (customConfig != null) {
+                defaultEditor = customConfig.getDefaultEditor(category);
+            }
         }
         return defaultEditor;
     }

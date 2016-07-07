@@ -100,17 +100,7 @@ public class DefaultEditorManager implements EditorManager
     @Override
     public <D> Editor<D> getDefaultEditor(Type dataType)
     {
-        Editor<D> defaultEditor;
-        String defaultEditorHint = this.configuration.getDefaultEditor(dataType);
-        if (defaultEditorHint == null) {
-            // There's no editor configured for the specified data type. See if there is any editor available. This way
-            // we don't force the user to configure the default editor when there's only one editor available.
-            List<Editor<D>> editors = getEditors(dataType);
-            defaultEditor = editors.isEmpty() ? null : editors.get(0);
-        } else {
-            defaultEditor = getEditorWithFallBackOnCategory(dataType, defaultEditorHint);
-        }
-        return defaultEditor;
+        return getDefaultEditor(dataType, null);
     }
 
     @Override
@@ -123,6 +113,10 @@ public class DefaultEditorManager implements EditorManager
             // available in the specified category. This way we don't force the user to configure the default editor for
             // each category when there's only one editor available per category.
             List<Editor<D>> editors = getEditors(dataType, category);
+            if (editors.isEmpty()) {
+                // See if there is any editor available for the specified data type.
+                editors = getEditors(dataType);
+            }
             defaultEditor = editors.isEmpty() ? null : editors.get(0);
         } else {
             defaultEditor = getEditorWithFallBackOnCategory(dataType, defaultEditorHint);

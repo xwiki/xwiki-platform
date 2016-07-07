@@ -285,7 +285,7 @@
       </title>
     </class>
     <property>
-      <content>{{activity/}}</content>
+      <content>{{activity rss="true"/}}</content>
     </property>
     <property>
       <position>2, 2</position>

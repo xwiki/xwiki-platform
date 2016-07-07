@@ -750,5 +750,28 @@ extension.oldflavors=$oldFlavor.trim()
 #-# The default is:
 # lesscss.generateInlineSourceMaps = false
 
+#-------------------------------------------------------------------------------------
+# Edit
+#-------------------------------------------------------------------------------------
+
+#-# [Since 8.2RC1]
+#-# Indicate the default editor to use for a specific data type.
+#-# The editors are components so they are specified using their role hints.
+#-# Some data types can be edited in multiple ways, by different types of editors.
+#-# Thus you can also indicate the default editor to use from a specific category (editor type).
+#-#
+#-# The format is this:
+#-# edit.defaultEditor.<dataType>=<roleHintOrCategory>
+#-# edit.defaultEditor.<dataType>#<category>=<roleHintOrSubCategory>
+#-#
+#-# The default bindings are:
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM=text
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM#text=text
+#if ($xwikiPropertiesDefaultWysiwygEditor)
+edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
+#else
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=xdomWysiwygGwt
+#end
+
 
 $!xwikiPropertiesAdditionalProperties

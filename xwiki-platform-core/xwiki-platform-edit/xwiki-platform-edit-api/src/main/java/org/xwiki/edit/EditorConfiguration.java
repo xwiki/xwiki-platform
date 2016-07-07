@@ -23,9 +23,13 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Interface used to <strong>overwrite</strong> the {@link EditConfiguration} for a specific data type. Use it
- * <strong>only</strong> if you want to reuse some existing configuration properties that don't follow the conventions
- * established by the {@link EditConfiguration}.
+ * Interface used to customize the {@link EditConfiguration} for a specific data type. It allows you to:
+ * <ul>
+ * <li>reuse some existing configuration properties that don't follow the conventions established by the
+ * {@link EditConfiguration}</li>
+ * <li>specify the default editor when there's no one configured</li>
+ * </ul>
+ * .
  * 
  * @param <D> the type of data that is edited by the editors affected by this configuration
  * @version $Id$

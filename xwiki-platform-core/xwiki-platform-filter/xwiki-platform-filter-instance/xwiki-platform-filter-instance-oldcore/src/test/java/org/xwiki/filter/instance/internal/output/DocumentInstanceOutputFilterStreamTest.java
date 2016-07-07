@@ -171,7 +171,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         Assert.assertFalse(document.isNew());
 
-        Assert.assertEquals(Locale.ROOT, document.getDefaultLocale());
+        Assert.assertEquals(Locale.ENGLISH, document.getDefaultLocale());
         Assert.assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
         Assert.assertEquals("customclass", document.getCustomClass());
         Assert.assertEquals("title", document.getTitle());

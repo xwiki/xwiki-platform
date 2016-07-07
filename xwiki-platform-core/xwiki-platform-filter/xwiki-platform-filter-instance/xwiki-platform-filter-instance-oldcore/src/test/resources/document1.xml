@@ -2,6 +2,14 @@
   <wiki name="wiki">
     <wikiSpace name="otherspace">
       <wikiDocument name="otherclass">
+        <p>
+          <parameters>
+            <entry>
+              <string>locale</string>
+              <locale></locale>
+            </entry>
+          </parameters>
+        </p>
         <wikiDocumentLocale>
           <p>
             <parameters>

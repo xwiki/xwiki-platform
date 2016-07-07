@@ -50,6 +50,7 @@ import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.instance.internal.XWikiDocumentFilter;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -112,6 +113,9 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    private LocalizationContext localizationContext;
 
     private DocumentInstanceOutputProperties properties;
 
@@ -367,7 +371,8 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     {
         this.currentEntityReference = new EntityReference(name, EntityType.DOCUMENT, this.currentEntityReference);
 
-        this.currentDefaultLocale = get(Locale.class, WikiDocumentFilter.PARAMETER_LOCALE, parameters, null);
+        this.currentDefaultLocale = get(Locale.class, WikiDocumentFilter.PARAMETER_LOCALE, parameters,
+            this.localizationContext.getCurrentLocale());
         this.currentLocale = Locale.ROOT;
         this.currentLocaleParameters = parameters;
 

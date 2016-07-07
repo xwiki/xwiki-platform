@@ -79,9 +79,15 @@ public class EditorWikiComponentBuilder implements WikiComponentBuilder
     {
         List<DocumentReference> editorReferences = new ArrayList<>();
         try {
+            // NOTE: We use HQL and not XWQL here because the conversion from XWQL to HQL requires the class definition
+            // (XWiki.EditorClass) to be present in order to determine which column to join (StringProperty here), and
+            // the class definition might not be available yet (it is initialized by EditorClassDocumentInitializer). We
+            // noticed this problem at build time when the XWiki package is created for functional tests.
             Query query =
-                this.queryManager.createQuery("from doc.object(XWiki.EditorClass) as editor where "
-                    + "(editor.roleHint <> '' or (editor.roleHint is not null and '' is null))", Query.XWQL);
+                this.queryManager.createQuery(", BaseObject as editorObject, StringProperty as roleHint "
+                    + "where doc.fullName = editorObject.name and editorObject.className = 'XWiki.EditorClass' and "
+                    + "editorObject.id = roleHint.id.id and roleHint.id.name='roleHint' and "
+                    + "(roleHint.value <> '' or (roleHint.value is not null and '' is null))", Query.HQL);
             for (Object result : query.execute()) {
                 editorReferences.add(this.currentDocumentReferenceResolver.resolve(result.toString()));
             }

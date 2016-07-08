@@ -94,7 +94,16 @@ public class FilterScriptService extends AbstractFilterScriptService
     public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties,
         FilterStreamType outputType, Map<String, Object> outputProperties)
     {
-        return convert(inputType, inputProperties, outputType, outputProperties, true);
+        return startConvert(inputType, inputProperties, outputType, true, outputProperties);
+    }
+
+    /**
+     * @since 8.2RC1
+     */
+    public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties,
+        FilterStreamType outputType, boolean folded, Map<String, Object> outputProperties)
+    {
+        return convert(inputType, inputProperties, outputType, folded, outputProperties, true);
     }
 
     /**
@@ -103,11 +112,20 @@ public class FilterScriptService extends AbstractFilterScriptService
     public Job convert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
         Map<String, Object> outputProperties)
     {
-        return convert(inputType, inputProperties, outputType, outputProperties, false);
+        return convert(inputType, inputProperties, outputType, true, outputProperties);
+    }
+
+    /**
+     * @since 8.2RC1
+     */
+    public Job convert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
+        boolean folded, Map<String, Object> outputProperties)
+    {
+        return convert(inputType, inputProperties, outputType, folded, outputProperties, false);
     }
 
     private Job convert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
-        Map<String, Object> outputProperties, boolean async)
+        boolean folded, Map<String, Object> outputProperties, boolean async)
     {
         resetError();
 
@@ -117,7 +135,7 @@ public class FilterScriptService extends AbstractFilterScriptService
             this.authorization.checkAccess(Right.PROGRAM);
 
             FilterStreamConverterJobRequest request =
-                new FilterStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
+                new FilterStreamConverterJobRequest(inputType, inputProperties, outputType, folded, outputProperties);
 
             if (async) {
                 this.lastJob = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);

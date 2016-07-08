@@ -30,10 +30,10 @@ import org.xwiki.edit.AbstractTemplateEditor;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
 import org.xwiki.edit.EditorDescriptorBuilder;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 /**
- * {@link XDOM} WYSIWYG {@link Editor} implemented using Google Web Toolkit.
+ * {@link SyntaxContent} WYSIWYG {@link Editor} implemented using Google Web Toolkit.
  * 
  * @version $Id$
  * @since 8.2RC1
@@ -41,19 +41,15 @@ import org.xwiki.rendering.block.XDOM;
 @Component
 @Singleton
 @Named(GwtXdomEditor.ROLE_HINT)
-public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initializable
+public class GwtSyntaxContentEditor extends AbstractTemplateEditor<SyntaxContent> implements Initializable
 {
-    /**
-     * The editor component hint.
-     */
-    public static final String ROLE_HINT = "gwt";
-
     @Inject
     private EditorDescriptorBuilder editorDescriptorBuilder;
 
     @Override
     public String getTemplateName()
     {
+        // Re-use the XDOM WYSIWYG editor template.
         return "editors/xdomWysiwygGwt.vm";
     }
 
@@ -67,6 +63,6 @@ public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initi
     @Override
     public void initialize() throws InitializationException
     {
-        this.editorDescriptorBuilder.setId(ROLE_HINT).setCategory("wysiwyg");
+        this.editorDescriptorBuilder.setId(GwtXdomEditor.ROLE_HINT).setCategory("wysiwyg");
     }
 }

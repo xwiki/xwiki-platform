@@ -136,12 +136,12 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
@@ -5971,9 +5971,9 @@ public class XWiki implements EventListener
 
     public String getEditorPreference(XWikiContext context)
     {
-        String defaultXDOMEditor = getEditConfiguration().getDefaultEditor(XDOM.class);
+        String defaultSyntaxContentEditor = getEditConfiguration().getDefaultEditor(SyntaxContent.class);
 
-        return defaultXDOMEditor == null ? "" : defaultXDOMEditor.toLowerCase();
+        return defaultSyntaxContentEditor == null ? "" : defaultSyntaxContentEditor.toLowerCase();
     }
 
     /**

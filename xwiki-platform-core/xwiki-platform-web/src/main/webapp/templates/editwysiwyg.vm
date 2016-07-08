@@ -25,7 +25,7 @@
     </div>
     <div id="xwikitext">
       <div id="xwikieditcontent">
-        $!services.edit.xdom.defaultWysiwygEditor.render($tdoc.getXDOM(), {
+        $!services.edit.syntaxContent.wysiwyg($tdoc.content, $tdoc.syntax, {
           'id': 'content',
           'name': 'content',
           'rows': 25,

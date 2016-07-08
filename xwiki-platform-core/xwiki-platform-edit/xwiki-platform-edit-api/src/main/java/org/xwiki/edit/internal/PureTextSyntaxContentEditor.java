@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.server.internal;
+package org.xwiki.edit.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,31 +30,28 @@ import org.xwiki.edit.AbstractTemplateEditor;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorDescriptor;
 import org.xwiki.edit.EditorDescriptorBuilder;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 /**
- * {@link XDOM} WYSIWYG {@link Editor} implemented using Google Web Toolkit.
+ * {@link SyntaxContent} pure text {@link Editor}. This is used by TextArea properties that have their "editor" meta
+ * property set to "PureText".
  * 
  * @version $Id$
  * @since 8.2RC1
  */
 @Component
 @Singleton
-@Named(GwtXdomEditor.ROLE_HINT)
-public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initializable
+@Named(PureTextXDOMEditor.ROLE_HINT)
+public class PureTextSyntaxContentEditor extends AbstractTemplateEditor<SyntaxContent> implements Initializable
 {
-    /**
-     * The editor component hint.
-     */
-    public static final String ROLE_HINT = "gwt";
-
     @Inject
     private EditorDescriptorBuilder editorDescriptorBuilder;
 
     @Override
     public String getTemplateName()
     {
-        return "editors/xdomWysiwygGwt.vm";
+        // Re-use the XDOM PureText editor template.
+        return "editors/xdomPureText.vm";
     }
 
     @Override
@@ -67,6 +64,6 @@ public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initi
     @Override
     public void initialize() throws InitializationException
     {
-        this.editorDescriptorBuilder.setId(ROLE_HINT).setCategory("wysiwyg");
+        this.editorDescriptorBuilder.setId(PureTextXDOMEditor.ROLE_HINT).setCategory(PureTextXDOMEditor.ROLE_HINT);
     }
 }

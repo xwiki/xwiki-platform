@@ -765,12 +765,16 @@ extension.oldflavors=$oldFlavor.trim()
 #-# edit.defaultEditor.<dataType>#<category>=<roleHintOrSubCategory>
 #-#
 #-# The default bindings are:
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent=text
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#text=text
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM=text
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM#text=text
 #if ($xwikiPropertiesDefaultWysiwygEditor)
+edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
 edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
 #else
-# edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=xdomWysiwygGwt
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=gwt
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=gwt
 #end
 
 

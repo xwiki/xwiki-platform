@@ -19,20 +19,18 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -150,7 +148,7 @@ public class TextAreaClass extends StringClass
     {
         String editorType = getEditorType(context);
         EditorManager editorManager = Utils.getComponent(EditorManager.class);
-        Editor<XDOM> editor = editorManager.getDefaultEditor(XDOM.class, editorType);
+        Editor<SyntaxContent> editor = editorManager.getDefaultEditor(SyntaxContent.class, editorType);
         Map<String, Object> parameters = new HashMap<>();
         String fieldName = prefix + name;
         parameters.put("id", fieldName);
@@ -158,15 +156,12 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
+        parameters.put("sourceDocumentReference", object.getDocumentReference());
         Syntax syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
-        Parser parser = Utils.getComponent(Parser.class, syntax.toIdString());
+        SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
         try {
-            XDOM data = parser.parse(new StringReader(object.getStringValue(name)));
-            // Make sure the syntax and the source document are specified.
-            data.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
-            data.getMetaData().addMetaData(MetaData.SOURCE, object.getDocumentReference());
-            buffer.append(editor.render(data, parameters));
-        } catch (Exception e) {
+            buffer.append(editor.render(syntaxContent, parameters));
+        } catch (EditException e) {
             LOGGER.error("Failed to display the text area property.", e);
         }
     }

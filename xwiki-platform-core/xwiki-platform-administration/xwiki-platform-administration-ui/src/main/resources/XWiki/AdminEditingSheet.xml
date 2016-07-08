@@ -45,7 +45,7 @@
 ##
 
 #macro (maybeConfigureDefaultWysiwygEditor)
-  #maybeConfigureDefaultEditor('org.xwiki.rendering.block.XDOM' 'wysiwyg')
+  #maybeConfigureDefaultEditor('org.xwiki.rendering.syntax.SyntaxContent' 'wysiwyg')
 #end
 
 #macro (maybeConfigureDefaultEditor $dataType $category)

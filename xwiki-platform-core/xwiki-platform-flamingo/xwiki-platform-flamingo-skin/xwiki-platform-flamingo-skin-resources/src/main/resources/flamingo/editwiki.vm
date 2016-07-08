@@ -17,7 +17,7 @@
 <div id="xwikitext">
 <div id="xwikieditcontent">
 <div id="xwikieditcontentinner">
-$!services.edit.xdom.defaultTextEditor.render($tdoc.getXDOM(), {
+$!services.edit.syntaxContent.text($tdoc.content, $tdoc.syntax, {
   'id': 'content',
   'name': 'content',
   'rows': 25,

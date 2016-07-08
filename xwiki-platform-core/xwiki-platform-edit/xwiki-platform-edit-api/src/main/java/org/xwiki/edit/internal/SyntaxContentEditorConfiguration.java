@@ -17,56 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wysiwyg.server.internal;
+package org.xwiki.edit.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.edit.AbstractTemplateEditor;
 import org.xwiki.edit.Editor;
-import org.xwiki.edit.EditorDescriptor;
-import org.xwiki.edit.EditorDescriptorBuilder;
+import org.xwiki.edit.EditorConfiguration;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 /**
- * {@link XDOM} WYSIWYG {@link Editor} implemented using Google Web Toolkit.
+ * Custom configuration for {@link SyntaxContent} {@link Editor}s, which serves two roles:
+ * <ul>
+ * <li>preserves backward compatibility (because it looks for configuration properties that existed before the edit
+ * module was written)</li>
+ * <li>provides the default editor when there's no one configured</li>
+ * </ul>
+ * .
  * 
  * @version $Id$
  * @since 8.2RC1
  */
 @Component
 @Singleton
-@Named(GwtXdomEditor.ROLE_HINT)
-public class GwtXdomEditor extends AbstractTemplateEditor<XDOM> implements Initializable
+public class SyntaxContentEditorConfiguration implements EditorConfiguration<SyntaxContent>
 {
-    /**
-     * The editor component hint.
-     */
-    public static final String ROLE_HINT = "gwt";
-
     @Inject
-    private EditorDescriptorBuilder editorDescriptorBuilder;
+    private EditorConfiguration<XDOM> xdomEditorConfiguration;
 
     @Override
-    public String getTemplateName()
+    public String getDefaultEditor()
     {
-        return "editors/xdomWysiwygGwt.vm";
+        return this.xdomEditorConfiguration.getDefaultEditor();
     }
 
     @Override
-    public EditorDescriptor getDescriptor()
+    public String getDefaultEditor(String category)
     {
-        // Re-build the descriptor for the current localization context.
-        return this.editorDescriptorBuilder.build();
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.editorDescriptorBuilder.setId(ROLE_HINT).setCategory("wysiwyg");
+        return this.xdomEditorConfiguration.getDefaultEditor(category);
     }
 }

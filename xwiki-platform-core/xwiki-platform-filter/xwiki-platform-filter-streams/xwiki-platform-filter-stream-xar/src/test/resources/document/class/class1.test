@@ -31,6 +31,14 @@
 .#------------------------------------------------------------------------------
 <wikiSpace name="space">
   <wikiDocument name="page">
+    <p>
+      <parameters>
+        <entry>
+          <string>locale</string>
+          <locale></locale>
+        </entry>
+      </parameters>
+    </p>
     <wikiDocumentLocale>
       <wikiDocumentRevision>
         <p>

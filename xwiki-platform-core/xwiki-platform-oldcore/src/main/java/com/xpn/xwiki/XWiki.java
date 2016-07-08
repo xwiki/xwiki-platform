@@ -910,6 +910,11 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Using reflection, read the private value of the passed field name for the passed object.
+     *
+     * @param obj the java object on which to read the private field value
+     * @param fieldName the object member field for which to read the value
+     * @return the private value for the field
      * @deprecated use {@link FieldUtils#readDeclaredField(Object, String, boolean)} instead
      */
     @Deprecated
@@ -953,23 +958,48 @@ public class XWiki implements EventListener
      * etc.).
      * <p>
      * Needed for tools or tests which need XWiki because it is used everywhere in the API.
-     * </p>
      */
     public XWiki()
     {
-
+        // Empty voluntarily
     }
 
+    /**
+     * Initialize all xwiki subsystems.
+     *
+     * @param context the object holding data valid for the current request lifetime
+     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     *        data that live on as long as the XWiki webapp is not stopped in the Servlet Container
+     * @param noupdate true if the whole initialization should be done (create mandatory xlcasses,
+     *        initialize stats service), i.e. if this is not an update, and false otherwise
+     * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
+     */
     public XWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
         initXWiki(context, engine_context, noupdate);
     }
 
+    /**
+     * Initialize all xwiki subsystems.
+     *
+     * @param context the object holding data valid for the current request lifetime
+     * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
+     */
     public XWiki(XWikiContext context) throws XWikiException
     {
         this(context, null, false);
     }
 
+    /**
+     * Initialize all xwiki subsystems.
+     *
+     * @param context the object holding data valid for the current request lifetime
+     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     *        data that live on as long as the XWiki webapp is not stopped in the Servlet Container
+     * @param noupdate true if the whole initialization should be done (create mandatory xlcasses,
+     *        initialize stats service), i.e. if this is not an update, and false otherwise
+     * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
+     */
     public void initXWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
@@ -979,6 +1009,13 @@ public class XWiki implements EventListener
     /**
      * Initialize all xwiki subsystems.
      *
+     * @param config the object holding the XWiki configuration read from {@code xwiki.cfg}
+     * @param context the object holding data valid for the current request lifetime
+     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     *        data that live on as long as the XWiki webapp is not stopped in the Servlet Container
+     * @param noupdate true if the whole initialization should be done (create mandatory xlcasses,
+     *        initialize stats service), i.e. if this is not an update, and false otherwise
+     * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
      * @deprecated since 6.1M2, use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
@@ -1078,6 +1115,8 @@ public class XWiki implements EventListener
     /**
      * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create them if they don't
      * exist.
+     *
+     * @param context the object holding data valid for the current request lifetime
      */
     private void initializeMandatoryDocuments(XWikiContext context)
     {

@@ -157,7 +157,7 @@ public class XWikiServletURLFactoryTest
     // Tests
 
     @Test
-    public void testCreateURLOnMainWiki() throws MalformedURLException
+    public void createURLOnMainWiki() throws MalformedURLException
     {
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
             this.oldcore.getXWikiContext());
@@ -165,7 +165,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWiki() throws MalformedURLException
+    public void createURLOnSubWiki() throws MalformedURLException
     {
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
             this.oldcore.getXWikiContext());
@@ -173,7 +173,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInVirtualMode() throws MalformedURLException
+    public void createURLOnSubWikiInVirtualMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
 
@@ -183,7 +183,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnMainWikiInPathMode() throws MalformedURLException
+    public void createURLOnMainWikiInPathMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
@@ -193,7 +193,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInPathMode() throws MalformedURLException
+    public void createURLOnSubWikiInPathMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
@@ -203,7 +203,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInVirtualModeInPathMode() throws MalformedURLException
+    public void createURLOnSubWikiInVirtualModeInPathMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
@@ -222,7 +222,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnMainWikiInDomainMode() throws MalformedURLException
+    public void createURLOnMainWikiInDomainMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
@@ -232,7 +232,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInDomainMode() throws MalformedURLException
+    public void createURLOnSubWikiInDomainMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
@@ -242,7 +242,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInVirtualModeInDomainMode() throws MalformedURLException
+    public void createURLOnSubWikiInVirtualModeInDomainMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
@@ -258,7 +258,7 @@ public class XWikiServletURLFactoryTest
      * @throws MalformedURLException shouldn't happen
      */
     @Test
-    public void testCreateURLOnMainWikiInDomainModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnMainWikiInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
@@ -275,7 +275,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInDomainModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnSubWikiInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new HTTP headers.
@@ -292,7 +292,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInVirtualModeInDomainModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnSubWikiInVirtualModeInDomainModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
@@ -311,7 +311,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnMainWikiInPathModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnMainWikiInPathModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
         // Reinitialize the URL factory to take into account the new HTTP headers.
@@ -327,7 +327,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInPathModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnSubWikiInPathModeInReverseProxyMode() throws MalformedURLException
     {
         secure = true;
         httpHeaders.put("x-forwarded-host", "www.xwiki.org");
@@ -344,7 +344,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLOnSubWikiInVirtualModeInPathModeInReverseProxyMode() throws MalformedURLException
+    public void createURLOnSubWikiInVirtualModeInPathModeInReverseProxyMode() throws MalformedURLException
     {
         httpHeaders.put("x-forwarded-host", "www.xwiki.org:8080");
         // Reinitialize the URL factory to take into account the new HTTP headers.
@@ -365,7 +365,7 @@ public class XWikiServletURLFactoryTest
      * set from code on the XWiki context) are different.
      */
     @Test
-    public void testGetURLWhenRequestWikiAndContextWikiAreDifferent() throws MalformedURLException
+    public void getURLWhenRequestWikiAndContextWikiAreDifferent() throws MalformedURLException
     {
         this.oldcore.getXWikiContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
         // Reinitialize the URL factory to take into account the new request URL.
@@ -384,7 +384,7 @@ public class XWikiServletURLFactoryTest
 
     /** When the URL contains only the hostname, without a path, / is returned instead of the empty string. */
     @Test
-    public void testGetURLWithEmptyPathReturnsSlash() throws MalformedURLException
+    public void getURLWithEmptyPathReturnsSlash() throws MalformedURLException
     {
         this.oldcore.getXWikiContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
         // Reinitialize the URL factory to take into account the new request URL.
@@ -399,7 +399,7 @@ public class XWikiServletURLFactoryTest
      * xwiki.home should be returned. see: XWIKI-5981
      */
     @Test
-    public void testGetServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
+    public void getServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         this.oldcore.getXWikiContext()
             .setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
@@ -420,7 +420,7 @@ public class XWikiServletURLFactoryTest
      * Proves that from a virtual wiki, URLs generated to point to the main wiki will use xwiki.home. see: XWIKI-5981
      */
     @Test
-    public void testXWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
+    public void createURLWhenWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
     {
         this.oldcore.getXWikiContext()
             .setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
@@ -457,7 +457,7 @@ public class XWikiServletURLFactoryTest
      * set, xwiki.home should be returned. see: XWIKI-5981
      */
     @Test
-    public void testGetServerURLNonVirtualModeWithXWikiDotHomeEnabled() throws MalformedURLException
+    public void getServerURLNonVirtualModeWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         this.oldcore.getXWikiContext().setURL(new URL("http://127.0.0.1:8080/xwiki/view/InitialSpace/InitialPage"));
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
@@ -473,7 +473,7 @@ public class XWikiServletURLFactoryTest
      * Proves that in a single wiki instance, URLs are always generated using xwiki.home if present. see: XWIKI-5981
      */
     @Test
-    public void testXWikiDotHomeParameterNonVirtualMode() throws MalformedURLException
+    public void createURLWhenXWikiDotHomeParameterNonVirtualMode() throws MalformedURLException
     {
         // Some proxies will modify the host field without adding a x-forwarded-host field,
         // Using xwiki.home we should be able to make it work anyway.
@@ -502,7 +502,7 @@ public class XWikiServletURLFactoryTest
      * Verify that jsessionid is removed from URL.
      */
     @Test
-    public void testNormalizeURL() throws Exception
+    public void normalizeURL() throws Exception
     {
         assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en"),
             XWikiServletURLFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
@@ -510,14 +510,14 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateURLWithNestedSpaces() throws Exception
+    public void createURLWithNestedSpaces() throws Exception
     {
         URL url = this.urlFactory.createURL("Space1.Space2", "Page", this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page"), url);
     }
 
     @Test
-    public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsNotContextDoc() throws Exception
+    public void createAttachmentURLWhenViewRevAndRevSpecifiedAndIsNotContextDoc() throws Exception
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.put("rev", "1.0");
@@ -528,7 +528,7 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsContextDocAndAttachmentDoesntExist()
+    public void createAttachmentURLWhenViewRevAndRevSpecifiedAndIsContextDocAndAttachmentDoesntExist()
         throws Exception
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
@@ -570,5 +570,18 @@ public class XWikiServletURLFactoryTest
         // Verify that the URL factory encodes each path segment.
         URL url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/resources/o;ne/t%3Fw&o/t=hr%23e%20e"), url);
+    }
+
+    @Test
+    public void createURLWhenCharactersNeedToBeEncoded() throws Exception
+    {
+        // Note: The query string is not encoded, and used as is. It's the responsibility of the caller to
+        // url-encode it.
+        // See see http://stackoverflow.com/a/29948396/153102 for a good explanation of URL encoding:
+        // - space in path part must be encoded with %20 (and not "+"). "+" character should be left as is.
+        // - space in query string part and fragment part can be encoded with "+" or "%20". "+" character should be
+        //   encoded with "%2B"
+        URL url = this.urlFactory.createURL("a b.c+d", "e f", "view", "g=h+i", "j k+l", this.oldcore.getXWikiContext());
+        assertEquals("http://127.0.0.1/xwiki/bin/view/a%20b/c+d/e%20f?g=h+i#j%20k%2Bl", url.toString());
     }
 }

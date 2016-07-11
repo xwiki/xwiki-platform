@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -192,7 +193,13 @@ public class TreeNodeElement extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return !Boolean.valueOf(getElement().getAttribute("aria-busy"));
+                WebElement element = getElement();
+                try {
+                    return !Boolean.valueOf(element.getAttribute("aria-busy"));
+                } catch (StaleElementReferenceException e) {
+                    // The element has just been replaced. Try again.
+                    return false;
+                }
             }
         });
         return this;

@@ -34,7 +34,7 @@
   <date>1466599156000</date>
   <contentUpdateDate>1466599146000</contentUpdateDate>
   <version>1.1</version>
-  <title>Preferences</title>
+  <title>$services.localization.render('admin.preferences.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>

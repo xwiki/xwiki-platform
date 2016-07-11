@@ -168,11 +168,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         Bindings bindings = scriptContext.getBindings(scope);
         if (bindings != null) {
             for (Map.Entry<String, Object> entry : bindings.entrySet()) {
-                // Not ideal since it doesn't allow us to modify a binding but it's too dangerous for existing velocity
-                // scripts otherwise (e.g. each velocity script would have a separate instance of $doc).
-                if (!vcontext.containsKey(entry.getKey())) {
-                    vcontext.put(entry.getKey(), entry.getValue());
-                }
+                vcontext.put(entry.getKey(), entry.getValue());
             }
         }
     }

@@ -47,23 +47,15 @@ public abstract class AbstractEditor<D> implements Editor<D>
     private ScriptContextManager scripts;
 
     @Override
-    @SuppressWarnings("unchecked")
     public String render(D data, Map<String, Object> parameters) throws EditException
     {
         ScriptContext scriptContext = this.scripts.getScriptContext();
-        // DefaultVelocityManager doesn't overwrite the existing keys when copying the script context bindings so we
-        // have to reuse the existing binding for the edit context.
-        Object editContext = scriptContext.getAttribute(EDIT_CONTEXT_KEY, ScriptContext.ENGINE_SCOPE);
-        Map<String, Object> editContextMap;
-        if (editContext instanceof Map) {
-            editContextMap = (Map<String, Object>) editContext;
-            editContextMap.clear();
-        } else {
-            editContextMap = new HashMap<>();
-            scriptContext.setAttribute(EDIT_CONTEXT_KEY, editContextMap, ScriptContext.ENGINE_SCOPE);
+        scriptContext.setAttribute(EDIT_CONTEXT_KEY, getEditContext(data, parameters), ScriptContext.ENGINE_SCOPE);
+        try {
+            return render();
+        } finally {
+            scriptContext.removeAttribute(EDIT_CONTEXT_KEY, ScriptContext.ENGINE_SCOPE);
         }
-        editContextMap.putAll(getEditContext(data, parameters));
-        return render();
     }
 
     protected Map<String, Object> getEditContext(D data, Map<String, Object> parameters)

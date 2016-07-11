@@ -36,6 +36,7 @@ import javax.inject.Singleton;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.job.AbstractExtensionRequest;
 import org.xwiki.extension.job.history.ExtensionJobHistory;
 import org.xwiki.extension.job.history.ExtensionJobHistoryRecord;
 import org.xwiki.extension.job.history.ExtensionJobHistorySerializer;
@@ -286,6 +287,6 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
 
     private List<String> getReplayJobId(String suffix)
     {
-        return Arrays.asList(ExtensionManagerScriptService.EXTENSION_JOBID_PREFIX, ID, suffix);
+        return Arrays.asList(AbstractExtensionRequest.JOBID_PREFIX, ID, suffix);
     }
 }

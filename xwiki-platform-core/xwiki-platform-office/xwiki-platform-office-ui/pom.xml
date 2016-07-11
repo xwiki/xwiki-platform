@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-office-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Office - UI</name>
-  <description>Easily turn Office documents (MS Office, Open Office, PDF, etc) into wiki pages</description>
+  <description>Import Office documents, spreadsheets and presentations into wiki pages (most major office suite formats are supported)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Office Importer Application</xwiki.extension.name>

@@ -76,20 +76,24 @@ public class XWiki extends Api
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
+        .getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /**
      * The object used to serialize entity references into strings. We need it because we have script APIs that work
      * with entity references but have to call older, often internal, methods that still use string references.
      */
-    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer = Utils
+        .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
+    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
 
     /**
      * XWiki API Constructor
@@ -104,44 +108,6 @@ public class XWiki extends Api
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
         this.criteriaService = new CriteriaService(context);
-    }
-
-    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
-    {
-        if (this.currentMixedDocumentReferenceResolver == null) {
-            this.currentMixedDocumentReferenceResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        }
-
-        return this.currentMixedDocumentReferenceResolver;
-    }
-
-    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
-    {
-        if (this.currentgetdocumentResolver == null) {
-            this.currentgetdocumentResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        }
-
-        return this.currentgetdocumentResolver;
-    }
-
-    private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()
-    {
-        if (this.defaultDocumentReferenceResolver == null) {
-            this.defaultDocumentReferenceResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        }
-
-        return this.defaultDocumentReferenceResolver;
-    }
-
-    private EntityReferenceSerializer<String> getDefaultStringEntityReferenceSerializer()
-    {
-        if (this.defaultStringEntityReferenceSerializer == null) {
-            this.defaultStringEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-        }
-
-        return this.defaultStringEntityReferenceSerializer;
     }
 
     /**
@@ -216,9 +182,9 @@ public class XWiki extends Api
         if (fullName != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
+            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
         } else {
-            reference = getDefaultDocumentReferenceResolver().resolve("");
+            reference = this.defaultDocumentReferenceResolver.resolve("");
         }
 
         return getDocument(reference);
@@ -265,7 +231,7 @@ public class XWiki extends Api
      */
     public Document getDocument(EntityReference reference) throws XWikiException
     {
-        return getDocument(getCurrentgetdocumentResolver().resolve(reference));
+        return getDocument(this.currentgetdocumentResolver.resolve(reference));
     }
 
     /**
@@ -286,9 +252,9 @@ public class XWiki extends Api
         if (fullName != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
+            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
         } else {
-            reference = getDefaultDocumentReferenceResolver().resolve("");
+            reference = this.defaultDocumentReferenceResolver.resolve("");
         }
 
         return getDocumentAsAuthor(reference);
@@ -468,7 +434,7 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(docname);
+            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
             XWikiDocument doc = getXWikiContext().getWiki().getDocument(docReference, this.context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
@@ -1537,14 +1503,14 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
         String wikilocale, boolean reset, boolean force) throws XWikiException
     {
-        DocumentReference sourceDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(docname);
+        DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
             sourceDocumentReference =
                 sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(), new WikiReference(
                     sourceWiki));
         }
 
-        DocumentReference targetDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(targetdocname);
+        DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
             targetDocumentReference =
                 targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(), new WikiReference(
@@ -1571,8 +1537,8 @@ public class XWiki extends Api
         String wikilocale, boolean resetHistory, boolean overwrite) throws XWikiException
     {
         // In order to copy the source document the user must have at least the right to view it.
-        if (hasAccessLevel("view", getDefaultStringEntityReferenceSerializer().serialize(sourceDocumentReference))) {
-            String targetDocStringRef = getDefaultStringEntityReferenceSerializer().serialize(targetDocumentReference);
+        if (hasAccessLevel("view", this.defaultStringEntityReferenceSerializer.serialize(sourceDocumentReference))) {
+            String targetDocStringRef = this.defaultStringEntityReferenceSerializer.serialize(targetDocumentReference);
             // To create the target document the user must have edit rights. If the target document exists and the user
             // wants to overwrite it then he needs delete right.
             // Note: We have to check if the target document exists before checking the delete right because delete
@@ -2662,7 +2628,7 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(documentName);
+        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentName);
         return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 

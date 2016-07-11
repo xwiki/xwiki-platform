@@ -90,7 +90,7 @@
 #end
 
 #macro (importCKEditorCSS $path $evaluate)
-  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' '1.9-SNAPSHOT' $path $evaluate)
+  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' '1.8.1' $path $evaluate)
 #end
 
 #macro (importCKEditorResources)

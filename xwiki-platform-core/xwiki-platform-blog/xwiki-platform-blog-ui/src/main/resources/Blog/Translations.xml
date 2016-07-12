@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1467882999000</date>
-  <contentUpdateDate>1467882999000</contentUpdateDate>
+  <date>1466137546000</date>
+  <contentUpdateDate>1466137483000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
   <comment/>
@@ -40,8 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>blog.templateProvider.blogpost.name=Blog Post
-blog.templateProvider.blogpost.description=Communicate news
-blog.categories.all=All</content>
+blog.templateProvider.blogpost.description=Communicate news</content>
   <object>
     <name>Blog.Translations</name>
     <number>0</number>

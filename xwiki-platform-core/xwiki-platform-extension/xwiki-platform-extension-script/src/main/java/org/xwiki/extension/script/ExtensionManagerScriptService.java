@@ -89,6 +89,30 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     public static final String ROLEHINT = "extension";
 
     /**
+     * The prefix put behind all job ids.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PREFIX} instead
+     */
+    @Deprecated
+    public static final String EXTENSION_JOBID_PREFIX = ROLEHINT;
+
+    /**
+     * The prefix put behind all job ids which are actual actions.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_ACTION_PREFIX} instead
+     */
+    @Deprecated
+    public static final String EXTENSIONACTION_JOBID_PREFIX = "action";
+
+    /**
+     * The prefix put behind all job ids which are information gathering.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PLAN_PREFIX} instead
+     */
+    @Deprecated
+    public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
+
+    /**
      * This property is set on requests to create an install or uninstall plan in order to specify which type of job
      * generated the plan.
      */

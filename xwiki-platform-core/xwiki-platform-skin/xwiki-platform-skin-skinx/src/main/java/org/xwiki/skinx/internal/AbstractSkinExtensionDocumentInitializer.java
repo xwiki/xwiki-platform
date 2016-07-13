@@ -50,12 +50,12 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
         BaseClass bclass = document.getXClass();
 
         needsUpdate |= bclass.addTextField("name", "Name", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
+        needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20, "PureText");
         needsUpdate |= bclass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
         needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
         needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 
-        needsUpdate = setClassDocumentFields(document, "XWiki Ratings Class");
+        needsUpdate = setClassDocumentFields(document, document.getDocumentReference().getName());
 
         return needsUpdate;
     }

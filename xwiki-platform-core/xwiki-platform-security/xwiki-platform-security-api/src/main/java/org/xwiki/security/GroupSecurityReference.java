@@ -26,7 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
  * which is a set of users, such that rights can be assigned to the whole group at once.  A security
  * group entity is a document that represents the group by containing group member objects.
  *
- * @see {@link SecurityReferenceFactory}
+ * @see SecurityReferenceFactory
  * @version $Id$
  * @since 4.0M2
  */

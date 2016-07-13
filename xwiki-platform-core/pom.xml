@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -526,6 +526,7 @@
     <module>xwiki-platform-dashboard</module>
     <module>xwiki-platform-diffplugin</module>
     <module>xwiki-platform-display</module>
+    <module>xwiki-platform-edit</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-feed</module>

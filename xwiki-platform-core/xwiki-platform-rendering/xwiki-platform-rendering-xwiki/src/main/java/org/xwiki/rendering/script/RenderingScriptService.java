@@ -188,10 +188,10 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Escapes a give text using the escaping method specific to the given syntax.
-     * <p/>
+     * <p>
      * One example of escaping method is using escape characters like {@code ~} for the {@link Syntax#XWIKI_2_1} syntax
      * on all or just some characters of the given text.
-     * <p/>
+     * <p>
      * The current implementation only escapes XWiki 1.0, 2.0 and 2.1 syntaxes.
      *
      * @param content the text to escape

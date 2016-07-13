@@ -36,7 +36,6 @@ import com.xpn.xwiki.util.Programming;
  * date. The attachment can be accessed using {@link #getAttachment()}.
  * <p>
  * This object is immutable, since entries in the trash can not be modified.
- * </p>
  *
  * @version $Id$
  * @since 2.2M1

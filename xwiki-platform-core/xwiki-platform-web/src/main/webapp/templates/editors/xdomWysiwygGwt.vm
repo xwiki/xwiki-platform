@@ -1,0 +1,19 @@
+#template('editors/xdom_macros.vm')
+## The editor will replace the following text area with its own widget.
+## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
+#textArea
+## $syntaxId is set by #textArea macro call.
+#if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+  #set ($sourceDocumentReference = $edit.parameters.sourceDocumentReference)
+  #if (!$sourceDocumentReference)
+    ## Support for XDOM input.
+    #set ($sourceDocumentReference = $edit.data.metaData.getMetaData('source'))
+  #end
+  #if ($sourceDocumentReference)
+    #set ($sourceDocument = $xwiki.getDocument($sourceDocumentReference))
+  #else
+    #set ($sourceDocument = $tdoc)
+  #end
+  #set ($full = $edit.parameters.full == true)
+  #wysiwyg_editProperty($sourceDocument $edit.parameters.name $full)
+#end

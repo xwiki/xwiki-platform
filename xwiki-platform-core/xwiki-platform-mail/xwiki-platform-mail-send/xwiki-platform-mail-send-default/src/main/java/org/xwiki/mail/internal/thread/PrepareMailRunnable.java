@@ -40,6 +40,8 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Runnable that regularly check for mail items on a Prepare Queue, and for each mail item there, generate the message
  * to send and persist it and put that reference on the Send Queue for sending.
@@ -179,14 +181,21 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         }
 
         // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
+        // Extract the wiki id from the context
         this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getUniqueMessageId(),
-            item.getSession(), listener, item.getBatchId()));
+            item.getSession(), listener, item.getBatchId(), extractWikiId(item)));
 
         // Step 4: Notify the user that the MimeMessage is prepared
         if (listener != null) {
             listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
         }
 
+    }
+
+    private String extractWikiId(PrepareMailQueueItem item)
+    {
+        XWikiContext xcontext = (XWikiContext) item.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        return xcontext.getWikiId();
     }
 
     private void completeMessage(MimeMessage mimeMessage)

@@ -30,16 +30,34 @@ import org.xwiki.properties.annotation.PropertyName;
  */
 public class UserInstanceOutputProperties extends InstanceOutputProperties
 {
+    /**
+     * @see #getSaveComment()
+     */
     private String saveComment = "Import";
 
-    private DocumentReference author = null;
+    /**
+     * @see #getAuthor()
+     */
+    private DocumentReference author;
 
-    private boolean authorSet = false;
+    /**
+     * @see #isAuthorSet()
+     */
+    private boolean authorSet;
 
-    private boolean versionPreserved = false;
+    /**
+     * @see #isVersionPreserved()
+     */
+    private boolean versionPreserved;
 
+    /**
+     * @see #getGroupPrefix()
+     */
     private String groupPrefix = "";
 
+    /**
+     * @see #getGroupSuffix()
+     */
     private String groupSuffix = "";
 
     /**
@@ -80,7 +98,7 @@ public class UserInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return true if the author have been explicitely set
+     * @return true if the author have been explicitly set
      */
     public boolean isAuthorSet()
     {

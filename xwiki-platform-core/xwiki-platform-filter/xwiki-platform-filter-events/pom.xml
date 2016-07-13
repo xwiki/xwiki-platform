@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-events</artifactId>
   <packaging>pom</packaging>
@@ -35,4 +35,24 @@
     <module>xwiki-platform-filter-event-xwiki</module>
     <module>xwiki-platform-filter-event-user</module>
   </modules>
+  <build>
+    <pluginManagement>
+      <!-- Needed to handle the custom @type javadoc tag in the sources -->
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <tags>
+              <tag>
+                <name>type</name>
+                <placement>a</placement>
+                <head>Type:</head>
+              </tag>
+            </tags>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

@@ -41,7 +41,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * @param <F>
+ * @param <F> the type of the filter declaring the events supported by this {@link InstanceInputEventGenerator}
  * @version $Id$
  * @since 6.2M1
  */
@@ -50,7 +50,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     @Inject
     private FilterDescriptorManager filterDescriptorManager;
 
-    private List<Class< ? >> filerInterfaces;
+    private List<Class<?>> filerInterfaces;
 
     protected Map<String, Object> properties;
 
@@ -73,7 +73,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(AbstractInstanceInputEventGenerator.class, getClass());
         this.filerInterfaces =
-            Arrays.<Class< ? >> asList(ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]));
+            Arrays.<Class<?>>asList(ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]));
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     }
 
     @Override
-    public Collection<Class< ? >> getFilterInterfaces() throws FilterException
+    public Collection<Class<?>> getFilterInterfaces() throws FilterException
     {
         return this.filerInterfaces;
     }
@@ -127,9 +127,8 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     public void setFilter(Object filter)
     {
         this.filter = filter;
-        this.proxyFilter =
-            this.filterDescriptorManager.createFilterProxy(filter,
-                this.filerInterfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
+        this.proxyFilter = this.filterDescriptorManager.createFilterProxy(filter,
+            this.filerInterfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
     }
 
     @Override

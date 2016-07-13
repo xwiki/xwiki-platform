@@ -1,0 +1,51 @@
+#macro (getTextAreaAttributes $parameters $attributes)
+  #if ("$!parameters.id" != '')
+    #set ($attributes.id = $parameters.id)
+  #end
+  #if ("$!parameters.name" != '')
+    #set ($attributes.name = $parameters.name)
+  #end
+  #if ("$!parameters.cols" != '')
+    #set ($attributes.cols = $parameters.cols)
+  #end
+  #if ("$!parameters.rows" != '')
+    #set ($attributes.rows = $parameters.rows)
+  #end
+  #if ("$!parameters.disabled" == 'true')
+    #set ($attributes.disabled = 'disabled')
+  #end
+#end
+#macro (getTextArea)
+  #set ($syntaxId = $edit.data.syntax.toIdString())
+  #if (!$syntaxId)
+    ## Support for XDOM input.
+    #set ($syntaxId = $edit.data.metaData.getMetaData('syntax').toIdString())
+  #end
+  #set ($content = $edit.data.content)
+  #if (!$content)
+    ## Support for XDOM input.
+    #set ($content = $services.rendering.render($edit.data, $syntaxId))
+  #end
+  #set ($attributes = {})
+  #getTextAreaAttributes($edit.parameters $attributes)
+  #set ($textArea = {
+    'content': $content,
+    'attributes': $attributes
+  })
+#end
+#macro (printAttributes $attributes)
+  #foreach ($entry in $attributes.entrySet())
+    $entry.key="$!escapetool.xml($entry.value)"
+  #end
+#end
+#macro (printTextArea $textArea)
+  ## We add a new line at the start of the edited content because browsers remove the first new line as per
+  ## http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 and we don't want to strip the leading new line
+  ## from the edited content.
+  <textarea #printAttributes($textArea.attributes)>
+$!escapetool.xml($textArea.content)</textarea>
+#end
+#macro (textArea)
+  #getTextArea
+  #printTextArea($textArea)
+#end

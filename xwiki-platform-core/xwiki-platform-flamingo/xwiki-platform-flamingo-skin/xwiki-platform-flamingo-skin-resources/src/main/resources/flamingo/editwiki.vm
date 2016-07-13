@@ -17,8 +17,12 @@
 <div id="xwikitext">
 <div id="xwikieditcontent">
 <div id="xwikieditcontentinner">
-#template("simpleedittoolbar.vm")
-$xwiki.getTextArea($tdoc.content)
+$!services.edit.syntaxContent.text($tdoc.content, $tdoc.syntax, {
+  'id': 'content',
+  'name': 'content',
+  'rows': 25,
+  'cols': 80
+})
 </div></div> ## xwikieditcontent
 </div> ## xwikitext
 </div> ## noname

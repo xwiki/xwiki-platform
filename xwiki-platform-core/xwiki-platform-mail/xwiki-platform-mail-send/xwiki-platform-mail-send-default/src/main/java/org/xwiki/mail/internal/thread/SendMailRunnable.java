@@ -37,6 +37,8 @@ import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Runnable that regularly check for mails on a Queue, and for each mail tries to send it.
  *
@@ -64,6 +66,8 @@ public class SendMailRunnable extends AbstractMailRunnable
 
     private int count;
 
+    private ExecutionContext executionContext;
+
     @Override
     public void run()
     {
@@ -83,8 +87,21 @@ public class SendMailRunnable extends AbstractMailRunnable
     private void prepareContext() throws ExecutionContextException
     {
         // Create a single execution context and use it for the send mail thread.
-        ExecutionContext executionContext = new ExecutionContext();
-        this.executionContextManager.initialize(executionContext);
+        ExecutionContext ec = new ExecutionContext();
+        this.executionContextManager.initialize(ec);
+        this.executionContext = ec;
+    }
+
+    private void prepareContextForQueueItem(SendMailQueueItem mailItem)
+    {
+        // Set the current wiki in the context. This is needed for example to be able to locate the configuration
+        // properties when processing the mail queue items (in waitSendWaitTime()).
+        XWikiContext xcontext = (XWikiContext) this.executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        if (xcontext == null) {
+            xcontext = new XWikiContext();
+            this.executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+        }
+        xcontext.setWikiId(mailItem.getWikiId());
     }
 
     private void runInternal()
@@ -127,6 +144,8 @@ public class SendMailRunnable extends AbstractMailRunnable
      */
     protected void sendMail(SendMailQueueItem item)
     {
+        prepareContextForQueueItem(item);
+
         MailListener listener = item.getListener();
 
         ExtendedMimeMessage message;

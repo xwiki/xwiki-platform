@@ -82,9 +82,7 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
             throw new FilterException("Failed to get document [" + reference + "]", e);
         }
 
-        if (!defaultDocument.getDefaultLocale().equals(Locale.ROOT)) {
-            documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, defaultDocument.getDefaultLocale());
-        }
+        documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, defaultDocument.getDefaultLocale());
     }
 
     @Override

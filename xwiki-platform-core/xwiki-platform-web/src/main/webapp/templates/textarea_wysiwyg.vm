@@ -1,5 +1,0 @@
-#set ($editors = $xcontext.getEditorWysiwyg())
-#if ($editors && $services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
-  ## Load the rich text object properties using a compact WYSIWYG editor.
-  #wysiwyg_editProperties($doc $editors false)
-#end

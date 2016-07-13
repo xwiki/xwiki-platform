@@ -58,6 +58,14 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+/**
+ * Represents the execution environment for all the wiki pages. An instance of the <code>Context</code> class is
+ * available as a predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code> in Velocity
+ * scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means of getting
+ * contextual information about the current request or configuring XWiki on the fly.
+ *
+ * @version $Id$
+ */
 public class XWikiContext extends Hashtable<Object, Object>
 {
     /**
@@ -841,6 +849,15 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.displayedFields;
     }
 
+    /**
+     * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
+     * TextArea properties.
+     *
+     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
+     *         enabled
+     */
+    @Deprecated
     public String getEditorWysiwyg()
     {
         return (String) get("editor_wysiwyg");

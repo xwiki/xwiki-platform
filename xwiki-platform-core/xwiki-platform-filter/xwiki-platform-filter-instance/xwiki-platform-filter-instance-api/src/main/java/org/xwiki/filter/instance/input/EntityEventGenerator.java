@@ -26,8 +26,7 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 
 /**
- * @param <E>
- * @param <P>
+ * @param <E> the type of the entity (XWikiDocument, BaseObject, BaseClass, etc.)
  * @version $Id$
  * @since 6.2M1
  */
@@ -37,7 +36,8 @@ public interface EntityEventGenerator<E>
     void write(E entity, Object filter, Map<String, Object> properties) throws FilterException;
 
     /**
-     * @return The FilterStreamDescriptor describes a FilterStream and has the list of bean class parameters or properties.
+     * @return the FilterStreamDescriptor describes a FilterStream and has the list of bean class parameters or
+     *         properties.
      */
     FilterStreamDescriptor getDescriptor();
 }

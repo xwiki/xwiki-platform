@@ -48,7 +48,7 @@ public interface TranslationBundle extends Comparable<TranslationBundle>
      * smaller priority value will be searched before a bundle with a higher value.
      * 
      * @return the priority
-     * @see #compareTo(TranslationBundle)
+     * @see #compareTo(Object)
      */
     int getPriority();
 

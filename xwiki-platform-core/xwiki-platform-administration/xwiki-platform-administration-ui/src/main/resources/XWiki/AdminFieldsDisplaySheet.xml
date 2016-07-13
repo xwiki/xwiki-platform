@@ -39,7 +39,53 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
+#macro (__displayXProperty $prop)
+  #set ($title = $services.localization.render($prop.name))
+  #if ($title == $prop.name)
+    #set ($title = $prop.prettyName)
+  #end
+  #if ($services.localization.get("${obj.xWikiClass.name}_${prop.name}"))
+    #set ($title = $services.localization.render("${obj.xWikiClass.name}_${prop.name}"))
+  #end
+  #set ($hint = $services.localization.render("${obj.xWikiClass.name}_${prop.name}.hint"))
+  #if ($hint == "${obj.xWikiClass.name}_${prop.name}.hint")
+    #set($hint = $NULL)
+  #end
+  &lt;dt&gt;
+  &lt;label for="${configClassName}_${obj.number}_${prop.name}" class="$prop.name"&gt;$title
+  #if ($prop.name == 'skin')
+    #set ($skin = $xwiki.skin)
+    &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin, 'edit')"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+  #end
+  #if ($prop.name == 'colorTheme')
+    #if ($editor == 'globaladmin')
+      #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
+    #else
+      #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
+      #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
+      #if (!$wikiColorTheme.isNew())
+        #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
+      #end
+    #end
+    #if ($xwiki.exists($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome')))
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+    #elseif ($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+    #end
+    &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+  #end
+  &lt;/label&gt;
+  #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+  &lt;/dt&gt;
+  &lt;dd&gt;$configDoc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
+  #if ($prop.name == 'colorTheme' &amp;&amp; $colorThemeHint)
+    &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 ### Input variables: 
 ### - $params (mandatory): list of properties to display and their associated sections
@@ -72,48 +118,12 @@
       #if ($fields.size() &gt; 0)
         &lt;dl&gt;
       #end
-      #foreach($field in $fields)
-        #set($prop = $obj.xWikiClass.get($field))
-        #set($title = $services.localization.render($field))
-        #if ($title == $field &amp;&amp; $prop)
-          #set ($title = $!prop.prettyName)
-        #end
-        #if($services.localization.get("${obj.xWikiClass.name}_${field}"))
-          #set ($title = $services.localization.render("${obj.xWikiClass.name}_${field}"))
-        #end
-        #set($hint = $services.localization.render("${obj.xWikiClass.name}_${field}.hint"))
-        #if($hint == "${obj.xWikiClass.name}_${field}.hint") #set($hint = $NULL) #end
-        &lt;dt&gt;
-        &lt;label #if($prop)for="${configClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
-        #if($field == 'skin')
-          #set ($skin = $xwiki.skin)
-          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin, 'edit')"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
-        #end
-        #if($field == 'colorTheme')
-          #if ($editor == 'globaladmin')
-            #set ($colorThemeName = $xwiki.getXWikiPreference('colorTheme'))
-          #else
-            #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
-            #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
-            #if (!$wikiColorTheme.isNew())
-              #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
-            #end
-          #end
-          #if($xwiki.exists($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome')))
-            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
-          #elseif($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
-            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
-          #end
-          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
-        #end
-        &lt;/label&gt;
-        #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
-        &lt;/dt&gt;
+      #foreach ($field in $fields)
+        #set ($prop = $obj.xWikiClass.get($field))
         #if ($prop)
-          &lt;dd&gt;$configDoc.display($prop.name, 'edit', $obj).replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
-          #if($field == 'colorTheme' &amp;&amp; $colorThemeHint)
-            &lt;dd class="xHint"&gt;$colorThemeHint&lt;/dd&gt;
-          #end
+          #__displayXProperty($prop)
+        #elseif ($field.html)
+          $field.html
         #end
       #end
       #if ($fields.size() &gt; 0)

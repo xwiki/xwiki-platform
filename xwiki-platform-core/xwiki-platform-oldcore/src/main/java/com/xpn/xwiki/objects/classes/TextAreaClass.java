@@ -19,16 +19,21 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.apache.ecs.xhtml.textarea;
-import org.apache.velocity.VelocityContext;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.edit.EditException;
+import org.xwiki.edit.Editor;
+import org.xwiki.edit.EditorManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
@@ -78,6 +83,11 @@ public class TextAreaClass extends StringClass
         return getStringValue("editor").toLowerCase();
     }
 
+    public void setEditor(String editor)
+    {
+        setStringValue("editor", editor);
+    }
+
     public String getContentType()
     {
         String result = getStringValue("contenttype").toLowerCase();
@@ -95,54 +105,28 @@ public class TextAreaClass extends StringClass
 
     public boolean isWysiwyg(XWikiContext context)
     {
-        String editor = null;
-        if ((context != null) && (context.getRequest() != null)) {
-            editor = context.getRequest().get("xeditmode");
+        return "wysiwyg".equals(getEditorType(context));
+    }
+
+    private String getEditorType(XWikiContext context)
+    {
+        String editorType = null;
+        if (context != null && context.getRequest() != null) {
+            editorType = context.getRequest().get("xeditmode");
         }
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
-            }
-        }
-
-        editor = getEditor();
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
+        if (isEmptyValue(editorType)) {
+            editorType = getEditor();
+            if (isEmptyValue(editorType) && context != null && context.getWiki() != null) {
+                editorType = context.getWiki().getEditorPreference(context);
             }
         }
+        return isEmptyValue(editorType) ? null : editorType.toLowerCase();
+    }
 
-        if ((context != null) && (context.getWiki() != null)) {
-            editor = context.getWiki().getEditorPreference(context);
-        }
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
-            }
-        }
-
-        return false;
+    private boolean isEmptyValue(String value)
+    {
+        // See XWIKI-10853: Some static lists in XWiki.XWikiPreferences have the "---" value
+        return StringUtils.isEmpty(value) || "---".equals(value);
     }
 
     /**
@@ -162,40 +146,24 @@ public class TextAreaClass extends StringClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        boolean isWysiwyg = isWysiwyg(context);
-        textarea textarea = new textarea();
-        textarea.setAttributeFilter(new XMLAttributeValueFilter());
-        String tname = prefix + name;
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop != null) {
-            textarea.addElement(prop.toFormString());
+        String editorType = getEditorType(context);
+        EditorManager editorManager = Utils.getComponent(EditorManager.class);
+        Editor<SyntaxContent> editor = editorManager.getDefaultEditor(SyntaxContent.class, editorType);
+        Map<String, Object> parameters = new HashMap<>();
+        String fieldName = prefix + name;
+        parameters.put("id", fieldName);
+        parameters.put("name", fieldName);
+        parameters.put("cols", getSize());
+        parameters.put("rows", getRows());
+        parameters.put("disabled", isDisabled());
+        parameters.put("sourceDocumentReference", object.getDocumentReference());
+        Syntax syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
+        try {
+            buffer.append(editor.render(syntaxContent, parameters));
+        } catch (EditException e) {
+            LOGGER.error("Failed to display the text area property.", e);
         }
-
-        textarea.setName(tname);
-        textarea.setID(tname);
-        textarea.setCols(getSize());
-        textarea.setRows(getRows() + (isWysiwyg ? 2 : 0));
-        textarea.setDisabled(isDisabled());
-
-        // Let's add the Wysiwyg JS
-        if (isWysiwyg) {
-            String wysiwyg = (String) context.get("editor_wysiwyg");
-            if (wysiwyg == null) {
-                wysiwyg = tname;
-            } else {
-                wysiwyg += "," + tname;
-            }
-            context.put("editor_wysiwyg", wysiwyg);
-        } else {
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext != null) {
-                vcontext.put("textareaName", tname);
-                vcontext.put("textarea", textarea);
-                String addscript = context.getWiki().parseTemplate("textarea_text.vm", context);
-                buffer.append(addscript);
-            }
-        }
-        buffer.append(textarea.toString());
     }
 
     @Override

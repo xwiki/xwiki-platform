@@ -46,6 +46,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
 import org.xwiki.wysiwyg.server.wiki.LinkService;
 
@@ -105,6 +106,9 @@ public abstract class AbstractWikiService implements WikiService
 
     @Inject
     private SpaceReferenceResolver<String> spaceResolver;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public Boolean isMultiWiki()
@@ -271,5 +275,18 @@ public abstract class AbstractWikiService implements WikiService
         String queryString = "form_token=" + csrf.getToken();
         return documentAccessBridge.getDocumentURL(entityReferenceConverter.convert(reference), "upload", queryString,
             null);
+    }
+
+    @Override
+    public List<String> getVirtualWikiNames()
+    {
+        try {
+            List<String> wikis = new ArrayList<String>(this.wikiDescriptorManager.getAllIds());
+            Collections.sort(wikis);
+            return wikis;
+        } catch (Exception e) {
+            this.logger.error("Failed to retrieve the list of wikis.", e);
+            return Collections.emptyList();
+        }
     }
 }

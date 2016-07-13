@@ -51,6 +51,7 @@ public class ComputedFieldMetaClass extends PropertyMetaClass
         TextAreaClass scriptClass = new TextAreaClass(this);
         scriptClass.setName("script");
         scriptClass.setPrettyName("Script");
+        scriptClass.setEditor("Text");
         scriptClass.setSize(80);
         scriptClass.setRows(5);
         safeput(scriptClass.getName(), scriptClass);

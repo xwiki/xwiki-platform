@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
@@ -91,18 +92,32 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                 ScriptContext.ENGINE_SCOPE);
         }
 
-        if (xcontext.getDoc() != null) {
-            Document apiDocument = xcontext.getDoc().newDocument(xcontext);
-            Document translatedDocument = apiDocument;
-            try {
-                translatedDocument = apiDocument.getTranslatedDocument();
-            } catch (XWikiException e) {
-                this.logger.warn("Failed to retrieve the translated document for [{}]. "
-                    + "Continue using the default translation.", apiDocument.getFullName(), e);
+        // Current document
+        XWikiDocument doc = xcontext.getDoc();
+        if (doc != null) {
+            Document previousDoc = (Document) scriptContext.getAttribute("doc");
+            if (previousDoc == null || !previousDoc.getDocumentReference().equals(doc.getDocumentReference())) {
+                Document apiDocument = doc.newDocument(xcontext);
+                Document translatedDocument = apiDocument;
+                try {
+                    translatedDocument = apiDocument.getTranslatedDocument();
+                } catch (XWikiException e) {
+                    this.logger.warn("Failed to retrieve the translated document for [{}]. "
+                        + "Continue using the default translation.", apiDocument.getFullName(), e);
+                }
+                scriptContext.setAttribute("doc", apiDocument, ScriptContext.ENGINE_SCOPE);
+                scriptContext.setAttribute("cdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
+                scriptContext.setAttribute("tdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
             }
-            scriptContext.setAttribute("doc", apiDocument, ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("cdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
-            scriptContext.setAttribute("tdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
+        }
+
+        // Current secure document
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc != null) {
+            Document previousSDoc = (Document) scriptContext.getAttribute("sdoc");
+            if (previousSDoc == null || !previousSDoc.getDocumentReference().equals(sdoc.getDocumentReference())) {
+                scriptContext.setAttribute("sdoc", sdoc.newDocument(xcontext), ScriptContext.ENGINE_SCOPE);
+            }
         }
     }
 }

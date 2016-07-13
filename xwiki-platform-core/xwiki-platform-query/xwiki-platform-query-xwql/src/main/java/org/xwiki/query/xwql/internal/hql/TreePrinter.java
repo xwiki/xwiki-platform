@@ -90,6 +90,8 @@ public class TreePrinter extends DepthFirstAdapter
             from = "XWikiDocument";
         } else if (getContext().getObject(alias) != null) {
             from = "BaseObject";
+        } else if (from.equals("Space")) {
+            from = "XWikiSpace";
         }
         builder.append(' ').append(from)
             .append(" as ").append(alias);

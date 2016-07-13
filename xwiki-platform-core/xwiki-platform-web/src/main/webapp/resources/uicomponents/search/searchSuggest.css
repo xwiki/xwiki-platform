@@ -5,15 +5,23 @@ div.suggestItems.searchSuggest {
   box-shadow:3px 3px 5px;
 }
 
-ul.xlist li.showAllResuts {
+.xlist .xitem .xitemcontainer {
+  padding: 0;
+}
+
+.xlist .xitem .xitemcontainer:hover {
+  background-color: inherit;
+}
+
+ul.xlist li.showAllResults {
   padding:0;
 }
 
-ul.xlist li.showAllResuts.loading {
+ul.xlist li.showAllResults.loading {
   background-position:6px center;
 }
 
-ul.xlist li.showAllResuts div.xitemcontainer {
+ul.xlist li.showAllResults div.xitemcontainer {
   margin-left:0;
   padding-left:10px;
   border: 1px solid #EEEEEE;

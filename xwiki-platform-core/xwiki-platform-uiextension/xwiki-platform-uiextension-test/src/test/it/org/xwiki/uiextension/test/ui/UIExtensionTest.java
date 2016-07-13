@@ -19,13 +19,13 @@
  */
 package org.xwiki.uiextension.test.ui;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.uiextension.internal.HelloWorldUIExtension;
-
-import org.junit.Assert;
 
 /**
  * UI tests for the UI Extension feature.
@@ -39,13 +39,13 @@ public class UIExtensionTest extends AbstractTest
 
     private static final String HELLOWIKIWORLD_UIX_PAGE = "HelloWikiWorld";
 
+    // Login as superadmin to have delete rights.
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
     @Before
     public void setUp()
     {
-        // Login as superadmin to have delete rights.
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
         // Delete pages that we create in the test
         getUtil().deletePage(getTestClassName(), HELLOWORLD_UIX_PAGE);
         getUtil().deletePage(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE);
@@ -78,18 +78,18 @@ public class UIExtensionTest extends AbstractTest
             "name", "helloWikiWorld2",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld2",
-            "parameters", "HelloWikiWorldKey=zz2_$xcontext.user");
+            "parameters", "HelloWorldKey=zz2_$xcontext.user");
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
             "name", "helloWikiWorld1",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld1",
-            "parameters", "HelloWikiWorldKey=zz1_$xcontext.user");
+            "parameters", "HelloWorldKey=zz1_$xcontext.user");
         getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
         Assert.assertEquals("HelloWorld\n"
             + "HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"
             + "{HelloWorldKey=HelloWorldValue}\n"
-            + "{HelloWikiWorldKey=zz1_XWiki.superadmin}\n"
-            + "{HelloWikiWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
+            + "{HelloWorldKey=zz1_XWiki.superadmin}\n"
+            + "{HelloWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
     }
 }

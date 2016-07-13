@@ -33,7 +33,7 @@ public abstract class XWikiForm extends ActionForm
 
     /**
      * Reset all properties to their default values.
-     * 
+     *
      * @param request The servlet request we are processing
      */
     public void setRequest(HttpServletRequest request)
@@ -43,7 +43,7 @@ public abstract class XWikiForm extends ActionForm
 
     /**
      * Reset all properties to their default values.
-     * 
+     *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */
@@ -56,7 +56,7 @@ public abstract class XWikiForm extends ActionForm
 
     /**
      * Reset all properties to their default values.
-     * 
+     *
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */
@@ -68,7 +68,7 @@ public abstract class XWikiForm extends ActionForm
 
     public XWikiRequest getRequest()
     {
-        return request;
+        return this.request;
     }
 
     public abstract void readRequest();

@@ -135,9 +135,6 @@ public class EventGroup
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString()
     {

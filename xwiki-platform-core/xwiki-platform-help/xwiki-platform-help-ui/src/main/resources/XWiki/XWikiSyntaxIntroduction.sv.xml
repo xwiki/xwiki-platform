@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300892851000</creationDate>
+  <date>1301497886000</date>
+  <contentUpdateDate>1301497886000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Generell =
+
+== Inledning ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Introduction ===
+
+Med början på XWiki enterprise version 1.7 och senare har en ny wikisyntax, kallad //XWiki syntax v2.0//, introducerats som efterföljare till //XWiki syntax v1.0//.  De huvudsakliga anledningarna för den nya syntaxen är:
+* Fixa begränsningarna och tvetydigheterna som finns i XWiki 1.0 syntaxen (som byggde både på Radeox - den underliggande renderingsmotorn - och TWiki).
+** Symbolvalen var inte bra.  Exempelvis användes en asterisk för att ange fetstil.  Detta orsakade problem då användare matade in text som innehöll asterisker eftersom texten felaktigt antogs vara fetstil.  Således används åtminstone dubbla symboler överallt i wikisyntaxen.
+** Tvetydigheter fanns exempelvis då en rad inleddes med en asterisk.  Var det då fetstil eller en punktlista?  Detta var nödvändigt att lösa för att möjliggöra en deterministisk WYSIWYG-editor.
+* För att närma sig [[Creole 1.0 syntaxen&gt;&gt;http://www.wikicreole.org/]] vilken håller på att bli standard för wikisyntax.  Sammanslutningen bakom Creole har dessutom noggrant analyserat alla existerande wikisyntaxer innan de valt symboler.  Symbolvalen är därför väldigt bra.
+
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}
+
+
+=== 2.0 Introduction ===
+Med början på XWiki enterprise version 1.7 och senare har en ny wikisyntax, kallad //XWiki syntax v2.0//, introducerats som efterföljare till //XWiki syntax v1.0//.  De huvudsakliga anledningarna för den nya syntaxen är:
+* Fixa begränsningarna och tvetydigheterna som finns i XWiki 1.0 syntaxen (som byggde både på Radeox - den underliggande renderingsmotorn - och TWiki).
+** Symbolvalen var inte bra.  Exempelvis användes en asterisk för att ange fetstil.  Detta orsakade problem då användare matade in text som innehöll asterisker eftersom texten felaktigt antogs vara fetstil.  Således används åtminstone dubbla symboler överallt i wikisyntaxen.
+** Tvetydigheter fanns exempelvis då en rad inleddes med en asterisk.  Var det då fetstil eller en punktlista?  Detta var nödvändigt att lösa för att möjliggöra en deterministisk WYSIWYG-editor.
+* För att närma sig [[Creole 1.0 syntaxen&gt;&gt;http://www.wikicreole.org/]] vilken håller på att bli standard för wikisyntax.  Sammanslutningen bakom Creole har dessutom noggrant analyserat alla existerande wikisyntaxer innan de valt symboler.  Symbolvalen är därför väldigt bra.
+
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}
+
+
+=== 2.1 Introduction ===
+
+Sedan introduktionen av XWiki syntax 2.0 har några begränsningar upptäckts.  För att åtgärda dessa har den //experimentella// syntaxen XWiki syntax 2.1 introducerats i XWiki Enterprise version 3.0.  Anledningarna att denna nya syntax utvecklats är:
+* Harmonisera länk- och bild-syntaxerna för tydlighetens och konsekvensens skull och för att förbättra påbyggnadsmöjligheterna.
+* Möjligheten att visa ikoner, att länka till filer med UNC-notation och att länka till relativa URL:er.
+
+{{info}}Eftersom XWiki syntax 2.1 bygger på XWiki syntax 2.0 gäller all syntax från XWiki syntax 2.0 om inte annat anges i specifikationen för 2.1.{{/info}}
+
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}</content>
+</xwikidoc>

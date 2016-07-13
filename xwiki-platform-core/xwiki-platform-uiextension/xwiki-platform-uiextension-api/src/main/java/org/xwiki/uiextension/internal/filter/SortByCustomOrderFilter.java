@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.uiextension.UIExtension;
@@ -39,6 +40,7 @@ import org.xwiki.uiextension.UIExtensionFilter;
  */
 @Component
 @Named("sortByCustomOrder")
+@Singleton
 public class SortByCustomOrderFilter implements UIExtensionFilter
 {
     /**

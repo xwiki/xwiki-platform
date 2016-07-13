@@ -29,13 +29,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.SecurityReference;
@@ -67,15 +65,14 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
     /** A security rules to deny everyone the edit right by allowing edit to no one. */
     private static final SecurityRule DENY_EDIT = new AllowEditToNoOneRule();
 
+    /** Right set allowed for main wiki owner. */
+    private static final Set<Right> MAINWIKIOWNER_RIGHTS = new RightSet(Right.PROGRAM);
+
     /** Right set allowed for wiki owner. */
     private static final Set<Right> OWNER_RIGHTS = new RightSet(Right.ADMIN);
 
     /** Right set allowed for document creators. */
     private static final Set<Right> CREATOR_RIGHTS = new RightSet(Right.CREATOR);
-
-    /** Logger. **/
-    @Inject
-    private Logger logger;
 
     /** Resolver for user and group names. */
     @Inject
@@ -115,7 +112,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         /**
-         * @return all rules available for this entity
+         * @return the reference of the related entity
          */
         @Override
         public SecurityReference getReference()
@@ -141,6 +138,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      * @throws org.xwiki.security.authorization.AuthorizationException if an issue arise while reading these rules
      *         from the wiki.
      */
+    @Override
     public SecurityRuleEntry read(SecurityReference entity) throws AuthorizationException
     {
         if (entity == null) {
@@ -170,18 +168,14 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
                 classReference = new DocumentReference(XWikiConstants.GLOBAL_CLASSNAME,
                     new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
                 break;
+            case DOCUMENT:
+                wikiReference = new WikiReference(entity.extractReference(EntityType.WIKI));
+                documentReference = new DocumentReference(entity);
+                classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
+                    new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
+                break;
             default:
-                EntityReference relatedDocument = entity.extractReference(EntityType.DOCUMENT);
-                if (relatedDocument != null) {
-                    wikiReference = new WikiReference(relatedDocument.extractReference(EntityType.WIKI));
-                    documentReference = new DocumentReference(relatedDocument);
-                    classReference = new DocumentReference(XWikiConstants.LOCAL_CLASSNAME,
-                        new SpaceReference(XWikiConstants.XWIKI_SPACE, wikiReference));
-                } else {
-                    this.logger.debug("Rights on entities of type {} is not supported by this reader!",
-                                      entity.getType());
-                    throw new EntityTypeNotSupportedException(entity.getType(), this);
-                }
+                throw new EntityTypeNotSupportedException(entity.getType(), this);
         }
 
         return new InternalSecurityRuleEntry(entity,
@@ -295,10 +289,17 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
 
         if (isGlobalRightsReference) {
             if (isGlobalRightRequested) {
-                DocumentReference owner = getWikiOwner(documentReference.getWikiReference());
+                WikiReference documentWiki = documentReference.getWikiReference();
+                DocumentReference owner = getWikiOwner(documentWiki);
                 if (owner != null) {
+                    XWikiContext context = getXWikiContext();
+
                     // Allow global rights to wiki owner
-                    rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    if (context.isMainWiki(documentWiki.getName())) {
+                        rules.add(new XWikiSecurityRule(MAINWIKIOWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    } else {
+                        rules.add(new XWikiSecurityRule(OWNER_RIGHTS, RuleState.ALLOW, Collections.singleton(owner), null));
+                    }
                 }
             } else {
                 // Deny local edit right on documents hosting global rights for anyone but admins.
@@ -307,9 +308,12 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         if (!isGlobalRightRequested && document != null) {
-            // Allow local rights to document creator
-            rules.add(new XWikiSecurityRule(CREATOR_RIGHTS, RuleState.ALLOW,
-                Collections.singleton(document.getCreatorReference()), null));
+            DocumentReference creator = document.getCreatorReference();
+
+            // Allow local rights to document creator (unless it is a public creator)
+            if (creator != null && !XWikiConstants.GUEST_USER.equals(creator.getName())) {
+                rules.add(new XWikiSecurityRule(CREATOR_RIGHTS, RuleState.ALLOW, Collections.singleton(creator), null));
+            }
         }
 
         return rules;

@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -30,15 +29,14 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.EmailClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.TimezoneClass;
 
 /**
  * Update XWiki.XWikiUsers document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
@@ -50,7 +48,12 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
     /**
      * The name of the field containing the user email.
      */
-    private static final String FIELD_EMAIL = "email";
+    private static final String EMAIL_FIELD = "email";
+
+    /**
+     * The name of the field containing the time zone.
+     */
+    private static final String TIMEZONE_FIELD = "timezone";
 
     /**
      * Used to bind a class to a document sheet.
@@ -58,12 +61,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
     @Inject
     @Named("class")
     private SheetBinder classSheetBinder;
-
-    /**
-     * Used to access current XWikiContext.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Default constructor.
@@ -86,13 +83,14 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             needsUpdate = true;
         }
 
-        XWikiContext xcontext = xcontextProvider.get();
-
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);
-        if (!(bclass.getField(FIELD_EMAIL) instanceof EmailClass)) {
-            bclass.removeField(FIELD_EMAIL);
-            bclass.addEmailField(FIELD_EMAIL, "e-Mail", 30);
+
+        // Email. Handle upgrade since in the past we were using a standard text field with a custom displayer and
+        // we're now using an Email Class. Thus we need to remove any existing field to upgrade it.
+        if (!(bclass.getField(EMAIL_FIELD) instanceof EmailClass)) {
+            bclass.removeField(EMAIL_FIELD);
+            bclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
             needsUpdate = true;
         }
         needsUpdate |= bclass.addPasswordField("password", "Password", 10);
@@ -109,31 +107,12 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
         needsUpdate |= bclass.addStaticListField("usertype", "User type", "Simple|Advanced");
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
         needsUpdate |= bclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
-        needsUpdate |= bclass.addTextField("timezone", "Timezone", 30);
-        PropertyClass timezoneProperty = (PropertyClass) bclass.get("timezone");
-        if (!timezoneProperty.isCustomDisplayed(xcontext)) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{{velocity}}\n");
-            builder.append("#if ($xcontext.action == 'inline' || $xcontext.action == 'edit')\n");
-            builder.append("  {{html}}\n");
-            builder.append("    #if($xwiki.jodatime)\n");
-            builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
-            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>\n");
-            builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
-            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
-                + "$tz</option>\n");
-            builder.append("        #end\n");
-            builder.append("      </select>\n");
-            builder.append("    #else\n");
-            builder.append("      <input id='$prefix$name' name='$prefix$name' type=\"text\" value=\"$!value\"/>\n");
-            builder.append("    #end\n");
-            builder.append("  {{/html}}\n");
-            builder.append("#else\n");
-            builder.append("  $!value\n");
-            builder.append("#end\n");
-            builder.append("{{/velocity}}\n");
-            timezoneProperty.setCustomDisplay(builder.toString());
+
+        // Timezone. Handle upgrade since in the past we were using a standard text field with a custom displayer and
+        // we're now using a Timezone Class. Thus we need to remove any existing field to upgrade it.
+        if (!(bclass.getField(TIMEZONE_FIELD) instanceof TimezoneClass)) {
+            bclass.removeField(TIMEZONE_FIELD);
+            bclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
             needsUpdate = true;
         }
 

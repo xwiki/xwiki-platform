@@ -1,0 +1,2193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>FlamingoThemes</web>
+  <name>Darkly</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1414591072000</creationDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1431947745000</date>
+  <contentUpdateDate>1431940822000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Darkly</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <attachment>
+    <filename>logo-white.svg</filename>
+    <mimetype>image/svg+xml</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1450354976000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHZpZXdCb3g9Ii01NyAtNTcgMzQ4LjYxMzI1IDE0My42NjY1MiIKICAgd2lkdGg9IjE3NC4zMDY2MyIKICAgaGVpZ2h0PSI3MS44MzMyNiIKICAgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2Utd2lkdGg6Ny41cHg7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO292ZXJmbG93OmhpZGRlbiIKICAgaWQ9InN2ZzIiCiAgIHZlcnNpb249IjEuMSIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMC40OC40IHI5OTM5IgogICBzb2RpcG9kaTpkb2NuYW1lPSJsb2dvLXdoaXRlLnN2ZyI+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhMjciPgogICAgPHJkZjpSREY+CiAgICAgIDxjYzpXb3JrCiAgICAgICAgIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgICAgICA8ZGM6dHlwZQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+CiAgICAgIDwvY2M6V29yaz4KICAgIDwvcmRmOlJERj4KICA8L21ldGFkYXRhPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTMxOSIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI3NDQiCiAgICAgaWQ9Im5hbWVkdmlldzI1IgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTp6b29tPSIyLjAzNzAzNyIKICAgICBpbmtzY2FwZTpjeD0iODguNDE2NjMxIgogICAgIGlua3NjYXBlOmN5PSIzNS45MTY2MzEiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjQ3IgogICAgIGlua3NjYXBlOndpbmRvdy15PSIyNCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzIiCiAgICAgZml0LW1hcmdpbi10b3A9IjEwIgogICAgIGZpdC1tYXJnaW4tbGVmdD0iMTAiCiAgICAgZml0LW1hcmdpbi1yaWdodD0iMTAiCiAgICAgZml0LW1hcmdpbi1ib3R0b209IjEwIiAvPgogIDxzdHlsZQogICAgIHR5cGU9InRleHQvY3NzIgogICAgIGlkPSJzdHlsZTQiPgogICAgKiB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZS13aWR0aDogNy41cHg7CiAgICAgIHN0cm9rZS1saW5lY2FwOiByb3VuZDsKICAgICAgc3Ryb2tlLWxpbmVqb2luOiByb3VuZDsKICAgIH0KICAgIC5YIHsKICAgICAgc3Ryb2tlLXdpZHRoOiAxM3B4OwogICAgICBzdHJva2U6ICM1MDUwNTI7CiAgICB9CiAgICAud2lraSB7CiAgICAgIHN0cm9rZS13aWR0aDogM3B4OwogICAgICBzdHJva2U6ICM5OTk7CiAgICB9CiAgICAud2VzdCB7CiAgICAgIHN0cm9rZTogIzAwODdDQjsKICAgIH0KICAgIC5ub3J0aCB7CiAgICAgIHN0cm9rZTogIzcwQjcwMDsKICAgIH0KICAgIC5lYXN0IHsKICAgICAgc3Ryb2tlOiAjRkY3NzAwOwogICAgfQogICAgLnNvdXRoIHsKICAgICAgc3Ryb2tlOiAjRkYwMDAwOwogICAgfQogPC9zdHlsZT4KICA8ZGVmcwogICAgIGlkPSJkZWZzNiI+CiAgICA8ZwogICAgICAgaWQ9ImRhc2giCiAgICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMCwtMjApIgogICAgICAgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2Utd2lkdGg6Ny41cHg7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kIj4KICAgICAgPHBhdGgKICAgICAgICAgZD0iTSAzLC0zIDE0LC0xNCIKICAgICAgICAgaWQ9InBhdGg5IgogICAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIgogICAgICAgICBzdHlsZT0iZmlsbDpub25lO3N0cm9rZS13aWR0aDo3LjVweDtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQiIC8+CiAgICA8L2c+CiAgPC9kZWZzPgogIDx1c2UKICAgICB4bGluazpocmVmPSIjZGFzaCIKICAgICB0cmFuc2Zvcm09Im1hdHJpeCgwLjcwNzEwNjc4LC0wLjcwNzEwNjc4LDAuNzA3MTA2NzgsMC43MDcxMDY3OCwxNC44MzMyNjEsMTQuODMzMjYxKSIKICAgICBjbGFzcz0ibm9ydGgiCiAgICAgaWQ9InVzZTExIgogICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmZmZmY7c3Ryb2tlLXdpZHRoOjcuNXB4O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZCIKICAgICB4PSIwIgogICAgIHk9IjAiCiAgICAgd2lkdGg9IjMyNCIKICAgICBoZWlnaHQ9IjExNCIgLz4KICA8dXNlCiAgICAgeGxpbms6aHJlZj0iI2Rhc2giCiAgICAgdHJhbnNmb3JtPSJtYXRyaXgoMC43MDcxMDY3OCwwLjcwNzEwNjc4LC0wLjcwNzEwNjc4LDAuNzA3MTA2NzgsMTQuODMzMjYxLDE0LjgzMzI2MSkiCiAgICAgY2xhc3M9ImVhc3QiCiAgICAgaWQ9InVzZTEzIgogICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmZmZmY7c3Ryb2tlLXdpZHRoOjcuNXB4O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZCIKICAgICB4PSIwIgogICAgIHk9IjAiCiAgICAgd2lkdGg9IjMyNCIKICAgICBoZWlnaHQ9IjExNCIgLz4KICA8dXNlCiAgICAgeGxpbms6aHJlZj0iI2Rhc2giCiAgICAgdHJhbnNmb3JtPSJtYXRyaXgoLTAuNzA3MTA2NzgsMC43MDcxMDY3OCwtMC43MDcxMDY3OCwtMC43MDcxMDY3OCwxNC44MzMyNjEsMTQuODMzMjYxKSIKICAgICBjbGFzcz0ic291dGgiCiAgICAgaWQ9InVzZTE1IgogICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmZmZmY7c3Ryb2tlLXdpZHRoOjcuNXB4O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZCIKICAgICB4PSIwIgogICAgIHk9IjAiCiAgICAgd2lkdGg9IjMyNCIKICAgICBoZWlnaHQ9IjExNCIgLz4KICA8dXNlCiAgICAgeGxpbms6aHJlZj0iI2Rhc2giCiAgICAgdHJhbnNmb3JtPSJtYXRyaXgoLTAuNzA3MTA2NzgsLTAuNzA3MTA2NzgsMC43MDcxMDY3OCwtMC43MDcxMDY3OCwxNC44MzMyNjEsMTQuODMzMjYxKSIKICAgICBjbGFzcz0id2VzdCIKICAgICBpZD0idXNlMTciCiAgICAgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6I2ZmZmZmZjtzdHJva2Utd2lkdGg6Ny41cHg7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kIgogICAgIHg9IjAiCiAgICAgeT0iMCIKICAgICB3aWR0aD0iMzI0IgogICAgIGhlaWdodD0iMTE0IiAvPgogIDxsaW5lCiAgICAgY2xhc3M9IlgiCiAgICAgeDE9Ii0yMC4xNjY3MzkiCiAgICAgeTE9Ii0yNS4xNjY3MzkiCiAgICAgeDI9IjQ5LjgzMzI2IgogICAgIHkyPSI1NC44MzMyNiIKICAgICBpZD0ibGluZTE5IgogICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmZmZmY7c3Ryb2tlLXdpZHRoOjEzcHg7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kIiAvPgogIDxsaW5lCiAgICAgY2xhc3M9IlgiCiAgICAgeDE9Ii0yMC4xNjY3MzkiCiAgICAgeTE9IjU0LjgzMzI2IgogICAgIHgyPSI0OS44MzMyNiIKICAgICB5Mj0iLTI1LjE2NjczOSIKICAgICBpZD0ibGluZTIxIgogICAgIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiNmZmZmZmY7c3Ryb2tlLXdpZHRoOjEzcHg7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kIiAvPgogIDxwYXRoCiAgICAgY2xhc3M9Indpa2kiCiAgICAgZD0ibSA3My44MzMyNjEsLTI2LjY2NjczOSAxNS45NSw4Mi45NCAyOC43MDk5OTksLTgyLjk0IDI4LjcxLDgyLjk0IDE1Ljk1LC04Mi45NCBtIDE3LjU0NSwwIHYgODIuOTQgbSAyMC43MzUsLTgyLjk0IHYgODIuOTQgbSA0Ny44NSwtODIuOTQgLTQxLjQ3LDQxLjQ3IDQxLjQ3LDQxLjQ3IG0gMTcuNTQ1LC04Mi45NCB2IDgyLjk0IgogICAgIGlkPSJwYXRoMjMiCiAgICAgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6I2ZmZmZmZjtzdHJva2Utd2lkdGg6OS41Njk5OTk2OXB4O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZCIKICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPgo8L3N2Zz4K</content>
+    <filesize>4641</filesize>
+  </attachment>
+  <object>
+    <name>FlamingoThemes.Darkly</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>8e0ce202-38f5-4242-9273-0e800ae70117</guid>
+    <class>
+      <name>FlamingoThemesCode.ThemeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <body-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>body-bg</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>body-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </body-bg>
+      <brand-danger>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>brand-danger</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>brand-danger</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </brand-danger>
+      <brand-info>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>brand-info</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>brand-info</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </brand-info>
+      <brand-primary>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>brand-primary</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>brand-primary</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </brand-primary>
+      <brand-success>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>brand-success</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>brand-success</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </brand-success>
+      <brand-warning>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>brand-warning</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>brand-warning</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </brand-warning>
+      <breadcrumb-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>breadcrumb-bg</name>
+        <number>47</number>
+        <picker>0</picker>
+        <prettyName>breadcrumb-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </breadcrumb-bg>
+      <breadcrumb-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>breadcrumb-color</name>
+        <number>48</number>
+        <picker>0</picker>
+        <prettyName>breadcrumb-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </breadcrumb-color>
+      <breadcrumb-separator>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>breadcrumb-separator</name>
+        <number>49</number>
+        <picker>0</picker>
+        <prettyName>breadcrumb-separator</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </breadcrumb-separator>
+      <btn-danger-bg>
+        <disabled>0</disabled>
+        <name>btn-danger-bg</name>
+        <number>55</number>
+        <prettyName>btn-danger-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-danger-bg>
+      <btn-danger-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-danger-color</name>
+        <number>24</number>
+        <picker>0</picker>
+        <prettyName>btn-danger-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-danger-color>
+      <btn-default-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-default-bg</name>
+        <number>19</number>
+        <picker>0</picker>
+        <prettyName>btn-default-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-default-bg>
+      <btn-default-border>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-default-border</name>
+        <number>25</number>
+        <picker>0</picker>
+        <prettyName>btn-default-border</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-default-border>
+      <btn-default-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-default-color</name>
+        <number>18</number>
+        <picker>0</picker>
+        <prettyName>btn-default-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-default-color>
+      <btn-font-weight>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-font-weight</name>
+        <number>17</number>
+        <picker>0</picker>
+        <prettyName>btn-font-weight</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-font-weight>
+      <btn-info-bg>
+        <disabled>0</disabled>
+        <name>btn-info-bg</name>
+        <number>53</number>
+        <prettyName>btn-info-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-info-bg>
+      <btn-info-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-info-color</name>
+        <number>22</number>
+        <picker>0</picker>
+        <prettyName>btn-info-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-info-color>
+      <btn-primary-bg>
+        <disabled>0</disabled>
+        <name>btn-primary-bg</name>
+        <number>51</number>
+        <prettyName>btn-primary-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-primary-bg>
+      <btn-primary-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-primary-color</name>
+        <number>20</number>
+        <picker>0</picker>
+        <prettyName>btn-primary-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-primary-color>
+      <btn-success-bg>
+        <disabled>0</disabled>
+        <name>btn-success-bg</name>
+        <number>52</number>
+        <prettyName>btn-success-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-success-bg>
+      <btn-success-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-success-color</name>
+        <number>21</number>
+        <picker>0</picker>
+        <prettyName>btn-success-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-success-color>
+      <btn-warning-bg>
+        <disabled>0</disabled>
+        <name>btn-warning-bg</name>
+        <number>54</number>
+        <prettyName>btn-warning-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-warning-bg>
+      <btn-warning-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>btn-warning-color</name>
+        <number>23</number>
+        <picker>0</picker>
+        <prettyName>btn-warning-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </btn-warning-color>
+      <component-active-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>component-active-bg</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>component-active-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </component-active-bg>
+      <component-active-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>component-active-color</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>component-active-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </component-active-color>
+      <dropdown-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-bg</name>
+        <number>39</number>
+        <picker>0</picker>
+        <prettyName>dropdown-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-bg>
+      <dropdown-border>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-border</name>
+        <number>40</number>
+        <picker>0</picker>
+        <prettyName>dropdown-border</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-border>
+      <dropdown-divider-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-divider-bg</name>
+        <number>43</number>
+        <picker>0</picker>
+        <prettyName>dropdown-divider-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-divider-bg>
+      <dropdown-link-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-link-color</name>
+        <number>41</number>
+        <picker>0</picker>
+        <prettyName>dropdown-link-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-link-color>
+      <dropdown-link-hover-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-link-hover-bg</name>
+        <number>44</number>
+        <picker>0</picker>
+        <prettyName>dropdown-link-hover-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-link-hover-bg>
+      <dropdown-link-hover-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dropdown-link-hover-color</name>
+        <number>42</number>
+        <picker>0</picker>
+        <prettyName>dropdown-link-hover-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dropdown-link-hover-color>
+      <font-family-base>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>font-family-base</name>
+        <number>12</number>
+        <picker>0</picker>
+        <prettyName>font-family-base</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </font-family-base>
+      <font-family-monospace>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>font-family-monospace</name>
+        <number>15</number>
+        <picker>0</picker>
+        <prettyName>font-family-monospace</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </font-family-monospace>
+      <font-family-sans-serif>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>font-family-sans-serif</name>
+        <number>13</number>
+        <picker>0</picker>
+        <prettyName>font-family-sans-serif</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </font-family-sans-serif>
+      <font-family-serif>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>font-family-serif</name>
+        <number>14</number>
+        <picker>0</picker>
+        <prettyName>font-family-serif</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </font-family-serif>
+      <font-size-base>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>font-size-base</name>
+        <number>16</number>
+        <picker>0</picker>
+        <prettyName>font-size-base</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </font-size-base>
+      <headings-color>
+        <disabled>0</disabled>
+        <name>headings-color</name>
+        <number>59</number>
+        <prettyName>headings-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </headings-color>
+      <input-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>input-bg</name>
+        <number>26</number>
+        <picker>0</picker>
+        <prettyName>input-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </input-bg>
+      <input-border>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>input-border</name>
+        <number>27</number>
+        <picker>0</picker>
+        <prettyName>input-border</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </input-border>
+      <input-border-focus>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>input-border-focus</name>
+        <number>29</number>
+        <picker>0</picker>
+        <prettyName>input-border-focus</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </input-border-focus>
+      <input-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>input-color</name>
+        <number>28</number>
+        <picker>0</picker>
+        <prettyName>input-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </input-color>
+      <input-color-placeholder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>input-color-placeholder</name>
+        <number>30</number>
+        <picker>0</picker>
+        <prettyName>input-color-placeholder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </input-color-placeholder>
+      <legend-border-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>legend-border-color</name>
+        <number>32</number>
+        <picker>0</picker>
+        <prettyName>legend-border-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </legend-border-color>
+      <legend-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>legend-color</name>
+        <number>31</number>
+        <picker>0</picker>
+        <prettyName>legend-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </legend-color>
+      <lessCode>
+        <disabled>0</disabled>
+        <name>lessCode</name>
+        <number>56</number>
+        <prettyName>lessCode</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </lessCode>
+      <link-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>link-color</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>link-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </link-color>
+      <logo>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>logo</name>
+        <number>50</number>
+        <picker>0</picker>
+        <prettyName>logo</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </logo>
+      <navbar-default-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-default-bg</name>
+        <number>34</number>
+        <picker>0</picker>
+        <prettyName>navbar-default-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-bg>
+      <navbar-default-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-default-color</name>
+        <number>33</number>
+        <picker>0</picker>
+        <prettyName>navbar-default-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-color>
+      <navbar-default-link-active-bg>
+        <disabled>0</disabled>
+        <name>navbar-default-link-active-bg</name>
+        <number>58</number>
+        <prettyName>navbar-default-link-active-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-link-active-bg>
+      <navbar-default-link-active-color>
+        <disabled>0</disabled>
+        <name>navbar-default-link-active-color</name>
+        <number>57</number>
+        <prettyName>navbar-default-link-active-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-link-active-color>
+      <navbar-default-link-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-default-link-color</name>
+        <number>35</number>
+        <picker>0</picker>
+        <prettyName>navbar-default-link-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-link-color>
+      <navbar-default-link-hover-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-default-link-hover-bg</name>
+        <number>37</number>
+        <picker>0</picker>
+        <prettyName>navbar-default-link-hover-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-link-hover-bg>
+      <navbar-default-link-hover-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-default-link-hover-color</name>
+        <number>36</number>
+        <picker>0</picker>
+        <prettyName>navbar-default-link-hover-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-default-link-hover-color>
+      <navbar-height>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>navbar-height</name>
+        <number>38</number>
+        <picker>0</picker>
+        <prettyName>navbar-height</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </navbar-height>
+      <panel-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>panel-bg</name>
+        <number>45</number>
+        <picker>0</picker>
+        <prettyName>panel-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </panel-bg>
+      <panel-default-text>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>panel-default-text</name>
+        <number>46</number>
+        <picker>0</picker>
+        <prettyName>panel-default-text</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </panel-default-text>
+      <text-color>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>text-color</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>text-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </text-color>
+      <xwiki-page-content-bg>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>xwiki-page-content-bg</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>xwiki-page-content-bg</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </xwiki-page-content-bg>
+    </class>
+    <property>
+      <body-bg>#222222</body-bg>
+    </property>
+    <property>
+      <brand-danger/>
+    </property>
+    <property>
+      <brand-info/>
+    </property>
+    <property>
+      <brand-primary/>
+    </property>
+    <property>
+      <brand-success/>
+    </property>
+    <property>
+      <brand-warning/>
+    </property>
+    <property>
+      <breadcrumb-bg/>
+    </property>
+    <property>
+      <breadcrumb-color/>
+    </property>
+    <property>
+      <breadcrumb-separator/>
+    </property>
+    <property>
+      <btn-danger-bg/>
+    </property>
+    <property>
+      <btn-danger-color/>
+    </property>
+    <property>
+      <btn-default-bg/>
+    </property>
+    <property>
+      <btn-default-border/>
+    </property>
+    <property>
+      <btn-default-color/>
+    </property>
+    <property>
+      <btn-font-weight/>
+    </property>
+    <property>
+      <btn-info-bg/>
+    </property>
+    <property>
+      <btn-info-color/>
+    </property>
+    <property>
+      <btn-primary-bg/>
+    </property>
+    <property>
+      <btn-primary-color/>
+    </property>
+    <property>
+      <btn-success-bg/>
+    </property>
+    <property>
+      <btn-success-color/>
+    </property>
+    <property>
+      <btn-warning-bg/>
+    </property>
+    <property>
+      <btn-warning-color/>
+    </property>
+    <property>
+      <component-active-bg/>
+    </property>
+    <property>
+      <component-active-color/>
+    </property>
+    <property>
+      <dropdown-bg/>
+    </property>
+    <property>
+      <dropdown-border/>
+    </property>
+    <property>
+      <dropdown-divider-bg/>
+    </property>
+    <property>
+      <dropdown-link-color/>
+    </property>
+    <property>
+      <dropdown-link-hover-bg/>
+    </property>
+    <property>
+      <dropdown-link-hover-color/>
+    </property>
+    <property>
+      <font-family-base/>
+    </property>
+    <property>
+      <font-family-monospace/>
+    </property>
+    <property>
+      <font-family-sans-serif/>
+    </property>
+    <property>
+      <font-family-serif/>
+    </property>
+    <property>
+      <font-size-base/>
+    </property>
+    <property>
+      <headings-color/>
+    </property>
+    <property>
+      <input-bg/>
+    </property>
+    <property>
+      <input-border/>
+    </property>
+    <property>
+      <input-border-focus/>
+    </property>
+    <property>
+      <input-color/>
+    </property>
+    <property>
+      <input-color-placeholder/>
+    </property>
+    <property>
+      <legend-border-color/>
+    </property>
+    <property>
+      <legend-color/>
+    </property>
+    <property>
+      <lessCode>// Darkly 3.3.5
+// Variables
+// --------------------------------------------------
+
+
+//== Colors
+//
+//## Gray and brand colors for use across Bootstrap.
+
+@gray-base:              #000;
+@gray-darker:            lighten(@gray-base, 13.5%); // #222
+@gray-dark:              #303030;   // #333
+@gray:                   #464545;
+@gray-light:             #999;   // #999
+@gray-lighter:           #EBEBEB; // #eee
+
+@brand-primary:         #375a7f;
+@brand-success:         #00bc8c;
+@brand-info:            #3498DB;
+@brand-warning:         #F39C12;
+@brand-danger:          #E74C3C;
+
+
+//== Scaffolding
+//
+//## Settings for some of the most global styles.
+
+//** Background color for `&lt;body&gt;`.
+@body-bg:               @gray-darker;
+//** Global text color on `&lt;body&gt;`.
+@text-color:            #fff;
+
+//** Global textual link color.
+@link-color:            desaturate(lighten(@brand-success, 10%),10%);
+//** Link hover color set via `darken()` function.
+@link-hover-color:      @link-color;
+//** Link hover decoration.
+@link-hover-decoration: underline;
+
+
+//== Typography
+//
+//## Font, line-height, and color for body text, headings, and more.
+
+@font-family-sans-serif:  "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-serif:       Georgia, "Times New Roman", Times, serif;
+//** Default monospace fonts for `&lt;code&gt;`, `&lt;kbd&gt;`, and `&lt;pre&gt;`.
+@font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
+@font-family-base:        @font-family-sans-serif;
+
+/* XWiki already overrides these variables
+@font-size-base:          15px;
+@font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
+@font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
+
+@font-size-h1:            floor((@font-size-base * 2.6)); // ~36px
+@font-size-h2:            floor((@font-size-base * 2.15)); // ~30px
+@font-size-h3:            ceil((@font-size-base * 1.7)); // ~24px
+@font-size-h4:            ceil((@font-size-base * 1.25)); // ~18px
+@font-size-h5:            @font-size-base;
+@font-size-h6:            ceil((@font-size-base * 0.85)); // ~12px
+*/
+
+//** Unit-less `line-height` for use in components like buttons.
+@line-height-base:        1.428571429; // 20/14
+//** Computed "line-height" (`font-size` * `line-height`) for use with `margin`, `padding`, etc.
+@line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
+
+//** By default, this inherits from the `&lt;body&gt;`.
+@headings-font-family:    @font-family-base;
+@headings-font-weight:    400;
+@headings-line-height:    1.1;
+@headings-color:          inherit;
+
+
+//== Iconography
+//
+//## Specify custom location and filename of the included Glyphicons icon font. Useful for those including Bootstrap via Bower.
+
+//** Load fonts from this directory.
+// @icon-font-path:          "../fonts/"; // XWiki already overrides this variable
+//** File name for all font files.
+@icon-font-name:          "glyphicons-halflings-regular";
+//** Element ID within SVG icon file.
+@icon-font-svg-id:        "glyphicons_halflingsregular";
+
+
+//== Components
+//
+//## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
+
+@padding-base-vertical:     10px;
+@padding-base-horizontal:   15px;
+
+@padding-large-vertical:    18px;
+@padding-large-horizontal:  27px;
+
+@padding-small-vertical:    6px;
+@padding-small-horizontal:  9px;
+
+@padding-xs-vertical:       1px;
+@padding-xs-horizontal:     5px;
+
+@line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
+@line-height-small:         1.5;
+
+@border-radius-base:        4px;
+@border-radius-large:       6px;
+@border-radius-small:       3px;
+
+//** Global color for active items (e.g., navs or dropdowns).
+@component-active-color:    #fff;
+//** Global background color for active items (e.g., navs or dropdowns).
+@component-active-bg:       @brand-primary;
+
+//** Width of the `border` for generating carets that indicator dropdowns.
+@caret-width-base:          4px;
+//** Carets increase slightly in size for larger components.
+@caret-width-large:         5px;
+
+
+//== Tables
+//
+//## Customizes the `.table` component with basic values, each used across all table variations.
+
+//** Padding for `&lt;th&gt;`s and `&lt;td&gt;`s.
+@table-cell-padding:            8px;
+//** Padding for cells in `.table-condensed`.
+@table-condensed-cell-padding:  5px;
+
+//** Default background color used for all tables.
+@table-bg:                      transparent;
+//** Background color used for `.table-striped`.
+@table-bg-accent:               lighten(@gray-dark, 5%);
+//** Background color used for `.table-hover`.
+@table-bg-hover:                @gray;
+@table-bg-active:               @table-bg-hover;
+
+//** Border color for table and cell borders.
+@table-border-color:            @gray;
+
+
+//== Buttons
+//
+//## For each of Bootstrap's buttons, define text, background and border color.
+
+@btn-font-weight:                normal;
+
+@btn-default-color:              @text-color;
+@btn-default-bg:                 @gray;
+@btn-default-border:             @btn-default-bg;
+
+@btn-primary-color:              #fff;
+@btn-primary-bg:                 @brand-primary;
+@btn-primary-border:             @btn-primary-bg;
+
+@btn-success-color:              @btn-primary-color;
+@btn-success-bg:                 @brand-success;
+@btn-success-border:             @btn-success-bg;
+
+@btn-info-color:                 @btn-success-color;
+@btn-info-bg:                    @brand-info;
+@btn-info-border:                @btn-info-bg;
+
+@btn-warning-color:              @btn-success-color;
+@btn-warning-bg:                 @brand-warning;
+@btn-warning-border:             @btn-warning-bg;
+
+@btn-danger-color:               @btn-success-color;
+@btn-danger-bg:                  @brand-danger;
+@btn-danger-border:              @btn-danger-bg;
+
+@btn-link-disabled-color:        @gray-light;
+
+// Allows for customizing button radius independently from global border radius
+@btn-border-radius-base:         @border-radius-base;
+@btn-border-radius-large:        @border-radius-large;
+@btn-border-radius-small:        @border-radius-small;
+
+
+//== Forms
+//
+//##
+
+//** `&lt;input&gt;` background color
+@input-bg:                       #fff;
+//** `&lt;input disabled&gt;` background color
+@input-bg-disabled:              @gray-lighter;
+
+//** Text color for `&lt;input&gt;`s
+@input-color:                    @gray;
+//** `&lt;input&gt;` border color
+@input-border:                   #f1f1f1;
+
+// TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
+//** Default `.form-control` border radius
+// This has no effect on `&lt;select&gt;`s in some browsers, due to the limited stylability of `&lt;select&gt;`s in CSS.
+@input-border-radius:            @border-radius-base;
+//** Large `.form-control` border radius
+@input-border-radius-large:      @border-radius-large;
+//** Small `.form-control` border radius
+@input-border-radius-small:      @border-radius-small;
+
+//** Border color for inputs on focus
+@input-border-focus:             #fff;
+
+//** Placeholder text color
+@input-color-placeholder:        @gray-light;
+
+//** Default `.form-control` height
+@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 4);
+//** Large `.form-control` height
+@input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 4);
+//** Small `.form-control` height
+@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 4);
+
+//** `.form-group` margin
+@form-group-margin-bottom:       15px;
+
+@legend-color:                   @text-color;
+@legend-border-color:            transparent;
+
+//** Background color for textual input addons
+@input-group-addon-bg:           @gray;
+//** Border color for textual input addons
+@input-group-addon-border-color: transparent;
+
+//** Disabled cursor for form controls and buttons.
+@cursor-disabled:                not-allowed;
+
+
+//== Dropdowns
+//
+//## Dropdown menu container and contents.
+
+//** Background for the dropdown menu.
+@dropdown-bg:                    @gray-dark;
+//** Dropdown menu `border-color`.
+@dropdown-border:                rgba(0,0,0,.15);
+//** Dropdown menu `border-color` **for IE8**.
+@dropdown-fallback-border:       #ccc;
+//** Divider color for between dropdown items.
+@dropdown-divider-bg:            @gray;
+
+//** Dropdown link text color.
+@dropdown-link-color:            @gray-lighter;
+//** Hover color for dropdown links.
+@dropdown-link-hover-color:      #fff;
+//** Hover background for dropdown links.
+@dropdown-link-hover-bg:         @component-active-bg;
+
+//** Active dropdown menu item text color.
+@dropdown-link-active-color:     #fff;
+//** Active dropdown menu item background color.
+@dropdown-link-active-bg:        @component-active-bg;
+
+//** Disabled dropdown menu item background color.
+@dropdown-link-disabled-color:   @gray-light;
+
+//** Text color for headers within dropdown menus.
+@dropdown-header-color:          @gray-light;
+
+//** Deprecated `@dropdown-caret-color` as of v3.1.0
+@dropdown-caret-color:           #000;
+
+
+//-- Z-index master list
+//
+// Warning: Avoid customizing these values. They're used for a bird's eye view
+// of components dependent on the z-axis and are designed to all work together.
+//
+// Note: These variables are not generated into the Customizer.
+
+@zindex-navbar:            1000;
+@zindex-dropdown:          1000;
+@zindex-popover:           1060;
+@zindex-tooltip:           1070;
+@zindex-navbar-fixed:      1030;
+@zindex-modal-background:  1040;
+@zindex-modal:             1050;
+
+
+//== Media queries breakpoints
+//
+//## Define the breakpoints at which your layout will change, adapting to different screen sizes.
+
+// Extra small screen / phone
+//** Deprecated `@screen-xs` as of v3.0.1
+@screen-xs:                  480px;
+//** Deprecated `@screen-xs-min` as of v3.2.0
+@screen-xs-min:              @screen-xs;
+//** Deprecated `@screen-phone` as of v3.0.1
+@screen-phone:               @screen-xs-min;
+
+// Small screen / tablet
+//** Deprecated `@screen-sm` as of v3.0.1
+@screen-sm:                  768px;
+@screen-sm-min:              @screen-sm;
+//** Deprecated `@screen-tablet` as of v3.0.1
+@screen-tablet:              @screen-sm-min;
+
+// Medium screen / desktop
+//** Deprecated `@screen-md` as of v3.0.1
+@screen-md:                  992px;
+@screen-md-min:              @screen-md;
+//** Deprecated `@screen-desktop` as of v3.0.1
+@screen-desktop:             @screen-md-min;
+
+// Large screen / wide desktop
+//** Deprecated `@screen-lg` as of v3.0.1
+@screen-lg:                  1200px;
+@screen-lg-min:              @screen-lg;
+//** Deprecated `@screen-lg-desktop` as of v3.0.1
+@screen-lg-desktop:          @screen-lg-min;
+
+// So media queries don't overlap when required, provide a maximum
+@screen-xs-max:              (@screen-sm-min - 1);
+@screen-sm-max:              (@screen-md-min - 1);
+@screen-md-max:              (@screen-lg-min - 1);
+
+
+//== Grid system
+//
+//## Define your custom responsive grid.
+
+//** Number of columns in the grid.
+@grid-columns:              12;
+//** Padding between columns. Gets divided in half for the left and right.
+@grid-gutter-width:         30px;
+// Navbar collapse
+//** Point at which the navbar becomes uncollapsed.
+@grid-float-breakpoint:     @screen-sm-min;
+//** Point at which the navbar begins collapsing.
+@grid-float-breakpoint-max: (@grid-float-breakpoint - 1);
+
+
+//== Container sizes
+//
+//## Define the maximum width of `.container` for different screen sizes.
+
+// Small screen / tablet
+@container-tablet:             (720px + @grid-gutter-width);
+//** For `@screen-sm-min` and up.
+@container-sm:                 @container-tablet;
+
+// Medium screen / desktop
+@container-desktop:            (940px + @grid-gutter-width);
+//** For `@screen-md-min` and up.
+@container-md:                 @container-desktop;
+
+// Large screen / wide desktop
+@container-large-desktop:      (1140px + @grid-gutter-width);
+//** For `@screen-lg-min` and up.
+@container-lg:                 @container-large-desktop;
+
+
+//== Navbar
+//
+//##
+
+// Basics of a navbar
+@navbar-height:                    60px;
+@navbar-margin-bottom:             @line-height-computed;
+@navbar-border-radius:             @border-radius-base;
+@navbar-padding-horizontal:        floor((@grid-gutter-width / 2));
+@navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);
+@navbar-collapse-max-height:       340px;
+
+@navbar-default-color:             #777;
+@navbar-default-bg:                @brand-primary;
+@navbar-default-border:            transparent;
+
+// Navbar links
+@navbar-default-link-color:                #fff;
+@navbar-default-link-hover-color:          @brand-success;
+@navbar-default-link-hover-bg:             transparent;
+@navbar-default-link-active-color:         #fff;
+@navbar-default-link-active-bg:            darken(@navbar-default-bg, 10%);
+@navbar-default-link-disabled-color:       #ccc;
+@navbar-default-link-disabled-bg:          transparent;
+
+// Navbar brand label
+@navbar-default-brand-color:               @navbar-default-link-color;
+@navbar-default-brand-hover-color:         @navbar-default-link-hover-color;
+@navbar-default-brand-hover-bg:            transparent;
+
+// Navbar toggle
+@navbar-default-toggle-hover-bg:           darken(@navbar-default-bg, 10%);
+@navbar-default-toggle-icon-bar-bg:        #fff;
+@navbar-default-toggle-border-color:       darken(@navbar-default-bg, 10%);
+
+
+//=== Inverted navbar
+// Reset inverted navbar basics
+@navbar-inverse-color:                      #fff;
+@navbar-inverse-bg:                         @brand-success;
+@navbar-inverse-border:                     transparent;
+
+// Inverted navbar links
+@navbar-inverse-link-color:                 @navbar-inverse-color;
+@navbar-inverse-link-hover-color:           @brand-primary;
+@navbar-inverse-link-hover-bg:              transparent;
+@navbar-inverse-link-active-color:          @navbar-inverse-color;
+@navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 5%);
+@navbar-inverse-link-disabled-color:        #aaa;
+@navbar-inverse-link-disabled-bg:           transparent;
+
+// Inverted navbar brand label
+@navbar-inverse-brand-color:                @navbar-inverse-link-color;
+@navbar-inverse-brand-hover-color:          @navbar-inverse-link-hover-color;
+@navbar-inverse-brand-hover-bg:             transparent;
+
+// Inverted navbar toggle
+@navbar-inverse-toggle-hover-bg:            darken(@navbar-inverse-bg, 10%);
+@navbar-inverse-toggle-icon-bar-bg:         #fff;
+@navbar-inverse-toggle-border-color:        darken(@navbar-inverse-bg, 10%);
+
+
+//== Navs
+//
+//##
+
+//=== Shared nav styles
+@nav-link-padding:                          10px 15px;
+@nav-link-hover-bg:                         @gray-dark;
+
+@nav-disabled-link-color:                   lighten(@gray, 10%);
+@nav-disabled-link-hover-color:             lighten(@gray, 10%);
+
+//== Tabs
+@nav-tabs-border-color:                     @gray;
+
+@nav-tabs-link-hover-border-color:          @gray;
+
+@nav-tabs-active-link-hover-bg:             @body-bg;
+@nav-tabs-active-link-hover-color:          @brand-success;
+@nav-tabs-active-link-hover-border-color:   @nav-tabs-link-hover-border-color;
+
+@nav-tabs-justified-link-border-color:            @gray-lighter;
+@nav-tabs-justified-active-link-border-color:     @body-bg;
+
+//== Pills
+@nav-pills-border-radius:                   @border-radius-base;
+@nav-pills-active-link-hover-bg:            @component-active-bg;
+@nav-pills-active-link-hover-color:         @component-active-color;
+
+
+//== Pagination
+//
+//##
+
+@pagination-color:                     #fff;
+@pagination-bg:                        @brand-success;
+@pagination-border:                    transparent;
+
+@pagination-hover-color:               #fff;
+@pagination-hover-bg:                  lighten(@brand-success, 6%);
+@pagination-hover-border:              transparent;
+
+@pagination-active-color:              #fff;
+@pagination-active-bg:                 lighten(@brand-success, 6%);
+@pagination-active-border:             transparent;
+
+@pagination-disabled-color:            #fff;
+@pagination-disabled-bg:               darken(@brand-success, 15%);
+@pagination-disabled-border:           transparent;
+
+
+//== Pager
+//
+//##
+
+@pager-bg:                             @pagination-bg;
+@pager-border:                         @pagination-border;
+@pager-border-radius:                  15px;
+
+@pager-hover-bg:                       @pagination-hover-bg;
+
+@pager-active-bg:                      @pagination-active-bg;
+@pager-active-color:                   @pagination-active-color;
+
+@pager-disabled-color:                 #ddd;
+
+
+//== Jumbotron
+//
+//##
+
+@jumbotron-padding:              30px;
+@jumbotron-color:                inherit;
+@jumbotron-bg:                   @gray-dark;
+@jumbotron-heading-color:        inherit;
+@jumbotron-font-size:            ceil((@font-size-base * 1.5));
+@jumbotron-heading-font-size:    ceil((@font-size-base * 4.5));
+
+
+//== Form states and alerts
+//
+//## Define colors for form feedback states and, by default, alerts.
+
+@state-success-text:             #fff;
+@state-success-bg:               @brand-success;
+@state-success-border:           @brand-success;
+
+@state-info-text:                #fff;
+@state-info-bg:                  @brand-info;
+@state-info-border:              @brand-info;
+
+@state-warning-text:             #fff;
+@state-warning-bg:               @brand-warning;
+@state-warning-border:           @brand-warning;
+
+@state-danger-text:              #fff;
+@state-danger-bg:                @brand-danger;
+@state-danger-border:            @brand-danger;
+
+
+//== Tooltips
+//
+//##
+
+//** Tooltip max width
+@tooltip-max-width:           200px;
+//** Tooltip text color
+@tooltip-color:               #fff;
+//** Tooltip background color
+@tooltip-bg:                  #000;
+@tooltip-opacity:             .9;
+
+//** Tooltip arrow width
+@tooltip-arrow-width:         5px;
+//** Tooltip arrow color
+@tooltip-arrow-color:         @tooltip-bg;
+
+
+//== Popovers
+//
+//##
+
+//** Popover body background color
+@popover-bg:                          @gray-dark;
+//** Popover maximum width
+@popover-max-width:                   276px;
+//** Popover border color
+@popover-border-color:                rgba(0,0,0,.2);
+//** Popover fallback border color
+@popover-fallback-border-color:       #999;
+
+//** Popover title background color
+@popover-title-bg:                    darken(@popover-bg, 3%);
+
+//** Popover arrow width
+@popover-arrow-width:                 10px;
+//** Popover arrow color
+@popover-arrow-color:                 @popover-bg;
+
+//** Popover outer arrow width
+@popover-arrow-outer-width:           (@popover-arrow-width + 1);
+//** Popover outer arrow color
+@popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
+//** Popover outer arrow fallback color
+@popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
+
+
+//== Labels
+//
+//##
+
+//** Default label background color
+@label-default-bg:            @gray;
+//** Primary label background color
+@label-primary-bg:            @brand-primary;
+//** Success label background color
+@label-success-bg:            @brand-success;
+//** Info label background color
+@label-info-bg:               @brand-info;
+//** Warning label background color
+@label-warning-bg:            @brand-warning;
+//** Danger label background color
+@label-danger-bg:             @brand-danger;
+
+//** Default label text color
+@label-color:                 #fff;
+//** Default text color of a linked label
+@label-link-hover-color:      #fff;
+
+
+//== Modals
+//
+//##
+
+//** Padding applied to the modal body
+@modal-inner-padding:         20px;
+
+//** Padding applied to the modal title
+@modal-title-padding:         15px;
+//** Modal title line-height
+@modal-title-line-height:     @line-height-base;
+
+//** Background color of modal content area
+@modal-content-bg:                             @gray-dark;
+//** Modal content border color
+@modal-content-border-color:                   rgba(0,0,0,.2);
+//** Modal content border color **for IE8**
+@modal-content-fallback-border-color:          #999;
+
+//** Modal backdrop background color
+@modal-backdrop-bg:           #000;
+//** Modal backdrop opacity
+@modal-backdrop-opacity:      .7;
+//** Modal header border color
+@modal-header-border-color:   @gray;
+//** Modal footer border color
+@modal-footer-border-color:   @modal-header-border-color;
+
+@modal-lg:                    900px;
+@modal-md:                    600px;
+@modal-sm:                    300px;
+
+
+//== Alerts
+//
+//## Define alert colors, border radius, and padding.
+
+@alert-padding:               15px;
+@alert-border-radius:         @border-radius-base;
+@alert-link-font-weight:      bold;
+
+@alert-success-bg:            @state-success-bg;
+@alert-success-text:          @state-success-text;
+@alert-success-border:        @state-success-border;
+
+@alert-info-bg:               @state-info-bg;
+@alert-info-text:             @state-info-text;
+@alert-info-border:           @state-info-border;
+
+@alert-warning-bg:            @state-warning-bg;
+@alert-warning-text:          @state-warning-text;
+@alert-warning-border:        @state-warning-border;
+
+@alert-danger-bg:             @state-danger-bg;
+@alert-danger-text:           @state-danger-text;
+@alert-danger-border:         @state-danger-border;
+
+
+//== Progress bars
+//
+//##
+
+//** Background color of the whole progress component
+@progress-bg:                 @gray-lighter;
+//** Progress bar text color
+@progress-bar-color:          #fff;
+//** Variable for setting rounded corners on progress bar.
+@progress-border-radius:      @border-radius-base;
+
+//** Default progress bar color
+@progress-bar-bg:             @brand-primary;
+//** Success progress bar color
+@progress-bar-success-bg:     @brand-success;
+//** Warning progress bar color
+@progress-bar-warning-bg:     @brand-warning;
+//** Danger progress bar color
+@progress-bar-danger-bg:      @brand-danger;
+//** Info progress bar color
+@progress-bar-info-bg:        @brand-info;
+
+
+//== List group
+//
+//##
+
+//** Background color on `.list-group-item`
+@list-group-bg:                 @gray-dark;
+//** `.list-group-item` border color
+@list-group-border:             @gray;
+//** List group border radius
+@list-group-border-radius:      @border-radius-base;
+
+//** Background color of single list items on hover
+@list-group-hover-bg:          transparent;
+//** Text color of active list items
+@list-group-active-color:       @component-active-color;
+//** Background color of active list items
+@list-group-active-bg:          @component-active-bg;
+//** Border color of active list elements
+@list-group-active-border:      @list-group-active-bg;
+//** Text color for content within active list items
+@list-group-active-text-color:  lighten(@list-group-active-bg, 40%);
+
+//** Text color of disabled list items
+@list-group-disabled-color:      @gray-light;
+//** Background color of disabled list items
+@list-group-disabled-bg:         @gray-lighter;
+//** Text color for content within disabled list items
+@list-group-disabled-text-color: @list-group-disabled-color;
+
+@list-group-link-color:         @link-color;
+@list-group-link-hover-color:   @list-group-link-color;
+@list-group-link-heading-color: darken(@link-color, 5%);
+
+
+//== Panels
+//
+//##
+
+@panel-bg:                    @gray-dark;
+@panel-body-padding:          15px;
+@panel-heading-padding:       10px 15px;
+@panel-footer-padding:        @panel-heading-padding;
+@panel-border-radius:         @border-radius-base;
+
+//** Border color for elements within panels
+@panel-inner-border:          @gray;
+@panel-footer-bg:             @gray;
+
+@panel-default-text:          @text-color;
+@panel-default-border:        @gray;
+@panel-default-heading-bg:    @gray-dark;
+
+@panel-primary-text:          #fff;
+@panel-primary-border:        @brand-primary;
+@panel-primary-heading-bg:    @brand-primary;
+
+@panel-success-text:          @state-success-text;
+@panel-success-border:        @state-success-border;
+@panel-success-heading-bg:    @state-success-bg;
+
+@panel-info-text:             @state-info-text;
+@panel-info-border:           @state-info-border;
+@panel-info-heading-bg:       @state-info-bg;
+
+@panel-warning-text:          @state-warning-text;
+@panel-warning-border:        @state-warning-border;
+@panel-warning-heading-bg:    @state-warning-bg;
+
+@panel-danger-text:           @state-danger-text;
+@panel-danger-border:         @state-danger-border;
+@panel-danger-heading-bg:     @state-danger-bg;
+
+
+//== Thumbnails
+//
+//##
+
+//** Padding around the thumbnail image
+@thumbnail-padding:           2px;
+//** Thumbnail background color
+@thumbnail-bg:                @body-bg;
+//** Thumbnail border color
+@thumbnail-border:            @gray;
+//** Thumbnail border radius
+@thumbnail-border-radius:     @border-radius-base;
+
+//** Custom text color for thumbnail captions
+@thumbnail-caption-color:     @text-color;
+//** Padding around the thumbnail caption
+@thumbnail-caption-padding:   9px;
+
+
+//== Wells
+//
+//##
+
+@well-bg:                     @gray-dark;
+@well-border:                 transparent;
+
+
+//== Badges
+//
+//##
+
+@badge-color:                 #fff;
+//** Linked badge text color on hover
+@badge-link-hover-color:      #fff;
+@badge-bg:                    @gray;
+
+//** Badge text color in active nav link
+@badge-active-color:          @brand-primary;
+//** Badge background color in active nav link
+@badge-active-bg:             #fff;
+
+@badge-font-weight:           bold;
+@badge-line-height:           1;
+@badge-border-radius:         10px;
+
+
+//== Breadcrumbs
+//
+//##
+
+@breadcrumb-padding-vertical:   8px;
+@breadcrumb-padding-horizontal: 15px;
+//** Breadcrumb background color
+@breadcrumb-bg:                 @gray;
+//** Breadcrumb text color
+@breadcrumb-color:              @text-color;
+//** Text color of current page in the breadcrumb
+@breadcrumb-active-color:       @gray-light;
+//** Textual separator for between breadcrumb elements
+@breadcrumb-separator:          "/";
+
+
+//== Carousel
+//
+//##
+
+@carousel-text-shadow:                        0 1px 2px rgba(0,0,0,.6);
+
+@carousel-control-color:                      #fff;
+@carousel-control-width:                      15%;
+@carousel-control-opacity:                    .5;
+@carousel-control-font-size:                  20px;
+
+@carousel-indicator-active-bg:                #fff;
+@carousel-indicator-border-color:             #fff;
+
+@carousel-caption-color:                      #fff;
+
+
+//== Close
+//
+//##
+
+@close-font-weight:           bold;
+@close-color:                 #fff;
+@close-text-shadow:           none;
+
+
+//== Code
+//
+//##
+
+@code-color:                  #c7254e;
+@code-bg:                     #f9f2f4;
+
+@kbd-color:                   #fff;
+@kbd-bg:                      #333;
+
+@pre-bg:                      @gray-lighter;
+@pre-color:                   @gray-dark;
+@pre-border-color:            #ccc;
+@pre-scrollable-max-height:   340px;
+
+
+//== Type
+//
+//##
+
+//** Horizontal offset for forms and lists.
+@component-offset-horizontal: 180px;
+//** Text muted color
+@text-muted:                  @gray-light;
+//** Abbreviations and acronyms border color
+@abbr-border-color:           @gray-light;
+//** Headings small color
+@headings-small-color:        @gray-light;
+//** Blockquote small color
+@blockquote-small-color:      @gray-light;
+//** Blockquote font size
+@blockquote-font-size:        (@font-size-base * 1.25);
+//** Blockquote border color
+@blockquote-border-color:     @gray;
+//** Page header border color
+@page-header-border-color:    transparent;
+//** Width of horizontal description list titles
+@dl-horizontal-offset:        @component-offset-horizontal;
+//** Horizontal line color.
+@hr-border:                   @gray;
+
+// Darkly 3.3.5
+// Bootswatch
+// -----------------------------------------------------
+
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700,400italic");
+
+// Navbar =====================================================================
+
+.navbar {
+  border-width: 0;
+
+  &amp;-default {
+
+    .badge {
+      background-color: #fff;
+      color: @navbar-default-bg;
+    }
+  }
+
+  &amp;-inverse {
+
+    .badge {
+      background-color: #fff;
+      color: @navbar-inverse-bg;
+    }
+  }
+
+  &amp;-brand {
+    line-height: 1;
+  }
+
+  &amp;-form {
+    .form-control {
+      background-color: white;
+
+      &amp;:focus {
+        border-color: white;
+      }
+    }
+  }
+}
+
+// Buttons ====================================================================
+
+.btn {
+  border-width: 2px;
+}
+
+.btn:active {
+  .box-shadow(none);
+}
+
+.btn-group.open .dropdown-toggle {
+  .box-shadow(none);
+}
+
+// Typography =================================================================
+
+.text-primary,
+.text-primary:hover {
+  color: lighten(@brand-primary, 10%);
+}
+
+.text-success,
+.text-success:hover {
+  color: @brand-success;
+}
+
+.text-danger,
+.text-danger:hover {
+  color: @brand-danger;
+}
+
+.text-warning,
+.text-warning:hover {
+  color: @brand-warning;
+}
+
+.text-info,
+.text-info:hover {
+  color: @brand-info;
+}
+
+// Tables =====================================================================
+
+table,
+.table {
+
+  a:not(.btn) {
+    text-decoration: underline;
+  }
+
+  .dropdown-menu a {
+    text-decoration: none;
+  }
+
+  .success,
+  .warning,
+  .danger,
+  .info {
+    color: #fff;
+
+    &gt; th &gt; a,
+    &gt; td &gt; a,
+    &gt; a {
+      color: #fff;
+    }
+  }
+
+  &gt; thead &gt; tr &gt; th,
+  &gt; tbody &gt; tr &gt; th,
+  &gt; tfoot &gt; tr &gt; th,
+  &gt; thead &gt; tr &gt; td,
+  &gt; tbody &gt; tr &gt; td,
+  &gt; tfoot &gt; tr &gt; td {
+    border: none;
+  }
+
+  &amp;-bordered &gt; thead &gt; tr &gt; th,
+  &amp;-bordered &gt; tbody &gt; tr &gt; th,
+  &amp;-bordered &gt; tfoot &gt; tr &gt; th,
+  &amp;-bordered &gt; thead &gt; tr &gt; td,
+  &amp;-bordered &gt; tbody &gt; tr &gt; td,
+  &amp;-bordered &gt; tfoot &gt; tr &gt; td {
+    border: 1px solid @table-border-color;
+  }
+}
+
+// Forms ======================================================================
+
+input,
+textarea {
+  color: @input-color;
+}
+
+.form-control,
+input,
+textarea {
+  border: 2px hidden transparent;
+  .box-shadow(none);
+
+  &amp;:focus {
+    .box-shadow(none);
+  }
+}
+
+.has-warning {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-warning;
+  }
+
+  .form-control,
+  .form-control:focus {
+    .box-shadow(none);
+  }
+
+  .input-group-addon {
+    border-color: @brand-warning;
+  }
+}
+
+.has-error {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-danger;
+  }
+
+  .form-control,
+  .form-control:focus {
+    .box-shadow(none);
+  }
+
+  .input-group-addon {
+    border-color: @brand-danger;
+  }
+}
+
+.has-success {
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline,
+  &amp;.radio label,
+  &amp;.checkbox label,
+  &amp;.radio-inline label,
+  &amp;.checkbox-inline label,
+  .form-control-feedback {
+    color: @brand-success;
+  }
+
+  .form-control,
+  .form-control:focus {
+    .box-shadow(none);
+  }
+
+  .input-group-addon {
+    border-color: @brand-success;
+  }
+}
+
+.input-group-addon {
+  color: @text-color;
+}
+
+// Navs =======================================================================
+
+.nav {
+  .open &gt; a,
+  .open &gt; a:hover,
+  .open &gt; a:focus {
+    border-color: @nav-tabs-border-color;
+  }
+}
+
+.nav-tabs &gt; li &gt; a,
+.nav-pills &gt; li &gt; a {
+  color: #fff;
+}
+
+.pager {
+  a,
+  a:hover {
+    color: #fff;
+  }
+
+  .disabled {
+    &amp;&gt;a,
+    &amp;&gt;a:hover,
+    &amp;&gt;a:focus,
+    &amp;&gt;span {
+      background-color: @pagination-disabled-bg;
+    }
+  }
+}
+
+.breadcrumb a {
+  color: #fff;
+}
+
+// Indicators =================================================================
+
+.close {
+  text-decoration: none;
+  text-shadow: none;
+  opacity: 0.4;
+
+  &amp;:hover,
+  &amp;:focus {
+    opacity: 1;
+  }
+}
+
+.alert {
+  .alert-link {
+    color: #fff;
+    text-decoration: underline;
+  }
+}
+
+// Progress bars ==============================================================
+
+.progress {
+  height: 10px;
+  .box-shadow(none);
+  .progress-bar {
+    font-size: 10px;
+    line-height: 10px;
+  }
+}
+
+// Containers =================================================================
+
+.well {
+  .box-shadow(none);
+}
+
+a.list-group-item {
+
+  &amp;.active,
+  &amp;.active:hover,
+  &amp;.active:focus {
+    border-color: @list-group-border;
+  }
+
+  &amp;-success {
+    &amp;.active {
+      background-color: @state-success-bg;
+    }
+
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-success-bg, 5%);
+    }
+  }
+
+  &amp;-warning {
+    &amp;.active {
+      background-color: @state-warning-bg;
+    }
+    
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-warning-bg, 5%);
+    }
+  }
+
+  &amp;-danger {
+    &amp;.active {
+      background-color: @state-danger-bg;
+    }
+    
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-danger-bg, 5%);
+    }
+  }
+}
+
+.popover {
+  color: @text-color;
+}
+
+.panel-default &gt; .panel-heading {
+  background-color: @panel-footer-bg;
+}</lessCode>
+    </property>
+    <property>
+      <link-color/>
+    </property>
+    <property>
+      <logo>logo-white.svg</logo>
+    </property>
+    <property>
+      <navbar-default-bg>#375a7f</navbar-default-bg>
+    </property>
+    <property>
+      <navbar-default-color>#ffffff</navbar-default-color>
+    </property>
+    <property>
+      <navbar-default-link-active-bg/>
+    </property>
+    <property>
+      <navbar-default-link-active-color/>
+    </property>
+    <property>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
+    </property>
+    <property>
+      <navbar-default-link-hover-bg/>
+    </property>
+    <property>
+      <navbar-default-link-hover-color/>
+    </property>
+    <property>
+      <navbar-height>50px</navbar-height>
+    </property>
+    <property>
+      <panel-bg>#222222</panel-bg>
+    </property>
+    <property>
+      <panel-default-text/>
+    </property>
+    <property>
+      <text-color>#ffffff</text-color>
+    </property>
+    <property>
+      <xwiki-page-content-bg>#222222</xwiki-page-content-bg>
+    </property>
+  </object>
+</xwikidoc>

@@ -21,5 +21,6 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.objects.ObjectInterface;
 
-public interface ClassInterface extends ObjectInterface {
+public interface ClassInterface extends ObjectInterface
+{
 }

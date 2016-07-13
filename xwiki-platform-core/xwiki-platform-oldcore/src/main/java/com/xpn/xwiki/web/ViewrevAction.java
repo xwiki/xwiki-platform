@@ -24,6 +24,15 @@ import com.xpn.xwiki.XWikiException;
 
 public class ViewrevAction extends XWikiAction
 {
+    /**
+     * Default constructor.
+     */
+    public ViewrevAction()
+    {
+        this.waitForXWikiInitialization = false;
+        this.handleRedirectObject = true;
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -34,8 +43,9 @@ public class ViewrevAction extends XWikiAction
                 context.put("message", "revisiondoesnotexist");
                 return "exception";
 
-            } else
+            } else {
                 throw e;
+            }
         }
         return "view";
     }

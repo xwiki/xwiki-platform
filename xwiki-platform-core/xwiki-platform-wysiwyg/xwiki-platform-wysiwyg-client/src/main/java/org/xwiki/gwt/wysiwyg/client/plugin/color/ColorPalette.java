@@ -68,11 +68,7 @@ public class ColorPalette extends Composite implements HasSelectionHandlers<Stri
         initWidget(colorGrid);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
-     */
+    @Override
     public HandlerRegistration addSelectionHandler(SelectionHandler<String> handler)
     {
         return addHandler(handler, SelectionEvent.getType());
@@ -86,11 +82,7 @@ public class ColorPalette extends Composite implements HasSelectionHandlers<Stri
         return (Grid) getWidget();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == getColorGrid()) {

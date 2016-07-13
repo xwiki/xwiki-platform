@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
@@ -39,14 +40,15 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.internal.model.LegacySpaceResolver;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Special URL Factory used during exports, which stores referenced attachments and resources on the filesystem, in a
  * temporary folder, so that they can be included in the export result. The returned URLs point to these resources as
  * {@code file://} links, and not as {@code http://} links.
- * 
+ *
  * @version $Id$
  * @since 5.0RC1
  */
@@ -56,29 +58,31 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemURLFactory.class);
 
     /** Segment separator used in the collision-free key generation. */
-    private static final String SEPARATOR = "/";
+    private static final char SEPARATOR = '/';
+
+    private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
 
     @Override
-    public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String wiki, XWikiContext context)
     {
         try {
-            return getURL(wiki, space, name, filename, null, context);
+            return getURL(wiki, spaces, name, filename, null, context);
         } catch (Exception ex) {
             LOGGER.warn("Failed to save image for PDF export", ex);
-            return super.createAttachmentURL(filename, space, name, action, null, wiki, context);
+            return super.createAttachmentURL(filename, spaces, name, action, null, wiki, context);
         }
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String wiki,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String wiki,
         XWikiContext context)
     {
         try {
-            return getURL(wiki, space, name, filename, revision, context);
+            return getURL(wiki, spaces, name, filename, revision, context);
         } catch (Exception ex) {
             LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
-            return super.createAttachmentRevisionURL(filename, space, name, revision, wiki, context);
+            return super.createAttachmentRevisionURL(filename, spaces, name, revision, wiki, context);
         }
     }
 
@@ -119,23 +123,21 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getURL(URL url, XWikiContext context)
     {
         if (url == null) {
             return "";
         }
-        return Util.escapeURL(url.toString());
+        return url.toString();
     }
 
     /**
      * Store the requested attachment on the filesystem and return a {@code file://} URL where FOP can access that file.
      *
      * @param wiki the name of the owner document's wiki
-     * @param space the name of the owner document's space
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param name the name of the owner document
      * @param filename the name of the attachment
      * @param revision an optional attachment version
@@ -143,19 +145,17 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @return a {@code file://} URL where the attachment has been stored
      * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
      */
-    private URL getURL(String wiki, String space, String name, String filename, String revision, XWikiContext context)
+    private URL getURL(String wiki, String spaces, String name, String filename, String revision, XWikiContext context)
         throws Exception
     {
         Map<String, File> usedFiles = getFileMapping(context);
-        String key = getAttachmentKey(space, name, filename, revision);
+        List<String> spaceNames = this.legacySpaceResolver.resolve(spaces);
+        String key = getAttachmentKey(spaceNames, name, filename, revision);
         if (!usedFiles.containsKey(key)) {
             File file = getTemporaryFile(key, context);
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
-            XWikiDocument doc =
-                context.getWiki()
-                    .getDocument(
-                        new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name),
-                        context);
+            XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
+                StringUtils.defaultString(wiki, context.getWikiId()), spaceNames, name), context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
@@ -202,22 +202,30 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     /**
      * Computes a safe identifier for an attachment, guaranteed to be collision-free.
      *
-     * @param space the name of the owner document's space
      * @param name the name of the owner document
      * @param filename the name of the attachment
      * @param revision an optional attachment version
      * @return an identifier for this attachment
      */
-    private String getAttachmentKey(String space, String name, String filename, String revision)
+    private String getAttachmentKey(List<String> spaceNames, String name, String filename, String revision)
     {
+        StringBuilder builder = new StringBuilder();
+
         try {
-            return "attachment" + SEPARATOR + URLEncoder.encode(space, XWiki.DEFAULT_ENCODING) + SEPARATOR
-                + URLEncoder.encode(name, XWiki.DEFAULT_ENCODING) + SEPARATOR
-                + URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING) + SEPARATOR
-                + URLEncoder.encode(StringUtils.defaultString(revision), XWiki.DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException ex) {
+            builder.append("attachment").append(SEPARATOR);
+            for (String spaceName : spaceNames) {
+                builder.append(URLEncoder.encode(spaceName, XWiki.DEFAULT_ENCODING));
+                builder.append(SEPARATOR);
+            }
+            builder.append(URLEncoder.encode(name, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
+            builder.append(URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING)).append(SEPARATOR);
+            builder.append(URLEncoder.encode(StringUtils.defaultString(revision), XWiki.DEFAULT_ENCODING));
+            return builder.toString();
+        } catch (UnsupportedEncodingException e) {
             // This should never happen, UTF-8 is always available
-            return space + SEPARATOR + name + SEPARATOR + filename + SEPARATOR + StringUtils.defaultString(revision);
+            throw new RuntimeException(String.format("Failed to compute unique Attachment key for spaces [%s[, "
+                + "page [%s], filename [%s], revision [%s], while exporting.", StringUtils.join(spaceNames, ", "),
+                name, filename, revision), e);
         }
     }
 

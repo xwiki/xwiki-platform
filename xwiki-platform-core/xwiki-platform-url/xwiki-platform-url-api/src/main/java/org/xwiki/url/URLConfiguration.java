@@ -20,21 +20,19 @@
 package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 5.3M1
  */
 @Role
-@Unstable
 public interface URLConfiguration
 {
     /**
-     * @return the id of the URL format to use. This allows to plug in different implementations and thus allows
-     *         to completely control the format of XWiki URLs.
+     * @return the id of the URL format to use when converting a URL to a Resource. This allows to plug in different
+     *         implementations and thus allows to completely control the format of XWiki URLs.
      */
     String getURLFormatId();
 }

@@ -1,0 +1,20 @@
+.runTransformations
+.#--------------------------------------------------------------
+.input|xwiki/2.0
+.# Validate that script macro use JSR223 and that it works when
+.# the engine returns the content (and doesn't write in the
+.# script context writer).
+.#--------------------------------------------------------------
+{{script language="test2"}}content{{/script}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [script] [language=test2] [content]
+beginParagraph
+onWord [Test]
+onSpace
+onWord [content]
+endParagraph
+endMacroMarkerStandalone [script] [language=test2] [content]
+endDocument

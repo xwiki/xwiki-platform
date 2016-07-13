@@ -20,21 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4">
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
 
   <display-name>XWiki</display-name>
   <description>XWiki Application</description>
-  
+
   <!-- Main Restlet Application using Restlet's JAX-RS extension. -->
   <context-param>
     <param-name>org.restlet.application</param-name>
     <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
-  </context-param> 
-  
+  </context-param>
+
+  <!-- Filter in charge of deciding whether to call the ResourceReferenceHandler Servlet (currently used to handle new
+       Resource Types registered as Components) or instead to continue with the rest of the filters and mappings below.
+       In the future, the goal is to move more and more Resource handling using the ResourceReferenceHandler Servlet and
+       remove the Struts Action Servlet at some point.
+
+       Note: it is important that this filter be the first filter declared (and thus executed). -->
+  <filter>
+    <filter-name>RoutingFilter</filter-name>
+    <filter-class>org.xwiki.resource.servlet.RoutingFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -73,12 +83,6 @@
     <filter-class>org.xwiki.wysiwyg.server.filter.ConversionFilter</filter-class>
   </filter>
 
-  <!-- Filter used to 'steal' webdav requests made to the application root -->
-  <filter>
-    <filter-name>DavFilter</filter-name>
-    <filter-class>com.xpn.xwiki.plugin.webdav.XWikiDavFilter</filter-class>
-  </filter>
-
   <!-- A filter that dispatches requests to the right action depending on the button pressed in the editing form. This
        is needed when javascript is disabled, since the browser cannot send the form data to different URLs depending on
        the button pressed. -->
@@ -93,7 +97,7 @@
     <filter-class>org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
   </filter>
 
-  <!-- This filter is used to initialize the XWiki context before processing a XML-RPC request. -->
+  <!-- This filter is used to initialize the XWiki context before processing a REST request. -->
   <filter>
     <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
     <filter-class>org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
@@ -103,6 +107,41 @@
       <param-value>2</param-value>
     </init-param>
   </filter>
+
+  <!-- This filter is used to add the 'Content-Type-Script' header to the HTTP response. -->
+  <filter>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Content-Script-Type</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>text/javascript</param-value>
+    </init-param>
+  </filter>
+  
+  <!-- We need this filter because cross domain request for fonts are not allowed if some headers are not set.
+       See http://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
+  <filter>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Access-Control-Allow-Origin</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>*</param-value>
+    </init-param>
+  </filter>
+
+  <!-- The Routing Fitler decides how to route all requests and thus must be mapped to handle all incoming requests -->
+  <filter-mapping>
+    <filter-name>RoutingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
@@ -132,11 +171,6 @@
   </filter-mapping>
 
   <filter-mapping>
-    <filter-name>DavFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter-mapping>
     <filter-name>ActionDispatcher</filter-name>
     <servlet-name>action</servlet-name>
     <dispatcher>REQUEST</dispatcher>
@@ -152,14 +186,6 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
-  <filter-mapping>
-    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
-    <servlet-name>xmlrpc</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-    <dispatcher>INCLUDE</dispatcher>
-    <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>    
-
   <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
        "XWikiXmlRpcContextInitializationFilter" points to
        org.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter -->
@@ -171,6 +197,30 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
+  <filter-mapping>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- We set the CORS policy globally for webjars.
+
+       TODO: We currently use a <servlet-name> mapping since we've noticed that <url-pattern> ones have no effect.
+       The problem is described at http://stackoverflow.com/questions/31142302/getnameddispatcher-forward-and-filters-using-url-pattern
+       Right now it means that all URLs handled by a ResourceReferenecHandler<ResourceType> will have this filter
+       applied when it should only be applied to "webjars" URLs. We need to find a solution to fix this. It happens
+       that at this point in time, only "webjars" URLs are handled using a ResourceReferenecHandler<ResourceType>.
+  -->
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <servlet-name>resourceReferenceHandler</servlet-name>
+    <url-pattern>/webjars/*</url-pattern>
+    <url-pattern>*.woff</url-pattern>
+    <url-pattern>*.eot</url-pattern>
+    <url-pattern>*.ttf</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
   <!-- Initializes XWiki -->
   <listener>
     <listener-class>org.xwiki.container.servlet.XWikiServletContextListener</listener-class>
@@ -179,6 +229,12 @@
   <listener>
     <listener-class>org.xwiki.container.servlet.SetThreadNameServletRequestListener</listener-class>
   </listener>
+
+  <!-- Handles Resource Types registered as Components (e.g. WebJars) -->
+  <servlet>
+    <servlet-name>resourceReferenceHandler</servlet-name>
+    <servlet-class>org.xwiki.resource.servlet.ResourceReferenceHandlerServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>action</servlet-name>
@@ -224,16 +280,6 @@
     -->
   </servlet>
 
-  <servlet>
-    <servlet-name>xmlrpc</servlet-name>
-    <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
-    <init-param>
-      <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
-      <param-name>enabledForExtensions</param-name>
-      <param-value>false</param-value>
-    </init-param>
-  </servlet>
-
   <!-- This is the entry point for all component-based XWiki GWT services. XWikiService servlet should be dropped
     in favor of this servlet when we completely move to components. -->
   <servlet>
@@ -245,12 +291,6 @@
   <servlet>
     <servlet-name>XWikiService</servlet-name>
     <servlet-class>com.xpn.xwiki.gwt.api.server.XWikiServiceImpl</servlet-class>
-  </servlet>
-
-  <!-- WebDAV servlet -->
-  <servlet>
-   <servlet-name>webdav</servlet-name>
-   <servlet-class>com.xpn.xwiki.plugin.webdav.XWikiDavServlet</servlet-class>
   </servlet>
 
   <!-- RESTful API Restlet servlet -->
@@ -266,12 +306,12 @@
     <servlet-name>RestletServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/wiki/*</url-pattern>
@@ -288,11 +328,6 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>xmlrpc</servlet-name>
-    <url-pattern>/xmlrpc/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
     <servlet-name>redirectHomeServlet</servlet-name>
     <url-pattern>/redirect</url-pattern>
   </servlet-mapping>
@@ -305,11 +340,6 @@
   <servlet-mapping>
     <servlet-name>XWikiService</servlet-name>
     <url-pattern>/XWikiService</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-   <servlet-name>webdav</servlet-name>
-   <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
   <!-- We override the mime type definition for javascript and css files, as some containers don't

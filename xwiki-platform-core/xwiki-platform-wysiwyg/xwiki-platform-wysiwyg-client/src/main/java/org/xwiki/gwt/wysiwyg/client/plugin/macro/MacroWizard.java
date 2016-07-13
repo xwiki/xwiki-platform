@@ -141,21 +141,13 @@ public class MacroWizard implements WizardListener
         getInsertWizard().start(EDIT_STEP_NAME, macroCall);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onCancel(Wizard)
-     */
+    @Override
     public void onCancel(Wizard sender)
     {
         displayer.getTextArea().setFocus(true);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardListener#onFinish(Wizard, Object)
-     */
+    @Override
     public void onFinish(Wizard sender, Object result)
     {
         displayer.getTextArea().setFocus(true);

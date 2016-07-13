@@ -43,7 +43,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     public static final String CONFIGURATIONID = "eviction";
 
     /**
-     * The key used to access time to live duration in the {@link EntryEvictionConfiguration}.
+     * @see #getTimeToLive()
      */
     public static final String TIMETOLIVE_ID = "timetolive";
 
@@ -90,7 +90,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     }
 
     /**
-     * @param timeToLive the maximum time to live in seconds of a cache entry.
+     * @param timeToLive see {@link #getTimeToLive()}
      */
     public void setTimeToLive(int timeToLive)
     {
@@ -98,7 +98,10 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     }
 
     /**
-     * @return the maximum time to live in seconds of a cache entry.
+     * @return the time a cache entry will continue to stay in the cache after being last accessed, in seconds. When
+     *         the time is reached, the entry is expired and removed from the cache. In addition, when the cache
+     *         reaches its maximum number of entries, the defined eviction algorithm is used (e.g. LRU) and thus an
+     *         entry can stay less time in the cache than its maximum defined time.
      */
     public int getTimeToLive()
     {

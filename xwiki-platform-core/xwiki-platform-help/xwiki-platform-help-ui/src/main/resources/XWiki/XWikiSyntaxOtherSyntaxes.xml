@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxOtherSyntaxes</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300892851000</creationDate>
+  <date>1301497886000</date>
+  <contentUpdateDate>1301497886000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Other Wiki Syntaxes</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxId</name>
+        <number>4</number>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxId</name>
+        <number>3</number>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxIntroduction</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>c49c899e-d77d-4f06-91a5-c6a29b3e8550</guid>
+    <property>
+      <category>0</category>
+    </property>
+    <property>
+      <maxSyntaxId>1.0</maxSyntaxId>
+    </property>
+    <property>
+      <minSyntaxId>1.0</minSyntaxId>
+    </property>
+    <property>
+      <section>2</section>
+    </property>
+  </object>
+  <content>= General =
+
+== Other Syntaxes ==
+
+=== 1.0 Other Syntaxes ===
+
+The following other syntaxes are implemented in XWiki Enterprise 1.6 and later:
+* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
+* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
+* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
+* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
+* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
+* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
+
+{{warning}}The implementation for these syntaxes is not fully finished yet. For example support for links is not working perfectly yet. We also need to define if we want to extend the original syntaxes to support XWiki-specific features like ability to link to another sub-wiki.{{/warning}}
+
+</content>
+</xwikidoc>

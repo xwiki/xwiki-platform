@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>IconThemesCode</web>
+  <name>IconPicker</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1415189081000</creationDate>
+  <parent>IconThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1417708185000</date>
+  <contentUpdateDate>1417707808000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Icon Picker</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+###########################
+## GLOBALS
+###########################
+#set($xwikiIcons = ['home', 'wiki', 'space', 'page', 'check', 'add', 'anchor', 'terminal', 'list', 'branch', 'down', 'up', 'left', 'right', 'arrows', 'repeat', 'undo', 'refresh', 'rotate-left', 'rotate-right', 'switch', 'random', 'attach', 'shopping-cart', 'bell', 'trash', 'bomb', 'book', 'cube', 'cubes', 'briefcase', 'bug', 'building', 'caret-down', 'caret-up', 'caret-right', 'calculator', 'calendar', 'camera', 'remove', 'cross', 'car', 'truck', 'chart-bar', 'chart-organisation', 'cloud', 'clock', 'cog', 'comment', 'comments', 'desktop', 'contrast', 'eject', 'step-forward', 'step-backward', 'fast-forward', 'backward', 'play', 'pause', 'stop', 'gamepad', 'credit-card', 'coffee', 'cut', 'database', 'delete', 'floppy-disk', 'glass', 'drive', 'envelope', 'warning', 'error', 'info', 'eye', 'rss', 'female', 'male', 'film', 'flag', 'search', 'search-plus', 'search-minus', 'folder', 'user', 'group', 'heart', 'question', 'image', 'key', 'keyboard', 'lightbulb', 'link', 'unlink', 'lock', 'unlock', 'money', 'dollar', 'euro', 'gbp', 'yen', 'music', 'file', 'file-white', 'file-pdf', 'file-code', 'file-archive', 'file-word', 'file-excel', 'file-powerpoint', 'file-text', 'paste', 'pencil', 'print', 'shield', 'certificate', 'volume-up', 'volume-down', 'volume-off', 'soccer', 'star', 'table', 'phone', 'font', 'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'underline', 'align-center', 'align-justify', 'align-left', 'align-right', 'columns', 'indent-left', 'indent-right', 'list-bullets', 'list-numbers', 'sun', 'world', 'wrench'])
+###########################
+## DATA: ICON THEMES
+###########################
+#if($request.action == 'data_iconthemes')
+  #set($map = {})
+  #set($discard = $map.put('iconThemes', $services.icon.iconSetNames))
+  #set($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
+  $jsontool.serialize($map)
+###########################
+## DATA: ICONS
+###########################
+#elseif($request.action == 'data_icons')
+  #set($icons = [])
+  #set($iconTheme = $request.iconTheme)
+  #foreach($xwikiIcon in $xwikiIcons)
+    #set($icon = {})
+    #set($discard = $icon.put('name', $xwikiIcon))
+    #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
+    #set($discard = $icons.add($icon))
+  #end
+  $jsontool.serialize($icons)
+#else
+= Presentation =
+The Icon Picker is a jQuery plugin written by XWiki to help user selecting an icon. See [[IconPickerMacro]] for using this picker easily. If you want to use it manually, read the following.
+
+== Example ==
+With Velocity and HTML:
+
+{{code language="none"}}
+// Enable the CSS of the picker:
+\#set(\$discard = \$xwiki.ssx.use('IconThemesCode.IconPicker'))
+
+// JavaScript code:
+&lt;script language="javascript"&gt;
+
+// Configure requirejs to load the picker code
+require.config({
+  paths: {
+    'xwiki-icon-picker': '\$xwiki.getURL($services.model.createDocumentReference('', 'IconThemesCode', 'IconPicker'), 'jsx', "minify=$!request.minify")'
+  }
+});
+
+// Require jquery and the icon picker
+require(['jquery', 'xwiki-icon-picker'], function($) {
+  // Here you can bind the picker to some elements.
+  // Examples:
+  $('#someElement').xwikiIconPicker(); // apply the picker to the field #someElement
+  $('#someElement').xwikiIconPicker({prefix: 'image:icon:'}); // change the prefix inserted before the icon name
+});
+
+&lt;/script&gt;
+{{/code}}
+#end
+{{/velocity}}
+</content>
+  <object>
+    <name>IconThemesCode.IconPicker</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f9fc785d-a4a9-4613-97df-7121bd281fc5</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define(['jquery', 'xwiki-meta'], function($, xm) {
+
+  /**
+   * Globals
+   */
+   
+  // There could be only one picker at a time
+  var xwikiCurrentIconsPicker = 0;
+  
+  // Map that will contains the icons sorted by icon themes
+  var icons = {};
+  
+  // List of icon themes
+  var iconThemes = [];
+  
+  // Current icon theme used for the preview
+  var currentIconTheme = '';
+  
+  // Current input field (there could be only one picker at a time)
+  var currentInput = 0;
+  
+  // The spinner object to display when the picker is loading some data from the server
+  var spinner = 0;
+  
+  // The HTML section where the icons are displayed
+  var iconListSection = 0;
+  
+  // The HTML input to select the icon theme to use for the preview
+  var iconThemeSelector = 0;
+  
+  // Picker Dimmensions
+  var PICKER_WIDTH = 520;
+  var PICKER_HEIGHT = 300;
+
+  /**
+   * Generate an URL for getting JSON resources about icons
+   */
+  var getResourceURL = function(action, parameters) {
+    var param = 'outputSyntax=plain&amp;action=' + action;
+    if (parameters) {
+      param += '&amp;' + parameters;
+    }
+    return (new XWiki.Document('IconPicker', 'IconThemesCode', xm.wiki)).getURL('get', param);
+  }
+  
+  /**
+   * Close the picker
+   */
+  var closePicker = function() {
+    xwikiCurrentIconsPicker.remove();
+    xwikiCurrentIconsPicker = 0;
+  }
+  
+  /**
+   * Display the list of icons
+   */
+  var displayList = function(iconTheme) {
+    // For each icon
+    for (var i=0; i &lt; iconTheme.length; ++i) {
+      // Display the icon
+      var displayer = $(document.createElement('div'));
+      iconListSection.append(displayer);
+      displayer.addClass('xwikiIconPickerIcon');
+      var imageDiv = $(document.createElement('div'));
+      imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+      displayer.append(imageDiv);
+      var iconNameDiv = $(document.createElement('div'));
+      iconNameDiv.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+      displayer.append(iconNameDiv);
+      // Change the input value when the icon is clicked
+      displayer.click(function(event) {
+        currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text() );
+        closePicker();
+      });
+    }
+  }
+  
+  /**
+   * Load the icon list (get the JSON from the server) and display it afterwards
+   */
+  var loadIconList = function(iconTheme) {
+    $.getJSON(getResourceURL('data_icons', 'iconTheme='+iconTheme), function(dataIcons) {
+      // Put the result in the icons map
+      icons[iconTheme] = dataIcons;
+      // Display the list
+      displayList(icons[iconTheme]);
+      // Hide the spinner
+      spinner.hide();
+    });
+  }
+  
+  /**
+   * Fill the icon theme selector with the list of icon themes
+   */
+  var fillIconThemesSelector = function() {
+    // Create the icon theme selector
+    for (var i = 0; i &lt; iconThemes.length; ++i) {
+      iconThemeSelector.append('&lt;option&gt;'+iconThemes[i]+'&lt;/option&gt;');
+    }
+    // Select the icon theme
+    iconThemeSelector.val(currentIconTheme);
+  }
+  
+  /**
+   * Load the list of all icon themes and display it in the icon themes selector afterwards
+   */
+  var loadIconThemes = function() {
+    // Get the list of all icon themes
+    $.getJSON(getResourceURL('data_iconthemes'), function(data) {
+      // Save the result
+      iconThemes = data.iconThemes;
+      // Re-init the global icons map
+      icons = {};
+      // Fill the map where icon theme names are the keys
+      for (var i = 0; i &lt; iconThemes.length; ++i) {
+        icons[iconThemes[i]] = [];
+      }
+      // The first icon theme is the current one (hack)
+      currentIconTheme = data.currentIconTheme;
+      // Get the icons of the current icon theme
+      loadIconList(currentIconTheme);
+      // Fill the selector
+      fillIconThemesSelector();
+    });
+  }
+  
+  /**
+   * Create the icon theme selector
+   */
+  var createIconThemeSelector = function() {
+    iconThemeSelector = $(document.createElement('select'));
+    // Change the current icon theme where the selector is used
+    iconThemeSelector.change(function() {
+      currentIconTheme = iconThemeSelector.val();
+      // Remove all the displayed icons
+      $('.xwikiIconPickerIcon').remove();
+      // Display the new ones
+      if (icons[currentIconTheme].length == 0) {
+        // if the icon theme has not already been loaded, load it
+        spinner.show();
+        loadIconList(currentIconTheme)
+      } else {
+        // just display what have been previously loaded
+        displayList(icons[currentIconTheme]);
+      }
+    });
+  }
+  
+  /**
+   * Set the position of the picker and handle the current window scroll status
+   */
+  var setPickerPosition = function() {
+    // If the picker does not exist, nothing to do
+    if (xwikiCurrentIconsPicker == 0) {
+      return;
+    }
+  
+    var inputOffset = currentInput.offset();
+    var inputWidth = currentInput.outerWidth();
+    var inputHeight = currentInput.outerHeight();
+    
+    // Compute the left coordinate
+    var left = inputOffset.left - $(window).scrollLeft();
+    if (inputOffset.left + PICKER_WIDTH &gt; $('body').outerWidth()) {
+      // if there is not enough place to display the picker at the same position than the input,
+      // then display it by using the right corner of the input for the right corner of the picker
+      left = inputOffset.left + inputWidth - PICKER_WIDTH - $(window).scrollLeft();
+      if (left &lt; 0) {
+        // if there is not enough place for this neither, center the picker
+        left = $('body').outerWidth() / 2 - PICKER_WIDTH / 2;
+      }
+    }
+    xwikiCurrentIconsPicker.css('left', left);
+    
+    // Compute the top coordinate
+    var top = inputOffset.top + inputHeight - $(window).scrollTop();
+    if (inputOffset.top + inputHeight + PICKER_HEIGHT &gt; $('body').outerHeight()) {
+      // if there is not enough place to display the picker just under the input,
+      // then display it on the top
+      top = inputOffset.top - PICKER_HEIGHT - $(window).scrollTop();
+      if (top &lt; 0) {
+        // if there is not enough place for this neither, center the picker
+        top = $('body').outerHeight() / 2 - PICKER_HEIGHT / 2;
+      }
+    }
+    xwikiCurrentIconsPicker.css('top', top);
+  }
+  
+  /**
+   * Create the piccker
+   */
+  var createPicker = function (input) {
+    // If the picker already exists
+    if (xwikiCurrentIconsPicker != 0) {
+      if (input != currentInput) {
+        // if it has been created for an other input, close the previous one
+        closePicker();
+      } else {
+        // the picker already exists for the current input, we do not go further
+        return;
+      }
+    }
+    // Save the input
+    currentInput = input;
+    // Create the picker
+    xwikiCurrentIconsPicker = $(document.createElement('div'));
+    xwikiCurrentIconsPicker.addClass('xwikiIconPickerContainer');
+    // Insert the picker in the DOM
+    $(body).after(xwikiCurrentIconsPicker);
+    // Set the position
+    setPickerPosition();
+    // Add the icon list section
+    iconListSection = $(document.createElement('div'));
+    iconListSection.addClass('xwikiIconPickerList');
+    xwikiCurrentIconsPicker.append(iconListSection);
+    // Display the spinner correctly, while the icons are loading
+    if (spinner == 0) {
+      spinner = $(document.createElement('img'));
+      spinner.attr('alt', '$escapetool.javascript($services.localization.render('platform.icon.picker.loading'))').attr('src', '$xwiki.getSkinFile('icons/xwiki/spinner.gif')');
+    }
+    iconListSection.append(spinner);
+    // Add the icon theme selector section
+    var iconThemeSelectorSection = $(document.createElement('div'));
+    xwikiCurrentIconsPicker.append(iconThemeSelectorSection);
+    iconThemeSelectorSection.addClass('xwikiIconPickerIconThemeSelector');
+    iconThemeSelectorSection.text('$escapetool.javascript($services.localization.render('platform.icon.picker.preview'))');
+    // Create the icon theme selector
+    createIconThemeSelector();
+    iconThemeSelectorSection.append(iconThemeSelector);
+    // Load the icon themes (if is not already loaded)
+    if (iconThemes.length == 0) {
+      loadIconThemes();
+    } else {
+      // Fill the selector
+      fillIconThemesSelector();
+      // Display icons
+      if (icons[currentIconTheme].length &gt; 0) {
+        // display the icon theme since it has already be loaded
+        displayList(icons[currentIconTheme]);
+      } else {
+        // load the icon theme
+        loadIconList(currentIconTheme);
+      }
+    }
+    // Close the picker when the user press 'escape'.
+    currentInput.keyup(function (event) {
+      // See: http://stackoverflow.com/questions/1160008/which-keycode-for-escape-key-with-jquery
+      if (event.which == 27) {
+        closePicker();
+      }
+    });
+  }
+  
+  /**
+   * Create the jQuery plugin
+   */
+  $.fn.xwikiIconPicker = function(options) {
+    // Get the default settings if the options are not fully filled
+    var settings = $.extend({
+      prefix: 'icon:image:'
+    }, options);
+  
+    // Enable the picker on focus
+    this.each(function() {
+      var elem = $(this);
+      // Verify that the element is a valid input field
+      if (!elem.is('input')) {
+        return;
+      }
+      // Attach the settings to the input
+      $(this).data('xwikiIconPickerSettings', settings);
+      // Create the picker on focus
+      $(this).focusin(function(event) {
+        createPicker($(event.currentTarget));
+      });
+    });
+    
+    // Because the picker uses the 'fixed' position, we must recompute its position everytime the user scrolls the page
+    // Otherwise, the picker would stay in the same position *on the screen* without staying close to the input.
+    $(window).scroll(function() {
+      setPickerPosition();
+    });
+    
+    // Close the picker if the input and the picker itself have lost the focus
+    $(window).click(function(event) {
+      if (document.activeElement != currentInput[0] &amp;&amp; !$.contains(xwikiCurrentIconsPicker[0], document.activeElement)) {
+        closePicker();
+      }
+    });
+    
+    // Return this object to enable the jQuery chaining
+    return this;
+  }
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>IconThemesCode.IconPicker</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>c0c65e5c-9025-4e48-afb1-07ce47946a5e</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.xwikiIconPickerContainer {
+  width: 520px;
+  height: 300px;
+  border: 1px solid black;
+  position: fixed;
+  z-index: 1000;
+  background-color: $theme.pageContentBackgroundColor;
+}
+
+.xwikiIconPickerList {
+  overflow-y: scroll;
+  height: 240px;
+}
+
+.xwikiIconPickerIcon {
+  float: left;
+  height: 80px;
+  width: 100px;
+  text-align: center;
+  border-radius: 4px;
+  vertical-align: middle;
+  overflow: hidden;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.xwikiIconPickerIcon:hover {
+  background-color: $theme.highlightColor;
+}
+
+.xwikiIconPickerIconImage {
+  font-size: 24px;
+  margin: 0;
+}
+
+.xwikiIconPickerIconImage img{
+  width: 24px;
+}
+
+.xwikiIconPickerIconThemeSelector {
+  width: 100%;
+  background-color: $theme.menuBackgroundColor;
+  color: $theme.menuLinkColor;
+  padding: 10px;
+  text-align: center;
+  clear: left;
+  height: 60px;
+}
+</code>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

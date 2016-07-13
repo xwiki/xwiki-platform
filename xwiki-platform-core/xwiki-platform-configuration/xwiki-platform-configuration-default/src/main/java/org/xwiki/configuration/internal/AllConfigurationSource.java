@@ -31,10 +31,10 @@ import org.xwiki.configuration.ConfigurationSource;
 /**
  * Composite Configuration Source that looks in the following sources in that order:
  * <ul>
- *   <li>user preferences wiki page</li>
- *   <li>space preferences wiki page</li>
- *   <li>wiki preferences wiki page</li>
- *   <li>xwiki properties file (xwiki.properties)</li>
+ * <li>user preferences wiki page</li>
+ * <li>space preferences wiki page</li>
+ * <li>wiki preferences wiki page</li>
+ * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
  * Should be used when a configuration can be overridden by the user in his/her profile.
  * 
@@ -51,12 +51,8 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
     private ConfigurationSource xwikiPropertiesSource;
 
     @Inject
-    @Named("wiki")
-    private ConfigurationSource wikiPreferencesSource;
-
-    @Inject
-    @Named("space")
-    private ConfigurationSource spacePreferencesSource;
+    @Named("documents")
+    private ConfigurationSource documentsPreferencesSource;
 
     @Inject
     @Named("user")
@@ -67,8 +63,7 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
     {
         // First source is searched first when a property value is requested.
         addConfigurationSource(this.userPreferencesSource);
-        addConfigurationSource(this.spacePreferencesSource);
-        addConfigurationSource(this.wikiPreferencesSource);
+        addConfigurationSource(this.documentsPreferencesSource);
         addConfigurationSource(this.xwikiPropertiesSource);
     }
 }

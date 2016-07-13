@@ -24,7 +24,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Represent an event related to a provided entity.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */

@@ -1,0 +1,149 @@
+//
+// Buttons
+// --------------------------------------------------
+
+// Gradients ==============================================================
+/* These rules need to be applied before since they overwrite Bootstrap defaults */
+
+.btn-gradient(@color) {
+  #gradient > .vertical-three-colors(lighten(@color, 10%), @color, 50%, darken(@color, 5%));
+}
+
+.btn-border(@color) {
+  border: 1px solid @color;
+  border-bottom-color: darken(@color, 10%);
+  .box-shadow(~"inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05)");
+}
+
+/* &-.button selectors are added in order to override the mapping and legacy usage of .button class */
+.btn {
+  &-default {
+    .btn-gradient(lighten(@btn-default-bg, 5%));
+    .btn-border(@btn-default-bg);
+
+    &:hover, 
+    &:focus {
+      .btn-gradient(@btn-default-bg);
+      .btn-border(@btn-default-bg);
+    }
+  }
+
+  &-primary {
+    .btn-gradient(@btn-primary-bg);
+    .btn-border(@btn-primary-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-primary-bg, 5%));
+      .btn-border(@btn-primary-bg);
+    }
+  }
+
+  &-success, &-success.button {
+    .btn-gradient(@btn-success-bg);
+    .btn-border(@btn-success-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-success-bg, 5%));
+      .btn-border(@btn-success-bg);
+    }
+  }
+
+  &-info, &-info.button {
+    .btn-gradient(@btn-info-bg);
+    .btn-border(@btn-info-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-info-bg, 5%));
+      .btn-border(@btn-info-bg);
+    }
+  }
+
+  &-warning, &-warning.button {
+    .btn-gradient(@btn-warning-bg);
+    .btn-border(@btn-warning-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-warning-bg, 5%));
+      .btn-border(@btn-warning-bg);
+    }
+  }
+
+  &-danger, &-danger.button {
+    .btn-gradient(@btn-danger-bg);
+    .btn-border(@btn-danger-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-danger-bg, 5%));
+      .btn-border(@btn-danger-bg);
+    }
+  }
+}
+
+// Spacing ================================================================
+
+.btn,
+.btn-group {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.btn-group .btn, 
+.input-group-btn .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+// Mapping ================================================================
+
+input.button, .buttonwrapper button, .buttonwrapper a {
+  background-image: none; // XWIKI-7870
+  .btn;
+  .btn-primary;
+}
+
+.buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary {
+  .btn-default;
+}
+
+.buttonwrapper a, a.buttonwrapper{
+  display: inline-block; // Making buttons and links look the same
+}
+
+a.button{
+  .btn;
+  .btn-primary;
+}
+
+a.secondary{
+  .btn-default;
+}
+
+// Gradients & Mapping ====================================================
+/* These rules need to be applied after since they overwrite the mapping. They cover the usage before Bootstrap adoption. */
+
+input.button, .buttonwrapper button, .buttonwrapper a {
+  .btn-gradient(@btn-primary-bg);
+  .btn-border(@btn-primary-bg);
+  &:hover {
+    .btn-gradient(darken(@btn-primary-bg, 5%));
+    .btn-border(@btn-primary-bg);
+  }
+}
+
+.buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary, a.secondary {
+  .btn-gradient(lighten(@btn-default-bg, 5%));
+  .btn-border(@btn-default-bg);
+
+  &:hover, 
+  &:focus {
+    .btn-gradient(@btn-default-bg);
+    .btn-border(@btn-default-bg);
+  }
+}
+
+// Buttons on the navbar ==================================================
+.navbar-nav {
+  .btn-group {
+    margin: 0;
+  }
+}

@@ -30,9 +30,8 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -51,7 +50,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * A proxy store implementation that caches Documents when they are first fetched and subsequently return them from a
  * cache. It delegates all write and search operations to an underlying store without doing any caching on them.
- * 
+ *
  * @version $Id$
  */
 public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
@@ -64,7 +63,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     private Cache<Boolean> pageExistCache;
 
-    private int cacheCapacity = 100;
+    private int cacheCapacity = 500;
 
     private int pageExistCacheCapacity = 10000;
 
@@ -98,8 +97,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
-            new DocumentDeletedEvent(), new WikiDeletedEvent());
+        return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
+            new WikiDeletedEvent());
     }
 
     public synchronized void initCache(XWikiContext context) throws XWikiException
@@ -126,25 +125,16 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
     {
-        CacheFactory cacheFactory = context.getWiki().getCacheFactory();
+        CacheManager cacheManager = Utils.getComponent(CacheManager.class);
 
         try {
-            CacheConfiguration cacheConfiguration = new CacheConfiguration();
-            cacheConfiguration.setConfigurationId("xwiki.store.pagecache");
-            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-            lru.setMaxEntries(capacity);
-            cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-            Cache<XWikiDocument> pageCache = cacheFactory.newCache(cacheConfiguration);
+            Cache<XWikiDocument> pageCache =
+                cacheManager.createNewCache(new LRUCacheConfiguration("xwiki.store.pagecache", capacity));
             setCache(pageCache);
 
-            cacheConfiguration = new CacheConfiguration();
-            cacheConfiguration.setConfigurationId("xwiki.store.pageexistcache");
-            lru = new LRUEvictionConfiguration();
-            lru.setMaxEntries(pageExistCacheCapacity);
-            cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-            Cache<Boolean> pageExistcache = cacheFactory.newCache(cacheConfiguration);
+            Cache<Boolean> pageExistcache =
+                cacheManager.createNewCache(new LRUCacheConfiguration("xwiki.store.pageexistcache",
+                    pageExistCacheCapacity));
             setPageExistCache(pageExistcache);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
@@ -277,7 +267,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
         LOGGER.debug("Cache: Trying to get doc {} from cache", key);
 
-        XWikiDocument cachedoc = getCache().get(key);
+        XWikiDocument cachedoc;
+        try {
+            cachedoc = getCache().get(key);
+        } catch (Exception e) {
+            LOGGER.error("Failed to get document from the cache", e);
+
+            cachedoc = null;
+        }
 
         if (cachedoc != null) {
             doc = cachedoc;
@@ -285,17 +282,41 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
             LOGGER.debug("Cache: got doc {} from cache", key);
         } else {
-            LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
+            Boolean result = getPageExistCache().get(key);
 
-            doc = this.store.loadXWikiDoc(doc, context);
-            doc.setStore(this.store);
+            if (result == Boolean.FALSE) {
+                LOGGER.debug("Cache: The document {} does not exist, return an empty one", key);
 
-            LOGGER.debug("Cache: Got doc {} from storage", key);
+                doc.setStore(this.store);
+                doc.setNew(true);
 
-            getCache().set(key, doc);
-            getPageExistCache().set(key, new Boolean(!doc.isNew()));
+                // Make sure to always return a document with an original version, even for one that does not exist.
+                // Allow writing more generic code.
+                doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+            } else {
+                LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
 
-            LOGGER.debug("Cache: put doc {} in cache", key);
+                doc = this.store.loadXWikiDoc(doc, context);
+                doc.setStore(this.store);
+
+                // Recalculate the key in case it's not exactly the same as the one from the passed XWikiDocument
+                // TODO: ideally we modify store implementation to search in passed document wiki instead of context
+                // wiki
+                key = doc.getKey();
+
+                LOGGER.debug("Cache: Got doc {} from storage", key);
+
+                if (doc.isNew()) {
+                    getPageExistCache().set(key, Boolean.FALSE);
+                } else {
+                    getCache().set(key, doc);
+
+                    // Also update exist cache
+                    getPageExistCache().set(key, Boolean.TRUE);
+                }
+
+                LOGGER.debug("Cache: put doc {} in cache", key);
+            }
         }
 
         LOGGER.debug("Cache: end for doc {} in cache", key);
@@ -315,7 +336,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
         getCache().remove(key);
         getPageExistCache().remove(key);
-        getPageExistCache().set(key, new Boolean(false));
+        getPageExistCache().set(key, Boolean.FALSE);
     }
 
     @Override
@@ -373,28 +394,28 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     @Override
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentReferences(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
     @Override
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
+        XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
     @Override
-    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentReferences(parametrizedSqlClause, parameterValues, context);
     }
 
     @Override
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
-        XWikiContext context) throws XWikiException
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
+        throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
     }
@@ -468,13 +489,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, nb, start, parameterValues, context);
     }
 
     @Override
-    public List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocuments(wheresql, parameterValues, context);
@@ -482,14 +503,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
+        int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, customMapping, nb, start, parameterValues,
             context);
     }
 
     @Override
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, nb, start, parameterValues, context);
@@ -497,14 +518,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
+        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, customMapping, checkRight, nb, start,
             parameterValues, context);
     }
 
     @Override
-    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    public int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.countDocuments(parametrizedSqlClause, parameterValues, context);
@@ -574,14 +595,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     }
 
     @Override
-    public <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.search(sql, nb, start, parameterValues, context);
     }
 
     @Override
-    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.search(sql, nb, start, whereParams, parameterValues, context);

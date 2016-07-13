@@ -56,9 +56,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * If the property is not found in any of these 3 sources then the key is returned in place of the value. In addition
  * the property values are cached for better performance but if one of the XWiki documents containing the properties is
  * modified, its content is cached again next time a key is asked.
- * 
+ *
  * @version $Id$
- * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
+ * @deprecated since 4.3M2 use the {@link org.xwiki.localization.LocalizationManager} component instead
  */
 @Deprecated
 public class XWikiMessageTool
@@ -117,8 +117,6 @@ public class XWikiMessageTool
 
     /**
      * @param localization the localization manager
-     * @param componentManager used to get the proper renderer
-     * @param context the XWiki context
      */
     public XWikiMessageTool(ContextualLocalizationManager localization)
     {
@@ -174,13 +172,13 @@ public class XWikiMessageTool
      * an Array in Velocity whereas a List is easily created. For example: <code>$msg.get("key", ["1", "2", "3"])</code>
      * .
      * </p>
-     * 
+     *
      * @param key the key of the string to find
      * @param params the list of parameters to use for replacing "{N}" elements in the string. See
      *            {@link java.text.MessageFormat} for the full syntax
      * @return the translated string with parameters resolved
      */
-    public String get(String key, List< ? > params)
+    public String get(String key, List<?> params)
     {
         return get(key, params.toArray());
     }
@@ -188,7 +186,7 @@ public class XWikiMessageTool
     /**
      * Find a translation and then replace any parameters found in the translation by the passed parameters. The format
      * is the one used by {@link java.text.MessageFormat}.
-     * 
+     *
      * @param key the key of the string to find
      * @param params the list of parameters to use for replacing "{N}" elements in the string. See
      *            {@link java.text.MessageFormat} for the full syntax
@@ -276,7 +274,7 @@ public class XWikiMessageTool
     /**
      * Helper method to help get a translated version of a document. It handles any exception raised to make it easy to
      * use.
-     * 
+     *
      * @param documentName the document's name (eg Space.Document)
      * @return the document object corresponding to the passed document's name. A translated version of the document for
      *         the current Locale is looked for.
@@ -309,7 +307,7 @@ public class XWikiMessageTool
     /**
      * Helper method to help get a translated version of a document. It handles any exception raised to make it easy to
      * use.
-     * 
+     *
      * @param documentName the document's name (eg Space.Document)
      * @param defaultLanguage default language
      * @return the document object corresponding to the passed document's name. A translated version of the document for
@@ -365,7 +363,7 @@ public class XWikiMessageTool
     /**
      * Looks for a translation in the list of internationalization document bundles. It first checks if the translation
      * can be found in the cache.
-     * 
+     *
      * @param key the key identifying the translation
      * @return the translation or null if not found or if the passed key is null
      */

@@ -24,20 +24,25 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.DocumentPicker;
 
 /**
  * Represents the actions possible on the Templates Administration Page.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public class TemplatesAdministrationSectionPage extends AdministrationSectionPage
 {
-    @FindBy(id = "space")
-    private WebElement spaceInput;
+    public static final String ADMINISTRATION_SECTION_ID = "Templates";
 
-    @FindBy(id = "page")
-    private WebElement pageInput;
+    /**
+     * The element that contains the document picker used to select the target document.
+     */
+    @FindBy(className = "location-picker")
+    private WebElement documentPickerElement;
+
+    private DocumentPicker documentPicker;
 
     @FindBy(id = "createTemplateProvider")
     private WebElement createButton;
@@ -47,23 +52,35 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     public static TemplatesAdministrationSectionPage gotoPage()
     {
-        TemplatesAdministrationSectionPage page = new TemplatesAdministrationSectionPage();
-        page.getDriver().get(page.getURL());
-        return page;
+        AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
+        return new TemplatesAdministrationSectionPage();
     }
 
     public TemplatesAdministrationSectionPage()
     {
-        super("Templates");
+        super(ADMINISTRATION_SECTION_ID);
+    }
+
+    /**
+     * @return the document picker used to select the target document
+     */
+    public DocumentPicker getDocumentPicker()
+    {
+        if (this.documentPicker == null) {
+            this.documentPicker = new DocumentPicker(this.documentPickerElement);
+        }
+
+        return this.documentPicker;
     }
 
     public TemplateProviderInlinePage createTemplateProvider(String space, String page)
     {
-        spaceInput.clear();
-        spaceInput.sendKeys(space);
-        pageInput.clear();
-        pageInput.sendKeys(page);
-        createButton.click();
+        DocumentPicker documentPicker = getDocumentPicker();
+        documentPicker.toggleLocationAdvancedEdit();
+        documentPicker.setParent(space);
+        documentPicker.setName(page);
+        this.createButton.click();
+
         return new TemplateProviderInlinePage();
     }
 

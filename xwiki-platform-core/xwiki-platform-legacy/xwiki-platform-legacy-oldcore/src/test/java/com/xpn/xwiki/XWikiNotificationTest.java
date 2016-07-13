@@ -98,7 +98,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         TestListener listener = new TestListener();
         getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
-        XWikiDocument document = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+        XWikiDocument document = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
 
         this.xwiki.saveDocument(document, getContext());
         assertTrue("Listener not called", listener.hasListenerBeenCalled);
@@ -118,10 +118,10 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         listener.expectedNewStatus = false;
         getNotificationManager().addGeneralRule(new DocChangeRule(listener));
 
-        XWikiDocument original = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+        XWikiDocument original = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
         original.setNew(false);
         original.setContent("Old content");
-        XWikiDocument document = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
+        XWikiDocument document = new XWikiDocument(new DocumentReference("WikiDescriptor", "Space", "Page"));
         document.setContent("New content");
         document.setOriginalDocument(original);
 

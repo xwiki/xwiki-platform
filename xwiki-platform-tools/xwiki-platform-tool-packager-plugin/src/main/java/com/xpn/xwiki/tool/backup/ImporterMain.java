@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * Class to call from the command line to import XWiki documents into database.
- * 
+ *
  * @version $Id$
  */
 public final class ImporterMain
@@ -37,7 +37,7 @@ public final class ImporterMain
 
     /**
      * Command line hook so that the importer can be called directly on the command line.
-     * 
+     *
      * @param args the first argument is the directory where the package.xml file is located and where the documents to
      *            import are located, the second argument is some database name (TODO: find out what this name is
      *            really) and the third argument is the Hibernate config fill containing the database definition (JDBC

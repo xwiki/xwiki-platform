@@ -1,0 +1,11 @@
+###
+### Annotations page in the "view" mode
+###
+###
+#if("$!request.xpage" == 'annotations')
+  $response.sendRedirect($doc.getURL('view', 'viewer=annotations'))
+#else
+  #set($titleToDisplay = $services.localization.render('core.viewers.annotations.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.getPlainTitle())</a>"]))
+  #template('contentheader.vm')
+  #template("annotationsinline.vm")
+#end

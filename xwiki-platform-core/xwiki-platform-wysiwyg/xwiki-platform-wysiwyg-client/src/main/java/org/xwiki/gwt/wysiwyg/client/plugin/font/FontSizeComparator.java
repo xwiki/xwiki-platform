@@ -39,11 +39,7 @@ public class FontSizeComparator extends AbstractFontMatcher implements Comparato
         super("m");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Comparator#compare(Object, Object)
-     */
+    @Override
     public int compare(String leftValue, String rightValue)
     {
         left.getStyle().setProperty(Style.FONT_SIZE.getJSName(), leftValue);
@@ -51,11 +47,7 @@ public class FontSizeComparator extends AbstractFontMatcher implements Comparato
         return left.getOffsetWidth() - right.getOffsetWidth();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Matcher#match(Object, Object)
-     */
+    @Override
     public boolean match(String leftValue, String rightValue)
     {
         return super.match(leftValue, rightValue) || compare(leftValue, rightValue) == 0;

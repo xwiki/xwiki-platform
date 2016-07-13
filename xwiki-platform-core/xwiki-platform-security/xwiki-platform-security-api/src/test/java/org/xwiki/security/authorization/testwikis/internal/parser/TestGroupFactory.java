@@ -57,6 +57,7 @@ public class TestGroupFactory extends TestUserFactory
     @Override
     protected void registerFactories(ElementParser parser, TestDocument entity)
     {
+        super.registerFactories(parser, entity);
         parser.register(new TestGroupUserFactory(entity));
     }
 

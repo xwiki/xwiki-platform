@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -39,16 +40,17 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.classes.ClassPropertiesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.classes.ClassPropertiesResourceImpl")
 public class ClassPropertiesResourceImpl extends XWikiResource implements ClassPropertiesResource
 {
     @Override
     public Properties getClassProperties(String wikiName, String className) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
             if (xwikiClass == null) {
@@ -71,7 +73,7 @@ public class ClassPropertiesResourceImpl extends XWikiResource implements ClassP
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

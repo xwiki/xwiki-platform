@@ -16,3 +16,4 @@ com.xpn.xwiki.internal.model.reference.DeprecatedCurrentStringAttachmentReferenc
 com.xpn.xwiki.internal.model.reference.DeprecatedCurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.DeprecatedCurrentStringEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.DeprecatedXClassRelativeStringEntityReferenceResolver
+com.xpn.xwiki.internal.query.DeprecatedConfiguredQueryExecutorProvider

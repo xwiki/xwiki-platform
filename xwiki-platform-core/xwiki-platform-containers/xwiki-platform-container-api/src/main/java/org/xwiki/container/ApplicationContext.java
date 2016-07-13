@@ -26,7 +26,7 @@ import java.net.URL;
 
 /**
  * @version $Id$
- * @deprecated starting with 3.5M1, use the notion of Environment instead
+ * @deprecated starting with 3.5M1, use the notion of {@link org.xwiki.environment.Environment} instead
  */
 @Deprecated
 public interface ApplicationContext

@@ -21,15 +21,22 @@ package org.xwiki.observation.remote.converter;
 
 /**
  * Base class for events converters. Provide a default priority.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
 public abstract class AbstractEventConverter implements LocalEventConverter, RemoteEventConverter
 {
+    /**
+     * The default priority.
+     *
+     * @since 6.0RC1
+     */
+    public static final int DEFAULT_PRIORITY = 1000;
+
     @Override
     public int getPriority()
     {
-        return 1000;
+        return DEFAULT_PRIORITY;
     }
 }

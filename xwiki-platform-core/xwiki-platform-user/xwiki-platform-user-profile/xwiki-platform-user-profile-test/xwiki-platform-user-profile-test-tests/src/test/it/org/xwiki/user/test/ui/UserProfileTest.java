@@ -22,7 +22,6 @@ package org.xwiki.user.test.ui;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
@@ -61,7 +60,7 @@ public class UserProfileTest extends AbstractTest
 
     private static final String USER_BLOG = "http://xwiki.org/";
 
-    private static final String USER_BLOGFEED = "http://xwiki.org/";
+    private static final String USER_BLOGFEED = "http://xwiki.org/feed";
 
     private static final String WYSIWYG_EDITOR = "Wysiwyg";
 
@@ -83,24 +82,12 @@ public class UserProfileTest extends AbstractTest
 
     private String userName;
 
-    @BeforeClass
-    public static void globalSetUp()
-    {
-        getDriver().get(
-            getUtil().getURLToLoginAndGotoPage("superadmin", "pass", getUtil().getURL("XWiki", "ChangePassword")));
-        getUtil().recacheSecretToken();
-        ChangePasswordPage changePasswordPage = new ChangePasswordPage();
-        changePasswordPage.edit();
-        changePasswordPage.clickSaveAndView();
-        getDriver().get(getUtil().getURLToLogout());
-    }
-
     @Before
     public void setUp()
     {
         getUtil().recacheSecretToken();
         this.userName = getTestClassName() + getTestMethodName();
-        getUtil().createUser(this.userName, DEFAULT_PASSWORD);
+        getUtil().createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
     }
@@ -169,16 +156,15 @@ public class UserProfileTest extends AbstractTest
         // Logout
         getUtil().forceGuestUser();
 
-        // Login with the new password
-        getDriver().get(getUtil().getURLToLoginAs(this.userName, newPassword));
-        // Navigate to a page to verify that the user is logged in
-        ViewPage vp = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        // Login with the new password and navigate to a page to verify that the user is logged in
+        getUtil().loginAndGotoPage(this.userName, newPassword,
+            getUtil().getURL(getTestClassName(), getTestMethodName()));
+        ViewPage vp = new ViewPage();
         Assert.assertTrue(vp.isAuthenticated());
         getUtil().recacheSecretToken();
         
         //Reset the password
-        getDriver().get(getUtil().getURLToLoginAndGotoPage("superadmin", "pass", this.customProfilePage.getURL()));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(this.customProfilePage.getURL());
 
         preferencesPage = this.customProfilePage.switchToPreferences();
         changePasswordPage = preferencesPage.changePassword();
@@ -305,8 +291,7 @@ public class UserProfileTest extends AbstractTest
     public void testChangePasswordOfAnotherUserWithTwoDifferentPasswords()
     {
         // Login as superadmin (to have Admin rights) and change the password of another user.
-        getDriver().get(getUtil().getURLToLoginAndGotoPage("superadmin", "pass", this.customProfilePage.getURL()));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(this.customProfilePage.getURL());
 
         PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();

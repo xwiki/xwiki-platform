@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -33,11 +35,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 /**
  * Delete attachment xwiki action.
- * 
+ *
  * @version $Id$
  */
 public class DeleteAttachmentAction extends XWikiAction
@@ -89,7 +90,7 @@ public class DeleteAttachmentAction extends XWikiAction
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
             String requestUri = request.getRequestURI();
-            filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+            filename = getFileName();
         }
 
         XWikiDocument newdoc = doc.clone();
@@ -109,9 +110,8 @@ public class DeleteAttachmentAction extends XWikiAction
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             if (vcontext != null) {
-                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
-                vcontext.put("details",
-                    context.getMessageTool().get("platform.core.action.deleteAttachment.noAttachment"));
+                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
+                vcontext.put("details", localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"));
             }
             return true;
         }
@@ -119,22 +119,21 @@ public class DeleteAttachmentAction extends XWikiAction
         newdoc.setAuthorReference(context.getUserReference());
 
         // Set "deleted attachment" as the version comment.
-        ArrayList<String> params = new ArrayList<String>();
-        params.add(filename);
+        String comment;
         if (attachment.isImage(context)) {
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
+            comment = localizePlainOrKey("core.comment.deleteImageComment", filename);
         } else {
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
+            comment = localizePlainOrKey("core.comment.deleteAttachmentComment", filename);
         }
 
         try {
             newdoc.removeAttachment(attachment);
-            xwiki.saveDocument(newdoc, "Deleted attachment [" + attachment.getFilename() + "]", context);
+            xwiki.saveDocument(newdoc, comment, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             if (vcontext != null) {
-                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
+                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
                 vcontext.put("details", ExceptionUtils.getRootCauseMessage(ex));
             }
             return true;
@@ -153,5 +152,16 @@ public class DeleteAttachmentAction extends XWikiAction
     public String render(XWikiContext context)
     {
         return "error";
+    }
+
+    /**
+     * @return the filename of the attachment.
+     */
+    private String getFileName()
+    {
+        // Extract the Attachment file name from the parsed request URL that was done before this Action is called
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
     }
 }

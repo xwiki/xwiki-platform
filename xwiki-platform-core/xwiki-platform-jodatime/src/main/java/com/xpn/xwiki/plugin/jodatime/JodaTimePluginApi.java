@@ -178,4 +178,13 @@ public class JodaTimePluginApi extends PluginApi<JodaTimePlugin>
     {
         return getProtectedPlugin().getDuration(from, to);
     }
+
+    /**
+     * @return an ISO8601 date time formatter
+     * @since 5.2RC1
+     */
+    public DateTimeFormatter getISODateTimeFormatter()
+    {
+        return getProtectedPlugin().getISODateTimeFormatter();
+    }
 }

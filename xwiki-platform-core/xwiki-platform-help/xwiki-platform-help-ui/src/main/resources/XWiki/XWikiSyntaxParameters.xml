@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParameters</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497957000</date>
+  <contentUpdateDate>1301497957000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParameters</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxId</name>
+        <number>4</number>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxId</name>
+        <number>3</number>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxParameters</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>24d8ef32-81df-4862-b5a2-e735ced07d70</guid>
+    <property>
+      <category>2</category>
+    </property>
+    <property>
+      <maxSyntaxId>2.0</maxSyntaxId>
+    </property>
+    <property>
+      <minSyntaxId>1.0</minSyntaxId>
+    </property>
+    <property>
+      <section>4</section>
+    </property>
+  </object>
+  <content>= Advanced =
+
+== Parameters ==
+
+=== 1.0 Parameters ===
+
+In XWiki Syntax 1.0 there is no syntax for passing parameters and the only way to do it was to write XHTML directly in the content as shown in the table below.
+
+|=XWiki Syntax 1.0|=Generated XHTML
+|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
+}}})))
+
+=== 2.0 Parameters ===
+
+With XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} it's possible to pass parameters to the different syntax elements and also to blocks of text. This is used for example to style them. You can set any parameter key/value pair you want. The XHTML renderer will pass these parameters as XHTML attributes to the underlying XHTML representation of the different syntax elements.
+
+|=(% style="width="60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generated XHTML
+|((({{{
+(% class="myClass" style="myStyle" id="myId" %)
+= heading =
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
+}}})))</content>
+</xwikidoc>

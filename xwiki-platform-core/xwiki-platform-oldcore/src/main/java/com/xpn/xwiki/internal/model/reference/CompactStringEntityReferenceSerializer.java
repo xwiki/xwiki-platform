@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,14 +29,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReferenceProvider;
 
 /**
  * Generate an entity reference string that doesn't contain reference parts that are the same as either the current
- * entity in the execution context or as the passed entity reference (if any).
- * Note that the terminal part is always kept (eg the document's page for a document reference or the attachment's
- * filename for an attachment reference).
- * 
+ * entity in the execution context or as the passed entity reference (if any). Note that the terminal part is always
+ * kept (eg the document's page for a document reference or the attachment's filename for an attachment reference).
+ *
  * @version $Id$
  * @since 2.2M1
  */
@@ -45,16 +46,45 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
 {
     @Inject
     @Named("current")
-    private EntityReferenceValueProvider provider;
+    private EntityReferenceProvider provider;
 
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
+    public String serialize(EntityReference reference, Object... parameters)
+    {
+        if (reference == null) {
+            return null;
+        }
+
+        StringBuilder representation = new StringBuilder();
+
+        List<EntityReference> references = reference.getReversedReferenceChain();
+        for (int i = 0; i < references.size();) {
+            EntityReference currentReference = references.get(i);
+            EntityType currentType = currentReference.getType();
+
+            // Move to last element of the same type
+            while (++i < references.size() && references.get(i).getType() == currentType) {
+                currentReference = references.get(i);
+            }
+
+            if (shouldSerialize(currentReference, representation, currentReference == reference, parameters)) {
+                serializeEntityReferenceType(currentReference, representation, currentReference == reference);
+            }
+        }
+
+        return representation.toString();
+    }
+
+    /**
+     * @since 7.2M2
+     */
+    protected boolean shouldSerialize(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
         boolean shouldPrint = false;
 
         // Only serialize if:
-        // - the current entity reference has a different value than the passed reference
+        // - the current entity reference has a different value and type than the passed reference
         // - the entity type being serialized is not the last type of the chain
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
@@ -62,33 +92,76 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         if (isLastReference || representation.length() > 0) {
             shouldPrint = true;
         } else {
-            String defaultName = resolveDefaultValue(currentReference.getType(), parameters);
-            if (defaultName == null || !defaultName.equals(currentReference.getName())) {
+            EntityReference defaultReference = resolveDefaultReference(currentReference.getType(), parameters);
+            if (defaultReference == null || !equal(defaultReference, currentReference)) {
                 shouldPrint = true;
             }
         }
 
-        if (shouldPrint) {
-            super.serializeEntityReference(currentReference, representation, isLastReference);
-        }
+        return shouldPrint;
     }
 
-    protected String resolveDefaultValue(EntityType type, Object... parameters)
+    /**
+     * Serialize the last part of the reference (all the ending elements having the same entity type).
+     * 
+     * @param reference the reference to serialize
+     * @since 7.2M2
+     */
+    protected void serializeEntityReferenceType(EntityReference reference, StringBuilder representation,
+        boolean isLastReference)
     {
-        String resolvedDefaultValue = null;
+        EntityReference parent = reference.getParent();
+        if (parent != null && parent.getType() == reference.getType()) {
+            serializeEntityReferenceType(parent, representation, false);
+        }
+
+        super.serializeEntityReference(reference, representation, isLastReference);
+    }
+
+    protected boolean equal(EntityReference defaultReference, EntityReference currentReference)
+    {
+        EntityReference defaultReferenceIt = defaultReference;
+        EntityReference currentReferenceIt = currentReference;
+
+        for (; defaultReferenceIt != null; defaultReferenceIt = defaultReferenceIt.getParent(), currentReferenceIt =
+            currentReferenceIt.getParent()) {
+            if (currentReferenceIt == null || defaultReferenceIt.getType() != currentReferenceIt.getType()
+                || !defaultReferenceIt.getName().equals(currentReferenceIt.getName())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @since 7.2M1
+     */
+    protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
+    {
+        EntityReference resolvedDefaultReference = null;
         if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
             // Try to extract the type from the passed parameter.
             EntityReference referenceParameter = (EntityReference) parameters[0];
             EntityReference extractedReference = referenceParameter.extractReference(type);
             if (extractedReference != null) {
-                resolvedDefaultValue = extractedReference.getName();
+                resolvedDefaultReference = extractedReference;
+
+                // Remove parent if any
+                EntityReference parent = resolvedDefaultReference.getParent();
+                while (parent != null && parent.getType() == resolvedDefaultReference.getType()) {
+                    parent = parent.getParent();
+                }
+                if (parent != null) {
+                    resolvedDefaultReference = resolvedDefaultReference.removeParent(parent);
+                }
             }
         }
 
-        if (resolvedDefaultValue == null) {
-            resolvedDefaultValue = this.provider.getDefaultValue(type);
+        if (resolvedDefaultReference == null) {
+            resolvedDefaultReference = this.provider.getDefaultReference(type);
         }
 
-        return resolvedDefaultValue;
+        return resolvedDefaultReference;
     }
 }

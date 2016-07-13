@@ -52,11 +52,7 @@ public class EmbedPlugin extends AbstractPlugin implements CommandListener, Inne
      */
     public static final Command RESET = new Command("reset");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -68,11 +64,7 @@ public class EmbedPlugin extends AbstractPlugin implements CommandListener, Inne
         replaceEmbeddedObjects(getTextArea().getDocument().getBody());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         getTextArea().getCommandManager().removeCommandListener(this);
@@ -81,22 +73,14 @@ public class EmbedPlugin extends AbstractPlugin implements CommandListener, Inne
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         // Do nothing.
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (RESET.equals(command)) {
@@ -104,11 +88,7 @@ public class EmbedPlugin extends AbstractPlugin implements CommandListener, Inne
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InnerHTMLListener#onInnerHTMLChange(org.xwiki.gwt.dom.client.Element)
-     */
+    @Override
     public void onInnerHTMLChange(org.xwiki.gwt.dom.client.Element element)
     {
         replaceEmbeddedObjects(element);

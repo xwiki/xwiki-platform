@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxMacros</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1380707156000</date>
+  <contentUpdateDate>1380707156000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxMacros</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxId</name>
+        <number>4</number>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxId</name>
+        <number>3</number>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxMacros</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>b92796d3-f2f2-42a5-9368-77be0e51ce91</guid>
+    <property>
+      <category>3</category>
+    </property>
+    <property>
+      <maxSyntaxId>2.0</maxSyntaxId>
+    </property>
+    <property>
+      <minSyntaxId>1.0</minSyntaxId>
+    </property>
+    <property>
+      <section>0</section>
+    </property>
+  </object>
+  <content>= Programming =
+
+== Macros ==
+
+=== 1.0 Macros ===
+
+There are two kinds of macros in XWiki Syntax 1.0:
+
+* Velocity macros (called using the ###macroname(param1 ... paramN)## syntax)
+* Radeox macros (called using the ##{macroname:param1=value1|...|paramN=valueN}## syntax)
+
+{{info}}
+For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}
+
+|=Feature|=XWiki Syntax 1.0
+|Velocity Macro|(((
+{{{#info("Some text")}}}
+)))
+|Radeox Macro|(((
+{{{{code:java}
+java content
+{code}
+}}}
+)))
+
+=== 2.0 Macros ===
+
+There is only one kind of macro in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, which is called by the syntax: ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. For macros without content there's a short notation: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Rendering Macro with a content|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+|Rendering Macro without content|(((
+{{{{{include reference="Space.Page"/}}}}}
+)))|The referenced page is included in the current page
+
+{{info}}
+Radeox macros cannot be used in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. Thus they have been rewritten as Rendering macros.
+{{/info}}
+
+{{info}}
+For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}</content>
+</xwikidoc>

@@ -48,11 +48,7 @@ public class ToolBarControllerTest extends WysiwygTestCase
      */
     private PluginManager pluginManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

@@ -1,0 +1,13 @@
+#set($flavors = [])
+#foreach($extension in $services.flavor.validExtensions)
+#set($flavor = {})
+#set($void = $flavor.put('id', $extension.id))
+#set($void = $flavor.put('website', $extension.website))
+#set($void = $flavor.put('authors', $extension.authors))
+#set($void = $flavor.put('rating', $extension.rating))
+#set($void = $flavor.put('summary', $extension.summary))
+#set($void = $flavor.put('name', $extension.name))
+#set($void = $flavor.put('type', $extension.type))
+#set($void = $flavors.add($flavor))
+#end
+$jsontool.serialize($flavors)

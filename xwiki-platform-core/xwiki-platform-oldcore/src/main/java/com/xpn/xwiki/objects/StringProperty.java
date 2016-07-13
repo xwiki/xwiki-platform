@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.objects;
 
-
 /**
  * XProperty for containing a string of limited size (default 255 characters max).
- * 
+ *
  * @version $Id$
  */
 public class StringProperty extends BaseStringProperty

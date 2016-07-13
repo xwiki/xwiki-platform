@@ -28,6 +28,11 @@ package org.xwiki.search.solr.internal.api;
 public class SolrException extends Exception
 {
     /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Constructor.
      * 
      * @param message the exception message

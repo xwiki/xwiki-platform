@@ -28,20 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.jmock.Expectations;
-import org.jmock.api.Action;
-import org.jmock.api.Invocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationsMockSetup;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -72,12 +64,6 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
      * The setup for mocking components needed in annotation code.
      */
     protected AnnotationsMockSetup setup;
-
-    /**
-     * Entity reference serializer mock to return documents path as references, so that all mocks work with the test
-     * files.
-     */
-    protected EntityReferenceSerializer<String> serializerMock;
 
     static {
         addFileToTest("maintainer/correction/Correction1");
@@ -198,40 +184,6 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
         // register the IO mockups
         setup = new AnnotationsMockSetup(getComponentManager(), new TestDocumentFactory());
         setup.setupExpectations(docName);
-
-        // mock the document name serializer to return the document name as the reference to be able to get the
-        // documents from the factory
-        serializerMock = setup.getMockery().mock(EntityReferenceSerializer.class);
-        // register
-        DefaultComponentDescriptor<EntityReferenceSerializer> ersDesc =
-            new DefaultComponentDescriptor<EntityReferenceSerializer>();
-        ersDesc.setRoleType(EntityReferenceSerializer.TYPE_STRING);
-        getComponentManager().registerComponent(ersDesc, serializerMock);
-        // and setup the mock
-        setup.getMockery().checking(new Expectations()
-        {
-            {
-                allowing(serializerMock).serialize(with(any(EntityReference.class)), with(any(Object.class)));
-                will(new Action()
-                {
-                    public void describeTo(Description description)
-                    {
-                        description.appendText("Gets the serialization of a reference");
-                    }
-
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        EntityReference documentRef =
-                            (org.xwiki.model.reference.EntityReference) invocation.getParameter(0);
-                        // extract the document part and return it
-                        if (documentRef.getType() != EntityType.DOCUMENT) {
-                            throw new Exception("Expected document reference but got " + documentRef);
-                        }
-                        return documentRef.getName();
-                    }
-                });
-            }
-        });
     }
 
     /**

@@ -98,7 +98,7 @@ public abstract class AbstractFormulaRenderer implements FormulaRenderer
             hashAlgorithm.update((byte) size.ordinal());
             hashAlgorithm.update((byte) type.ordinal());
             hashAlgorithm.update(formula.getBytes());
-            return new String(org.apache.commons.codec.binary.Hex.encodeHex(hashAlgorithm.digest()));
+            return String.valueOf(org.apache.commons.codec.binary.Hex.encodeHex(hashAlgorithm.digest()));
         } catch (NoSuchAlgorithmException ex) {
             LOGGER.error("No MD5 hash algorithm implementation", ex);
         } catch (NullPointerException ex) {

@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
@@ -45,13 +48,16 @@ import com.xpn.xwiki.web.XWikiResponse;
  * See http://www.graphviz.org/doc/info/lang.html for the dot language specification. See
  * http://www.graphviz.org/doc/info/output.html for the possible output formats
  * </p>
- * 
+ *
  * @deprecated the plugin technology is deprecated
  * @version $Id$
  */
 @Deprecated
 public class GraphVizPlugin extends XWikiDefaultPlugin
 {
+    /** Detects HTML character references produced by the {@link com.xpn.xwiki.render.filter.EscapeFilter}. */
+    private static final Pattern HTML_ESCAPE_PATTERN = Pattern.compile("&#([0-9]++);");
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
 
@@ -80,7 +86,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
-     * 
+     *
      * @param name the plugin name
      * @param className the name of this class, ignored
      * @param context the current request context
@@ -154,7 +160,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and returns the URL for the produced file, a PNG image.
-     * 
+     *
      * @param content the dot source
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @param context the current request context
@@ -169,7 +175,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and returns the URL for the produced file.
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @param outputFormat the output format to use
@@ -187,7 +193,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and return the content of the resulting image (PNG format).
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @return the content of the generated image
@@ -200,7 +206,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and return the content of the resulting image (PNG format).
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -216,7 +222,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     /**
      * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename
      * which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @return the name of the file where the generated output is stored
@@ -230,7 +236,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     /**
      * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
      * the filename which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -247,7 +253,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and writes the resulting image (PNG format) into the response.
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @param context the current request context
@@ -260,7 +266,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Executes GraphViz and writes the resulting image (in the requested format) into the response.
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -281,7 +287,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Writes an already generated result from the temporary file into the response.
-     * 
+     *
      * @param filename the name of the temporary file, previously returned by
      *            {@link #writeDotImage(String, String, boolean)}
      * @param context the current request context
@@ -303,7 +309,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     /**
      * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
      * the generated content from that file.
-     * 
+     *
      * @param hashCode the hascode of the content, to be used as the temporary file name
      * @param content the dot source code
      * @param extension the output file extension
@@ -315,7 +321,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     {
         File dfile = getTempFile(hashCode, "input.dot", dot);
         if (!dfile.exists()) {
-            FileUtils.write(dfile, content, XWiki.DEFAULT_ENCODING);
+            FileUtils.write(dfile, undoEscapeFilter(content), XWiki.DEFAULT_ENCODING);
         }
 
         File ofile = getTempFile(hashCode, extension, dot);
@@ -350,7 +356,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Get the contents of a previously generated temporary file.
-     * 
+     *
      * @param ofile the file to read
      * @return the content found inside the file, if any
      * @throws IOException when reading the file fails
@@ -362,7 +368,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Return the temporary disk file corresponding to the given parameters.
-     * 
+     *
      * @param hashcode the hashcode of the dot content, used as the main part for the filename
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -376,7 +382,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
     /**
      * Return the temporary disk file corresponding to the given filename.
-     * 
+     *
      * @param filename the filename to look for
      * @return the corresponding File
      */
@@ -389,7 +395,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
      * Hangcheck runnable, which interrupts the main thread after 10 seconds of waiting for the conversion to end. If
      * the conversion ends normally before the 10 seconds timeout expires, then this runnable should be terminated by
      * {@link Thread#interrupt() interrupting it}.
-     * 
+     *
      * @version $Id$
      */
     private static class Hangcheck implements Runnable
@@ -399,17 +405,14 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
 
         /**
          * Simple constructor which specifies the thread to monitor.
-         * 
+         *
          * @param converterThread the thread to monitor
          */
-        public Hangcheck(Thread converterThread)
+        Hangcheck(Thread converterThread)
         {
             this.converterThread = converterThread;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void run()
         {
@@ -419,6 +422,36 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
             } catch (InterruptedException ex) {
                 // Expected result if the dot process terminates on time
             }
+        }
+    }
+
+    /**
+     * When rendering using Radeox, {@link com.xpn.xwiki.render.filter.EscapeFilter} replaces all instances of
+     * {@code \\char} backslash escapes with a HTML character reference. Unfortunately this also happens for GraphViz
+     * content, which isn't right, since some backslash escapes are valid GraphViz syntax. This method undoes this kind
+     * of escaping to preserve node and edge label formatting, if the character reference is an ASCII character.
+     *
+     * @param escapedContent the macro content, already filtered by Radeox and possibly containing broken backslash
+     *            escapes
+     * @return the content with HTML character references replaced with backslash escapes
+     */
+    private String undoEscapeFilter(String escapedContent)
+    {
+        if (StringUtils.isNotEmpty(escapedContent)) {
+            Matcher matcher = HTML_ESCAPE_PATTERN.matcher(escapedContent);
+            StringBuffer result = new StringBuffer(escapedContent.length());
+            while (matcher.find()) {
+                int codepoint = Integer.valueOf(matcher.group(1));
+                if (codepoint >= 65 && codepoint <= 122) {
+                    matcher.appendReplacement(result, new String(new int[] { 92, 92, codepoint }, 0, 3));
+                } else {
+                    matcher.appendReplacement(result, "$0");
+                }
+            }
+            matcher.appendTail(result);
+            return result.toString();
+        } else {
+            return "";
         }
     }
 }

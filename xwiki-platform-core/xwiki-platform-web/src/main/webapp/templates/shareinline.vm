@@ -7,14 +7,15 @@
   #set ($sender = $xwiki.getUserName($xcontext.user, false))
   #set ($display = "$!{request.includeDocument}")
   #set ($serverName = $request.serverName)
-  #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
-    #if ("$!{xwiki.getXWikiPreference('admin_email')}" != '')
-      #set ($sender = "$!{escapetool.q($sender)} <$!{xwiki.getXWikiPreference('admin_email')}>")
-    #else
-      #set ($sender = "$!{escapetool.q($sender)} <noreply@domain.net>")
-    #end
+  #set ($from = $services.mailsender.configuration.fromAddress)
+  #if ("$!from" != '')
+    #set ($sender = "$!{escapetool.q($sender)} <$from>")
   #else
-    #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{serverName}>")
+    #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
+      #set ($sender = "$!{escapetool.q($sender)} <noreply@domain.net>")
+    #else
+      #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{serverName}>")
+    #end
   #end
   #set ($recipients = [])
   #set ($errors = {})
@@ -39,7 +40,7 @@
         #end ## @
         #if (!$recipients.contains($recipient) && "$!recipient" != '')
           #set ($discard = $recipients.add($recipient))
-          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, $xcontext.language, 'XWiki.SharePage', {}))
+          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, "${xcontext.locale}", 'XWiki.SharePage', {}))
           #if ($result != 0)
             #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.serverError')))
           #else
@@ -87,10 +88,11 @@
     ## <dd><label><input type="checkbox" name="includeComments"/> $services.localization.render('core.viewers.share.includeComments')</label></dd>
 
     #set ($message = "<textarea name='message' rows='3' cols='80'>${services.localization.render('core.viewers.share.defaultMessage')}</textarea>")
-    #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', $xcontext.language, true).getProperty('html').value)
+    #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', "${xcontext.locale}", true).getProperty('html').value)
     #set ($fullMessage = $fullMessage.replace('${recipientName}', $services.localization.render('core.viewers.share.recipientPlaceholder')))
     #set ($fullMessage = $fullMessage.replaceAll('<pre[^>]*+>[^<]*+</pre>', $message))
-    #set ($fullMessage = $xwiki.parseContent($fullMessage))
+    ## Evaluate the template's content since it contains Velocity code.
+    #set ($fullMessage = "#evaluate($fullMessage)")
 
     <dt><label for="message">$services.localization.render('core.viewers.share.messagePreviewLabel')</label></dt>
     <dd class='mail-preview'>$fullMessage</dd>

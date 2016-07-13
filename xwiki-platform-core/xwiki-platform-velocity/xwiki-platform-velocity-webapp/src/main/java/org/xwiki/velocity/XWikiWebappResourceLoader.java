@@ -20,22 +20,22 @@
 package org.xwiki.velocity;
 
 import org.apache.commons.collections.ExtendedProperties;
-import org.apache.velocity.tools.view.servlet.WebappLoader;
+import org.apache.velocity.tools.view.WebappResourceLoader;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 
 /**
- * Extends the Velocity Tool's {@link WebappLoader} by adding the ServletContext to the Velocity Engine's Application
- * Attributes since this is a prerequisite for {@link WebappLoader} to work correctly. This resource loader depends on
- * the fact that the XWiki Component Manager has been set in Velocity Engine's Application Attribute prior to its
- * initialization.
+ * Extends the Velocity Tool's {@link WebappResourceLoader} by adding the ServletContext to the Velocity Engine's
+ * Application Attributes since this is a prerequisite for {@link WebappResourceLoader} to work correctly. This resource
+ * loader depends on the fact that the XWiki Component Manager has been set in Velocity Engine's Application Attribute
+ * prior to its initialization.
  *
  * @version $Id$
  * @since 3.0M3
  */
-public class XWikiWebappResourceLoader extends WebappLoader
+public class XWikiWebappResourceLoader extends WebappResourceLoader
 {
     @Override
     public void init(ExtendedProperties configuration)
@@ -67,8 +67,7 @@ public class XWikiWebappResourceLoader extends WebappLoader
      */
     private ComponentManager getComponentManager()
     {
-        ComponentManager cm =
-            (ComponentManager) this.rsvc.getApplicationAttribute(ComponentManager.class.getName());
+        ComponentManager cm = (ComponentManager) this.rsvc.getApplicationAttribute(ComponentManager.class.getName());
         if (cm == null) {
             throw new RuntimeException(
                 "Cannot initialize Velocity subsystem: missing Component Manager in Velocity Application Attribute");

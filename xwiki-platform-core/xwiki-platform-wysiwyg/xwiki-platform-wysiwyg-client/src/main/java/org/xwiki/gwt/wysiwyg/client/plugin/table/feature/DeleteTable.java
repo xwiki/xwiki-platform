@@ -57,11 +57,7 @@ public class DeleteTable extends AbstractTableFeature
         super(NAME, new Command(NAME), Strings.INSTANCE.deleteTable(), plugin);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         Selection selection = rta.getDocument().getSelection();
@@ -88,11 +84,7 @@ public class DeleteTable extends AbstractTableFeature
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled()

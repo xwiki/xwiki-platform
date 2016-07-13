@@ -48,16 +48,14 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 /**
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
  * {@link FileItem}s.
- * 
+ *
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class FileUploadPlugin extends XWikiDefaultPlugin
 {
     /**
      * The name of the plugin; the key that can be used to retrieve this plugin from the context.
-     * 
+     *
      * @see XWikiPluginInterface#getName()
      */
     public static final String PLUGIN_NAME = "fileupload";
@@ -134,7 +132,10 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * {@inheritDoc} Make sure we don't leave files in temp directories and in memory.
+     * {@inheritDoc}
+     * <p>
+     * Make sure we don't leave files in temp directories and in memory.
+     * </p>
      */
     @Override
     public void endRendering(XWikiContext context)
@@ -146,7 +147,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Deletes all temporary files of the upload.
-     * 
+     *
      * @param context Context of the request.
      * @see FileUploadPluginApi#cleanFileList()
      */
@@ -169,7 +170,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
-     * 
+     *
      * @param context Context of the request.
      * @throws XWikiException An XWikiException is thrown if the request could not be parsed.
      * @see FileUploadPluginApi#loadFileList()
@@ -185,7 +186,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
-     * 
+     *
      * @param uploadMaxSize Maximum size of the uploaded files.
      * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
@@ -265,7 +266,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Allows to retrieve the current list of uploaded files, as a list of {@link FileItem}s.
      * {@link #loadFileList(XWikiContext)} needs to be called beforehand
-     * 
+     *
      * @param context Context of the request.
      * @return A list of FileItem elements.
      * @see FileUploadPluginApi#getFileItems()
@@ -278,7 +279,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Allows to retrieve the contents of an uploaded file as a sequence of bytes. {@link #loadFileList(XWikiContext)}
      * needs to be called beforehand.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return The contents of the file.
@@ -316,7 +317,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Allows to retrieve the contents of an uploaded file as a stream. {@link #loadFileList(XWikiContext)} needs to be
      * called beforehand.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return a InputStream on the file content
@@ -336,7 +337,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Retrieve the size of a file content in byte. {@link #loadFileList(XWikiContext)} needs to be called beforehand.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return the size of the file in byte
@@ -356,7 +357,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList(XWikiContext)} needs to be
      * called beforehand.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return The contents of the file.
@@ -376,7 +377,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     /**
      * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList(XWikiContext)} needs to be
      * called beforehand.
-     * 
+     *
      * @deprecated not well named, use {@link #getFileItemAsString(String, com.xpn.xwiki.XWikiContext)}
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
@@ -392,7 +393,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Retrieves the list of FileItem names. {@link #loadFileList(XWikiContext)} needs to be called beforehand.
-     * 
+     *
      * @param context Context of the request
      * @return List of strings of the item names
      */
@@ -413,7 +414,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Get the name of the file uploaded for a form field.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
@@ -428,7 +429,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
 
     /**
      * Return the FileItem corresponding to the file uploaded for a form field.
-     * 
+     *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return The corresponding FileItem, or <tt>null</tt> if no file was uploaded for that form field.

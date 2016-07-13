@@ -1,29 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>LiveTableTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AppWithinMinutes.LiveTableClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1321280711000</creationDate>
+  <parent>AppWithinMinutes.LiveTableClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1321361326000</date>
   <contentUpdateDate>1321361326000</contentUpdateDate>
   <version>1.1</version>
   <title>LiveTable Template</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>AppWithinMinutes.LiveTableTemplate</name>
+    <number>0</number>
+    <className>AppWithinMinutes.LiveTableClass</className>
+    <guid>d7be175c-78d1-4ac7-8afd-d41113c51f56</guid>
     <class>
       <name>AppWithinMinutes.LiveTableClass</name>
       <customClass/>
@@ -59,6 +80,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </columns>
+      <dataSpace>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>dataSpace</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Data Location</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </dataSpace>
       <description>
         <customDisplay/>
         <disabled>0</disabled>
@@ -75,10 +109,6 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
     </class>
-    <name>AppWithinMinutes.LiveTableTemplate</name>
-    <number>0</number>
-    <className>AppWithinMinutes.LiveTableClass</className>
-    <guid>d7be175c-78d1-4ac7-8afd-d41113c51f56</guid>
     <property>
       <class/>
     </property>
@@ -86,10 +116,17 @@
       <columns>doc.name doc.date doc.author _actions</columns>
     </property>
     <property>
+      <dataSpace>.Data</dataSpace>
+    </property>
+    <property>
       <description/>
     </property>
   </object>
   <object>
+    <name>AppWithinMinutes.LiveTableTemplate</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>7060860d-9bd0-4217-9a25-8c4a12d0a50c</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -122,7 +159,7 @@
         <disabled>0</disabled>
         <name>name</name>
         <number>2</number>
-        <prettyName>Extension Name</prettyName>
+        <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
@@ -147,17 +184,13 @@
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>AppWithinMinutes.LiveTableTemplate</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>7060860d-9bd0-4217-9a25-8c4a12d0a50c</guid>
     <property>
       <content/>
     </property>
@@ -174,5 +207,4 @@
       <scope>wiki</scope>
     </property>
   </object>
-  <content/>
 </xwikidoc>

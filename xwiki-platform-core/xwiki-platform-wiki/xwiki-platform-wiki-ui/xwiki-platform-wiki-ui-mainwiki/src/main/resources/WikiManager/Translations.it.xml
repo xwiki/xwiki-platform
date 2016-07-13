@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1307189790000</date>
+  <contentUpdateDate>1307189790000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
+platform.wiki.create.error=Creazione del Wiki "{0}" non riuscita\: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=Un database con questo identificatore esiste già
+platform.wiki.create.error.wikiname.empty=L'identificatore non può essere vuoto
+platform.wiki.create.error.wikiname.wikialreadyexists=Questo identificatore è già usato
+platform.wiki.create.members=MEMBRI
+platform.wiki.create.prettyname.empty=Il nome in chiaro non può essere vuoto
+platform.wiki.create.title=Crea un nuovo Wiki
+platform.wiki.dependencies.applicationmanager.missing=L''{0}Application Manager Plugin{1} non è installato. Installarlo e riprovare.
+platform.wiki.dependencies.wiki.missing=Il componente java per la Gestione Spazi di Lavoro non è installato. Questa pagina non funzionerà correttamente. Assicuratevi che l'estensione "Workspace API" sia installata (usando la Gestione Estensioni) o che il file 'xwiki-platform-workspace-api-&lt;version&gt;.jar' sia presente nella cartella 'WEB-INF/lib/' delle applicazioni web (in caso d'installazione manuale).
+platform.wiki.error.exceptionWithMessage=Eccezione\: {0} 
+platform.wiki.error.oneParameterNotSpecified=Non è stato specificato il parametro "{0}".
+platform.wiki.error.parameterAcceptsMultipleValues=Sono accettati valori multipli.
+platform.wiki.error.wikidoesnotexist=Il wiki {0} non esiste 
+platform.wiki.form.requiredField=Richiesto
+platform.wiki.menu.deletewiki=Elimina
+platform.wiki.menu.userwikis=I Wiki
+platform.wiki.menu.wikiindex=Indice dei Wiki
+platform.wiki.sheet.title.createnewalias=Crea nuovi alias
+platform.wiki.users.delete.empty=Elimina il Wiki
+platform.wiki.users.delete.title=Elimina il Wiki "{0}"
+platform.wiki.users.invitation.accept.label=Accettazione
+platform.wiki.users.invitation.message.label=Messaggio d'Invito
+platform.wiki.users.invitation.reject.label=Rifiuto
+platform.wiki.users.invitation.reply.hint=Un messaggio di risposta, visibile dall'amministratore del wiki, che si deve inviare per motivare la propria decisione.
+platform.wiki.users.invitation.reply.title=Risposta
+platform.wiki.users.invitation.title=Siete stato invitato ad iscrivervi al wiki {0}{1}{2}.
+platform.wiki.users.invitation.userAcceptedNotification=L''utente "{0}" ({1}) ha accettato l''invito ad iscriversi al wiki "{2}" ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=L''utente {0}{1}{2} ha accettato l''invito e si è iscritto con successo al wiki {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=L''utente {0}{1}{2} ha rifiutato con successo la richiesta d''iscrizione al wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=Sicuri di volersi iscrivere al wiki {0}{1}{2}?
+platform.wiki.users.join.error.needInvitation=Questo wiki è solo a inviti. Per poter iscriversi, si deve ricevere un invito da uno degli amministratori.
+platform.wiki.users.join.no=No
+platform.wiki.users.join.request.cancelConfirmation=Sicuri di voler annullare la richiesta di iscrizione al wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelNo=No
+platform.wiki.users.join.request.cancelSuccess=L''utente {0}{1}{2} ha annullato con successo la richiesta d''iscrizione al wiki {3}{4}{5}.
+platform.wiki.users.join.request.cancelYes=Sì
+platform.wiki.users.join.request.hint=Per iscriversi al wiki {0}{1}{2} si deve prima richiedere l''iscrizione. In seguito un amministratore esaminerà la richiesta e valuterà se accettarla o respingerla.
+platform.wiki.users.join.request.message.hint=Un messaggio, visibile dall'amministratore del wiki, che si deve inviare per motivare la richiesta di iscrizione al wiki.
+platform.wiki.users.join.request.pendingRequestExists=L''utente {0}{1}{2} ha già una richiesta in sospeso d''iscrizione al wiki {3}{4}{5}. Attendere che un amministratore del wiki la processi.
+platform.wiki.users.join.request.saveNotification=L''utente "{0}" ({1}) ha richiesto l''iscrizione al wiki "{2}" ({3}).
+platform.wiki.users.join.request.success=L''utente {0}{1}{2} ha inviato con successo la richiesta d''iscrizione al wiki {3}{4}{5}.
+platform.wiki.users.join.success=L''utente {0}{1}{2} si è iscritto con successo al wiki {3}{4}{5}.
+platform.wiki.users.join.title=Iscriviti al Wiki
+platform.wiki.users.join.yes=Sì
+platform.wiki.users.leave.confirmation=Sicuri di volersi cancellare dal wiki {0}{1}{2}?
+platform.wiki.users.leave.confirmation.no=No
+platform.wiki.users.leave.confirmation.yes=Sì
+platform.wiki.users.leave.empty=Lascia il Wiki
+platform.wiki.users.leave.error.userIsOwner=L''utente ''{0}{1}{2} è il proprietario del wiki {3}{4}{5}. Il proprietario del wiki non può lasciarlo a meno che il wiki sia eliminato o che cambi il proprietario.
+platform.wiki.users.leave.success=L''utente {0}{1}{2} ha lasciato con successo il wiki {3}{4}{5}.
+platform.wiki.users.leave.title=Lascia il Wiki "{0}"
+platform.wiki.users.logInToContinue=Per continuare si deve prima fare il {0}log in{1}.
+platform.wiki.users.userAlreadyMemberOfWiki=L''utente {0}{1}{2} è già un membro del wiki {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=L''utente {0}{1}{2} non è un membro del wiki {3}{4}{5}.
+</content>
+</xwikidoc>

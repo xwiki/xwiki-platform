@@ -49,6 +49,10 @@ public class DatabaseProductTest extends TestCase
         product = DatabaseProduct.toProduct("Unknown");
         assertEquals(DatabaseProduct.UNKNOWN, product);
         assertSame(DatabaseProduct.UNKNOWN, product);
+
+        product = DatabaseProduct.toProduct("H2");
+        assertEquals(DatabaseProduct.H2, product);
+        assertSame(DatabaseProduct.H2, product);
     }
 
     public void testDifference()

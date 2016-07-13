@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.mock;
-
 import java.net.URL;
 
 import org.junit.Before;
@@ -29,10 +27,11 @@ import org.junit.Test;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -40,12 +39,17 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.web.Utils;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * TODO DOCUMENT ME!
@@ -54,9 +58,9 @@ import com.xpn.xwiki.web.Utils;
  */
 @ComponentList({DefaultModelContext.class, DefaultModelConfiguration.class, LocalStringEntityReferenceSerializer.class,
 RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
-CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
-DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
+CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceProvider.class,
+CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceProvider.class,
+DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
 public class DefaultSolrIndexerTest
 {
     @Rule
@@ -66,6 +70,8 @@ public class DefaultSolrIndexerTest
     private XWikiContext xcontext;
 
     private XWiki xwiki;
+
+    private SolrConfiguration mockConfig;
 
     @Before
     public void configure() throws Exception
@@ -79,11 +85,15 @@ public class DefaultSolrIndexerTest
         // XWikiContext
 
         this.xcontext = new XWikiContext();
-        this.xcontext.setDatabase("xwiki");
+        this.xcontext.setWikiId("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
+        // Solr configuration
+
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+        this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
+        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), anyString()))
+            .thenReturn(url.getPath());
     }
 
     @Test

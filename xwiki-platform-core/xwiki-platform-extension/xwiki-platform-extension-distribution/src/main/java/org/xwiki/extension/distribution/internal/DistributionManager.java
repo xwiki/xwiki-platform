@@ -27,7 +27,6 @@ import org.xwiki.extension.distribution.internal.job.FarmDistributionJob;
 import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 
 /**
  * @version $Id$
@@ -144,12 +143,6 @@ public interface DistributionManager
     WikiDistributionJob startWikiJob(String wiki);
 
     /**
-     * @return the current {@link UpgradeMode}
-     * @since 5.0RC1
-     */
-    UpgradeMode getUpgradeMode();
-
-    /**
      * @return the distribution job object that can be used to get information like the job status
      * @since 5.0RC1
      */
@@ -169,7 +162,7 @@ public interface DistributionManager
     DistributionJob getCurrentDistributionJob();
 
     /**
-     * @return true it's allowed to display the Distribution Wizard in the current context
+     * @return true if it's allowed to display the Distribution Wizard in the current context
      */
     boolean canDisplayDistributionWizard();
 }

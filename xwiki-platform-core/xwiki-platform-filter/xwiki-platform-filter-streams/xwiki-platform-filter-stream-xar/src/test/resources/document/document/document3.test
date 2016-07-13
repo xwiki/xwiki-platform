@@ -1,0 +1,38 @@
+.#------------------------------------------------------------------------------
+.input|xwiki+xar/1.1
+.# Empty document
+.#------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+</xwikidoc>
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <wikiDocumentLocale>
+      <wikiDocumentRevision>
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <org.xwiki.rendering.syntax.Syntax>
+                <type>
+                  <name>XWiki</name>
+                  <id>xwiki</id>
+                </type>
+                <version>1.0</version>
+              </org.xwiki.rendering.syntax.Syntax>
+            </entry>
+            <entry>
+              <string>hidden</string>
+              <boolean>false</boolean>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

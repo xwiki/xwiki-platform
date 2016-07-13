@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -39,19 +41,16 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.ModificationsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.ModificationsResourceImpl")
 public class ModificationsResourceImpl extends XWikiResource implements ModificationsResource
 {
     @Override
     public History getModifications(String wikiName, Integer start, Integer number, String order, Long ts,
             Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
-
         try {
             History history = new History();
-
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String query = String.format("select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author,"
                 + " rcs.comment from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
@@ -60,12 +59,13 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
 
             List<Object> queryResult = null;
             queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("date", new Date(ts)).setLimit(number)
-                    .setOffset(start).execute();
+                    .setOffset(start).setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
-                String spaceName = (String) fields[0];
+                String spaceId = (String) fields[0];
+                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
                 String pageName = (String) fields[1];
                 String language = (String) fields[2];
                 if (language.equals("")) {
@@ -78,7 +78,7 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
                 String comment = (String) fields[6];
 
                 HistorySummary historySummary = DomainObjectFactory.createHistorySummary(objectFactory,
-                        uriInfo.getBaseUri(), wikiName, spaceName, pageName, language, nodeId.getVersion(), modifier,
+                        uriInfo.getBaseUri(), wikiName, spaces, pageName, language, nodeId.getVersion(), modifier,
                         modified, comment, Utils.getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
@@ -87,8 +87,6 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
             return history;
         } catch (QueryException e) {
             throw new XWikiRestException(e);
-        } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

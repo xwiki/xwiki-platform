@@ -44,11 +44,7 @@ public class ImageMetaDataExtractorTest extends WysiwygTestCase
      */
     private ImageMetaDataExtractor extractor;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -57,11 +53,7 @@ public class ImageMetaDataExtractorTest extends WysiwygTestCase
         extractor = new ImageMetaDataExtractor();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygTestCase#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         super.gwtTearDown();

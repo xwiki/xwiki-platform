@@ -33,7 +33,9 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
@@ -80,6 +82,9 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
     @Inject
     private ModelBridge modelBridge;
 
+    @Inject
+    private ModelContext modelContext;
+
     /**
      * The component used to serialize entity references.
      */
@@ -92,17 +97,22 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
         XDOM xdom = null;
         if (isSheetExpected(document, parameters)) {
             Map<String, Object> backupObjects = null;
+            EntityReference currentWikiReference = null;
             try {
                 // It is very important to determine the sheet in a new, isolated, execution context, if the given
-                // document is not the currently on the execution context. Put the given document in the context only if
+                // document is not currently on the execution context. Put the given document in the context only if
                 // it's not already there.
-                if (document != modelBridge.getCurrentDocument()) {
+                if (!modelBridge.isCurrentDocument(document)) {
                     backupObjects = modelBridge.pushDocumentInContext(document);
+
+                    currentWikiReference = modelContext.getCurrentEntityReference();
+                    modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
                 }
                 xdom = maybeDisplayWithSheet(document, parameters);
             } finally {
                 if (backupObjects != null) {
                     documentAccessBridge.popDocumentFromContext(backupObjects);
+                    modelContext.setCurrentEntityReference(currentWikiReference);
                 }
             }
         }
@@ -203,36 +213,12 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
             return null;
         }
 
-        if (modelBridge.hasProgrammingRights(document) ^ modelBridge.hasProgrammingRights(sheet)) {
-            // FIXME: If the displayed document and the sheet don't have the same programming rights then we preserve
-            // the programming rights of the sheet by rendering it as if the author of the displayed document is the
-            // author of the sheet.
-            return displayAsSheetAuthor(document, sheet, parameters);
-        } else {
-            return display(document, sheet, parameters);
-        }
-    }
+        DocumentModelBridge originalSecurityDoc = this.modelBridge.setSecurityDocument(sheet);
 
-    /**
-     * Displays a document with a sheet, changing the document content author to match the sheet content author in order
-     * to preserve the programming rights of the sheet.
-     * 
-     * @param document the displayed document
-     * @param sheet the applied sheet
-     * @param parameters the display parameters
-     * @return the result of displaying the sheet in the context of the given document
-     */
-    private XDOM displayAsSheetAuthor(DocumentModelBridge document, DocumentModelBridge sheet,
-        DocumentDisplayerParameters parameters)
-    {
-        DocumentReference documentContentAuthorReference = modelBridge.getContentAuthorReference(document);
         try {
-            // This is a hack. We need a better way to preserve the programming rights level of the sheet.
-            modelBridge.setContentAuthorReference(document, modelBridge.getContentAuthorReference(sheet));
             return display(document, sheet, parameters);
         } finally {
-            // Restore the content author of the target document.
-            modelBridge.setContentAuthorReference(document, documentContentAuthorReference);
+            this.modelBridge.setSecurityDocument(originalSecurityDoc);
         }
     }
 

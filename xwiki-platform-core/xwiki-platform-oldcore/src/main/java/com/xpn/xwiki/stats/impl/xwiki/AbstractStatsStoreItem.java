@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class of interface {@link XWikiStatsStoreItem}.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -98,7 +98,7 @@ public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem
 
     /**
      * Store provided statistics into the database.
-     * 
+     *
      * @param statsList the list of statistics item to store.
      * @since 2.2.4
      */

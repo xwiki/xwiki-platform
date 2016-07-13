@@ -1,0 +1,94 @@
+#set ($defaultTreeOptions = {
+  'checkboxes': false,
+  'class': 'xtree',
+  'contextMenu': false,
+  'dragAndDrop': false,
+  'edges': true,
+  'finder': false,
+  'icons': true,
+  'limit': 15,
+  'links': false,
+  'openTo': '',
+  'reference': '',
+  'root': '',
+  'showRoot': false
+})
+
+#macro (tree $options)
+  <div #treeAttributes($options)></div>
+#end
+
+#macro (treeAttributes $options $isWikiSyntax)
+  #set ($attributes = {})
+  #getTreeAttributes($options $attributes)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/tree.min.js', true))
+  #if ($attributes.get('data-finder'))
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+      'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #end
+  #foreach ($entry in $attributes.entrySet())
+    #set ($value = "$!entry.value")
+    #if ($isWikiSyntax)
+      #set ($escapedValue = $value.replaceAll('([~"])', '~$1'))
+    #else
+      #set ($escapedValue = $escapetool.xml($value))
+    #end
+    $entry.key = "$escapedValue"##
+  #end
+#end
+
+#macro (getTreeAttributes $options $attributes)
+  #set ($macro.options = {})
+  #set ($discard = $macro.options.putAll($defaultTreeOptions))
+  #set ($discard = $macro.options.putAll($options))
+  #set ($classes = ["$!macro.options.get('class')"])
+  #set ($noLinks = $macro.options.links != 'true')
+  #if ($noLinks)
+    #set ($discard = $classes.add('jstree-no-links'))
+  #end
+  #set ($discard = $attributes.put('class', $stringtool.join($classes, ' ')))
+  #set ($discard = $attributes.put('data-responsive', true))
+  #if ("$!macro.options.reference" != '')
+    #set ($defaultResourceParams = {
+      'limit': 15,
+      'root': '',
+      'showRoot': false
+    })
+    #set ($resourceParams = {})
+    #foreach ($entry in $defaultResourceParams.entrySet())
+      #set ($value = $macro.options.get($entry.key))
+      #if ("$!value" != '' && $value != "$!entry.value")
+        #set ($discard = $resourceParams.put($entry.key, $value))
+      #end
+    #end
+    #set ($reference = $macro.options.reference)
+    #if ($reference.startsWith('path:'))
+      ## URL/Path reference
+      #set ($resourceURL = $reference.substring(5))
+      #set ($resourceURL = "$resourceURL#if ($resourceURL.indexOf('?') < 0)?#else&#end$escapetool.url($resourceParams)")
+    #else
+      ## Document reference
+      #if ($reference.startsWith('doc:'))
+        #set ($reference = $reference.substring(4))
+      #end
+      #set ($resourceParams.outputSyntax = 'plain')
+      #set ($resourceURL = $xwiki.getURL($reference, 'get', $escapetool.url($resourceParams)))
+    #end
+    #set ($discard = $attributes.put('data-url', $resourceURL))
+  #end
+  #set ($dragAndDrop = $macro.options.dragAndDrop == 'true')
+  #set ($discard = $attributes.put('data-dragAndDrop', $dragAndDrop))
+  #set ($contextMenu = $macro.options.contextMenu == 'true')
+  #set ($discard = $attributes.put('data-contextMenu', $contextMenu))
+  #set ($icons = $macro.options.icons == 'true')
+  #set ($discard = $attributes.put('data-icons', $icons))
+  #set ($edges = $macro.options.edges == 'true')
+  #set ($discard = $attributes.put('data-edges', $edges))
+  #set ($checkboxes = $macro.options.checkboxes == 'true')
+  #set ($discard = $attributes.put('data-checkboxes', $checkboxes))
+  #set ($discard = $attributes.put('data-openTo', $macro.options.openTo))
+  #set ($finder = $macro.options.finder == 'true')
+  #set ($discard = $attributes.put('data-finder', $finder))
+#end

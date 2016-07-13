@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-vfs</artifactId>
+    <version>8.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-vfs-api</artifactId>
+  <name>XWiki Platform - VFS - API</name>
+  <packaging>jar</packaging>
+  <description>Access content of archives (Zip, Tar, Jar, GZip, etc)</description>
+  <properties>
+    <truevfs.version>0.11.0</truevfs.version>
+    <truecommons.version>2.5.0</truecommons.version>
+    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>VFS API</xwiki.extension.name>
+    <!-- This extension needs to be installed at the farm level (ie in the root namespace) to work fine.
+         This is because is contributes a new URL Resource Handler and those need to be installed in the
+         root Component Manager (since they're executed before the wiki is extracted from the URL during
+         the URL parsing process). -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-access</artifactId>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-jar</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-zip</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-kernel-impl</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truecommons</groupId>
+      <artifactId>truecommons-key-default</artifactId>
+      <scope>runtime</scope>
+      <version>${truecommons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-http</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-odf</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-bzip2</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-gzip</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-tar-xz</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truevfs</groupId>
+      <artifactId>truevfs-driver-zip-raes</artifactId>
+      <scope>runtime</scope>
+      <version>${truevfs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.truecommons</groupId>
+      <artifactId>truecommons-key-macosx</artifactId>
+      <scope>runtime</scope>
+      <version>${truecommons.version}</version>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

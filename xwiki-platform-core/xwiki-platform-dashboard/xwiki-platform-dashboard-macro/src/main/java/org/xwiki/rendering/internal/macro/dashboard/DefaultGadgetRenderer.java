@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.macro.dashboard;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -38,6 +40,7 @@ import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
  * @since 3.0rc1
  */
 @Component
+@Singleton
 public class DefaultGadgetRenderer implements GadgetRenderer
 {
     /**

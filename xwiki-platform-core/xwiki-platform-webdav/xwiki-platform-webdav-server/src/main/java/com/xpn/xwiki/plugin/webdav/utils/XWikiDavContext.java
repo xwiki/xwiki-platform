@@ -37,11 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 
@@ -51,7 +49,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -131,7 +128,7 @@ public class XWikiDavContext
 
             xwikiContext = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
             xwikiContext.setMode(XWikiContext.MODE_SERVLET);
-            xwikiContext.setDatabase("xwiki");
+            xwikiContext.setWikiId("xwiki");
 
             ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
@@ -175,14 +172,11 @@ public class XWikiDavContext
     {
         try {
             CacheManager cacheManager = Utils.getComponent(CacheManager.class, "default");
-            CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-            lec.setTimeToLive(300);
+            lec.setMaxIdle(300);
             conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
-            davCache = factory.newCache(conf);
-        } catch (ComponentLookupException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            davCache = cacheManager.createNewCache(conf);
         } catch (CacheException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
@@ -339,7 +333,12 @@ public class XWikiDavContext
     {
         try {
             // Delete the current attachment
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(
+                document,
+                "Move attachment [" + attachment.getFilename() + "] to document ["
+                    + destinationDoc.getDocumentReference() + "]", this.xwikiContext);
             // Rename the (in memory) attachment.
             attachment.setFilename(newAttachmentName);
             // Add the attachment to destination doc.
@@ -362,7 +361,11 @@ public class XWikiDavContext
     public void deleteAttachment(XWikiAttachment attachment) throws DavException
     {
         try {
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(document, "Deleted attachment [" + attachment.getFilename() + "]",
+                this.xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }

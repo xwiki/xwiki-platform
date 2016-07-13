@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.macro.cache;
 import java.io.StringWriter;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
@@ -37,6 +36,7 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link CacheMacro}.
@@ -58,12 +58,12 @@ public class CacheMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-        this.cacheMacro = (CacheMacro) getComponentManager().getInstance(Macro.class, "cache");
+        this.cacheMacro = getComponentManager().getInstance(Macro.class, "cache");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
     @Test
-    public void testExecuteWhenNoIdAndSameContent() throws Exception
+    public void executeWhenNoIdAndSameContent() throws Exception
     {
         String expected = "beginDocument\n"
             + "beginMacroMarkerStandalone [velocity] [] [$var]\n"
@@ -93,7 +93,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testExecuteWhenNoIdAndDifferentContent() throws Exception
+    public void executeWhenNoIdAndDifferentContent() throws Exception
     {
         String expected1 = "beginDocument\n"
             + "beginMacroMarkerStandalone [velocity] [] [$var]\n"
@@ -130,7 +130,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testExecuteWhenSameIdAndDifferentContent() throws Exception
+    public void executeWhenSameIdAndDifferentContent() throws Exception
     {
         String expected = "beginDocument\n"
             + "beginMacroMarkerStandalone [velocity] [] [$var]\n"
@@ -159,7 +159,7 @@ public class CacheMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testExecuteWithIdGeneratedByVelocityMacro() throws Exception
+    public void executeWithIdGeneratedByVelocityMacro() throws Exception
     {
         VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
@@ -176,11 +176,11 @@ public class CacheMacroTest extends AbstractComponentTestCase
         // is the same even the cache macro content is different.
         params.setId("generatedid");
         List<Block> result2 = this.cacheMacro.execute(params, "something else", context);
-        Assert.assertEquals(result1, result2);
+        assertEquals(result1, result2);
     }
 
     @Test
-    public void testExecuteWithDifferentTimeToLive() throws Exception
+    public void executeWithDifferentTimeToLive() throws Exception
     {
         CacheMacroParameters params = new CacheMacroParameters();
         MacroTransformationContext context = createMacroTransformationContext();
@@ -194,11 +194,11 @@ public class CacheMacroTest extends AbstractComponentTestCase
         // cache will be used and thus the first cached content won't be returned.
         params.setTimeToLive(200);
         List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
-        Assert.assertFalse(result2.equals(result1));
+        assertFalse(result2.equals(result1));
     }
 
     @Test
-    public void testExecuteWithDifferentMaxEntries() throws Exception
+    public void executeWithDifferentMaxEntries() throws Exception
     {
         CacheMacroParameters params = new CacheMacroParameters();
         MacroTransformationContext context = createMacroTransformationContext();
@@ -212,13 +212,12 @@ public class CacheMacroTest extends AbstractComponentTestCase
         // cache will be used and thus the first cached content won't be returned.
         params.setMaxEntries(11);
         List<Block> result2 = this.cacheMacro.execute(params, "content2", context);
-        Assert.assertFalse(result2.equals(result1));
+        assertFalse(result2.equals(result1));
     }
 
     private MacroTransformationContext createMacroTransformationContext() throws Exception
     {
-        MacroTransformation macroTransformation =
-            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
+        MacroTransformation macroTransformation = getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
         context.setTransformation(macroTransformation);
         context.setSyntax(Syntax.XWIKI_2_0);

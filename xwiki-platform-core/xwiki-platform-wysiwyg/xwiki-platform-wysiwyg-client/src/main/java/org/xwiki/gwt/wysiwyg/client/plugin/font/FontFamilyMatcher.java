@@ -56,11 +56,7 @@ public class FontFamilyMatcher extends AbstractFontMatcher
         right.getStyle().setFontSize(TEST_FONT_SIZE, Unit.PX);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Matcher#match(Object, Object)
-     */
+    @Override
     public boolean match(String leftValue, String rightValue)
     {
         if (super.match(leftValue, rightValue)) {

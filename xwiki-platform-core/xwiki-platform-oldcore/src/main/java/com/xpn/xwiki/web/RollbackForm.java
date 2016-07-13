@@ -60,7 +60,7 @@ public class RollbackForm extends XWikiForm
 
     public String getConfirm()
     {
-        return confirm;
+        return this.confirm;
     }
 
     public void setConfirm(String confirm)

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1418633909000</creationDate>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1422375914000</date>
+  <contentUpdateDate>1422375914000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=Email
+admin.email.description=Configure email (general, mail sending) and view mail statuses.
+admin.emailgeneral=General
+admin.emailgeneral.description=Configure general email parameters.
+admin.emailsend=Mail Sending
+admin.emailsend.description=Configure mail sending parameters.
+admin.emailstatus=Mail Sending Status
+admin.emailstatus.description=View the statuses of sent mails.
+Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
+Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
+Mail.SendMailConfigClass_from=Email address to send from
+Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
+Mail.SendMailConfigClass_bcc=BCC email addresses
+Mail.SendMailConfigClass_bcc.hint=A default comma-separated list of BCC email addresses to use when sending mail
+Mail.SendMailConfigClass_host=Email Server
+Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "localhost"
+Mail.SendMailConfigClass_port=Email Server Port
+Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
+Mail.SendMailConfigClass_username=Email Server Username
+Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
+Mail.SendMailConfigClass_password=Email Server Password
+Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
+Mail.SendMailConfigClass_properties=Additional Properties
+Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
+Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
+Mail.SendMailConfigClass_sendWaitTime.hint=The delay to wait between each mail being sent, in milliseconds (defaults to 8 seconds)
+Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Whether mail statuses are kept or not for mail that have been sent successfully (defaults to true)
+Mail.SendMailStatus_livetable.date=Date
+Mail.SendMailStatus_livetable.batchId=Batch ID
+Mail.SendMailStatus_livetable.type=Type
+Mail.SendMailStatus_livetable.recipients=Recipients
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Error
+Mail.SendMailStatus_livetable.actions=Actions
+Mail.SendMailStatus_livetable.resend=Resend
+mailSender.admin.resendSuccess=The mail has been resent successfully
+mailSender.admin.resendFailure=The mail has failed again to be sent. Click for more details.</content>
+  <object>
+    <name>Mail.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>3717d543-149c-4119-a7d5-cef10dedd8d9</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

@@ -148,11 +148,13 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
 
         cleaner.clean(currentHTML, new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 cleanHTMLTextArea.setText(caught.toString());
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 cleanHTMLTextArea.setText(result);
@@ -161,11 +163,13 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
 
         converter.fromHTML(currentHTML, editor.getConfig().getSyntax(), new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 wikiTextArea.setText(caught.toString());
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 wikiTextArea.setText(result);
@@ -174,11 +178,13 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
 
         converter.fromHTML(currentHTML, "event/1.0", new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 eventsTextArea.setText(caught.toString());
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 eventsTextArea.setText(result);
@@ -186,11 +192,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TimerListener#onElapsed(Timer)
-     */
+    @Override
     public void onElapsed(Timer sender)
     {
         if (sender == timer) {

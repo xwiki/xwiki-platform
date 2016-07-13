@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="Main.SolrSpaceFacet" locale="">
+  <web>Main</web>
+  <name>SolrSpaceFacet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1442223472000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1442242125000</date>
+  <contentUpdateDate>1442242057000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#macro (displaySearchFacetValue_space $facetPrettyValue)
+  #set ($localSpaceReference = $stringtool.removeEnd($stringtool.substringAfter($facetValue.name, '/'), '.'))
+  #set ($spaceReference = $services.model.resolveSpace($localSpaceReference))
+  #set ($spaceDocument = $xwiki.getDocument($spaceReference))
+  #if ($spaceDocument)
+    $spaceDocument.plainTitle
+  #else
+    $spaceReference.name
+  #end
+#end
+#macro (getSpaceFacetHierarchyPathData $spaceReference $return $options)
+  #getHierarchyPath($spaceReference $path $options)
+  #getHierarchyPathLabels($path $labels $options)
+  #set ($macro.data = [])
+  #foreach ($reference in $path)
+    #set ($url = $NULL)
+    #if ($reference.type == 'SPACE' &amp;&amp; $foreach.index &lt; $mathtool.sub($path.size(), 1))
+      #set ($localReference = $services.model.serialize($reference, 'local'))
+      #set ($queryStringParameters = {
+        $facetRequestParameter: "$mathtool.sub($reference.size(), 2)/${localReference}.",
+        'firstIndex': []
+      })
+      #extendQueryString($url $queryStringParameters)
+    #elseif ($reference.type == 'WIKI')
+      ## Reset the location facet.
+      #set ($queryStringParameters = {$facetRequestParameter: [], 'firstIndex': []})
+      #extendQueryString($url $queryStringParameters)
+    #end
+    #set ($discard = $macro.data.add({
+      'reference': $reference,
+      'label': $labels.get($foreach.index),
+      'url': $url
+    }))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.data)
+#end
+{{html}}
+#set ($discard = $xwiki.ssx.use('Main.SolrSpaceFacet'))
+#if ($facetRequestValues &amp;&amp; $facetRequestValues.size() &gt; 0)
+  #set ($localSpaceReference = $stringtool.removeEnd($stringtool.substringAfter($facetRequestValues.get(0), '/'), '.'))
+  #set ($spaceReference = $services.model.resolveSpace($localSpaceReference))
+  #set ($spaceFacetHierarchyOptions = {'limit': 4})
+  #getSpaceFacetHierarchyPathData($spaceReference $pathData $spaceFacetHierarchyOptions)
+  &lt;div class="selectedLocation"&gt;
+    #displayHierarchyPath($pathData $spaceFacetHierarchyOptions)
+  &lt;/div&gt;
+#end
+#retainMatchedRequestValues()
+#displaySearchFacetValues($facetValues {} 'displaySearchFacetValue_space')
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>Main.SolrSpaceFacet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>334bc1f3-e135-437e-9263-a405838cba19</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.search-facet-body .selectedLocation .breadcrumb {
+  margin: .5em 0;
+}
+.search-facet-body .selectedLocation .breadcrumb li {
+  padding: 0;
+}
+.search-facet-body .selectedLocation .breadcrumb li:hover {
+  background-color: transparent;
+}
+.search-facet-body .selectedLocation .breadcrumb a {
+  color: $theme.textSecondaryColor;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

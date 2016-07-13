@@ -1,12 +1,14 @@
 #template('colorThemeInit.vm')
 .meta-versionSummary label {
   color: $theme.textSecondaryColor;
-  display: block;
   font-size: .85em;
   font-weight: 700;
   margin: 10px 0 4px !important; /* !important overrides Toucan rules */
   text-align: left !important; /* !important overrides Toucan rules */
   text-transform: uppercase;
+}
+.skin-colibri .meta-versionSummary label {
+  display: block;
 }
 .meta-versionSummary span {
   text-transform: none;

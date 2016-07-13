@@ -34,7 +34,7 @@ import org.xwiki.rest.model.jaxb.Object;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}")
 public interface ObjectResource
 {
     @GET Object getObject(

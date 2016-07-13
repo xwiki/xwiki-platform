@@ -42,16 +42,16 @@ public class ObjectRemoveAction extends XWikiAction
         String className = form.getClassName();
         int classId = form.getClassId();
         if (StringUtils.isBlank(className)) {
-            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
-                "platform.core.action.objectRemove.noClassnameSpecified"));
+            ((VelocityContext) context.get("vcontext")).put("message",
+                localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"));
         } else if (classId < 0) {
-            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
-                "platform.core.action.objectRemove.noObjectSpecified"));
+            ((VelocityContext) context.get("vcontext")).put("message",
+                localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"));
         } else {
             obj = doc.getObject(className, classId);
             if (obj == null) {
-                ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
-                    "platform.core.action.objectRemove.invalidObject"));
+                ((VelocityContext) context.get("vcontext")).put("message",
+                    localizePlainOrKey("platform.core.action.objectRemove.invalidObject"));
             }
         }
         return obj;
@@ -76,7 +76,7 @@ public class ObjectRemoveAction extends XWikiAction
 
         doc.removeObject(obj);
         doc.setAuthor(username);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.deleteObject"), true, context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);

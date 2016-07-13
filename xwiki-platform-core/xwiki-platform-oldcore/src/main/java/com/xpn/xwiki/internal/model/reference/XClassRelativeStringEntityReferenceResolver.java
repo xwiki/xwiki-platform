@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReference;
  * The behavior is the one defined in {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver}
  * except that it uses a space with the "XWiki" value if no space is specified and that an optional parameter can be
  * passed to specify what page name to use if no page is specified in the passed string representation.
- * 
+ *
  * @version $Id$
  * @since 2.2.3
  * @deprecated this is only a backward compatibility resolver since the old behavior for class reference was to use the
@@ -46,7 +46,7 @@ import org.xwiki.model.reference.EntityReference;
 public class XClassRelativeStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
         if (type == EntityType.DOCUMENT) {
             // This means that the user has not passed an optional page reference and we don't have a fallback, we
@@ -68,8 +68,8 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
             EntityReference extractedPageReference =
                 ((EntityReference) parameters[0]).extractReference(EntityType.DOCUMENT);
             if (extractedPageReference != null) {
-                explicitReference = new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT,
-                    explicitReference);
+                explicitReference =
+                    new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT, explicitReference);
             }
         }
 

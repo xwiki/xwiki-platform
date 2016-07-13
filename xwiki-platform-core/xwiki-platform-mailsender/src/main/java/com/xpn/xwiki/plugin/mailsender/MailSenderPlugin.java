@@ -59,7 +59,9 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -72,8 +74,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExternalServletURLFactory;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -249,7 +252,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {
@@ -608,7 +611,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         if (vcontext == null) {
             // Use the original velocity context as a starting point
-            vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            vcontext = new VelocityContext(velocityManager.getVelocityContext());
         }
 
         vcontext.put("from.name", fromAddr);
@@ -635,7 +639,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String ccAddr, String bccAddr,
         Map<String, Object> parameters, XWikiContext context)
     {
-        VelocityContext vcontext = new VelocityContext((VelocityContext) context.get("vcontext"));
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+        VelocityContext vcontext = new VelocityContext(velocityManager.getVelocityContext());
 
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
@@ -797,11 +802,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
         XWikiURLFactory originalURLFactory = context.getURLFactory();
-        // Backup the Locale and restore it in the finally block
-        // because setting the language below to the given language changes the locale.
         Locale originalLocale = context.getLocale();
         try {
             context.setURLFactory(new ExternalServletURLFactory(context));
+            context.setLocale(LocaleUtils.toLocale(language));
             VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
@@ -819,12 +823,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             String txtContent = obj.getStringValue("text");
             String htmlContent = obj.getStringValue("html");
 
-            String subject =
-                XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
-            String msg =
-                XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
-            String html =
-                XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
+            String subject = evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
+            String msg = evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
+            String html = evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
 
             Mail mail = new Mail();
             mail.setFrom((String) updatedVelocityContext.get("from.address"));
@@ -846,6 +847,24 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         } finally {
             context.setURLFactory(originalURLFactory);
             context.setLocale(originalLocale);
+        }
+    }
+
+    private String evaluate(String content, String name, VelocityContext vcontext, XWikiContext context)
+    {
+        StringWriter writer = new StringWriter();
+        try {
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
+            return writer.toString();
+        } catch (Exception e) {
+            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
+            Object[] args = { name };
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
+                    e, args);
+            return Util.getHTMLExceptionMessage(xe, context);
         }
     }
 

@@ -1,0 +1,6 @@
+###
+### Changes page in the "view" mode
+###
+#set($titleToDisplay = $services.localization.render('core.viewers.diff.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()]))
+#template('contentheader.vm')
+#template("changesinline.vm")

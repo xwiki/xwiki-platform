@@ -58,11 +58,7 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
      */
     private TableMenuExtension menuExtension;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(XRichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea rta, Config config)
     {
         super.init(rta, config);
@@ -95,11 +91,7 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
         disableInlineTableEditing();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         for (TableFeature feature : features) {
@@ -131,21 +123,13 @@ public class TablePlugin extends AbstractPlugin implements CommandListener
         return features;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if ("enable".equalsIgnoreCase(command.toString())) {

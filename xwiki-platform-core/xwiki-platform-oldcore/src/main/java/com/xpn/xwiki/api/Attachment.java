@@ -20,11 +20,14 @@
 package com.xpn.xwiki.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,6 +36,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class Attachment extends Api
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Attachment.class);
+
     private Document doc;
 
     private XWikiAttachment attachment;
@@ -143,6 +149,17 @@ public class Attachment extends Api
         }
     }
 
+    public InputStream getContentInputStream()
+    {
+        try {
+            return this.attachment.getContentInputStream(getXWikiContext());
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get attachment input stream", e);
+
+            return null;
+        }
+    }
+
     public String getContentAsString() throws XWikiException
     {
         // TODO: detect correct encoding for XML files?
@@ -222,7 +239,7 @@ public class Attachment extends Api
 
     /**
      * Allow to easily access any revision of an attachment.
-     * 
+     *
      * @param rev Version to access, in the "Major.minor" format.
      * @return Attachment API object, or <tt>null</tt> if the requested version does not exist.
      * @throws XWikiException In case of an error.

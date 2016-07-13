@@ -52,11 +52,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
      */
     private Executable executable;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -73,6 +69,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("");
@@ -93,6 +90,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestInsertHeaderAroundCaret();
@@ -137,6 +135,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestInsertHeaderAroundSelection();
@@ -213,6 +212,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestChangeBlock();
@@ -256,6 +256,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestDetectHeaderFromASpanWithDisplayBlock();

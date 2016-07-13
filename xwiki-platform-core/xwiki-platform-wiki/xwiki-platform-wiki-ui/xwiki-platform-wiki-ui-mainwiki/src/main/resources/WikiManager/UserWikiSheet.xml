@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>UserWikiSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1392888654000</creationDate>
+  <parent>XWiki.XWikiUserSheet</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1393434253000</date>
+  <contentUpdateDate>1393434253000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($obj = $doc.getObject('XWiki.XWikiUsers'))
+#if (!$obj)
+= {{translation key="xe.admin.users.sheet"/}} =
+
+{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
+#else
+  #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
+  #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
+  #set($temp = $doc.use($obj))
+  #set ($currentUser = $xcontext.user)
+  #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
+    #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
+  #end
+  #set($documentUser = $doc.prefixedFullName)
+  #set($isMyProfile = ($currentUser == $documentUser))
+  {{html clean='false'}}
+  &lt;div class='half column'&gt;
+    &lt;div class='profile-section highlighted-profile-section'&gt;
+      &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
+      #set ($joinedWikis = [])
+      #set ($wikis = $services.wiki.getAll())
+      #foreach ($wiki in $wikis)
+        #if($services.wiki.user.isMember($currentUser, $wiki.id))
+          #set($temp = $joinedWikis.add($wiki))
+        #end
+      #end
+      #if ($joinedWikis.size() == 0)
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
+      #else
+        &lt;ul id='wikis'&gt;
+        #foreach ($wiki in $joinedWikis)
+          &lt;li id='$wiki.id'&gt;
+            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+          &lt;/li&gt;
+        #end
+        &lt;/ul&gt;
+      #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  {{/html}}
+
+  {{html clean='false' wiki='true'}}
+  &lt;div id='wikiActivity' class='half column'&gt;
+    &lt;div id='wikiActivityColumn'&gt;
+    #if("$!request.wikiName" != '')
+      {{include reference="WikiManager.WikiActivityServiceCode" /}}
+    #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+  {{/html}}
+#end## User object exists
+{{/velocity}}</content>
+  <object>
+    <name>WikiManager.UserWikiSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>80a56ef7-cc1d-4206-a749-9066de3e32df</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+
+XWiki.UserWikiTab = Class.create({
+  initialize : function () {
+    this.addListeners();
+  },
+
+  addListeners : function() {
+    var elements = $('wikis') ? $('wikis').childElements() : [];
+    for (var i = 0; i &lt; elements.length; ++i) {
+      elements[i].down('.wikiActivity a').observe('click', this.onWikiClicked);
+    }
+  },
+
+  onWikiClicked : function (event) {
+    event.stop();
+    var element = Event.element(event);
+    var wikiId = element.up('li').id;
+    new Ajax.Request("$xwiki.getURL('WikiManager.WikiActivityServiceCode')", {
+      parameters: {
+        'xpage' : 'plain',
+        'wikiName' : wikiId
+      },
+
+      onCreate : function() {
+        $('wikiActivityColumn').innerHTML = '&lt;span class="loading"&gt;Loading...&lt;/span&gt;';
+      }.bind(this),
+
+      onSuccess : function(response) {
+        $('wikiActivityColumn').innerHTML = response.responseText;
+      }.bind(this),
+
+      onFailure: function(response) {
+        var failureReason = response.statusText;
+        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+          failureReason = 'Server not responding';
+        }
+        $('wikiActivityColumn').innerHTML = '&lt;span&gt;Failed to load activity stream. Reason:&lt;/span&gt;&lt;br/&gt;&lt;span&gt;' + failureReason + '&lt;/span&gt;';
+      }.bind(this),
+
+      on0: function (response) {
+        response.request.options.onFailure(response);
+      }.bind(this),
+
+      onComplete : function() {
+      }
+    });
+  }
+});
+
+var init = function() {
+  new XWiki.UserWikiTab();
+};
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>WikiManager.UserWikiSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a20d3a8b-f13e-4d73-8dc4-3e6fb45ddc5f</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template("colorThemeInit.vm")
+
+#wikiActivityColumn {
+  margin: 5px 10px 10px;
+  padding: 5px 10px 10px;
+}
+
+#wikiActivity .loading {
+  padding-left: 20px;
+  background-position: 0 0;
+}
+
+.wikiActivity {
+  float: right;
+  font-size: 0.8em;
+}
+
+#wikis li:hover {
+  background-color: $theme.highlightColor;
+}
+
+#wikis li {
+  padding: 2px 20px 2px 2px;
+}
+
+#wikis {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}</code>
+    </property>
+    <property>
+      <name>wikis</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

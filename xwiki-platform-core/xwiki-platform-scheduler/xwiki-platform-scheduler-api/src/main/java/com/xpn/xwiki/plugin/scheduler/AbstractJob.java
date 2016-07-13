@@ -41,6 +41,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractJob implements Job
 {
+    private XWikiContext xcontext;
+
     @Override
     public final void execute(JobExecutionContext jobContext) throws JobExecutionException
     {
@@ -48,7 +50,10 @@ public abstract class AbstractJob implements Job
 
         // The XWiki context was saved in the Job execution data map. Get it as we'll retrieve
         // the script to execute from it.
-        XWikiContext xwikiContext = (XWikiContext) data.get("context");
+        this.xcontext = (XWikiContext) data.get("context");
+
+        // Clone the XWikiContex to have a new one for each run
+        this.xcontext = this.xcontext.clone();
 
         // Init execution context
         Execution execution;
@@ -58,8 +63,8 @@ public abstract class AbstractJob implements Job
 
             ExecutionContext context = new ExecutionContext();
 
-            // Bridge with old XWiki Context, required for old code.
-            context.setProperty("xwikicontext", xwikiContext);
+            // Bridge with old XWiki Context, required for old code
+            this.xcontext.declareInExecutionContext(context);
 
             ecim.initialize(context);
         } catch (ExecutionContextException e) {
@@ -74,6 +79,11 @@ public abstract class AbstractJob implements Job
             // component as otherwise we will have a potential memory leak.
             execution.removeContext();
         }
+    }
+
+    protected XWikiContext getXWikiContext()
+    {
+        return this.xcontext;
     }
 
     protected abstract void executeJob(JobExecutionContext jobContext) throws JobExecutionException;

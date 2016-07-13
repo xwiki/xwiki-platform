@@ -4,7 +4,7 @@
 .#-----------------------------------------------------
 {{ruby}}
 require 'java'
-include_class 'java.util.TreeSet'
+java_import 'java.util.TreeSet'
 set = TreeSet.new
 set.add "foo"
 set.add "Bar"
@@ -18,7 +18,7 @@ end
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [ruby] [] [require 'java'
-include_class 'java.util.TreeSet'
+java_import 'java.util.TreeSet'
 set = TreeSet.new
 set.add "foo"
 set.add "Bar"
@@ -43,7 +43,7 @@ onSpace
 onWord [foo]
 endParagraph
 endMacroMarkerStandalone [ruby] [] [require 'java'
-include_class 'java.util.TreeSet'
+java_import 'java.util.TreeSet'
 set = TreeSet.new
 set.add "foo"
 set.add "Bar"

@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Class for String [de]serialization for {@link XWikiDocumentArchive}.
- * 
+ *
  * @version $Id$
  * @since 1.2M1
  */
@@ -60,7 +60,7 @@ public class XWikiRCSArchive extends Archive
 
     /**
      * Used to serialize {@link XWikiDocumentArchive}.
-     * 
+     *
      * @param nodeInfos - collection of {@link XWikiRCSNodeInfo} in any order
      * @param context - for loading nodes content
      * @throws XWikiException if can't load nodes content
@@ -99,7 +99,7 @@ public class XWikiRCSArchive extends Archive
 
     /**
      * Used to deserialize {@link XWikiDocumentArchive}.
-     * 
+     *
      * @param archiveText - archive text in JRCS format
      * @throws ParseException if syntax errors
      */
@@ -242,12 +242,6 @@ public class XWikiRCSArchive extends Archive
             return mergedText()[0].toString();
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @throws PatchFailedException
-         * @throws InvalidFileFormatException
-         */
         @Override
         public void patch(List original, boolean annotate) throws InvalidFileFormatException, PatchFailedException
         {

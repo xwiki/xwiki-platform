@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.captcha.CaptchaVerifier;
@@ -31,7 +30,6 @@ import org.xwiki.captcha.CaptchaVerifierNotFoundException;
 import org.xwiki.captcha.XWikiCaptchaService;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.annotation.Component;
 
 /**
  * Provides access to the classes implementing Captcha.
@@ -39,8 +37,6 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 2.2M2
  */
-@Component
-@Singleton
 public class DefaultXWikiCaptchaService implements XWikiCaptchaService
 {
     /** A Map of all captchas by their names. */

@@ -55,6 +55,7 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
      * <p>
      * Applies the underlying style property with the specified value to the nearest block-level ancestor of the given
      * node.
+     * </p>
      * 
      * @see AbstractStyleExecutable#execute(Node, int, int, String)
      */
@@ -94,6 +95,7 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
      * {@inheritDoc}
      * <p>
      * Returns the value of the underlying style property for the nearest block-level ancestor of the given node.
+     * </p>
      * 
      * @see AbstractStyleExecutable#getParameter(Node)
      */

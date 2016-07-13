@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1454940903000</date>
+  <contentUpdateDate>1454940903000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Saites ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Links ===
+
+|=(% style="width:20%" %)Piemērs|=XWiki 1.0 sintakse|=(% style="width:20%" %)Rezultāts
+|Saite uz lapu tekošajā vietā|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
+|Saite ar nosaukumu|{{{[nosaukums&gt;WebHome]}}}|[[nosaukums&gt;&gt;WebHome]]
+|Saite uz lapu norādītā vietā|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
+|Saite uz subviki|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
+|Saite, kas atveras jaunā lapā|{{{[nosaukums&gt;WebHome&gt;_blank]}}}|[[nosaukums&gt;&gt;WebHome||rel="__blank"]]
+|Saite uz URL atklātā tekstā|{{{Šis ir URL: http://xwiki.org}}}|Šis ir URL: http://xwiki.org
+|Saite uz URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
+|Saite uz URL ar nosaukumu|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Saite uz e-pastu|{{{[janis@test.lv&gt;mailto:janis@test.lv]}}}|[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]
+|Saite ar attēlu|{{{&lt;a href="$xwiki.getURL("Vieta1.Lapa1")"&gt;{image:attels.png|document=Vieta2.Lapa2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Saite uz pielikumu|(((
+{{info}}Skatīt papildu informāciju par [[//Attach// makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/AttachMacro]].{{/info}}
+
+{{{{attach:pielikums|file=attels.png}}}}
+)))|[[pielikums&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+
+{{velocity}}$subHeading XWiki 1.0 saišu sintakse $subHeading{{/velocity}}
+
+Pilnais saites formāts ir: ##(nosaukums[|&gt;])+(saite)(@citaVikiAliase)+([|&gt;]mērķis)+##
+
+* ##nosaukums##: neobligāts saites nosaukums, kas tiek parādīts lietotājam gala tekstā, piemēram, "Mana lapa".
+* ##saite##: Saite, kas tiek norādīta sekojošā veidā: ##(virtuālāVikiAliase{{{:}}})+(vieta.)+(reference)(?pieprasījums)+(#enkurs)+##
+* Ņemiet vērā, ka ##saite## vai ##nosaukums## ir jānorāda obligāti.
+** ##virtuālāVikiAliase##: neobligāts virtuālā viki nosaukums (ja tiek izmantoti virtuālie viki). Saite norādīs uz norādīto virtuālo viki, piemēram, "mansviki".
+** ##vieta##: Neobligāts viki vietas nosaukums. Ja vietu nenorāda, tiek izmantota tekošā vieta. Piemērs: "Main".
+** ##reference##: Saites reference. Tā var būt URI formā ##{{{protokols:ceļš}}}## (piemēram: {{{"http://xwiki.org"}}}, {{{"mailto:john@smith.com"}}}) vai arī viki lapas nosaukums(piemēram: "WebHome").
+** ##pieprasījums##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: {{{"?parametrs_1=5&amp;amp;parametrs_2=Sveiki"}}}.
+** ##enkurs##: Neobligāts vietas nosaukums mērķa lapā (enkurs). Ņemiet vērā, ka XWiki automatiski izveido enkurus priekš virsrakstiem. Piemēram: "TableOfContentAnchor".
+* ##citaVikiAliase##: Neobligāta [[cita viki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] aliase, kas definēta InterWiki sarakstā (skatiet [[Administratora rokasgrāmatu&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Piemēram: "vikipēdija"
+* ##mērķis##: Neobligāts HTML ##mērķa## atribūts ko izmanto HTML saites ##a## elementā. Šo parametru izmanto, apstrādājot saiti. Pēc noklusēšanas to atver tekošajā logā. Piemēri: "_self", "_blank"
+
+=== 2.0 Links ===
+
+|=(% style="width:20%" %)Piemērs|=XWiki 2.0 sintakse|=(% style="width:20%" %)Rezultāts
+|Saite uz lapu tekošajā vietā|{{{[[WebHome]]}}}|[[WebHome]]
+|Saite ar nosaukumu|{{{[[nosaukums&gt;&gt;WebHome]]}}}|[[nosaukums&gt;&gt;WebHome]]
+|Saite uz lapu norādītā vietā|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Saite uz subviki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Saite, kas atveras jaunā lapā|{{{[[nosaukums&gt;&gt;WebHome||rel="__blank"]]}}}|[[nosaukums&gt;&gt;WebHome||rel="__blank"]]
+|Saite uz URL atklātā tekstā|{{{Šis ir URL: http://xwiki.org}}}|Šis ir URL: http://xwiki.org
+|Saite uz URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Saite uz URL ar nosaukumu|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Saite uz e-pastu|{{{[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]}}}|[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]
+|Saite ar attēlu|(((
+{{{[[image:Vieta2.Lapa2@attels.png&gt;&gt;Vieta1.Lapa1]]}}}
+
+{{info}}Saišu nosaukumos ir atļauta viki sintakse{{/info}}
+)))|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Saite uz pielikumu|{{{[[pielikums&gt;&gt;attach:attels.png]]}}}|[[pielikums&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+
+
+{{velocity}}$subHeading XWiki 2.0 saišu sintakse $subHeading{{/velocity}}
+
+Pilnais saites formāts ir: ##(nosaukums&gt;&gt;)?(saite)(||parametri)*##
+
+* ##nosaukums##: saites nosaukums. Var saturēt viki sintaksi
+* ##saite##: saites mērķis, t.i. vieta, kas tiks atvērta, kad uz saites uzklikšķina. Tās sintakse ir līdzīga XWiki 1.0 sintaksei, un tā var būt arī norāde uz {{{mailto:}}} un {{{attach:}}}, lai attiecīgi norādītu uz e-pasta adresi vai lapas pielikumu.
+* ##parametri##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: {{{"parametrs_1=5&amp;amp;parametrs_2=Sveiki"}}}.
+
+=== 2.1 Links ===
+
+|=Piemērs|=XWiki 2.1 sintakse|=Rezultāts
+|Saite uz lapu tekošajā vietā|{{{[[WebHome]]}}}|[[WebHome]]
+|Saite ar nosaukumu|{{{[[nosaukums&gt;&gt;WebHome]]}}}|[[nosaukums&gt;&gt;WebHome]]
+|Saite uz lapu norādītā vietā|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Saite uz subviki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Saite, kas atveras jaunā lapā|{{{[[nosaukums&gt;&gt;WebHome||rel="__blank"]]}}}|[[nosaukums&gt;&gt;WebHome||rel="__blank"]]
+|Saite uz URL atklātā tekstā|{{{Šis ir URL: http://xwiki.org}}}|Šis ir URL: http://xwiki.org
+|Saite uz URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Saite uz URL ar nosaukumu|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Saite uz e-pastu|{{{[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]}}}|[[janis@test.lv&gt;&gt;mailto:janis@test.lv]]
+|Saite ar attēlu|(((
+{{{[[image:Vieta2.Lapa2@attels.png&gt;&gt;Vieta1.Lapa1]]}}}
+
+{{info}}Saišu nosaukumos ir atļauta viki sintakse{{/info}}
+)))|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Saite uz pielikumu|{{{[[pielikums&gt;&gt;attach:attels.png]]}}}|[[pielikums&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+
+{{velocity}}$subHeading XWiki 2.1 saišu sintakse $subHeading{{/velocity}}
+
+Pilnais saites formāts ir: **##[nosaukums&gt;&gt;] (saite) [||parametri]##**
+
+* ##nosaukums##: saites nosaukums. Var saturēt viki sintaksi
+* ##saite##: saites mērķis, t.i. vieta, kas tiks atvērta, kad uz saites uzklikšķina. Tās sintakse ir līdzīga XWiki 1.0 sintaksei, un tā var būt arī norāde uz {{{mailto:}}} un {{{attach:}}}, lai attiecīgi norādītu uz e-pasta adresi vai lapas pielikumu.
+* ##parametri##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: ##queryString="parametrs_1=5&amp;parametrs_2=Sveiki" anchor="HTableOfContents" rel="~_~_blank"##.
+</content>
+</xwikidoc>

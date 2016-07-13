@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+  <web>space</web>
+  <name>blegacy</name>
+  <language>en</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>XWiki.creator</creator>
+  <creationDate>946684800000</creationDate>
+  <versions>jrcsrevisions</versions>
+  <parent>parent</parent>
+  <author>XWiki.author</author>
+  <customClass>customclass</customClass>
+  <contentAuthor>XWiki.contentAuthor</contentAuthor>
+  <date>946771200000</date>
+  <contentUpdateDate>946857600000</contentUpdateDate>
+  <version>1.1</version>
+  <title>title</title>
+  <defaultTemplate>defaultTemplate</defaultTemplate>
+  <validationScript>validationScript</validationScript>
+  <comment>comment</comment>
+  <minorEdit>false</minorEdit>
+  <syntaxId>syntax/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>content</content>
+  <renderedcontent/>
+</xwikidoc>

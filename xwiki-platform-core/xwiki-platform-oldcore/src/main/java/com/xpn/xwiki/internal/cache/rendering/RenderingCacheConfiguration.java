@@ -24,7 +24,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Configuration of the rendering cache.
- * 
+ *
  * @version $Id$
  * @since 2.4M1
  */
@@ -48,7 +48,7 @@ public interface RenderingCacheConfiguration
 
     /**
      * Indicate if the provided document's rendering result should be cached.
-     * 
+     *
      * @param documentReference the reference of the document
      * @return true if the document should be cached, false otherwise
      */

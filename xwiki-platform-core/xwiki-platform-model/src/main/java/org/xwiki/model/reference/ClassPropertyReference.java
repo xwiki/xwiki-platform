@@ -99,6 +99,7 @@ public class ClassPropertyReference extends EntityReference
      * {@inheritDoc}
      * <p>
      * Overridden to ensure that the parent of a property is always an object.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */

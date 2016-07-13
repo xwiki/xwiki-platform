@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -28,7 +30,8 @@ import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 
-@Component("org.xwiki.rest.internal.resources.spaces.SpaceSearchResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpaceSearchResourceImpl")
 public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSearchResource
 {
     @Override
@@ -36,15 +39,17 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
             Integer number, Integer start, String orderField, String order, Boolean withPrettyNames)
             throws XWikiRestException
     {
+        List<String> spaces = parseSpaceSegments(spaceName);
+        
         try {
             SearchResults searchResults = objectFactory.createSearchResults();
             searchResults.setTemplate(String.format("%s?%s", Utils.createURI(uriInfo.getBaseUri(),
-                SpaceSearchResource.class, wikiName, spaceName).toString(), SEARCH_TEMPLATE_INFO));
+                SpaceSearchResource.class, wikiName, spaces).toString(), SEARCH_TEMPLATE_INFO));
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                    search(searchScopes, keywords, wikiName, spaceName,
+                    search(searchScopes, keywords, wikiName, Utils.getLocalSpaceId(spaces),
                             Utils.getXWiki(componentManager).getRightService().hasProgrammingRights(
                                     Utils.getXWikiContext(componentManager)), number, start, true, orderField, order,
                             withPrettyNames));

@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.office;
 
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.office.OfficeMacro}.
@@ -37,6 +37,12 @@ public class OfficeMacroParameters
     private String attachment;
 
     /**
+     * The office document to be viewed. Use an attachment string reference to specify which office file should be
+     * viewed: {@code file.ppt}, {@code Page@file.doc}, {@code Space.Page@file.xls} or {@code wiki:Space.Page@file.odt}.
+     */
+    private ResourceReference reference;
+
+    /**
      * Whether to filter in-line CSS styles present in the HTML content produced by the OpenOffice server. Office
      * content is usually better integrated in the host wiki page when styles are filtered.
      * <p>
@@ -46,7 +52,9 @@ public class OfficeMacroParameters
 
     /**
      * @return a string reference to the office attachment to be viewed
+     * @deprecated since 5.4.6, use {@link #getSource()} instead
      */
+    @Deprecated
     public String getAttachment()
     {
         return attachment;
@@ -56,13 +64,38 @@ public class OfficeMacroParameters
      * Sets the office attachment to be viewed.
      * 
      * @param attachment an attachment string reference
+     * @deprecated since
      */
     @PropertyDescription("The office attachment to be viewed. Use an attachment string reference to specify which "
         + "office file should be viewed: file.ppt, Page@file.doc, Space.Page@file.xls or wiki:Space.Page@file.odt.")
-    @PropertyMandatory
+    @Deprecated
     public void setAttachment(String attachment)
     {
         this.attachment = attachment;
+    }
+
+    /**
+     * IMPORTANT: this method should not be used from Java, its signature is temporary and will change in 6.2.1.
+     * 
+     * @return a string reference to the office file to be viewed
+     * @since 5.4.6/6.2.2
+     */
+    public ResourceReference getReference()
+    {
+        return this.reference;
+    }
+
+    /**
+     * @param reference the reference to the file to be viewed
+     * @since 5.4.6/6.2.2
+     */
+    @PropertyDescription("The office file to be viewed. Use an resource string reference to specify which"
+        + " office file should be viewed:"
+        + " attach:file.ppt, attach:Page@file.doc, attach:Space.Page@file.xls, attach:wiki:Space.Page@file.odt,"
+        + " url:http://some/remote/file.ppt.")
+    public void setReference(ResourceReference reference)
+    {
+        this.reference = reference;
     }
 
     /**

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,29 +34,34 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
- * Called at startup to initialize classes and existing wiki macros.
+ * Called at startup to initialize existing wiki macros.
  * 
  * @version $Id$
  * @since 4.2M1
  */
 @Component
 @Singleton
-@Named("WikiMacroInitializerListener")
+@Named(WikiMacroInitializerListener.NAME)
 public class WikiMacroInitializerListener implements EventListener
 {
+    static final String NAME = "WikiMacroInitializerListener";
+
     /**
      * The events observed by this event listener.
      */
-    private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent(),
-        new WikiReadyEvent()));
+    private static final List<Event> EVENTS = Arrays.asList(new ApplicationReadyEvent(), new WikiReadyEvent());
 
     /**
      * The macro initializer used to register the wiki macros.
      */
     @Inject
     private Provider<WikiMacroInitializer> macroInitializer;
+
+    @Inject
+    private WikiDescriptorManager wikiManager;
 
     /**
      * The logger to log.
@@ -74,7 +78,7 @@ public class WikiMacroInitializerListener implements EventListener
     @Override
     public String getName()
     {
-        return "WikiMacroInitializerListener";
+        return NAME;
     }
 
     @Override
@@ -84,13 +88,13 @@ public class WikiMacroInitializerListener implements EventListener
 
         if (event instanceof ApplicationReadyEvent) {
             try {
-                initializer.registerExistingWikiMacros();
+                initializer.registerExistingWikiMacros(wikiManager.getCurrentWikiId());
             } catch (Exception e) {
                 this.logger.error("Error while registering wiki macros.", e);
             }
         } else if (event instanceof WikiReadyEvent) {
             try {
-                initializer.installOrUpgradeWikiMacroClasses();
+                initializer.registerExistingWikiMacros(((WikiReadyEvent) event).getWikiId());
             } catch (Exception e) {
                 this.logger.error("Error while initializing wiki macro classes.", e);
             }

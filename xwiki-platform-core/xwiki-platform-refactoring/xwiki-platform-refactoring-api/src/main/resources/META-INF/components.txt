@@ -1,0 +1,6 @@
+org.xwiki.refactoring.internal.job.CreateJob
+org.xwiki.refactoring.internal.job.DeleteJob
+org.xwiki.refactoring.internal.job.MoveJob
+org.xwiki.refactoring.internal.job.RenameJob
+org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter
+org.xwiki.refactoring.script.RefactoringScriptService

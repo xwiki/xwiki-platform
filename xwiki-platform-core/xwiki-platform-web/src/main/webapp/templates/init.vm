@@ -1,0 +1,123 @@
+#set($jobstatus = $xwiki.jobStatus)
+#set($errors = $jobstatus.log.getLogsFrom('ERROR'))
+#set($hasErrors = !$errors.isEmpty())
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+    #if ($jobstatus.state.name() != 'FINISHED')
+      #set($percent = 0)
+      #if ($jobstatus)
+        #set($percent = $jobstatus.progress.offset * 100)
+        #set($percent = $percent.intValue())
+      #end
+      <title>$services.localization.render('platform.web.init.message.intializing', $percent)</title>
+      <meta http-equiv="refresh" content="1"/>
+    #else
+      #if ($hasErrors)
+        <title>$services.localization.render('platform.web.init.message.intializationFailure')</title>
+      #else
+        <title>$services.localization.render('platform.web.init.message.intializationSuccess')</title>
+        <meta http-equiv="refresh" content="1"/>
+      #end
+
+      <style type="text/css">
+        ul.log {
+          list-style-type: none;
+          margin: .5em 0 0;
+        }
+        ul.log li:hover {
+          background-color: $theme.highlightColor;
+        }
+        .log-item {
+          background: transparent none no-repeat left;
+          padding: 0.3em 0 0.3em 20px;
+          position: relative;
+        }
+        .log-item > div {
+          line-height: 1.4em;
+        }
+        .log-item {
+          background-position: left .3em;
+        }
+        .log-item-loading {
+          background-image: url("/xwiki/resources/icons/xwiki/spinner.gif");
+          color: #336699;
+        }
+        .log-item-trace {
+          background-image: url("/xwiki/resources/icons/silk/bug.png");
+          color: #336699;
+        }
+        .log-item-debug {
+          background-image: url("/xwiki/resources/icons/silk/bug.png");
+          color: #336699;
+        }
+        .log-item-info {
+          background-image: url("/xwiki/resources/icons/silk/information.png");
+          color: #336699;
+        }
+        .log-item-warn {
+          background-image: url("/xwiki/resources/icons/silk/error.png");
+          color: #D09000;
+        }
+        .log-item-error {
+          background-image: url("/xwiki/resources/icons/silk/exclamation.png");
+          color: #CC3333;
+        }
+        .log-item .stacktrace {
+          white-space: pre;
+        }
+      </style>
+
+      ## The URL factory is not available until XWiki is fully initialized. The WebJar script service uses the URL factory.
+      <script type="text/javascript" src="${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
+      <script type='text/javascript' src='${request.getContextPath()}/resources/uicomponents/logging/logging.js'></script>
+      <script type="text/javascript">
+      // <![CDATA[
+        require.config({
+          baseUrl: '/',
+            paths: { 'jquery': '${request.getContextPath()}${request.getServletPath()}/webjars/resources/path?value=jquery%2F1.11.3%2Fjquery.min.js' },
+          map: {
+            '*': { 'jquery': 'jQueryNoConflict' },
+            'jQueryNoConflict': { 'jquery': 'jquery' }
+          }
+        });
+      define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
+      // ]]>
+      </script>
+    #end
+
+    <style type="text/css">
+      body{
+        background-color: gray;
+        font-family: sans-serif;
+        font-size: 87.5%;
+      }
+      #content{
+        margin: 1em auto;
+        width: 80%;
+        color: #4D4D4D;
+        border: 1px solid #E8E8E8;
+        background-color: #FFF;
+        border-radius: 4px;
+        box-shadow: 0px 0px 7px #E8E8E8;
+        padding: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="content">
+      #if ($jobstatus.state.name() != 'FINISHED')
+        <p>$services.localization.render('platform.web.init.message.intializing', $percent)</p>
+      #else
+        #if ($hasErrors)
+          <p>$services.localization.render('platform.web.init.message.intializationFailure')<p>
+        #else
+          <p>$services.localization.render('platform.web.init.message.intializationSuccess')</p>
+        #end
+        $services.template.execute('logging_macros.vm')
+        #printLogs($jobstatus.log)
+      #end
+    </div>
+  </body>
+</html>

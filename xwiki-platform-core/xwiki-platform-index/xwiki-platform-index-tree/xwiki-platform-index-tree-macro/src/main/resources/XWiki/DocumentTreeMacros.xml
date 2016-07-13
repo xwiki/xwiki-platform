@@ -1,0 +1,1789 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.DocumentTreeMacros" locale="">
+  <web>XWiki</web>
+  <name>DocumentTreeMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1414163661000</creationDate>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1440768391000</date>
+  <contentUpdateDate>1440768251000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Document Tree Macros</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="XWiki.SuggestSolrMacros" /}}
+
+{{template name="documentTree_macros.vm" /}}
+
+{{velocity output="false"}}
+#macro (updateDocTreeConfigFromRequest)
+  #foreach ($entry in $docTreeConfig.entrySet())
+    #set ($valueFromRequest = $request.getParameter($entry.key))
+    #if ("$!valueFromRequest" != '')
+      #if ($entry.value.getClass().getName() == 'java.lang.Boolean')
+        #set ($entry.value = $valueFromRequest == 'true')
+      #else
+        #set ($entry.value = $valueFromRequest)
+      #end
+    #end
+  #end
+  ## Show the wikis only for global users.
+  #set ($docTreeConfig.showWikis = $docTreeConfig.showWikis &amp;&amp;
+    $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName)
+  #if ($docTreeConfig.showWikis)
+    #set ($docTreeConfig.defaultRoot = 'farm:')
+  #else
+    #set ($docTreeConfig.defaultRoot = "wiki:$xcontext.database")
+  #end
+  #if ($docTreeConfig.root == $docTreeConfig.defaultRoot)
+    #set ($docTreeConfig.root = '')
+  #end
+#end
+
+#macro (handleDocumentTreeRequest)
+  #if ($request.action)
+    #if ($services.csrf.isTokenValid($request.form_token))
+      $response.sendError(400, 'The specified action is not supported.')
+    #elseif ($isAjaxRequest)
+      $response.sendError(403, 'The CSRF token is missing.')
+    #else
+      $response.sendRedirect($services.csrf.getResubmissionURL())
+    #end
+  #else
+    #set ($data = $NULL)
+    #if ($request.data == 'children')
+      #getChildren($request.id $data)
+    #elseif ($request.data == 'path')
+      #getPath($request.id $data)
+    #elseif ($request.data == 'contextMenu')
+      #getContextMenu($data)
+    #elseif ($request.data == 'suggestions')
+      #getSuggestions($data)
+    #end
+    #if ($data)
+      #set ($discard = $response.setContentType('application/json'))
+      $jsontool.serialize($data)
+    #else
+      $response.sendError(404)
+    #end
+  #end
+#end
+
+##------------------------------------------------------------
+## Children
+##------------------------------------------------------------
+
+#macro (getChildren $nodeId $return)
+  #set ($children = [])
+  #if ($nodeId == '#')
+    ## Return the top level nodes.
+    #if ($docTreeConfig.root == '')
+      ## Return the children of the default root node.
+      #set ($actualNodeId = $docTreeConfig.defaultRoot)
+    #else
+      ## Return the children of the specified root node.
+      #set ($actualNodeId = $docTreeConfig.root)
+    #end
+  #else
+    ## Return the children of the specified node.
+    #set ($actualNodeId = $nodeId)
+  #end
+  #set ($parts = $actualNodeId.split(':', 2))
+  #if ($parts.size() == 2)
+    #set ($nodeType = $parts[0])
+    #set ($nodeReference = $parts[1])
+  #else
+    #set ($nodeType = 'unknown')
+    #set ($nodeReference = $actualNodeId)
+  #end
+  #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
+  #if ("$!offset" == '')
+    #set ($offset = 0)
+  #end
+  #set ($limit = $mathtool.max($mathtool.toInteger($request.limit), 1))
+  #if ("$!limit" == '')
+    #set ($limit = 15)
+  #end
+  #if ($nodeId == '#' &amp;&amp; $docTreeConfig.showRoot)
+    #maybeAddNode($nodeType $nodeReference $children)
+  #else
+    #set ($discard = "#evaluate(""${escapetool.h}add$stringtool.capitalize($nodeType)Children(
+      ${escapetool.d}nodeReference $offset $limit ${escapetool.d}children)"")")
+  #end
+  #if ($children.isEmpty() &amp;&amp; $nodeId == '#')
+    ## Inform the user that the tree is empty.
+    #addEmptyTreeNode($children)
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $children)
+#end
+
+#macro (maybeAddNode $type $reference $siblings)
+  #if ($type == 'farm')
+    #addFarmNode($siblings)
+  #elseif ($type == 'wiki')
+    #set ($wiki = $services.wiki.getById($reference))
+    #maybeAddWikiNode($wiki $siblings)
+  #elseif ($type == 'space')
+    #set ($spaceReference = $services.model.resolveSpace($reference))
+    #maybeAddSpaceNode($spaceReference $siblings)
+  #elseif ($type == 'document')
+    #set ($documentReference = $services.model.resolveDocument($reference))
+    #maybeAddDocumentNode($documentReference $children)
+  #end
+#end
+
+##
+## Farm Node
+##
+
+#macro (addFarmNode $siblings)
+  #set ($farmHomeReference = $services.model.resolveDocument('', 'default'))
+  #set ($discard = $siblings.add({
+    'id': 'farm:',
+    'text': 'Farm',
+    'icon': 'fa fa-home',
+    'children': true,
+    'data': {
+      'type': 'farm',
+      'validChildren': ['wiki', 'pagination']
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($farmHomeReference)
+    }
+  }))
+#end
+
+#macro (addFarmChildren $nodeId $offset $limit $children)
+  #foreach ($wiki in $services.wiki.all)
+    #maybeAddWikiNode($wiki $children)
+  #end
+#end
+
+##
+## Wiki Nodes
+##
+
+#macro (maybeAddWikiNode $wiki $siblings $placeholder)
+  #if ($wiki &amp;&amp; (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $wiki.reference)))
+    #addWikiNode($wiki $siblings)
+  #elseif ($placeholder)
+    #set ($discard = $siblings.add($placeholder))
+  #end
+#end
+
+#macro (addWikiNode $wiki $siblings)
+  ## The main wiki cannot be deleted. For the rest we need special rights.
+  #set ($canDeleteWiki = $wiki.id != $services.wiki.mainWikiId
+    &amp;&amp; $services.wiki.canDeleteWiki($xcontext.user, $wiki.id))
+  #if ($docTreeConfig.showWikiPrettyName)
+    #set ($label = $wiki.prettyName)
+  #else
+    #set ($label = $wiki.id)
+  #end
+  #set ($discard = $siblings.add({
+    'id': "wiki:$wiki.id",
+    'text': $label,
+    'icon': 'fa fa-hdd-o',
+    'children': true,
+    'data': {
+      'id': $wiki.id,
+      'type': 'wiki',
+      'validChildren': ['space', 'document', 'pagination'],
+      'canDelete': $canDeleteWiki
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($wiki.mainPageReference)
+    }
+  }))
+#end
+
+#macro (addWikiChildren $wikiId $offset $limit $children)
+  #set ($wikiReference = $services.model.createWikiReference($wikiId))
+  #if ($docTreeConfig.showSpaces)
+    #addChildSpaces($wikiReference $offset $limit $children)
+  #else
+    #addChildDocuments($wikiReference $offset $limit $children)
+  #end
+#end
+
+##
+## Space Nodes
+##
+
+#macro (addChildSpaces $parentReference $offset $limit $children)
+  #getChildSpacesQuery($parentReference $selectQuery)
+  #set ($spaceNames = $selectQuery.setOffset($offset).setLimit($limit).execute())
+  #if ($spaceNames.size() &gt;= $limit)
+    #getChildSpacesQuery($parentReference $countQuery true)
+    #set ($totalCount = $countQuery.execute().get(0))
+  #end
+  #foreach ($spaceName in $spaceNames)
+    #set ($childSpaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $parentReference))
+    #maybeAddSpaceNode($childSpaceReference $children)
+  #end
+  #if ($spaceNames.size() &gt;= $limit)
+    #set ($newOffset = $mathtool.add($offset, $spaceNames.size()))
+    #if ($newOffset &lt; $totalCount)
+      #set ($parentRefAsString = $services.model.serialize($parentReference, 'default'))
+      #set ($parentId = "$parentReference.type.toLowerCase():$parentRefAsString")
+      #addPaginationNode($parentId $newOffset $totalCount $children)
+    #end
+  #end
+#end
+
+#macro (getChildSpacesQuery $parentReference $return $count)
+  #set ($constraints = [])
+  #set ($parameters = {})
+  #set ($parentSpaceReference = $parentReference.extractReference('SPACE'))
+  #if ($parentSpaceReference)
+    #set ($discard = $constraints.add('space.parent = :parent'))
+    #set ($parameters.parent = $services.model.serialize($parentSpaceReference, 'local'))
+  #else
+    #set ($discard = $constraints.add('space.parent is null'))
+  #end
+  #set ($whereClause = '')
+  #if ($constraints.size() &gt; 0)
+    #set ($whereClause = "where $stringtool.join($constraints, ' and ')")
+  #end
+  #set ($selectClause = 'select space.name from XWikiSpace space')
+  #set ($orderByClause = 'order by lower(space.name), space.name')
+  #if ($count)
+    #set ($selectClause = 'select count(*) from XWikiSpace space')
+    #set ($orderByClause = '')
+  #end
+  #set ($_query = $services.query.hql("$selectClause $whereClause $orderByClause"))
+  #set ($_query = $_query.setWiki($parentReference.extractReference('WIKI').name))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($_query = $_query.addFilter('hidden/space'))
+  #end
+  #foreach ($entry in $parameters.entrySet())
+    #set ($_query = $_query.bindValue($entry.key, $entry.value))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $_query)
+#end
+
+#macro (maybeAddSpaceNode $spaceReference $siblings $placeholder)
+  #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $spaceReference))
+    #addSpaceNode($spaceReference $siblings)
+  #elseif ($placeholder)
+    Add placeholder for $spaceReference.getClass().getName()
+    #set ($discard = $siblings.add($placeholder))
+  #end
+#end
+
+#macro (addSpaceNode $spaceReference $siblings)
+  #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
+  #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
+  #set ($canViewSpace = $services.security.authorization.hasAccess('view', $spaceReference))
+  #if ($docTreeConfig.showTerminalDocuments)
+    ## Each space has at least one document or one sub-space. There's no such thing as "empty space" in the model.
+    #set ($hasChildren = true)
+  #else
+    ## We display only the nested spaces. This space might contain only documents.
+    #getChildSpacesQuery($spaceReference $countQuery true)
+    #set ($hasChildren = $countQuery.execute().get(0) &gt; 0)
+  #end
+  #set ($discard = $siblings.add({
+    'id': "space:$spaceId",
+    'text': $spaceReference.name,
+    'icon': 'fa fa-folder-o',
+    'iconOpened': 'fa fa-folder-open-o',
+    'children': $hasChildren,
+    'data': {
+      'id': $spaceId,
+      'type': 'space',
+      'validChildren': ['addDocument', 'space', 'document', 'pagination'],
+      'hasContextMenu': true,
+      'draggable': $canViewSpace,
+      'canMove': $hasSpaceAdmin,
+      'canCopy': $canViewSpace,
+      'canRename': $hasSpaceAdmin,
+      'canDelete': $hasSpaceAdmin,
+      'createDocumentURL': $xwiki.getURL($spaceReference, 'create', $NULL),
+      'deleteURL': $xwiki.getURL($spaceReference, 'deletespace', $NULL)
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($spaceReference)
+    }
+  }))
+#end
+
+#macro (addSpaceChildren $spaceId $offset $limit $children)
+  #set ($spaceReference = $services.model.resolveSpace($spaceId))
+  #if ($docTreeConfig.showTerminalDocuments)
+    #addChildSpacesAndDocuments($spaceReference $offset $limit $children)
+  #else
+    #addChildSpaces($spaceReference $offset $limit $children)
+  #end
+#end
+
+#macro (addChildSpacesAndDocuments $spaceReference $offset $limit $children)
+  #getSpaceChildrenQuery($spaceReference $selectQuery)
+  #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
+  #if ($results.size() &gt;= $limit)
+    #getSpaceChildrenCount($spaceReference $totalCount)
+  #end
+  #set ($childTypes = ['SPACE', 'DOCUMENT'])
+  #foreach ($result in $results)
+    #set ($childName = $result.get(0))
+    #set ($childType = $childTypes.get($result.get(1)))
+    #set ($childReference = $services.model.createEntityReference($childName, $childType, $spaceReference))
+    #if ($childType == 'SPACE')
+      #maybeAddSpaceNode($childReference $children)
+    #else
+      #maybeAddDocumentNode($childReference $children)
+    #end
+  #end
+  #if ($results.size() &gt;= $limit)
+    #set ($newOffset = $mathtool.add($offset, $results.size()))
+    #if ($newOffset &lt; $totalCount)
+      #set ($parentId = "space:$services.model.serialize($spaceReference, 'default')")
+      #addPaginationNode($parentId $newOffset $totalCount $children)
+    #end
+  #end
+#end
+
+#macro (getSpaceChildrenQuery $parentReference $return)
+  #set ($parentSpaceRef = $parentReference.extractReference('SPACE'))
+  #set ($parentLocalSpaceRef = $services.model.serialize($parentSpaceRef, 'local'))
+  #set ($escapedParentLocalSpaceRef = $parentLocalSpaceRef.replaceAll("'", "''"))
+  #set ($selectEntityName = "case when space.parent = '$escapedParentLocalSpaceRef' then space.name else doc.name end")
+  #set ($selectEntityType = "case when space.parent = '$escapedParentLocalSpaceRef' then 0 else 1 end")
+  ## We select the lower case version of the entity name in order to be able to sort on it. PostgreSQL complains that
+  ## "ORDER BY expressions must appear in select list" otherwise (when 'select distinct' is used). See XWIKI-13025.
+  #set ($selectClause = "select distinct $selectEntityName, $selectEntityType, lower($selectEntityName)")
+  #set ($fromClause = 'from XWikiDocument doc, XWikiSpace space')
+  #set ($isChildDocument = [
+    'doc.space = :parentSpaceRef',
+    'doc.translation = 0'
+  ])
+  #set ($parameters = {
+    'parentSpaceRef': $parentLocalSpaceRef
+  })
+  #if ($docTreeConfig.hierarchyMode == 'parentchild')
+    ## Include only the documents that either don't have a parent or that have a parent in a different space.
+    ## In Oracle the empty parent is actually null.
+    #set ($hasNoParent = "doc.parent = '' or doc.parent is null")
+    #set ($hasParentOutsideSpace = "(doc.parent like '%.%' and doc.parent not like :absoluteRef and doc.parent not like :localRef)")
+    #set ($discard = $isChildDocument.add("($hasNoParent or $hasParentOutsideSpace)"))
+    #set ($absoluteRef = $services.model.resolveDocument('%', 'explicit', $parentSpaceRef))
+    #set ($parameters.absoluteRef = $services.model.serialize($absoluteRef, 'default'))
+    #set ($parameters.localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))
+  #elseif (!$docTreeConfig.showSpaces)
+    ## Exclude the space home page which is actually the parent node.
+    #set ($discard = $isChildDocument.add('doc.name &lt;&gt; :spaceHomePageName'))
+    #set ($parameters.spaceHomePageName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #end
+  #set ($isChildDocument = "($stringtool.join($isChildDocument, ' and '))")
+  #set ($isChildSpace = 'space.parent = :parentSpaceRef')
+  #set ($whereClause = "where ($isChildSpace or $isChildDocument)")
+  ## List the child spaces first and then the child documents.
+  ## We cannot call the lower() function with an alias because:
+  ## * MySql throws com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'name' in 'order clause'
+  ## * HSQLDB throws org.hsqldb.HsqlException: user lacks privilege or object not found: NAME
+  ## We cannot duplicate the CASE expression in the ORDER BY clause either because PostgreSQL complains that "ORDER BY
+  ## expressions must appear in select list". We specify the output columns to sort on using their ordinal.
+  #set ($orderByClause = "order by 2, 3, 1")
+  #if (!$docTreeConfig.showSpaces)
+    ## Mix terminal and non-terminal documents in nested documents mode.
+    #set ($orderByClause = "order by 3, 1")
+  #end
+  #set ($statement = "$selectClause $fromClause $whereClause $orderByClause")
+  #set ($_query = $services.query.hql($statement))
+  #set ($_query = $_query.setWiki($parentReference.extractReference('WIKI').name))
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($_query = $_query.addFilter('hidden/document').addFilter('hidden/space'))
+  #end
+  #foreach ($entry in $parameters.entrySet())
+    #set ($_query = $_query.bindValue($entry.key, $entry.value))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $_query)
+#end
+
+#macro (getSpaceChildrenCount $parentReference $return)
+  ## We cannot perform a single query because:
+  ## * select count(distinct case ...) doesn't work (https://hibernate.atlassian.net/browse/HHH-4150)
+  ## * select count(*) from (select distinct case ...) doesn't work (https://hibernate.atlassian.net/browse/HHH-3356)
+  ## * if we use group-by then count returns the number of rows in each group not the number of groups
+  ## So we're forced to do two queries.
+  ## Count child spaces.
+  #getChildSpacesQuery($parentReference $query true)
+  #set ($count = $query.execute().get(0))
+  ## Count child documents.
+  #set ($isChildDocument = [
+    'doc.space = :parentSpaceRef',
+    'doc.translation = 0'
+  ])
+  #set ($parentSpaceRef = $parentReference.extractReference('SPACE'))
+  #set ($parameters = {
+    'parentSpaceRef': $services.model.serialize($parentSpaceRef, 'local')
+  })
+  #if ($docTreeConfig.hierarchyMode == 'parentchild')
+    ## Include only the documents that either don't have a parent or that have a parent in a different space.
+    ## In Oracle the empty parent is actually null.
+    #set ($hasNoParent = "doc.parent = '' or doc.parent is null")
+    #set ($hasParentOutsideSpace = "(doc.parent like '%.%' and doc.parent not like :absoluteRef and doc.parent not like :localRef)")
+    #set ($discard = $isChildDocument.add("($hasNoParent or $hasParentOutsideSpace)"))
+    #set ($absoluteRef = $services.model.resolveDocument('%', 'explicit', $parentSpaceRef))
+    #set ($parameters.absoluteRef = $services.model.serialize($absoluteRef, 'default'))
+    #set ($parameters.localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))
+  #elseif (!$docTreeConfig.showSpaces)
+    ## Exclude the space home page which is actually the parent node.
+    #set ($discard = $isChildDocument.add('doc.name &lt;&gt; :spaceHomePageName'))
+    #set ($parameters.spaceHomePageName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #end
+  #set ($query = $services.query.hql("where $stringtool.join($isChildDocument, ' and ')"))
+  #set ($query = $query.setWiki($parentReference.extractReference('WIKI').name))
+  #foreach ($entry in $parameters.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
+  #end
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/document'))
+  #end
+  #set ($count = $count + $query.count())
+  #set ($return = $NULL)
+  #setVariable("$return" $count)
+#end
+
+##
+## Document Nodes
+##
+
+#macro (addChildDocuments $parentReference $offset $limit $siblings)
+  #if ($docTreeConfig.hierarchyMode == 'reference' &amp;&amp; !$docTreeConfig.showSpaces
+      &amp;&amp; ($parentReference.type != 'DOCUMENT' ||
+      $parentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name))
+    #addNestedChildDocuments($parentReference $offset $limit $siblings)
+  #elseif ($docTreeConfig.hierarchyMode == 'parentchild')
+    #addParentChildDocuments($parentReference $offset $limit $siblings)
+  #end
+#end
+
+#macro (addNestedChildDocuments $parentReference $offset $limit $siblings)
+  #set ($macro.parentSpaceRef = $parentReference.extractReference('SPACE'))
+  #if ($macro.parentSpaceRef &amp;&amp; $docTreeConfig.showTerminalDocuments)
+    #getSpaceChildrenQuery($parentReference $selectQuery)
+    #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
+    #if ($results.size() &gt;= $limit)
+      #getSpaceChildrenCount($parentReference $totalCount)
+    #end
+    #set ($childTypes = ['SPACE', 'DOCUMENT'])
+    #foreach ($result in $results)
+      #set ($childName = $result.get(0))
+      #set ($childType = $childTypes.get($result.get(1)))
+      #set ($childReference = $services.model.createEntityReference($childName, $childType, $macro.parentSpaceRef))
+      #if ($childType == 'SPACE')
+        #set ($childReference = $services.model.resolveDocument('', 'default', $childReference))
+      #end
+      #maybeAddDocumentNode($childReference $siblings)
+    #end
+  #else
+    #getChildSpacesQuery($parentReference $selectQuery)
+    #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
+    #if ($results.size() &gt;= $limit)
+      #getChildSpacesQuery($parentReference $countQuery true)
+      #set ($totalCount = $countQuery.execute().get(0))
+    #end
+    #set ($spaceParentReference = $macro.parentSpaceRef)
+    #if (!$spaceParentReference)
+      #set ($spaceParentReference = $parentReference.extractReference('WIKI'))
+    #end
+    #foreach ($spaceName in $results)
+      #set ($spaceReference = $services.model.createEntityReference($spaceName, 'SPACE', $spaceParentReference))
+      #set ($documentReference = $services.model.resolveDocument('', 'default', $spaceReference))
+      #maybeAddDocumentNode($documentReference $siblings)
+    #end
+  #end
+  #if ($results.size() &gt;= $limit)
+    #set ($newOffset = $mathtool.add($offset, $results.size()))
+    #if ($newOffset &lt; $totalCount)
+      #set ($parentRefAsString = $services.model.serialize($parentReference, 'default'))
+      #set ($parentId = "$parentReference.type.toLowerCase():$parentRefAsString")
+      #addPaginationNode($parentId $newOffset $totalCount $siblings)
+    #end
+  #end
+#end
+
+#macro (maybeAddDocumentNode $documentReference $siblings $placeholder)
+  #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $documentReference))
+    #addDocumentNode($documentReference $siblings)
+  #elseif ($placeholder)
+    #set ($discard = $siblings.add($placeholder))
+  #end
+#end
+
+#macro (addDocumentNode $documentReference $siblings)
+  #set ($label = $documentReference.name)
+  #if (!$docTreeConfig.showSpaces &amp;&amp;
+      $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+    ## Use the space name as default value for the node label (in case the document is not viewable).
+    #set ($label = $documentReference.parent.name)
+  #end
+  #set ($hasChildren = false)
+  #set ($canViewDoc = $services.security.authorization.hasAccess('view', $documentReference))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $documentReference))
+  #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
+  #if ($canViewDoc)
+    #set ($document = $xwiki.getDocument($documentReference))
+    #if ($docTreeConfig.showDocumentTitle)
+      #set ($plainTitle = $document.plainTitle)
+      #if (!$stringtool.isBlank($plainTitle))
+        #set ($label = $plainTitle)
+      #end
+    #end
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showTranslations &amp;&amp; $document.translationList.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showAttachments
+      &amp;&amp; (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $document.attachmentList.size() &gt; 0)))
+    #set ($xclass = $document.getxWikiClass())
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $document.getxWikiObjects().size() &gt; 0))
+    #set ($hasChildren = $hasChildren || (
+      $docTreeConfig.showAddDocument &amp;&amp;
+      $docTreeConfig.hierarchyMode == 'reference' &amp;&amp;
+      $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name &amp;&amp;
+      $services.security.authorization.hasAccess('edit', $documentReference.parent)
+    ))
+  #end
+  #if (!$hasChildren)
+    #getChildDocumentsCount($documentReference $count)
+    #set ($hasChildren = $count &amp;&amp; $count &gt; 0)
+  #end
+  #set ($discard = $siblings.add({
+    'id': "document:$services.model.serialize($documentReference, 'default')",
+    'text': $label,
+    'icon': 'fa fa-file-o',
+    'children': $hasChildren,
+    'data': {
+      'id': $services.model.serialize($documentReference, 'default'),
+      'type': 'document',
+      'validChildren': ['translations', 'attachments', 'attachment', 'classProperties', 'objects', 'document', 'pagination'],
+      'hasContextMenu': true,
+      'draggable': $canViewDoc,
+      'canDelete': $canDeleteDoc,
+      'canMove': $canDeleteDoc,
+      'canCopy': $canViewDoc,
+      'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($documentReference)
+    }
+  }))
+#end
+
+#macro (getChildDocumentsCount $parentReference $return)
+  #set ($count = 0)
+  #if ($docTreeConfig.hierarchyMode == 'reference' &amp;&amp; !$docTreeConfig.showSpaces
+      &amp;&amp; $parentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #if ($docTreeConfig.showTerminalDocuments)
+      #getSpaceChildrenCount($parentReference $count)
+    #else
+      #getChildSpacesQuery($parentReference $countQuery true)
+      #set ($count = $countQuery.execute().get(0))
+    #end
+  #elseif ($docTreeConfig.hierarchyMode == 'parentchild')
+    #getParentChildDocumentsQuery($parentReference $countQuery)
+    #set ($wikiReference = $parentReference.extractReference('WIKI'))
+    #set ($count = $countQuery.setWiki($wikiReference.name).count())
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $count)
+#end
+
+#macro (addDocumentChildren $docId $offset $limit $children)
+  #set ($documentReference = $services.model.resolveDocument($docId))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $documentReference))
+  #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
+  #set ($document = $xwiki.getDocument($documentReference))
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showTranslations &amp;&amp; $document.translationList.size() &gt; 0)
+    #set ($discard = $children.add({
+      'id': "translations:${documentReference}",
+      'text': 'Translations',
+      'icon': 'fa fa-language',
+      'children': true,
+      'data': {
+        'type': 'translations',
+        'validChildren': ['translation'],
+        'canDelete': $canDeleteDoc
+      }
+    }))
+  #end
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showAttachments &amp;&amp;
+      (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $document.attachmentList.size() &gt; 0))
+    #addAttachmentsNode($documentReference $children)
+  #end
+  #set ($xclass = $document.getxWikiClass())
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0)
+    #set ($discard = $children.add({
+      'id': "classProperties:${documentReference}",
+      'text': 'Class Properties',
+      'icon': 'fa fa-gears',
+      'children': true,
+      'data': {
+        'type': 'classProperties',
+        'validChildren': ['classProperty'],
+        'canDelete': $canEditDoc
+      }
+    }))
+  #end
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showObjects &amp;&amp; $document.getxWikiObjects().size() &gt; 0)
+    #set ($discard = $children.add({
+      'id': "objects:${documentReference}",
+      'text': 'Objects',
+      'icon': 'fa fa-cubes',
+      'children': true,
+      'data': {
+        'type': 'objects',
+        'validChildren': ['objectsOfType'],
+        'canDelete': $canEditDoc
+      }
+    }))
+  #end
+  #maybeAddAddDocumentNode($documentReference $children)
+  #addChildDocuments($documentReference $offset $limit $children)
+#end
+
+#macro (addParentChildDocuments $parentReference $offset $limit $siblings)
+  #if ("$parentReference.type" == 'DOCUMENT')
+    #getParentChildDocumentsQuery($parentReference $query)
+  #else
+    ## Get top level documents. In Oracle the empty parent is actually null.
+    #getDocumentsQuery(["(doc.parent = '' or doc.parent is null)", 'doc.translation = 0'] {} $query)
+  #end
+  #addDocumentNodesFromQuery($query $offset $limit $parentReference $children)
+#end
+
+#macro (getParentChildDocumentsQuery $parentReference $return)
+  #set ($constraints = [
+    'doc.translation = 0',
+    '(doc.parent in (:absoluteRef, :localRef) or (doc.space = :space and doc.parent = :relativeRef))'
+  ])
+  #set ($wikiReference = $parentReference.extractReference('WIKI'))
+  #set ($parameters = {
+    'space': $services.model.serialize($parentReference.parent, 'local'),
+    'absoluteRef': $services.model.serialize($parentReference, 'default'),
+    'localRef': $services.model.serialize($parentReference, 'compactwiki', $wikiReference),
+    'relativeRef': $services.model.serialize($parentReference, 'compact', $parentReference.parent)
+  })
+  #if ($docTreeConfig.showSpaces)
+    #set ($discard = $constraints.add(0, 'doc.space = :space'))
+    #set ($discard = $constraints.set(2, 'doc.parent in (:absoluteRef, :localRef, :relativeRef)'))
+  #end
+  #getDocumentsQuery($constraints $parameters $query)
+  #set ($return = $NULL)
+  #setVariable("$return" $query)
+#end
+
+#macro (getDocumentsQuery $constraints $parameters $return)
+  #set ($fromClause = '')
+  #set ($finalConstraints = [])
+  #set ($finalParameters = {})
+  #if ("$!docTreeConfig.filterByClass" != '')
+    #set ($fromClause = ', BaseObject as obj')
+    #set ($discard = $finalConstraints.addAll([
+      'obj.name = doc.fullName',
+      'obj.className = :class',
+      'doc.fullName &lt;&gt; :template'
+    ]))
+    #set ($discard = $finalParameters.putAll({
+      'class': $docTreeConfig.filterByClass,
+      'template': "$stringtool.removeEnd($docTreeConfig.filterByClass, 'Class')Template"
+    }))
+  #end
+  #set ($discard = $finalConstraints.addAll($constraints))
+  #set ($discard = $finalParameters.putAll($parameters))
+  #set ($statement = "$fromClause where $stringtool.join($finalConstraints, ' and ') "
+    + "order by lower(doc.name), doc.name")
+  #set ($docsQuery = $services.query.hql($statement))
+  #foreach ($entry in $finalParameters.entrySet())
+    #set ($docsQuery = $docsQuery.bindValue($entry.key, $entry.value))
+  #end
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($discard = $docsQuery.addFilter('hidden/document'))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $docsQuery)
+#end
+
+#macro (addDocumentNodesFromQuery $_query $offset $limit $parentReference $children)
+  #set ($wikiReference = $parentReference.extractReference('WIKI'))
+  #set ($_query = $_query.setWiki($wikiReference.name))
+  #set ($results = $_query.setOffset($offset).setLimit($limit).execute())
+  #foreach ($docFullName in $results)
+    #set ($documentReference = $services.model.resolveDocument($docFullName, 'explicit', $parentReference))
+    #maybeAddDocumentNode($documentReference $children)
+  #end
+  #if ($results &amp;&amp; $results.size() &gt;= $limit)
+    ## There may be more documents in this space.
+    #set ($totalCount = $_query.count())
+    #set ($newOffset = $mathtool.add($offset, $results.size()))
+    #if ($newOffset &lt; $totalCount)
+      #set ($parentRefAsString = $services.model.serialize($parentReference, 'default'))
+      #set ($parentId = "$parentReference.type.toLowerCase():$parentRefAsString")
+      #addPaginationNode($parentId $newOffset $totalCount $children)
+    #end
+  #end
+#end
+
+#macro (maybeAddAddDocumentNode $documentReference $siblings)
+  #if ($docTreeConfig.showAddDocument &amp;&amp;
+      $docTreeConfig.hierarchyMode == 'reference' &amp;&amp;
+      $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name &amp;&amp;
+      $services.security.authorization.hasAccess('edit', $documentReference.parent))
+    #addAddDocumentNode($documentReference $siblings)
+  #end
+#end
+
+#macro (addAddDocumentNode $documentReference $siblings)
+  #set ($discard = $siblings.add({
+    'id': "addDocument:$services.model.serialize($documentReference, 'default')",
+    'text': 'New document...',
+    'icon': 'fa fa-plus-circle',
+    'children': false,
+    'data': {
+      'type': 'addDocument',
+      'validChildren': []
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($documentReference, 'create')
+    }
+  }))
+#end
+
+##
+## Pagination Nodes
+##
+
+#macro (addPaginationNode $parentId $offset $totalCount $siblings)
+  #set ($discard = $siblings.add({
+    'id': "pagination:$parentId",
+    'text': $services.localization.render('index.documentTree.more', $!mathtool.sub($totalCount, $offset)),
+    'icon': 'fa fa-eye',
+    'children': false,
+    'data': {
+      'type': 'pagination',
+      'validChildren': [],
+      'canDelete': true,
+      'offset': $offset
+    }
+  }))
+#end
+
+##
+## Empty Tree Node
+##
+
+#macro (addEmptyTreeNode $siblings)
+  #set ($discard = $siblings.add({
+    'id': "empty",
+    'text': $services.localization.render('index.documentTree.empty'),
+    'icon': 'fa fa-info-circle',
+    'children': false,
+    'data': {
+      'type': 'empty',
+      'validChildren': []
+    }
+  }))
+#end
+
+##
+## Translation Nodes
+##
+
+#macro (addTranslationsChildren $docId $offset $limit $children)
+  #set ($docRef = $services.model.resolveDocument($docId))
+  #foreach ($language in $xwiki.getDocument($docRef).translationList)
+    #set ($locale = $services.localization.toLocale($language))
+    #set ($translationReference = $services.model.createDocumentReference($docRef, $locale))
+    #addTranslationNode($translationReference $children)
+  #end
+#end
+
+#macro (addTranslationNode $translationReference $siblings)
+  #set ($currentLocale = $services.localization.currentLocale)
+  #set ($discard = $siblings.add({
+    'id': "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale",
+    'text': $translationReference.locale.getDisplayName($currentLocale),
+    'icon': 'fa fa-file-text-o',
+    'children': false,
+    'data': {
+      'type': 'translation',
+      'validChildren': [],
+      'canDelete': $services.security.authorization.hasAccess('delete', $translationReference)
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($translationReference)
+    }
+  }))
+#end
+
+##
+## Attachment Nodes
+##
+
+#macro (addAttachmentsNode $documentReference $siblings)
+  #set ($discard = $siblings.add({
+    'id': "attachments:${documentReference}",
+    'text': 'Attachments',
+    'icon': 'fa fa-paperclip',
+    'children': true,
+    'data': {
+      'type': 'attachments',
+      'validChildren': ['addAttachment', 'attachment', 'pagination'],
+      'hasContextMenu': true,
+      'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
+    }
+  }))
+#end
+
+#macro (addAttachmentsChildren $docId $offset $limit $children)
+  #set ($docRef = $services.model.resolveDocument($docId))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $docRef))
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc)
+    #addAddAttachmentNode($docRef $children)
+  #end
+  #set ($attachments = $xwiki.getDocument($docRef).attachmentList)
+  #set ($totalCount = $attachments.size())
+  ## Limit the number of attachments.
+  #set ($attachments = $attachments.subList($offset, $mathtool.min($mathtool.add($offset, $limit), $totalCount)))
+  #foreach ($attachment in $attachments)
+    #addAttachmentNode($attachment $children)
+  #end
+  #if ($attachments.size() &gt;= $limit)
+    #set ($newOffset = $mathtool.add($offset, $attachments.size()))
+    #if ($newOffset &lt; $totalCount)
+      #addPaginationNode("attachments:$docId" $newOffset $totalCount $children)
+    #end
+  #end
+#end
+
+#macro (addAddAttachmentNode $documentReference $siblings)
+  #set ($discard = $siblings.add({
+    'id': "addAttachment:$documentReference",
+    'text': 'Upload file...',
+    'icon': 'fa fa-plus-circle',
+    'children': false,
+    'data': {
+      'type': 'addAttachment',
+      'validChildren': []
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
+    }
+  }))
+#end
+
+#macro (addAttachmentNode $attachment $siblings)
+  #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
+    $attachment.filename))
+  #set ($attachmentId = $services.model.serialize($attachmentReference, 'default'))
+  #getAttachmentIcon($attachment $icon)
+  #set ($discard = $siblings.add({
+    'id': "attachment:$attachmentId",
+    'text': $attachment.filename,
+    'icon': $icon,
+    'children': false,
+    'data': {
+      'id': $attachmentId,
+      'type': 'attachment',
+      'validChildren': [],
+      'hasContextMenu': true,
+      'draggable': true,
+      'canRename': $canEditDoc,
+      'canDelete': $canEditDoc,
+      'canMove': $canEditDoc,
+      'canCopy': true,
+      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment')
+    },
+    'a_attr': {
+      'href': $attachment.document.getAttachmentURL($attachment.filename)
+    }
+  }))
+#end
+
+#set ($fileIconByMediaType = {
+  'text': ['text/', 'application/xml', 'application/javascript', 'application/ecmascript', 'application/json', 'application/x-sh', '+xml'],
+  'image': ['image/'],
+  'audio': ['audio/'],
+  'video': ['video/'],
+  'pdf': ['application/pdf', 'application/postscript'],
+  'word': ['application/msword', 'application/vnd.ms-word.', 'application/vnd.oasis.opendocument.text', 'application/vnd.openxmlformats-officedocument.word'],
+  'powerpoint': ['application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.presentation', 'application/vnd.openxmlformats-officedocument.presentation'],
+  'excel': ['application/vnd.ms-excel', 'application/vnd.oasis.opendocument.spreadsheet', 'application/vnd.openxmlformats-officedocument.spreadsheet'],
+  'archive': ['application/zip', 'application/x-gzip', 'application/x-bzip', 'application/x-tar', 'application/x-gtar', 'application/vnd.xara', '-archive', '-compressed', '-package', '+zip']
+})
+
+#macro (getAttachmentIcon $attachment $return)
+  #set ($mediaType = $attachment.mimeType)
+  #set ($icon = $NULL)
+  #foreach ($entry in $fileIconByMediaType.entrySet())
+    #foreach ($pattern in $entry.value)
+      #if ($mediaType.startsWith($pattern) || $mediaType.endsWith($pattern))
+        #set ($icon = $entry.key)
+        #break
+      #end
+    #end
+    #if ($icon)
+      #break
+    #end
+  #end
+  #set ($suffix = $stringtool.substringAfterLast($attachment.filename, '.'))
+  #set ($codeSuffixes = ['html', 'css', 'js', 'java', 'c', 'cpp', 'c++', 'cs', 'h', 'sql', 'php', 'ruby'])
+  #if (!$icon)
+    #set ($icon = 'fa fa-paperclip')
+  #elseif ($icon == 'text' &amp;&amp; $codeSuffixes.contains($suffix))
+    #set ($icon = 'fa fa-file-code-o')
+  #else
+    #set ($icon = "fa fa-file-${icon}-o")
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $icon)
+#end
+
+##
+## Class Property Nodes
+##
+
+#macro (addClassPropertiesChildren $classId $offset $limit $children)
+  #set ($classRef = $services.model.resolveDocument($classId))
+  #set ($classNode = $xwiki.getDocument($classRef))
+  #foreach ($property in $classNode.getxWikiClass().properties)
+    #addClassPropertyNode($property $classRef $children)
+  #end
+#end
+
+#set ($iconByPropertyType = {
+  'Boolean': 'check-square-o',
+  'Date': 'calendar-o',
+  'DBList': 'database',
+  'Groups': 'group',
+  'Password': 'asterisk',
+  'Levels': 'lock',
+  'StaticList': 'list',
+  'TextArea': 'paragraph',
+  'DBTreeList': 'sitemap',
+  'Users': 'user'
+})
+
+#macro (addClassPropertyNode $property $classRef $siblings)
+  #set ($classPropertyReference = $services.model.createEntityReference($property.name, 'CLASS_PROPERTY', $classRef))
+  #set ($classPropertyId = $services.model.serialize($classPropertyReference, 'default'))
+  #set ($icon = $iconByPropertyType.get($property.classType))
+  #if (!$icon)
+    #set ($icon = 'gear')
+  #end
+  #set ($discard = $siblings.add({
+    'id': "classProperty:$classPropertyId",
+    'text': $property.name,
+    'icon': "fa fa-$icon",
+    'children': false,
+    'data': {
+      'id': $classPropertyId,
+      'type': 'classProperty',
+      'validChildren': []
+    }
+  }))
+#end
+
+##
+## Object Nodes
+##
+
+#macro (addObjectsChildren $docId $offset $limit $children)
+  #set ($docRef = $services.model.resolveDocument($docId))
+  #foreach ($classId in $xwiki.getDocument($docRef).getxWikiObjects().keySet())
+    #set ($discard = $children.add({
+      'id': "objectsOfType:$docRef/$classId",
+      'text': $classId,
+      'icon': 'fa fa-cubes',
+      'children': true,
+      'data': {
+        'type': 'objectsOfType',
+        'validChildren': ['object', 'pagination'],
+        'canDelete': $services.security.authorization.hasAccess('edit', $docRef)
+      }
+    }))
+  #end
+#end
+
+#macro (addObjectsOfTypeChildren $nodeId $offset $limit $children)
+  #set ($separatorIndex = $nodeId.lastIndexOf('/'))
+  #set ($docId = $nodeId.substring(0, $separatorIndex))
+  #set ($classId = $nodeId.substring($mathtool.add($separatorIndex, 1)))
+  #set ($docRef = $services.model.resolveDocument($docId))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $docRef))
+  #set ($objects = $xwiki.getDocument($docRef).getObjects($classId))
+  #set ($totalCount = $objects.size())
+  ## Limit the number of objects.
+  #set ($objects = $objects.subList($offset, $mathtool.min($mathtool.add($offset, $limit), $totalCount)))
+  #foreach ($object in $objects)
+    #set ($objectReference = $services.model.createEntityReference("${classId}[$object.number]", 'OBJECT', $docRef))
+    #addObjectNode($object $objectReference $children)
+  #end
+  #if ($objects.size() &gt;= $limit)
+    #set ($newOffset = $mathtool.add($offset, $objects.size()))
+    #if ($newOffset &lt; $totalCount)
+      #addPaginationNode("objectsOfType:$nodeId" $newOffset $totalCount 'bricks' $children)
+    #end
+  #end
+#end
+
+#macro (addObjectNode $object $objectReference $siblings)
+  #set ($objectId = $services.model.serialize($objectReference, 'default'))
+  #set ($discard = $children.add({
+    'id': "object:$objectId",
+    'text': "[$object.number]",
+    'icon': 'fa fa-cube',
+    'children': true,
+    'data': {
+      'id': $objectId,
+      'type': 'object',
+      'validChildren': ['objectProperty'],
+      'canDelete': $canEditDoc
+    }
+  }))
+#end
+
+#macro (addObjectChildren $objId $offset $limit $children)
+  #set ($objRef = $services.model.resolveObject($objId))
+  ## Object name is: Space.Class[index]
+  #set ($separatorIndex = $objRef.name.lastIndexOf('['))
+  #set ($classId = $objRef.name.substring(0, $separatorIndex))
+  #set ($objectNumber = $mathtool.toInteger($objRef.name.substring($mathtool.add($separatorIndex, 1),
+    $mathtool.sub($objRef.name.length(), 1))))
+  #set ($document = $xwiki.getDocument($objRef.extractReference('DOCUMENT')))
+  #set ($object = $document.getObject($classId, $objectNumber))
+  #foreach ($property in $object.properties)
+    #addObjectPropertyNode($property $objRef $children)
+  #end
+#end
+
+##
+## Object Property Nodes
+##
+
+#macro (addObjectPropertyNode $property $objRef $siblings)
+  #set ($classId = $stringtool.substringBeforeLast($objRef.name, '['))
+  #set ($classRef = $services.model.resolveDocument($classId, 'explicit', $objRef))
+  #set ($xclass = $xwiki.getDocument($classRef).getxWikiClass())
+  #set ($icon = $iconByPropertyType.get($xclass.get($property.name).classType))
+  #if (!$icon)
+    #set ($icon = 'gear')
+  #end
+  #set ($objectPropertyReference = $services.model.createEntityReference($property.name, 'OBJECT_PROPERTY', $objRef))
+  #set ($objectPropertyId = $services.model.serialize($objectPropertyReference, 'default'))
+  #set ($discard = $siblings.add({
+    'id': "objectProperty:$objectPropertyId",
+    'text': $property.name,
+    'icon': "fa fa-$icon",
+    'children': false,
+    'data': {
+      'id': $objectPropertyId,
+      'type': 'objectProperty',
+      'validChildren': []
+    }
+  }))
+#end
+
+##------------------------------------------------------------
+## Path
+##------------------------------------------------------------
+
+#macro (getPath $nodeId $return)
+  #set ($parts = $nodeId.split(':', 2))
+  #if ($parts.size() == 1)
+    #set ($path = [$nodeId])
+  #else
+    #set ($nodeType = $parts[0])
+    #set ($nodeId = $parts[1])
+    #set ($path = [])
+    #set ($discard = "#evaluate(""${escapetool.h}get$stringtool.capitalize($nodeType)Path(
+      ${escapetool.d}nodeId ${escapetool.d}path)"")")
+    #if ("$!docTreeConfig.root" != '')
+      ## The path needs to be relative to the specified root because only a sub-tree is displayed.
+      #getRelativePath($path $docTreeConfig.root)
+    #elseif ($docTreeConfig.showRoot)
+      ## We must prefix the path with the default root node.
+      #getChildren('#' $topLevelNodes)
+      #if ($topLevelNodes.size() &gt; 0)
+        #set ($discard = $path.add(0, $topLevelNodes.get(0)))
+      #end
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $path)
+#end
+
+#macro (getRelativePath $path $rootId)
+  #set ($index = -1)
+  #foreach ($node in $path)
+    #if ($node.id == $rootId)
+      #set ($index = $foreach.index)
+      #break
+    #end
+  #end
+  #if ($index &gt;= 0)
+    ## Return the path suffix that starts from the specified root.
+    #set ($startIndex = $index)
+    #if (!$docTreeConfig.showRoot)
+      ## Exclude the root node from the path.
+      #set ($startIndex = $mathtool.add($index, 1))
+    #end
+    #set ($path = $path.subList($startIndex, $path.size()))
+  #else
+    ## The target node is not in the specified sub-tree. We return an empty path in this case, which prevents the node
+    ## from being opened or added to the tree (in case the root node has pagination).
+    #set ($path = [])
+  #end
+#end
+
+#macro (getWikiPath $wikiRefOrId $path)
+  #set ($wikiId = $wikiRefOrId.extractReference('WIKI').name)
+  #if (!$wikiId)
+    #set ($wikiId = $wikiRefOrId)
+  #end
+  #set ($wiki = $services.wiki.getById($wikiId))
+  #maybeAddWikiNode($wiki $path {})
+#end
+
+#macro (getSpacePath $spaceRefOrId $path)
+  #set ($spaceRef = $spaceRefOrId.extractReference('SPACE'))
+  #if (!$spaceRef)
+    #set ($spaceRef = $services.model.resolveSpace($spaceRefOrId))
+  #end
+  #if ($docTreeConfig.showWikis)
+    #getWikiPath($spaceRef $path)
+  #end
+  #set ($ancestorReferences = $spaceRef.reversedReferenceChain)
+  ## Skip the wiki reference.
+  #if ($ancestorReferences.size() &gt; 1)
+    #foreach ($index in [1..$mathtool.sub($ancestorReferences.size(), 1)])
+      #set ($ancestorReference = $ancestorReferences.get($index))
+      #maybeAddSpaceNode($ancestorReference $path {})
+    #end
+  #end
+#end
+
+#macro (getDocumentPath $docRefOrId $path)
+  #set ($docRef = $docRefOrId.extractReference('DOCUMENT'))
+  #if (!$docRef)
+    #set ($docRef = $services.model.resolveDocument($docRefOrId))
+  #end
+  ## We use a linked list because the parents are inserted at the start of the list.
+  #set ($docPath = $collectionstool.linkedList)
+  #set ($discard = $docPath.add($docRef))
+  ## Collect the references of all the ancestor documents.
+  #if ($docTreeConfig.hierarchyMode == 'reference' &amp;&amp; !$docTreeConfig.showSpaces)
+    #getNestedDocumentPath($docPath)
+  #elseif ($docTreeConfig.hierarchyMode == 'parentchild')
+    #getParentChildDocumentPath($docPath)
+  #end
+  #set ($rootDocRef = $docPath.first)
+  #if ($docTreeConfig.showSpaces)
+    #getSpacePath($rootDocRef $path)
+  #elseif ($docTreeConfig.showWikis)
+    #getWikiPath($rootDocRef $path)
+  #end
+  #foreach ($docRef in $docPath)
+    #maybeAddDocumentNode($docRef $path {})
+  #end
+#end
+
+#macro (getNestedDocumentPath $path)
+  #set ($docRef = $path.get(0))
+  #set ($parentReference = $docRef.parent)
+  #if ($docRef.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #set ($parentReference = $parentReference.parent)
+  #end
+  #set ($ancestorReferences = $parentReference.reversedReferenceChain)
+  ## Skip the wiki reference.
+  #if ($ancestorReferences.size() &gt; 1)
+    #foreach ($index in [$mathtool.sub($ancestorReferences.size(), 1)..1])
+      #set ($discard = $path.add(0, $services.model.resolveDocument('', 'default', $ancestorReferences.get($index))))
+    #end
+  #end
+#end
+
+#macro (getParentChildDocumentPath $path)
+  #set ($docRef = $path.get(0))
+  #set ($document = $xwiki.getDocument($docRef))
+  #if ($document &amp;&amp; $document.parent != '')
+    #set ($parentRef = $services.model.resolveDocument($document.parent, 'explicit', $docRef))
+    ## If the wiki/space nodes are displayed then the documents are grouped by wiki/space and thus the parent document
+    ## must remain in the same wiki/space.
+    #if ((!$docTreeConfig.showSpaces || $docRef.parent.equals($parentRef.parent))
+        &amp;&amp; (!$docTreeConfig.showWikis || $docRef.wikiReference.equals($parentRef.wikiReference)))
+      #set ($discard = $path.add(0, $parentRef))
+      #getParentChildDocumentPath($path)
+    #end
+  #end
+#end
+
+#macro (getAttachmentsPath $docRefOrId $path)
+  #getDocumentPath($docRefOrId $path)
+  #set ($docRef = $docRefOrId.extractReference('DOCUMENT'))
+  #if (!$docRef)
+    #set ($docRef = $services.model.resolveDocument($docRefOrId))
+  #end
+  #addAttachmentsNode($docRef $path)
+#end
+
+#macro (getAttachmentPath $attachmentId $path)
+  #set ($attachmentReference = $services.model.resolveAttachment($attachmentId))
+  #set ($documentReference = $attachmentReference.documentReference)
+  #getAttachmentsPath($documentReference $path)
+  #set ($attachment = $xwiki.getDocument($attachmentReference.parent).getAttachment($attachmentReference.name))
+  #if ($attachment)
+    #addAttachmentNode($attachment $path)
+  #else
+    #set ($discard = $path.add({}))
+  #end
+#end
+
+##------------------------------------------------------------
+## Context Menu
+##------------------------------------------------------------
+
+#macro (getContextMenu $return)
+  #set ($contextMenuByNodeType = {})
+  #if ($docTreeConfig.showSpaces)
+    #addSpaceContextMenu($contextMenuByNodeType)
+  #end
+  #addDocumentContextMenu($contextMenuByNodeType)
+  #if ($docTreeConfig.showAttachments)
+    #addAttachmentsContextMenu($contextMenuByNodeType)
+    #addAttachmentContextMenu($contextMenuByNodeType)
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $contextMenuByNodeType)
+#end
+
+#macro (addSpaceContextMenu $contextMenuByNodeType)
+  #set ($contextMenuByNodeType.space = {
+    'createDocument': {
+      'label': 'New Page',
+      'icon': 'fa fa-file-o',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'createDocumentURL'
+      }
+    },
+    'openLink': {
+      'separator_before': true,
+      'label': 'Go to Space',
+      'icon': 'fa fa-external-link'
+    },
+    'refresh': {
+      'label': 'Refresh',
+      'icon': 'fa fa-refresh'
+    },
+    'paste': {
+      'separator_before': true,
+      'label': 'Paste Into Space',
+      'icon': 'fa fa-clipboard'
+    },
+    'rename': {
+      'label': 'Rename...',
+      'icon': 'fa fa-pencil-square-o'
+    },
+    'remove': {
+      'label': 'Delete',
+      'icon': 'fa fa-trash-o',
+      'parameters': {
+        'confirmationMessage': 'Are you sure you want to move ALL the documents from this space to the recycle bin? If there are hidden documents in this space they will also be deleted.'
+      }
+    }
+  })
+#end
+
+#macro (addDocumentContextMenu $contextMenuByNodeType)
+  #set ($contextMenuByNodeType.document = {
+    'createDocument': {
+      'label': 'New Page',
+      'icon': 'fa fa-file-o',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'createDocumentURL'
+      }
+    },
+    'openLink': {
+      'separator_before': true,
+      'label': 'Go to Page',
+      'icon': 'fa fa-external-link'
+    },
+    'refresh': {
+      'label': 'Refresh',
+      'icon': 'fa fa-refresh'
+    },
+    'cut': {
+      'separator_before': true,
+      'label': 'Cut',
+      'icon': 'fa fa-scissors'
+    },
+    'copy': {
+      'label': 'Copy',
+      'icon': 'fa fa-files-o'
+    },
+    'paste': {
+      'label': 'Paste',
+      'icon': 'fa fa-clipboard'
+    },
+    'remove': {
+      'separator_before': true,
+      'label': 'Delete',
+      'icon': 'fa fa-trash-o',
+      'parameters': {
+        'confirmationMessage': 'Are you sure you want to move this document to the recycle bin? All child documents will become orphan as a result.'
+      }
+    }
+  })
+#end
+
+#macro (addAttachmentsContextMenu $contextMenuByNodeType)
+  #set ($contextMenuByNodeType.attachments = {
+    'openLink': {
+      'label': 'Go to Attachments',
+      'icon': 'fa fa-external-link'
+    },
+    'refresh': {
+      'label': 'Refresh',
+      'icon': 'fa fa-refresh'
+    },
+    'paste': {
+      'separator_before': true,
+      'label': 'Paste',
+      'icon': 'fa fa-clipboard'
+    },
+    'remove': {
+      'label': 'Delete All',
+      'icon': 'fa fa-trash-o',
+      'parameters': {
+        'confirmationMessage': 'Are you sure you want to delete all the attachments of this page?'
+      }
+    }
+  })
+#end
+
+#macro (addAttachmentContextMenu $contextMenuByNodeType)
+  #set ($contextMenuByNodeType.attachment = {
+    'openLink': {
+      'label': 'Go to Attachment',
+      'icon': 'fa fa-external-link'
+    },
+    'cut': {
+      'separator_before': true,
+      'label': 'Cut',
+      'icon': 'fa fa-scissors'
+    },
+    'copy': {
+      'label': 'Copy',
+      'icon': 'fa fa-files-o'
+    },
+    'rename': {
+      'separator_before': true,
+      'label': 'Rename...',
+      'icon': 'fa fa-pencil-square-o'
+    },
+    'remove': {
+      'label': 'Delete',
+      'icon': 'fa fa-trash-o',
+      'parameters': {
+        'confirmationMessage': 'Are you sure you want to delete this attachment?'
+      }
+    }
+  })
+#end
+
+##------------------------------------------------------------
+## Finder Suggestions
+##------------------------------------------------------------
+
+#macro (getSuggestions $return)
+  #set ($limit = 6)
+  #set ($text = "$!request.query")
+  #set ($lists = [])
+  #getRootReference
+  #set ($ancestorsOf = {
+    'space': ['farm', 'wiki', 'space'],
+    'document': ['farm', 'wiki', 'space', 'document'],
+    'attachment': ['farm', 'wiki', 'space', 'document', 'attachments']
+  })
+  #if ((!$docTreeConfig.showSpaces || $docTreeConfig.showTerminalDocuments)
+      &amp;&amp; $ancestorsOf.document.contains($rootType))
+    #addDocumentSuggestions($text $limit $lists)
+  #end
+  #if ($docTreeConfig.showAttachments &amp;&amp; $ancestorsOf.attachment.contains($rootType))
+    #addAttachmentSuggestions($text $limit $lists)
+  #end
+  #if ($docTreeConfig.showSpaces &amp;&amp; $ancestorsOf.space.contains($rootType))
+    #addSpaceSuggestions($text $limit $lists)
+  #end
+  #limitTotalCount($lists $limit)
+  #set ($output = [])
+  #foreach ($list in $lists)
+    #foreach ($node in $list)
+      ## Use the node path as suggestion info.
+      #getPath($node.id $path)
+      ## The path is empty when the node is not found in the tree. This happens if the tree finder doesn't restrict the
+      ## search to the nodes that are available in the tree.
+      #if ($path.size() &gt; 0)
+        #displayPath($path)
+        #set ($node.data.info = $stringtool.join($path.subList(0, $mathtool.sub($path.size(), 1)), ' / '))
+        #set ($discard = $output.add($node))
+      #end
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $output)
+#end
+
+#macro (getRootReference)
+  #set ($root = $docTreeConfig.root)
+  #if ($root == '')
+    #set ($root = $docTreeConfig.defaultRoot)
+  #end
+  #set ($parts = $root.split(':', 2))
+  #if ($parts.size() == 2)
+    #set ($rootType = $parts[0])
+    #set ($rootReference = $parts[1])
+    #if ($rootType == 'wiki')
+      #set ($rootReference = $services.model.createWikiReference($parts[1]))
+    #elseif ($rootType == 'space')
+      #set ($rootReference = $services.model.resolveSpace($parts[1]))
+    #elseif ($rootType == 'document' || $rootType == 'attachments')
+      #set ($rootReference = $services.model.resolveDocument($parts[1]))
+    #end
+  #else
+    #set ($rootType = 'unknown')
+    #set ($rootReference = $parts[0])
+  #end
+#end
+
+#macro (addSpaceSuggestions $text $limit $suggestions)
+  #searchSpaces($text $limit $spaceReferences)
+  #set ($spaceSuggestions = [])
+  #foreach ($spaceReference in $spaceReferences)
+    #maybeAddSpaceNode($spaceReference $spaceSuggestions)
+  #end
+  #set ($discard = $suggestions.add($spaceSuggestions))
+#end
+
+#macro (searchSpaces $text $limit $return)
+  #set ($constraints = ["upper(space.name) like upper(:spaceNamePattern) escape '!'"])
+  #set ($params = {'spaceNamePattern': "%$!text.replaceAll('([%_!])', '!$1')%"})
+  #addSpaceLocationDatabaseConstraint($rootReference $constraints $params 'space.reference')
+  #set ($statement = "select space.reference from XWikiSpace space where $stringtool.join($constraints, ' and ') "
+    + "order by lower(space.reference), space.reference")
+  #set ($query = $services.query.hql($statement).setLimit($limit))
+  #addWikiLocationDatabaseConstraint($rootReference $query)
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/space'))
+  #end
+  #foreach ($entry in $params.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
+  #end
+  #set ($spaceReferences = [])
+  #foreach ($localSpaceRef in $query.execute())
+    #set ($discard = $spaceReferences.add($services.model.resolveSpace($localSpaceRef)))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $spaceReferences)
+#end
+
+#macro (addDocumentSuggestions $text $limit $suggestions)
+  #searchDocuments($text $limit $documentReferences)
+  #set ($docSuggestions = [])
+  #foreach ($documentReference in $documentReferences)
+    #maybeAddDocumentNode($documentReference $docSuggestions)
+  #end
+  #set ($discard = $suggestions.add($docSuggestions))
+#end
+
+#macro (searchDocuments $text $limit $return)
+  #if ($xwiki.exists('XWiki.SuggestSolrMacros'))
+    #searchDocumentsSolr($text $limit $return)
+  #else
+    #searchDocumentsDatabase($text $limit $return)
+  #end
+#end
+
+#macro (searchDocumentsSolr $text $limit $return)
+  #set ($params = [
+    'fq=type:DOCUMENT',
+    'fq=doclocale:""',
+    'qf=title^6 name^4 doccontent^2 doccontentraw',
+    'fl=wiki spaces name'
+  ])
+  #addCommonDocTreeSolrParams($params)
+  #set ($params = $stringtool.join($params, $util.newline))
+  #createSearchSuggestQuery($params $text $query)
+  #set ($discard = $query.setLimit($limit))
+  #set ($documentReferences = [])
+  #foreach ($result in $query.execute()[0].results)
+    #set ($discard = $documentReferences.add($services.solr.resolveDocument($result)))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $documentReferences)
+#end
+
+#macro (searchDocumentsDatabase $text $limit $return)
+  #set ($constraints = [
+    'doc.translation = 0',
+    'doc.space = space.reference'
+  ])
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($matchDocTitle = "upper(doc.title) like upper(:text) escape '!'")
+  #set ($params = {'text': "%$!text.replaceAll('([%_!])', '!$1')%"})
+  #if ($docTreeConfig.showTerminalDocuments)
+    #set ($matchDocName = "(doc.name &lt;&gt; '$defaultDocumentName' and upper(doc.name) like upper(:text) escape '!')")
+    #set ($matchSpaceName = "(doc.name = '$defaultDocumentName' and upper(space.name) like upper(:text) escape '!')")
+    #set ($discard = $constraints.add("($matchDocTitle or $matchDocName or $matchSpaceName)"))
+  #else
+    #set ($matchSpaceName = "upper(space.name) like upper(:text) escape '!'")
+    #set ($discard = $constraints.addAll([
+      "doc.name = '$defaultDocumentName'",
+      "($matchDocTitle or $matchSpaceName)"
+    ]))
+  #end
+  #addDocumentLocationDatabaseConstraint($rootReference $constraints $params)
+  #set ($constraints = $stringtool.join($constraints, ' and '))
+  #set ($statement = "select doc.fullName from XWikiDocument doc, XWikiSpace space where $constraints")
+  #set ($query = $services.query.hql($statement).setLimit($limit))
+  #foreach ($entry in $params.entrySet())
+    #set ($query = $query.bindValue($entry.key, $entry.value))
+  #end
+  #addWikiLocationDatabaseConstraint($rootReference $query)
+  #if ($docTreeConfig.filterHiddenDocuments)
+    #set ($query = $query.addFilter('hidden/document'))
+  #end
+  #set ($documentReferences = [])
+  #foreach ($docFullName in $query.execute())
+    #set ($discard = $documentReferences.add($services.model.resolveDocument($docFullName)))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $documentReferences)
+#end
+
+#macro (addAttachmentSuggestions $text $limit $suggestions)
+  #searchAttachments($text $limit $attachmentReferences)
+  #set ($attachmentSuggestions = [])
+  #foreach ($attachmentReference in $attachmentReferences)
+    #set ($attachment = $xwiki.getDocument($attachmentReference.parent).getAttachment($attachmentReference.name))
+    #addAttachmentNode($attachment $attachmentSuggestions)
+  #end
+  #set ($discard = $suggestions.add($attachmentSuggestions))
+#end
+
+#macro (searchAttachments $text $limit $return)
+  #if ($xwiki.exists('XWiki.SuggestSolrMacros'))
+    #searchAttachmentsSolr($text $limit $return)
+  #else
+    #searchAttachmentsDatabase($text $limit $return)
+  #end
+#end
+
+#macro (searchAttachmentsSolr $text $limit $return)
+  #set ($params = [
+    'fq=type:ATTACHMENT',
+    'qf=filename^4 attcontent',
+    'fl=type wiki spaces name filename'
+  ])
+  #addCommonDocTreeSolrParams($params)
+  #set ($params = $stringtool.join($params, $util.newline))
+  #createSearchSuggestQuery($params $text $query)
+  #set ($discard = $query.setLimit($limit))
+  #set ($attachmentReferences = [])
+  #foreach ($result in $query.execute()[0].results)
+    #set ($discard = $attachmentReferences.add($services.solr.resolve($result)))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $attachmentReferences)
+#end
+
+#macro (searchAttachmentsDatabase $text $limit $return)
+  #set ($constraints = ["upper(attach.filename) like upper(:text) escape'!'"])
+  #set ($params = {'text': "%$!text.replaceAll('([%_!])', '!$1')%"})
+  #if ($docTreeConfig.filterHiddenDocuments &amp;&amp; "$!xwiki.getUserPreference('displayHiddenDocuments')" != '1')
+    #set ($discard = $constraints.add("(doc.hidden &lt;&gt; true or doc.hidden is null)"))
+  #end
+  #set ($exactMatch = $rootType == 'attachments')
+  #addDocumentLocationDatabaseConstraint($rootReference $constraints $params $exactMatch)
+  #set ($statement = "where $stringtool.join($constraints, ' and ')")
+  ##
+  ## Convert named parameters to positional parameters.
+  #set ($paramList = [])
+  #foreach ($item in $regextool.findAll($statement, ':(\w+)'))
+    #set ($paramName = $item.get(1).getGroup())
+    #set ($discard = $paramList.add($params.get($paramName)))
+  #end
+  #set ($statement = $statement.replaceAll(':\w+', '\?'))
+  ##
+  ## TODO: Search in the wiki that corresponds to the root node.
+  #set ($attachments = $xwiki.searchAttachments($statement, $limit, 0, $paramList))
+  #set ($attachmentReferences = [])
+  #foreach ($attachment in $attachments)
+    #set ($discard = $attachmentReferences.add($services.model.createAttachmentReference(
+      $attachment.document.documentReference, $attachment.filename)))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $attachmentReferences)
+#end
+
+#macro (addCommonDocTreeSolrParams $params)
+  #if ($rootType == 'wiki')
+    ## Limit the search to the specified wiki.
+    #addWikiLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'space')
+    ## Limit the search to the specified space.
+    #addSpaceLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'document')
+    ## Limit the search to the specified document.
+    #addDocumentLocationSolrParams($rootReference $params)
+  #elseif ($rootType == 'attachments')
+    ## Limit the search to the attachments of the specified document.
+    #addDocumentLocationSolrParams($rootReference $params true)
+  #end
+  #if (!$docTreeConfig.showTerminalDocuments)
+    #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #set ($discard = $params.add("fq=name:$defaultDocumentName"))
+  #end
+  #if (!$docTreeConfig.filterHiddenDocuments)
+    ## Force the inclusion of the hidden documents.
+    #set ($discard = $params.add("fq=hidden:*"))
+  #end
+#end
+
+#macro (addWikiLocationSolrParams $rootReference $params)
+  #set ($wikiReference = $rootReference.extractReference('WIKI'))
+  #if ($wikiReference)
+    #set ($discard = $params.add("fq=wiki:$wikiReference.name"))
+  #end
+#end
+
+#macro (addWikiLocationDatabaseConstraint $rootReference $query)
+  #set ($wikiReference = $rootReference.extractReference('WIKI'))
+  #if ($wikiReference)
+    #set ($query = $query.setWiki($wikiReference.name))
+  #end
+#end
+
+#macro (addSpaceLocationSolrParams $rootReference $params $exactMatch)
+  #addWikiLocationSolrParams($rootReference $params)
+  #set ($spaceReference = $rootReference.extractReference('SPACE'))
+  #if ($spaceReference &amp;&amp; ($docTreeConfig.showSpaces || $docTreeConfig.hierarchyMode == 'reference'))
+    #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+    #set ($spaceField = 'space_prefix')
+    #if ($exactMatch)
+      #set ($spaceField = 'space_exact')
+    #end
+    #set ($discard = $params.add("fq=$spaceField:$localSpaceReference"))
+  #end
+#end
+
+#macro (addSpaceLocationDatabaseConstraint $rootReference $constraints $params $field)
+  #set ($spaceReference = $rootReference.extractReference('SPACE'))
+  #if ($spaceReference &amp;&amp; ($docTreeConfig.showSpaces || $docTreeConfig.hierarchyMode == 'reference'))
+    #set ($discard = $constraints.add("($field = :localSpaceReference or $field like :spaceReferencePattern escape '!')"))
+    #set ($localSpaceReference = $services.model.serialize($spaceReference, 'local'))
+    #set ($discard = $params.put('localSpaceReference', $localSpaceReference))
+    #set ($spaceReferencePattern = $services.model.createEntityReference('x', 'SPACE', $spaceReference))
+    #set ($spaceReferencePattern = $services.model.serialize($spaceReferencePattern, 'local'))
+    #set ($spaceReferencePattern = $stringtool.removeEnd($spaceReferencePattern, 'x').replaceAll('([%_!])', '!$1'))
+    #set ($discard = $params.put('spaceReferencePattern', "$spaceReferencePattern%"))
+  #end
+#end
+
+#macro (addDocumentLocationSolrParams $rootReference $params $exactMatch)
+  #set ($documentReference = $rootReference.extractReference('DOCUMENT'))
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($macro.exactMatch = $exactMatch || ($docTreeConfig.hierarchyMode == 'reference'
+    &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
+  #addSpaceLocationSolrParams($rootReference $params $macro.exactMatch)
+  #if ($documentReference &amp;&amp; $macro.exactMatch)
+    #set ($discard = $params.add("fq=name_exact:$documentReference.name"))
+  #end
+#end
+
+#macro (addDocumentLocationDatabaseConstraint $rootReference $constraints $params $exactMatch)
+  #set ($documentReference = $rootReference.extractReference('DOCUMENT'))
+  #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($macro.exactMatch = $exactMatch || ($docTreeConfig.hierarchyMode == 'reference'
+    &amp;&amp; $documentReference &amp;&amp; $documentReference.name != $defaultDocumentName))
+  #if ($documentReference &amp;&amp; $macro.exactMatch)
+    #set ($localDocumentReference = $services.model.serialize($documentReference, 'local'))
+    #set ($discard = $constraints.add('doc.fullName = :localDocumentReference'))
+    #set ($discard = $params.put('localDocumentReference', $localDocumentReference))
+  #elseif (!$macro.exactMatch)
+    #addSpaceLocationDatabaseConstraint($rootReference $constraints $params 'doc.space')
+  #end
+#end
+
+#macro (displayPath $path)
+  #foreach ($node in $path)
+    #set ($discard = $path.set($foreach.index, $node.text))
+  #end
+#end
+
+#macro (limitTotalCount $lists $limit)
+  ## Prepare the input.
+  #set ($input = [])
+  #foreach ($list in $lists)
+    ## We use queues to be able to easily remove items from the start.
+    #set ($queue = $collectionstool.queue)
+    #set ($discard = $queue.addAll($list))
+    #set ($discard = $input.add($queue))
+    ## We will add (part of) the items back later.
+    #set ($discard = $list.clear())
+  #end
+  ## Limit the total item count.
+  #set ($index = -1)
+  #foreach ($count in [1..$limit])
+    #foreach ($i in [1..$input.size()])
+      #set ($newIndex = ($index + $i) % $input.size())
+      #if ($input.get($newIndex).size() &gt; 0)
+        #set ($index = $newIndex)
+        #break
+      #end
+    #end
+    #if ($index &lt; 0 || $input.get($index).isEmpty())
+      #break
+    #else
+      #set ($discard = $lists.get($index).add($input.get($index).poll()))
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

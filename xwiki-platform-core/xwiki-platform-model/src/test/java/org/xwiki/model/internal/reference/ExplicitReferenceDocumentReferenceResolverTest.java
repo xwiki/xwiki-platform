@@ -21,11 +21,14 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver}.
@@ -33,20 +36,26 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class ExplicitReferenceDocumentReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> mocker =
+        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+
     private DocumentReferenceResolver<EntityReference> resolver;
 
     @Before
     public void setUp() throws Exception
     {
         this.resolver = new ExplicitReferenceDocumentReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver",
-            new ExplicitStringEntityReferenceResolver());
+        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
     }
 
     @Test
-    public void testResolveWithExplicitDocumentReference()
+    public void resolveWithExplicitDocumentReference()
     {
         DocumentReference reference = this.resolver.resolve(null, new DocumentReference("wiki", "space", "page"));
 

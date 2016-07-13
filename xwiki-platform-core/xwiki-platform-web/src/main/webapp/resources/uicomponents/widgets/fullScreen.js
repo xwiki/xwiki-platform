@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
 var widgets = XWiki.widgets = XWiki.widgets || {};
@@ -12,6 +31,8 @@ widgets.FullScreen = Class.create({
   margin : 0,
   /** Full screen activator / deactivator button size */
   buttonSize : 16,
+  editFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.editFullScreen')),
+  exitFullScreenLabel: $jsontool.serialize($services.localization.render('core.editors.fullscreen.exitFullScreen')),
   /**
    * Full screen control initialization
    * Identifies the elements that must be visible in full screen: the textarea or the rich text editor, along with their
@@ -73,16 +94,12 @@ widgets.FullScreen = Class.create({
   addBehavior : function (item) {
     if (this.isWysiwyg20Content(item)) {
       this.addWysiwyg20ContentButton(item);
-    } else if (this.isWysiwyg10Content(item)) {
-      this.addWysiwyg10ContentButton(item);
     } else if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
     } else if (this.isWysiwyg20Field(item)) {
       this.addWysiwyg20FieldButton(item);
     } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
-    } else if (this.isWysiwyg10Field(item)) {
-      this.addWysiwyg10FieldButton(item);
     } else {
       // a div element with class maximazable
       this.addElementButton(item);
@@ -90,12 +107,6 @@ widgets.FullScreen = Class.create({
   },
   addWysiwygListeners : function () {
     document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
-    document.observe('xwiki:tinymce:created', this.wysiwyg10Created.bindAsEventListener(this));
-  },
-  wysiwyg10Created : function(event) {
-    var item = $(event.memo.instance);
-    this.removeTextareaLink(item);
-    this.addBehavior(item);
   },
   wysiwyg20Created : function(event) {
     var item = $(event.memo.instance.getRichTextArea()).up(".xRichTextEditor");
@@ -119,20 +130,12 @@ widgets.FullScreen = Class.create({
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.name == 'content' && textarea.visible();
   },
-  isWysiwyg10Content : function (textarea) {
-    // If the textarea is not visible, then the WYSIWYG editor is active.
-    // In IE, the WYSIWYG is placed before its textarea.
-    return textarea.name == 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
-  },
   isWysiwyg20Content : function (item) {
     return item.hasClassName("xRichTextEditor") && item.up("div[id^=content_container]");
   },
   isWikiField : function (textarea) {
     // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.visible();
-  },
-  isWysiwyg10Field : function (textarea) {
-    return !textarea.visible() && textarea.name != 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
   },
   isWysiwyg20Field : function (item) {
     return item.hasClassName("xRichTextEditor") && !item.up("div[id^=content_container]");
@@ -146,31 +149,6 @@ widgets.FullScreen = Class.create({
     } else {
       this.addWikiFieldButton(textarea);
     }
-  },
-  /** Adds the fullscreen button in the TinyMCE WYSIWYG editor toolbar. */
-  addWysiwyg10ContentButton : function (item) {
-    var container = (Prototype.Browser.IE ? item.previous(".mceEditorContainer") : item.next(".mceEditorContainer"));
-    if (!container) {
-      return false;
-    }
-    var toolbar = container.down(".mceToolbar");
-    if (!toolbar) {
-      return false;
-    }
-    // Create a tinymce-like internal toolbar to contain the fullscreen button
-    var newToolbar = new Element('span', {'class': 'mce_editor_fullscreentoolbar'});
-    var link = new Element('a', {'class' : 'mceButtonNormal'});
-    // Separator
-    newToolbar.insert(new Element('img', {
-       'class': 'mceSeparatorLine',
-       height: 15,
-       width: 1,
-       src: toolbar.down('img.mceSeparatorLine').src
-    }));
-    newToolbar.insert(link.insert(this.createOpenButton(container)));
-    toolbar.insert(newToolbar);
-    container._toolbar = toolbar;
-    return true;
   },
   /** Adds the fullscreen button in the GWT WYSIWYGR editor menu. */
   addWysiwyg20ContentButton : function (item) {
@@ -207,9 +185,6 @@ widgets.FullScreen = Class.create({
   addWikiFieldButton : function (textarea) {
     Element.insert(textarea, {before: this.createOpenLink(textarea)});
   },
-  addWysiwyg10FieldButton : function (textarea) {
-    this.addWysiwyg10ContentButton(textarea);
-  },
   addWysiwyg20FieldButton : function (textarea) {
     this.addWysiwyg20ContentButton(textarea);
   },
@@ -218,9 +193,9 @@ widgets.FullScreen = Class.create({
     // Create HTML element
     var fullScreenActivator = new Element('img', {
       'class': 'fullScreenEditButton',
-      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
-      alt: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
+      title: this.editFullScreenLabel,
+      alt: this.editFullScreenLabel,
+      src: $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_out.png'))
     });
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
@@ -237,9 +212,8 @@ widgets.FullScreen = Class.create({
     });
     var fullScreenActivator = new Element('a', {
       'class': 'fullScreenEditLink',
-      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')"
-    });
-    fullScreenActivator.update("${services.localization.render('core.editors.fullscreen.editFullScreen')} &raquo;")
+      title: this.editFullScreenLabel
+    }).update(this.editFullScreenLabel + ' &raquo;');
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     // Add it to the container
@@ -257,9 +231,9 @@ widgets.FullScreen = Class.create({
     // Create HTML element
     this.closeButton = new Element('img', {
       'class': 'fullScreenCloseButton',
-      title: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
-      alt: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
+      title: this.exitFullScreenLabel,
+      alt: this.exitFullScreenLabel,
+      src: $jsontool.serialize($xwiki.getSkinFile('icons/silk/arrow_in.png'))
     });
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));
@@ -270,9 +244,9 @@ widgets.FullScreen = Class.create({
     // Edit actions button
     // Create HTML element
     this.actionCloseButton = new Element('input', {
-      "type" : "button",
+      type: 'button',
       'class': 'button',
-      value: "$services.localization.render('core.editors.fullscreen.exitFullScreen')"
+      value: this.exitFullScreenLabel
     });
     this.actionCloseButtonWrapper = new Element('span', {
       'class': 'buttonwrapper'
@@ -334,17 +308,6 @@ widgets.FullScreen = Class.create({
         'width' : iframe.style['width'],
         'height' : iframe.style['height']
       };
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      var iframe = targetElement.down(".mceEditorIframe");
-      iframe._originalStyle = {
-        'width' : iframe.style['width'],
-        'height' : iframe.style['height']
-      };
-      var tframe = targetElement.down(".mceEditorSource");
-      tframe._originalStyle = {
-        'width' : tframe.style['width'],
-        'height' : tframe.style['height']
-      };
     }
     // All the elements between the targetElement and the root element are set to position: static, so that the offset
     // parent of the targetElement will be the window. Remember the previous settings in order to be able to restore the
@@ -379,6 +342,11 @@ widgets.FullScreen = Class.create({
       parent.siblings().each(function(item) {
         item._originalDisplay = item.style['display'];
         item.setStyle({display: "none"});
+        // We tag this element to know that we have hidden it, and that we should rollback the original style when we
+        // close the fullscreen mode.
+        // We have introduced this variable because _originalDisplay can be null so we cannot rely on this variable
+        // to know if either or not we have hidden the element.
+        item._fullscreenHidden = true;
       });
       parent = parent.up();
     }
@@ -439,11 +407,6 @@ widgets.FullScreen = Class.create({
     if (targetElement.hasClassName("xRichTextEditor")) {
       var iframe = targetElement.down(".gwt-RichTextArea");
       iframe.setStyle(targetElement._richTextAreaOriginalStyle);
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      var iframe = targetElement.down(".mceEditorIframe");
-      iframe.setStyle(iframe._originalStyle);
-      var tframe = targetElement.down(".mceEditorSource");
-      tframe.setStyle(tframe._originalStyle);
     }
 
     // Restore the previous layout
@@ -460,9 +423,12 @@ widgets.FullScreen = Class.create({
       parent = parents[i];
       parent.setStyle(parent._originalStyle);
       parent.siblings().each(function(item) {
-        // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
-        // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
-        item.style['display'] = item._originalDisplay || "";
+        // if the element has been hidden by us, we should rollback its style
+        if (item._fullscreenHidden) {
+          // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
+          // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
+          item.style['display'] = item._originalDisplay || "";
+        }
       });
     }
     document.body.setStyle(document.body._originalStyle);
@@ -524,9 +490,6 @@ widgets.FullScreen = Class.create({
     // Resize the WYSIWYGs
     if (targetElement.hasClassName("xRichTextEditor")) {
       targetElement.down(".gwt-RichTextArea").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement.down(".xToolbar").getHeight() - targetElement.down(".gwt-MenuBar").getHeight() + 'px'});
-    } else if (targetElement.hasClassName("mceEditorContainer")) {
-      targetElement.down(".mceEditorIframe").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
-      targetElement.down(".mceEditorSource").setStyle({'width' :  newWidth + 'px', 'height' : newHeight - targetElement._toolbar.getHeight() + 'px'});
     }
     document.fire("xwiki:fullscreen:resized", { "target" : targetElement });
   },
@@ -538,7 +501,12 @@ widgets.FullScreen = Class.create({
   cleanup : function() {
     Event.stopObserving(window, 'unload', this.unloadHandler);
     // Remove the "Exit full screen" action button because it can interfere with the browser's back-forward cache.
-    this.actionCloseButtonWrapper.remove();
+    // This can throw an exception in certain browsers (IE9 for one), since the DOM may be already cleaned
+    try {
+      this.actionCloseButtonWrapper.remove();
+    } catch (ex) {
+      // Not important, just ignore
+    }
   }
 });
 

@@ -72,10 +72,10 @@ public class DateFormatChartParam extends LocaleChartParam
     public void init()
     {
         styleChoices = new HashMap(4);
-        styleChoices.put(SHORT, new Integer(DateFormat.SHORT));
-        styleChoices.put(MEDIUM, new Integer(DateFormat.MEDIUM));
-        styleChoices.put(LONG, new Integer(DateFormat.LONG));
-        styleChoices.put(FULL, new Integer(DateFormat.FULL));
+        styleChoices.put(SHORT, DateFormat.SHORT);
+        styleChoices.put(MEDIUM, DateFormat.MEDIUM);
+        styleChoices.put(LONG, DateFormat.LONG);
+        styleChoices.put(FULL, DateFormat.FULL);
     }
 
     @Override

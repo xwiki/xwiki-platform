@@ -20,6 +20,7 @@
 
 package org.xwiki.repository.internal.resources;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -36,7 +37,8 @@ import org.xwiki.repository.Resources;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.repository.internal.resources.ExtensionsRESTResource")
+@Component
+@Named("org.xwiki.repository.internal.resources.ExtensionsRESTResource")
 @Path(Resources.EXTENSIONS)
 @Singleton
 public class ExtensionsRESTResource extends AbstractExtensionRESTResource

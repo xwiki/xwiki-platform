@@ -1,0 +1,6 @@
+###
+### Attachments page in the "view" mode
+###
+#set($titleToDisplay = $services.localization.render('core.viewers.attachments.title', [$escapetool.xml($doc.getPlainTitle()), $doc.getURL()]))
+#template('contentheader.vm')
+#template("attachmentsinline.vm")

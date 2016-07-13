@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Convert and filter action events for the network.
  * <p>
  * Currently only "upload" action is send (for attachments modifications).
- * 
+ *
  * @todo make the list of actions to send configurable
  * @version $Id$
  * @since 2.0M4

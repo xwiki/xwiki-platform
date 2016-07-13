@@ -1,7 +1,11 @@
-org.xwiki.extension.script.internal.ExtensionManagerScriptService
+org.xwiki.extension.script.CoreExtensionScriptService
+org.xwiki.extension.script.ExtensionHistoryScriptService
+org.xwiki.extension.script.ExtensionManagerScriptService
+org.xwiki.extension.script.ExtensionRatingScriptService
+org.xwiki.extension.script.InstalledExtensionScriptService
+org.xwiki.extension.script.LocalExtensionScriptService
 org.xwiki.extension.script.internal.XWikiExtensionValidator
 org.xwiki.extension.script.internal.safe.ExtensionPlanScriptSafeProvider
 org.xwiki.extension.script.internal.safe.ExtensionRepositoryScriptSafeProvider
 org.xwiki.extension.script.internal.safe.ExtensionScriptSafeProvider
 org.xwiki.extension.script.internal.safe.IterableResultScriptSafeProvider
-org.xwiki.extension.script.internal.safe.JobStatusScriptSafeProvider

@@ -41,11 +41,7 @@ public class InsertHRExecutable extends InsertBlockHTMLExecutable
         super(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InsertBlockHTMLExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         return execute(rta.getDocument().createHRElement());

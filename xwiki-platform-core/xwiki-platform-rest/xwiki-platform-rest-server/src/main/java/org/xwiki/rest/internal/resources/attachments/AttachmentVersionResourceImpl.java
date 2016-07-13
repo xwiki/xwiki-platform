@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.attachments;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -34,7 +35,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.attachments.AttachmentVersionResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.attachments.AttachmentVersionResourceImpl")
 public class AttachmentVersionResourceImpl extends XWikiResource implements AttachmentVersionResource
 {
     @Override

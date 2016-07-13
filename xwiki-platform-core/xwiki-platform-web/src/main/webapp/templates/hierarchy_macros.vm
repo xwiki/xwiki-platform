@@ -1,0 +1,317 @@
+#template('documentTree_macros.vm')
+
+#**
+ * Display the path of the specified entity within the hierarchy.
+ *
+ * @param $entityReference the entity for which to display the hierarchy path, defaults on the current document
+ * @param $options various configuration options; see #getHierarchyPath() and #displayHierarchyPath()
+ *#
+#macro (hierarchy $entityReference $options)
+  #if (!$options)
+    #set ($options = {})
+  #else
+    ## We need to assign the options to a variable in case the user has passed a literal map.
+    #set ($options = $options)
+  #end
+  #if (!$entityReference)
+    ## Default on the current (translated) document.
+    #set ($entityReference = $tdoc.documentReference)
+    #if ($entityReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+      ## The current document is a space home page. Use the space reference instead. This is important for preview mode
+      ## and when editing a document section because $tdoc needs to be mapped to the right entity reference in the
+      ## 'entities' configuration option.
+      #set ($entityReference = $entityReference.parent)
+    #end
+    #if (!$options.entities)
+      #set ($discard = $options.put('entities', {}))
+    #end
+    #set ($discard = $options.entities.put($entityReference, $tdoc))
+  #end
+  #getHierarchyPath($entityReference $path $options)
+  #if ($options.plain)
+    #getHierarchyPathLabels($path $labels $options)
+    $stringtool.join($labels, ' / ')
+  #else
+    #getHierarchyPathData($path $data $options)
+    ## At this point, we need to know the *document* actually pointed by the breadcrumb to give the correct reference
+    ## to #displayHierarchyPath(), which displays this reference as hidden data.
+    #if ($entityReference.type == 'SPACE')
+       #set ($entityReference = $services.model.createEntityReference('WebHome', 'DOCUMENT', $entityReference))
+    #end
+    #displayHierarchyPath($data $options $entityReference)
+  #end
+#end
+
+#**
+ * Compute the path of the specified entity within the hierarchy.
+ *
+ * @param $entityReference the entity for which to compute the path
+ * @options various configuration options; default values are {
+ *   local: false, // whether to compute the local path or not (i.e. including the wiki reference or not)
+ *   excludeSelf: false, // whether to exclude the passed reference from the path
+ *   limit: 0 // the maximum number of path elements (limit/2 on the left and the rest of the right)
+ * }
+ *#
+#macro (getHierarchyPath $entityReference $return $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #set ($macro.path = [])
+  #set ($discard = $macro.path.addAll($entityReference.reversedReferenceChain))
+  #if ($macro.path.get(0).type == 'WIKI')
+    #set ($wikiName = $macro.path.get(0).name)
+    #if ($options.local)
+      ## Remove the wiki reference.
+      #set ($discard = $macro.path.remove(0))
+    #elseif ($wikiName != $xcontext.mainWikiName
+        && $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName
+        && $services.wiki.user.getUserScope($wikiName) != 'LOCAL_ONLY')
+      ## Global users should be able to navigate to the main wiki from a subwiki that accepts global users.
+      #set ($discard = $macro.path.add(0, $services.model.createWikiReference($xcontext.mainWikiName)))
+    #end
+  #end
+  ## Merge the space reference with the space home page reference.
+  #foreach ($reference in $macro.path)
+    #if ($reference.type == 'DOCUMENT' && $foreach.index > 0
+        && $reference.name == $services.model.getEntityReference('DOCUMENT', 'default').name
+        && $macro.path.get($mathtool.sub($foreach.index, 1)).type == 'SPACE')
+      #set ($discard = $macro.path.remove($reference))
+      #break
+    #end
+  #end
+  #if ($options.excludeSelf)
+    ## Remove the last reference.
+    #set ($discard = $macro.path.remove($mathtool.sub($macro.path.size(), 1)))
+  #end
+  ## Limit the number of path elements (by removing elements in the middle of the path).
+  #set ($size = $macro.path.size())
+  #if ($options.limit && $options.limit > 0 && $options.limit < $size)
+    #set ($left = $options.limit / 2)
+    #set ($right = $size - ($options.limit - $left))
+    #set ($limitedPath = [])
+    #set ($discard = $limitedPath.addAll($macro.path.subList(0, $left)))
+    #set ($discard = $limitedPath.add({'type': 'ellipsis'}))
+    #set ($discard = $limitedPath.addAll($macro.path.subList($right, $size)))
+    #set ($macro.path = $limitedPath)
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.path)
+#end
+
+#**
+ * Displays a hierarchy path computed with #getHierarchyPathData().
+ *
+ * @param $pathData the data of the hierarchy path to display
+ * @param $options various display options; default values are {
+ *   id: null, // the value of the id attribute to set on the container element
+ *   excludeSelf: false, // whether the target reference has been excluded from the path
+ *   selfIsActive: true, // whether the target reference should be marked as active or not
+ *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
+ * }
+ * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
+ *#
+#macro (displayHierarchyPath $pathData $options $entityReference)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #set ($breadCrumbClassNames = 'breadcrumb')
+  #set ($breadCrumbParameters = '')
+  #if ($options.limit)
+    #set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+    ## Tag the breadcrumb as expandable, so the JS can enable the 'expand' feature
+    #set ($breadCrumbClassNames = "${breadCrumbClassNames} breadcrumb-expandable")
+    ## Store the entity reference into the breadcrumb, so the JS can retreive the full hierarchy
+    #set ($breadCrumbParameters = "data-entity='$escapetool.xml($services.model.serialize($entityReference, 'local'))'")
+    ## Store the options into the breadcrumb, so the JS can have all informations
+    #foreach ($option in $options.keySet())
+      #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
+    #end
+  #end
+  <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters><li
+    #foreach ($item in $pathData)
+      #set ($classNames = $collectionstool.set)
+      #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))
+      #if ($item.classNames)
+        #set ($discard = $classNames.addAll($item.classNames))
+      #end
+      #getTreeNavigation($pathData $foreach.index $options)
+      ## Avoid whitespace characters between the list items (they are visible when display=inline-block).
+      #set ($closingTag = '</li><li')
+      #if ($foreach.index == $mathtool.sub($pathData.size(), 1))
+        #if (!$options.excludeSelf && "$!options.selfIsActive" != 'false')
+          #set ($discard = $classNames.add('active'))
+        #end
+        #set ($closingTag = '')
+      #end
+      class="$stringtool.join($classNames, ' ')">#if ($item.url)<a href="$item.url"
+        >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
+    #end##
+  </li></ol>
+#end
+
+#macro (getTreeNavigation $pathData $index $options)
+  #set ($treeNavigation = '')
+  #if ($isDocumentTreeAvailable && $options.treeNavigation && $pathData.get($index).reference.type != 'ellipsis')
+    #set ($discard = $classNames.add('dropdown'))
+
+    ## Open the tree to an intermediary path element, showing its siblings and its children.
+    #set ($openToIndex = $index)
+    #if ($index == 0)
+      ## Open the tree to the last path element (e.g. when you click on the home icon).
+      #set ($openToIndex = $mathtool.sub($pathData.size(), 1))
+    #end
+    #set ($openTo = $pathData.get($openToIndex).reference)
+    #if ($openTo.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+      ## The tree shows nested documents.
+      #set ($openTo = $services.model.resolveDocument('', 'default', $openTo))
+    #end
+    #set ($openToType = $openTo.type.toString().toLowerCase())
+    #set ($openToId = "$openToType:$services.model.serialize($openTo, 'default')")
+
+    #set ($rootId = $NULL)
+    #if ($index > 0 && $openTo.type != 'WIKI')
+      #set ($root = $pathData.get($mathtool.sub($index, 1)).reference)
+      #if ($root.type == 'ellipsis')
+        ## $openTo may have been converted to a document reference above so we take the parent from its initial value.
+        #set ($root = $pathData.get($openToIndex).reference.parent)
+      #end
+      #if ($root.type == 'SPACE' && !$services.parentchild.isParentChildMechanismEnabled())
+        ## The tree shows nested documents.
+        #set ($root = $services.model.resolveDocument('', 'default', $root))
+      #end
+      #set ($rootType = $root.type.toString().toLowerCase())
+      #set ($rootId = "$rootType:$services.model.serialize($root, 'default')")
+    #end
+
+    ## Show the wiki nodes if the first path element is from a different wiki (e.g. the home icon points to the main
+    ## wiki while the last path element points to a document from a subwiki).
+    #set ($showWikis = $pathData.get(0).reference.extractReference('WIKI') != $openTo.extractReference('WIKI'))
+
+    ## FIXME: The tree navigation should take into account the current hierarchy mode.
+    ## FIXME: Make sure the tree shows entities of type $root.type and $openTo.type
+    #set ($treeParams = {
+      'class': 'breadcrumb-tree',
+      'limit': 10,
+      'links': true,
+      'openTo': $openToId,
+      'root': $rootId,
+      'showTranslations': $xwiki.isMultiLingual(),
+      'showWikis': $showWikis
+    })
+    #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
+      "$services.icon.renderHTML('caret-down')</span>")
+    #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
+  #end
+#end
+
+#macro (getHierarchyPathData $path $return $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #getHierarchyPathLabels($path $labels $options)
+  #set ($macro.data = [])
+  #foreach ($reference in $path)
+    #set ($url = $NULL)
+    #getHierarchyPathData_url($reference)
+    #set ($discard = $macro.data.add({
+      'reference': $reference,
+      'label': $labels.get($foreach.index),
+      'url': $url
+    }))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.data)
+#end
+
+#macro (getHierarchyPathData_url $reference)
+  #if ($reference.type == 'OBJECT')
+    #if ($services.security.authorization.hasAccess('edit', $reference))
+      #if ($reference.objectNumber)
+        #set ($objectNumber = $reference.objectNumber)
+        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+      #else
+        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
+        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+      #end
+      #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
+        'editor': 'object',
+        'classname': $objectType,
+        'object': $objectNumber
+      })))
+    #end
+  #elseif ($reference.type != 'ellipsis' && $services.security.authorization.hasAccess('view', $reference))
+    #set ($url = $xwiki.getURL($reference))
+  #end
+#end
+
+#**
+ * Collects the labels of the entities from the given path.
+ *
+ * @param $path a path in the hierarchy
+ * @param $options various display options; default values are {
+ *   entities: {}, // a map of (reference, entity) pairs holding unsaved entities that should be used for display
+ *   plain: false, // whether to use plain text or HTML
+ *   displayTitle: true // whether to display the title of the documents or the reference name
+ *#
+#macro (getHierarchyPathLabels $path $return $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
+  #set ($macro.labels = [])
+  #foreach ($reference in $path)
+    #set ($label = $escapetool.xml($reference.name))
+    #if (($reference.type == 'SPACE' || $reference.type == 'DOCUMENT') && "$!options.displayTitle" != 'false')
+      ## Check if there is an unsaved document with this reference.
+      #set ($document = $options.entities.get($reference))
+      #if (!$document)
+        ## Get the saved document.
+        #set ($document = $xwiki.getDocument($reference).translatedDocument)
+      #end
+      #if ($document)
+        #set ($label = $escapetool.xml($document.plainTitle))
+      #end
+    #elseif ($reference.type == 'WIKI')
+      #if ($foreach.index == 0 && !$options.plain)
+        #if ($services.icon)
+          #set ($label = $services.icon.renderHTML('home'))
+        #else
+          ## Fallback on the Silk icon set for now as it is bundled by default.
+          #set ($label = "<img src=""$xwiki.getSkinFile('icons/silk/house.png')"" />")
+        #end
+      #else
+        #set ($wikiPrettyName = $services.wiki.getById($reference.name).prettyName)
+        #if ("$!wikiPrettyName" != '')
+          #set ($label = $escapetool.xml($wikiPrettyName))
+        #end
+      #end
+    #elseif ($reference.type == 'ellipsis')
+      #if ($options.plain)
+        #set ($label = '...')
+      #else
+        #set ($label = '&hellip;')
+      #end
+    #end
+    #set ($discard = $macro.labels.add($label))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.labels)
+#end
+
+#*
+ * Display the parents of a document based on the old parent/child mechanism.
+ *#
+#macro (hierarchy_parentChild)
+  #if ("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+    #set ($path = [])
+    #set ($discard = $path.addAll($services.parentchild.getParentsBasedOnParentChildRelationship($doc.documentReference)))
+    #set ($discard = $path.add($doc.documentReference))
+    #set ($options = {
+      'id': 'hierarchy',
+      'entities': {
+        $doc.documentReference: $tdoc
+      }
+    })
+    #getHierarchyPathData($path $data $options)
+    #displayHierarchyPath($data $options)
+  #end
+#end

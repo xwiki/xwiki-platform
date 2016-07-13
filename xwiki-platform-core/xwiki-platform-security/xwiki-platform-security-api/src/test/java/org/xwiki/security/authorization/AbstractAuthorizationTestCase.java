@@ -25,7 +25,7 @@ import java.io.File;
 import org.junit.Rule;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,12 +46,14 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATE_WIKI;
 import static org.xwiki.security.authorization.Right.CREATOR;
 import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.SCRIPT;
 
 
 /**
@@ -62,28 +64,31 @@ import static org.xwiki.security.authorization.Right.REGISTER;
  * @since 5.0M2
  */
 @ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
-    DefaultEntityReferenceValueProvider.class, DefaultModelConfiguration.class})
+    DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class})
 public abstract class AbstractAuthorizationTestCase
 {
     /** SuperAdmin user. */
     protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "anySpace", "SuperAdmin");
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN, PROGRAM, CREATE_WIKI. */
     protected static final RightSet ALL_RIGHTS = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN, CREATE_WIKI. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN. */
-    protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN = new RightSet();
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN. */
+    protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING_AND_CREATE_WIKI = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT. */
+    protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI = new RightSet();
+
+    /** VIEW, EDIT, COMMENT, DELETE, SCRIPT, ADMIN. */
     protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
 
     /** VIEW, EDIT, COMMENT, REGISTER, LOGIN. */
     protected static final RightSet DEFAULT_DOCUMENT_RIGHTS = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE. */
+    /** VIEW, EDIT, COMMENT, DELETE, SCRIPT. */
     protected static final RightSet ALL_DOCUMENT_RIGHTS = new RightSet();
 
     static {
@@ -92,16 +97,21 @@ public abstract class AbstractAuthorizationTestCase
                 ALL_RIGHTS.add(right);
                 if (right != PROGRAM) {
                     ALL_RIGHTS_EXCEPT_PROGRAMING.add(right);
+                    if (right != CREATE_WIKI) {
+                        ALL_RIGHTS_EXCEPT_PROGRAMING_AND_CREATE_WIKI.add(right);
+                    }
                     if (right != ADMIN) {
-                        ALL_RIGHTS_EXCEPT_ADMIN.add(right);
-                        if (right != LOGIN && right != REGISTER) {
-                            ALL_DOCUMENT_RIGHTS.add(right);
-                        }
-                        if (right != DELETE) {
-                            DEFAULT_DOCUMENT_RIGHTS.add(right);
+                        if (right != CREATE_WIKI){
+                            ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI.add(right);
+                            if (right != LOGIN && right != REGISTER) {
+                                ALL_DOCUMENT_RIGHTS.add(right);
+                            }
+                            if (right != DELETE && right != SCRIPT) {
+                                DEFAULT_DOCUMENT_RIGHTS.add(right);
+                            }
                         }
                     }
-                    if (right != LOGIN && right != REGISTER) {
+                    if (right != LOGIN && right != REGISTER && right != CREATE_WIKI) {
                         ALL_SPACE_RIGHTS.add(right);
                     }
                 }

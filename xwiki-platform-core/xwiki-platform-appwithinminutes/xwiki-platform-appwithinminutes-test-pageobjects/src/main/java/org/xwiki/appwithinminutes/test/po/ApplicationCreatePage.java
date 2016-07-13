@@ -26,25 +26,28 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions possible on the first step of the App Within Minutes wizard.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
 public class ApplicationCreatePage extends ViewPage
 {
-    @FindBy(id = "appName")
-    private WebElement appNameInput;
+    /**
+     * The widget used to select the application location.
+     */
+    private DocumentPicker locationPicker = new DocumentPicker();
 
     @FindBy(id = "wizard-next")
     private WebElement nextStepButton;
 
     /**
      * Loads the first step of the App Within Minutes wizard
-     * 
+     *
      * @return the page that represents the first step of the App Within Minutes wizard
      */
     public static ApplicationCreatePage gotoPage()
@@ -55,13 +58,12 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Types the given string into the application name input.
-     * 
+     *
      * @param appName the application name
      */
     public void setApplicationName(String appName)
     {
-        appNameInput.clear();
-        appNameInput.sendKeys(appName);
+        this.locationPicker.setTitle(appName);
     }
 
     /**
@@ -69,7 +71,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public WebElement getApplicationNameInput()
     {
-        return appNameInput;
+        return this.locationPicker.getTitleInput();
     }
 
     /**
@@ -77,8 +79,8 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void waitForApplicationNamePreview()
     {
-        final String appName = appNameInput.getAttribute("value");
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        final String appName = this.locationPicker.getTitle();
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -94,17 +96,48 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void waitForApplicationNameError()
     {
-        waitUntilElementHasAttributeValue(By.id("appName"), "class", "xErrorField");
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#appTitle.xErrorField"));
+    }
+
+    /**
+     * Sets the location where to create the application.
+     *
+     * @param location the location where to create the application
+     * @since 7.3RC1
+     */
+    public void setLocation(String location)
+    {
+        this.locationPicker.setParent(location);
+    }
+
+    /**
+     * @return the application location picker
+     * @since 7.4.1, 8.0M1
+     */
+    public DocumentPicker getLocationPicker()
+    {
+        return this.locationPicker;
     }
 
     /**
      * Clicks on the Next Step button.
-     * 
+     *
      * @return the page that represents the next step of the App Within Minutes wizard
      */
     public ApplicationClassEditPage clickNextStep()
     {
-        nextStepButton.click();
+        clickNextStepButton();
         return new ApplicationClassEditPage();
+    }
+
+    /**
+     * Simply clicks on the Next Stept button, nothing more.
+     * <p/>
+     * You should generally use {@link #clickNextStep()} instead if you are not expecting an error or something outside
+     * the normal flow.
+     */
+    public void clickNextStepButton()
+    {
+        nextStepButton.click();
     }
 }

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>AppWithinMinutes</web>
+  <name>DeleteApplication</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1407150147000</creationDate>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1407168058000</date>
+  <contentUpdateDate>1407168058000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Delete Application</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#**
+ * Delete only the application's entries (just data) from the data space.
+ *#
+#macro (deleteApplicationEntries $dataSpaceReference $classReference)
+  #set ($statement = ', BaseObject as obj where doc.fullName = obj.name and ' +
+    'obj.className = :class and doc.fullName &lt;&gt; :template and ' +
+    "(doc.space = :dataSpace or doc.space like :dataSpacePrefix escape '!')")
+  #set ($query = $services.query.hql($statement))
+  #set ($classLocalReference = $services.model.serialize($classReference, 'local'))
+  #set ($discard = $query.bindValue('class', $classLocalReference))
+  #set ($discard = $query.bindValue('template', "$stringtool.removeEnd($classLocalReference, 'Class')Template"))
+  #set ($dataLocalSpaceReference = $services.model.serialize($dataSpaceReference, 'local'))
+  #set ($dataSpacePrefix = $dataLocalSpaceReference.replaceAll('([%_!])', '!$1').concat('.%'))
+  #set ($discard = $query.bindValue('dataSpace', $dataLocalSpaceReference))
+  #set ($discard = $query.bindValue('dataSpacePrefix', $dataSpacePrefix))
+  #set ($entryReferences = [])
+  #foreach ($entryLocalReference in $query.execute())
+    #set ($discard = $entryReferences.add($services.model.resolveDocument($entryLocalReference)))
+  #end
+  #bulkDelete($entryReferences)
+#end
+
+#**
+ * Delete the entire application (application space, code space and data space).
+ *#
+#macro (deleteApplication $appReference $classReference $dataSpaceReference)
+  #set ($spacesToDelete = $collectionstool.set)
+  #set ($discard = $spacesToDelete.add($appReference))
+  #if (!$classReference.hasParent($appReference))
+    ## The code space is outside the application space.
+    #set ($discard = $spacesToDelete.add($classReference.parent))
+  #end
+  #if (!$dataSpaceReference.hasParent($appReference))
+    ## The data space is outside the application space.
+    #set ($discard = $spacesToDelete.add($dataSpaceReference))
+  #end
+  #bulkDelete($spacesToDelete)
+#end
+
+#macro (bulkDelete $entities)
+  #set ($errors = [])
+  #set ($deleteJob = $services.refactoring.delete($entities))
+  #try()
+    #set ($discard = $deleteJob.join())
+    #set ($deleteJobStatus = $services.job.getJobStatus($deleteJob.request.id))
+    #set ($errors = $deleteJobStatus.log.getLogs('ERROR'))
+  #end
+#end
+
+#macro (askForDeleteConfirmation $appReference $scope)
+  ## Confirmation dialog
+  #set ($appName = $appReference.name)
+  #if ($scope == 'entries')
+    #set ($confirmationMessage = $services.localization.render(
+      'platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
+  #else
+    #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation',
+      $escapetool.xml($appName)))
+  #end
+  #set ($cancelURL = $doc.getURL())
+  #set ($confirmParams = {
+    'appName': $services.model.serialize($appReference, 'local'),
+    'resolve': true,
+    'scope': $scope,
+    'confirm': 1,
+    'form_token': $services.csrf.token
+  })
+  #if ("$!request.xredirect" != '')
+    #set ($cancelURL = $request.xredirect)
+    #set ($confirmParams.xredirect = $cancelURL)
+  #end
+  #set ($confirmURL = $doc.getURL($xcontext.action, $escapetool.url($confirmParams)))
+  {{html}}
+  #xwikimessagebox($services.localization.render('core.delete') $confirmationMessage $confirmURL
+    $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.appName" != '')
+  #if ($request.resolve == 'true')
+    #set ($appReference = $services.model.resolveSpace($request.appName))
+  #else
+    #set ($appReference = $services.model.createSpaceReference($request.appName,
+      $doc.documentReference.wikiReference))
+  #end
+  #set ($appHomeReference = $services.model.resolveDocument('', 'default', $appReference))
+  #set ($scope = $request.scope)
+  ## Make sure a valid application name has been passed, otherwise stop here.
+  #set ($appDescriptor = $xwiki.getDocument($appReference).getObject('AppWithinMinutes.LiveTableClass'))
+  #if ($appDescriptor)
+    #if ($request.confirm == '1')
+      ## CSRF protection.
+      #if(!$services.csrf.isTokenValid($request.form_token))
+        $response.sendRedirect($services.csrf.getResubmissionURL())
+        #stop
+      #end
+      ##
+      #set ($classLocalReference = $appDescriptor.getValue('class'))
+      #set ($classReference = $services.model.resolveDocument($classLocalReference, 'explicit', $appHomeReference))
+      #set ($dataSpace = $appDescriptor.getValue('dataSpace'))
+      #set ($dataSpaceReference = $services.model.resolveSpace($dataSpace, 'explicit', $appReference))
+      ##
+      #if ($scope == 'entries')
+        #deleteApplicationEntries($dataSpaceReference $classReference)
+      #else
+        #deleteApplication($appReference $classReference $dataSpaceReference)
+      #end
+      ##
+      #if ($errors.size() &gt; 0)
+        {{error}}$errors.get(0){{/error}}
+      #elseif ($request.xredirect)
+        ## If requested, redirect the UI after the work is complete.
+        $response.sendRedirect($request.xredirect)
+      #end
+    #else
+      #askForDeleteConfirmation($appReference $scope)
+    #end
+  #else
+    ## Unusable application name.
+    #if (!$xwiki.exists($appHomeReference))
+      {{error}}$services.localization.render('platform.appwithinminutes.deleteAppDoesNotExistError'){{/error}}
+    #else
+      {{error}}$services.localization.render('platform.appwithinminutes.deleteAppInvalidAppError'){{/error}}
+    #end
+  #end
+#else
+  {{error}}$services.localization.render('platform.appwithinminutes.deleteAppNotSpecifiedError'){{/error}}
+#end
+{{/velocity}}
+</content>
+</xwikidoc>

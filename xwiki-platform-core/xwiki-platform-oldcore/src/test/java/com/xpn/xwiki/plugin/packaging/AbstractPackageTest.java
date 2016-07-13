@@ -20,27 +20,26 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
-import java.io.StringReader;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
+import java.io.StringReader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.xwiki.extension.ExtensionId;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Utility functions used by ImportTest and PackageTest.
  *
  * @since 4.1M2
- * @version $Id$ 
+ * @version $Id$
  */
 public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentTestCase
 {
@@ -51,15 +50,17 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
      * @param docs The documents to include.
      * @param encodings The charset for each document.
      * @param packageXmlEncoding The encoding of package.xml
+     * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings, String packageXmlEncoding) throws Exception
+    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings, String packageXmlEncoding,
+        ExtensionId extension) throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
         ZipEntry zipp = new ZipEntry("package.xml");
         zos.putNextEntry(zipp);
-        zos.write(getEncodedByteArray(getPackageXML(docs, packageXmlEncoding), packageXmlEncoding));
+        zos.write(getEncodedByteArray(getPackageXML(docs, packageXmlEncoding, extension), packageXmlEncoding));
         for (int i = 0; i < docs.length; i++) {
             String zipEntryName = docs[i].getSpace() + "/" + docs[i].getName();
             if (docs[i].getTranslation() != 0) {
@@ -80,11 +81,12 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
      *
      * @param docs The documents to include.
      * @param encodings The charset for each document.
+     * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings) throws Exception
+    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings, ExtensionId extension) throws Exception
     {
-        return createZipFile(docs, encodings, "ISO-8859-1");
+        return createZipFile(docs, encodings, "ISO-8859-1", extension);
     }
 
     /**
@@ -95,13 +97,14 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
      * @param packageXmlEncoding The encoding of package.xml
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings, String packageXmlEncoding) throws Exception
+    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings,
+        String packageXmlEncoding, ExtensionId extension) throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipArchiveOutputStream zos = new ZipArchiveOutputStream(baos);
         ZipArchiveEntry zipp = new ZipArchiveEntry("package.xml");
         zos.putArchiveEntry(zipp);
-        zos.write(getEncodedByteArray(getPackageXML(docs, packageXmlEncoding), packageXmlEncoding));
+        zos.write(getEncodedByteArray(getPackageXML(docs, packageXmlEncoding, extension), packageXmlEncoding));
         for (int i = 0; i < docs.length; i++) {
             String zipEntryName = docs[i].getSpace() + "/" + docs[i].getName();
             if (docs[i].getTranslation() != 0) {
@@ -123,11 +126,13 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
      *
      * @param docs The documents to include.
      * @param encodings The charset for each document.
+     * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings) throws Exception
+    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings, ExtensionId extension)
+        throws Exception
     {
-        return createZipFileUsingCommonsCompress(docs, encodings, "ISO-8859-1");
+        return createZipFileUsingCommonsCompress(docs, encodings, "ISO-8859-1", extension);
     }
 
     private byte[] getEncodedByteArray(String content, String charset) throws IOException
@@ -152,17 +157,30 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
         return ostr.toByteArray();
     }
 
-    private String getPackageXML(XWikiDocument docs[], String encoding)
+    private String getPackageXML(XWikiDocument docs[], String encoding, ExtensionId extension)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("<?xml version=\"1.0\" encoding=\""+ encoding + "\"?>\n");
+        sb.append("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n");
         sb.append("<package>\n").append("<infos>\n").append("<name>Backup</name>\n");
         sb.append("<description>on Mon Jan 01 01:44:32 CET 2007 by XWiki.Admin</description>\n");
         sb.append("<licence></licence>\n");
         sb.append("<author>XWiki.Admin</author>\n");
-        sb.append("<version></version>\n");
         sb.append("<backupPack>true</backupPack>\n");
+
+        // Add extension related informations
+        if (extension != null) {
+            sb.append("<extensionId>");
+            sb.append(extension.getId());
+            sb.append("</extensionId>\n");
+            sb.append("<version>");
+            sb.append(extension.getVersion());
+            sb.append("</version>\n");
+        } else {
+            sb.append("<version></version>\n");
+        }
+
         sb.append("</infos>\n");
+
         sb.append("<files>\n");
         for (int i = 0; i < docs.length; i++) {
 
@@ -172,6 +190,5 @@ public abstract class AbstractPackageTest extends AbstractBridgedXWikiComponentT
         sb.append("</files></package>\n");
         return sb.toString();
     }
-
 
 }

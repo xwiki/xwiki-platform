@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +42,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,7 +68,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Log helper for logging messages in this class.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
 
     /**
      * The name of the field that indicates whether an extension should always be used, or only when explicitly pulled.
@@ -194,7 +197,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         XWikiContext context = Utils.getContext();
         // Retrieve the current wiki name from the XWiki context
-        String currentWiki = StringUtils.defaultIfEmpty(context.getDatabase(), context.getMainXWiki());
+        String currentWiki = StringUtils.defaultIfEmpty(context.getWikiId(), context.getMainXWiki());
         // If we already have extensions defined for this wiki, we return them
         if (this.alwaysUsedExtensions.get(currentWiki) != null) {
             return this.alwaysUsedExtensions.get(currentWiki);
@@ -211,7 +214,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
-                        if (context.getWiki().getRightService().hasProgrammingRights(doc, context)) {
+                        if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
+                            doc.getContentAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
@@ -281,44 +285,6 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
-     * Set the meta-information fields of the given extension class document.
-     * 
-     * @param doc the document representing the extension class.
-     * @return true if the document has been modified, false otherwise.
-     */
-    private boolean setExtensionClassDocumentFields(XWikiDocument doc)
-    {
-        boolean needsUpdate = false;
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator("superadmin");
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(doc.getCreator());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        return needsUpdate;
-    }
-
-    /**
      * Creates or updates the XClass used for this type of extension. Usually called on {@link #init(XWikiContext)} and
      * {@link #virtualInit(XWikiContext)}.
      * 
@@ -329,30 +295,12 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
-            boolean needsUpdate = false;
-            String useOptions = "currentPage=Always on this page|onDemand=On demand|always=Always on this wiki";
 
-            BaseClass bclass = doc.getXClass();
-            if (context.get("initdone") != null) {
-                return bclass;
-            }
-
-            bclass.setName(getExtensionClassName());
-
-            needsUpdate |= bclass.addTextField("name", "Name", 30);
-            needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
-            needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
-            needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
-            needsUpdate |= setExtensionClassDocumentFields(doc);
-
-            if (needsUpdate) {
-                context.getWiki().saveDocument(doc, context);
-            }
-            return bclass;
+            return doc.getXClass();
         } catch (Exception ex) {
-            LOGGER.error("Cannot initialize skin extension class [{}]", getExtensionClassName(), ex);
+            LOGGER.error("Cannot get skin extension class [{}]", getExtensionClassName(), ex);
         }
+
         return null;
     }
 
@@ -386,7 +334,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (context.getWiki().getRightService().hasProgrammingRights(document, context)) {
+                if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
+                    document.getContentAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
@@ -422,4 +371,99 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         return serializer.serialize(resolver.resolve(documentName, EntityType.DOCUMENT));
     }
+
+    /**
+     * @param documentName the Skin Extension's document name
+     * @param context the XWiki Context
+     * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
+     */
+    protected boolean isAccessible(String documentName, XWikiContext context)
+    {
+        return isAccessible(getCurrentDocumentReferenceResolver().resolve(documentName), context);
+    }
+
+    /**
+     * @param documentReference the Skin Extension's document reference
+     * @param context the XWiki Context
+     * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
+     * @since 7.4.1
+     */
+    protected boolean isAccessible(DocumentReference documentReference, XWikiContext context)
+    {
+        if (!Utils.getComponent(ContextualAuthorizationManager.class).hasAccess(Right.VIEW, documentReference)) {
+            LOGGER.debug("[{}] The current user [{}] does not have 'view' rights on the Skin Extension document [{}]",
+                getName(), context.getUserReference(), documentReference);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param documentReference the Skin Extension's document reference
+     * @param context the XWiki Context
+     * @return the version of the document
+     */
+    private String getDocumentVersion(DocumentReference documentReference, XWikiContext context)
+    {
+        try {
+            return context.getWiki().getDocument(documentReference, context).getVersion();
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to load document [{}].", documentReference, e);
+        }
+        return "";
+    }
+
+    /**
+     * Return the query string part with the version of the document, to add to the URL of a resource. The objective is
+     * to generate an URL specific to this version to avoid browsers using an outdated version from their cache.
+     *  
+     * @param documentReference the Skin Extension's document reference
+     * @param context the XWiki Context
+     * @return the query string part handling the version of the document
+     */
+    private String getDocumentVersionQueryString(DocumentReference documentReference, XWikiContext context)
+    {
+        return "docVersion=" + sanitize(getDocumentVersion(documentReference, context));
+    }
+
+    /**
+     * Return the query string part with the language of the document (if any).
+     *  
+     * @param context the XWiki Context
+     * @return the query string handling the language of the document
+     */
+    private String getLanguageQueryString(XWikiContext context)
+    {
+        Locale locale = context.getLocale();
+        if (locale != null) {
+            return "language=" + sanitize(locale.toString());
+        }
+        return "";
+    }
+
+    /**
+     * Return the URL to a document skin extension.
+     *
+     * @param documentReference the Skin Extension's document reference
+     * @param documentName the Skin Extension's document name
+     * @param pluginName the name of the plugin
+     * @param context the XWiki Context
+     * @return the URL to the document skin extension.
+     *
+     * @since 7.4.1 
+     */
+    protected String getDocumentSkinExtensionURL(DocumentReference documentReference, String documentName,
+            String pluginName, XWikiContext context)
+    {
+        String queryString = String.format("%s&amp;%s%s",
+                getLanguageQueryString(context),
+                getDocumentVersionQueryString(documentReference, context),
+                parametersAsQueryString(documentName, context));
+
+        return context.getWiki().getURL(documentReference, pluginName, queryString, "", context);
+    }
+    
+    
 }

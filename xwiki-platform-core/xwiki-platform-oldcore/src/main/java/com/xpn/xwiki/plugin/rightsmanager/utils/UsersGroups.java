@@ -24,7 +24,7 @@ import java.util.HashSet;
 
 /**
  * Contains a collection of users and groups.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -45,17 +45,17 @@ public class UsersGroups
     {
         StringBuilder sb = new StringBuilder();
 
-        if (!users.isEmpty()) {
+        if (!this.users.isEmpty()) {
             sb.append('{');
             sb.append("users : ");
-            sb.append(users);
+            sb.append(this.users);
             sb.append('}');
         }
 
-        if (!groups.isEmpty()) {
+        if (!this.groups.isEmpty()) {
             sb.append('{');
             sb.append("groups : ");
-            sb.append(groups);
+            sb.append(this.groups);
             sb.append('}');
         }
 

@@ -28,9 +28,9 @@ import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a local extension repository.
@@ -40,7 +40,7 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
  * @since 4.0M2
  */
 public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> extends
-    SafeSearchableExtensionRepository<T> implements LocalExtensionRepository
+    SafeAdvancedSearchableExtensionRepository<T> implements LocalExtensionRepository
 {
     /**
      * @param repository wrapped repository
@@ -48,7 +48,7 @@ public class SafeLocalExtensionRepository<T extends LocalExtensionRepository> ex
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeLocalExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);

@@ -29,8 +29,7 @@ import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 
 /**
  * Chains Component Managers to perform lookups based on the current execution context (current user, current wiki,
@@ -42,7 +41,7 @@ import org.xwiki.component.phase.InitializationException;
 @Component
 @Named("context")
 @Singleton
-public class ContextComponentManager extends DelegateComponentManager implements Initializable
+public class ContextComponentManager extends DelegateComponentManager
 {
     /**
      * The first Component Manager in the chain.
@@ -51,12 +50,21 @@ public class ContextComponentManager extends DelegateComponentManager implements
     @Named("user")
     private ComponentManager userComponentManager;
 
+    @Inject
+    private ComponentManager rootComponentManager;
+
+    @Inject
+    private Execution execution;
+
     @Override
-    public void initialize() throws InitializationException
+    public ComponentManager getComponentManager()
     {
-        // The first Component Manager in the lookup chain is the user Component Manager (i.e. components registered
-        // for the current user).
-        setComponentManager(this.userComponentManager);
+        // If there is no context go directly to root CM
+        if (this.execution.getContext() == null) {
+            return this.rootComponentManager;
+        } else {
+            return this.userComponentManager;
+        }
     }
 
     // Make the Context Component Manager "read-only". Writes should be done against specific Component Managers.

@@ -35,7 +35,7 @@ import com.xpn.xwiki.CoreConfiguration;
 
 /**
  * Configuration for the Core module.
- * 
+ *
  * @version $Id$
  * @since 1.8RC2
  */
@@ -57,7 +57,7 @@ public class DefaultCoreConfiguration implements CoreConfiguration
 
     /**
      * Used to parse the syntax specified as a String in the configuration.
-     * 
+     *
      * @since 2.3M1
      */
     @Inject

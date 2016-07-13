@@ -22,6 +22,9 @@ package org.xwiki.officeimporter.internal.filter;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +43,9 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/list")
+@Component
+@Named("officeimporter/list")
+@Singleton
 public class ListFilter extends AbstractHTMLFilter
 {
     @Override

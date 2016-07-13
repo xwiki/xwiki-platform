@@ -29,7 +29,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.objects.classes.PropertyClassProvider;
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -39,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
  * A pseudo XClass whose fields are meta properties. In other words, each field of this XClass defines a type of
  * property that can be added to a standard XClass. This class is being used to lookup XClass property types. New code
  * should lookup {@link PropertyClassProvider} implementations instead using the component manager.
- * 
+ *
  * @version $Id$
  */
 public class MetaClass extends BaseClass
@@ -57,7 +56,7 @@ public class MetaClass extends BaseClass
     /**
      * A cached instance of this class that can be used to quickly lookup XClass property types.
      */
-    private static MetaClass metaClass = new MetaClass();
+    private static MetaClass metaClass;
 
     /**
      * Creates a new instance that has a property for each available property type.
@@ -66,7 +65,7 @@ public class MetaClass extends BaseClass
     {
         try {
             List<PropertyClassProvider> providers =
-                Utils.getComponentManager().getInstanceList(PropertyClassProvider.class);
+                Utils.getContextComponentManager().getInstanceList(PropertyClassProvider.class);
             for (PropertyClassProvider provider : providers) {
                 PropertyInterface property = provider.getDefinition();
                 safeput(property.getName(), property);
@@ -82,7 +81,7 @@ public class MetaClass extends BaseClass
         addField(PROPERTY_NAME_PREFIX + name, property);
         if (property instanceof PropertyClass) {
             ((PropertyClass) property).setObject(this);
-            ((BaseProperty) property).setName(name);
+            ((PropertyClass) property).setName(name);
         }
     }
 
@@ -116,12 +115,15 @@ public class MetaClass extends BaseClass
      */
     public static MetaClass getMetaClass()
     {
+        if (metaClass == null) {
+            metaClass = new MetaClass();
+        }
         return metaClass;
     }
 
     /**
      * Sets the cached instance of this class.
-     * 
+     *
      * @param metaClass the cached instance
      */
     public static void setMetaClass(MetaClass metaClass)

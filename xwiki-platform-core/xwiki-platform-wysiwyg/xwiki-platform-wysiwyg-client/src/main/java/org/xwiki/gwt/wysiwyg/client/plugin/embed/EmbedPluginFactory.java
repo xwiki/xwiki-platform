@@ -53,11 +53,7 @@ public final class EmbedPluginFactory extends AbstractPluginFactory
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return new EmbedPlugin();

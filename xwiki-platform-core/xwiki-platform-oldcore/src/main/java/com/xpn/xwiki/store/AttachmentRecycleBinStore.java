@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * using {@link #saveToRecycleBin(XWikiAttachment, String, Date, XWikiContext, boolean)}, restored using
  * {@link #restoreFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)}, and permanently removed from the
  * recycle bin using {@link #deleteFromRecycleBin(long, XWikiContext, boolean)}.
- * 
+ *
  * @version $Id$
  * @since 1.4M1
  */
@@ -44,7 +44,7 @@ public interface AttachmentRecycleBinStore
 {
     /**
      * Save attachment to recycle bin, with full history.
-     * 
+     *
      * @param attachment The attachment to save.
      * @param deleter The user which deleted the attachment.
      * @param date Date of delete action.
@@ -57,7 +57,7 @@ public interface AttachmentRecycleBinStore
 
     /**
      * Restore an attachment from the recycle bin (with full history).
-     * 
+     *
      * @return Restored attachment, or <code>null</code> if an entry with the requested ID does not exist.
      * @param attachment Optional attachment to restore. If a non-null value is passed, then this object will be changed
      *            to reflect the contents/history of the deleted attachment.
@@ -72,7 +72,7 @@ public interface AttachmentRecycleBinStore
 
     /**
      * Returns a {@link DeletedAttachment handler} for a deleted attachment.
-     * 
+     *
      * @return Specified deleted document from recycle bin. <code>null</code> if not found.
      * @param index What deleted attachment to restore. See {@link DeletedAttachment#getId()}
      * @param context The current context.
@@ -86,7 +86,7 @@ public interface AttachmentRecycleBinStore
     /**
      * Get all the deleted attachments from the database matching an attachment template (document name and filename).
      * The results are ordered by the deletion date, descending (most recently deleted first).
-     * 
+     *
      * @param attachment Optional attachment template. If <code>null</code>, return information about all deleted
      *            attachments from the database. Otherwise, filter by the document and filename provided in the passed
      *            attachment.
@@ -100,7 +100,7 @@ public interface AttachmentRecycleBinStore
 
     /**
      * Get all the deleted attachments for a given document.
-     * 
+     *
      * @return Infos about all deleted attachments of specific document, sorted by date.
      * @param doc The document for which to retrieve deleted attachments.
      * @param context The current context.
@@ -112,7 +112,7 @@ public interface AttachmentRecycleBinStore
 
     /**
      * Permanently delete attachment from recycle bin.
-     * 
+     *
      * @param index Which instance to delete from the recycle bin.
      * @param context The current context.
      * @param bTransaction Should use old transaction (false) or create new (true).

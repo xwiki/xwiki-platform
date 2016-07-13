@@ -251,7 +251,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
     {
         getMockery().checking(new Expectations() {{
             oneOf(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
-            exactly(2).of(mockHibernateSession).delete(with(anything()));
+            exactly(2).of(mockHibernateSession).delete(with(any(Object.class)));
         }});
         this.createFile();
 
@@ -269,7 +269,7 @@ public class FilesystemAttachmentStoreTest extends AbstractFilesystemAttachmentS
 
         getMockery().checking(new Expectations() {{
             oneOf(mockAttachVersionStore).deleteArchive(mockAttach, mockContext, false);
-            exactly(2).of(mockHibernateSession).delete(with(anything()));
+            exactly(2).of(mockHibernateSession).delete(with(any(Object.class)));
             oneOf(mockHibernate).saveXWikiDoc(doc, mockContext, false);
             will(new CustomAction("Make sure the attachment has been removed from the list.")
             {

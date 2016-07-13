@@ -1,12 +1,21 @@
 #if ($type == 'edit' || $type == 'search')
+  #set ($disabled = $field.getProperty('disabled').value == 1)
   #set ($id = $escapetool.xml("${prefix}${name}"))
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email" />
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email"
+    #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
-#if ($xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0) == 1)
+  #set ($mailConfigDoc = $xwiki.getDocument('Mail.MailConfig'))
+  #set ($generalMailConfigObject = $mailConfigDoc.getObject('Mail.GeneralMailConfigClass'))
+  #set ($obfuscate = $generalMailConfigObject.getValue('obfuscate'))
+  #if ("$!obfuscate" == '')
+    ## We handle backward compatibility by also looking in the XWikiPreferences xobject
+    #set ($obfuscate = $xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0))
+  #end
+  #if ($obfuscate == 1)
 $!value.replaceAll('^(.).*@', '$1...@')##
-#else
-$!value##
-#end
+  #elseif ($value !='')
+<a href="mailto:$!value">$!value</a>##
+  #end
 #elseif ($type == 'hidden')
   #set ($id = $escapetool.xml("${prefix}${name}"))
   <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />

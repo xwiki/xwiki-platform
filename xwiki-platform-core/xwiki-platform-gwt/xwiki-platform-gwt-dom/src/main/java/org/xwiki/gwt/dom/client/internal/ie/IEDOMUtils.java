@@ -21,21 +21,14 @@ package org.xwiki.gwt.dom.client.internal.ie;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.Window;
 
 /**
- * Contains methods from {@link DOMUtils} that require a different implementation in Internet Explorer 9 and above.
+ * Contains methods from {@link DOMUtils} that require a different implementation in Internet Explorer 9.
  * 
  * @version $Id$
  */
 public class IEDOMUtils extends DOMUtils
 {
-    @Override
-    public void stop(Window window)
-    {
-        window.getDocument().execCommand("Stop", null);
-    }
-
     @Override
     public void ensureBlockIsEditable(Element block)
     {

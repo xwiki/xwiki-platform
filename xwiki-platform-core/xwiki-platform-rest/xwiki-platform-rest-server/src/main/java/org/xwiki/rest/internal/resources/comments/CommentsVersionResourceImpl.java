@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.comments;
 
 import java.util.Vector;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -36,7 +38,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.comments.CommentsVersionResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.comments.CommentsVersionResourceImpl")
 public class CommentsVersionResourceImpl extends XWikiResource implements CommentsVersionResource
 {
     @Override

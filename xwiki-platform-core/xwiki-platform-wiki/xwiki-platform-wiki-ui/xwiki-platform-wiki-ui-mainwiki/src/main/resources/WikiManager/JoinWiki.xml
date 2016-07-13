@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>JoinWiki</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1293832800000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1307191413000</date>
+  <contentUpdateDate>1307191413000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.wiki.users.join.title')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#macro (printException $exception)
+  #if($exception.message)
+    {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}
+  #else
+    {{error}}$exception.class{{/error}}
+  #end
+#end
+#set ($wikiId = $request.wikiId)
+#set ($form_token = $request.form_token)
+##
+#if ("$!wikiId" == '')
+  {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
+#else
+  ## FIXME: add plugin dependency checks.
+  ##
+  #set ($wiki = $services.wiki.getById($wikiId))
+  #set ($wikiMainPage = $wiki.mainPageReference)
+  #set ($wikiMainPageLinkStart = '')
+  #set ($wikiMainPageLinkEnd = '')
+  #if ($xwiki.exists($wikiMainPage))
+    #set ($wikiMainPageLinkStart = '[[')
+    #set ($wikiMainPageLinkEnd = "&gt;&gt;${wikiMainPage}]]")
+  #end
+  ##
+  #if ("$!wiki" == '')
+    #if ("$!{services.wiki.lastException}" != '')
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+    #else
+      {{error}}$services.localization.render('platform.wiki.error.wikidoesnotexist', [$wikiId]){{/error}}
+    #end
+  #else
+    #set ($wikiName = $wiki.prettyName)
+    #if ("$!wikiName" == '')
+      #set ($wikiName = $wikiId)
+    #end
+    #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
+    ##
+    #set ($members = $services.wiki.user.getMembers($wikiId))
+    #if ($members &amp;&amp; $members.contains($currentUser))
+      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/info}}
+    #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
+      #set ($loginDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'XWikiLogin'))
+      #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
+      #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+      {{error}}$services.localization.render('platform.wiki.users.logInToContinue', ['[[', "&gt;&gt;$loginUrl]]"]){{/error}}
+    #else
+      ## The user is not already a member of the wiki
+      ##
+      #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
+      #set ($backUrl = $xwiki.getURL($browseDocumentReference))
+      ##
+      #set ($membershipType = $services.wiki.user.getMembershipType($wiki.id))
+      ##
+      ## Determine if, regardless of membership type, an existing invitation exists for the current user.
+      #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))
+      #set ($existingInvitation = false)
+      #if ($invitations &amp;&amp; !$invitations.isEmpty())
+        #foreach($invitation in $invitations)
+          #if ($invitation.userId == $currentUser &amp;&amp; $invitation.status == 'PENDING')
+            #set ($existingInvitation = $invitation)
+          #end
+        #end
+      #end
+      #if ($existingInvitation)
+        ##
+        ## An invitation exists.
+        #if (($request.acceptInvitation || $request.rejectInvitation) &amp;&amp; $services.csrf.isTokenValid($form_token))
+          ##
+          ## The user decided whether to accept or to reject the invitation.
+          #set ($notificationMessage = $services.localization.render('platform.wiki.users.invitation.userAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
+          ## Accept
+          #if ($request.acceptInvitation)
+            #set ($discard = $services.wiki.user.acceptInvitation($existingInvitation, $request.userComment))
+          #else
+            #set ($discard = $services.wiki.user.refuseInvitation($existingInvitation, $request.userComment))
+          #end          
+          ## Send message to wiki admins. (XWikiAdminGroup)
+          #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
+          #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
+          ## Display the proper success info.
+          {{success}}
+          #if ($request.acceptInvitation)
+            $services.localization.render('platform.wiki.users.invitation.userAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+          #else
+            $services.localization.render('platform.wiki.users.invitation.userRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+          #end
+          {{/success}}
+        #else
+          #if("$!form_token" != '')
+
+             {{warning}}
+               {{translation key="platform.wiki.csrf.error" /}}
+             {{/warning}}
+
+          #end
+          ##
+          ## User can decide if to accept or reject the invitation.
+          {{html wiki='true'}}
+          $services.localization.render('platform.wiki.users.invitation.title', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+
+          &lt;form class='xform third' method='post'&gt;
+            &lt;dl&gt;
+            #if ("$!existingInvitation.get('reviewerComment').getValue()" != '')
+              &lt;dt&gt;
+                &lt;label&gt;{{translation key="platform.wiki.users.invitation.message.label"/}}&lt;/label&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                $existingInvitation.get('reviewerComment').getValue()
+              &lt;/dd&gt;
+            #end  
+              &lt;dt&gt;
+                &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.invitation.reply.title"/}}&lt;/label&gt;
+                &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.invitation.reply.hint"/}}&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
+              &lt;span class='buttonwrapper'&gt;
+                &lt;br/&gt;
+                &lt;input type='submit' name='acceptInvitation' value="$services.localization.render('platform.wiki.users.invitation.accept.label')" class='button'/&gt;
+                &lt;input type='submit' name='rejectInvitation' value="$services.localization.render('platform.wiki.users.invitation.reject.label')" class='button'/&gt;
+                &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.invitation.postpone.label"/}}&lt;/a&gt;
+              &lt;/span&gt;
+              &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+              &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+            &lt;/dl&gt;
+          &lt;/form&gt;
+          {{/html}}
+        #end
+      ##
+      ## The user is not invited to join. Continue based on the current membership type of the wiki.
+      #elseif ($membershipType == 'INVITE')
+        ##
+        ## User does not have an invitation.
+        {{error}}{{translation key="platform.wiki.users.join.error.needInvitation"/}}{{/error}}
+      #elseif ($membershipType == 'REQUEST')
+        ## Determine if a pending request already exists.
+        ##
+        #set ($pendingRequest = false)
+        #set ($existingRequests = $services.wiki.user.getAllRequests($wikiId))
+        #foreach ($existingRequest in $existingRequests)
+          #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
+            #set ($pendingRequest = $existingRequest)
+          #end
+        #end
+        #if ($pendingRequest)
+          #if ("$!{request.cancelJoinRequest}" != '1')
+            ## Request already exists.
+            ##
+            {{info}}$services.localization.render('platform.wiki.users.join.request.pendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/info}}
+          #elseif (!$services.csrf.isTokenValid($form_token))
+            ## User wants to cancel existing request.
+            ##
+            #if("$!form_token" != '')
+
+              {{warning}}
+               {{translation key="platform.wiki.csrf.error" /}}
+              {{/warning}}
+
+            #end
+            {{box}}
+              $services.localization.render('platform.wiki.users.join.request.cancelConfirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+              ((({{html}}
+                &lt;form action="$doc.getURL()" method="post"&gt;
+                  &lt;fieldset&gt;
+                    &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                    &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                    &lt;input type="hidden" name="cancelJoinRequest" value="1" /&gt;
+                    &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.users.join.request.cancelYes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelNo')&lt;/a&gt;&lt;/span&gt;
+                  &lt;/fieldset&gt;
+                &lt;/form&gt;
+              {{/html}})))
+            {{/box}}
+          #else
+            ## User confirms the cancel of existing request.
+            ##
+            #set ($result = $services.wiki.user.cancelCandidacy($pendingRequest))
+            #if ($result)
+              {{success}}$services.localization.render('platform.wiki.users.join.request.cancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
+            #else
+              #printException($services.wiki.user.lastException.message)
+            #end
+          #end
+        #elseif (!$services.csrf.isTokenValid($form_token))
+          ## Join request.
+          ##
+          #if("$!form_token" != '')
+
+           {{warning}}
+             {{translation key="platform.wiki.csrf.error" /}}
+           {{/warning}}
+
+          #end
+        
+          {{html wiki='true'}}
+            $services.localization.render('platform.wiki.users.join.request.hint', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+
+            &lt;form class='xform third' method='GET'&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.join.request.message.label"/}}&lt;/label&gt;
+                  &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.join.request.message.hint"/}}&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
+                &lt;span class='buttonwrapper'&gt;
+                  &lt;br/&gt;
+                  &lt;input type='submit' name='submit' value="$services.localization.render('platform.wiki.users.join.request.send.label')" class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.join.request.cancel.label"/}}&lt;/a&gt;
+                &lt;/span&gt;
+                &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
+                &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
+                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+              &lt;/dl&gt;
+            &lt;/form&gt;
+          {{/html}}
+        #else
+          ## User confirmed the join request.
+          ##
+          #set ($request = $services.wiki.user.askToJoin($currentUser, $wikiId, $request.userComment))
+          #if ($request)
+            ## Send message to wiki admins. (XWikiAdminGroup)
+            #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
+            #set ($notificationMessage = $services.localization.render('platform.wiki.users.join.request.saveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $wikiName, $wikiId]))
+            #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
+            {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
+          #else
+            #printException($services.wiki.user.lastException.message)
+          #end
+        #end
+      #else
+        ## Open membership as default.
+        ##
+        #if (!$services.csrf.isTokenValid($form_token))
+          ## Open join.
+          ##
+          #if("$!form_token" != '')
+
+           {{warning}}
+             {{translation key="platform.wiki.csrf.error" /}}
+           {{/warning}}
+
+          #end
+          {{box}}
+            $services.localization.render('platform.wiki.users.join.confirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+            ((({{html}}
+              &lt;form action="$doc.getURL()" method="post"&gt;
+                &lt;fieldset&gt;
+                  &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                  &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                  &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.users.join.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.no')&lt;/a&gt;&lt;/span&gt;
+                &lt;/fieldset&gt;
+              &lt;/form&gt;
+            {{/html}})))
+          {{/box}}
+        #else
+          ## User confirmed to join the wiki.
+          ##
+          #set ($result = $services.wiki.user.join($currentUser, $wikiId))
+          #if ($result)
+            {{success}}$services.localization.render('platform.wiki.users.join.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
+          #else
+            #printException($services.wiki.user.lastException.message)
+          #end
+        #end
+      #end
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

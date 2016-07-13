@@ -69,11 +69,7 @@ public class LinkWizardStepProvider implements WizardStepProvider
         this.wikiService = wikiService;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WizardStepProvider#getStep(String)
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         LinkWizardStep requestedStep = parseStepName(name);
@@ -116,7 +112,7 @@ public class LinkWizardStepProvider implements WizardStepProvider
                 step = new LinkDispatcherWizardStep(wikiService);
                 break;
             case WIKI_PAGE:
-                PageSelectorWizardStep pageSelector = new PageSelectorWizardStep(wikiService);
+                PageSelectorWizardStep pageSelector = new PageSelectorWizardStep(wikiService, config);
                 pageSelector.setValidDirections(EnumSet.of(NavigationDirection.NEXT));
                 step = pageSelector;
                 break;
@@ -172,7 +168,7 @@ public class LinkWizardStepProvider implements WizardStepProvider
         attachmentSelector.setValidDirections(EnumSet.of(NavigationDirection.NEXT));
         attachmentSelector.setCurrentPageSelector(new CurrentPageAttachmentSelectorWizardStep(wikiService));
         if (!selectionLimitedToCurrentPage) {
-            attachmentSelector.setAllPagesSelector(new AttachmentExplorerWizardStep());
+            attachmentSelector.setAllPagesSelector(new AttachmentExplorerWizardStep(config));
         }
         return attachmentSelector;
     }

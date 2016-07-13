@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -45,9 +47,11 @@ import org.xwiki.rest.model.jaxb.ObjectFactory;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.representations.comments.FormUrlEncodedCommentReader")
+@Component
+@Named("org.xwiki.rest.internal.representations.comments.FormUrlEncodedCommentReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+@Singleton
 public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, XWikiRestComponent
 {
     private static final String COMMENT_TEXT_FIELD_NAME = "text";

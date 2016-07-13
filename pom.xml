@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,21 +17,31 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>8.2-SNAPSHOT</version>
+    <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
+         Jenkins and you have the following directory structure:
+             workspace/xwiki-commons
+             workspace/xwiki-platform_Quality_Checks
+         When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
+         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
+         date with the latest code from the SCM, thus causing build failures that are hard to track.
+
+         By using an empty value we force Maven to resolve the parent from the Maven repositories,
+         see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
+    -->
+    <relativePath/>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>5.2-SNAPSHOT</version>
+  <version>8.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -41,9 +49,9 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.2.9</hsqldb.version>
-    <!-- Version of SmartGWT that we use in platform for the XWiki Explorer Tree. -->
-    <smartgwt.version>3.1</smartgwt.version>
+    <hsqldb.version>2.3.3</hsqldb.version>
+    <!-- By default check that unit tests don't output anything to the console -->
+    <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -58,8 +66,45 @@
   <modules>
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
+    <module>xwiki-platform-distribution</module>
   </modules>
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/*IntegrationTests.java</include>
+            </includes>
+            <!-- Verify that unit tests don't output anything to stdout/stderr -->
+            <systemProperties combine.children="append">
+              <!-- This property makes it simple for some module to exclude the check (for example for functional
+                   tests) -->
+              <property>
+                <name>xwiki.surefire.captureconsole.skip</name>
+                <value>${xwiki.surefire.captureconsole.skip}</value>
+              </property>
+            </systemProperties>
+            <properties>
+              <property>
+                <name>listener</name>
+                <value>org.xwiki.test.CaptureConsoleRunListener</value>
+              </property>
+            </properties>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${commons.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
@@ -68,29 +113,20 @@
       </plugin>
       <!-- Check license headers -->
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-        <configuration>
-          <includes>
-            <!-- At the moment, only check the license headers in Java file since we need to fix other types of files
-                 first -->
-            <include>**/*.java</include>
-            <include>**/*.bat</include>
-            <include>**/*.sh</include>
-          </includes>
-        </configuration>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
-          <!-- Verify that all org.xwiki.commons dependencies in Commons have a version specified either as:
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
                - ${commons.version}
                - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.rendering dependencies in Commons have a version specified either as:
+               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
                - ${rendering.version}
                - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.platform dependencies in Commons have a version specified either as:
+               Also verifies that all org.xwiki.platform dependencies have a version specified either as:
                - ${project.version}
                - a value not starting with $ (we want to allow supporting ranges)
           -->
@@ -122,4 +158,25 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <properties>
+        <!-- Don't check that unit tests don't output anything to the console since for example Clover will output
+             messages such as "Updating existing database at '...'." during tests! -->
+        <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+      </properties>
+    </profile>
+    <profile>
+      <!-- TODO: Java 8 is now stricter for checking validity of javadoc. We need to fix our errors and then we can
+           disable this. -->
+      <id>disable-java8-doclint</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <properties>
+        <additionalparam>-Xdoclint:none</additionalparam>
+      </properties>
+    </profile>
+  </profiles>
 </project>

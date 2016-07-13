@@ -32,6 +32,7 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
@@ -66,6 +67,9 @@ public class SolrIndexInitializeListener implements EventListener
     @Inject
     private Provider<SolrIndexer> solrIndexer;
 
+    @Inject
+    private SolrConfiguration configuration;
+
     @Override
     public List<Event> getEvents()
     {
@@ -81,14 +85,16 @@ public class SolrIndexInitializeListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Start synchronization
-        IndexerRequest request = new IndexerRequest();
-        request.setId(Arrays.asList("solr", "indexer"));
+        if (this.configuration.synchronizeAtStartup()) {
+            // Start synchronization
+            IndexerRequest request = new IndexerRequest();
+            request.setId(Arrays.asList("solr", "indexer"));
 
-        try {
-            this.solrIndexer.get().startIndex(request);
-        } catch (SolrIndexerException e) {
-            this.logger.error("Failed to start initial Solr index synchronization", e);
+            try {
+                this.solrIndexer.get().startIndex(request);
+            } catch (SolrIndexerException e) {
+                this.logger.error("Failed to start initial Solr index synchronization", e);
+            }
         }
     }
 }

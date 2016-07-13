@@ -20,387 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AnnotationCode</web>
   <name>Settings</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AnnotationCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1264870880000</creationDate>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1271945477000</date>
   <contentUpdateDate>1271945477000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>AnnotationCode.Settings</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>a029fb86-6224-4ce9-b1d4-189b19753e9e</guid>
-    <property>
-      <cache/>
-    </property>
-    <property>
-      <code>var XWiki = (function (XWiki) {
-// Start XWiki augmentation.
-XWiki.AnnotationSettings = Class.create({
-  initialize : function() {
-    this.addCheckboxListeners();
-    this.addClearListeners();
-    this.addToggleFilterVisibility('.criterion-label', '.criterion', 'collapsed');
-    this.addToggleFilterVisibility('.annotation-filters-toggler a', '.annotation-filters', 'collapsed');
-    // send a filter change event to notify annotations of the initial state of the loaded filter
-    document.fire("xwiki:annotations:filter:changed", this.getCurrentFilter());
-  },
-
-  addCheckboxListeners : function() {
-    $$('.criteria input[type=checkbox]').each(function(item) {
-      item.observe('click', function(event) {
-        // 1/ Update annotations
-        var filter = this.getCurrentFilter();
-        document.fire("xwiki:annotations:filter:changed", filter);
-        // 2/ Some visual changes:
-        var input = event.element();
-        input.up().toggleClassName('selected');
-        var criterion = input.up('.criterion');
-        if (criterion.select('label.selected').size() &gt; 0) {
-          criterion.addClassName('active');
-        } else {
-          criterion.removeClassName('active');
-        }
-      }.bindAsEventListener(this));
-    }, this);
-  },
-
-  addClearListeners : function () {
-    $$('.criterion .clear').each(function(item) {
-      item.observe('click', function(event) {
-        event.stop();
-        // 1/ Unckeck all options + some visual changes:
-        var criterion = event.element().up('.criterion');
-        criterion.select('label.selected').each(function(item) {
-          item.removeClassName('selected');
-          item.down('input').checked = false;
-        });
-        criterion.removeClassName('active');
-        // 2/ Update annotations
-        var filter = this.getCurrentFilter();
-        document.fire("xwiki:annotations:filter:changed", filter);
-      }.bindAsEventListener(this));
-    }, this);
-  },
-
-  /**
-   * Reads the current filter from the filtering checkboxes.
-   */
-  getCurrentFilter : function() {
-    var filter = [];
-    // for each criterion
-    $$('.criteria .criterion').each(function(criterion) {
-      // get its name
-      var criterionName = criterion.down('input[type=hidden]');
-      if (!criterionName) {
-        return;
-      }
-      criterionName = criterionName.name;
-      // now go down and gel all values checkboxes which are checked
-      var values = [];
-      criterion.select('input[type=checkbox]').each(function(checkbox) {
-        if(checkbox.checked) {
-          values.push(checkbox.value);
-        }
-      });
-      // and stack them in the filter
-      for (var i = 0; i &lt; values.length; i++) {
-        filter.push({'name' : criterionName, 'value' : values[i]});
-      }
-    });
-    return filter;
-  },
-
-  /**
-   * Expand/Collapse elements of the filter widget
-   */
-  addToggleFilterVisibility : function(triggerSelector, parentSelector, toggledClassName) {
-    $$(triggerSelector).each(function(item) {
-      item.observe('click', function(event) {
-        event.stop();
-        var parent = event.element().up(parentSelector);
-        if (parent) {
-          parent.toggleClassName(toggledClassName);
-        }
-      });
-    });
-  }
-});
-// End XWiki augmentation.
-return XWiki;
-}(XWiki || {}));
-
-document.observe('xwiki:annotations:settings:loaded', function() {
-  new XWiki.AnnotationSettings();
-});</code>
-    </property>
-    <property>
-      <name>Annotation Javascript -- Settings panel javascript, filters UI and update</name>
-    </property>
-    <property>
-      <parse/>
-    </property>
-    <property>
-      <use>always</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>AnnotationCode.Settings</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>dcd32810-0559-4cd4-aa90-c4bbb7192535</guid>
-    <property>
-      <cache/>
-    </property>
-    <property>
-      <code>#template('colorThemeInit.vm')
-
-.annotationsettings .plainmessage {
-  background-image: url($xwiki.getSkinFile('icons/silk/add.png'));
-  float: right;
-  width: 30%;
-  margin: 0 0 12px 4px;
-}
-/* IE7 expands the box for an unknown reason, and this seems to fix it: */
-*+html .annotationsettings {
-  zoom: 100%;
-}
-.annotation-filters {
-  padding: 8px 4px 4px;
-}
-.annotation-filters-toggler {
-  font-size: 80%;
-  color: $theme.textPrimaryColor;
-}
-.criteria {
-  margin: 0.5em 0;
-}
-.collapsed .criteria {
-  display: none;
-}
-
-*+html .collapsed .criterion-option-list {
-  width: 10px;
-}
-
-#annotation-filters:target .criteria {
-  display: block;
-}
-.criterion {
-  margin: 2px 0;
-  padding: 0 0 0 14px;
-  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')) top left no-repeat;
-}
-.criteria .collapsed {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png'));
-}
-.criteria .collapsed .criterion-option-list {
-  display: none;
-}
-.criterion-label {
-  margin-left: -14px;
-  padding-left: 14px;
-  cursor: pointer;
-}
-.active .criterion-label {
-  font-weight: bold;
-}
-.criterion-label .details {
-  text-transform: lowercase;
-  font-size: 80%;
-  color: $theme.textPrimaryColor;
-}
-.active .criterion-label .details {
-  display: none;
-}
-.criterion-label .clear {
-  text-transform: lowercase;
-  font-size: 80%;
-  color: $theme.notificationErrorColor;
-  font-weight: normal;
-  cursor: pointer;
-  display: none;
-}
-.active .criterion-label .clear {
-  display: inline;
-}
-.criterion-option-list label.option {
-  font-weight: normal;
-}
-.criterion-option-list label.selected {
-  background-color: $theme.highlightColor;
-}</code>
-    </property>
-    <property>
-      <name>Annotations settings panel css</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>always</use>
-    </property>
-  </object>
   <content>{{velocity output="false"}}
 #*
  * Display the checkboxes for a given criterion, according to the values passed in $options
@@ -521,4 +159,378 @@ document.observe('xwiki:annotations:settings:loaded', function() {
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>
+  <object>
+    <name>AnnotationCode.Settings</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a029fb86-6224-4ce9-b1d4-189b19753e9e</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.AnnotationSettings = Class.create({
+  initialize : function() {
+    this.addCheckboxListeners();
+    this.addClearListeners();
+    this.addToggleFilterVisibility('.criterion-label', '.criterion', 'collapsed');
+    this.addToggleFilterVisibility('.annotation-filters-toggler a', '.annotation-filters', 'collapsed');
+    // send a filter change event to notify annotations of the initial state of the loaded filter
+    document.fire("xwiki:annotations:filter:changed", this.getCurrentFilter());
+  },
+
+  addCheckboxListeners : function() {
+    $$('.criteria input[type=checkbox]').each(function(item) {
+      item.observe('click', function(event) {
+        // 1/ Update annotations
+        var filter = this.getCurrentFilter();
+        document.fire("xwiki:annotations:filter:changed", filter);
+        // 2/ Some visual changes:
+        var input = event.element();
+        input.up().toggleClassName('selected');
+        var criterion = input.up('.criterion');
+        if (criterion.select('label.selected').size() &gt; 0) {
+          criterion.addClassName('active');
+        } else {
+          criterion.removeClassName('active');
+        }
+      }.bindAsEventListener(this));
+    }, this);
+  },
+
+  addClearListeners : function () {
+    $$('.criterion .clear').each(function(item) {
+      item.observe('click', function(event) {
+        event.stop();
+        // 1/ Unckeck all options + some visual changes:
+        var criterion = event.element().up('.criterion');
+        criterion.select('label.selected').each(function(item) {
+          item.removeClassName('selected');
+          item.down('input').checked = false;
+        });
+        criterion.removeClassName('active');
+        // 2/ Update annotations
+        var filter = this.getCurrentFilter();
+        document.fire("xwiki:annotations:filter:changed", filter);
+      }.bindAsEventListener(this));
+    }, this);
+  },
+
+  /**
+   * Reads the current filter from the filtering checkboxes.
+   */
+  getCurrentFilter : function() {
+    var filter = [];
+    // for each criterion
+    $$('.criteria .criterion').each(function(criterion) {
+      // get its name
+      var criterionName = criterion.down('input[type=hidden]');
+      if (!criterionName) {
+        return;
+      }
+      criterionName = criterionName.name;
+      // now go down and gel all values checkboxes which are checked
+      var values = [];
+      criterion.select('input[type=checkbox]').each(function(checkbox) {
+        if(checkbox.checked) {
+          values.push(checkbox.value);
+        }
+      });
+      // and stack them in the filter
+      for (var i = 0; i &lt; values.length; i++) {
+        filter.push({'name' : criterionName, 'value' : values[i]});
+      }
+    });
+    return filter;
+  },
+
+  /**
+   * Expand/Collapse elements of the filter widget
+   */
+  addToggleFilterVisibility : function(triggerSelector, parentSelector, toggledClassName) {
+    $$(triggerSelector).each(function(item) {
+      item.observe('click', function(event) {
+        event.stop();
+        var parent = event.element().up(parentSelector);
+        if (parent) {
+          parent.toggleClassName(toggledClassName);
+        }
+      });
+    });
+  }
+});
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+
+document.observe('xwiki:annotations:settings:loaded', function() {
+  new XWiki.AnnotationSettings();
+});</code>
+    </property>
+    <property>
+      <name>Annotation Javascript -- Settings panel javascript, filters UI and update</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.Settings</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>dcd32810-0559-4cd4-aa90-c4bbb7192535</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache/>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.annotationsettings .plainmessage {
+  background-image: url($xwiki.getSkinFile('icons/silk/add.png'));
+  float: right;
+  width: 30%;
+  margin: 0 0 12px 4px;
+}
+/* IE7 expands the box for an unknown reason, and this seems to fix it: */
+*+html .annotationsettings {
+  zoom: 100%;
+}
+.annotation-filters {
+  padding: 8px 4px 4px;
+}
+.annotation-filters-toggler {
+  font-size: 80%;
+  color: $theme.textPrimaryColor;
+}
+.criteria {
+  margin: 0.5em 0;
+}
+.collapsed .criteria {
+  display: none;
+}
+
+*+html .collapsed .criterion-option-list {
+  width: 10px;
+}
+
+#annotation-filters:target .criteria {
+  display: block;
+}
+.criterion {
+  margin: 2px 0;
+  padding: 0 0 0 14px;
+  background: transparent url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')) top left no-repeat;
+}
+.criteria .collapsed {
+  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png'));
+}
+.criteria .collapsed .criterion-option-list {
+  display: none;
+}
+.criterion-label {
+  margin-left: -14px;
+  padding-left: 14px;
+  cursor: pointer;
+}
+.active .criterion-label {
+  font-weight: bold;
+}
+.criterion-label .details {
+  text-transform: lowercase;
+  font-size: 80%;
+  color: $theme.textPrimaryColor;
+}
+.active .criterion-label .details {
+  display: none;
+}
+.criterion-label .clear {
+  text-transform: lowercase;
+  font-size: 80%;
+  color: $theme.notificationErrorColor;
+  font-weight: normal;
+  cursor: pointer;
+  display: none;
+}
+.active .criterion-label .clear {
+  display: inline;
+}
+.criterion-option-list label.option {
+  font-weight: normal;
+}
+.criterion-option-list label.selected {
+  background-color: $theme.highlightColor;
+}</code>
+    </property>
+    <property>
+      <name>Annotations settings panel css</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
 </xwikidoc>

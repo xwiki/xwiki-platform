@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -59,6 +57,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -76,6 +75,8 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
+
+import net.sf.json.JSONObject;
 
 public class Package
 {
@@ -100,7 +101,7 @@ public class Package
     /**
      * @see #isInstallExension()
      */
-    private boolean installExension = true;
+    private boolean installExtension = true;
 
     private String extensionId;
 
@@ -157,15 +158,43 @@ public class Package
     /**
      * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
      *         <code>false</code> otherwise.
+     * @deprecated since 6.4.5, 7.0.1, 7.1M1, use {@link #isInstallExtension()} instead
      */
+    @Deprecated
     public boolean isInstallExension()
     {
-        return this.installExension;
+        return isInstallExtension();
     }
 
+    /**
+     * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
+     *         <code>false</code> otherwise.
+     * @since 6.4.5, 7.0.1, 7.1M1
+     */
+    public boolean isInstallExtension()
+    {
+        return this.installExtension;
+    }
+
+    /**
+     * @param installExension <code>true</code> if the extension packaged in the XAR should be registered as such
+     *            automatically, <code>false</code> otherwise.
+     * @deprecated since 6.4.5, 7.0.1, 7.1M1, use {@link #setInstallExension(boolean)} instead
+     */
+    @Deprecated
     public void setInstallExension(boolean installExension)
     {
-        this.installExension = installExension;
+        this.installExtension = installExension;
+    }
+
+    /**
+     * @param installExension <code>true</code> if the extension packaged in the XAR should be registered as such
+     *            automatically, <code>false</code> otherwise.
+     * @since 6.4.5, 7.0.1, 7.1M1
+     */
+    public void setInstallExtension(boolean installExtension)
+    {
+        this.installExtension = installExtension;
     }
 
     public String getExtensionId()
@@ -211,7 +240,7 @@ public class Package
     /**
      * If true, the package will preserve the original author during import, rather than updating the author to the
      * current (importing) user.
-     * 
+     *
      * @see #isWithVersions()
      * @see #isVersionPreserved()
      */
@@ -233,7 +262,7 @@ public class Package
     /**
      * If true, the package will preserve the current document version during import, regardless of whether or not the
      * document history is included.
-     * 
+     *
      * @see #isWithVersions()
      * @see #isBackupPack()
      */
@@ -435,7 +464,7 @@ public class Package
      * Load this package in memory from a byte array. It may be installed later using {@link #install(XWikiContext)}.
      * Your should prefer {@link #Import(InputStream, XWikiContext)} which may avoid loading the package twice in
      * memory.
-     * 
+     *
      * @param file a byte array containing the content of a zipped package file
      * @param context current XWikiContext
      * @return an empty string, useless.
@@ -449,7 +478,7 @@ public class Package
 
     /**
      * Load this package in memory from an InputStream. It may be installed later using {@link #install(XWikiContext)}.
-     * 
+     *
      * @param file an InputStream of a zipped package file
      * @param context current XWikiContext
      * @return an empty string, useless.
@@ -683,7 +712,7 @@ public class Package
     private void registerExtension(XWikiContext context)
     {
         // Register the package as extension if it's one
-        if (isInstallExension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
+        if (isInstallExtension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
             ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
 
             try {
@@ -705,15 +734,30 @@ public class Package
                     localExtension = localRepository.storeExtension(extension);
                 }
 
-                // Register the extension as installed
                 InstalledExtensionRepository installedRepository =
                     Utils.getComponent(InstalledExtensionRepository.class);
-                String namespace = "wiki:" + context.getDatabase();
-                InstalledExtension installedExtension =
-                    installedRepository.getInstalledExtension(localExtension.getId());
-                if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
-                    installedRepository.installExtension(localExtension, namespace, false);
+
+                String namespace = "wiki:" + context.getWikiId();
+
+                // Make sure it's not already there
+                if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
+                    for (ExtensionId feature : localExtension.getExtensionFeatures()) {
+                        if (installedRepository.getInstalledExtension(feature.getId(), namespace) != null) {
+                            // Already exist so don't register it or it could create a mess
+                            return;
+                        }
+                    }
+                } else {
+                    return;
                 }
+
+                // Register the extension as installed
+                InstalledExtension installedExtension =
+                    installedRepository.installExtension(localExtension, namespace, false);
+
+                // Tell the world about it
+                Utils.getComponent(ObservationManager.class)
+                    .notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }
@@ -722,20 +766,20 @@ public class Package
 
     /**
      * Indicate of the user has amin rights on the farm, i.e. that he has admin rights on the main wiki.
-     * 
+     *
      * @param context the XWiki context
      * @return true if the current user is farm admin
      */
     private boolean isFarmAdmin(XWikiContext context)
     {
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
 
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
 
             return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
-            context.setDatabase(wiki);
+            context.setWikiId(wiki);
         }
     }
 
@@ -766,8 +810,8 @@ public class Package
             addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
-        if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST
-            && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
+        if (status == DocumentInfo.INSTALL_OK
+            || status == DocumentInfo.INSTALL_ALREADY_EXIST && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
             XWikiDocument previousdoc = null;
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST) {
                 previousdoc = context.getWiki().getDocument(doc.getFullName(), context);
@@ -791,6 +835,19 @@ public class Package
                         }
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
+                        }
+                    }
+                } else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+                    // We conserve the old attachments in the new documents
+                    List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
+                    for (XWikiAttachment att : previousdoc.getAttachmentList()) {
+                        if (doc.getDoc().getAttachment(att.getFilename()) == null) {
+                            // We add the attachment to new document
+                            newDocAttachments.add(att);
+                            // But then we add it in the "to remove list" of the document
+                            // So the attachment will be removed from the database when XWiki#saveDocument
+                            // will be called
+                            doc.getDoc().removeAttachment(att);
                         }
                     }
                 }
@@ -840,15 +897,8 @@ public class Package
                     }
                 }
 
-                // Attachment saving should not generate additional saving
-                for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
-                    xa.setMetaDataDirty(false);
-                    xa.getAttachment_content().setContentDirty(false);
-                }
-
                 String saveMessage = context.getMessageTool().get("core.importer.saveDocumentComment");
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
-                doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
                 if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
@@ -931,7 +981,7 @@ public class Package
 
     private void setStatus(int status, XWikiContext context)
     {
-        context.put("install_status", new Integer((status)));
+        context.put("install_status", status);
     }
 
     public List<String> getErrors(XWikiContext context)
@@ -961,7 +1011,7 @@ public class Package
 
     /**
      * Create a {@link XWikiDocument} from xml stream.
-     * 
+     *
      * @param is the xml stream.
      * @return the {@link XWikiDocument}.
      * @throws XWikiException error when creating the {@link XWikiDocument}.
@@ -977,7 +1027,7 @@ public class Package
 
     /**
      * Create a {@link XWikiDocument} from xml {@link Document}.
-     * 
+     *
      * @param domDoc the xml {@link Document}.
      * @return the {@link XWikiDocument}.
      * @throws XWikiException error when creating the {@link XWikiDocument}.
@@ -994,7 +1044,7 @@ public class Package
     /**
      * You should prefer {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter)}. If an error occurs, a stacktrace is dump
      * to logs, and an empty String is returned.
-     * 
+     *
      * @return a package.xml file for the this package
      */
     public String toXml(XWikiContext context)
@@ -1011,7 +1061,7 @@ public class Package
 
     /**
      * Write the package.xml file to an {@link XMLWriter}.
-     * 
+     *
      * @param wr the writer to write to
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
@@ -1066,7 +1116,7 @@ public class Package
 
     /**
      * Write the package.xml file to an OutputStream
-     * 
+     *
      * @param out the OutputStream to write to
      * @param context curent XWikiContext
      * @throws IOException when an error occurs during streaming operation
@@ -1084,7 +1134,7 @@ public class Package
 
     /**
      * Write the package.xml file to a ZipOutputStream
-     * 
+     *
      * @param zos the ZipOutputStream to write to
      * @param context current XWikiContext
      */
@@ -1103,7 +1153,7 @@ public class Package
 
     /**
      * Generate a relative path based on provided document.
-     * 
+     *
      * @param doc the document to export.
      * @return the corresponding path.
      */
@@ -1114,13 +1164,13 @@ public class Package
 
     /**
      * Generate a file name based on provided document.
-     * 
+     *
      * @param doc the document to export.
      * @return the corresponding file name.
      */
     public String getFileNameFromDocument(XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer fileName = new StringBuffer(doc.getDocumentReference().getName());
+        StringBuilder fileName = new StringBuilder(doc.getDocumentReference().getName());
 
         // Add language
         String language = doc.getLanguage();
@@ -1137,7 +1187,7 @@ public class Package
 
     /**
      * Generate a relative path based on provided document for the directory where the document should be stored.
-     * 
+     *
      * @param doc the document to export
      * @return the corresponding path
      */
@@ -1152,7 +1202,7 @@ public class Package
 
     /**
      * Write an XML serialized XWikiDocument to a ZipOutputStream
-     * 
+     *
      * @param doc the document to serialize
      * @param zos the ZipOutputStream to write to
      * @param withVersions if true, also serialize all document versions
@@ -1174,7 +1224,7 @@ public class Package
 
     /**
      * Write an XML serialized XWikiDocument to a ZipOutputStream
-     * 
+     *
      * @param doc the document to serialize
      * @param zos the ZipOutputStream to write to
      * @param withVersions if true, also serialize all document versions
@@ -1282,7 +1332,7 @@ public class Package
                 add(docName, DocumentInfo.ACTION_OVERWRITE, context);
             }
         } catch (QueryException ex) {
-            throw new PackageException(PackageException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+            throw new PackageException(XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                 "Cannot retrieve the list of documents to export", ex);
         }
     }
@@ -1303,7 +1353,7 @@ public class Package
 
     /**
      * Load document files from provided directory and sub-directories into packager.
-     * 
+     *
      * @param dir the directory from where to load documents.
      * @param context the XWiki context.
      * @param description the package descriptor.
@@ -1318,9 +1368,7 @@ public class Package
         SAXReader reader = new SAXReader();
 
         int count = 0;
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
-
+        for (File file : files) {
             if (file.isDirectory()) {
                 count += readFromDir(file, context, description);
             } else {
@@ -1344,8 +1392,8 @@ public class Package
 
                             ++count;
                         } else {
-                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "document "
-                                + doc.getDocumentReference() + " does not exist in package definition");
+                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                                "document " + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
                         LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
@@ -1361,7 +1409,7 @@ public class Package
 
     /**
      * Load document files from provided directory and sub-directories into packager.
-     * 
+     *
      * @param dir the directory from where to load documents.
      * @param context the XWiki context.
      * @return
@@ -1371,8 +1419,8 @@ public class Package
     public String readFromDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
         if (!dir.isDirectory()) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, dir.getAbsolutePath()
-                + " is not a directory");
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
+                dir.getAbsolutePath() + " is not a directory");
         }
 
         int count = 0;
@@ -1394,7 +1442,7 @@ public class Package
 
     /**
      * Outputs the content of this package in the JSON format
-     * 
+     *
      * @param wikiContext the XWiki context
      * @return a representation of this package under the JSON format
      * @since 2.2M1

@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 public class RollbackAction extends XWikiAction
 {
@@ -34,21 +35,37 @@ public class RollbackAction extends XWikiAction
             return false;
         }
 
-        XWiki xwiki = context.getWiki();
-        XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
         RollbackForm form = (RollbackForm) context.getForm();
-
-        String confirm = form.getConfirm();
-        String rev = form.getRev();
-        String language = form.getLanguage();
-
-        if ((confirm == null) || (!confirm.equals("1"))) {
+        if (!"1".equals(form.getConfirm())) {
             return true;
         }
 
+        XWiki xwiki = context.getWiki();
+        XWikiResponse response = context.getResponse();
+        XWikiDocument doc = context.getDoc();
+
+        String rev = form.getRev();
+        String language = form.getLanguage();
+
         // We don't clone the document here because the rollback method does it before making modifications.
-        xwiki.rollback(getTranslatedDocument(doc, language, context), rev, context);
+        XWikiDocument tdoc = getTranslatedDocument(doc, language, context);
+
+        // Support for the "previous" pseudoversions.
+        if ("previous".equals(rev)) {
+            XWikiDocumentArchive archive = tdoc.loadDocumentArchive();
+
+            // Note: Using Object to try to avoid to use jrcs objects.
+            Object previousVersion = archive.getPrevVersion(archive.getLatestVersion());
+            if (previousVersion != null) {
+                rev = previousVersion.toString();
+            } else {
+                // Some inexistent version, since we have found no previous version in the archive.
+                rev = "-1";
+            }
+        }
+
+        // Perform the rollback.
+        xwiki.rollback(tdoc, rev, context);
 
         // Forward to view.
         String redirect = Utils.getRedirect("view", context);
@@ -59,7 +76,6 @@ public class RollbackAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        handleRevision(context);
         return "rollback";
     }
 }

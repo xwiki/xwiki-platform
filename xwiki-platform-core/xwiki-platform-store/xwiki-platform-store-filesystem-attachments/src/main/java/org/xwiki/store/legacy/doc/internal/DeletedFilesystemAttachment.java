@@ -21,8 +21,6 @@ package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
@@ -33,17 +31,12 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 /**
  * Filesystem based Archive of deleted attachment, stored in
  * {@link org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore}.
- * 
+ *
  * @version $Id$
  * @since 3.0M3
  */
 public class DeletedFilesystemAttachment extends DeletedAttachment
 {
-    /**
-     * The reference to the document which this attachment belongs to.
-     */
-    private DocumentReference docReference;
-
     /**
      * The attachment which was deleted.
      */
@@ -58,20 +51,16 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
 
     /**
      * A constructor with all the information about the deleted attachment.
-     * 
+     *
      * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
+     * @throws XWikiException is never thrown, we just have to declare it in order to call the super constructor
      */
     public DeletedFilesystemAttachment(final XWikiAttachment attachment, final String deleter, final Date deleteDate)
+        throws XWikiException
     {
-        this.setDocId(attachment.getDocId());
-        this.setDocName(attachment.getDoc().getFullName());
-        this.setFilename(attachment.getFilename());
-        this.setDeleter(deleter);
-        this.attachment = attachment;
-        this.setDate(deleteDate);
-        this.docReference = attachment.getDoc().getDocumentReference();
+        super(attachment, deleter, deleteDate, null);
     }
 
     @Override
@@ -85,8 +74,11 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * {@inheritDoc} context is unused and may safely be null.
-     * 
+     * {@inheritDoc}
+     * <p>
+     * The XWiki context is unused and may safely be null.
+     * </p>
+     *
      * @see com.xpn.xwiki.doc.DeletedAttachment#setAttachment(XWikiAttachment, XWikiContext)
      */
     @Override
@@ -108,32 +100,14 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * Get the attachment. This does not clone the attachment. To get a clone, use
-     * {@link #restoreAttachment(XWikiAttachment, XWikiContext)}
-     * 
+     * Get the attachment. This does not clone the attachment. To get a clone, use {@link
+     * #restoreAttachment(XWikiAttachment, XWikiContext)}
+     *
      * @return the attachment which was deleted.
      */
     public XWikiAttachment getAttachment()
     {
         return this.attachment;
-    }
-
-    /**
-     * @return the DocumentReference to the document which this attachment is attached to.
-     */
-    public DocumentReference getDocumentReference()
-    {
-        return this.docReference;
-    }
-
-    /**
-     * Set the document reference for the document which this attachment is attached to.
-     * 
-     * @param docReference the reference to the document.
-     */
-    protected void setDocumentReference(final DocumentReference docReference)
-    {
-        this.docReference = docReference;
     }
 
     @Override
@@ -158,16 +132,16 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
             result = (XWikiAttachment) this.attachment.clone();
         }
 
-        result.setDoc(context.getWiki().getDocument(this.getDocumentReference(), context));
+        result.setDoc(context.getWiki().getDocument(this.attachment.getReference().getDocumentReference(), context));
         return result;
     }
 
     /**
-     * Generate an ID which will be as collision resistant as possible. Because
-     * {@link con.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long, this ID is guaranteed to be
-     * unique unless the same attachment is deleted twice in the same second or again in a second which will come around
-     * in another 136 years.
-     * 
+     * Generate an ID which will be as collision resistant as possible. Because {@link
+     * com.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long, this ID is guaranteed to be unique
+     * unless the same attachment is deleted twice in the same second or again in a second which will come around in
+     * another 136 years.
+     *
      * @param attachment the attachment to get an ID number for.
      * @param deleteDate the Date the attachment was deleted.
      * @return an ID number for this deleted attachment.

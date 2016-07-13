@@ -1,0 +1,235 @@
+################################################
+##
+## LESS variables initialized by Velocity
+##
+################################################
+
+##############################################
+##
+## 1/ Initialize variables from (color) theme
+##
+##############################################
+#set($doNotLoadColorThemeFromCSS = true)
+#template('colorThemeInit.vm')
+## Reset $doNotLoadColorThemeFromCSS for future calls (in SSX for examples)
+#set($doNotLoadColorThemeFromCSS = false)
+#if ("$!themeObj" != '')
+  #initFromOldColorTheme()
+#else
+  #set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+  #if ("$!themeObj" != '')
+    #initFromFlamingoTheme()
+  #else
+    #initDefaultXWikiVariables()
+  #end
+#end
+
+##############################################
+##
+## Initialize variables from an old color theme
+## (ColorTheme.ColorThemeClass)
+##
+##############################################
+#macro(initFromOldColorTheme)
+  // Colors from the old color theme class
+  ##
+  ## Bootstrap: Mapping between XWiki Color Theme and Bootstrap variables
+  ##
+  @text-color:                          $theme.textColor;
+  @link-color:                          $theme.linkColor;
+  @headings-color:                      $theme.titleColor;
+  @body-bg:                             $theme.pageBackgroundColor;
+  @nav-tabs-border-color:               $theme.borderColor;
+  @nav-tabs-active-link-hover-border-color: $theme.borderColor;
+  @pagination-border:                   $theme.borderColor;
+  @pagination-hover-border:             $theme.borderColor;
+  @pagination-disabled-border:          $theme.borderColor;
+  @list-group-border:                   $theme.borderColor;
+  @thumbnail-border:                    $theme.borderColor;
+  @input-border:                        $theme.borderColor;
+
+  @navbar-default-toggle-border-color:  $theme.borderColor;
+  @navbar-default-bg:                   $theme.menuBackgroundColor;
+  @navbar-default-link-color:           $theme.menuLinkColor;
+  @navbar-default-link-disabled-color:  $theme.menuContentLinkColor;
+  @navbar-default-link-active-bg:       lighten($theme.menuBackgroundColor, 3%);
+  @navbar-default-link-active-color:    $theme.menuLinkColor;
+  @navbar-default-link-hover-bg:        lighten($theme.menuBackgroundColor, 3%);
+  @navbar-default-link-hover-color:     $theme.menuLinkColor;
+  @dropdown-bg:                         $theme.pageContentBackgroundColor;
+  @dropdown-link-color:                 $theme.textColor;
+  @dropdown-link-hover-bg:              $theme.submenuContentBackgroundColor;
+  @dropdown-link-hover-color:           $theme.textColor;
+
+  @btn-primary-color:                   $theme.buttonPrimaryTextColor;
+  @btn-primary-bg:                      $theme.buttonPrimaryBackgroundColor;
+  @btn-default-color:                   $theme.buttonSecondaryTextColor;
+  @btn-default-bg:                      $theme.buttonSecondaryBackgroundColor;
+  @btn-success-color:                   $theme.menuAddEntryLinkColor;
+  @btn-success-bg:                      $theme.menuAddEntryBackgroundColor;
+
+  @nav-tabs-active-link-hover-bg:       $theme.pageContentBackgroundColor;
+
+  @nav-link-hover-bg:                   $theme.highlightColor;
+  @brand-primary:                       $theme.buttonPrimaryBackgroundColor;
+  @brand-success:                       $theme.notificationSuccessColor;
+  @brand-info:                          $theme.notificationInfoColor;
+  @brand-warning:                       $theme.notificationWarningColor;
+  @brand-danger:                        $theme.notificationErrorColor;
+
+  @panel-bg:                            $theme.panelBackgroundColor;
+  @panel-default-text:                  $theme.panelTextColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  
+  ##
+  ## XWiki variables: LESS variables specific to XWiki
+  ##
+  @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
+  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
+  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+#end
+
+##############################################
+##
+## Initialize variables from an old color theme
+## (FlamingoThemesCode.ThemeClass)
+##
+##############################################
+#macro(initFromFlamingoTheme)
+  // Colors from the new flamingo theme class
+  ## Set the XWiki variables
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
+  @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
+  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  ## Now set the variables with the values of the object
+  #if ("$!themeObj" != '')
+    ## variables of the class
+    #set($variables = {
+      "text-color": "color",
+      "body-bg": "color",
+      "xwiki-page-content-bg" : "color",
+      "font-family-base": "text",
+      "link-color": "color",
+      "brand-primary": "color",
+      "brand-success": "color",
+      "brand-info": "color",
+      "brand-warning": "color",
+      "brand-danger": "color",
+      "headings-color": "color",
+      "component-active-color" : "color",
+      "component-active-bg" : "color",
+      "font-family-base": "text",
+      "font-family-sans-serif": "text",
+      "font-family-serif": "text",
+      "font-family-monospace": "font",
+      "font-size-base" : "size",
+      "btn-font-weight" : "size",
+      "btn-default-color" : "color",
+      "btn-default-bg" : "color",
+      "btn-primary-color" : "color",
+      "btn-primary-bg" : "color",
+      "btn-success-color" : "color",
+      "btn-success-bg" : "color",
+      "btn-info-color" : "color",
+      "btn-info-bg" : "color",
+      "btn-warning-color" : "color",
+      "btn-warning-bg" : "color",
+      "btn-danger-color" : "color",
+      "btn-danger-bg" : "color",
+      "btn-default-border" : "color",
+      "navbar-default-color" : "color",
+      "navbar-default-bg" : "color",
+      "navbar-default-link-color" : "color",
+      "navbar-default-link-hover-color" : "color",
+      "navbar-default-link-hover-bg" : "color",
+      "navbar-default-link-active-color" : "color",
+      "navbar-default-link-active-bg": "color",
+      "navbar-height" : "size",
+      "dropdown-bg" : "color",
+      "dropdown-border" : "color",
+      "dropdown-link-color" : "color",
+      "dropdown-link-hover-color" : "color",
+      "dropdown-link-hover-bg" : "color",
+      "dropdown-divider-bg" : "color",
+      "input-bg" : "color",
+      "input-border" : "color",
+      "input-color" : "color",
+      "input-border-focus" : "color",
+      "input-color-placeholder" : "color",
+      "legend-color" : "color",
+      "legend-border-color": "color",
+      "panel-bg" : "color",
+      "panel-default-text" : "color",
+      "breadcrumb-bg": "color",
+      "breadcrumb-color": "color",
+      "breadcrumb-separator": "escapedText"
+      })
+    #set($themeClass = $xwiki.getClass('FlamingoThemesCode.ThemeClass'))
+    #foreach($property in $variables.keySet())
+      #set($value = $themeDoc.getValue($property, $themeObj))
+      #if("$!value" != '')
+        #set($propertyType = $variables.get($property))
+        #if($propertyType == 'escapedText')
+          @$property: "$escapetool.javascript($value)";
+        #else
+          @$property: $value;
+        #end
+      #end
+    #end
+  #end
+#end
+
+##############################################
+##
+## Initialize XWiki variables when no color theme is used
+##
+##############################################
+#macro(initDefaultXWikiVariables)
+  ## currently, it comes from the old color theme object
+  // Default
+  @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
+  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
+  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+#end
+
+##############################################
+##
+## 2/ Initialize other variables (image paths, etc...)
+##
+##############################################
+
+## Fix font path
+@icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
+
+##
+## XWiki variables: LESS variables specific to XWiki
+##
+@xwiki-accordion-title-bar-background:"$xwiki.getSkinFile('icons/xwiki/accordion.png')";
+
+## Some Silk icons
+@xwiki-silk-icon-folder:              "$xwiki.getSkinFile('icons/silk/folder.png')";
+@xwiki-silk-icon-page-white-text:     "$xwiki.getSkinFile('icons/silk/page_white_text.png')";
+@xwiki-silk-icon-comment:             "$xwiki.getSkinFile('icons/silk/comment.png')";
+@xwiki-silk-icon-attachment:          "$xwiki.getSkinFile('icons/silk/attach.png')";
+@xwiki-silk-icon-bullet-add:          "$xwiki.getSkinFile('icons/silk/bullet_add.png')";
+@xwiki-silk-icon-chart-organization:  "$xwiki.getSkinFile('icons/silk/chart_organisation.png')";
+
+## Some XWiki icons
+@xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
+@xwiki-icon-edit-section:             "\f040";
+@xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
+@xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";

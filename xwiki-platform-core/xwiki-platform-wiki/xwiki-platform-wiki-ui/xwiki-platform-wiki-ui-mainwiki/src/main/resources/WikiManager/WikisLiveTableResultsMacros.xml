@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>WikisLiveTableResultsMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1293832800000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1307188675000</date>
+  <contentUpdateDate>1307188675000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.livetable.resultsMacros')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
+{{velocity output="false"}}
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on XWikiServerTemplate.
+* This should be removed when http://jira.xwiki.org/browse/XWIKI-10010 is fixed.
+*#
+#macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
+  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  #set($fromSql = '')
+  ## parametrized filter part of the query
+  #set($whereSql = '')
+  ## list of parameters to use with $whereSql
+  #set($whereParams = [])
+  #set($class = $xwiki.getDocument($className).getxWikiClass())
+  ##
+  ## Add the columns needed for the actual data
+  ##
+  #set($tablelist = [])
+  #foreach($colname in $collist)
+    #livetable_addColumnToQuery($colname)
+  #end
+  ##
+  ## Tag filtering
+  ##
+  #if($request.tag)
+    #set($fromSql = "${fromSql} , BaseObject as tobject, DBStringListProperty as tagprop")
+    #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
+    #foreach($tag in $request.getParameterValues('tag'))
+      #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
+      ## Tags are case insensitive but they are stored unchanged which means we have to normalize them when performing
+      ## a query. Unfortunately there's no simple way to match multiple tags (AND operator). If we join the list of
+      ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to
+      ## check that the list of tags contains each of the desired tags. HQL doesn't help us to lower-case the entire
+      ## list of tags so we use an inner select for this.
+      #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
+      #set($discard = $whereParams.add("${tag}"))
+    #end
+    #set($whereSql = "${whereSql})")
+  #end
+  ##
+  ##
+  ## Order
+  ##
+  #set($order = "$!request.sort")
+  #if($order != '')
+    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+      #set($orderDirection = 'desc')
+    #end
+    #if($order == 'description')
+      #set($tableAlias = 'dtable')
+    #else
+      #set($tableAlias = $order)
+    #end
+    ## only safe version should be used in SQL queries
+    #livetable_getTableAlias($tableAlias)
+    ##
+    #if($order.startsWith('doc.'))
+      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+    #elseif($tablelist.contains($tableAlias))
+      #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
+      #if ($multiselect != '1')
+        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #elseif($order == 'averagevote')
+      #livetable_getTableName($order)
+      #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+      #set($discard = $whereParams.add("${order}"))
+      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+    #else
+      #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
+      #if("$multiselect" != '1')
+        #livetable_getTableName($order)
+        #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+        #set($discard = $whereParams.add("${order}"))
+        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #end
+  #end
+  ##
+  ##
+  ## Compute the final queries
+  ##
+  #set($sqlParams = [])
+  #set($tagsMatchingParams = [])
+  #set($allMatchingParams = [])
+  #if("$!className" != '')
+    ## Class query
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll(["${className}", "${className}Template"]))
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = ", BaseObject as obj $!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template"]))
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = ", BaseObject as obj $!filterfrom")
+    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!filterwhere")
+    #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template"]))
+    #################################################
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #else
+    ## Document query
+    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "1=1 $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = "$!filterfrom")
+    #set($allMatchingTagsWhere = "1=1 $!filterwhere")
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #end
+  #set($sql = "$countSql $!{orderSql}")
+#end
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents and to display wiki ui properties with a custom code
+*#
+#macro(gridresult_buildRowsJSON $map)
+  #set($offset = $mathtool.toInteger($request.get('offset')))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if (!$offset || $offset &lt; 0)
+    #set($offset = 0)
+  #end
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+  ## The descriptors are always hidden, so we don't filter on the hidden column.
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('unique').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #################################################
+  #set($items = $query.execute())
+  #set($discard = $map.put('totalrows', $query.count()))
+  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
+  #set($rows = [])
+  #foreach($item in $items)
+    #gridresult_buildRowJSON($item $rows)
+  #end
+  #set($discard = $map.put('rows', $rows))
+#end
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to add custom actions (join, leave, etc...)
+* and to display the membershipType.
+*#
+#macro(gridresult_buildRowJSON $item $rows)
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
+  ## only the document name is returned. When more than the document name is returned the $item variable is a list.
+  #if ($item.size())
+    ## Extract doc name and doc language from $item
+    #set($docName = $item[0])
+    #set($docLanguage = $item[1])
+  #else
+    #set($docName = $item)
+    #set($docLanguage = '')
+  #end
+  #set($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
+  #set($row = {'doc_viewable': $viewable})
+  #if(!$viewable)
+    #set($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+  #else
+    #set($itemDoc = $xwiki.getDocument($docName))
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    ## Some constants which are usefull while processing each item.
+    #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
+    #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'DeleteWiki'))
+    #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWiki'))
+    #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'LeaveWiki'))
+    #set ($wikiId = $docName.toLowerCase().replaceAll("xwiki.xwikiserver", ""))
+    #set ($wiki = $services.wiki.getById($wikiId))
+    ## Init membership actions as denied.
+    #set ($itemMembershipType = $services.wiki.user.getMembershipType($wiki.id))
+    #set ($itemUserScope = $services.wiki.user.getUserScope($wiki.id))
+    #set ($itemHasJoin = false)
+    #set ($itemHasRequestJoin = false)
+    #set ($itemHasCancelJoinRequest = false)
+    #set ($itemHasViewInvitation = false)
+    #set ($itemHasLeave = false)
+    ## Determine if current user is already a member.
+    #set ($currentUserIsMember = ($services.wiki.user.isMember($currentUser, $wiki.id) || $currentUser == $wiki.ownerId))
+    ## Determine available membership action and action URL.
+    #if ($currentUserIsMember)
+      ## Don't allow the owner to leave the workspace.
+      #if ($wiki.ownerId != $currentUser)
+        #set ($itemHasLeave = true)
+        #set ($leaveUrl = $xwiki.getURL($leaveWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+      #end
+    #elseif($itemUserScope != 'LOCAL_ONLY')
+      ##
+      ## Determine if, regardless of membership type, an existing invitation exists for the 
+      #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))
+      #set ($existingInvitation = false)
+      #if ($invitations &amp;&amp; !$invitations.isEmpty())
+        #foreach($invitation in $invitations)
+          #if ($invitation.userId == $currentUser &amp;&amp; $invitation.status == 'PENDING')
+            #set ($existingInvitation = $invitation)
+          #end
+        #end
+      #end
+      #if ($existingInvitation)
+        #set ($itemHasViewInvitation = true)
+        #set ($viewInvitationUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+      #elseif ($itemMembershipType == 'OPEN')
+        #set ($itemHasJoin = true)
+        #set ($joinUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+      #elseif ($itemMembershipType == 'REQUEST')
+        ## Determine if a request was already sent.
+        #set ($pendingRequest = false)
+        #set ($existingRequests = $services.wiki.user.getAllRequests($wikiId))
+        #foreach ($existingRequest in $existingRequests)
+          #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
+            #set ($pendingRequest = true)
+          #end
+        #end
+        #if ($pendingRequest)
+          #set ($itemHasCancelJoinRequest = true)
+          #set ($cancelJoinRequestUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}&amp;cancelJoinRequest=1"))
+        #else
+          #set ($itemHasRequestJoin = true)
+          #set ($requestJoinUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}&amp;requestJoin=1"))
+        #end
+      #end
+    #end
+    #################################################
+    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+    ## result is a translation.
+    #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+      #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #set($isTranslation = true)
+    #else
+      #set($translatedDoc = $itemDoc)
+      #set($isTranslation = false)
+    #end
+    #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
+    #set($discard = $itemDoc.use($className))
+    #if ($isTranslation)
+      ## Display the language after the document name so that not all translated documents have the same name displayed
+      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+    #else
+      #set($discard = $row.put('doc_name', $itemDoc.name))
+    #end
+    #set($discard = $row.put('doc_fullName', $fullname))
+    #set($discard = $row.put('doc_space', $itemDoc.space))
+    #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
+    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
+    #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
+    #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
+    #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #set($discard = $row.put('doc_hasdelete', $services.wiki.canDeleteWiki($currentUser, $wikiId)))
+    #################################################
+    #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #set($deleteUrl = $xwiki.getURL($deleteWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+    #set($discard = $row.put('doc_delete_url', $deleteUrl))
+    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL('view')))
+    #################################################
+    #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
+    #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
+    #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+    #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+    #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($translatedDoc.author, false)))
+    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($translatedDoc.creator, false)))
+    #foreach($colname in $collist)
+      #gridresult_buildColumnJSON($colname $row)
+    #end
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #if($itemUserScope == 'LOCAL_ONLY' || $wikiId == $services.wiki.mainWikiId)
+      #set($discard = $row.put('membershipType', $services.localization.render("platform.wiki.browse.emptyvalue")))
+    #else
+      #set($discard = $row.put('membershipType', $services.localization.render("WikiManager.WikiUserClass_membershipType_${itemMembershipType.name().toLowerCase()}")))
+    #end
+    #set($discard = $row.put('doc_hasjoin', $itemHasJoin))
+    #set($discard = $row.put('doc_hasrequestJoin', $itemHasRequestJoin))
+    #set($discard = $row.put('doc_hasviewInvitation', $itemHasViewInvitation))
+    #set($discard = $row.put('doc_hascancelJoinRequest', $itemHasCancelJoinRequest))
+    #set($discard = $row.put('doc_hasleave', $itemHasLeave))
+    #if ($itemHasJoin)
+      #set($discard = $row.put('doc_join_url', $joinUrl))
+    #elseif ($itemHasLeave)
+      #set($discard = $row.put('doc_leave_url', $leaveUrl))
+    #elseif ($itemHasRequestJoin)
+      #set($discard = $row.put('doc_requestJoin_url', $requestJoinUrl))
+    #elseif ($itemHasViewInvitation)
+      #set($discard = $row.put('doc_viewInvitation_url', $viewInvitationUrl))
+    #elseif ($itemHasCancelJoinRequest)
+      #set($discard = $row.put('doc_cancelJoinRequest_url', $cancelJoinRequestUrl))
+    #end
+    #################################################
+  #end
+  #set($discard = $rows.add($row))
+#end
+
+
+#**
+ * Adds information about the given column to the JSON returned by a live table data call.
+ * NOTE: This macro uses Velocity variables available in gridresult_buildRowJSON.
+ *
+ * @param $colname the name of the live table column for which to retrieve information
+ * @param $row stores the JSON in memory so that it can be adjusted before serialization
+ *#
+#macro(gridresult_buildColumnJSON $colname $row)
+  #if($colname.startsWith('doc.'))
+  #elseif($colname == '_action')
+    #set($discard = $row.put($colname, $services.localization.render("${request.transprefix}actiontext")))
+  #elseif($colname == '_attachments')
+    #livetable_getAttachmentsList($translatedDoc)
+    #set($discard = $row.put($colname, $attachlist))
+  #elseif($colname == '_avatar')
+    #livetable_getAvatar($itemDoc)
+    #set($discard = $row.put($colname, $avatar))
+  #elseif($colname == '_images')
+    #livetable_getImagesList($itemDoc)
+    #set($discard = $row.put($colname, $imagesList))
+  #else
+    #set($propClassName = "$!request.get($colname.concat('_class'))")
+    #if($propClassName != '')
+      #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+      #set($discard = $itemDoc.use($propClassName))
+    #else
+      #set($propClass = $class)
+    #end
+    ## Retrieve the property type as it might be usefull
+    #set($propType = '')
+    #if($propClass.getPropertyNames().contains($colname))
+      #set($propType = "$!propClass.get($colname).type")
+    #end
+    #set($fieldValue = "$!itemDoc.getValue($colname)")
+    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
+    #if($fieldDisplayValue == '')
+      #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
+    #end
+    #set($fieldUrl = '')
+    ## only retrieve an URL for a DBListClass item
+    #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
+      #set($fieldUrl = $xwiki.getURL($fieldValue))
+      #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+        #set($fieldUrl = '')
+      #end
+    #end
+    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put("${colname}_value", $fieldValue))
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #if($colname == 'wikiprettyname')
+      #set($fieldUrl = $xwiki.getURL("$wiki.mainPageReference"))
+    #end
+    #################################################
+    #set($discard = $row.put("${colname}_url", $fieldUrl))
+    ## reset to the default class
+    #set($discard = $itemDoc.use($className))
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

@@ -46,32 +46,32 @@ public class BufferedResponse extends HttpServletResponseWrapper
     @Override
     public ServletOutputStream getOutputStream() throws IOException
     {
-        if (outputStream == null) {
-            outputStream = new BufferOutputStream();
+        if (this.outputStream == null) {
+            this.outputStream = new BufferOutputStream();
         }
 
-        return outputStream;
+        return this.outputStream;
     }
 
     @Override
     public PrintWriter getWriter() throws IOException
     {
-        if (writer == null) {
-            writer = new PrintWriter(new OutputStreamWriter(getOutputStream(), getCharacterEncoding()));
+        if (this.writer == null) {
+            this.writer = new PrintWriter(new OutputStreamWriter(getOutputStream(), getCharacterEncoding()));
         }
 
-        return writer;
+        return this.writer;
     }
 
     public byte[] getBufferAsByteArray() throws IOException
     {
-        if (writer != null) {
-            writer.flush();
+        if (this.writer != null) {
+            this.writer.flush();
         }
 
-        outputStream.flush();
+        this.outputStream.flush();
 
-        return outputStream.getContentsAsByteArray();
+        return this.outputStream.getContentsAsByteArray();
     }
 
 }

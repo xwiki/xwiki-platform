@@ -190,7 +190,7 @@ public final class ActivityStreamCleaner
 
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
-                doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
+                doc.setContent("{{include reference=\"XWiki.SchedulerJobSheet\"/}}");
                 doc.setSyntax(Syntax.XWIKI_2_0);
             }
 

@@ -72,13 +72,13 @@ public class XWikiValidationStatus
         getErrorObjects().add(className);
         getPropertyErrors().add(propName);
 
-        if ((validationMessage != null) && (!validationMessage.trim().equals("")))
+        if ((validationMessage != null) && (!validationMessage.trim().equals(""))) {
             getErrors().add(validationMessage);
-        else {
+        } else {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext == null)
+            if (vcontext == null) {
                 getErrors().add("Validation error for property " + propPrettyName + " in class " + className);
-            else {
+            } else {
                 vcontext.put("className", className);
                 vcontext.put("propName", propPrettyName);
                 String message = context.getMessageTool().get("validationerror", Collections.singletonList(propName));
@@ -99,12 +99,12 @@ public class XWikiValidationStatus
 
     public List getExceptions()
     {
-        return exceptions;
+        return this.exceptions;
     }
 
     public List getErrorObjects()
     {
-        return errorObjects;
+        return this.errorObjects;
     }
 
     public void setErrorObjects(List errorObjects)
@@ -114,7 +114,7 @@ public class XWikiValidationStatus
 
     public List getPropertyErrors()
     {
-        return propertyErrors;
+        return this.propertyErrors;
     }
 
     public void setPropertyErrors(List propertyErrors)
@@ -124,7 +124,7 @@ public class XWikiValidationStatus
 
     public List getErrors()
     {
-        return errors;
+        return this.errors;
     }
 
     public void setErrors(List errors)

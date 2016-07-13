@@ -1,0 +1,50 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Configuration
+#########################
+
+. /usr/share/debconf/confmodule
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.pgsql ]; then
+  . /usr/share/dbconfig-common/dpkg/postinst.pgsql
+
+  dbc_pgsql_createdb_encoding='UTF8'
+
+  dbc_generate_include='template:/etc/xwiki/hibernate.cfg.xml'
+  dbc_generate_include_perms='644'
+  dbc_generate_include_args='-U -o template_infile=/usr/share/xwiki/templates/pgsql/hibernate.cfg.xml'
+
+  dbc_go xwiki $@
+
+  # if they don't want our help, quit
+  if [ "$dbc_install" != "true" ]; then return 0; fi
+
+  # find out if we're upgrading/reinstalling
+  if [ "$dbc_oldversion" ]; then
+    # read that little crumb left in config if we're reconfiguring
+    db_get $dbc_package/internal/reconfiguring && reconfiguring="$RET"
+    # and set it back to false
+    db_reset $dbc_package/internal/reconfiguring
+    # if not, we're definitely upgrading
+    if [ "$reconfiguring" = "false" ]; then
+        upgrading="yes"
+    else
+        db_get $dbc_package/dbconfig-reinstall && reinstall=$RET
+        db_reset $dbc_package/dbconfig-reinstall
+        # if they've said they don't want to reinstall stuff...
+        if [ "$reinstall" = "false" ]; then return 0; fi
+    fi
+  fi
+
+  # don't perform the following block of code during upgrades
+  if [ ! "$upgrading" ]; then
+    # Allow creating new wikis (so new schemas)
+    # TODO: ask it in an install step
+
+    echo "allow $dbc_dbuser user to create new schemas in database $dbc_dbname"
+    _dbc_pgsql_exec_command "GRANT CREATE ON DATABASE $dbc_dbname TO $dbc_dbuser"
+  fi
+fi

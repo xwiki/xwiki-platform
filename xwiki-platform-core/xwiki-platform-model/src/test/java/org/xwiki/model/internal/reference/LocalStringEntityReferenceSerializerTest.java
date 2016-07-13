@@ -21,11 +21,14 @@ package org.xwiki.model.internal.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link LocalStringEntityReferenceSerializer}.
@@ -33,28 +36,39 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  * @since 2.2M1
  */
+@ComponentList({
+    DefaultSymbolScheme.class
+})
 public class LocalStringEntityReferenceSerializerTest
 {
+    @Rule
+    public MockitoComponentMockingRule<EntityReferenceSerializer<String>> mocker =
+        new MockitoComponentMockingRule<>(LocalStringEntityReferenceSerializer.class);
+
+    @Rule
+    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> resolverMocker =
+        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
+
     private EntityReferenceSerializer<String> serializer;
 
     private EntityReferenceResolver<String> resolver;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
-        this.serializer = new LocalStringEntityReferenceSerializer();
-        this.resolver = new DefaultStringEntityReferenceResolver();
+        this.serializer = this.mocker.getComponentUnderTest();
+        this.resolver = this.resolverMocker.getComponentUnderTest();
     }
 
     @Test
-    public void testSerializeDocumentReference() throws Exception
+    public void serializeDocumentReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("space.page", serializer.serialize(reference));
     }
     
     @Test
-    public void testSerializeSpaceReferenceWithChild()
+    public void serializeSpaceReferenceWithChild()
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("space", serializer.serialize(reference.getParent()));

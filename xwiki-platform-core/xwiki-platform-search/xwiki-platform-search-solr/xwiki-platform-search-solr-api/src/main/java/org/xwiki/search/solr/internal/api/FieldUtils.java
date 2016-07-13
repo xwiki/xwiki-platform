@@ -38,8 +38,13 @@ import java.util.Locale;
 public final class FieldUtils
 {
     /**
-     * Keyword field, holds a string uniquely identifying a document across the index. this is used for finding old
-     * versions of a document to be indexed.
+     * The suffix added to the fields used for sorting.
+     */
+    public static final String SORT_SUFFIX = "_sort";
+
+    /**
+     * Keyword field, holds a string uniquely identifying a document across the index. This is used for finding old
+     * versions of a document to be indexed. The value format is wiki:Space.Page_locale .
      */
     public static final String ID = "id";
 
@@ -54,7 +59,7 @@ public final class FieldUtils
     public static final String LOCALE = "locale";
 
     /**
-     * Technical locale of the document (emty for the default document entry). Not indexed, mostly used to find the
+     * Technical locale of the document (empty for the default document entry). Not indexed, mostly used to find the
      * document in database.
      */
     public static final String DOCUMENT_LOCALE = "doclocale";
@@ -71,14 +76,48 @@ public final class FieldUtils
     public static final String WIKI = "wiki";
 
     /**
-     * Name of the space the document belongs to.
+     * The local reference of the space the document belongs to. For a document {@code A.B.C.Page} the value of this
+     * field is {@code A.B.C}. This field is analyzed and thus used for free text search.
+     * 
+     * @deprecated since 7.2, use {@link #SPACES} instead; the problem with this field is that the standard tokenizer
+     *             doesn't split around dots, and even if it did, it would also split around escaped dots (e.g.
+     *             {@code A.B\.1.C}) which is not what we want.
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-12594">XWIKI-12594: The path of a nested document is not
+     *      properly matched</a>
      */
+    @Deprecated
     public static final String SPACE = "space";
 
     /**
-     * Unanalyzed and not stored version of the document's space.
+     * The names of all the nested spaces the document belongs to. For a document {@code A.B.C.Page} the value of this
+     * field will be {@code ['A', 'B', 'C']}. This field is used for free text search.
+     */
+    public static final String SPACES = "spaces";
+
+    /**
+     * The local space reference, unanalyzed and not stored, used for exact matching.
      */
     public static final String SPACE_EXACT = "space_exact";
+
+    /**
+     * This field is used for hierarchical faceting on nested spaces (using 'facet.prefix'-based drill down). E.g. for a
+     * document A.B.C.Page this field will hold ['0/A.', '1/A.B.', '2/A.B.C.']
+     * 
+     * @see <a href='https://wiki.apache.org/solr/HierarchicalFaceting'>Hierarchical Faceting</a>
+     * @since 7.2RC1
+     */
+    public static final String SPACE_FACET = "space_facet";
+
+    /**
+     * This field is used to match descendant documents. A query such as {@code space_prefix:A.B} will match the
+     * documents from space A.B and all its descendants (like A.B.C). This is possible because this field holds the
+     * local references of all the ancestor spaces of a document (i.e. all the prefixes of the space reference). E.g.
+     * for a document A.B.C.Page this field will hold ['A', 'A.B', 'A.B.C']. As a consequence, searching for
+     * {@code space_prefix:A.B} will match A.B.C.Page
+     * 
+     * @since 7.2RC1
+     */
+    public static final String SPACE_PREFIX = "space_prefix";
 
     /**
      * Name of the document.
@@ -86,7 +125,7 @@ public final class FieldUtils
     public static final String NAME = "name";
 
     /**
-     * Unanalyzed and not stored version of the document's space.
+     * Unanalyzed and not stored version of the document's name.
      */
     public static final String NAME_EXACT = "name_exact";
 
@@ -105,7 +144,7 @@ public final class FieldUtils
     /**
      * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
      */
-    public static final String TITLE_SORT = "title_sort";
+    public static final String TITLE_SORT = TITLE + SORT_SUFFIX;
 
     /**
      * Version of the document (example: {@code 4.2}).
@@ -126,7 +165,12 @@ public final class FieldUtils
     public static final String TYPE = "type";
 
     /**
-     * XWiki object class, only used for objects and properties.
+     * Used to index XClass names.
+     * <ul>
+     * <li>document: the type of objects a document has, e.g. [Blog.BlogPostClass, XWiki.TagClass, ..]</li>
+     * <li>object: the object type</li>
+     * <li>object property: the type of object this property belongs to</li>.
+     * </ul>
      */
     public static final String CLASS = "class";
 
@@ -156,7 +200,7 @@ public final class FieldUtils
     /**
      * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
      */
-    public static final String AUTHOR_DISPLAY_SORT = "author_display_sort";
+    public static final String AUTHOR_DISPLAY_SORT = AUTHOR_DISPLAY + SORT_SUFFIX;
 
     /**
      * Creator of the document.
@@ -213,6 +257,41 @@ public final class FieldUtils
     public static final String ATTACHMENT_VERSION = "attversion";
 
     /**
+     * The date when the last version of the attachment was uploaded.
+     */
+    public static final String ATTACHMENT_DATE = "attdate";
+
+    /**
+     * Same as {@link #ATTACHMENT_DATE} but single valued so that it can be used for sorting.
+     */
+    public static final String ATTACHMENT_DATE_SORT = ATTACHMENT_DATE + SORT_SUFFIX;
+
+    /**
+     * The size in bytes of the last version of the attachment.
+     */
+    public static final String ATTACHMENT_SIZE = "attsize";
+
+    /**
+     * Same as {@link #ATTACHMENT_SIZE} but single valued so that it can be used for sorting.
+     */
+    public static final String ATTACHMENT_SIZE_SORT = ATTACHMENT_SIZE + SORT_SUFFIX;
+
+    /**
+     * The user that uploaded the last version of the attachment.
+     */
+    public static final String ATTACHMENT_AUTHOR = "attauthor";
+
+    /**
+     * The display name of the user that uploaded the last version of the attachment.
+     */
+    public static final String ATTACHMENT_AUTHOR_DISPLAY = ATTACHMENT_AUTHOR + "_display";
+
+    /**
+     * Same as {@link #ATTACHMENT_AUTHOR_DISPLAY} but used for sorting.
+     */
+    public static final String ATTACHMENT_AUTHOR_DISPLAY_SORT = ATTACHMENT_AUTHOR_DISPLAY + SORT_SUFFIX;
+
+    /**
      * For storing mimetype of the attachments.
      */
     public static final String MIME_TYPE = "mimetype";
@@ -221,6 +300,11 @@ public final class FieldUtils
      * Filename, only used for attachments.
      */
     public static final String FILENAME = "filename";
+
+    /**
+     * The attachment file name, used for sorting.
+     */
+    public static final String FILENAME_SORT = FILENAME + SORT_SUFFIX;
 
     /**
      * For storing property name.
@@ -268,5 +352,24 @@ public final class FieldUtils
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Get the name of a dynamic field based on its type or the given locale. If the field type is specified then it is
+     * suffixed to the field name so that its value is indexed properly (see schema.xml). Otherwise, the locale is
+     * suffixed to the field name so that the field text content is indexed based on the specified locale.
+     * 
+     * @param prefix the field name prefix
+     * @param type the field type
+     * @param locale the locale of the field value in case the type is not specified
+     * @return the name that should be used for the specified field in order for its value to be indexed correctly
+     */
+    public static String getFieldName(String prefix, String type, Locale locale)
+    {
+        if (type != null) {
+            return prefix + FieldUtils.USCORE + type;
+        } else {
+            return FieldUtils.getFieldName(prefix, locale);
+        }
     }
 }

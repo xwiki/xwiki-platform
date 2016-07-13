@@ -22,7 +22,8 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -60,13 +61,59 @@ public class AdministrationPage extends ViewPage
     @FindBy(xpath = "//a[contains(@href, 'section=Elements')]")
     private WebElement pageElementsLink;
 
+    @FindBy(xpath = "//a[contains(@href, 'section=Presentation')]")
+    private WebElement presentationLink;
+
     @FindBy(id = "goto-select")
     WebElement spaceAdminSelect;
 
     public static AdministrationPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin");
+        getUtil().gotoPage(getSpace(), getPage(), "admin");
         return new AdministrationPage();
+    }
+
+    /**
+     * Redirects to the administration page of a specified space.
+     *
+     * @param spaceReference the space reference
+     * @return the administration page of the specified space
+     * @since 7.2M3
+     */
+    public static AdministrationPage gotoSpaceAdministrationPage(SpaceReference spaceReference)
+    {
+        DocumentReference documentReference = new DocumentReference("WebPreferences", spaceReference);
+        getUtil().gotoPage(documentReference, "admin");
+
+        return new AdministrationPage();
+    }
+
+    /**
+     * Redirects to the administration page of a specified space.
+     *
+     * @param spaceReferenceString the string serialized space reference
+     * @return the administration page of the specified space
+     * @since 7.2M3
+     */
+    public static AdministrationPage gotoSpaceAdministrationPage(String spaceReferenceString)
+    {
+        SpaceReference spaceReference = new SpaceReference(getUtil().resolveSpaceReference(spaceReferenceString));
+        return gotoSpaceAdministrationPage(spaceReference);
+    }
+
+    public static String getURL()
+    {
+        return getUtil().getURL(getSpace(), getPage());
+    }
+
+    public static String getSpace()
+    {
+        return "XWiki";
+    }
+
+    public static String getPage()
+    {
+        return "XWikiPreferences";
     }
 
     public LocalizationAdministrationSectionPage clickLocalizationSection()
@@ -112,6 +159,15 @@ public class AdministrationPage extends ViewPage
     }
 
     /**
+     * @since 6.3M1
+     */
+    public PresentationAdministrationSectionPage clickPresentationSection()
+    {
+        this.presentationLink.click();
+        return new PresentationAdministrationSectionPage();
+    }
+
+    /**
      * Opens the "Page Elements" administration section.
      * 
      * @return the "Page Elements" administration section
@@ -122,15 +178,49 @@ public class AdministrationPage extends ViewPage
         return new PageElementsAdministrationSectionPage();
     }
 
+    /**
+     * @since 6.4M2
+     */
+    public ViewPage clickSection(String categoryName, String sectionName)
+    {
+        getDriver().findElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).click();
+        return new ViewPage();
+    }
+
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasSection(String categoryName, String sectionName)
+    {
+        return getDriver().hasElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']"));
+    }
+
     public boolean hasSection(String sectionName)
     {
-        return getUtil().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
+        return getDriver().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
             + sectionName + "')]"));
+    }
+
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasNotSection(String categoryName, String sectionName)
+    {
+        return getDriver().findElementsWithoutWaiting(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).size() == 0;
     }
 
     public boolean hasNotSection(String sectionName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
                 + sectionName + "')]")).size() == 0;
     }
@@ -143,8 +233,8 @@ public class AdministrationPage extends ViewPage
      */
     public AdministrationPage selectSpaceToAdminister(String spaceName)
     {
-        Select select = new Select(this.spaceAdminSelect);
-        select.selectByVisibleText(spaceName);
-        return new AdministrationPage();
+        // FIXME: actually implement this (and maybe change its signature accordingly) once the new page administration
+        // UI is implemented in http://jira.xwiki.org/browse/XWIKI-12219
+        return gotoSpaceAdministrationPage(spaceName);
     }
 }

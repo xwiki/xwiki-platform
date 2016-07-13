@@ -1,0 +1,19 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validate error when the script engine does not exist
+.#-----------------------------------------------------
+{{script language="doesnotexist"}}content{{/script}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [script] [language=doesnotexist] [content]
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Failed to execute the [script] macro. Cause: [Can't find script engine with name [doesnotexist]]. Click on this message for details.]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: Can't find script engine with name [doesnotexist]${{{regex:.*}}}] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [script] [language=doesnotexist] [content]
+endDocument

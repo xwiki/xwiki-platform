@@ -1,0 +1,50 @@
+//
+// Edit
+// --------------------------------------------------
+
+#editcolumn, #inline {
+  .bottombuttons {
+    .buttons {
+      margin: 10px 0;
+    }
+  }
+
+  .edit-meta-tools {
+    .pull-right();
+    margin: @breadcrumb-padding-vertical @breadcrumb-padding-horizontal 0 0;
+    
+    a {
+      display: block;
+      width: 16px;
+      height: 16px;
+      overflow: hidden;
+      text-indent: -9999px;
+      background: none no-repeat scroll left top transparent;
+      margin-left: 4px;
+    }
+    
+    a.edit-parent {
+      background-image: url(@xwiki-icon-parent-edit);
+    }
+    
+    a.hide-edit-parent {
+      background-image: url(@xwiki-silk-icon-chart-organization);
+    }
+  }
+}
+
+#mainEditArea #parentinput, #mainContentArea #parentinput {
+  display: none;
+}
+
+#mainEditArea #parentinput.active, #mainContentArea #parentinput.active {
+  display: block;
+}
+
+#editMeta input {
+  width: 100%;
+}
+
+textarea#content {
+  width: 100%;
+}

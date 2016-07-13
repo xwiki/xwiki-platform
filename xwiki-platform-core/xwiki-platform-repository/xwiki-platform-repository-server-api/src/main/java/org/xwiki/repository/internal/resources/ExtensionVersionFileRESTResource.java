@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -75,7 +76,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
+@Component
+@Named("org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource")
 @Path(Resources.EXTENSION_VERSION_FILE)
 @Singleton
 public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResource
@@ -171,8 +173,8 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // Should probably use javax.ws.rs.ext.MessageBodyWriter
             HttpEntity entity = subResponse.getEntity();
             InputRepresentation content =
-                new InputRepresentation(entity.getContent(), new MediaType(entity.getContentType().getValue()),
-                    entity.getContentLength());
+                new InputRepresentation(entity.getContent(), entity.getContentType() != null ? new MediaType(entity
+                    .getContentType().getValue()) : MediaType.APPLICATION_OCTET_STREAM, entity.getContentLength());
 
             String type = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 

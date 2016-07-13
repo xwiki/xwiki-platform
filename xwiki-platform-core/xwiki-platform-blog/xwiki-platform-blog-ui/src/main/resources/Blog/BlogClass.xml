@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.BlogCode</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1227675584000</creationDate>
+  <parent>Blog.BlogCode</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1227676200000</date>
   <contentUpdateDate>1227676174000</contentUpdateDate>
   <version>1.1</version>
   <title>Blog XClass</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <class>
     <name>Blog.BlogClass</name>
     <customClass/>
@@ -35,6 +52,7 @@
     <blogType>
       <cache>0</cache>
       <customDisplay/>
+      <disabled>0</disabled>
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>blogType</name>
@@ -56,6 +74,7 @@
     <description>
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
+      <disabled>0</disabled>
       <editor>---</editor>
       <name>description</name>
       <number>2</number>
@@ -72,6 +91,7 @@
     <displayType>
       <cache>0</cache>
       <customDisplay/>
+      <disabled>0</disabled>
       <displayType>select</displayType>
       <multiSelect>0</multiSelect>
       <name>displayType</name>
@@ -92,6 +112,7 @@
     </displayType>
     <itemsPerPage>
       <customDisplay/>
+      <disabled>0</disabled>
       <name>itemsPerPage</name>
       <number>4</number>
       <numberType>integer</numberType>
@@ -105,6 +126,7 @@
     </itemsPerPage>
     <title>
       <customDisplay/>
+      <disabled>0</disabled>
       <name>title</name>
       <number>1</number>
       <picker>0</picker>
@@ -118,6 +140,10 @@
     </title>
   </class>
   <object>
+    <name>Blog.BlogClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>2609cac8-0c5f-4ba3-be0a-d4b8d41daca4</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -141,15 +167,15 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>Blog.BlogClass</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>2609cac8-0c5f-4ba3-be0a-d4b8d41daca4</guid>
     <property>
       <sheet>BlogSheet</sheet>
     </property>
   </object>
   <object>
+    <name>Blog.BlogClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>5d650c2c-8348-4c1a-b3f0-6757389e6155</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -173,13 +199,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>Blog.BlogClass</name>
-    <number>0</number>
-    <className>XWiki.DocumentSheetBinding</className>
-    <guid>5d650c2c-8348-4c1a-b3f0-6757389e6155</guid>
     <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>
-  <content/>
 </xwikidoc>

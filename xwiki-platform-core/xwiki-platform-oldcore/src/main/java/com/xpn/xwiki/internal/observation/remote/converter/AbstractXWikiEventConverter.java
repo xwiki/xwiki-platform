@@ -38,25 +38,25 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.
- * 
+ *
  * @version $Id$
  * @since 2.0M4
  */
 public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
 {
-    private static final String CONTEXT_WIKI = "contextwiki";
+    protected static final String CONTEXT_WIKI = "contextwiki";
 
-    private static final String CONTEXT_USER = "contextuser";
+    protected static final String CONTEXT_USER = "contextuser";
 
-    private static final String DOC_NAME = "docname";
+    protected static final String DOC_NAME = "docname";
 
-    private static final String DOC_VERSION = "docversion";
+    protected static final String DOC_VERSION = "docversion";
 
-    private static final String DOC_LANGUAGE = "doclanguage";
+    protected static final String DOC_LANGUAGE = "doclanguage";
 
-    private static final String ORIGDOC_VERSION = "origdocversion";
+    protected static final String ORIGDOC_VERSION = "origdocversion";
 
-    private static final String ORIGDOC_LANGUAGE = "origdoclanguage";
+    protected static final String ORIGDOC_LANGUAGE = "origdoclanguage";
 
     /**
      * The logger to log.
@@ -84,7 +84,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
 
-        remoteDataMap.put(CONTEXT_WIKI, context.getDatabase());
+        remoteDataMap.put(CONTEXT_WIKI, context.getWikiId());
         remoteDataMap.put(CONTEXT_USER, context.getUser());
 
         return remoteDataMap;
@@ -120,7 +120,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         if (xcontext != null) {
-            xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
+            xcontext.setWikiId((String) remoteDataMap.get(CONTEXT_WIKI));
             xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
         } else {
             this.logger.warn("Can't get a proper XWikiContext."

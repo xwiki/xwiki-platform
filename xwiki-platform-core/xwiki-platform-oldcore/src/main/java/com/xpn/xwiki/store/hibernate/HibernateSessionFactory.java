@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Class used by Hibernate stores for obtain sessions. Simple holder for real sessionFactory and configuration for now.
- * 
+ *
  * @version $Id$
  * @since 1.6M1
  */

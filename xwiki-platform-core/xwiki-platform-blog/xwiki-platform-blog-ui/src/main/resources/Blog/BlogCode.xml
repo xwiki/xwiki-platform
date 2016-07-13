@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogCode</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016402000</creationDate>
+  <parent>Blog.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1373018317000</date>
   <contentUpdateDate>1373018155000</contentUpdateDate>
   <version>1.1</version>
   <title>Macros for the Blog application</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.BlogParameters"/}}
+  <content>{{include reference="Blog.BlogParameters"/}}
 
 {{velocity output="false"}}
 ##
@@ -40,7 +57,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param blogDoc the XDocument holding the blog definition object.
  *###
 #macro(printBlog $blogDoc)
-  {{include document='Blog.CreatePost'/}}
+  {{include reference='Blog.CreatePost'/}}
   #getBlogEntries($blogDoc $entries)
   #displayBlog($entries 'index' true true)
   #displayNavigationLinks($blogDoc)
@@ -120,9 +137,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param title The resulting title.
  *###
 #macro(getBlogTitle $blogDoc $title)
-  #getBlogProperty($blogDoc 'title' $!blogDoc.displayTitle $result)
+  ## Titles can contain velocity code (most commonly translations), so we should evaluate them.
   #set ($title = $NULL)
-  #setVariable ("$title" $result)
+  #setVariable ("$title" $!blogDoc.displayTitle)
 #end
 ##
 ##
@@ -404,13 +421,16 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The resulting xobject of the blog post.
  *###
-#macro(getEntryObject $entryDoc $entryObj)
+#macro(getEntryObject $entryDoc $__entryObj)
   #set($result = $entryDoc.getObject("${blogPostClassname}"))
   #if(!$result)
     #set($result = $entryDoc.getObject("${oldArticleClassname}"))
   #end
-  #set ($entryObj = $NULL)
-  #setVariable ("$entryObj" $result)
+  ## NOTE: The reason we put an underscore in front of the variable name is to prevent the following line from
+  ## overwriting the $entryObj variable that may be defined before this macro is called. Of course, $__entryObj may be
+  ## overwritten in this case but it's less likely to have such a variable defined before.
+  #set ($__entryObj = $NULL)
+  #setVariable ("$__entryObj" $result)
 #end
 ##
 ##
@@ -552,7 +572,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayPublishButton $entryDoc $entryObj)
   #isPublished($entryObj $isPublished)
   #if(!$isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
-    [[{{html clean="false"}}#toolImage('page_white_world' 'publish '){{/html}}&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="${escapetool.xml($services.localization.render('xe.blog.code.notpublished'))}"]]##
+    [[#toolImage('page_white_world' 'publish ')&gt;&gt;path:$blogPublisher.getURL('view', "entryName=${escapetool.url($entryDoc.fullName)}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||title="$services.localization.render('xe.blog.code.notpublished')"]]##
   #end
 #end
 ##
@@ -569,10 +589,24 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #isHidden($entryObj $isHidden)
   ## Only published articles can be hidden. Unpublished articles are considered already hidden.
   #if($isPublished &amp;&amp; $entryDoc.creator == $xcontext.user &amp;&amp; $xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
+    #set ($queryString = {
+      'xredirect'  : $thisURL, 
+      'form_token' : $services.csrf.getToken()
+      })
     #if ($isHidden)
-      [[{{html clean="false"}}#toolImage('lock_open', 'show '){{/html}}&gt;&gt;path:$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=0&amp;comment=${escapetool.url($services.localization.render('xe.blog.code.madevisible'))}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||class="blog-tool-show" title="${escapetool.xml($services.localization.render('xe.blog.code.makevisible'))}"]]##
+      #set ($discard = $queryString.putAll({
+        "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 0,
+        'comment' : $services.localization.render('xe.blog.code.madevisible')
+        }))
+      #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
+      [[#toolImage('lock_open', 'show ')&gt;&gt;path:$lockURL||class="blog-tool-show" title="$services.localization.render('xe.blog.code.makevisible')"]]##
     #else
-      [[{{html clean="false"}}#toolImage('lock', 'hide '){{/html}}&gt;&gt;path:$entryDoc.getURL('save', "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden=1&amp;comment=${escapetool.url($services.localization.render('xe.blog.code.hid'))}&amp;xredirect=${escapetool.url($thisURL)}&amp;form_token=$!{services.csrf.getToken()}")||class="blog-tool-hide" title="${escapetool.xml($services.localization.render('xe.blog.code.hide'))}"]]##
+      #set ($discard = $queryString.putAll({
+        "${entryObj.getxWikiClass().getName()}_${entryObj.number}_hidden" : 1,
+        'comment' : $services.localization.render('xe.blog.code.hid')
+        }))
+      #set ($lockURL = $entryDoc.getURL('save', $escapetool.url($queryString)))
+      [[#toolImage('lock', 'hide ')&gt;&gt;path:$lockURL||class="blog-tool-hide" title="$services.localization.render('xe.blog.code.hide')"]]##
     #end
   #end
 #end
@@ -588,7 +622,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEditButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryDoc.fullName))
     ## Call getDefaultEditMode() for backward compatibility with older blog posts.
-    [[{{html clean="false"}}#toolImage('pencil' 'edit '){{/html}}&gt;&gt;path:$entryDoc.getURL('edit')||title="${escapetool.xml($services.localization.render('xe.blog.code.editpost'))}"]]##
+    [[#toolImage('pencil' 'edit ')&gt;&gt;path:$entryDoc.getURL('edit')||title="$services.localization.render('xe.blog.code.editpost')"]]##
   #end
 #end
 ##
@@ -603,7 +637,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *###
 #macro(displayDeleteButton $entryDoc $entryObj)
   #if($xwiki.hasAccessLevel('delete', $xcontext.user, $entryDoc.fullName))
-    [[{{html clean="false"}}#toolImage('cross' 'delete '){{/html}}&gt;&gt;path:$entryDoc.getURL('delete')||title="${escapetool.xml($services.localization.render('xe.blog.code.deletepost'))}"]]##
+    [[#toolImage('cross' 'delete ')&gt;&gt;path:$entryDoc.getURL('delete')||title="$services.localization.render('xe.blog.code.deletepost')"]]##
   #end
 #end
 ##
@@ -637,8 +671,11 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   (% class="#if($onlyExtract)entry-summary#{else}entry-content#end" %)(((
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
+  ## FIXME: This causes the blog's content to not be annotatable. See http://jira.xwiki.org/browse/XWIKI-6328
+  ##        Should probably be replaced by a display macro call with a reference to the object property holding the post's content
   {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
   ))) ## entry-content
+  (% class="clearfloats" %)((()))
 #end
 ##
 ##
@@ -687,19 +724,18 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryFooter $entryDoc $entryObj)
   (% class="entry-footer" %)(((
   #isPublished($entryObj $isPublished)
+  (% class='entry-author-label' %)
   #if($isPublished)
     {{translation key='xe.blog.code.postedby'/}} ##
   #else
     {{translation key='xe.blog.code.createdby'/}} ##
   #end
-  {{html wiki="false"}}
-  &lt;address class="author vcard"&gt;#userfn($entryDoc.creator)&lt;/address&gt; ##
+  {{html wiki="false" clean="false"}}&lt;span class='author vcard'&gt;#userfn($entryDoc.creator)&lt;/span&gt;{{/html}} ##
   #getEntryDate($entryDoc $entryObj $entryDate)
-  #listCategories($entryObj) ##
+  #listCategories($entryObj) #*
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
-  {{/html}}
-  (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
+  *#(% class="separator" %)·(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
   (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.comments'/}}&gt;&gt;$entryDoc||anchor="Comments"]] (% class="itemCount" %)($entryDoc.comments.size())(%%) ##
   )))## entry-footer
 #end
@@ -717,16 +753,16 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     #set($first = true)
     #if($categories.size() &gt; 0)
       #foreach($category in $categories)
-## Do not indent
-#set($categoryDoc = $!xwiki.getDocument($category))
-#if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
-#if($first)
- &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; $services.localization.render('xe.blog.code.categories')
-#set($first = false)
-#else, #end## if first
-&lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!{escapetool.xml($!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value)}&lt;/a&gt;##
-#end## if isNew
-#end## foreach
+        #set($categoryDoc = $!xwiki.getDocument($category))
+        #if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
+          #if($foreach.count == 1)
+            (% class='separator' %)·(%%) $services.localization.render('xe.blog.code.categories') ##
+          #else
+            , ##
+          #end##
+          [[$!{escapetool.xml($!categoryDoc.getObject($blogCategoryClassname).getValue('name'))}&gt;&gt;${category}||rel='tag']]##
+        #end##
+      #end##
     #end
   #end
 #end

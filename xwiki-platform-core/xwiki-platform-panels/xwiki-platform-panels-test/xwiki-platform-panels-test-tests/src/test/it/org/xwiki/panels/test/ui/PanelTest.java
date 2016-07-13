@@ -19,18 +19,21 @@
  */
 package org.xwiki.panels.test.ui;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.xwiki.administration.test.po.AdministrablePage;
+import org.junit.*;
 import org.xwiki.administration.test.po.PageElementsAdministrationSectionPage;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.EditRightsPane.Right;
 import org.xwiki.test.ui.po.EditRightsPane.State;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
+import org.xwiki.text.StringUtils;
+
+import static org.junit.Assert.*;
 
 /**
  * Various Panel tests.
@@ -38,35 +41,49 @@ import org.xwiki.test.ui.po.editor.RightsEditPage;
  * @version $Id$
  * @since 5.0M2
  */
-public class PanelTest extends AbstractAdminAuthenticatedTest
+public class PanelTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    @Test
+    public void verifyApplicationsPanelEntry()
+    {
+        // Navigate to the Panels app by clicking in the Application Panel.
+        // This verifies that the Panels application is registered in the Applications Panel.
+        // It also verifies that the Translation is registered properly.
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        ViewPage vp = applicationPanel.clickApplication("Panels");
+
+        // Verify we're on the right page!
+        assertEquals(PanelsHomePage.getSpace(), vp.getMetaDataValue("space"));
+        assertEquals(PanelsHomePage.getPage(), vp.getMetaDataValue("page"));
+
+        // Now log out to verify that the Panels entry is not displayed for non admin users
+        getUtil().forceGuestUser();
+        // Navigate again to the Application Panels page to perform the verification
+        applicationPanel = ApplicationsPanel.gotoPage();
+        assertFalse(applicationPanel.containsApplication("Panels"));
+    }
+
     /**
      * @see "XWIKI-8591: Cannot use a panel with a name containing spaces"
      */
     @Test
     public void addPanelWithSpacesInName()
     {
-        // Create a panel whose name contain spaces.
+        // Delete panel that will be created by the test
         String panelName = "My First Panel";
         getUtil().deletePage("Panels", panelName);
+
+        // Create a panel whose name contain spaces.
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
         panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, getTestMethodName()));
         panelEditPage.clickSaveAndContinue();
 
         // Add the panel to the right column from the administration.
-        PageElementsAdministrationSectionPage pageElements =
-            new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
-        String rightPanels = pageElements.getRightPanels();
-        pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
-        try {
-            pageElements.clickSave();
-            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
-        } finally {
-            // Restore the right panels.
-            pageElements = PageElementsAdministrationSectionPage.gotoPage();
-            pageElements.setRightPanels(rightPanels);
-            pageElements.clickSave();
-        }
+        setRightPanelInAdministration(panelName);
+        assertTrue(new PageWithPanels().hasPanel(panelName));
     }
 
     /**
@@ -75,46 +92,53 @@ public class PanelTest extends AbstractAdminAuthenticatedTest
     @Test
     public void limitPanelViewRight()
     {
-        // Create a new panel.
+        // Delete panel that will be created by the test
         String panelName = getTestMethodName();
         getUtil().deletePage("Panels", panelName);
+
+        // Create a user for the test so that we can give view rights to the panel page to that user.
+        String userName = String.format("%s%s", getTestClassName(), getTestMethodName());
+        getUtil().createUser(userName, "password", getUtil().getURLToNonExistentPage());
+
+        // Create new Panel
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
         panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
         panelEditPage.clickSaveAndContinue();
 
-        // Add the panel to the right column from the administration.
-        PageElementsAdministrationSectionPage pageElements =
-            new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
-        String rightPanels = pageElements.getRightPanels();
-        pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
-        try {
-            pageElements.clickSave();
+        // Add the panel to the right column from the administration. This also proves that the Panel Admin UI is
+        // displayed fine and can be modified.
+        setRightPanelInAdministration(panelName);
 
-            // The panel should be visible for the administrator.
-            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
+        // The panel should be visible for the administrator.
+        assertTrue(new PageWithPanels().hasPanel(panelName));
 
-            // Go to a page that doesn't exist and logout to see the panel as guest.
-            getUtil().gotoPage(getTestClassName(), getTestMethodName()).logout();
-            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
+        // Force the guest user to verify the Panel is also visible for Guests.
+        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        getUtil().forceGuestUser();
+        assertTrue(new PageWithPanels().hasPanel(panelName));
 
-            // Login and limit the view right on the panel document.
-            loginAdminUser();
-            RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
-            rightsEditor.switchToUsers();
-            // Explicit view right for the administrator.
-            rightsEditor.setRight("Admin", Right.VIEW, State.ALLOW);
+        // Login and limit the view right on the panel document to the test user.
+        this.authenticationRule.authenticate();
+        RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
+        rightsEditor.switchToUsers();
+        // Explicit view right for the test user.
+        rightsEditor.setRight(userName, Right.VIEW, State.ALLOW);
 
-            // Check again the panel visibility for guest and then for administrator.
-            ViewPage page = getUtil().gotoPage(getTestClassName(), getTestMethodName());
-            Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
-            page.logout();
-            Assert.assertFalse(new PageWithPanels().hasPanel(panelName));
-        } finally {
-            // Restore the right panels.
-            loginAdminUser();
-            pageElements = PageElementsAdministrationSectionPage.gotoPage();
-            pageElements.setRightPanels(rightPanels);
-            pageElements.clickSave();
+        // Check again the panel visibility for the test user and then for guest
+        getUtil().loginAndGotoPage(userName, "password", getUtil().getURL(getTestClassName(), getTestMethodName()));
+        assertTrue(new PageWithPanels().hasPanel(panelName));
+        getUtil().forceGuestUser();
+        assertFalse(new PageWithPanels().hasPanel(panelName));
+    }
+
+    private void setRightPanelInAdministration(String panelName)
+    {
+        PageElementsAdministrationSectionPage peasp = PageElementsAdministrationSectionPage.gotoPage();
+        String rightPanels = peasp.getRightPanels();
+        String newPanelString = "Panels." + panelName;
+        if (!rightPanels.contains(newPanelString)) {
+            peasp.setRightPanels(StringUtils.join(new Object[]{ rightPanels, newPanelString }, ','));
         }
+        peasp.clickSave();
     }
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>WikisSuggestSolrService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1392139133000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1392296504000</date>
+  <contentUpdateDate>1392296504000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Wikis Solr Suggestion Service</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="XWiki.SuggestSolrMacros" /}}
+
+{{velocity}}
+#if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
+  #getSearchSuggestResults($results)
+  #set ($discard = $response.setContentType('text/xml'))
+  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+  &lt;results&gt;
+    #foreach ($result in $results)
+      #set ($documentReference = $services.solr.resolveDocument($result))
+      #set ($wikiId = $stringtool.substringAfter($documentReference.name, 'XWikiServer').toLowerCase())
+      #set ($wikiDescriptor = $services.wiki.getById($wikiId))
+      #if ($wikiDescriptor)
+        #set ($name = $wikiDescriptor.prettyName)
+        #if ("$!name.trim()" == '')
+          #set ($name = $wikiDescriptor.id)
+        #end
+        #set ($url = $xwiki.getURL($wikiDescriptor.mainPageReference))
+        &lt;rs id="$escapetool.xml($wikiId)" type="wiki" url="$escapetool.xml($url)"&gt;$escapetool.xml($name)&lt;/rs&gt;
+      #end
+    #end
+  &lt;/results&gt;
+#else
+  {{info}}
+    This service provides search results for the search suggest UI component.
+    Examples:
+    * [[$doc.getExternalURL('get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'query': 'class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:__INPUT__*',
+        'input': 'home'
+      }))]]
+  {{/info}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

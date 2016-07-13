@@ -1,0 +1,82 @@
+#set ($discard = $xwiki.ssfx.use('uicomponents/job/job.css', true))
+
+$services.template.execute('logging_macros.vm')
+
+#macro (displayJobProgressBar $jobStatus)
+  <div class="ui-progress">
+    <div class="ui-progress-background">
+      #set ($percent = $jobStatus.progress.offset)
+      ## There is no progress information if the job was scheduled but hasn't started yet.
+      #if (!$percent)
+        #set ($percent = 0)
+      #end
+      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+      <div class="ui-progress-bar green" style="width:${percent}%"></div>
+    </div>
+    #if ($jobStatus && !$jobStatus.log.isEmpty())
+      ## We need the tail of the log queue.
+      #set ($logList = [])
+      #set ($discard = $logList.addAll($jobStatus.log))
+      <p class="ui-progress-message">
+        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
+      </p>
+    #end
+  </div>
+#end
+
+#macro (displayJobStatusLog $status $collapsed)
+  <dl class="xform">
+    ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
+    <dt>
+      <label class="collapse-toggle#if ($collapsed || $status.state == 'WAITING') collapsed#end"
+          data-target-xpath="parent::*/following-sibling::*">
+        <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
+        <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
+        #set ($jobType = $status.request.getProperty('job.type'))
+        #set ($translationKey = "job.log.label.$jobType")
+        #if (!$services.localization.get($translationKey))
+          #set ($translationKey = 'job.log.label')
+        #end
+        $services.localization.render($translationKey)
+      </label>
+    </dt>
+    <dd>#printStatusLog($status)</dd>
+  </dl>
+#end
+
+#macro (printStatusLog $status)
+  #if ($status.state != 'FINISHED')
+    #set($loading = true)
+  #end
+  #printLogs($status.log $loading)
+#end
+
+#macro (getJobStatusJSON $status $json)
+  #set ($logOffset = $mathtool.toInteger($request.logOffset))
+  #if (!$logOffset)
+    #set ($logOffset = 0)
+  #else
+    #set ($logOffset = $mathtool.max($logOffset, 0))
+  #end
+  #set ($log = [])
+  #foreach ($logEvent in $status.log)
+    #if ($foreach.index >= $logOffset)
+      #set ($discard = $log.add({
+        'level': $logEvent.level.toString().toLowerCase(),
+        'renderedMessage': "#printLog($logEvent)"
+      }))
+    #end
+  #end
+  #set ($json = $NULL)
+  #setVariable("$json" {
+    'id': $status.request.id,
+    'state': $status.state,
+    'progress': {
+      'offset': $status.progress.offset
+    },
+    'log': {
+      'offset': $logOffset,
+      'items': $log
+    }
+  })
+#end

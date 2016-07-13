@@ -35,11 +35,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.text.exec.BoldExecutable;
  */
 public class HistoryTest extends RichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -57,6 +53,7 @@ public class HistoryTest extends RichTextAreaTestCase
     {
         deferTest(new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 doTestRestoreSelection();
@@ -94,6 +91,7 @@ public class HistoryTest extends RichTextAreaTestCase
     {
         deferTest(new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 doTestRestoreSelectionEndingInAComment();
@@ -134,6 +132,7 @@ public class HistoryTest extends RichTextAreaTestCase
     {
         deferTest(new com.google.gwt.user.client.Command()
         {
+            @Override
             public void execute()
             {
                 doTestUndoInsideParagraph();

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxHeadings</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1384507498000</creationDate>
+  <date>1384508603000</date>
+  <contentUpdateDate>1384508603000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxHeadings</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Rubriker ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Headings ===
+
+|=Formateringstyp|=XWiki syntax 1.0|=Resultat
+|Standardrubriker|(((
+1 nivå 1
+1.1 nivå 2
+1.1.1 nivå 3
+1.1.1.1 nivå 4
+1.1.1.1.1 nivå 5
+1.1.1.1.1.1 nivå 6
+)))|(((
+= nivå 1 = 
+== nivå 2 ==
+=== nivå 3 ===
+==== nivå 4 ====
+===== nivå 5 =====
+====== nivå 6 ======
+)))
+|Parametriserade rubriker|&lt;h1&gt;&lt;span style="color:blue"&gt;rubrik&lt;/span&gt;&lt;/h1&gt;|(((
+(% style="color:blue" %)
+= rubrik =
+)))
+|Rubriker med wikisyntax|1.1.1 Rubrik med *fetstil*|(((=== Rubrik med **fetstil** ===)))
+
+
+=== 2.0 Headings ===
+
+|=Formateringstyp|=XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Standardrubriker|((({{{
+= nivå 1 = 
+== nivå 2 ==
+=== nivå 3 ===
+==== nivå 4 ====
+===== nivå 5 =====
+====== nivå 6 ======
+}}})))|(((
+{{html}}
+&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
+&lt;h1 id="Hlevel1"&gt;&lt;span&gt;nivå 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;nivå 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;nivå 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;nivå 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;nivå 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;nivå 6&lt;/span&gt;&lt;/h6&gt;
+{{/html}}
+)))
+|Parametriserade rubriker|{{{(% style="color:blue" %)}}}\\= rubrik =|(((
+(% style="color:blue" %)
+= rubrik =
+)))
+|Rubriker med wikisyntax|{{{=== Rubrik med **fetstil** ===}}}|(((=== Rubrik med **fetstil** ===)))</content>
+</xwikidoc>

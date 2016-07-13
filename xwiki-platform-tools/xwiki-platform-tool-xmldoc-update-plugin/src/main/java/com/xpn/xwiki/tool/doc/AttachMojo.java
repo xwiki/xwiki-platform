@@ -48,9 +48,15 @@ public class AttachMojo extends AbstractDocumentMojo
      * The file to attach
      * 
      * @parameter
-     * @required
      */
     private File file;
+
+    /**
+     * The files to attach.
+     * 
+     * @parameter
+     */
+    private File[] files;
 
     public AttachMojo() throws MojoExecutionException
     {
@@ -61,21 +67,26 @@ public class AttachMojo extends AbstractDocumentMojo
     {
         try {
             XWikiDocument doc = loadFromXML(sourceDocument);
+            List<XWikiAttachment> attachments = doc.getAttachmentList();
 
-            // Create a XWiki attachment from the file
-            XWikiAttachment attachment = createAttachment(file, author);
+            // Create an XWiki attachment from each of the specified files.
+            if (this.file != null) {
+                attachments.add(createAttachment(this.file, this.author));
+            }
+            if (this.files != null) {
+                for (File file : this.files) {
+                    attachments.add(createAttachment(file, this.author));
+                }
+            }
 
-            // Add the attachment to the document attachments list
-            List<XWikiAttachment> attachlist = doc.getAttachmentList();
-            attachlist.add(attachment);
-            doc.setAttachmentList(attachlist);
+            // Update the list of attachments.
+            doc.setAttachmentList(attachments);
 
             // output the file
             File outputFile = new File(getSpaceDirectory(outputDirectory, sourceDocument), sourceDocument.getName());
             writeToXML(doc, outputFile);
-
         } catch (Exception e) {
-            throw new MojoExecutionException("Error while attaching the file [" + file + "] on document ["
+            throw new MojoExecutionException("Error while attaching files on document ["
                 + sourceDocument.getParentFile().getName() + "." + sourceDocument.getName() + "]", e);
         }
     }

@@ -19,25 +19,26 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.dom4j.Element;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import org.dom4j.Element;
 
 public interface ObjectInterface extends ElementInterface
 {
     /**
      * @since 4.0M1
      */
-    public BaseClass getXClass(XWikiContext context) throws XWikiException;
+    BaseClass getXClass(XWikiContext context) throws XWikiException;
 
-    public PropertyInterface get(String name) throws XWikiException;
+    PropertyInterface get(String name) throws XWikiException;
 
-    public void put(String name, PropertyInterface property) throws XWikiException;
+    void put(String name, PropertyInterface property) throws XWikiException;
 
-    public PropertyInterface safeget(String name);
+    PropertyInterface safeget(String name);
 
-    public void safeput(String name, PropertyInterface property);
+    void safeput(String name, PropertyInterface property);
 
-    public Element toXML(BaseClass bclass);
+    Element toXML(BaseClass bclass);
 }

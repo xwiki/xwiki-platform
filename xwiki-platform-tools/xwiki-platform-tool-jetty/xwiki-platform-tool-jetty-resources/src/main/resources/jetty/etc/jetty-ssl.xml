@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<!-- ============================================================= -->
+<!-- Configure a TLS (SSL) Context Factory                         -->
+<!-- This configuration must be used in conjunction with jetty.xml -->
+<!-- and either jetty-https.xml or jetty-spdy.xml (but not both)   -->
+<!-- ============================================================= -->
+<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+  <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="etc/keystore"/></Set>
+  <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4"/></Set>
+  <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="OBF:1u2u1wml1z7s1z7a1wnl1u2g"/></Set>
+  <Set name="TrustStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.truststore" default="etc/keystore"/></Set>
+  <Set name="TrustStorePassword"><Property name="jetty.truststore.password" default="OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4"/></Set>
+  <Set name="EndpointIdentificationAlgorithm"></Set>
+  <Set name="NeedClientAuth"><Property name="jetty.ssl.needClientAuth" default="false"/></Set>
+  <Set name="WantClientAuth"><Property name="jetty.ssl.wantClientAuth" default="false"/></Set>
+  <Set name="ExcludeCipherSuites">
+    <Array type="String">
+      <Item>SSL_RSA_WITH_DES_CBC_SHA</Item>
+      <Item>SSL_DHE_RSA_WITH_DES_CBC_SHA</Item>
+      <Item>SSL_DHE_DSS_WITH_DES_CBC_SHA</Item>
+      <Item>SSL_RSA_EXPORT_WITH_RC4_40_MD5</Item>
+      <Item>SSL_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
+      <Item>SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
+      <Item>SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA</Item>
+    </Array>
+  </Set>
+
+  <!-- =========================================================== -->
+  <!-- Create a TLS specific HttpConfiguration based on the        -->
+  <!-- common HttpConfiguration defined in jetty.xml               -->
+  <!-- Add a SecureRequestCustomizer to extract certificate and    -->
+  <!-- session information                                         -->
+  <!-- =========================================================== -->
+  <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+    <Arg><Ref refid="httpConfig"/></Arg>
+    <Call name="addCustomizer">
+      <Arg><New class="org.eclipse.jetty.server.SecureRequestCustomizer"/></Arg>
+    </Call>
+  </New>
+
+</Configure>

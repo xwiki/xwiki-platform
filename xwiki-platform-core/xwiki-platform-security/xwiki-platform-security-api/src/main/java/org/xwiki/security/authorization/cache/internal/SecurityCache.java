@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
+import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
@@ -112,4 +113,23 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
      */
     void add(SecurityShadowEntry entry, Collection<GroupSecurityReference> groups)
         throws ParentEntryEvictedException, ConflictingInsertionException;
+
+    /**
+     * Get all groups where the user/group is a member (directly, or indirectly including relation due to global groups
+     * members of local ones).
+     * 
+     * If the user is global and entityWiki is not null:
+     *   - returns the local groups (from entityWiki) and the global groups where the user is, directly or indirectly
+     * If entityWiki is null:
+     *   - returns the groups from the wiki of the user where the user is, directly or indirectly
+     * If the cache does not contain the needed information::
+     *   - returns null
+     *  
+     * @param user reference to a user/group
+     * @param entityWiki the wiki where to look for the groups (null if the wiki is the same than the user's wiki) 
+     * @return the list of all groups where the user is a member or null if the information is not in the cache yet
+     * 
+     * @since 7.0RC1 - 6.4.3
+     */
+    Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki);
 }

@@ -55,11 +55,7 @@ public class InsertImageExecutableTest extends RichTextAreaTestCase
      */
     private final ImageMetaDataExtractor metaDataExtractor = new ImageMetaDataExtractor();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();

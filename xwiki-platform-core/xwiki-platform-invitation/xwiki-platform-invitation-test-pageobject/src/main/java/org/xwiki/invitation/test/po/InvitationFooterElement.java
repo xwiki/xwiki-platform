@@ -44,7 +44,7 @@ public class InvitationFooterElement extends BaseElement
 
     public boolean isAdmin()
     {
-        return !getUtil().findElementsWithoutWaiting(getDriver(), this.footer, By.id("HAdministrativeTools")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(this.footer, By.id("HAdministrativeTools")).isEmpty();
     }
 
     public InspectInvitationsPage inspectMyInvitations()
@@ -64,23 +64,22 @@ public class InvitationFooterElement extends BaseElement
 
     public int myPendingInvitations()
     {
-        if (getUtil().findElementsWithoutWaiting(
-            getDriver(), this.footer, By.id("my-pending-invitations")).size() == 0)
+        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("my-pending-invitations")).size() == 0)
         {
             return 0;
         }
-        String message = getUtil().findElementsWithoutWaiting(
-            getDriver(), this.footer, By.id("my-pending-invitations")).get(0).getText().trim();
+        String message = getDriver().findElementsWithoutWaiting(this.footer,
+            By.id("my-pending-invitations")).get(0).getText().trim();
         return Integer.parseInt(message.substring(0, message.indexOf(" pending")));
     }
 
     public int spamReports()
     {
-        if (getUtil().findElementsWithoutWaiting(getDriver(), this.footer, By.id("spam-reports")).size() == 0) {
+        if (getDriver().findElementsWithoutWaiting(this.footer, By.id("spam-reports")).size() == 0) {
             return 0;
         }
-        String message = getUtil().findElementsWithoutWaiting(
-            getDriver(), this.footer, By.id("spam-reports")).get(0).getText().trim();
+        String message = getDriver().findElementsWithoutWaiting(this.footer,
+            By.id("spam-reports")).get(0).getText().trim();
         return Integer.parseInt(message.substring(0, message.indexOf(" reported as spam")));
     }
 }

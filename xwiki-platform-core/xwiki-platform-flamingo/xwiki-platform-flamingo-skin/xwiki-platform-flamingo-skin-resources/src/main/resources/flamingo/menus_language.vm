@@ -1,0 +1,39 @@
+##################################
+##        LANGUAGE MENU
+##################################
+#if ($displayLanguageChoice && $xwiki.isMultiLingual())
+  #set($currentLanguage = "$!{tdoc.realLocale}")
+  #set($originalLanguage = "$!{doc.realLocale}")
+  #set ($availtrans = $doc.translationList)
+  #set ($discard = $availtrans.add($originalLanguage))
+  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+  #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+  #set ($additionallangs = [])
+  #foreach($lang in $availtrans)
+    #if((!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang)) && $currentLanguage != $lang)
+      #set ($discard = $additionallangs.add($lang))
+    #end
+  #end
+  ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
+  #set($queryStringMap = {})
+  #set($discard = $queryStringMap.putAll($request.parameterMap))
+  #set($discard = $queryStringMap.put('language', $currentLanguage))
+  #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
+  #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
+  #foreach($lang in $additionallangs)
+    #set($discard = $queryStringMap.put('language', $lang))
+    #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
+  #end
+  #drawerTopItemStop()
+  #drawerSeparator()
+#end
+##########################################
+## Display the pretty name of a language
+##########################################
+#macro(displayLanguagePrettyName $language)
+#if ($language != '')
+#set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))
+#else
+$services.localization.render('defaultlanguage')
+#end
+#end

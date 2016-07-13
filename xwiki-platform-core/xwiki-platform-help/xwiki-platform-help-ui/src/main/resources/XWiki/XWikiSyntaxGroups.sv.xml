@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497834000</date>
+  <contentUpdateDate>1301497834000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Gruppering ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 Groups ===
+
+Gruppering kan användas för att infoga kompexa element i löpande text. Exempelvis för att infoga ett dokument i löpande text, eller komplexa element inuti listor eller tabellceller.  Gruppering markeras med följande syntaktiska symboler: ##{{{(((...)))}}}##.  En gruppering kan innehålla en annan gruppering.
+
+|=XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|((({{{
+|=Titel 1|=Titel 2|=Titel 3
+|Cell ett|(((
+= Inbäddat dokument
+
+Ett inbäddat stycke
+
+* listelement ett
+* listelement två
+  ** underelement 1
+  ** underelement 2
+))) | Cell tre
+
+Fortsättningen på toppnivådokumentet
+}}})))|(((
+|=Titel 1|=Titel 2|=Titel 3
+|Cell ett|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Inbäddat dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Ett inbäddat stycke
+
+* listelement ett
+* listelement två
+  ** underelement 1
+  ** underelement 2
+))) | Cell tre
+
+Fortsättningen på toppnivådokumentet
+)))</content>
+</xwikidoc>

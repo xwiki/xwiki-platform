@@ -1,0 +1,80 @@
+#template('drawer_macros.vm')
+##
+## Display the drawer
+##
+<div class="drawer-main drawer-default" id="tmDrawer">
+  <nav class="drawer-nav">
+  
+    ##
+    ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)
+    ##
+    <div class="drawer-brand clearfix">
+      <a href="$xwiki.getURL($xcontext.user, 'view')">
+      #largeUserAvatar($xcontext.user)
+      </a>
+      <div class="brand-links">
+        #if ($xcontext.user != 'XWiki.XWikiGuest')
+          <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$escapetool.xml($services.localization.render('logout'))</a>
+        #else
+          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$escapetool.xml($services.localization.render('login'))</a>
+          #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
+            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$escapetool.xml($services.localization.render('register'))</a>
+          #end
+        #end
+         ##
+         ## UIX
+         ##
+         #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
+      </div>
+    </div>
+
+    ##
+    ## Display the content of the drawer
+    ##
+    <ul class="drawer-menu">
+      ##
+      ## Administer wiki (import actually)
+      ##
+      #if ($hasGlobalAdmin)
+        #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
+        #if (!$isAdminAppInstalled)
+          ## If the admin application is not installed, we add a link to import it.
+          ## Otherwise, we let the admin application adds the correct UIX to administrate the wiki.
+          #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
+          #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
+          #drawerSeparator()
+        #end
+      #end
+      ##
+      ## Languages
+      ##
+      #template('menus_language.vm')
+      ##
+      ## UIX
+      ##
+      #displayDrawerUIX('org.xwiki.plaftorm.drawer')
+    </ul>
+  </nav>
+</div>
+#**
+ * Display the UI extensions.
+ *
+ * @param $name the name of the UI extension to display
+ *#
+#macro(displayDrawerUIX $name)
+  #set ($canHaveMenuSeparator = false)
+  #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
+    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      #if ("$!uix.getParameters().separator" == 'true' && $canHaveMenuSeparator)
+        #drawerSeparator()
+        #set ($canHaveMenuSeparator = false)
+      #end
+      #set ($content = $services.rendering.render($uix.execute(), 'html/5.0'))
+      $content
+      #if (!$canHaveMenuSeparator && $stringtool.isNotBlank($content))
+        #set ($canHaveMenuSeparator = true)
+      #end
+    #end
+  #end
+#end

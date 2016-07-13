@@ -1,0 +1,2 @@
+org.xwiki.search.solr.internal.rest.SOLRSearchSource
+org.xwiki.search.solr.internal.rest.WikisSearchQueryResourceImpl

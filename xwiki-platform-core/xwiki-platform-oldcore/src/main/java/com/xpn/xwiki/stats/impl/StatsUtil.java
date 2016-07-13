@@ -48,7 +48,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Utility class for statistics.
- * 
+ *
  * @version $Id$
  */
 public final class StatsUtil
@@ -183,7 +183,7 @@ public final class StatsUtil
 
     /**
      * The type of the period.
-     * 
+     *
      * @version $Id$
      * @since 1.4M1
      */
@@ -213,7 +213,7 @@ public final class StatsUtil
      * <li>"yyyMM" for {@link PeriodType#MONTH}</li>
      * </ul>
      * .
-     * 
+     *
      * @param date the date for which to return an integer representation.
      * @param type the date type. It can be {@link PeriodType#DAY} or {@link PeriodType#MONTH}.
      * @return the integer representation of the specified date.
@@ -276,20 +276,20 @@ public final class StatsUtil
      * @return the recent statistics actions stored in the session.
      * @since 1.4M1
      */
-    public static Collection< ? > getRecentActionFromSessions(XWikiContext context, String action)
+    public static Collection<?> getRecentActionFromSessions(XWikiContext context, String action)
     {
-        return (Collection< ? >) context.getRequest().getSession().getAttribute(SESSPROP_RECENT_PREFFIX + action);
+        return (Collection<?>) context.getRequest().getSession().getAttribute(SESSPROP_RECENT_PREFFIX + action);
     }
 
     /**
      * Store the recent statistics actions in the session.
-     * 
+     *
      * @param context the XWiki context from where to get the HTTP session session.
      * @param action the action id.
      * @param actions the actions.
      * @since 1.4M1
      */
-    public static void setRecentActionsFromSession(XWikiContext context, String action, Collection< ? > actions)
+    public static void setRecentActionsFromSession(XWikiContext context, String action, Collection<?> actions)
     {
         context.getRequest().getSession().setAttribute(SESSPROP_RECENT_PREFFIX + action, actions);
     }
@@ -316,7 +316,7 @@ public final class StatsUtil
 
     /**
      * Store the visit object in the session.
-     * 
+     *
      * @param session the session.
      * @param visitStat the visit object.
      * @since 1.4M1
@@ -363,7 +363,7 @@ public final class StatsUtil
      * <li>more than 30 minutes have elapsed from the previous request</li>
      * <li>the user is not the same</li>
      * </ul>
-     * 
+     *
      * @param context The context of this request.
      * @return The visiting session, retrieved from the database or created.
      * @since 1.4M1
@@ -419,7 +419,7 @@ public final class StatsUtil
 
     /**
      * Try to find the visit object in the database from cookie if it's not a new cookie, search by unique id otherwise.
-     * 
+     *
      * @param context the XWiki context.
      * @return the visit statistics object found.
      * @since 1.4M1
@@ -454,7 +454,7 @@ public final class StatsUtil
 
     /**
      * Indicate of the provided visit object has to be recreated.
-     * 
+     *
      * @param visitObject the visit object to validate.
      * @param context the XWiki context.
      * @return false if the visit object has to be recreated, true otherwise.
@@ -477,8 +477,8 @@ public final class StatsUtil
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Found visit with cookie " + visitObject.getCookie() + " in session " + session.getId()
-                        + " for request with cookie " + cookie.getValue());
+                    LOGGER.debug("Found visit with cookie " + visitObject.getCookie() + " in session "
+                        + session.getId() + " for request with cookie " + cookie.getValue());
                 }
 
                 valid = false;
@@ -498,7 +498,7 @@ public final class StatsUtil
 
     /**
      * Create and initialize a new visit statistics object.
-     * 
+     *
      * @param context the XWiki context.
      * @return the new visit statistics object.
      * @since 1.4M1
@@ -554,7 +554,7 @@ public final class StatsUtil
 
     /**
      * Search visit statistics object in the database based on cookie name.
-     * 
+     *
      * @param fieldName the field name.
      * @param fieldValue the field value.
      * @param context the XWiki context.
@@ -606,7 +606,7 @@ public final class StatsUtil
 
     /**
      * Search visit statistics object in the database based on cookie name.
-     * 
+     *
      * @param cookie the cookie name.
      * @param context the XWiki context.
      * @return the visit object, null if no object was found.
@@ -620,7 +620,7 @@ public final class StatsUtil
 
     /**
      * Search visit statistics object in the database based on visit unique id.
-     * 
+     *
      * @param uniqueID the visit unique id.
      * @param context the XWiki context.
      * @return the visit object.
@@ -634,7 +634,7 @@ public final class StatsUtil
 
     /**
      * Create a new visit cookie and return it.
-     * 
+     *
      * @param context the XWiki context.
      * @return the newly created cookie.
      * @since 1.4M1
@@ -651,9 +651,9 @@ public final class StatsUtil
         getCookieDomains(context);
         if (cookieDomains != null) {
             String servername = context.getRequest().getServerName();
-            for (int i = 0; i < cookieDomains.length; i++) {
-                if (servername.indexOf(cookieDomains[i]) != -1) {
-                    cookieDomain = cookieDomains[i];
+            for (String cookieDomain2 : cookieDomains) {
+                if (servername.indexOf(cookieDomain2) != -1) {
+                    cookieDomain = cookieDomain2;
                     break;
                 }
             }
@@ -675,7 +675,7 @@ public final class StatsUtil
 
     /**
      * Try to find the cookie of the current request or create it.
-     * 
+     *
      * @param context The context of this request.
      * @return true if the cookie is created.
      * @since 1.4M1
@@ -725,7 +725,7 @@ public final class StatsUtil
 
     /**
      * The list of users.
-     * 
+     *
      * @param pref field name in XWikiPreference
      * @param cfg field name in xwiki.cfg file
      * @param context the XWiki context
@@ -775,7 +775,7 @@ public final class StatsUtil
 
     /**
      * The list of users to filter when storing statistics.
-     * 
+     *
      * @param context the XWiki context
      * @return the list of users references
      * @throws XWikiException error when trying to resolve users
@@ -789,7 +789,7 @@ public final class StatsUtil
 
     /**
      * The list of users to filter in view request.
-     * 
+     *
      * @param context the XWiki context
      * @return the list of users references
      * @throws XWikiException error when trying to resolve users

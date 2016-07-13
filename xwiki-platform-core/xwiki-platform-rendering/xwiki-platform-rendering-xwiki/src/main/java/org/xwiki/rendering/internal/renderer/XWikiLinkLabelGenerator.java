@@ -26,9 +26,13 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
@@ -51,52 +55,188 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+    private EntityReferenceResolver<ResourceReference> resourceReferenceResolver;
+
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localReferenceSerializer;
 
     /**
      * {@inheritDoc}
+     * 
      * @since 2.5RC1
      */
     @Override
     public String generate(ResourceReference reference)
     {
-        String result;
+        StringBuilder result = new StringBuilder();
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(reference.getReference());
 
-        // Replace %w with the wiki name
-        result = format.replace("%w", documentReference.getWikiReference().getName());
-
-        // Replace %p with the page name
-        result = result.replace("%p", documentReference.getName());
-
-        // Replace %s with the space name
-        result = result.replace("%s", documentReference.getLastSpaceReference().getName());
-
-        // Replace %P with the page name in camel case + space
-        if (result.indexOf("%P") > -1) {
-            String normalizedPage = documentReference.getName().replaceAll("([a-z])([A-Z])", "$1 $2");
-            result = result.replace("%P", normalizedPage);
+        EntityReference resolvedReference = resourceReferenceResolver.resolve(reference, EntityType.DOCUMENT);
+        if (resolvedReference == null) {
+            throw new IllegalArgumentException(String.valueOf(reference));
         }
+        DocumentReference documentReference = new DocumentReference(resolvedReference);
 
-        // Replace %t with the document title and fall back to %p if the title is null or empty
-        if (result.indexOf("%t") > -1) {
-            try {
-                DocumentModelBridge document = this.documentAccessBridge.getDocument(documentReference);
-                if (StringUtils.isNotBlank(document.getTitle())) {
-                    result = result.replace("%t", document.getTitle());
-                } else {
-                    result = documentReference.getName();
+        for (int i = 0; i < format.length(); i++) {
+            char c = format.charAt(i);
+            if (c == '%' && i + 1 < format.length()) {
+                // Check first letter after '%'
+                i++;
+                char cc = format.charAt(i);
+                switch (cc) {
+                    case 's':
+                        // Replace %s with the full space name (e.g. space1.space2)
+                        result.append(getSpacesLabel(documentReference));
+                        break;
+                    case 'p':
+                        // Replace %p with the page name
+                        result.append(getPageLabel(documentReference));
+                        break;
+                    case 't':
+                        // Replace %t with the document title and fall back to %np if the title is null or empty
+                        result.append(getTitleLabel(documentReference));
+                        break;
+                    case 'P':
+                        // Replace %P with the page name in camel case + space
+                        result.append(getCamelPageLabel(documentReference));
+                        break;
+                    case 'w':
+                        // Replace %w with the wiki name
+                        result.append(getWikiLabel(documentReference));
+                        break;
+                    case 'l':
+                        if (i + 1 < format.length()) {
+                            i++;
+                            char ccc = format.charAt(i);
+                            if (ccc == 's') {
+                                // Replace %ls with the last space name
+                                result.append(getLastSpaceLabel(documentReference));
+                            } else {
+                                result.append(c);
+                                result.append(cc);
+                                result.append(ccc);
+                            }
+                        } else {
+                            result.append(c);
+                            result.append(cc);
+                        }
+                        break;
+                    case 'n':
+                        if (i + 1 < format.length()) {
+                            i++;
+                            char ccc = format.charAt(i);
+                            if (ccc == 'p') {
+                                // Replace %np with the page name if the name is not the default page name
+                                // (e.g. "WebHome") or with the last space name if it is.
+                                result.append(getNestedPageLabel(documentReference));
+                            } else {
+                                result.append(c);
+                                result.append(cc);
+                                result.append(ccc);
+                            }
+                        } else {
+                            result.append(c);
+                            result.append(cc);
+                        }
+                        break;
+                    case 'N':
+                        if (i + 1 < format.length()) {
+                            i++;
+                            char ccc = format.charAt(i);
+                            if (ccc == 'P') {
+                                // Replace %NP with the nested page name in camel case + space
+                                result.append(getCamelNestedPageLabel(documentReference));
+                            } else {
+                                result.append(c);
+                                result.append(cc);
+                                result.append(ccc);
+                            }
+                        } else {
+                            result.append(c);
+                            result.append(cc);
+                        }
+                        break;
+                    default:
+                        result.append(c);
+                        result.append(cc);
                 }
-            } catch (Exception e) {
-                // If there's an error (meaning the document cannot be retrieved from the database for some reason)
-                // the fall back to displaying %p
-                result = documentReference.getName();
+            } else {
+                result.append(c);
             }
         }
 
+        return result.toString();
+    }
+
+    private String getCamelNestedPageLabel(DocumentReference documentReference)
+    {
+        return convertCamelString(getNestedPageLabel(documentReference));
+    }
+
+    private String getLastSpaceLabel(DocumentReference documentReference)
+    {
+        return documentReference.getLastSpaceReference().getName();
+    }
+
+    private String getWikiLabel(DocumentReference documentReference)
+    {
+        return documentReference.getWikiReference().getName();
+    }
+
+    private String getCamelPageLabel(DocumentReference documentReference)
+    {
+        return convertCamelString(documentReference.getName());
+    }
+
+    private String convertCamelString(String value)
+    {
+        return value.replaceAll("([a-z])([A-Z])", "$1 $2");
+    }
+
+    private String getPageLabel(DocumentReference documentReference)
+    {
+        return documentReference.getName();
+    }
+
+    private String getSpacesLabel(DocumentReference documentReference)
+    {
+        return this.localReferenceSerializer.serialize(documentReference.getParent());
+    }
+
+    private String getNestedPageLabel(DocumentReference documentReference)
+    {
+        String result;
+        if (this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName().equals(
+            documentReference.getName()))
+        {
+            result = documentReference.getLastSpaceReference().getName();
+        } else {
+            result = documentReference.getName();
+        }
+        return result;
+    }
+
+    private String getTitleLabel(DocumentReference documentReference)
+    {
+        String result;
+        try {
+            DocumentModelBridge document = this.documentAccessBridge.getDocument(documentReference);
+            if (StringUtils.isNotBlank(document.getTitle())) {
+                result = document.getTitle();
+            } else {
+                // Title is empty, fall back to %np
+                result = getNestedPageLabel(documentReference);
+            }
+        } catch (Exception e) {
+            // If there's an error (meaning the document cannot be retrieved from the database for some reason)
+            // the fall back to displaying %np
+            result = getNestedPageLabel(documentReference);
+        }
         return result;
     }
 }

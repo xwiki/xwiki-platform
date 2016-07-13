@@ -103,9 +103,8 @@ public class ListPropertyTest extends AbstractComponentTestCase
     public void toText()
     {
         ListProperty listProperty = new ListProperty();
-        listProperty.setFormStringSeparator("*");
         listProperty.setValue(Arrays.asList("c<b>a", "3\"2'1", "z{y&x"));
-        Assert.assertEquals("c<b>a*3\"2'1*z{y&x", listProperty.toText());
+        Assert.assertEquals("c<b>a|3\"2'1|z{y&x", listProperty.toText());
     }
 
     /**
@@ -117,5 +116,16 @@ public class ListPropertyTest extends AbstractComponentTestCase
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("o<n>e", "t\"w'o", "t{h&ree"));
         Assert.assertEquals("o&#60;n&#62;e|t&#34;w&#39;o|t&#123;h&#38;ree", listProperty.toFormString());
+    }
+
+    /**
+     * Tests that {@link ListProperty#toText()} properly joins values containing the separator itself.
+     */
+    @Test
+    public void toTextValuesWithEscapedSeparators()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a|b", "c|d", "e\\|f"));
+        Assert.assertEquals("a\\|b|c\\|d|e\\\\|f", listProperty.toText());
     }
 }

@@ -1,0 +1,23 @@
+#set ($discard = $xwiki.ssfx.use('uicomponents/rating/rating.css', true))
+
+###
+###    Display rating stars UI
+###
+###
+#macro(ratingstars $id $cssclass $ratinglabel $rating $nbVotes $locked)
+#set($width = $rating * 20)
+<div class="rating-container $cssclass" id="$id">
+    <div class="rating-header $cssclass">$ratinglabel</div>
+    <div class="rating-stars">
+        <ul class="star-rating ${cssclass}-star #if($locked) locked #end">
+            <li class="current-rating" style="width:${width}%;"></li>
+            #set($cls = ["one-star", "two-stars", "three-stars", "four-stars", "five-stars"])
+            #foreach($r in [1..5])
+                #set($i = $r - 1)
+                <li><a href="#" title="$services.localization.render("rating.${cls.get($i)}")" class="$cls.get($i)">$r</a></li>
+            #end
+        </ul>
+    </div>
+    <div class="rating-message">#if($nbVotes != "")<span>$nbVotes</span>&nbsp;$services.localization.render('rating.votes')#end</div>
+</div>
+#end

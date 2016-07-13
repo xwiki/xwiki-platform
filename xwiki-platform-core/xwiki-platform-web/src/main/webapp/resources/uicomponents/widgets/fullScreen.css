@@ -9,7 +9,15 @@
   cursor: pointer;
   display: block;
   margin-top: -1.4em;
+  position: relative;
   text-align: right;
+}
+/* The 'fullScreenEditLinkContainer' is displayed in the same row that the '#toggleLineNumbers' link because of
+   'margin-top: -1.4em' and that makes it impossible to click (see: http://jira.xwiki.org/browse/XWIKI-11228).
+   So we set the z-index of this element to be on top. */
+#toggleLineNumbers {
+  position: relative; /* needed by the z-index attribute */
+  z-index: 1;
 }
 
 /* Matches the style of the new object editor */
@@ -26,11 +34,6 @@
 .leftmenu2 .fullScreenEditButton, .leftmenu2 .fullScreenCloseButton {
   margin: 2px;
   float: right;
-}
-.mceToolbar .fullScreenEditButton, .mceToolbar .fullScreenCloseButton {
-  padding: 2px;
-  width: 16px;
-  height: 16px;
 }
 .gwt-MenuBar .fullScreenEditButton, .gwt-MenuBar .fullScreenCloseButton {
   float: right;
@@ -56,14 +59,6 @@
   display: none !important;
 }
 
-.fullScreenWrapper .mceEditorContainer {
-  height: auto !important;
-}
-.fullScreenWrapper table.mceEditor {
-  height: auto !important;
-  margin: 0 !important;
-  border: none !important;
-}
 * html .fullScreenWrapper {
   position: absolute !important;
 }
@@ -76,7 +71,8 @@
   white-space: normal;
 }
 /* This overrides a rule for the Object Editor that is supposed to resize text inputs. */
-#body .fullScreenWrapper .buttons .buttonwrapper input {
+#body .fullScreenWrapper .buttons .buttonwrapper input, 
+#body .fullScreenWrapper .btn {
   width: auto;
 }
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {

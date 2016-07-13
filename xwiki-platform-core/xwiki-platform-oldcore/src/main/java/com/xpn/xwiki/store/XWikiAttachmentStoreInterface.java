@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Interface for Attachment store system.
- * 
+ *
  * @version $Id$
  */
 @Role

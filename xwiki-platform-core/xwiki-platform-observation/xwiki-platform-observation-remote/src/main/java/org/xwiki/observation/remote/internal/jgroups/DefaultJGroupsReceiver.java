@@ -35,7 +35,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 /**
  * Default implementation of JGroupsReceiver. Receive remote events and send them as is to
  * {@link RemoteObservationManager} to be converted and injected as local events.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -67,13 +67,13 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     {
         if (this.remoteObservationManager == null) {
             try {
-                this.remoteObservationManager = componentManager.getInstance(RemoteObservationManager.class);
+                this.remoteObservationManager = this.componentManager.getInstance(RemoteObservationManager.class);
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to lookup the Remote Observation Manager.", e);
             }
         }
 
-        return remoteObservationManager;
+        return this.remoteObservationManager;
     }
 
     @Override

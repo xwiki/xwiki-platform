@@ -60,6 +60,7 @@ public class IEPasteManager extends PasteManager implements BeforePasteHandler
      * {@inheritDoc}
      * <p>
      * {@link Document#getScrollTop()} and {@link Document#getScrollLeft()} are broken for nested documents in IE9.
+     * </p>
      * 
      * @see <a href="http://code.google.com/p/google-web-toolkit/issues/detail?id=6256">getAbsoluteTop/getScrollTop
      *      returns wrong values for IE9 when body has been scrolled</a>

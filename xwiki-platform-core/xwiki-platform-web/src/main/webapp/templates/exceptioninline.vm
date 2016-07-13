@@ -1,6 +1,14 @@
-#set($message = $xwiki.parseMessage())
+#if ($response.status <= 200)
+  $response.setStatus(500)
+#end
+#set($message = $xcontext.message)
 #if($message)
-  #xwikimessageboxstart($services.localization.render('notice') $message)
+  #if ("$!xcontext.messageParameters" != '')
+    #set ($renderedText = $services.localization.render($message, $!xcontext.messageParameters))
+  #else
+    #set ($renderedText = $services.localization.render($message))
+  #end
+  #xwikimessageboxstart($services.localization.render('notice') $renderedText)
   #xwikimessageboxend()
 #else
   #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('problemoccured'))

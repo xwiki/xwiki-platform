@@ -41,6 +41,15 @@ public class AuthorizationException extends Exception
 
     /**
      * @param message Message.
+     * @see java.lang.Exception
+     */
+    public AuthorizationException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * @param message Message.
      * @param cause Original cause.
      * @see java.lang.Exception
      */

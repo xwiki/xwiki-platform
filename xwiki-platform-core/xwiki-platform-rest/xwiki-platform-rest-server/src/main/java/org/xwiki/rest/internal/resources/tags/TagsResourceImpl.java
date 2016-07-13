@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.tags;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -35,18 +37,19 @@ import org.xwiki.rest.model.jaxb.Tags;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
 import org.xwiki.rest.resources.tags.TagsResource;
 
-@Component("org.xwiki.rest.internal.resources.tags.TagsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.tags.TagsResourceImpl")
 public class TagsResourceImpl extends XWikiResource implements TagsResource
 {
     @Override
     public Tags getTags(String wikiName) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
             Tags tags = objectFactory.createTags();
 
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<String> tagNames = getAllTags();
 
@@ -68,7 +71,7 @@ public class TagsResourceImpl extends XWikiResource implements TagsResource
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 

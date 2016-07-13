@@ -54,6 +54,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class PasteManager implements PasteHandler, CopyHandler
 {
     /**
+     * The name of the property that stores a reference to the default content on the paste container element so that we
+     * can determine if the user has pasted something (i.e. the content of the paste container has changed) or not.
+     */
+    private static final String DEFAULT_CONTENT_KEY = "__defaultContent";
+
+    /**
      * The object used to filter the pasted content before cleaning it on the server.
      */
     private final PasteFilter pasteFilter = GWT.create(PasteFilter.class);
@@ -157,6 +163,9 @@ public class PasteManager implements PasteHandler, CopyHandler
         pasteContainer.getStyle().setOverflow(Overflow.HIDDEN);
         // Insert a text node (a non-breaking space) in the paste container to make sure the selection stays inside.
         pasteContainer.appendChild(document.createTextNode("\u00A0"));
+        // Put a reference to the default content (the text node we just inserted) on the paste container to be able to
+        // determine if the user has pasted something or not.
+        pasteContainer.setPropertyObject(DEFAULT_CONTENT_KEY, pasteContainer.getFirstChild());
         // Insert the paste container and select its contents.
         document.getBody().appendChild(pasteContainer);
         selectPasteContainer(pasteContainer);
@@ -196,8 +205,13 @@ public class PasteManager implements PasteHandler, CopyHandler
      */
     private void onAfterPaste(Element pasteContainer)
     {
-        pasteFilter.filter(pasteContainer);
-        String pasteContent = pasteContainer.xGetInnerHTML();
+        String pasteContent = "";
+        if (hasContentBeenPastedIn(pasteContainer)) {
+            pasteFilter.filter(pasteContainer);
+            pasteContent = pasteContainer.xGetInnerHTML();
+        }
+
+        pasteContainer.removeProperty(DEFAULT_CONTENT_KEY);
         pasteContainer.removeFromParent();
 
         selectionPreserver.restoreSelection();
@@ -207,6 +221,17 @@ public class PasteManager implements PasteHandler, CopyHandler
         } else if (pasteContent.length() > 0) {
             paste(pasteContent);
         }
+    }
+
+    /**
+     * @param pasteContainer the element were the paste content should have been inserted
+     * @return {@code true} if the content of the paste container has changed (the default content was overwritten by
+     *         the pasted content), {@code false} otherwise
+     */
+    private boolean hasContentBeenPastedIn(Element pasteContainer)
+    {
+        return pasteContainer.getChildCount() != 1
+            || pasteContainer.getPropertyObject(DEFAULT_CONTENT_KEY) != pasteContainer.getFirstChild();
     }
 
     @Override

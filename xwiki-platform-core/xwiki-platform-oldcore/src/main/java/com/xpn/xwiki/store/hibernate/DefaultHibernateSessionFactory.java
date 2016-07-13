@@ -27,28 +27,34 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.util.xml.XmlDocument;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.DisposePriority;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 
 import com.xpn.xwiki.util.Util;
 
 /**
  * Default implementation for {@link HibernateSessionFactory}.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
 // TODO: This was coded by Artem. Find out why we need this as a component.
 @Component
 @Singleton
-public class DefaultHibernateSessionFactory implements HibernateSessionFactory
+@DisposePriority(10000)
+public class DefaultHibernateSessionFactory implements HibernateSessionFactory, Disposable
 {
     /**
      * The logger to log.
@@ -61,6 +67,27 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
      */
     @Inject
     private org.xwiki.environment.Environment environment;
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // TODO: See http://jira.xwiki.org/jira/browse/XWIKI-471. Note that this code currently duplicates
+        // XWikiHibernateBaseStore.shutdownHibernate() which is not public and getting a Store implementation from
+        // this component is very difficult since there's no XWikiContext and the store used is defined in xwiki.cfg
+        SessionFactory sessionFactory = getSessionFactory();
+        if (sessionFactory != null) {
+            // Close all connections in the Connection Pool.
+            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+            // See http://bit.ly/QAJXlr
+            ConnectionProvider provider = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
+            // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is
+            // the following: if the user has configured Hibernate to use a Data Source then Hibernate will use
+            // the DatasourceConnectionProvider class which has a close() method that doesn't do anything...
+            if (provider != null) {
+                provider.close();
+            }
+        }
+    }
 
     /**
      * Hibernate configuration object.
@@ -141,7 +168,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         public void add(XmlDocument metadataXml)
         {
             Element basePropertyElement = selectChildClassMappingElement(metadataXml.getDocumentTree().getRootElement(),
-                                                                         "class", "com.xpn.xwiki.objects.BaseProperty");
+                "class", "com.xpn.xwiki.objects.BaseProperty");
             if (basePropertyElement != null) {
                 decorateDBStringListMapping(basePropertyElement);
             }
@@ -181,14 +208,16 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
             final String collectionType = "com.xpn.xwiki.internal.objects.ListPropertyCollectionType";
 
             Element listClassElement = selectChildClassMappingElement(basePropertyElement, "joined-subclass",
-                                                                      className);
+                className);
 
             if (listClassElement != null) {
                 Element listElement = listClassElement.element("list");
                 if (listElement != null) {
                     listElement.addAttribute("collection-type",
-                                              collectionType);
-                    logger.debug("Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType, className);
+                        collectionType);
+                    DefaultHibernateSessionFactory.this.logger.debug(
+                        "Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType,
+                        className);
                 }
             }
         }
@@ -205,9 +234,9 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         }
 
         /**
-         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-         * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value
-         * coming from the XWiki configuration.
+         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that
+         * right now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the
+         * value coming from the XWiki configuration.
          *
          * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
          */

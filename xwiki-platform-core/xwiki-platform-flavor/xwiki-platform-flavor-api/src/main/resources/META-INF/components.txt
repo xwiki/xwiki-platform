@@ -1,0 +1,4 @@
+org.xwiki.platform.flavor.internal.DefaultFlavorManager
+org.xwiki.platform.flavor.internal.job.FlavorSearchJob
+org.xwiki.platform.flavor.internal.safe.FlavorSearchStatusScriptSafeProvider
+org.xwiki.platform.flavor.script.FlavorManagerScriptService

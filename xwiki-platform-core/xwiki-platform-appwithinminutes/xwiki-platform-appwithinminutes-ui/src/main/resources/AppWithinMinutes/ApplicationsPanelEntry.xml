@@ -1,29 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>ApplicationsPanelEntry</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AppWithinMinutes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1346932969000</creationDate>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1346932969000</date>
   <contentUpdateDate>1346932969000</contentUpdateDate>
   <version>1.1</version>
   <title>Applications Panel Entry</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
   <object>
+    <name>AppWithinMinutes.ApplicationsPanelEntry</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>bd6c12e2-458d-4ce0-9d90-346e2b19a336</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -56,7 +77,7 @@
         <disabled>0</disabled>
         <name>name</name>
         <number>2</number>
-        <prettyName>Extension Name</prettyName>
+        <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
@@ -81,17 +102,13 @@
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>AppWithinMinutes.ApplicationsPanelEntry</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>bd6c12e2-458d-4ce0-9d90-346e2b19a336</guid>
     <property>
       <content/>
     </property>
@@ -103,12 +120,13 @@
     </property>
     <property>
       <parameters>label=$services.localization.render('platform.appwithinminutes.appPanelCreateEntry')
-target=AppWithinMinutes.WebHome
+## Only users with the right to create spaces should see the Create Applications since currently AWM creates a new space
+## to hold the application.
+target=#if ($hasCreateSpace)AppWithinMinutes.WebHome#end
 icon=icon:bullet_go</parameters>
     </property>
     <property>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{include document="XWiki.UIExtensionSheet" /}}</content>
 </xwikidoc>

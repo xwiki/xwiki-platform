@@ -25,17 +25,21 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.LocalizationContext;
+import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Defines an XClass property type whose value is a Date.
- * 
+ *
  * @version $Id$
  */
 public class DateClass extends PropertyClass
@@ -64,8 +68,13 @@ public class DateClass extends PropertyClass
     private static final String META_PROPERTY_DATE_FORMAT = "dateFormat";
 
     /**
+     * Used to get the current locale.
+     */
+    private LocalizationContext localizationContext;
+
+    /**
      * Creates a new Date property that is described by the given meta class.
-     * 
+     *
      * @param metaClass the meta class that defines the list of meta properties associated with this property type
      */
     public DateClass(PropertyMetaClass metaClass)
@@ -96,7 +105,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets whether to use a date picker or not to select the date in edit mode.
-     * 
+     *
      * @param picker {@code 1} to use a date picker, {@code 0} otherwise
      */
     public void setPicker(int picker)
@@ -114,7 +123,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets the size of the date input in edit mode.
-     * 
+     *
      * @param size the size of the date input in edit mode
      */
     public void setSize(int size)
@@ -132,7 +141,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets whether an empty date value represents the current date or not.
-     * 
+     *
      * @param emptyIsToday {@code 1} if an empty date value should represent the current date, {@code 0} otherwise
      */
     public void setEmptyIsToday(int emptyIsToday)
@@ -150,7 +159,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets the date format.
-     * 
+     *
      * @param format the new date format
      */
     public void setDateFormat(String format)
@@ -171,7 +180,7 @@ public class DateClass extends PropertyClass
         }
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
+            SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat(), getCurrentLocale());
             property.setValue(sdf.parse(value));
             return property;
         } catch (ParseException e) {
@@ -193,7 +202,8 @@ public class DateClass extends PropertyClass
      */
     public String toFormString(BaseProperty property)
     {
-        return property.getValue() == null ? "" : new SimpleDateFormat(getDateFormat()).format(property.getValue());
+        return property.getValue() == null ? "" : new SimpleDateFormat(getDateFormat(), getCurrentLocale())
+            .format(property.getValue());
     }
 
     /**
@@ -202,6 +212,7 @@ public class DateClass extends PropertyClass
      * We have to overwrite this method because the value of a date property is not serialized using the date format
      * specified in the XClass nor the time stamp but a custom hard-coded date format.. Changing this now will break
      * existing XARs..
+     * </p>
      */
     @Override
     public BaseProperty newPropertyfromXML(Element element)
@@ -215,7 +226,7 @@ public class DateClass extends PropertyClass
 
         // FIXME: The value of a date property should be serialized using the date timestamp or the date format
         // specified in the XClass the date property belongs to.
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+        SimpleDateFormat sdf = DateXarObjectPropertySerializer.DEFAULT_FORMAT;
         try {
             property.setValue(sdf.parse(value));
         } catch (ParseException e) {
@@ -232,5 +243,25 @@ public class DateClass extends PropertyClass
             }
         }
         return property;
+    }
+
+    private LocalizationContext getLocalizationContext()
+    {
+        if (this.localizationContext == null) {
+            this.localizationContext = Utils.getComponent(LocalizationContext.class);
+        }
+        return this.localizationContext;
+    }
+
+    private Locale getCurrentLocale()
+    {
+        try {
+            return getLocalizationContext().getCurrentLocale();
+        } catch (Exception e) {
+            Locale defaultLocale = Locale.getDefault();
+            LOGGER.warn("Failed to get the context locale: [{}]. Continue using the default JVM locale [{}].",
+                ExceptionUtils.getRootCauseMessage(e), defaultLocale);
+            return defaultLocale;
+        }
     }
 }

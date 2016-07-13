@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Main</web>
+  <name>SolrSearchConfig</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1393242543000</creationDate>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1433249908000</date>
+  <contentUpdateDate>1433249908000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set ($__defaultSolrConfig = {
+  'queryFields': {
+    'DOCUMENT': 'title^10.0 name^10.0
+                 doccontent^2.0
+                 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4
+                 author_display^0.08 creator_display^0.08
+                 comment^0.016 attauthor_display^0.016 spaces^0.016',
+    'ATTACHMENT': 'filename^5.0 attcontent attauthor_display^0.2',
+    'OBJECT': 'objcontent',
+    'OBJECT_PROPERTY': 'propertyvalue'
+  },
+  'sortFields': {
+    'DOCUMENT': {
+      'score': 'desc',
+      'title_sort': 'asc',
+      'date': 'desc',
+      'author_display_sort': 'asc'
+    },
+    'ATTACHMENT': {
+      'score': 'desc',
+      'filename_sort': 'asc',
+      'attsize_sort': 'asc',
+      'attdate_sort': 'desc',
+      'attauthor_display_sort': 'asc'
+    }
+  },
+  'filterQuery': [],
+  'facetFields': ['type', 'wiki', 'space_facet', 'locale', 'author', 'creator', 'date',
+    'creationdate', 'class', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+  'facetQuery': {
+    'type': 'DOCUMENT',
+    'locale': ["$xcontext.locale", '']
+  },
+  'facetEnabled': true,
+  'facetDisplayers': {
+    'type': 'Main.SolrTypeFacet',
+    'wiki': 'Main.SolrWikiFacet',
+    'space_facet': 'Main.SolrSpaceFacet',
+    'locale': 'Main.SolrLocaleFacet',
+    'author': 'Main.SolrUserFacet',
+    'creator': 'Main.SolrUserFacet',
+    'attauthor': 'Main.SolrUserFacet',
+    'date': 'Main.SolrDateFacet',
+    'creationdate': 'Main.SolrDateFacet',
+    'attdate': 'Main.SolrDateFacet',
+    'class': 'Main.SolrClassFacet',
+    'attsize': 'Main.SolrFileSizeFacet',
+    'mimetype': 'Main.SolrMediaTypeFacet'
+  },
+  'facetDisplayersByPropertyType': {
+    'Date': 'Main.SolrDateFacet',
+    'Users': 'Main.SolrUserFacet',
+    'Groups': 'Main.SolrUserFacet'
+  },
+  'facetPaginationStep': 5,
+  'facet': {
+    'mediaType': {
+      'categories': {
+        'text': ['text/', 'application/xml', 'application/javascript', 'application/ecmascript',
+          'application/json', 'application/x-sh', '+xml'],
+        'image': ['image/'],
+        'office': ['application/pdf', 'application/postscript', 'application/msword', 'application/vnd.ms-',
+          'application/vnd.oasis.opendocument.', 'application/vnd.openxmlformats-officedocument.'],
+        'archive': ['application/zip', 'application/x-gzip', 'application/x-bzip', 'application/x-tar',
+          'application/x-gtar', 'application/vnd.xara', '-archive', '-compressed', '-package', '+zip'],
+        'audio': ['audio/'],
+        'video': ['video/'],
+        'font': ['application/font-', 'application/x-font-']
+      },
+      'subcategories': {
+        'office': {
+          'word': ['application/msword', 'application/vnd.ms-word.', 'application/vnd.oasis.opendocument.text',
+            'application/vnd.openxmlformats-officedocument.word'],
+          'presentation': ['application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.presentation',
+            'application/vnd.openxmlformats-officedocument.presentation'],
+          'spreadsheet': ['application/vnd.ms-excel', 'application/vnd.oasis.opendocument.spreadsheet',
+            'application/vnd.openxmlformats-officedocument.spreadsheet']
+        }
+      }
+    },
+    'fileSize': {
+      'intervals': [
+        {
+          'id': 'tiny',
+          'end': 10240
+        }, {
+          'id': 'small',
+          'start': 10240,
+          'end': 512000
+        }, {
+          'id': 'medium',
+          'start': 512000,
+          'end': 5242880
+        }, {
+          'id': 'large',
+          'start': 5242880
+        }
+      ]
+    }
+  },
+  'wikisSearchableFromMainWiki': $wikisSearchableFromMainWiki,
+  'highlightEnabled' : true
+})
+
+#if (!$xcontext.isMainWiki() || !$xwiki.hasSubWikis())
+  ## Subwikis search by default in their content only so it doesn't make sense to display the wiki facet.
+  ## It also doesn't make sense to display the wiki facet if there is a single wiki.
+  #set ($discard = $__defaultSolrConfig.facetFields.remove('wiki'))
+#end
+
+#if ($solrConfig)
+  ## Merge the provided configuration with the default configuration.
+  #set ($discard = $__defaultSolrConfig.putAll($solrConfig))
+#end
+#set ($solrConfig = $__defaultSolrConfig)
+{{/velocity}}</content>
+</xwikidoc>

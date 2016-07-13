@@ -267,9 +267,7 @@ public class ImageConfigWizardStep extends AbstractInteractiveWizardStep impleme
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -300,9 +298,7 @@ public class ImageConfigWizardStep extends AbstractInteractiveWizardStep impleme
         Scheduler.get().scheduleDeferred(new FocusCommand(widthBox));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         String altText = altTextBox.getText().trim();
@@ -315,16 +311,12 @@ public class ImageConfigWizardStep extends AbstractInteractiveWizardStep impleme
         async.onSuccess(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         return entityLink;
@@ -340,27 +332,19 @@ public class ImageConfigWizardStep extends AbstractInteractiveWizardStep impleme
         return NavigationDirection.FINISH;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         navigationListeners.add(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
-     */
+    @Override
     public void onKeyPress(KeyPressEvent event)
     {
         if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {

@@ -51,11 +51,7 @@ public class InsertRowAfter extends AbstractTableFeature
         super(NAME, new Command(NAME), Strings.INSTANCE.insertRowAfter(), plugin);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         TableCellElement currentCell =
@@ -65,11 +61,7 @@ public class InsertRowAfter extends AbstractTableFeature
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled()

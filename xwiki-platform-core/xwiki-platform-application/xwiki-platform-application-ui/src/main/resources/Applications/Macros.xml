@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="Applications.Macros" locale="">
+  <web>Applications</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1465912281000</creationDate>
+  <parent>Applications.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1465912816000</date>
+  <contentUpdateDate>1465912281000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Macros</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (displayAppEntry $params)
+  #if ($params.icon.startsWith('icon:'))
+    #set ($icon = $services.icon.renderHTML($params.icon.substring(5)))
+  #else
+    #set ($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'),
+      'xhtml/1.0'))
+  #end
+  &lt;li&gt;
+    &lt;a href="$xwiki.getURL($params.target, 'view', $!{params.targetQueryString})" title="$escapetool.xml($params.label)"&gt;
+      &lt;span class="application-img"&gt;$icon&lt;/span&gt;
+      &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+#end
+
+#macro (maybeDisplayAppEntry $uix $configDoc)
+  #set ($params = $uix.getParameters())
+  #set ($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id))
+  #set ($targetReference = $services.model.resolveDocument($params.target))
+  #if (!$blackListObj &amp;&amp; "$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != ''
+      &amp;&amp; $services.security.authorization.hasAccess('view', $targetReference))
+    #displayAppEntry($params)
+  #end
+#end
+
+#macro (displayAppEntries $extensionPointId $configDoc)
+  #foreach ($uix in $services.uix.getExtensions($extensionPointId, {'sortByParameter': 'label'}))
+    #maybeDisplayAppEntry($uix $configDoc)
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

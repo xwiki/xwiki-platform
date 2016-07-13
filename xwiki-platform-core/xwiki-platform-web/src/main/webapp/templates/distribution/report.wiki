@@ -1,0 +1,125 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{velocity}}
+  #if ($request.document)
+    #set($actionDocumentReference = $services.model.resolveDocument($request.document))
+    #set($actionDocumentLocale = $services.localization.toLocale($!request.document_locale))
+    #set($actionDocumentReference = $services.model.createDocumentReference($actionDocumentReference, $actionDocumentLocale))
+    #set($actionDocument = $xwiki.getDocument($actionDocumentReference))
+    #if ($request.get('documentaction_delete.x'))
+      #if (!$actionDocument.isNew())
+        #set($void = $actionDocument.delete())
+        {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentDeletedSuccess', "**${request.document}**"){{/info}}
+      #end
+    #elseif ($request.get('documentaction_rollback.x'))
+      #if ($request.previousVersion)
+        #set($actionDocument = $xwiki.getDocument($request.document))
+        #if ($actionDocument.isNew())
+          ## We hope it's not been deleted and created several times (and we also hope recycle bin hasn't been skipped)
+          #set($void = $xwiki.xWiki.restoreFromRecycleBin($actionDocument.document, 'Restored from recycle bin', $xcontext.context))
+          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRestoredSuccess', "**${request.document}**"){{/info}}
+          ## TODO: also make sure it's the rigth version and if not rollback it to the right version
+        #else
+          #set($void = $xwiki.xWiki.rollback($actionDocument.document, $request.previousVersion, $xcontext.context))
+          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRollbackedSuccess', ["**${request.document}**", "**${request.previousVersion}**"]){{/info}}
+        #end
+      #end
+    #end
+  #end
+{{/velocity}}
+
+{{velocity output="false"}}
+  #set($modifiedWikis = $services.distribution.modifiedDocumentsTree)
+  #set($deletedIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/cross.png')))
+  #set($rollbackIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/arrow_undo.png')))
+
+  #macro(displayReportPageActions, $status)
+    ## TODO: use ajax instead if JS is enabled
+    <form class="actions" method="post">
+      <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
+      <input type="hidden" name="document_locale" value="$!{status.reference.locale}"/>
+      #if ($status.previousVersion)
+        <input type="hidden" name="previousVersion" value="$status.previousVersion"/>
+      #end
+
+      #if ($status.action.toString() != 'DELETED')
+        <input type="image" class="icon" src="$deletedIconSrc" name="documentaction_delete" alt="delete" />
+      #end
+      #if ($status.previousVersion)
+        <input type="image" class="icon" src="$rollbackIconSrc" name="documentaction_rollback" alt="rollback" />
+      #end
+    </form>
+  #end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!{request.action}" == '')
+  {{translation key="platform.extension.distributionWizard.reportStepDescription"/}} 
+
+  = {{translation key="platform.extension.distributionWizard.reportStepDocumentsTitle"/}} =
+
+  {{translation key="platform.extension.distributionWizard.reportStepDocumentsDescription"/}} 
+
+  #if (!$modifiedWikis.isEmpty())
+    {{html}}
+    #set ($currentLocale = $services.localization.currentLocale)
+    <ul class="collapsible document-tree">
+      #foreach ($wiki in $sorttool.sort($modifiedWikis.keySet()))
+        <li>
+          #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
+          #if ("$!wikiPrettyName.trim()" == '')
+            #set ($wikiPrettyName = $wiki)
+          #end
+          <div class="wiki node">$escapetool.xml($wikiPrettyName)</div>
+          <ul>
+            ## TODO: add support for sub-spaces
+            #foreach ($space in $modifiedWikis.get($wiki).keySet())
+              <li class="collapsed">
+                <div class="space node">$escapetool.xml($space)</div>
+                <ul>
+                  ## List each document in the space.
+                  #foreach ($page in $modifiedWikis.get($wiki).get($space).keySet())
+                    ## List each locale of the document
+                    #set ($locales = $modifiedWikis.get($wiki).get($space).get($page))
+                    #set ($rootLocale = $locales.get(''))
+                    #if ($locales.size() == 1)
+                      <li class="$!rootLocale.action.toString().toLowerCase() document node">$escapetool.xml($page)
+                        #displayReportPageActions($rootLocale)
+                      </li>
+                    #else
+                      <li class="collapsed">
+                        <div class="document node">$escapetool.xml($page)</div>
+                        <ul>
+                          #foreach ($document in $modifiedWikis.get($wiki).get($space).get($page).values())
+                            #if ("$!document.reference.locale" == '')
+                              #set ($locale = $services.localization.render(
+                                'platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage'))
+                            #else
+                              #set ($locale = $document.reference.locale.getDisplayName($currentLocale))
+                            #end
+                            <li class="$!document.action.toString().toLowerCase() locale node">$escapetool.xml($locale)
+                              #displayReportPageActions($document)
+                            </li>
+                          #end
+                        </ul>
+                      </li>
+                    #end
+                  #end
+                </ul>
+              </li>
+            #end
+          </ul>
+        </li>
+      #end
+    </ul>
+    {{/html}}
+  #else
+    {{translation key="platform.extension.distributionWizard.reportStepDocumentsNoChange"/}}
+  #end
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+#set ($showCompleteStepButton = true)
+{{/velocity}}

@@ -55,11 +55,7 @@ public final class TablePluginFactory extends AbstractPluginFactory
         return instance;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PluginFactory#newInstance()
-     */
+    @Override
     public Plugin newInstance()
     {
         return new TablePlugin();

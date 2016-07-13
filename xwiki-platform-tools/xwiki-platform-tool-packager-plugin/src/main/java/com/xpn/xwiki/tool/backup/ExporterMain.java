@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * Class to call from the command line to export XWiki documents found in a database to the file system.
- * 
+ *
  * @version $Id$
  */
 public final class ExporterMain
@@ -37,7 +37,7 @@ public final class ExporterMain
 
     /**
      * Command line hook so that the exporter can be called directly on the command line.
-     * 
+     *
      * @param args the first argument is the directory where to export the documents, the second argument is some
      *            database name (TODO: find out what this name is really) and the third argument is the Hibernate config
      *            fill containing the database definition (JDBC driver, username and password, etc)

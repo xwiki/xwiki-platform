@@ -525,8 +525,14 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:apply-templates select="." mode="transform"/>
     </xsl:template>
 
-    <!-- The 'style' preprocessor, which takes care of a few CSS properties that need special handling in FO -->
-    <xsl:template match="*[@style]" mode="preprocess">
+    <!-- The 'style' preprocessor, which takes care of a few CSS properties that need special handling in FO.
+
+         Note: Starting with css4j 0.16, css4j applies styles to all elements, including the body tag. For example:
+           <body class="exportbody" id="body" pdfcover="0" pdftoc="0" style="display: block; margin: 8pt; ">
+         As a result we need to exclude the body tag from being processed as otherwise it would lead to a fo:block
+         being issued at the wrong place.
+    -->
+    <xsl:template match="*[@style and not(self::html:body)]" mode="preprocess">
         <!-- Remove all white space and prepend ; for easier processing of the style -->
         <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
         <!-- Chain the 'style' processing into several named templates -->
@@ -807,7 +813,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                             <fo:conditional-page-master-reference page-position="rest" master-reference="rest"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <fo:conditional-page-master-reference page-position="all" master-reference="rest"/>
+                            <fo:conditional-page-master-reference page-position="any" master-reference="rest"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </fo:repeatable-page-master-alternatives>
@@ -825,7 +831,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:variable name="need-toc">
            <xsl:value-of select="@pdftoc"/>
         </xsl:variable>
-        <fo:page-sequence master-reference="all-pages">
+        <fo:page-sequence master-reference="all-pages" id="x-page-sequence">
             <fo:title>
                 <xsl:value-of select="/html:html/html:head/html:title[@class='pdftitle']"/>
             </fo:title>
@@ -870,8 +876,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                         <fo:block text-align="left" font-weight="bold" font-size="12pt"  padding-top="10pt" padding-bottom="10pt">
                             <xsl:apply-templates  select="/html:html/html:body/html:div[@class='pdftoc']" mode="pdftoc" />
                         </fo:block>
-                        <xsl:for-each select="//html:div[@id='xwikicontent' or @id='xwikimaincontainerinner']
-                                /html:*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
+                        <xsl:for-each select="//html:div[@id='xwikicontent']/html:*[local-name() = 'h1'
+                              or local-name() = 'h2' or local-name() = 'h3']">
                             <fo:block font-size="9pt" start-indent="10pt" width="100%" text-align-last="justify" >
                                 <xsl:choose>
                                     <xsl:when test="self::html:h1">
@@ -957,7 +963,11 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:template match="/html:html/html:body/html:div[@class='pdftoc']" priority="1" mode="preprocess"/>
 
     <xsl:template match="html:span[@class='page-number']" mode="preprocess">
-          <fo:page-number/>
+        <fo:page-number/>
+    </xsl:template>
+
+    <xsl:template match="html:span[@class='page-total']" mode="preprocess">
+        <fo:page-number-citation-last ref-id="x-page-sequence"/>
     </xsl:template>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

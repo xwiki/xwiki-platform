@@ -26,11 +26,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.font;
  */
 public class DefaultStringMatcher implements Matcher<String>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Matcher#match(Object, Object)
-     */
+    @Override
     public boolean match(String leftValue, String rightValue)
     {
         return leftValue == null ? rightValue == null : leftValue.equalsIgnoreCase(rightValue);

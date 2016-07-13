@@ -28,7 +28,7 @@ package com.xpn.xwiki.web.sx;
 public interface SxSource
 {
     /** Cache policies available for extensions. */
-    public enum CachePolicy
+    enum CachePolicy
     {
         /**
          * Cache for a long time.

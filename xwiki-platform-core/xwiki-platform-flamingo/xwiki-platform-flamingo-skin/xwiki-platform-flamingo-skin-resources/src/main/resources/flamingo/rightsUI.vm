@@ -1,0 +1,311 @@
+#set ($formname = 'update')
+#set ($saveaction = 'save')
+##
+## Set on which document the rights should be saved
+##
+## Most of the time, it is the current document
+#set ($targetDocument = $doc)
+#if ($request.section == 'PageRights')
+  ## But when the current page is the "PageRights" section of the page administration, the target doc is actually the
+  ## "WebHome" page of the current space.
+  #set ($parentSpace = $doc.documentReference.lastSpaceReference)
+  #set ($targetDocument = $xwiki.getDocument($parentSpace))
+#end
+########################
+## display the interface
+########################
+## inject the needed JS & CSS files
+$xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
+$xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
+$xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
+$xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
+## for admin, register, programming and createwiki, allow preceedes over deny
+#if("$!request.section"=='wikis.rights')
+  #set ($rightsLevels = {'createwiki': 0})
+  #set ($allowWins = [0])
+#else
+  #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
+  #set ($allowWins = [5, 6, 7])
+#end
+#set ($levelsRights = {})
+#foreach ($r in $rightsLevels.keySet())
+  #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
+#end
+#set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, script, delete
+#if("$!request.section"=='wikis.rights')
+  #set ($maxlevel = $rightsLevels.get('createwiki'))
+  #set ($clsname = 'XWiki.XWikiGlobalRights')
+#else
+  #if($targetDocument.fullName == 'XWiki.XWikiPreferences')
+    #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #if ($xcontext.database == 'xwiki')
+        #set ($maxlevel = $rightsLevels.get('programming')) ## base + admin, register, programming
+      #else
+        #set ($maxlevel = $rightsLevels.get('register')) ## base + admin, register
+      #end
+    #else
+      #set($clsname = 'XWiki.XWikiRights')
+    #end
+  #elseif ($targetDocument.name == 'WebPreferences')
+    #if (("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin'))
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
+    #else
+      #set ($clsname = 'XWiki.XWikiRights')
+    #end
+  #else
+    #set ($clsname = 'XWiki.XWikiRights')
+  #end
+#end
+
+## url to take the users and groups to display in the ajax-based table
+#set ($url = $targetDocument.getURL('get', 'xpage=getusersandgroups'))
+#set ($saveUrl = $targetDocument.getURL('edit', "form_token=$!{services.csrf.getToken()}&xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
+
+## get the rights for XWikiGuest
+#set ($guest = 'XWiki.XWikiGuest')
+#set ($allowGuest = {})
+#set ($denyGuest = {})
+#foreach ($obj in $targetDocument.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
+  #set ($pers = "$!obj.getProperty('users').getValue()")
+  #if ($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?$"))
+    #set ($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
+    #foreach ($right in $specifiedRights)
+      #if ($rightsLevels.containsKey($right) && $maxlevel >= $rightsLevels.get($right))
+        #if($obj.getProperty('allow').getValue() == 1)
+          #set($discard = $allowGuest.put($rightsLevels.get($right), "1"))
+        #else
+          #set($discard = $denyGuest.put($rightsLevels.get($right), "1"))
+        #end
+      #end
+    #end
+  #end
+#end
+#set ($r = [])
+#foreach ($i in [0..$maxlevel])
+  #set ($value = 0)
+  #if ($allowWins.contains($i))
+    #if ($allowGuest.containsKey($i))
+      #set ($value = 1)
+    #elseif ($denyGuest.containsKey($i))
+      #set ($value = 2)
+    #end
+  #else
+    #if ($denyGuest.containsKey($i))
+      #set ($value = 2)
+    #elseif ($allowGuest.containsKey($i))
+      #set ($value = 1)
+    #end
+  #end
+  #set ($discard = $r.add($value))
+#end
+
+<div id="xwikieditcontent">
+  <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor" != '') $editor#end">
+    <tr>
+      <td class="xwiki-livetable-pagination">
+        <span id="usersandgroupstable-limits" class="xwiki-livetable-limits"></span>
+        <span id="usersandgroupstable-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />$services.localization.render('platform.livetable.loading')</span>
+        <span class="pagination">
+          <span id="usersandgroupstable-pagination-text" class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
+          <span id="usersandgroupstable-pagination" class="xwiki-livetable-pagination-content" ></span>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td class="xwiki-livetable-display-container">
+        <table class="xwiki-livetable-display">
+          <thead class="xwiki-livetable-display-header">
+            <tr class="userorgroups-header">
+              ## Groups/Users switch
+              <th scope="col" class="usersorgroupsnames">
+                ## ToDo: workspace is deprecated
+                #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
+                <label for="uorgg" class="hidden">$services.localization.render('rightsmanager.groups')</label>
+                <input type="radio" id="uorgg" name="uorg" value="groups"
+                  onclick="if(!$('unregistered').hasClassName('hidden'))
+                             $('unregistered').addClassName('hidden');
+                         #if ($isWorkspace)
+                           ## Unhide scope selection and automatically select the old index.
+                           if($('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                             $('usersandgroupstable-filters-scope').removeClassName('hidden');
+                             $('wiki').options[groupScopeIndex].selected=true;
+                           }
+                         #end" checked="checked" />$services.localization.render('rightsmanager.groups')&nbsp;&nbsp;
+                <label for="uorgu" class="hidden">$services.localization.render('rightsmanager.users')</label>
+                <input type="radio" id="uorgu" name="uorg" value="users" 
+                  onclick="if($('unregistered').hasClassName('hidden'))
+                             $('unregistered').removeClassName('hidden');
+                         #if ($isWorkspace)
+                           ## Hide scope selection and automatically select global scope.
+                           if(!$('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                             $('usersandgroupstable-filters-scope').addClassName('hidden');
+                             groupScopeIndex = $('wiki').selectedIndex;
+                             $('wiki').options[1].selected=true;
+                           }
+                         #end" />$services.localization.render('rightsmanager.users')
+              </th>
+              ## Column headers for each configurable access right
+              #foreach ($i in [0..$maxlevel])
+                <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
+              #end
+            </tr>
+            <tr id="unregistered">
+              ## Rights for guests, statically displayed outside the livetable
+              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
+              #foreach ($i in [0..$maxlevel])
+                <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+              #end
+            </tr>
+            <tr id="usersandgroupstable-filters">
+              ## Users/groups filter
+              <td><label for="name">$services.localization.render('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
+                #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                  <div id="usersandgroupstable-filters-scope">
+                    <label for="wiki">$services.localization.render('rightsmanager.searchscope')</label>
+                    <select id="wiki" name="wiki" style="margin-left:10px;">
+                      <option value="local" selected="selected">$services.localization.render('rightsmanager.local')</option>
+                      <option value="global">$services.localization.render('rightsmanager.global')</option>
+                      <option value="both">$services.localization.render('rightsmanager.both')</option>
+                    </select>
+                  </div>
+                #else
+                  <input type="hidden" name="wiki" value="local"/>
+                #end
+                #set ($colsp = $maxlevel + 1)
+              </td>
+              <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+            </tr>
+          </thead>
+          ## Livetable placeholder, will be filled in from Javascript
+          <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+        </table>
+      </td>
+    </tr>
+  </table>
+  ## Global settings: mandatory authentication for view/edit, captcha
+  #set ($guest_comment_captcha_prop = $targetDocument.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
+  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'wikis.rights')
+    <dl class="rights-settings">
+      #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
+        #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
+        #if ("$!auth_view" == '1')
+          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($view_alt = 'yes')
+        #else
+          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($view_alt = 'no')
+        #end
+        <dt>
+          <label for="authenticate_view">
+            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
+            $services.localization.render('authenticate_view')
+          </label>
+          <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+        </dt>
+        #set ($auth_edit = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
+        #if ("$!auth_edit" == '1')
+          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($edit_alt = 'yes')
+        #else
+          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($edit_alt = 'no')
+        #end
+        <dt>
+          <label for="authenticate_edit">
+            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
+            $services.localization.render('authenticate_edit')
+          </label>
+          <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+        </dt>
+      #end
+      #if ($guest_comment_captcha_prop)
+        ## If we are in globaladmin, we don't want to get the setting from XWiki.WebPreferences...
+        #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
+          #set ($guest_comment_requires_captcha = $xwiki.getXWikiPreferenceAsInt('guest_comment_requires_captcha', 0))
+        #else
+          #set ($guest_comment_requires_captcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0))
+        #end
+        #if($guest_comment_requires_captcha == 1)
+          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($guest_comment_requires_captcha_alt = 'yes')
+        #else
+          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($guest_comment_requires_captcha_alt = 'no')
+        #end
+        <dt>
+          <label for="guest_comment_requires_captcha">
+            <input type="image" id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt"
+                src="$guest_comment_requires_captcha_icon" class="icon" />
+            $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
+          </label>
+        </dt>
+        <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+      #end
+    </dl>
+  #end
+
+    <script type="text/javascript">
+    //<![CDATA[
+(function() {
+  function hideScopeForUsers() {
+    if ($('uorgu').checked) {
+      // Hide scope filter.
+      $('usersandgroupstable-filters-scope').addClassName('hidden');
+      // Default to global.
+      $('wiki').options[1].selected=true;
+      
+      return true;
+    } 
+    
+    return false;
+  }
+  
+  function startup() {
+    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+    
+    #if ($isWorkspace)
+      window.groupScopeIndex = 0;
+      hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
+    #end
+
+      window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+      window.saveUrl = "$saveUrl";
+      window.saveUrl.replace(/&amp;/g, "&");
+      
+      var targetDocument = new XWiki.Document(XWiki.Model.resolve("$escapetool.javascript($services.model.serialize($targetDocument.documentReference, 'default'))", XWiki.EntityType.DOCUMENT));
+      
+      window.currentUser = "$!{escapetool.javascript($xcontext.user)}";
+      window.unregUser = "XWiki.XWikiGuest";
+      // the callback function is called from LiveTable with 3 arguments
+      var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
+      var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
+    #foreach($i in [0..$maxlevel])
+      var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+    #end
+      Event.observe(window, 'load', function() {
+        if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
+          $('unregistered').addClassName('hidden');
+        } else if($('uorgu').checked && $('unregistered').hasClassName('hidden')) {
+          $('unregistered').removeClassName('hidden');
+        }
+      });
+    #if("$!editor" == 'globaladmin')
+      Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+    #end
+    #if($guest_comment_captcha_prop)
+      Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+    #end
+      return true;
+    }
+    return false;
+  }
+  // Initialize liveTable
+  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
+})();
+    //]]>
+    </script>
+</div> ## xwikieditcontent

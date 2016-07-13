@@ -61,7 +61,7 @@ public interface ElementInterface
      * Apply a 3 ways merge on the current element based on provided previous and new version of the element.
      * <p>
      * All 3 elements are supposed to have the same class and reference.
-     * 
+     *
      * @param previousElement the previous version of the element
      * @param newElement the next version of the element
      * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
@@ -75,7 +75,7 @@ public interface ElementInterface
     /**
      * Apply the provided element so that the current one contains the same informations and indicate if it was
      * necessary to modify it in any way.
-     * 
+     *
      * @param newElement the element to apply
      * @param clean true if informations that are not in the new element should be removed (for example class properties
      *            not in the new class)

@@ -1,0 +1,7 @@
+###
+### History page in the "view" mode
+###
+###
+#set($titleToDisplay = $services.localization.render('core.viewers.history.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
+#template('contentheader.vm')
+#template("historyinline.vm")

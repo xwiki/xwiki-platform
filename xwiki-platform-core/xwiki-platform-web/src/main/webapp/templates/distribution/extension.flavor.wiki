@@ -1,0 +1,104 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{template name="distribution/macros.vm" output="false"/}}
+
+{{template name="flavor/macros.vm" output="false"/}}
+
+{{velocity output="false"}}
+## Globals
+#set ($flavorId = $services.flavor.getFlavorOfWiki($services.wiki.currentWikiId))
+#set ($extensionNamespace = "wiki:${services.wiki.currentWikiId}")
+#set ($isFlavorValid = $flavorId && $services.extension.installed.getInstalledExtension($flavorId.id, $extensionNamespace).isValid($extensionNamespace))
+
+#macro(controller)
+  #if ($flavorId && !$isFlavorValid)
+    ## TODO: propose an upgrade of the flavor
+    #set ($showCompleteStepButton = true)
+  #elseif ($request.noFlavor)
+    ## Let the wiki be empty
+    #displayNoFlavor()
+  #elseif ($request.installFlavor && $request.flavor)
+    ## The user has selected a flavor, let's propose him to install it
+    #displayFlavorInstallationStep()
+  #else
+    ## No flavor is currently installed or even selected by the user, display the flavor picker
+    #displayFlavorPickerStep()
+  #end
+#end
+
+#macro(createUpdateFlavorPlan)
+  ## TODO: this code is not working, fix it
+  #set($installRequest = $services.extension.createUpgradePlanRequest($extensionNamespace))
+  #set($discard = $installRequest.addExtension($flavorId))
+  #set($job = $services.extension.createUpgradePlan($installRequest))
+    
+  {{html}}
+    #displayExtensionUpdaterPlan($job.status)
+  {{/html}}
+#end
+
+#macro(displayFlavorLabel $message $backButtonMessage)
+  <div>
+    <label class="xLabel">Flavor</label>
+  </div>
+  <div class="flavorRow">
+    <div class="flavorLeft">
+      <p class="xHint">$services.localization.render($message)</p>
+    </div>
+    <div class="flavorRight buttonwrapper">
+      <form class="xform" action="$xwiki.relativeRequestURL" method="post">
+        #if ($request.flavor)
+          <input type="hidden" name="flavor" value="$escapetool.xml($request.flavor)" />
+        #end
+        <input class="button secondary" type="submit" value="$escapetool.xml($services.localization.render($backButtonMessage))" />
+      </form>
+    </div>
+  </div>
+#end
+
+#macro(displayNoFlavor)
+  {{html}}
+    #displayFlavorLabel('platform.extension.distributionWizard.flavorStepNoFlavorConfirm', 'platform.extension.distributionWizard.flavorStepNoFlavorBack')
+  {{/html}}
+  #set ($showCompleteStepButton = true)
+#end
+
+#macro(displayFlavorPickerStep)
+  {{html}}
+    <form action="$xwiki.relativeRequestURL" method="post">
+      <div><label for="flavor" class="xLabel">Flavor</label></div>
+      <div class="flavorRow">
+        <div class="flavorLeft">
+          <p class="xHint">$services.localization.render('platform.extension.distributionWizard.flavorStepDescription')</p>
+        </div>
+        <div class="flavorRight buttonwrapper">
+          <input class="button secondary" type="submit" value="Let the wiki be empty" name="noFlavor" />
+          <input class="button" type="submit" value="Install this flavor" name="installFlavor" />
+        </div>
+      </div>
+      <div class="xform">
+        #displayFlavorPicker('flavor', "$!request.flavor", true, 'xwiki-flavor-picker-medium', false)
+      </div>
+    </form>
+  {{/html}}
+#end
+
+#macro(displayFlavorInstallationStep)
+  #set ($flavorSplitted = $request.flavor.split(':::'))
+  #set ($requestFlavorId = $flavorSplitted[0])
+  #set ($requestFlavorVersion = $flavorSplitted[1])
+  #set ($requestFlavorExtension = $services.extension.resolve($requestFlavorId, $requestFlavorVersion))
+  
+  {{html}}
+    #displayFlavorLabel('platform.extension.distributionWizard.flavorStepConfirm', 'platform.extension.distributionWizard.flavorStepSelectOtherFlavor')
+    #displayExtensionAndUpdateStepButtons($requestFlavorExtension)
+  {{/html}}
+  
+  #set ($showCompleteStepButton = $isFlavorValid)
+#end
+{{/velocity}}
+
+{{velocity}}
+  #controller()
+{{/velocity}}

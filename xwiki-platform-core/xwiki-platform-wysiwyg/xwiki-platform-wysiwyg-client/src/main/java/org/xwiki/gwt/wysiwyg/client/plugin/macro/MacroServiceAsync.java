@@ -36,9 +36,30 @@ public interface MacroServiceAsync
      * 
      * @param macroId a macro identifier
      * @param syntaxId a syntax identifier
+     * @param wikiId a wiki identifier
+     * @param async the call-back to be used for notifying the caller after receiving the response from the server
+     * @since 6.4M1
+     */
+    void getMacroDescriptor(String macroId, String syntaxId, String wikiId, AsyncCallback<MacroDescriptor> async);
+
+    /**
+     * Makes a request to the server to get the descriptor for the specified macro.
+     * 
+     * @param macroId a macro identifier
+     * @param syntaxId a syntax identifier
      * @param async the call-back to be used for notifying the caller after receiving the response from the server
      */
     void getMacroDescriptor(String macroId, String syntaxId, AsyncCallback<MacroDescriptor> async);
+
+    /**
+     * Makes a request to the server to get all the macro descriptors for the specified syntax.
+     * 
+     * @param syntaxId a syntax identifier
+     * @param wikiId a wiki identifier
+     * @param async the call-back to be used for notifying the caller after receiving the response from the server
+     * @since 6.4M1
+     */
+    void getMacroDescriptors(String syntaxId, String wikiId, AsyncCallback<List<MacroDescriptor>> async);
 
     /**
      * Makes a request to the server to get all the macro descriptors for the specified syntax.

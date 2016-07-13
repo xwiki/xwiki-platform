@@ -48,7 +48,7 @@ public interface ContextualLocalizationManager
      * @param key the key identifying the message to look for
      * @param parameters the parameters
      * @return the translation in the current language rendered as plain text
-     * @see getTranslation(String)
+     * @see #getTranslation(String)
      */
     String getTranslationPlain(String key, Object...parameters);
 }

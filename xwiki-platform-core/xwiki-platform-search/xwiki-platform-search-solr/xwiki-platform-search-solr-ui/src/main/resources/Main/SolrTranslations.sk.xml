@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>sk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1385047506000</creationDate>
+  <date>1433258948000</date>
+  <contentUpdateDate>1433258948000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language sk generated from http://www.l10n.xwiki.org
+solr.admin.error.norights=Aby ste mohli pokračovať potrebujete administrátorské práva.
+solr.admin.error.notallowed=Nemáte oprávnenie na vykonávanie akcie.
+solr.admin.indexing.action.hint=Akcia sa vykoná na indexe.
+solr.admin.indexing.action.label=Akcia
+solr.admin.indexing.action.select_delete=Odstrániť z indexu
+solr.admin.indexing.action.select_index=Pridať do indexu
+solr.admin.indexing.action.select_reindex=Reindexovať
+solr.admin.indexing.query.hint=Voliteľný dotaz na obmedzenie počet dokumentov, ktoré budú ovplyvnené v indexe.
+solr.admin.indexing.query.label=Vlastný dotaz
+solr.admin.indexing.title=Indexovanie
+solr.admin.indexing.wiki.hint=Má vplyv na všetky dokumenty Wiki.
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.status.queueSize.hint=Počet dokumentov, ktoré čakajkú na indexovanie, re-indexovanie alebo vymazanie z indexu.
+solr.admin.status.queueSize.label=Veľkosť fronty
+solr.admin.status.title=Stav
+solr.admin.submit=Aplikovať
+solr.admin.title=Administrácia Solr vyhľadávania
+solr.facet.date.after=Po {0}
+solr.facet.date.any=Akýkoľvek dátum
+solr.facet.date.applyCustomInterval=Aplikovať
+solr.facet.date.before=Pred {0}
+solr.facet.date.between=Od {0} do {1}
+solr.facet.date.customInterval=Vlastný dátum a časový interval
+solr.facet.date.last30Days=Posledných 30 dní
+solr.facet.date.last7Days=Posledných 7 dní
+solr.facet.date.olderThan30Days=Staršie ako 30 dni
+solr.facet.date.today=Dnes
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.image.icon=Ikona
+solr.facet.fileType.other.octet-stream=Binárne dáta
+solr.facet.fileType.text.java-source=Java zdroj
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.plain=Obyčajný text
+solr.facet.fileType.text.sh=Shell Script
+solr.facet.size.any=Akákoľvek veľkosť
+solr.facet.size.between=Medzi {0} a {1}
+solr.facet.size.lessThan=Menej ako {0}
+solr.facet.size.moreThan=Viac ako {0}
+solr.facets.collapseAll=Zbaliť všetko
+solr.facets.emptyValue=Prázdna hodnota
+solr.facets.expandAll=Rozbaliť všetko
+solr.facets.moreValues={0} viac
+solr.facets.resetAll=Vynulovať všetky
+solr.field.attauthor=Nahral
+solr.field.attauthor_display=Nahral
+solr.field.attdate=Dátum pridania
+solr.field.attsize=Veľkosť súboru
+solr.field.author=Posledný autor
+solr.field.author_display=Posledný autor
+solr.field.class=Typ objektu
+solr.field.class.definedBy=Definuje {0} » {1}
+solr.field.comment=Komentár
+solr.field.creationdate=Dátum vytvorenia
+solr.field.creator=Vytvoril
+solr.field.creator_display=Vytvoril
+solr.field.date=Posledná modifikácia
+solr.field.filename=Názov prílohy
+solr.field.locale=jazyk
+solr.field.mimetype=Formát súboru
+solr.field.name=Strana
+solr.field.name_exact=Strana
+solr.field.objcontent=Objekty
+solr.field.propertyname=Pekný názov
+solr.field.space=Priestor
+solr.field.space_exact=Priestor
+solr.field.title=Názov
+solr.field.wiki=Wiki
+solr.filterBy.fileType.archive=Archív
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.font=Písmo
+solr.filterBy.fileType.image=Obrázok
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.other=Ostatné
+solr.filterBy.fileType.presentation=Prezentácia
+solr.filterBy.fileType.spreadsheet=Tabuľka
+solr.filterBy.fileType.text=Text
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.word=Word
+solr.filterBy.type.attachment=Príloha
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Vlastnosť objektu
+solr.options=Ukázať\:
+solr.options.highlight=Zvýraznenie
+solr.result.author=Editoval {0} ({1})
+solr.result.language=Jazyk
+solr.result.location=Nachádza sa v {0} » {1} » {2}
+solr.result.mediaType=Súbor typu {0}
+solr.result.uploadedBy=Nahral {0} - {1} ({2})
+solr.sortBy=Zoradiť podľa\:
+solr.sortBy.attauthor_display_sort=Nahral
+solr.sortBy.attdate_sort=Dátum
+solr.sortBy.attsize_sort=Veľkoť súboru
+solr.sortBy.author_display_sort=Posledný autor
+solr.sortBy.filename_sort=Názov súboru
+solr.sortBy.title_sort=Názov
+</content>
+</xwikidoc>

@@ -204,9 +204,9 @@ public class TextAreaClass extends StringClass
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
 
-        if ((contentType != null) && (doc != null) && (contentType.equals("puretext"))) {
+        if ("puretext".equals(contentType) && doc != null) {
             super.displayView(buffer, name, prefix, object, context);
-        } else if ((contentType != null) && (context.getWiki() != null) && (contentType.equals("velocitycode"))) {
+        } else if ("velocitycode".equals(contentType) && context.getWiki() != null) {
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0)) {
@@ -219,8 +219,8 @@ public class TextAreaClass extends StringClass
             StringBuffer result = new StringBuffer();
             super.displayView(result, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(result.toString(), getObjectDocumentSyntax(object, context)
-                    .toIdString(), context));
+                String syntax = getObjectDocumentSyntax(object, context).toIdString();
+                buffer.append(context.getDoc().getRenderedContent(result.toString(), syntax, context));
             } else {
                 buffer.append(result);
             }
@@ -236,7 +236,11 @@ public class TextAreaClass extends StringClass
         Syntax syntax;
 
         try {
-            XWikiDocument doc = context.getWiki().getDocument(object.getDocumentReference(), context);
+            XWikiDocument doc = object.getOwnerDocument();
+            if (doc == null) {
+                doc = context.getWiki().getDocument(object.getDocumentReference(), context);
+            }
+
             syntax = doc.getSyntax();
         } catch (Exception e) {
             // Used to convert a Document Reference to string (compact form without the wiki part if it matches the

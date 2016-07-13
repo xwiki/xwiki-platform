@@ -20,26 +20,23 @@
 package org.xwiki.annotation.internal;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Provides configuration from the Annotation Application's configuration document, for the current wiki. Clients of
- * this component should use lazy injection (@see {@link javax.inject.Provider}) in order to always receive the
- * configuration of the current wiki.
+ * Provides configuration from the Annotation Application's configuration document, for the current wiki.
  * 
  * @version $Id$
  * @since 4.0M2
  */
 @Component
 @Named("annotation")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Singleton
 public class AnnotationConfigurationSource extends AbstractDocumentConfigurationSource
 {
     /**
@@ -49,10 +46,21 @@ public class AnnotationConfigurationSource extends AbstractDocumentConfiguration
         AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME);
 
     @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.annotation";
+    }
+
+    @Override
+    protected String getCacheKeyPrefix()
+    {
+        return this.wikiManager.getCurrentWikiId();
+    }
+
+    @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(getCurrentWikiReference().getName(),
-            AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME);
+        return new DocumentReference(CLASS_REFERENCE, getCurrentWikiReference());
     }
 
     @Override

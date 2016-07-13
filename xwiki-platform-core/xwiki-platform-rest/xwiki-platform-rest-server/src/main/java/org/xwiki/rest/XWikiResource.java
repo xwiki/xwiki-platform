@@ -19,10 +19,15 @@
  */
 package org.xwiki.rest;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -36,7 +41,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -47,8 +54,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * <p> Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
- * access the XWiki API and a method for retrieving documents in their different incarnations. </p>
+ * Base class for all XWiki-related JAX-RS resources. This class provides to subclasses a set of protected fields to
+ * access the XWiki API and a method for retrieving documents in their different incarnations.
  *
  * @version $Id$
  */
@@ -56,49 +63,60 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class XWikiResource implements XWikiRestComponent, Initializable
 {
     /**
-     * <p> The actual URI information about the JAX-RS resource being called. This variable is useful when generating
-     * links to other resources in representations. </p>
+     * The actual URI information about the JAX-RS resource being called. This variable is useful when generating
+     * links to other resources in representations.
      */
     @Context
     protected UriInfo uriInfo;
 
     /**
-     * <p> The logger to be used to output log messages. </p>
+     * The logger to be used to output log messages.
+     * @deprecated since 7.3M1, use {@link #slf4Jlogger} instead
      */
+    @Deprecated
     protected Logger logger;
 
     /**
-     * <p> The object factory for model objects to be used when creating representations. </p>
+     * The logger to be used to output log messages.
+     * 
+     * @since 7.3M1
+     */
+    protected org.slf4j.Logger slf4Jlogger;
+
+    /**
+     * The object factory for model objects to be used when creating representations.
      */
     protected ObjectFactory objectFactory;
 
     /**
-     * <p> The XWiki component manager that is used to lookup XWiki components and context. </p>
+     * The XWiki component manager that is used to lookup XWiki components and context.
      */
     @Inject
+    @Named("context")
     protected ComponentManager componentManager;
 
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
     /**
-     * <p> The query manager to be used to perform low-level queries for retrieving information about wiki content.
-     * </p>
+     * The query manager to be used to perform low-level queries for retrieving information about wiki content.
      */
     @Inject
     protected QueryManager queryManager;
 
     /**
-     * <p> A wrapper class for returning an XWiki document enriched with information about its status. </p>
+     * A wrapper class for returning an XWiki document enriched with information about its status.
      */
     protected static class DocumentInfo
     {
         /**
-         * <p> The target XWiki document. </p>
+         * The target XWiki document.
          */
         private Document document;
 
         /**
-         * <p> A boolean variable stating if the XWiki document existed already of it is being created. This variable is
+         * A boolean variable stating if the XWiki document existed already of it is being created. This variable is
          * used when building responses in order to understand if a created or modified status code should be sent.
-         * </p>
          */
         private boolean created;
 
@@ -120,7 +138,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
-     * <p> Resource initialization. </p>
+     * Resource initialization.
      */
     @Override
     public void initialize() throws InitializationException
@@ -136,8 +154,47 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
-     * <p> Retrieve a document. This method never returns null. If something goes wrong with respect to some
-     * precondition an exception is thrown. </p>
+     * @param spaceSegments the space segments of the URL
+     * @return the list of parent spaces
+     * @throws XWikiRestException if the URL is malformed
+     */
+    public List<String> parseSpaceSegments(String spaceSegments) throws XWikiRestException
+    {
+        // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
+        List<String> spaces = new ArrayList<>();
+        // We actually don't get the first "spaces/" segment so we start from the first space
+        int i = 1;
+        for (String space : spaceSegments.split("/")) {
+            if (i % 2 == 0) {
+                // Every 2 segments, we should have "spaces". If not, the URL is malformed
+                if (!"spaces".equals(space)) {
+                    throw new XWikiRestException("Malformed URL: the spaces section is invalid.");
+                }
+            } else {
+                spaces.add(space);
+            }
+            i++;
+        }
+        if (spaces.isEmpty()) {
+            throw new XWikiRestException("Malformed URL: the spaces section is empty.");
+        }
+        return spaces;
+    }
+
+    /**
+     * @param spaceSegments the space segments of the URL
+     * @param wikiName the name of the wiki
+     * @return the space reference
+     * @throws XWikiRestException if the URL is malformed
+     */
+    public SpaceReference getSpaceReference(String spaceSegments, String wikiName) throws XWikiRestException
+    {
+        return Utils.getSpaceReference(parseSpaceSegments(spaceSegments), wikiName);
+    }
+    
+    /**
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some
+     * precondition an exception is thrown.
      *
      * @param wikiName The wiki name. Cannot be null.
      * @param spaceName The space name. Cannot be null.
@@ -149,18 +206,42 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @return A DocumentInfo structure containing the actual document and additional information about it.
      * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
      * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
+     * @throws XWikiRestException if the URL is malformed 
      * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
      */
     public DocumentInfo getDocumentInfo(String wikiName, String spaceName, String pageName, String language,
+            String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException, XWikiRestException
+    {
+        return getDocumentInfo(wikiName, parseSpaceSegments(spaceName), pageName, language, version, failIfDoesntExist,
+            failIfLocked);
+    }
+
+    /**
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some
+     * precondition an exception is thrown.
+     *
+     * @param wikiName The wiki name. Cannot be null.
+     * @param spaces The space hierarchy. Cannot be null.
+     * @param pageName The page name. Cannot be null.
+     * @param language The language. Null for the default language.
+     * @param version The version. Null for the latest version.
+     * @param failIfDoesntExist True if an exception should be raised whenever the page doesn't exist.
+     * @param failIfLocked True if an exception should be raised whenever the page is locked.
+     * @return A DocumentInfo structure containing the actual document and additional information about it.
+     * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
+     * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
+     * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     */
+    public DocumentInfo getDocumentInfo(String wikiName, List<String> spaces, String pageName, String language,
             String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
     {
-        if ((wikiName == null) || (spaceName == null) || (pageName == null)) {
+        if ((wikiName == null) || (spaces == null || spaces.isEmpty()) || (pageName == null)) {
             throw new IllegalArgumentException(String.format(
                     "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
-                    spaceName, pageName));
+                    spaces, pageName));
         }
 
-        String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
+        String pageFullName =  Utils.getPageId(wikiName, spaces, pageName);
 
         boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
 
@@ -172,7 +253,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
 
         Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
 
-        /* If doc is null, we don't have the rights to access the document */
+        // If doc is null, we don't have the rights to access the document
         if (doc == null) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
@@ -180,18 +261,23 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         if (language != null) {
             doc = doc.getTranslatedDocument(language);
 
-            /*
-             * If the language of the translated document is not the one we requested, then the requested translation
-             * doesn't exist. new translated document by hand.
-             */
-            if (!language.equals(doc.getLanguage())) {
-                /* If we are here the requested translation doesn't exist */
+            // If the language of the translated document is not the one we requested, then the requested translation
+            // doesn't exist. new translated document by hand.
+            // TODO: Ideally this method should take a Locale as input and not a String
+            Locale locale;
+            try {
+                locale = LocaleUtils.toLocale(language);
+            } catch (Exception e) {
+                // Language is invalid, we consider that the translation has not been found.
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+            if (!locale.equals(doc.getLocale())) {
+                // If we are here the requested translation doesn't exist
                 if (failIfDoesntExist) {
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
-                            new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
-                    xwikiDocument.setLanguage(language);
+                        new XWikiDocument(new DocumentReference(wikiName, spaces, pageName), locale);
                     doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;
@@ -199,12 +285,12 @@ public class XWikiResource implements XWikiRestComponent, Initializable
             }
         }
 
-        /* Get a specific version if requested to */
+        // Get a specific version if requested to
         if (version != null) {
             doc = doc.getDocumentRevision(version);
         }
 
-        /* Check if the doc is locked. */
+        // Check if the doc is locked.
         if (failIfLocked) {
             if (doc.getLocked()) {
                 throw new WebApplicationException(Status.PRECONDITION_FAILED);
@@ -215,10 +301,10 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
-     * <p> A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
-     * associated to a resource. This is an auxiliary method that is used for documenting the REST API. </p>
+     * A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
+     * associated to a resource. This is an auxiliary method that is used for documenting the REST API.
      *
-     * @return The URI template string associated to the requested resource.
+     * @return the URI template string associated to the requested resource
      */
     @GET
     @Produces("uritemplate")
@@ -246,6 +332,6 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     protected XWikiContext getXWikiContext()
     {
-        return Utils.getXWikiContext(this.componentManager);
+        return this.xcontextProvider.get();
     }
 }

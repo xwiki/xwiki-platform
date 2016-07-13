@@ -144,6 +144,7 @@ public class HTMLCleanerTestSuite extends Suite
          * {@inheritDoc}
          * <p>
          * Initialize the Component Manager before each test is executed, to ensure test isolation.
+         * </p>
          */
         @Override
         protected void runChild(FrameworkMethod method, RunNotifier notifier)
@@ -195,8 +196,9 @@ public class HTMLCleanerTestSuite extends Suite
     }
 
     /**
-     * {@inheritDoc} We override this method so that the JUnit results are not displayed in a test hierarchy with a
-     * single test result for each node (as it would be otherwise since RenderingTest has a single test method).
+     * {@inheritDoc}
+     * <p>We override this method so that the JUnit results are not displayed in a test hierarchy with a
+     * single test result for each node (as it would be otherwise since RenderingTest has a single test method).</p>
      */
     @Override
     public Description getDescription()

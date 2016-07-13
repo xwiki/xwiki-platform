@@ -26,7 +26,7 @@ import com.xpn.xwiki.api.Api;
  * Base class for all plugin APIs. API Objects are the Java Objects that can be manipulated from Velocity or Groovy
  * scripts in XWiki documents. They wrap around a fully functional and privileged Plugin object, and forward safe calls
  * to that object.
- * 
+ *
  * @param <T> The type of the internal plugin.
  * @version $Id$
  * @deprecated the plugin technology is deprecated, consider rewriting as components
@@ -41,7 +41,7 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
 
     /**
      * API constructor. The API must know the plugin object it wraps, and the request context.
-     * 
+     *
      * @param plugin The wrapped plugin object.
      * @param context Context of the request.
      */
@@ -55,7 +55,7 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
      * Return the inner plugin object. This method is only for the plugin API's internal use, and should not be exposed
      * to scripting languages. It is an XWiki practice to expose all the functionality using an API, and allow access to
      * the internal objects only to users with Programming Rights.
-     * 
+     *
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
@@ -66,7 +66,7 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
 
     /**
      * Return the inner plugin object, if the user has the required programming rights.
-     * 
+     *
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
@@ -80,7 +80,7 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
 
     /**
      * Set the inner plugin object.
-     * 
+     *
      * @param plugin The wrapped plugin object.
      * @todo Is this really needed? The inner plugin should not be changed.
      */

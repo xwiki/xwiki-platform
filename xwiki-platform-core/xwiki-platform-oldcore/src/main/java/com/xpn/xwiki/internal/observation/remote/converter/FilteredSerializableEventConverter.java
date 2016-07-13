@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Overwrite {@link SerializableEventConverter} to filter some known types which are declared as Serialized and are for
  * really being so.
- * 
+ *
  * @version $Id$
  * @since 4.1.3
  */

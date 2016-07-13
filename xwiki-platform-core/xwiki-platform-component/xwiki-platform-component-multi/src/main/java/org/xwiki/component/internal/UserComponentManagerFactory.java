@@ -56,4 +56,10 @@ public class UserComponentManagerFactory implements ComponentManagerFactory
     {
         return this.factory.createComponentManager(this.documentComponentManager);
     }
+
+    @Override
+    public ComponentManager createComponentManager(String namespace, ComponentManager parentComponentManager)
+    {
+        return this.factory.createComponentManager(namespace, this.documentComponentManager);
+    }
 }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.annotation.internal;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,12 +39,8 @@ import org.xwiki.annotation.renderer.AnnotationPrintRenderer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * Default annotation service, using the default {@link IOTargetService} and and {@link IOTargetService}, dispatching
@@ -65,7 +60,7 @@ public class DefaultAnnotationService implements AnnotationService
     private IOService ioService;
 
     /**
-     * Component manager used to lookup the content alterer needed for the specific document.
+     * Component manager used to lookup the annotation renderer needed for the specific source.
      */
     @Inject
     private ComponentManager componentManager;
@@ -111,21 +106,7 @@ public class DefaultAnnotationService implements AnnotationService
         Collection<Annotation> annotations) throws AnnotationServiceException
     {
         try {
-            String source = targetIoService.getSource(sourceReference);
-            String sourceSyntaxId = sourceSyntax;
-            // get if unspecified, get the source from the io service
-            if (sourceSyntaxId == null) {
-                sourceSyntaxId = targetIoService.getSourceSyntax(sourceReference);
-            }
-
-            Parser parser = componentManager.getInstance(Parser.class, sourceSyntaxId);
-            XDOM xdom = parser.parse(new StringReader(source));
-
-            // run transformations
-            SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
-            Syntax sSyntax = syntaxFactory.createSyntaxFromIdString(sourceSyntaxId);
-            TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
-            transformationManager.performTransformations(xdom, sSyntax);
+            XDOM xdom = targetIoService.getXDOM(sourceReference, sourceSyntax);
 
             // build the annotations renderer hint for the specified output syntax
             String outputSyntaxId = "annotations-" + outputSyntax;

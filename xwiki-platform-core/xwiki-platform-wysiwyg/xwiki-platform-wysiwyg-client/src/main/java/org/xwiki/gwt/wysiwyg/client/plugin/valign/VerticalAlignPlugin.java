@@ -59,11 +59,7 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -96,11 +92,7 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         for (ToggleButton button : buttons.keySet()) {
@@ -113,11 +105,7 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Command command = buttons.get(event.getSource());
@@ -127,11 +115,7 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#update()
-     */
+    @Override
     public void update()
     {
         for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {

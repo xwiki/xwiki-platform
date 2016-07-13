@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>PanelsCode</web>
+  <name>ApplicationsPanelConfigurationSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1413881393000</creationDate>
+  <parent>Panels.ApplicationsPanel</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1413991026000</date>
+  <contentUpdateDate>1413990747000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if($doc.name == 'ApplicationsPanelConfigurationSheet')ApplicationsPanelConfiguration Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+##########################
+## JAVASCRIPT/CSS
+##########################
+#set($discard = $xwiki.jsx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
+#set($discard = $xwiki.ssx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
+##########################
+## First, we split the applications in 2 categories (white listed/black listed)
+##########################
+#set($displayedApps = [])
+#set($blacklistedApps = [])
+#if($doc.fullName == 'XWiki.XWikiPreferences')
+  #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
+#else
+  #set($configDoc = $doc)
+#end
+#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
+  #if("$!configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id)" != '')
+    #set($discard = $blacklistedApps.add($uix))
+  #else
+    #set($discard = $displayedApps.add($uix))
+  #end
+#end
+##########################
+## Macro to display an application panel
+##########################
+#macro(showAppPanel $id $title $class $apps)
+
+  {{html}}
+    &lt;div class="col-xs-12 col-md-6"&gt;
+      &lt;div class="panel-width-Small panel $!class appsPanel" id="$id"&gt;
+        &lt;div class="panel-heading"&gt;
+          &lt;h2&gt;$title&lt;/h2&gt;
+        &lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          &lt;ul class="nav nav-pills applicationsPanel"&gt;
+            #foreach($uix in $apps)
+              #set($params = $uix.getParameters())
+              #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+                #if ($params.icon.startsWith('icon:'))
+                  #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+                #else
+                  #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
+                #end
+                &lt;li class="draggableApp" id="$uix.id"&gt;
+                  &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
+                &lt;/li&gt;
+              #end
+            #end
+          &lt;/ul&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  {{/html}}
+#end
+##########################
+## Display the information message
+##########################
+{{info}}
+{{translation key="platform.panels.applications.helper" /}}
+{{/info}}
+##########################
+## Display the 2 panels
+##########################
+(% class="row appLists" %)
+(((
+  #showAppPanel('displayedPanels', $services.localization.render('platform.panels.applications.displayedapps'), 'panel-primary', $displayedApps)
+  #showAppPanel('blacklistedPanels', $services.localization.render('platform.panels.applications.blacklistedapps'), 'panel-info', $blacklistedApps)
+)))
+##########################
+## Display the buttons
+##########################
+{{html}}
+&lt;button class="btn btn-success" id="bt-save"&gt;$services.localization.render('platform.panels.applications.save')&lt;/button&gt; &lt;button class="btn btn-default" id="bt-revert"&gt;$services.localization.render('platform.panels.applications.revert')&lt;/button&gt;
+{{/html}}
+{{/velocity}}
+</content>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>3bd008ad-ec26-4593-899c-729733fd5e37</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/************************************
+ * Configure RequireJS to use jQuery-UI
+ ************************************/
+require.config({
+  paths: {
+    'jquery-ui' : "$services.webjars.url('jquery-ui', 'jquery-ui.min')",
+    ## The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
+    ## specify the library version when computing the WebJar resource URL.
+    'jquery-ui-touch-punch' : "$services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min')"
+  },
+  shim: {
+    'jquery-ui' : ['jquery'],
+    'jquery-ui-touch-punch': ['jquery', 'jquery-ui']
+  }
+});
+/************************************
+ * Script that enable the drag &amp; drop of applications
+ ************************************/
+require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function($, xm) {
+  /**
+   * Panel ID that contains the last selected application
+   */
+  var lastDraggedObjectParent = false;
+  
+  /**
+   * Helper to know if a dragged element is inside a container or not
+   */
+  var isInContainer = function(element, containerId) {
+    var container        = $('#'+containerId);
+    var containerOffset  = container.offset();
+    var containerWidth   = container.width();
+    var containerHeight  = container.height();
+    var currentAppOffset = $(element).offset();
+    return (currentAppOffset.left &gt;= containerOffset.left &amp;&amp; currentAppOffset.left &lt;= containerOffset.left + containerWidth
+          &amp;&amp; currentAppOffset.top &gt;= containerOffset.top &amp;&amp; currentAppOffset.top &lt;= containerOffset.top + containerHeight);
+  }
+  
+  /**
+   * Move an application from a list to the other
+   */
+  var moveToContainer = function(element, selector) {
+    initDragAndDrop($(element).clone().css('left', 0).css('top', 0).appendTo($(selector)));
+    $(element).remove();
+  }
+
+  /**
+   * Save the black list configuration
+   */
+  var save = function() {
+    var blacklistElems = $('#blacklistedPanels li.draggableApp');
+    // Generate the JSON string that contains all the applications to have in the blacklist
+    var blacklist = '[';
+    for (var i = 0; i &lt; blacklistElems.length; ++i) {
+      if (i &gt; 0) {
+        blacklist += ',';
+      }
+      blacklist += "'" + blacklistElems[i].id + "'";
+    }
+    blacklist += ']';
+    $.ajax({
+      url: '$xwiki.getURL('PanelsCode.ApplicationsPanelConfigurationAjax', 'get', 'outputSyntax=plain')',
+      data: {
+        'form_token': xm['form_token'],
+        'blacklist': blacklist
+      },
+      success: function(data, status) {
+        if (data == 'SUCCESS') {
+          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.success'))', 'done');
+        } else if (data == 'BAD CSRF') {
+          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.csrf'))', 'error');
+        } else if (data == 'NO RIGHT') {
+          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.noright'))', 'error');
+        } else {
+          new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.error'))', 'error');
+        }
+      },
+      error: function() {
+        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.error'))', 'error');
+      }
+    });
+  }
+  
+  /**
+   * Add the drag-and-drop mechanism to the specified elements
+   */
+  var initDragAndDrop = function(element) {
+    $(element).draggable({
+      // Restrict the drag and drop to the '.appLists' container
+      containment: '.appLists',
+      // Revert the drag and drop if the dragged element has not be moved to the other list
+      revert: function(event) {
+        return !((isInContainer(this, 'displayedPanels') &amp;&amp; lastDraggedObjectParent == 'blacklistedPanels')
+            || (isInContainer(this, 'blacklistedPanels') &amp;&amp; lastDraggedObjectParent == 'displayedPanels'));
+      },
+      // On start
+      start: function(event, ui) {
+        // Set the z-index of the element to be on top of all the others
+        $(this).css('z-index', 100);
+        // Save the parent of the element
+        lastDraggedObjectParent = $(this).parents()[2].id;
+      },
+      // On stop: move the element to the other list
+      stop: function(event, ui) {
+        // Reset the z-index
+        $(this).css('z-index', 1);
+        if (lastDraggedObjectParent == 'displayedPanels' &amp;&amp; isInContainer(this, 'blacklistedPanels')) {
+          moveToContainer(this, '#blacklistedPanels &gt; div &gt; ul')
+        } else if (lastDraggedObjectParent == 'blacklistedPanels' &amp;&amp; isInContainer(this, 'displayedPanels')){
+          moveToContainer(this, '#displayedPanels &gt; div &gt; ul');
+        }
+      }
+    });
+  }
+  
+  /**
+   * Wait until all the DOM elements we want to initialize are ready.
+   * We cannot rely on $(window).load() or $(window).ready() because of the asynchronous nature of requirejs
+   * (see: http://requirejs.org/docs/api.html#pageload).
+   */
+  var waitDOMReady = function(callback) {
+    // if the dom elements that we want to initialize are not loaded
+    if ($('.draggableApp').length == 0) {
+      // then retry in 100ms
+      setTimeout(function(){waitDOMReady(callback);}, 100);
+    } else {
+       callback();
+    }
+  }
+
+  /**
+   * First: init all applications marked with the 'draggableApp' class.
+   */
+  waitDOMReady(function() {
+    initDragAndDrop('.draggableApp');
+    
+    $('#bt-revert').click(function(){
+      // Refresh the page
+      window.location.reload();
+    });
+    
+    $('#bt-save').click(save);
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>Drag &amp; Drop</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e6d34b0f-3b57-4cdf-b263-ad878e949af3</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.draggableApp {
+  cursor: grab;
+  width: 100px;
+}
+
+.appsPanel .applicationsPanel {
+  min-height: 100px;
+}</code>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+</xwikidoc>

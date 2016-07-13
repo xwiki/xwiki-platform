@@ -32,28 +32,38 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 /**
  * Displays the title of a document.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
 public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplayer
 {
     /**
-     * The key used to store on the XWiki context map the stack trace for the
-     * {@link #extractTitleFromContent(org.xwiki.bridge.DocumentModelBridge, DocumentDisplayerParameters)} method.
+     * The key used to store on the XWiki context map the stack of references to documents whose titles are currently
+     * being evaluated (in the current execution context). This stack is used to prevent infinite recursion, which can
+     * happen if the title displayer is called on the current document from the title field or from a script within the
+     * first content heading.
      */
-    private static final String EXTRACT_TITLE_STACK_TRACE_KEY = "internal.extractTitleFromContentStackTrace";
+    private static final String DOCUMENT_REFERENCE_STACK_KEY = "internal.displayer.title.documentReferenceStack";
 
     /**
      * The object used for logging.
@@ -93,6 +103,24 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    /**
+     * Used to get the default document reference, which normally is used to represent the home page of a space.
+     *
+     * @see #getStaticTitle(DocumentModelBridge)
+     */
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    private ModelContext modelContext;
+
     /**
      * Used to emulate an in-line parsing.
      */
@@ -101,34 +129,67 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
+        // Protect against infinite recursion which can happen for instance if the document title displayer is called on
+        // the current document from the title field or from a script within the first content heading.
+        Map<Object, Object> xwikiContext = getXWikiContextMap();
+        @SuppressWarnings("unchecked")
+        Stack<DocumentReference> documentReferenceStack =
+            (Stack<DocumentReference>) xwikiContext.get(DOCUMENT_REFERENCE_STACK_KEY);
+        if (documentReferenceStack == null) {
+            documentReferenceStack = new Stack<DocumentReference>();
+            xwikiContext.put(DOCUMENT_REFERENCE_STACK_KEY, documentReferenceStack);
+        } else if (documentReferenceStack.contains(document.getDocumentReference())) {
+            logger.warn("Infinite recursion detected while displaying the title of [{}]. "
+                + "Using the document name as title.", document.getDocumentReference());
+            return getStaticTitle(document);
+        }
+
+        documentReferenceStack.push(document.getDocumentReference());
+        try {
+            return displayTitle(document, parameters);
+        } finally {
+            documentReferenceStack.pop();
+        }
+    }
+
+    private XDOM displayTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    {
         // 1. Try to use the title provided by the user.
-        if (!StringUtils.isEmpty(document.getTitle())) {
+        String rawTitle = document.getTitle();
+        if (!StringUtils.isEmpty(rawTitle)) {
             try {
-                return parseTitle(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
+                String title = rawTitle;
+                // Evaluate the title only if the document has script rights, otherwise use the raw title.
+                if (authorizationManager.hasAccess(Right.SCRIPT, document.getContentAuthorReference(),
+                    document.getDocumentReference())) {
+                    title = evaluateTitle(rawTitle, document.getDocumentReference(), parameters);
+                }
+                return parseTitle(title);
             } catch (Exception e) {
-                String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                logger.warn("Failed to interpret title of document [{}].", reference);
+                logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
             }
         }
 
         // 2. Try to extract the title from the document content.
-        try {
-            XDOM title = safeExtractTitleFromContent(document, parameters);
-            if (title != null) {
-                return title;
+        if ("1".equals(this.xwikicfg.getProperty("xwiki.title.compatibility", "0"))) {
+            try {
+                XDOM title = extractTitleFromContent(document, parameters);
+                if (title != null) {
+                    return title;
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(),
+                    e);
             }
-        } catch (Exception e) {
-            String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-            logger.warn("Failed to extract title from content of document [{}].", reference);
         }
 
-        // 3. No title has been found. Use the document name as title.
-        return parseTitle(document.getDocumentReference().getName());
+        // 3. The title was not specified or its evaluation failed. Use the document name as a fall-back.
+        return getStaticTitle(document);
     }
 
     /**
      * Parses the given title as plain text and returns the generated XDOM.
-     * 
+     *
      * @param title the title to be parsed
      * @return the XDOM generated from parsing the title as plain text
      */
@@ -145,7 +206,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * Evaluates the Velocity script from the specified title.
-     * 
+     *
      * @param title the title to evaluate
      * @param documentReference a reference to the document whose title is evaluated
      * @param parameters display parameters
@@ -155,57 +216,44 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String nameSpace =
+        String namespace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
                 : documentAccessBridge.getCurrentDocumentReference());
+
+        // Get the velocity engine
+        VelocityEngine velocityEngine;
+        try {
+            velocityEngine = this.velocityManager.getVelocityEngine();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Execute Velocity code
         Map<String, Object> backupObjects = null;
+        boolean canPop = false;
+        EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
                 // The following method call also clones the execution context.
                 documentAccessBridge.pushDocumentInContext(backupObjects, documentReference);
+                // Pop the document from the context only if the push was successful!
+                canPop = true;
+                // Make sure to synchronize the context wiki with the context document's wiki.
+                modelContext.setCurrentEntityReference(documentReference.getWikiReference());
             }
-            velocityManager.getVelocityEngine()
-                .evaluate(velocityManager.getVelocityContext(), writer, nameSpace, title);
+            velocityEngine
+                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (parameters.isExecutionContextIsolated()) {
+            if (canPop) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
+                // Also restore the context wiki.
+                this.modelContext.setCurrentEntityReference(currentWikiReference);
             }
         }
         return writer.toString();
-    }
-
-    /**
-     * Extracts the title from the document content. This method prevents infinite recursion which can happen for
-     * instance if the title displayer is called from a script within the first heading in the document content.
-     * 
-     * @param document the document to extract the title from
-     * @param parameters display parameters
-     * @return the title XDOM
-     */
-    private XDOM safeExtractTitleFromContent(DocumentModelBridge document, DocumentDisplayerParameters parameters)
-    {
-        // Protect against cycles which can happen for instance if the document title displayer is called on the current
-        // document from a script within the first content heading.
-        Map<Object, Object> xwikiContext = getXWikiContextMap();
-        @SuppressWarnings("unchecked")
-        Stack<DocumentReference> stackTrace =
-            (Stack<DocumentReference>) xwikiContext.get(EXTRACT_TITLE_STACK_TRACE_KEY);
-        if (stackTrace == null) {
-            stackTrace = new Stack<DocumentReference>();
-            xwikiContext.put(EXTRACT_TITLE_STACK_TRACE_KEY, stackTrace);
-        } else if (stackTrace.contains(document.getDocumentReference())) {
-            return null;
-        }
-
-        stackTrace.push(document.getDocumentReference());
-        try {
-            return extractTitleFromContent(document, parameters);
-        } finally {
-            stackTrace.pop();
-        }
     }
 
     /**
@@ -219,13 +267,29 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * Extracts the title from the document content.
-     * 
+     *
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM
+     * @deprecated since 7.0M1
      */
+    @Deprecated
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
+
+    /**
+     * @param document an XWiki document
+     * @return the title used as a fall-back when the dynamic title cannot be evaluated
+     */
+    private XDOM getStaticTitle(DocumentModelBridge document)
+    {
+        String documentName = document.getDocumentReference().getName();
+        if (defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName().equals(documentName)) {
+            // This document represents a space (it is the home page of a space). Use the space name instead.
+            documentName = document.getDocumentReference().getParent().getName();
+        }
+        return parseTitle(documentName);
+    }
 
     /**
      * @return the object used for logging

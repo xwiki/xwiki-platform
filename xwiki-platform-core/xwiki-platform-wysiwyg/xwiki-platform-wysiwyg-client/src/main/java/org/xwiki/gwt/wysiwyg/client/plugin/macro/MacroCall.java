@@ -193,11 +193,7 @@ public class MacroCall
         this.content = content;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#toString()
-     */
+    @Override
     public String toString()
     {
         StringBuffer strBuff = new StringBuffer(START_MACRO);

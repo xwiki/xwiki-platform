@@ -34,22 +34,14 @@ public class CachedListBoxPicker extends DynamicListBoxPicker
      */
     private Map<String, Integer> cache = new HashMap<String, Integer>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DynamicListBoxPicker#setValue(int, String)
-     */
+    @Override
     public void setValue(int index, String value)
     {
         cache.clear();
         super.setValue(index, value);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DynamicListBoxPicker#setSelectedValue(String, Matcher)
-     */
+    @Override
     protected void setSelectedValue(String value, Matcher<String> matcher)
     {
         Integer index = cache.get(value);

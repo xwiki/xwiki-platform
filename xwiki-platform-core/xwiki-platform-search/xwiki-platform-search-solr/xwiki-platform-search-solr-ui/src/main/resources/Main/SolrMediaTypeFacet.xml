@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Main</web>
+  <name>SolrMediaTypeFacet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1393233536000</creationDate>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1393242399000</date>
+  <contentUpdateDate>1393242399000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (displaySearchFacetValues_mediaType $facetValues)
+  #set ($discard = $xwiki.ssx.use('Main.SolrMediaTypeFacet'))
+  #set ($discard = $xwiki.jsx.use('Main.SolrMediaTypeFacet'))
+  #set ($categoryMap = $solrConfig.facet.mediaType.categories)
+  #groupMediaTypes($facetValues $categoryMap true)
+  ## We also need to group some technical media types inside a category.
+  #set ($subcategoryMap = $solrConfig.facet.mediaType.subcategories)
+  #foreach ($facetValue in $facetValues)
+    #set ($subcategories = $subcategoryMap.get($facetValue.id))
+    #if ($subcategories)
+      #groupMediaTypes($facetValue.mediaTypesWithCounts $subcategories)
+      ## Update the list of media types to be able to unselect all subcategories when a category is selected.
+      #set ($discard = $facetValue.mediaTypes.clear())
+      #foreach ($mediaType in $facetValue.mediaTypesWithCounts)
+        #set ($discard = $facetValue.mediaTypes.add($mediaType.name))
+      #end
+    #end
+  #end
+  #displayMediaTypesWithPagination($facetValues)
+#end
+
+#macro (groupMediaTypes $mediaTypes $groups $groupRemainingMediaTypes)
+  #set ($matchedGroups = [])
+  #set ($groupedMediaTypes = [])
+  #foreach ($entry in $groups.entrySet())
+    #set ($group = {
+      'id': $entry.key,
+      'count': 0,
+      'mediaTypes': [],
+      'mediaTypesWithCounts': []
+    })
+    #foreach ($mediaType in $mediaTypes)
+      ## See if this media type is included in this group.
+      #foreach ($pattern in $entry.value)
+        #if ($mediaType.name == $pattern || $mediaType.name.startsWith($pattern) || $mediaType.name.endsWith($pattern))
+          #set ($group.count = $group.count + $mediaType.count)
+          #set ($discard = $group.mediaTypes.add($mediaType.name))
+          #set ($discard = $group.mediaTypesWithCounts.add($mediaType))
+          #set ($discard = $groupedMediaTypes.add($mediaType))
+          #break
+        #end
+      #end
+    #end
+    #if ($group.count &gt; 0)
+      ## Compute the filter value.
+      #joinMediaTypes($entry.value $escapedFilterValue)
+      #set ($discard = $group.put('name', $escapedFilterValue))
+      #set ($discard = $matchedGroups.add($group))
+    #end
+  #end
+  #set ($discard = $mediaTypes.removeAll($groupedMediaTypes))
+  #if ($groupRemainingMediaTypes &amp;&amp; $mediaTypes &amp;&amp; $mediaTypes.size() &gt; 0)
+    #set ($other = {
+      'id': 'other',
+      'count': 0,
+      'mediaTypes': [],
+      'mediaTypesWithCounts': []
+    })
+    #set ($discard = $other.mediaTypesWithCounts.addAll($mediaTypes))
+    #foreach ($mediaType in $mediaTypes)
+      #set ($other.count = $other.count + $mediaType.count)
+      #set ($discard = $other.mediaTypes.add($mediaType.name))
+    #end
+    #joinMediaTypes($other.mediaTypes $escapedFilterValue)
+    #set ($discard = $other.put('name', $escapedFilterValue))
+    #set ($discard = $mediaTypes.clear())
+    #set ($discard = $mediaTypes.add($other))
+  #end
+  #set ($discard = $mediaTypes.addAll($matchedGroups))
+  ## Sort the media type groups based on the number of matches.
+  ## Note that the sort tool doesn't change the passed list.
+  #set ($sortedMediaTypes = $sorttool.sort($mediaTypes, 'count:desc'))
+  #set ($discard = $mediaTypes.clear())
+  #set ($discard = $mediaTypes.addAll($sortedMediaTypes))
+#end
+
+#macro (joinMediaTypes $mediaTypes $return)
+  #set ($escapedMediaTypes = [])
+  #foreach ($mediaType in $mediaTypes)
+    ## Escape the characters that have special meaning in the filter query.
+    #set ($escapedMediaType = $mediaType.replaceAll('([/.+\-])', '\\$1'))
+    #if ($mediaType.indexOf('/') &gt; 0)
+      ## Prefix.
+      #set ($escapedMediaType = "$escapedMediaType*")
+    #else
+      ## Suffix.
+      #set ($escapedMediaType = "*$escapedMediaType")
+    #end
+    #set ($discard = $escapedMediaTypes.add($escapedMediaType))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" "($stringtool.join($escapedMediaTypes, ' '))")
+#end
+
+#macro (displayMediaTypesWithPagination $categories)
+  #set ($limitRequestParameter = "l_$facetField.name")
+  #set ($categoryLimit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #if ("$!categoryLimit" == '')
+    #set ($categoryLimit = $solrConfig.facetPaginationStep)
+  #end
+  #set ($categoryLimit = $mathtool.max($mathtool.min($categoryLimit, $categories.size()), 0))
+  &lt;ul class="mediaTypes"&gt;
+    #foreach ($category in $categories)
+      #if ($foreach.index &lt; $categoryLimit)
+        &lt;li&gt;
+          ## Backup the selected values to be able to restore them afterwards.
+          #set ($facetRequestValuesBackup = $facetRequestValues)
+          ## When an entire category is selected we need to remove the values that were selected from that category.
+          #set ($facetRequestValues = [])
+          #if ($facetRequestValuesBackup)
+            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
+              $facetRequestValuesBackup.size())))
+            #set ($discard = $facetRequestValues.removeAll($category.mediaTypes))
+          #end
+          &lt;div class="mediaTypeCategory"&gt;#displaySearchFacetValue($category {} 'displaySearchFacetValue_mediaType')&lt;/div&gt;
+          ## When a media type is selected, it's category should be unselected.
+          #set ($facetRequestValues = [])
+          #if ($facetRequestValuesBackup)
+            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
+              $facetRequestValuesBackup.size())))
+            #set ($discard = $facetRequestValues.remove($category.name))
+          #end
+          &lt;ul&gt;#displaySearchFacetValuesLimited($category.mediaTypesWithCounts {} 'displaySearchFacetValue_mediaType')&lt;/ul&gt;
+          ## Restore the selected values.
+          #set ($facetRequestValues = $facetRequestValuesBackup)
+        &lt;/li&gt;
+      #else
+        #extendQueryString($url {$limitRequestParameter: [$mathtool.add($categoryLimit, $solrConfig.facetPaginationStep)]})
+        &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
+          'solr.facets.moreValues', [$mathtool.sub($categories.size(), $categoryLimit)]))&lt;/a&gt;&lt;/li&gt;
+        #break
+      #end
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_mediaType $mediaType)
+  #if ($facetValue.id)
+    ## A media type category.
+    $services.localization.render("solr.filterBy.fileType.$facetValue.id")
+  #else
+    #set ($prettyName = $stringtool.substringAfter($mediaType, '/'))
+    ## Fonts have a dedicated category so we can remove the 'x-font-' prefix.
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-font-'))
+    ## Non-standard media type, i.e. not registered with the Internet Assigned Numbers Authority (IANA).
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-'))
+    ## Vendor specific media type.
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'vnd.'))
+    ## Many media types end with '+xml' or something similar. Let's remove this part.
+    #set ($prettyName = $stringtool.substringBeforeLast($prettyName, '+'))
+    ## Attempt to translate the pretty name.
+    #set ($translationKey = "solr.facet.fileType.${category.id}.$prettyName")
+    #if ($services.localization.get($translationKey))
+      #set ($prettyName = $services.localization.render($translationKey))
+    #elseif ($prettyName.length() &lt; 5)
+      ## Probably a file extension (or acronym).
+      #set ($prettyName = $prettyName.toUpperCase())
+    #end
+    &lt;span title="$mediaType"&gt;$prettyName&lt;/span&gt;
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($facetValues)
+  {{html}}#displaySearchFacetValues_mediaType($facetValues){{/html}}
+#end
+{{/velocity}}</content>
+  <object>
+    <name>Main.SolrMediaTypeFacet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4de439b7-54f8-40c1-a3e0-33525bf31737</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  var enhanceMediaTypeCategory = function() {
+    var category = $(this);
+    var subtypes = category.next('ul');
+    var selected = category.add(subtypes).find('.selected, input:checked').size() &gt; 0;
+    !selected &amp;&amp; category.addClass('closed');
+    subtypes.toggle(selected);
+    category.find('.itemCount').click(function(event) {
+      category.toggleClass('closed');
+      subtypes.toggle();
+    });
+  };
+
+  var maybeEnhanceMediaTypeCategory = function() {
+    if (!this.__mediaTypeCategory) {
+      this.__mediaTypeCategory = true;
+      enhanceMediaTypeCategory.call(this);
+    }
+  };
+
+  var enhanceMediaTypeFacets = function(elements) {
+    $(elements).find('.search-facet .mediaTypes .mediaTypeCategory').each(maybeEnhanceMediaTypeCategory);
+  };
+
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceMediaTypeFacets(data.elements);
+  });
+
+  enhanceMediaTypeFacets(document.body);
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Main.SolrMediaTypeFacet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>40f6ca03-fe7f-4159-927c-87323db27877</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.search-facet-body ul.mediaTypes ul {
+  margin-left: 1em;
+}
+
+/* Don't highlight the entire media type category. */
+.search-facet-body ul.mediaTypes &gt; li:hover {
+  background-color: transparent;
+}
+.search-facet-body .mediaTypeCategory:hover {
+  background-color: $theme.highlightColor;
+}
+
+.mediaTypeCategory .itemCount {
+  background: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-down.png')") no-repeat scroll 100% 50% transparent;
+  cursor: pointer;
+  padding-right: 9px;
+}
+.mediaTypeCategory .itemCount:hover {
+  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-down.png')")
+}
+.mediaTypeCategory.closed .itemCount {
+  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-left.png')")
+}
+.mediaTypeCategory.closed .itemCount:hover {
+  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-left.png')")
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

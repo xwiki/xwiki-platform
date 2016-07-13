@@ -83,7 +83,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    return new XWikiDocument(new DocumentReference(getContext().getDatabase(),
+                    return new XWikiDocument(new DocumentReference(getContext().getWikiId(),
                         (String) invocation.parameterValues.get(0), "WebPreferences"));
                 }
             });
@@ -94,7 +94,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
         this.user.setNew(false);
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         BaseObject userObject = new BaseObject();
         userObject.setClassName("XWiki.XWikiUser");
         this.user.addXObject(userObject);
@@ -103,7 +103,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
         this.group.setNew(false);
-        getContext().setDatabase(this.group.getWikiName());
+        getContext().setWikiId(this.group.getWikiName());
         BaseObject groupObject = new BaseObject();
         groupObject.setClassName("XWiki.XWikiGroups");
         groupObject.setStringValue("member", this.user.getFullName());
@@ -113,7 +113,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         this.group2 = new XWikiDocument(new DocumentReference("wiki2", "XWiki", "group2"));
         this.group2.setNew(false);
-        getContext().setDatabase(this.group2.getWikiName());
+        getContext().setWikiId(this.group2.getWikiName());
         BaseObject group2Object = new BaseObject();
         group2Object.setClassName("XWiki.XWikiGroups");
         group2Object.setStringValue("member", this.user.getPrefixedFullName());
@@ -130,9 +130,9 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 {
                     XWikiContext context = (XWikiContext) invocation.parameterValues.get(3);
 
-                    if (context.getDatabase().equals(group.getWikiName())) {
+                    if (context.getWikiId().equals(group.getWikiName())) {
                         return Collections.singleton(group.getDocumentReference());
-                    } else if (context.getDatabase().equals(group2.getWikiName())) {
+                    } else if (context.getWikiId().equals(group2.getWikiName())) {
                         return Collections.singleton(group2.getDocumentReference());
                     } else {
                         return Collections.emptyList();
@@ -167,7 +167,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 
-        getContext().setDatabase("wiki2");
+        getContext().setWikiId("wiki2");
 
         boolean result =
             this.rightService.checkRight(this.user.getPrefixedFullName(), doc, "view", true, true, true, getContext());
@@ -206,8 +206,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    if (!getContext().getDatabase().equals(wikiName)) {
-                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    if (!getContext().getWikiId().equals(wikiName)) {
+                        new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
                     }
 
                     return preferences;
@@ -216,7 +216,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
             returnValue(doc));
 
-        getContext().setDatabase(wikiName);
+        getContext().setWikiId(wikiName);
 
         assertFalse("Admin rights must not be considered when set on document level.",
                     this.rightService.hasAccessLevel("admin", this.user.getPrefixedFullName(),
@@ -242,8 +242,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    if (!getContext().getDatabase().equals("wiki2")) {
-                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    if (!getContext().getWikiId().equals("wiki2")) {
+                        new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
                     }
 
                     return preferences;
@@ -252,7 +252,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
             returnValue(doc));
 
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
 
         assertFalse("User from another wiki has right on a local wiki", this.rightService.hasAccessLevel("view",
             this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true, getContext()));
@@ -261,7 +261,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         preferencesObject.setStringValue("users", this.user.getPrefixedFullName());
 
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
 
         assertTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -270,7 +270,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
 
-        getContext().setDatabase(doc.getWikiName());
+        getContext().setWikiId(doc.getWikiName());
 
         assertTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -287,7 +287,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         preferencesObject.setStringValue("groups", this.group.getPrefixedFullName());
 
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
 
         assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -296,7 +296,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
 
-        getContext().setDatabase(doc.getWikiName());
+        getContext().setWikiId(doc.getWikiName());
 
         assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -309,7 +309,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         preferencesObject.setStringValue("groups", this.group2.getFullName());
 
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         
         assertTrue("User group from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -318,7 +318,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
 
-        getContext().setDatabase(doc.getWikiName());
+        getContext().setWikiId(doc.getWikiName());
 
         assertTrue("User group from another wiki does not have right on a local wiki when tested from local wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -333,7 +333,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getWikiOwner").with(eq(doc.getWikiName()), ANYTHING).will(
             returnValue(this.user.getPrefixedFullName()));
 
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
 
         assertTrue("Wiki owner from another wiki does not have right on a local wiki when tested from user wiki",
             this.rightService.hasAccessLevel("view", this.user.getPrefixedFullName(), doc.getPrefixedFullName(), true,
@@ -342,7 +342,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             this.rightService.hasAccessLevel("view", this.user.getFullName(), doc.getPrefixedFullName(), true,
                 getContext()));
 
-        getContext().setDatabase(doc.getWikiName());
+        getContext().setWikiId(doc.getWikiName());
 
         assertTrue(
             "Wiki owner group from another wiki does not have right on a local wiki when tested from local wiki",
@@ -371,11 +371,11 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             eq(preferences.getPageName()), ANYTHING).will(returnValue(preferences));
         this.mockXWiki.stubs().method("getDocument").with(eq(XWIKIPREFERENCES_REFERENCE), ANYTHING).will(
             returnValue(new XWikiDocument(
-                new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"))));
+                new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreferences"))));
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
             returnValue(doc));
 
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
         getContext().setDoc(doc);
 
         assertFalse("Failed to check right with only page name", this.rightService.hasAccessLevel("view", this.user
@@ -408,7 +408,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().remove("doc");
         getContext().remove("sdoc");
       
-        getContext().setDatabase(getContext().getMainXWiki());
+        getContext().setWikiId(getContext().getMainXWiki());
 
         // XWiki.Programmer should have PR, as per the global rights.
         getContext().setUser("XWiki.Programmer");
@@ -444,8 +444,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    if (!getContext().getDatabase().equals("wiki2")) {
-                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    if (!getContext().getWikiId().equals("wiki2")) {
+                        new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
                     }
 
                     return preferences;
@@ -469,7 +469,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
             eq(new DocumentReference("wiki2", "XWiki", XWikiRightService.GUEST_USER)), ANYTHING, ANYTHING, ANYTHING)
             .will(returnValue(Collections.emptyList()));
 
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
 
         assertFalse("Guest has wiew right on the document", this.rightService.hasAccessLevel("view",
             XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true, getContext()));
@@ -478,13 +478,13 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         preferencesObject.setStringValue("users", XWikiRightService.GUEST_USER_FULLNAME);
 
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
 
         assertTrue("Guest does not have right on the document when tested from another wiki", this.rightService
             .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true,
                 getContext()));
 
-        getContext().setDatabase(doc.getDatabase());
+        getContext().setWikiId(doc.getDatabase());
 
         assertTrue("Guest does not have right on the document when tested from the document wiki", this.rightService
             .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true,
@@ -555,7 +555,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
     public void testHasAccessLevelForDeleteRightWhenUserIsDocumentCreator() throws Exception
     {
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         final XWikiDocument doc = new XWikiDocument(new DocumentReference(this.user.getWikiName(), "Space", "Page"));
 
         // Set the creator to be the user we test against since creator should get delete rights
@@ -588,13 +588,13 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
     public void testHasAccessLevelOnEmptyWiki() throws Exception
     {
-        getContext().setDatabase("xwiki");
+        getContext().setWikiId("xwiki");
 
         final XWikiDocument doc
-            = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space", "Page"));
+            = new XWikiDocument(new DocumentReference(getContext().getWikiId(), "Space", "Page"));
 
         final XWikiDocument xwikiPreferences
-            = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+            = new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
 
         this.mockGroupService.stubs().method("getAllGroupsReferencesForMember")
             .with(ANYTHING, ANYTHING, ANYTHING, ANYTHING).will(
@@ -629,24 +629,24 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         if (shouldAllow) {
             assertTrue(level + " for admin should be allowed.",
-                       this.rightService.hasAccessLevel(level, getContext().getDatabase() + ":XWiki.Admin",
+                       this.rightService.hasAccessLevel(level, getContext().getWikiId() + ":XWiki.Admin",
                                                         doc.getFullName(), getContext()));
         } else {
             assertFalse(level + " for admin should be denied.",
-                        this.rightService.hasAccessLevel(level, getContext().getDatabase() + ":XWiki.Admin",
+                        this.rightService.hasAccessLevel(level, getContext().getWikiId() + ":XWiki.Admin",
                                                          doc.getFullName(), getContext()));
         }
     }
 
     public void testAdminAccessLevels() throws Exception
     {
-        getContext().setDatabase("xwiki");
+        getContext().setWikiId("xwiki");
         
         final XWikiDocument doc
-            = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space", "Page"));
+            = new XWikiDocument(new DocumentReference(getContext().getWikiId(), "Space", "Page"));
 
         final XWikiDocument xwikiPreferences
-            = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+            = new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
 
         this.mockGroupService.stubs().method("getAllGroupsReferencesForMember")
             .with(ANYTHING, ANYTHING, ANYTHING, ANYTHING).will(
@@ -674,7 +674,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         preferencesObject.setClassName("XWiki.XWikiGlobalRights");
         preferencesObject.setStringValue("levels", "admin");
         preferencesObject.setIntValue("allow", 1);
-        preferencesObject.setStringValue("users", getContext().getDatabase() + ":XWiki.Admin");
+        preferencesObject.setStringValue("users", getContext().getWikiId() + ":XWiki.Admin");
         xwikiPreferences.addXObject(preferencesObject);
 
         assertAccessLevelForAdminUser("login"      , doc, true);
@@ -701,14 +701,14 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
         this.user.setNew(false);
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         BaseObject userObject = new BaseObject();
         userObject.setClassName("XWiki.XWikiUser");
         this.user.addXObject(userObject);
         this.mockXWiki.stubs().method("getDocument").with(eq(this.user.getPrefixedFullName()), ANYTHING).will(
             returnValue(this.user));
 
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         final XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki", "Space", "Document"));
 
         this.mockXWiki.stubs().method("getDocument").with(eq(doc.getPrefixedFullName()), ANYTHING).will(
@@ -744,8 +744,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    if (!getContext().getDatabase().equals("wiki")) {
-                        new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreference"));
+                    if (!getContext().getWikiId().equals("wiki")) {
+                        new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreference"));
                     }
 
                     return preferences;
@@ -811,7 +811,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
     // See also: http://jira.xwiki.org/browse/XWIKI-8892
     public void testDeniesAccessLevelForCreateIfDocumentDeniesEdit() throws Exception
     {
-        getContext().setDatabase(this.user.getWikiName());
+        getContext().setWikiId(this.user.getWikiName());
         final XWikiDocument doc = new XWikiDocument(new DocumentReference(this.user.getWikiName(), "Space", "Page"));
 
         // Set the creator to be the user we test against since creator should get delete rights

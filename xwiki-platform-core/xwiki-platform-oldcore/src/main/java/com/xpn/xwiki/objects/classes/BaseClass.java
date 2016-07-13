@@ -34,12 +34,17 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
+import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,11 +67,13 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
  * {@link PropertyClass} and defines a single XClass property.
- * 
+ *
  * @version $Id$
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
+
     private String customMapping;
 
     private String customClass;
@@ -87,17 +94,39 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private boolean isDirty = true;
 
     /**
-     * The owner document, if this object was obtained from a document.
-     */
-    private transient XWikiDocument ownerDocument;
-
-    /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentMixedDocumentReferenceResolver == null) {
+            this.currentMixedDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentMixedDocumentReferenceResolver;
+    }
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks.
+     * 
+     * @since 7.2M3
+     */
+    private DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
+    {
+        if (this.currentDocumentReferenceResolver == null) {
+            this.currentDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        }
+
+        return this.currentDocumentReferenceResolver;
+    }
 
     @Override
     public DocumentReference getReference()
@@ -109,7 +138,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
-     * 
+     * </p>
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -124,7 +154,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * <p>
      * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and has been
      * replaced by this overridden method. See XWIKI-5285
-     * 
+     * </p>
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -138,13 +169,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
             if (reference != null) {
                 EntityReference relativeReference =
-                    this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+                    getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
                 reference =
                     new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
                         new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
                             .getParent().getParent()));
             } else {
-                reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+                reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
             }
             setDocumentReference(reference);
         }
@@ -155,7 +186,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * This insures natural ordering between properties.
-     * 
+     * </p>
+     *
      * @see com.xpn.xwiki.objects.BaseCollection#addField(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
      */
     @Override
@@ -176,7 +208,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Mark a property as disabled. A disabled property should not be editable, but existing object values are still
      * kept in the database.
-     * 
+     *
      * @param name the name of the property to disable
      * @since 2.4M2
      */
@@ -193,7 +225,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     /**
      * Re-enable a property. This field will appear again in object instances.
-     * 
+     *
      * @param name the name of the property to enable
      * @since 2.4M2
      */
@@ -224,7 +256,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Get the list of enabled (the default, normal state) property definitions that exist in this class. The resulting
      * list is unmodifiable, but the contained elements are live.
-     * 
+     *
      * @return an unmodifiable list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
      * @since 2.4M2
@@ -252,7 +284,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Get the list of disabled property definitions that exist in this class. The resulting list is unmodifiable, but
      * the contained elements are live.
-     * 
+     *
      * @return an unmodifiable list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
      * @since 2.4M2
@@ -281,7 +313,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * Get the list of disabled properties that exist in a given object. This list is a subset of all the disabled
      * properties in a class, since the object could have been created and stored before some of the class properties
      * were added. The resulting list is unmodifiable, but the contained elements are live.
-     * 
+     *
      * @param object the instance of this class where the disabled properties must exist
      * @return an unmodifiable list containing the disabled properties of the given object
      * @see PropertyClass#isDisabled()
@@ -313,7 +345,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
      * which exists in the Object but doesn't exist anymore in the Class, or which has the wrong data type. This is used
      * for synchronization of existing or imported Objects with respect to the modifications of their associated Class.
-     * 
+     *
      * @param object the instance of this class where to look for undefined properties
      * @return an unmodifiable list containing the properties of the object which don't exist in the class
      * @since 2.4M2
@@ -366,14 +398,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @deprecated since 2.2.3 use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
      */
     @Deprecated
-    public BaseCollection fromMap(Map<String, ? > map, XWikiContext context) throws XWikiException
+    public BaseCollection fromMap(Map<String, ?> map, XWikiContext context) throws XWikiException
     {
         BaseCollection object = newObject(context);
 
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ? > map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -382,8 +414,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 BaseProperty objprop;
                 if (formvalues instanceof String[]) {
                     objprop = property.fromStringArray(((String[]) formvalues));
-                } else {
+                } else if (formvalues instanceof String) {
                     objprop = property.fromString(formvalues.toString());
+                } else {
+                    objprop = property.fromValue(formvalues);
                 }
 
                 if (objprop != null) {
@@ -396,7 +430,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return object;
     }
 
-    public BaseCollection fromValueMap(Map<String, ? > map, BaseCollection object)
+    public BaseCollection fromValueMap(Map<String, ?> map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -448,7 +482,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!getCustomMapping().equals(bclass.getCustomMapping())) {
+        if (!Objects.equal(this.customMapping, bclass.customMapping)
+            && !getCustomMapping().equals(bclass.getCustomMapping())) {
             return false;
         }
 
@@ -579,24 +614,30 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 Element pcel = list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
+
                 PropertyClassProvider provider = null;
-                try {
-                    // First try to use the specified class type as hint.
+                // First try to use the specified class type as hint.
+                if (Utils.getComponentManager().hasComponent(PropertyClassProvider.class, classType)) {
                     provider = Utils.getComponent(PropertyClassProvider.class, classType);
-                } catch (Exception e) {
+                } else {
                     // In previous versions the class type was the full Java class name of the property class
                     // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
                     classType = StringUtils.removeEnd(StringUtils.substringAfterLast(classType, "."), "Class");
                     provider = Utils.getComponent(PropertyClassProvider.class, classType);
                 }
-                // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but it
-                // doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
-                // assumption that all property classes extend PropertyClass.
-                PropertyClass property = (PropertyClass) provider.getInstance();
-                property.setName(name);
-                property.setObject(this);
-                property.fromXML(pcel);
-                safeput(name, property);
+
+                if (provider != null) {
+                    // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but
+                    // it doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
+                    // assumption that all property classes extend PropertyClass.
+                    PropertyClass property = (PropertyClass) provider.getInstance();
+                    property.setName(name);
+                    property.setObject(this);
+                    property.fromXML(pcel);
+                    safeput(name, property);
+                } else {
+                    LOGGER.warn("Uknown property type [{}]", classType);
+                }
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
@@ -621,7 +662,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            Object[] args = {xml};
+            Object[] args = { xml };
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml {0}", e, args);
         }
@@ -673,6 +714,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             emailClass.setSize(size);
             emailClass.setObject(this);
             put(fieldName, emailClass);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean addTimezoneField(String fieldName, String fieldPrettyName, int size)
+    {
+        if (get(fieldName) == null) {
+            TimezoneClass timezoneClass = new TimezoneClass();
+            timezoneClass.setName(fieldName);
+            timezoneClass.setPrettyName(fieldPrettyName);
+            timezoneClass.setSize(size);
+            timezoneClass.setObject(this);
+            put(fieldName, timezoneClass);
 
             return true;
         }
@@ -780,7 +837,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTemplateField(String fieldName, String fieldPrettyName)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, 80, 15);
+        boolean result = addTextAreaField(fieldName, fieldPrettyName, 80, 15);
+        
+        if (result) {
+            TextAreaClass property = (TextAreaClass) get(fieldName);
+            property.setStringValue("editor", "PureText");
+        }
+        
+        return result;
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)
@@ -1051,10 +1115,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if ((customClass == null) || (customClass.equals(""))) {
                 return new BaseObject();
             } else {
-                return (BaseObject) Class.forName(getCustomClass()).newInstance();
+                return (BaseObject) Class
+                    .forName(getCustomClass(), true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
-            Object[] args = {customClass};
+            Object[] args = { customClass };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}",
                 e, args);
@@ -1069,6 +1134,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         BaseClass bclass = context.getWiki().getXClass(classReference, context);
         BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        object.setXClassReference(classReference);
 
         return object;
     }
@@ -1159,8 +1225,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         boolean isValid = true;
         Object[] props = getPropertyNames();
-        for (int i = 0; i < props.length; i++) {
-            String propname = (String) props[i];
+        for (Object prop : props) {
+            String propname = (String) prop;
             BaseProperty property = (BaseProperty) obj.get(propname);
             PropertyClass propclass = (PropertyClass) get(propname);
             isValid &= propclass.validateProperty(property, context);
@@ -1177,6 +1243,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
     {
         try {
+            ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+            DocumentReference validationScriptReference =
+                getCurrentDocumentReferenceResolver().resolve(validationScript, getDocumentReference());
+
+            // Make sure target document is allowed to execute Groovy
+            // TODO: this check should probably be right in XWiki#parseGroovyFromPage
+            authorization.checkAccess(Right.PROGRAM, validationScriptReference);
+
             XWikiValidationInterface validObject =
                 (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
 
@@ -1190,8 +1264,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void flushCache()
     {
         Object[] props = getPropertyNames();
-        for (int i = 0; i < props.length; i++) {
-            String propname = (String) props[i];
+        for (Object prop : props) {
+            String propname = (String) prop;
             PropertyClass propclass = (PropertyClass) get(propname);
             if (propclass != null) {
                 propclass.flushCache();
@@ -1239,78 +1313,27 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
 
-        setCustomClass(MergeUtils.mergeCharacters(previousClass.getCustomClass(), newClass.getCustomClass(),
+        setCustomClass(MergeUtils.mergeOject(previousClass.getCustomClass(), newClass.getCustomClass(),
             getCustomClass(), mergeResult));
 
-        setCustomMapping(MergeUtils.mergeCharacters(previousClass.getCustomMapping(), newClass.getCustomMapping(),
+        setCustomMapping(MergeUtils.mergeOject(previousClass.getCustomMapping(), newClass.getCustomMapping(),
             getCustomMapping(), mergeResult));
 
-        setDefaultWeb(MergeUtils.mergeCharacters(previousClass.getDefaultWeb(), newClass.getDefaultWeb(),
-            getDefaultWeb(), mergeResult));
+        setDefaultWeb(MergeUtils.mergeOject(previousClass.getDefaultWeb(), newClass.getDefaultWeb(), getDefaultWeb(),
+            mergeResult));
 
-        setDefaultViewSheet(MergeUtils.mergeCharacters(previousClass.getDefaultViewSheet(),
-            newClass.getDefaultViewSheet(), getDefaultViewSheet(), mergeResult));
+        setDefaultViewSheet(MergeUtils.mergeOject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
+            getDefaultViewSheet(), mergeResult));
 
-        setDefaultEditSheet(MergeUtils.mergeCharacters(previousClass.getDefaultEditSheet(),
-            newClass.getDefaultEditSheet(), getDefaultEditSheet(), mergeResult));
+        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
+            getDefaultEditSheet(), mergeResult));
 
-        setNameField(MergeUtils.mergeCharacters(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+        setNameField(MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
             mergeResult));
 
         // Properties
 
-        List<ObjectDiff> classDiff = newClass.getDiff(previousClass, context);
-        for (ObjectDiff diff : classDiff) {
-            PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
-            PropertyClass previousProperty = (PropertyClass) previousClass.getField(diff.getPropName());
-            PropertyClass newProperty = (PropertyClass) newClass.getField(diff.getPropName());
-
-            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                if (propertyResult == null) {
-                    // Add if none has been added by user already
-                    addField(diff.getPropName(),
-                        configuration.isProvidedVersionsModifiables() ? newClass.getField(diff.getPropName())
-                            : newClass.getField(diff.getPropName()).clone());
-                    mergeResult.setModified(true);
-                } else if (!propertyResult.equals(newProperty)) {
-                    // XXX: collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getLog().error("Collision found on class property [{}]", newProperty.getReference());
-                }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Delete if it's the same as previous one
-                        removeField(diff.getPropName());
-                        mergeResult.setModified(true);
-                    } else {
-                        // XXX: collision between DB and new: property to remove but not the same as previous
-                        // version
-                        mergeResult.getLog().error("Collision found on class property [{}]",
-                            previousProperty.getReference());
-                    }
-                } else {
-                    // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Object property [{}] already removed", previousProperty.getReference());
-                }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Let some automatic migration take care of that modification between DB and new
-                        addField(diff.getPropName(), newClass.getField(diff.getPropName()));
-                        mergeResult.setModified(true);
-                    } else if (!propertyResult.equals(newProperty)) {
-                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
-                    }
-                } else {
-                    // XXX: collision between DB and new: property to modify but does not exists in DB
-                    // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn("Collision found on class property [{}]", newProperty.getReference());
-
-                    addField(diff.getPropName(), newClass.getField(diff.getPropName()));
-                    mergeResult.setModified(true);
-                }
-            }
-        }
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     @Override
@@ -1359,11 +1382,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
-        if (ownerDocument != null && isDirty) {
-            ownerDocument.setContentDirty(true);
+        super.setOwnerDocument(ownerDocument);
+
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
+        }
+
+        if (ownerDocument != null && this.isDirty) {
+            ownerDocument.setMetaDataDirty(true);
         }
     }
 
@@ -1374,8 +1403,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void setDirty(boolean isDirty)
     {
         this.isDirty = isDirty;
-        if (isDirty && ownerDocument != null) {
-            ownerDocument.setContentDirty(true);
+        if (isDirty && this.ownerDocument != null) {
+            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 }

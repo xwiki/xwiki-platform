@@ -38,6 +38,8 @@ import org.xwiki.model.reference.SpaceReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -51,19 +53,24 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver2;
 
-    /**
-     * The owner document, if this object was obtained from a document.
-     */
-    private XWikiDocument ownerDocument;
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentMixedDocumentReferenceResolver2 == null) {
+            this.currentMixedDocumentReferenceResolver2 =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentMixedDocumentReferenceResolver2;
+    }
 
     /**
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
-     * 
+     * </p>
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -77,7 +84,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * {@inheritDoc}
      * <p>
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
-     * 
+     * </p>
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -87,13 +95,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
-            EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+            EntityReference relativeReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
             reference =
                 new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
                     new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
                         .getParent().getParent()));
         } else {
-            reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
         }
         setDocumentReference(reference);
     }
@@ -196,7 +204,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
      * data but with a different identity.
-     * 
+     *
      * @since 2.2.3
      */
     public BaseObject duplicate()
@@ -281,15 +289,21 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 
     public void fromXML(Element oel) throws XWikiException
     {
-        Element cel = oel.element("class");
         BaseClass bclass = new BaseClass();
+
+        Element cel = oel.element("class");
         if (cel != null) {
             bclass.fromXML(cel);
-            setClassName(bclass.getName());
         } else {
-            // We need at least to set the class name to avoid some NullPointerExceptions
-            setClassName(oel.elementText("className"));
+            bclass.setName(oel.elementText("className"));
+
+            // Get what we can find in the database (we need a class to load the properties)
+            XWikiContext xcontext = Utils.getContext();
+            if (xcontext != null) {
+                bclass = xcontext.getWiki().getXClass(bclass.getDocumentReference(), xcontext);
+            }
         }
+        setXClassReference(bclass.getDocumentReference());
 
         setName(oel.element("name").getText());
         String number = oel.element("number").getText();
@@ -415,7 +429,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         if (prop != null) {
-            prop.setOwnerDocument(ownerDocument);
+            prop.setOwnerDocument(getOwnerDocument());
             safeput(fieldname, prop);
         }
     }
@@ -432,16 +446,39 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 
     /**
      * Set the owner document of this base object.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
-        for (String propertyName : getPropertyList()) {
-            BaseProperty property = (BaseProperty) getField(propertyName);
-            property.setOwnerDocument(ownerDocument);
+        super.setOwnerDocument(ownerDocument);
+
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
         }
+    }
+
+    @Override
+    protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context, MergeResult mergeResult)
+    {
+        BaseClass baseClass = getXClass(context);
+        if (baseClass != null) {
+            PropertyClass propertyClass = (PropertyClass) baseClass.get(currentElement.getName());
+            if (propertyClass != null) {
+                try {
+                    propertyClass.mergeProperty((BaseProperty) currentElement, (BaseProperty) previousElement,
+                        (BaseProperty) newElement, configuration, context, mergeResult);
+                } catch (Exception e) {
+                    mergeResult.getLog().error("Failed to merge field [{}]", currentElement.getName(), e);
+                }
+
+                return;
+            }
+        }
+
+        super.mergeField(currentElement, previousElement, newElement, configuration, context, mergeResult);
     }
 }

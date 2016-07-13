@@ -1,0 +1,94 @@
+#######################################################
+###                CHILDREN PAGE
+###              ------------------
+#######################################################
+##
+#######################################################
+##                   HEADER
+#######################################################
+#if($request.xpage == 'children')
+  #template("startpage.vm")
+    <div class="main layoutsubsection">
+      <div id="mainContentArea">
+        <div class="xcontent">
+#end
+#######################################################
+##                    TITLE
+#######################################################
+#set ($titleToDisplay = $services.localization.render('core.children.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+#template('contentheader.vm')
+#######################################################
+##                  CONTROLLER
+#######################################################
+#if ($request.hierarchy == 'parentchild')
+  #displayParentChildChildren()
+#else
+  #displayChildren()
+#end
+#######################################################
+##                 DISPLAY CHILDREN
+#######################################################
+#macro(displayChildren)
+  #if ($services.parentchild.isParentChildMechanismEnabled())
+    <div class="box warningmessage">
+      $services.localization.render('core.children.warningParentChild')
+    </div>
+  #end
+  
+  #if ($doc.name != 'WebHome')
+    <p>$services.localization.render('core.children.terminalPage')</p>
+  #else
+    ##
+    ## List the children documents using a livetable
+    ##
+    #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+    #set ($colprops = {
+      'doc.title'    : { 'link' : 'view', 'sortable': false },
+      'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
+      'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
+      '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
+    })
+    #set ($queryFilters = "unique")
+    #if ("$!request.displayHidden" == '')
+      #set ($queryFilters = "${queryFilters},hidden")
+    #end
+    #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=$queryFilters")
+    #set ($options = { 
+      'url' : "$doc.getURL('get', $urlParameters)",
+      'translationPrefix' : 'platform.index.',
+      'outputOnlyHtml' : true
+    })
+    #livetable('childrenIndex' $collist $colprops $options)
+    ## Load the hierarchy JS file because the locations of documents in the livetable results are displayed as hierarchy
+    #set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+  #end
+#end
+#######################################################
+## DISPLAY CHILDREN ACCORDING TO THE PARENT/CHILD MECHANISM
+#######################################################
+#macro(displayParentChildChildren)
+  #set ($childrenStatement = 'WHERE doc.fullName <> :parentFullName AND (doc.parent = :parentFullName OR (doc.parent = :parentName AND doc.space = :parentSpace))')
+  #set ($childrenQuery = $services.query.xwql($childrenStatement))
+  #set ($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+  #set ($children = $childrenQuery.addFilter('unique').execute())
+  #if ($children && $children.size() > 0)
+    <p>$services.localization.render('core.children.parentChildDescription')</p>
+    <ul>
+      #foreach ($child in $children)
+        #set ($rdoc = $xwiki.getDocument($child).getTranslatedDocument())
+        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
+      #end
+    </ul>
+  #else
+    <p>$services.localization.render('core.children.parentChildNoChild')</p>
+  #end
+#end
+#######################################################
+##                   FOOTER
+#######################################################
+#if($request.xpage == 'children')
+        </div> ## xcontent
+      </div> ## mainContentArea
+    </div> ## main
+  #template("endpage.vm")
+#end

@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.slf4j.Logger;
@@ -49,7 +52,9 @@ import uk.ac.ed.ph.snuggletex.jeuclid.SimpleMathMLImageSavingCallback;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("snuggletex")
+@Component
+@Named("snuggletex")
+@Singleton
 public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
 {
     /** Logging helper object. */
@@ -58,9 +63,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
     /** The SnuggleTeX engine responsible for rendering the formulae. */
     private SnuggleEngine engine = new SnuggleEngine();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ImageData renderImage(String formula, boolean inline, FormulaRenderer.FontSize size,
         FormulaRenderer.Type type) throws IllegalArgumentException, IOException
@@ -95,15 +97,12 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
          * @param target the target output, see {@link #target}
          * @param size the desired font size
          */
-        public CustomMathMLImageSavingCallback(OutputStream target, int size)
+        CustomMathMLImageSavingCallback(OutputStream target, int size)
         {
             this.target = target;
             setFontSize(String.valueOf(size));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public File getImageOutputFile(int mathmlCounter)
         {
@@ -111,9 +110,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public OutputStream getImageOutputStream(int mathmlCounter)
         {
@@ -121,9 +117,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return mathmlCounter == 0 ? this.target : null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getImageURL(int mathmlCounter)
         {
@@ -131,9 +124,6 @@ public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
             return "";
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void imageSavingFailed(Object imageFileOrOutputStream, int mathmlCounter, String contentType,
             Throwable exception)
         {

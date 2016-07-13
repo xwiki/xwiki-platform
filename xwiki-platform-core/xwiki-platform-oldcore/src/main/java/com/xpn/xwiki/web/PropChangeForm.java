@@ -22,7 +22,7 @@ package com.xpn.xwiki.web;
 /**
  * Struts Form for the class {@link PropDeleteAction property delete}, {@link PropDisableAction property disable} and
  * {@link PropEnableAction property enable} actions.
- * 
+ *
  * @version $Id$
  * @since 2.4M2
  */
@@ -31,9 +31,6 @@ public class PropChangeForm extends XWikiForm
     /** The name of the class property to remove. */
     private String propertyName;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readRequest()
     {
@@ -42,7 +39,7 @@ public class PropChangeForm extends XWikiForm
 
     /**
      * Getter for the {@link #propertyName property name}.
-     * 
+     *
      * @return the property name specified in the request
      */
     public String getPropertyName()
@@ -52,7 +49,7 @@ public class PropChangeForm extends XWikiForm
 
     /**
      * Setter for the {@link #propertyName property name}.
-     * 
+     *
      * @param propertyName the property name specified in the request
      */
     public void setPropertyName(String propertyName)

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,14 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>8.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
   <packaging>xar</packaging>
   <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-panels</xwiki.extension.features>
   </properties>
@@ -63,6 +59,40 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui</artifactId>
+      <version>1.11.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui-touch-punch</artifactId>
+      <version>0.2.3-2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to display icons -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Panels currently don't fully have their own Administration page. For example defining the left and right
          panels or whether left/right panels are displayed or not are currently defined in the Administration
          Application. In the future move those features in this Panel Application and remove this dependency. -->
@@ -73,5 +103,37 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to get the homepage in Panels.OrphanedPages -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Used to check access rights (e.g. in the Applications panel). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <!-- The EditTranslations page is not a Translation page and thus not a content page!
+               Note that we need to override the contentPages definition too as otherwise EditTranslations would be
+               considered as a content page and thus would require a language of "en" -->
+          <contentPages combine.self="override" />
+          <technicalPages>
+            <technicalPage>EditTranslations\.xml</technicalPage>
+            <technicalPage>(?!Translation.*\.xml).*\.xml</technicalPage>
+          </technicalPages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

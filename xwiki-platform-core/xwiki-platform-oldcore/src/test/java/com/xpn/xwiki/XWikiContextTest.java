@@ -49,7 +49,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     public void testgetUser()
     {
         getContext().setMainXWiki("wiki");
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
         getContext().setUserReference(new DocumentReference("wiki", "space", "user"));
 
         Assert.assertEquals("space.user", getContext().getUser());
@@ -57,7 +57,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("space.user", getContext().getXWikiUser().getUser());
         Assert.assertTrue("space.user", getContext().getXWikiUser().isMain());
 
-        getContext().setDatabase("wiki1");
+        getContext().setWikiId("wiki1");
 
         Assert.assertEquals("wiki:space.user", getContext().getUser());
         Assert.assertEquals("space.user", getContext().getLocalUser());
@@ -69,7 +69,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     public void testSetUser()
     {
         getContext().setMainXWiki("wiki");
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
         getContext().setUser("XWiki.user");
 
         Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), getContext().getUserReference());
@@ -85,7 +85,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
     public void testAnonymousUser()
     {
         getContext().setMainXWiki("wiki");
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
         getContext().setUserReference(null);
 
         Assert.assertNull(getContext().getUserReference());
@@ -93,7 +93,7 @@ public class XWikiContextTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("XWiki.XWikiGuest", getContext().getLocalUser());
         Assert.assertNull(getContext().getXWikiUser());
 
-        getContext().setDatabase("wiki2");
+        getContext().setWikiId("wiki2");
 
         Assert.assertNull(getContext().getUserReference());
         Assert.assertEquals("XWiki.XWikiGuest", getContext().getUser());

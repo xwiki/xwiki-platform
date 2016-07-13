@@ -50,21 +50,13 @@ public class ToolBarSeparator extends AbstractSeparator
         super("toolbar");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSeparator#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return new String[] {VERTICAL_BAR, LINE_BREAK};
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSeparator#getUIObject(String)
-     */
+    @Override
     public UIObject getUIObject(String feature)
     {
         if (VERTICAL_BAR.equals(feature)) {

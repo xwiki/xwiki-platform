@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>PanelsCode</web>
+  <name>ApplicationsPanelConfigurationAjax</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1413896334000</creationDate>
+  <parent>PanelsCode.ApplicationsPanelConfigurationSheet</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1413990631000</date>
+  <contentUpdateDate>1413989384000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if($xcontext.action=='get' &amp;&amp; $request.outputSyntax == 'plain')
+  #if(!$services.csrf.isTokenValid($request.form_token))
+  BAD CSRF
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, 'PanelsCode.ApplicationsPanelConfiguration'))
+  NO RIGHT
+  #else
+    ## Get the blacklist configuration
+    #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
+    ## Get the desired blacklist
+    #set($list = $jsontool.parse($request.blacklist))
+    #foreach($app in $list)
+      #set($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $app))
+      #if(!$blackListObj)
+        #set($blackListObj = $configDoc.newObject('PanelsCode.ApplicationsPanelBlackListClass'))
+        #set($discard = $blackListObj.set('applicationId', $app))
+      #end
+    #end
+    #foreach($obj in $configDoc.getObjects('PanelsCode.ApplicationsPanelBlackListClass').clone())
+      #set($app = $obj.getValue('applicationId'))
+      #if(!$list.contains($app))
+        #set($discard = $configDoc.removeObject($obj))
+      #end
+    #end
+    #set($discard = $configDoc.save("Save the new configuration"))
+    SUCCESS
+  #end
+#end
+{{/velocity}}
+</content>
+</xwikidoc>

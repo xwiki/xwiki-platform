@@ -28,6 +28,12 @@ import java.util.Properties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+
+/**
+ * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource} component instead
+ */
+@Deprecated
 public class XWikiConfig extends Properties
 {
     public XWikiConfig()
@@ -46,7 +52,7 @@ public class XWikiConfig extends Properties
                 IOUtils.closeQuietly(fis);
             }
         } catch (FileNotFoundException e) {
-            Object[] args = {path};
+            Object[] args = { path };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
         }
@@ -64,7 +70,7 @@ public class XWikiConfig extends Properties
         try {
             load(is);
         } catch (IOException e) {
-            Object[] args = {path};
+            Object[] args = { path };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG, XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR,
                 "Error reading configuration file", e, args);
         }
@@ -84,7 +90,7 @@ public class XWikiConfig extends Properties
      * <p>
      * This method trims the spaces around the value.
      * </p>
-     * 
+     *
      * @see java.util.Properties#getProperty(java.lang.String, java.lang.String)
      */
     @Override
@@ -98,7 +104,7 @@ public class XWikiConfig extends Properties
      * <p>
      * This method trims the spaces around the value.
      * </p>
-     * 
+     *
      * @see java.util.Properties#getProperty(java.lang.String)
      */
     @Override

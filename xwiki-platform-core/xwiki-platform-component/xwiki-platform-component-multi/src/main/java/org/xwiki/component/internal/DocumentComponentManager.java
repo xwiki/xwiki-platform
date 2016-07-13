@@ -21,13 +21,15 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current document in
@@ -47,6 +49,10 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
      */
     public static final String ID = "document";
 
+    @Inject
+    @Named("current")
+    private Provider<DocumentReference> referenceProvider;
+
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
@@ -54,12 +60,10 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
     @Named(SpaceComponentManager.ID)
     private ComponentManager spaceComponentManager;
 
-    /**
-     * Default constructor.
-     */
-    public DocumentComponentManager()
+    @Override
+    protected EntityReference getCurrentReference()
     {
-        super(EntityType.DOCUMENT);
+        return this.referenceProvider.get();
     }
 
     @Override

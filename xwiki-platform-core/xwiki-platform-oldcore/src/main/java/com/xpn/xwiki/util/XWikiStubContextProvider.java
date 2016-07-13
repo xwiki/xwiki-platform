@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiContext;
  * <p>
  * The reason to initialize it based on first request is to get some informations we could not know otherwise like a
  * default scheme/host/port.
- * 
+ *
  * @version $Id$
  */
 @Role
@@ -40,7 +40,7 @@ public interface XWikiStubContextProvider
      * <p>
      * We create initial stub context from a real XWikiContext to have a stub as complete as possible. Like getting the
      * proper host/port/scheme, the engine context etc.
-     * 
+     *
      * @param context a real XWikiContext
      */
     void initialize(XWikiContext context);

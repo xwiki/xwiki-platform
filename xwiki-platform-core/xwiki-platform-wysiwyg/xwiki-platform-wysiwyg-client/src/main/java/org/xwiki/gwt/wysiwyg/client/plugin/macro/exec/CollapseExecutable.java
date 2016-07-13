@@ -75,11 +75,7 @@ public class CollapseExecutable extends AbstractSelectionExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         for (Element macro : getMacros()) {
@@ -88,11 +84,7 @@ public class CollapseExecutable extends AbstractSelectionExecutable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectionExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         for (Element macro : getMacros()) {

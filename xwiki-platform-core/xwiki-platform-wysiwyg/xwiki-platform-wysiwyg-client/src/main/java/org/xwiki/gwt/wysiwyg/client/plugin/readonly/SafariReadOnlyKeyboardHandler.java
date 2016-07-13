@@ -39,6 +39,7 @@ public class SafariReadOnlyKeyboardHandler extends ReadOnlyKeyboardHandler
      * <p>
      * WebKit browsers don't restore the selection after an element that contained or was touched by the selection is
      * removed. Instead of manually removing the read-only element we select it and let the browser remove it.
+     * </p>
      * 
      * @see ReadOnlyKeyboardHandler#onDelete(Event, Element)
      */
@@ -59,6 +60,7 @@ public class SafariReadOnlyKeyboardHandler extends ReadOnlyKeyboardHandler
      * WebKit browsers don't restore the selection after an element that contained or was touched by the selection is
      * removed. Instead of manually removing the read-only element we extend the given range to include the element and
      * let the browser remove it.
+     * </p>
      * 
      * @see ReadOnlyKeyboardHandler#onDelete(Event, Element, Range, boolean)
      */
@@ -84,6 +86,7 @@ public class SafariReadOnlyKeyboardHandler extends ReadOnlyKeyboardHandler
      * <p>
      * WebKit browsers don't keep the caret where we put it (before/after the macro container) so we have to add a text
      * node and select it to be sure the caret remains outside of the macro.
+     * </p>
      */
     @Override
     protected void moveCaretOutside(Node node, boolean before)

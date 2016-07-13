@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
@@ -52,7 +52,7 @@ import com.xpn.xwiki.web.ViewAction;
 
 /**
  * Store and retrieve statistics.
- * 
+ *
  * @version $Id$
  */
 public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
@@ -159,7 +159,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
             if (!action.equals(DownloadAction.ACTION_NAME)) {
                 Collection actions = StatsUtil.getRecentActionFromSessions(context, action);
                 if (actions == null) {
-                    actions = new CircularFifoBuffer(StatsUtil.getRecentVisitSize(context));
+                    actions = new CircularFifoQueue(StatsUtil.getRecentVisitSize(context));
                     StatsUtil.setRecentActionsFromSession(context, action, actions);
                 }
 
@@ -183,7 +183,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     }
 
     @Override
-    public Map< ? , ? > getActionStatistics(String action, Scope scope, Period period, Duration step,
+    public Map<?, ?> getActionStatistics(String action, Scope scope, Period period, Duration step,
         XWikiContext context)
     {
         return this.statsReader.getActionStatistics(action, scope, period, step, context);
@@ -239,7 +239,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     }
 
     @Override
-    public List< ? > getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
+    public List<?> getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
     {
         return this.statsReader.getRefMonthStats(docName, month, context);
     }

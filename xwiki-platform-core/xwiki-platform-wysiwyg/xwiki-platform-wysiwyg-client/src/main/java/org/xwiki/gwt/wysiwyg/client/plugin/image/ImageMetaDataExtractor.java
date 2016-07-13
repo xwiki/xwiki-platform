@@ -37,11 +37,7 @@ import com.google.gwt.dom.client.NodeList;
  */
 public class ImageMetaDataExtractor implements InnerHTMLListener
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InnerHTMLListener#onInnerHTMLChange(Element)
-     */
+    @Override
     public void onInnerHTMLChange(Element parent)
     {
         // look up all images in this subtree

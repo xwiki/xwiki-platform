@@ -1,0 +1,181 @@
+#macro (getVersions $extension $versionsByFeature)
+  ## Retrieve the list of available versions for each of the features (identifiers) of the given extension.
+  #set ($return = $collectionstool.orderedMap)
+  #set ($features = [])
+  #set ($discard = $features.addAll($extension.extensionFeatures))
+  #set ($discard = $features.add($extension.id))
+  #set ($discard = $collectionstool.reverse($features))
+  #foreach ($feature in $features)
+    #set ($stableVersions = [])
+    #foreach ($version in $services.extension.resolveVersions($feature.id, 0, -1))
+      #if ($version.type == 'STABLE')
+        #set ($discard = $stableVersions.add($version.value))
+      #end
+    #end
+    #set ($discard = $collectionstool.reverse($stableVersions))
+    #set ($discard = $return.put($feature.id, $stableVersions))
+  #end
+  #set ($versionsByFeature = $NULL)
+  #setVariable("$versionsByFeature" $return)
+#end
+
+#macro (displayUpgradeQuestion $documentCount)
+  <form action="$xwiki.relativeRequestURL" class="xform upgradeQuestion hidden">
+    <div class="xHint">$escapetool.xml($services.localization.render(
+      'platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
+    <p class="buttons">
+      <span class="buttonwrapper">
+        <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIUpgradeYesLabel'))" />
+      </span>
+      <span class="buttonwrapper">
+        <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIUpgradeNoLabel'))" />
+      </span>
+    </p>
+  </form>
+#end
+
+#macro (displayPreviousUIForm $wiki $recommendedUIExtension)
+  <form action="$xwiki.relativeRequestURL" method="post" class="xform previousUI">
+    <div class="xHint">$escapetool.xml($services.localization.render(
+      'platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
+    <div class="hidden">
+      <input type="hidden" name="wiki" value="$escapetool.xml($wiki)" />
+    </div>
+    <dl>
+      #if ($recommendedUIExtension)
+        ## Display a drop down list with the available versions for the recommended UI.
+        <dt class="hidden">
+          #set ($id = "recommendedUIVersions_$escapetool.xml($wiki)")
+          <label for="$id">$escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+          <span class="xHint">$escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionListHint'))</span>
+        </dt>
+        <dd class="hidden versionSelector">
+          #getVersions($recommendedUIExtension $versionsByFeature)
+          <select id="$id" class="versions">
+            <option value=""></option>
+            #foreach ($entry in $versionsByFeature.entrySet())
+              #foreach ($version in $entry.value)
+                #set ($selected = $version == $request.previousUIVersion && $wiki == $request.wiki)
+                <option #if ($selected)selected="selected"#end value="$version" title="$entry.key">
+                  $version
+                </option>
+              #end
+            #end
+          </select>
+        </dd>
+      #end
+      <dt>
+        #set ($id = "previousUIVersion_$escapetool.xml($wiki)")
+        <label for="$id">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+        <span class="xHint">
+          $escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionHint'))
+          1.8<strong>,</strong> 2.7.2<strong>,</strong> 3.2-rc-1<strong>,</strong> 4.3-milestone-2
+        </span>
+      </dt>
+      <dd><input id="$id" name="previousUIVersion" type="text"
+        value="$!escapetool.xml($request.previousUIVersion)" /></dd>
+      <dt>
+        #set ($id = "previousUIId_$escapetool.xml($wiki)")
+        <label for="$id">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIIdLabel'))</label>
+        <span class="xHint">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIIdHint', [$recommendedUIExtension.id.id]))</span>
+      </dt>
+      <dd><input id="$id" name="previousUIId" type="text"
+        value="$!escapetool.xml($request.previousUIId)" /></dd>
+    </dl>
+    <p class="buttons">
+      <span class="buttonwrapper">
+        <input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUISubmitLabel'))" />
+      </span>
+      <span class="buttonwrapper hidden">
+        <input type="submit" class="button secondary" value="$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUICancelLabel'))" />
+      </span>
+    </p>
+    #if ($request.previousUIId && $request.previousUIVersion && $wiki == $request.wiki)
+      ## We shouldn't get here unless JavaScript is disabled (the form is submitted with AJAX normally).
+      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
+        ["<strong>$!escapetool.xml($request.previousUIId)</strong>",
+        "<strong>$!escapetool.xml($request.previousUIVersion)</strong>"])</div>
+    #end
+  </form>
+#end
+
+#macro (displayExtensionAndUpdateStepButtons $extension)
+  #set ($jobStatus = $NULL)
+  #displayExtension($extension)
+  #set ($disableStepButtons = $disableStepButtons || $jobStatus.state == 'RUNNING' || $jobStatus.state == 'WAITING')
+#end
+
+#macro (repairPreviousUI $wiki $recommendedUIExtension $documentCount)
+  #set ($previousUI = $NULL)
+  #if ($request.previousUIId && $request.previousUIVersion && $wiki == $request.wiki)
+    #set ($previousUI = $services.extension.resolve($request.previousUIId, $request.previousUIVersion))
+  #end
+  #if (!$previousUI)
+    #if ($documentCount)
+      #displayUpgradeQuestion($documentCount)
+    #end
+    #displayPreviousUIForm($wiki $recommendedUIExtension)
+  #elseif (!$previousUI.isInstalled("wiki:$wiki"))
+    ## Allow the user to repair the previous UI extension.
+    ## NOTE: We shouldn't get here unless the JavaScript is disabled. The following code was added explicitly to support
+    ## this use case.
+    <p class="xHint">$services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint')</p>
+    ## TODO: Find a better way to 'force' the repair XAR extension button.
+    #set ($showRepairXARButton = true)
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    <div>#displayExtensionAndUpdateStepButtons($previousUI)</div>
+  #end
+#end
+
+#macro (maybeRepairPreviousUI $wiki $recommendedUIExtension)
+  #if (!$recommendedUIExtension)
+    ## The recommended UI extension couldn't be found in the configured repositories.
+    #break
+  #end
+  ## See if the previous UI extension is known.
+  #set ($previousDistributionJobStatus = $services.distribution.getPreviousJobStatus($wiki))
+  #if ($previousDistributionJobStatus.distributionExtensionUI == $recommendedUIExtension.id)
+    ## The Distribution Wizard may have been restarted before the finish.
+    #set ($previousUIId = $previousDistributionJobStatus.previousDistributionExtensionUI)
+  #else
+    #set ($previousUIId = $previousDistributionJobStatus.distributionExtensionUI)
+  #end
+  #if ($previousUIId)
+    ## The previous UI extension is known. Nothing to repair.
+    #break
+  #end
+  ## The recommended UI is available to install and we don't know the previous UI.
+  #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value $recommendedUIJobStatus)
+  #getInstalledExtension($recommendedUIExtension "wiki:$wiki" $installedVersion)
+  #if (!$installedVersion && (!$recommendedUIJobStatus || $recommendedUIJobStatus.state == 'FINISHED'))
+    ## There is no previous version of the recommended UI installed on the specified wiki and there is no job running
+    ## for the recommended UI either.
+    ##
+    ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't
+    ## installed with the Extension Manager (or at least it wasn't marked as installed).
+    ## Check if there are other extensions installed.
+    #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions("wiki:$wiki").size())
+    ## TODO: check this based on the list of mandatory documents instead of classes
+    ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
+    ## automatically at startup when the database is empty and we don't want to take them into account).
+    #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML is null or doc.xWikiClassXML not like '<%'"
+      ).setWiki($wiki).addFilter('unique').addFilter('count').execute().get(0))
+    ## Unfortunately there are still 6 documents that are not XClasses and which are created automatically (Watchlist
+    ## notifiers and XWikiAllGroup) and we want to exclude them also.
+    #if ($installedExtensionCount > 0 || $documentCount > 6)
+      ## There are documents in the database (past the default set that is automatically created), maybe from the
+      ## previous version of the default distribution UI, but the UI is not marked as installed.
+      #repairPreviousUI($wiki $recommendedUIExtension $documentCount)
+    #end
+  #end
+#end

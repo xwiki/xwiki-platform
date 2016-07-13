@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,7 +46,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * Realization of {@link XWikiVersioningStoreInterface} for Hibernate-based storage.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -59,14 +57,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
-    /** Needed for computing the archive cache key. */
-    @Inject
-    private EntityReferenceSerializer<String> referenceSerializer;
-
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
-     * 
+     *
      * @param xwiki The xwiki object
      * @param context The current context
      * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
@@ -79,7 +73,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
-     * 
+     *
      * @param hibpath path to hibernate.hbm.xml file
      * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
      */
@@ -124,7 +118,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             return versions;
         } catch (Exception e) {
-            Object[] args = {doc.getFullName()};
+            Object[] args = { doc.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
                 "Exception while reading document {0} revisions", e, args);
@@ -132,23 +126,26 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext)
+        throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc != null) {
             return archiveDoc;
         }
 
-        String db = context.getDatabase();
+        String db = context.getWikiId();
         try {
             if (doc.getDatabase() != null) {
-                context.setDatabase(doc.getDatabase());
+                context.setWikiId(doc.getDatabase());
             }
             archiveDoc = new XWikiDocumentArchive(doc.getId());
             loadXWikiDocArchive(archiveDoc, true, context);
             doc.setDocumentArchive(archiveDoc);
         } finally {
-            context.setDatabase(db);
+            context.setWikiId(db);
         }
         return archiveDoc;
     }
@@ -161,7 +158,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
-            Object[] args = {new Long(archivedoc.getId())};
+            Object[] args = { new Long(archivedoc.getId()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT, "Exception while loading archive {0}", e,
                 args);
@@ -195,33 +192,38 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context)
+    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
         Version version = new Version(sversion);
 
         XWikiDocument doc = archive.loadDocument(version, context);
         if (doc == null) {
-            Object[] args = {basedoc.getFullName(), version.toString()};
+            Object[] args = { basedoc.getDocumentReferenceWithLocale(), version.toString() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
                 "Version {1} does not exist while reading document {0}", null, args);
         }
+
         // Make sure the document has the same name
         // as the new document (in case there was a name change
-        doc.setName(basedoc.getName());
-        doc.setSpace(basedoc.getSpace());
+        // FIXME: is this really needed ?
+        doc.setDocumentReference(basedoc.getDocumentReference());
 
-        doc.setDatabase(basedoc.getDatabase());
         doc.setStore(basedoc.getStore());
+
         return doc;
     }
 
     @Override
-    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext context)
+    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         executeWrite(context, true, new HibernateCallback<Object>()
         {
             @Override
@@ -239,9 +241,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context)
+    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext inputxcontext)
         throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
             archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc.getRCSVersion(),
@@ -249,7 +253,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             doc.setRCSVersion(archiveDoc.getLatestVersion());
             saveXWikiDocArchive(archiveDoc, bTransaction, context);
         } catch (Exception e) {
-            Object[] args = {doc.getFullName()};
+            Object[] args = { doc.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT, "Exception while updating archive {0}", e,
                 args);
@@ -301,8 +305,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     @Override
-    public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
-        throws XWikiException
+    public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {

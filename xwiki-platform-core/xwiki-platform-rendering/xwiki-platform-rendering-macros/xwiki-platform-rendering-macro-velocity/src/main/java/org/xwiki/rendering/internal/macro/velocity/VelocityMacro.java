@@ -156,7 +156,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             try {
                 filter = getComponentManager().getInstance(VelocityMacroFilter.class, filterName);
             } catch (ComponentLookupException e) {
-                this.logger.error("Can't find velocity maco cleaner", e);
+                this.logger.error("Can't find velocity macro filter", e);
             }
         }
 

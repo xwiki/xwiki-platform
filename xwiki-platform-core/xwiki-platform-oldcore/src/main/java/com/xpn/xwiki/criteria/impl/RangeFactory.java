@@ -53,7 +53,7 @@ public class RangeFactory
 
     /**
      * Creates a new Range which matches all the elements of the list it is applied to.
-     * 
+     *
      * @return A new Range instance
      */
     public static Range createAllRange()
@@ -64,7 +64,7 @@ public class RangeFactory
     /**
      * Creates a new Range starting from 0 and having the specified size. It matches the first <code>size</code>
      * elements of the list it is applied to.
-     * 
+     *
      * @param size The size of the interval
      * @return A new Range instance
      */
@@ -76,7 +76,7 @@ public class RangeFactory
     /**
      * Creates a new Range starting from the end of the list it is applied to and having the specified size. It matches
      * the last <code>size</code> elements of the list.
-     * 
+     *
      * @param size The size of the interval
      * @return A new Range instance
      */

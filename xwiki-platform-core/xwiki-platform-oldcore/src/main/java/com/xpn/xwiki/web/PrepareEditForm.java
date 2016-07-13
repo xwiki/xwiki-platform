@@ -49,7 +49,7 @@ public class PrepareEditForm extends XWikiForm
 
     public String getTemplate()
     {
-        return template;
+        return this.template;
     }
 
     public void setTemplate(String template)
@@ -59,7 +59,7 @@ public class PrepareEditForm extends XWikiForm
 
     public String getDefaultTemplate()
     {
-        return defaultTemplate;
+        return this.defaultTemplate;
     }
 
     public void setDefaultTemplate(String template)
@@ -69,7 +69,7 @@ public class PrepareEditForm extends XWikiForm
 
     public String getParent()
     {
-        return parent;
+        return this.parent;
     }
 
     public void setParent(String parent)
@@ -79,7 +79,7 @@ public class PrepareEditForm extends XWikiForm
 
     public String getCreator()
     {
-        return creator;
+        return this.creator;
     }
 
     public void setCreator(String creator)
@@ -89,7 +89,7 @@ public class PrepareEditForm extends XWikiForm
 
     public String getDefaultLanguage()
     {
-        return defaultLanguage;
+        return this.defaultLanguage;
     }
 
     public void setDefaultLanguage(String defaultLanguage)
@@ -99,7 +99,7 @@ public class PrepareEditForm extends XWikiForm
 
     public boolean isLockForce()
     {
-        return lockForce;
+        return this.lockForce;
     }
 
     public void setLockForce(boolean lockForce)

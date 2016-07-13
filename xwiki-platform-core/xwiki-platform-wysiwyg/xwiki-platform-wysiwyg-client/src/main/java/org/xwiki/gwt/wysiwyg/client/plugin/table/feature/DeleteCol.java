@@ -53,11 +53,7 @@ public class DeleteCol extends AbstractTableFeature
         super(NAME, new Command(NAME), Strings.INSTANCE.deleteCol(), plugin);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#execute(String)
-     */
+    @Override
     public boolean execute(String parameter)
     {
         TableCellElement caretCell =
@@ -84,11 +80,7 @@ public class DeleteCol extends AbstractTableFeature
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractTableFeature#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return super.isEnabled()

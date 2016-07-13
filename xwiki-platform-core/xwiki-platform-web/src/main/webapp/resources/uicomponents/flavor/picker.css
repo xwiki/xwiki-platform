@@ -1,0 +1,88 @@
+/* TODO: use the xwiki select widget: http://jira.xwiki.org/browse/XWIKI-12503 */
+#template('colorThemeInit.vm')
+
+.xwiki-flavor-picker {
+  clear: both;
+}
+
+.xwiki-flavor-picker-results-container {
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+  padding: 5px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.xwiki-flavor-picker-small .xwiki-flavor-picker-results-container {
+  height: 200px;
+}
+
+.xwiki-flavor-picker-medium .xwiki-flavor-picker-results-container {
+  height: 400px;
+}
+
+.xwiki-flavor-picker-tall .xwiki-flavor-picker-results-container {
+  height: 800px;
+}
+
+.xwiki-flavor-picker-option input[type="radio"] {
+  display: none;
+}
+
+.xwiki-flavor-picker-option {
+  float: left;
+  padding: 5px;
+  width: 50%;
+  border: 1px dotted transparent;
+  list-style-type: none;
+}
+
+/* Make sure we create a new line every 2 items (like a grid) */
+.xwiki-flavor-picker-option:nth-child(2n+1) {
+  clear: both;
+}
+
+.xwiki-flavor-picker-option-selected {
+  background-color: $theme.highlightColor;
+  border: 1px dotted #CCC;
+}
+
+.xwiki-flavor-picker-option, .xwiki-flavor-picker-option > label {
+  cursor: pointer;
+}
+
+.xwiki-flavor-picker-option-icon {
+  display: table-cell;
+  font-size: 30px;
+  padding-right: 10px;
+  vertical-align: text-top;
+}
+
+.xwiki-flavor-picker-option > div{
+  display: table-cell;
+  vertical-align: top;
+}
+
+.xwiki-flavor-picker-option-icon > img{
+  height: 20px;
+  width: 20px;
+}
+
+.xwiki-flavor-picker-option:hover {
+  background-color: $theme.highlightColor;
+}
+
+.xwiki-flavor-picker ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.xwiki-flavor-picker .paginationFilter {
+  clear: both;
+}
+
+.skin-colibri .xwiki-flavor-picker-option {
+  width: 47%;
+}

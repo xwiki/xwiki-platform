@@ -35,6 +35,7 @@ public class DataMigrationException extends Exception
 
     /**
      * Build a simple exception with a message.
+     *
      * @param s message
      */
     public DataMigrationException(String s)
@@ -44,6 +45,7 @@ public class DataMigrationException extends Exception
 
     /**
      * Build an exception with a message and a root cause.
+     *
      * @param s message
      * @param throwable root cause
      */

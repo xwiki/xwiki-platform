@@ -1,0 +1,10 @@
+Could not compile less. 2 error(s) occurred:
+ERROR 1:1 The file style.less.vm does not exist.
+ 1: @import "style.less.vm";
+ 2: @import "subdir/import2.less";
+
+ERROR 2:1 The file subdir/import2.less does not exist.
+ 1: @import "style.less.vm";
+ 2: @import "subdir/import2.less";
+ 3: 
+

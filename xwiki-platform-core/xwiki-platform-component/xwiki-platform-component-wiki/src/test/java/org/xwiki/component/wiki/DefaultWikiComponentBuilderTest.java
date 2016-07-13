@@ -24,17 +24,18 @@ import java.util.List;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MapUtils;
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentBuilder;
-import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
+import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
-
-import org.junit.Assert;
 
 @MockingRequirement(DefaultWikiComponentBuilder.class)
 public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTestCase implements WikiComponentConstants
@@ -47,11 +48,14 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
 
     private WikiComponentBridge bridge;
 
+    private ContextualAuthorizationManager authorization;
+
     @Before
     public void configure() throws Exception
     {
         this.builder = getComponentManager().getInstance(WikiComponentBuilder.class);
         this.bridge = getComponentManager().getInstance(WikiComponentBridge.class);
+        this.authorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
     }
 
     @Test
@@ -60,7 +64,7 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
+                oneOf(authorization).hasAccess(Right.PROGRAM, DOC_REFERENCE);
                 will(returnValue(false));
             }
         });
@@ -79,8 +83,6 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
-                will(returnValue(true));
                 oneOf(bridge).getAuthorReference(DOC_REFERENCE);
                 will(returnValue(AUTHOR_REFERENCE));
                 oneOf(bridge).getRoleType(DOC_REFERENCE);
@@ -97,6 +99,9 @@ public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTes
                 will(returnValue(ListUtils.EMPTY_LIST));
                 oneOf(bridge).getSyntax(DOC_REFERENCE);
                 will(returnValue(Syntax.XWIKI_2_1));
+
+                oneOf(authorization).hasAccess(Right.PROGRAM, DOC_REFERENCE);
+                will(returnValue(true));
             }
         });
 

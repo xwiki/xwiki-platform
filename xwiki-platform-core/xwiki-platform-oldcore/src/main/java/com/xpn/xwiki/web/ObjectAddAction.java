@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,7 +40,13 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ObjectAddAction extends XWikiAction
 {
-    private static final String[] EMPTY_PROPERTY = new String[] {""};
+    private static final String[] EMPTY_PROPERTY = new String[] { "" };
+
+    /**
+     * A pattern that matches the {@code xobjectNumber} request parameter which is used to pass the number of the added
+     * object to the redirect URL.
+     */
+    private static final Pattern XOBJECT_NUMBER_PARAMETER = Pattern.compile("(\\?|&)xobjectNumber=?(&|#|$)");
 
     /**
      * Used to resolve XClass references.
@@ -88,7 +95,7 @@ public class ObjectAddAction extends XWikiAction
         if (doc.isNew()) {
             doc.setCreatorReference(userReference);
         }
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addObject"), true, context);
 
         // If this is an ajax request, no need to redirect.
         if (Utils.isAjaxRequest(context)) {
@@ -98,6 +105,10 @@ public class ObjectAddAction extends XWikiAction
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", "editor=object", "xcontinue", "xredirect");
+        // If the redirect URL contains the xobjectNumber parameter then inject the number of the added object as its
+        // value so that the target page knows which object was added.
+        redirect =
+            XOBJECT_NUMBER_PARAMETER.matcher(redirect).replaceFirst("$1xobjectNumber=" + object.getNumber() + "$2");
         sendRedirect(response, redirect);
 
         return false;

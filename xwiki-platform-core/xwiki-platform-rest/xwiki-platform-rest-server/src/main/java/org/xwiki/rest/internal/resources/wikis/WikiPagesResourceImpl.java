@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.UriBuilder;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
@@ -46,14 +46,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikiPagesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiPagesResourceImpl")
 public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesResource
 {
     @Override
     public Pages getPages(String wikiName, Integer start, String name, String space, String author, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         Pages pages = objectFactory.createPages();
 
@@ -64,7 +65,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 filters.put("name", name);
             }
             if (!space.equals("")) {
-                filters.put("space", space);
+                filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
             }
             if (!author.equals("")) {
                 filters.put("author", author);
@@ -143,11 +144,8 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
                         absoluteUrl, Utils.getXWikiContext(componentManager)));
 
-                String baseUri = uriInfo.getBaseUri().toString();
-
-                String pageUri =
-                        UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(),
-                                doc.getName()).toString();
+                String pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
+                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName()).toString();
                 Link pageLink = objectFactory.createLink();
                 pageLink.setHref(pageUri);
                 pageLink.setRel(Relations.PAGE);
@@ -156,7 +154,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pages.getPageSummaries().add(pageSummary);
             }
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return pages;

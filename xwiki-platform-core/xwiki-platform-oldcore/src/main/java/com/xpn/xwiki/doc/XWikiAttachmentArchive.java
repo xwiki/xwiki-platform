@@ -20,8 +20,12 @@
 package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Date;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
@@ -34,7 +38,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * JRCS based implementation of an archive for XWikiAttachment.
- * 
+ *
  * @version $Id$
  */
 public class XWikiAttachmentArchive implements Cloneable
@@ -62,7 +66,7 @@ public class XWikiAttachmentArchive implements Cloneable
 
     /**
      * This does nothing and is only here to satisfy Hibernate.
-     * 
+     *
      * @param id the id of the attachment which this archive is associated with, unused.
      */
     public void setId(final long id)
@@ -110,29 +114,47 @@ public class XWikiAttachmentArchive implements Cloneable
     /**
      * Get the archive if it is currently stored in RAM.
      * 
+     * @return a String representation of a JRCS archive.
+     * @throws XWikiException if anything goes wrong.
+     * @since 7.1M1
+     */
+    public String getArchiveAsString() throws XWikiException
+    {
+        if (this.archive == null) {
+            return "";
+        } else {
+            return this.archive.toString(Archive.RCS_NEWLINE);
+        }
+    }
+
+    /**
+     * Get the archive, loading it from the database if necessary.
+     *
+     * @param context the XWikiContext for the request used to load the correct attachment archive from the database.
+     * @return a String representation of a JRCS archive.
+     * @throws XWikiException if anything goes wrong.
+     * @since 7.1M1
+     */
+    public String getArchiveAsString(final XWikiContext context) throws XWikiException
+    {
+        if (this.archive == null) {
+            if (context != null) {
+                updateArchive(context);
+            }
+        }
+
+        return getArchiveAsString();
+    }
+
+    /**
+     * Get the archive if it is currently stored in RAM.
+     *
      * @return a byte array representation of a JRCS archive or an empty array if the archive is not available on the
      *         heap.
      * @throws XWikiException if anything goes wrong.
      */
     public byte[] getArchive() throws XWikiException
     {
-        return getArchive(null);
-    }
-
-    /**
-     * Get the archive, loading it from the database if necessary.
-     * 
-     * @param context the XWikiContext for the request used to load the correct attachment archive from the database.
-     * @return a byte array representation of a JRCS archive.
-     * @throws XWikiException if anything goes wrong.
-     */
-    public byte[] getArchive(final XWikiContext context) throws XWikiException
-    {
-        if (this.archive == null) {
-            if (context != null) {
-                updateArchive(this.attachment.getContent(context), context);
-            }
-        }
         if (this.archive == null) {
             return new byte[0];
         } else {
@@ -141,58 +163,107 @@ public class XWikiAttachmentArchive implements Cloneable
     }
 
     /**
+     * Get the archive, loading it from the database if necessary.
+     *
+     * @param context the XWikiContext for the request used to load the correct attachment archive from the database.
+     * @return a byte array representation of a JRCS archive.
+     * @throws XWikiException if anything goes wrong.
+     */
+    public byte[] getArchive(final XWikiContext context) throws XWikiException
+    {
+        if (this.archive == null) {
+            if (context != null) {
+                updateArchive(context);
+            }
+        }
+
+        return getArchive();
+    }
+
+    /**
      * Set the archive from a byte array representation of a JRCS archive.
-     * 
+     *
      * @param data a byte array representation of a JRCS archive.
      * @throws XWikiException if anything goes wrong.
      */
     public void setArchive(final byte[] data) throws XWikiException
     {
-        if ((data == null) || (data.length == 0)) {
+        if (ArrayUtils.isEmpty(data)) {
             this.archive = null;
         } else {
-            try {
-                // attachment.fromXML(data.toString());
-                final ByteArrayInputStream is = new ByteArrayInputStream(data);
+            try (ByteArrayInputStream is = new ByteArrayInputStream(data)) {
                 this.archive = new Archive(getAttachment().getFilename(), is);
-
             } catch (Exception e) {
                 Object[] args = {getAttachment().getFilename()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    GENERIC_EXCEPTION_MESSAGE, e, args);
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
+            }
+        }
+    }
+
+    /**
+     * Set the archive from a byte array representation of a JRCS archive.
+     *
+     * @param data a String representation of a JRCS archive.
+     * @throws XWikiException if anything goes wrong.
+     * @since 7.1M1
+     */
+    public void setArchive(final String data) throws XWikiException
+    {
+        if (StringUtils.isEmpty(data)) {
+            this.archive = null;
+        } else {
+            try (Reader reader = new StringReader(data)) {
+                this.archive = new Archive(getAttachment().getFilename(), reader);
+            } catch (Exception e) {
+                Object[] args = {getAttachment().getFilename()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
             }
         }
     }
 
     /**
      * Update the archive.
-     * 
+     *
      * @param data not used for anything, the data is loaded from the attachment included with this archive.
      * @param context the XWikiContext for the request used to load the correct attachment content from the database.
      * @throws XWikiException if anything goes wrong.
+     * @deprecated since 7.1M1, use {@link #updateArchive(XWikiContext)} instead
      */
+    @Deprecated
     public void updateArchive(final byte[] data, final XWikiContext context) throws XWikiException
+    {
+        updateArchive(context);
+    }
+
+    /**
+     * Update the archive.
+     *
+     * @param context the XWikiContext for the request used to load the correct attachment content from the database.
+     * @throws XWikiException if anything goes wrong.
+     * @since 7.1M1
+     */
+    public void updateArchive(final XWikiContext context) throws XWikiException
     {
         try {
             this.attachment.incrementVersion();
             this.attachment.setDate(new Date());
-            final String sdata = this.attachment.toStringXML(true, false, context);
-            final Object[] lines = ToString.stringToArray(sdata);
+            final Object[] lines = ToString.stringToArray(this.attachment.toStringXML(true, false, context));
 
             if (this.archive != null) {
                 this.archive.addRevision(lines, "");
             } else {
                 this.archive = new Archive(lines, getAttachment().getFilename(), getAttachment().getVersion());
             }
+
             // Set a standard author, since by default the operating system user is set, and it might contain confusing
             // characters (JRCS is very fragile and breaks easily if a wrong value is used)
             this.archive.findNode(this.archive.getRevisionVersion()).setAuthor("xwiki");
         } catch (Exception e) {
             Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 
@@ -207,7 +278,7 @@ public class XWikiAttachmentArchive implements Cloneable
     /**
      * Set the attachment to associate with this archive. This is a dangerous function because it will not change the
      * archive. Using this may cause an attachment to be associated with the wrong history.
-     * 
+     *
      * @param attachment the attachment to set for this archive.
      */
     public void setAttachment(final XWikiAttachment attachment)
@@ -216,14 +287,22 @@ public class XWikiAttachmentArchive implements Cloneable
     }
 
     /**
-     * @return an array of versions which are available for this attachment, ordered by version number decending.
+     * @return an array of versions which are available for this attachment, ordered by version number descending.
      */
     public Version[] getVersions()
     {
-        final Node[] nodes = getRCSArchive().changeLog();
-        final Version[] versions = new Version[nodes.length];
-        for (int i = 0; i < nodes.length; i++) {
-            versions[i] = nodes[i].getVersion();
+        final Archive rcsArchive = getRCSArchive();
+
+        Version[] versions;
+        if (rcsArchive != null) {
+            final Node[] nodes = rcsArchive.changeLog();
+            versions = new Version[nodes.length];
+            for (int i = 0; i < nodes.length; i++) {
+                versions[i] = nodes[i].getVersion();
+            }
+        } else {
+            // No archive means there is no history and only the current version
+            versions = new Version[] {this.attachment.getRCSVersion()};
         }
 
         return versions;
@@ -231,31 +310,31 @@ public class XWikiAttachmentArchive implements Cloneable
 
     /**
      * Get an old revision of the attachment which this is an archive of.
-     * 
+     *
      * @param attachment This attachment will be used to get the document to associate the attachment revision with.
      * @param rev a String representation of the version to load.
      * @param context the context for the request which needed this revision.
      * @return an XWikiAttachment for the given revision.
      * @throws XWikiException if any Exception is thrown while getting the revision.
      */
-    public XWikiAttachment getRevision(final XWikiAttachment attachment,
-        final String rev,
-        final XWikiContext context)
+    public XWikiAttachment getRevision(final XWikiAttachment attachment, final String rev, final XWikiContext context)
         throws XWikiException
     {
         try {
             final Archive rcsArchive = getRCSArchive();
 
             if (rcsArchive == null) {
-                return null;
+                // No archive means there is no history and only the current version.
+                return this.attachment.getVersion().equals(rev) ? this.attachment : null;
             }
 
             final Version version = rcsArchive.getRevisionVersion(rev);
             if (version == null) {
+                // The requested revision doesn't exist.
                 return null;
             }
             final Object[] lines = rcsArchive.getRevision(version);
-            final StringBuffer content = new StringBuffer();
+            final StringBuilder content = new StringBuilder();
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i].toString();
                 content.append(line);
@@ -273,8 +352,7 @@ public class XWikiAttachmentArchive implements Cloneable
         } catch (Exception e) {
             final Object[] args = {attachment.getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 }

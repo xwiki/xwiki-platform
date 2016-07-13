@@ -21,8 +21,8 @@ package org.xwiki.panels.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
  * Represents the NewPage panel.
@@ -33,19 +33,19 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 public class NewPagePanel extends ViewPage
 {
     /**
-     * The text field used to input the space name.
+     * The text field used to input the space reference.
      * <p>
      * NOTE: We can't find the space name text field by name because there is a meta tag with the same name. We can't
      * find the space name text field by id either because the create page panel uses random identifiers to prevent
      * conflicts with the page content.
      */
-    @FindBy(xpath = "//input[@type = 'text' and @name = 'space']")
+    @FindBy(xpath = "//input[@type = 'text' and @name = 'spaceReference']")
     private WebElement spaceNameTextField;
 
     /**
      * The text field used to input the page name.
      */
-    @FindBy(xpath = "//input[@type = 'text' and @name = 'page']")
+    @FindBy(xpath = "//input[@type = 'text' and @name = 'name']")
     private WebElement pageNameTextField;
 
     public static NewPagePanel gotoPage()
@@ -57,18 +57,18 @@ public class NewPagePanel extends ViewPage
     /**
      * Fills the form on the NewPage panel with the given information and submits the form.
      * 
-     * @param spaceName the name of the space where to create the page
+     * @param spaceReferenceString the string representation of the reference of the space where to create the page
      * @param pageName the name of page to create
-     * @return the WYSIWYG edit page for the specified page
+     * @return the create page form for the specified page
      */
-    public WYSIWYGEditPage createPage(String spaceName, String pageName)
+    public CreatePagePage createPage(String spaceReferenceString, String pageName)
     {
         // Clean the default space name value.
         this.spaceNameTextField.clear();
-        this.spaceNameTextField.sendKeys(spaceName);
+        this.spaceNameTextField.sendKeys(spaceReferenceString);
         this.pageNameTextField.clear();
         this.pageNameTextField.sendKeys(pageName);
         this.pageNameTextField.submit();
-        return new WYSIWYGEditPage();
+        return new CreatePagePage();
     }
 }

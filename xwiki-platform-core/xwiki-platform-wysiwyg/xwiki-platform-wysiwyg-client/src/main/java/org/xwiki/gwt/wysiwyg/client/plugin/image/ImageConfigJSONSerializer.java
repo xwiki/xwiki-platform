@@ -28,11 +28,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractInsertElementExecut
  */
 public class ImageConfigJSONSerializer extends AbstractConfigJSONSerializer<ImageConfig>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractConfigJSONSerializer#serialize(Object)
-     */
+    @Override
     public String serialize(ImageConfig imageConfig)
     {
         StringBuffer result = new StringBuffer();

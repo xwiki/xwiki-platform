@@ -142,8 +142,10 @@ public class TransactionException extends Exception
 
     /**
      * {@inheritDoc}
+     * <p>
      * In this implementation the message is also included in the
      * stack trace so calling both is redundant.
+     * </p>
      *
      * @see java.lang.Throwable#getMessage()
      */

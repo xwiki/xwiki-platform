@@ -1,0 +1,30 @@
+###
+### Document does not exist message
+###
+###
+#if ($services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED' && $services.distribution.canDisplayDistributionWizard())
+  $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+#else
+  $response.setStatus(404)
+  #template("startpage.vm")
+  <div class="main">
+  <div id="mainContentArea">
+  #template("hierarchy.vm")
+  #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
+  #template('contentheader.vm')
+  #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+  #else
+    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
+    #if($hasEdit)
+      #set($url = $doc.getURL("create", $editparams))
+      $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
+    #end
+    #template("recyclebinlist.vm")
+    #xwikimessageboxend()
+  #end
+  <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end

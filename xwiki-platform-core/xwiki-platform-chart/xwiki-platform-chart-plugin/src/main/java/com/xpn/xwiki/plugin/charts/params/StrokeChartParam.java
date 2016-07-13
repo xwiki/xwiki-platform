@@ -53,13 +53,13 @@ public class StrokeChartParam extends AbstractChartParam
 
     public void init()
     {
-        capChoices.put("butt", new Integer(BasicStroke.CAP_BUTT));
-        capChoices.put("round", new Integer(BasicStroke.CAP_ROUND));
-        capChoices.put("square", new Integer(BasicStroke.CAP_SQUARE));
+        capChoices.put("butt", BasicStroke.CAP_BUTT);
+        capChoices.put("round", BasicStroke.CAP_ROUND);
+        capChoices.put("square", BasicStroke.CAP_SQUARE);
 
-        joinChoices.put("miter", new Integer(BasicStroke.JOIN_MITER));
-        joinChoices.put("round", new Integer(BasicStroke.JOIN_ROUND));
-        joinChoices.put("bevel", new Integer(BasicStroke.JOIN_BEVEL));
+        joinChoices.put("miter", BasicStroke.JOIN_MITER);
+        joinChoices.put("round", BasicStroke.JOIN_ROUND);
+        joinChoices.put("bevel", BasicStroke.JOIN_BEVEL);
     }
 
     @Override

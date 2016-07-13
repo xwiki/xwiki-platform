@@ -64,11 +64,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
      */
     private final CompositeUIExtension toolBarExtension = new CompositeUIExtension(toolBarFocusWidgets.getRole());
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -103,11 +99,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         if (hr != null) {
@@ -121,11 +113,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == hr && hr.isEnabled()) {

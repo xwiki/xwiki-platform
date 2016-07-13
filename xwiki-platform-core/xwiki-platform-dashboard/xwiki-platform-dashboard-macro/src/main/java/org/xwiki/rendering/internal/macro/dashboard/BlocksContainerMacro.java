@@ -58,7 +58,7 @@ class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParamete
     /**
      * Default constructor, building a blocks macro with the default name and description.
      */
-    public BlocksContainerMacro()
+    BlocksContainerMacro()
     {
         super("Container", "Lays out the blocks passed as content according to the passed parameters.",
             null, ContainerMacroParameters.class);

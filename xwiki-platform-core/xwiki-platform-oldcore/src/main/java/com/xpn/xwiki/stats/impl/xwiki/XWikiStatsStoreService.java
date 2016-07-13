@@ -28,6 +28,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -38,11 +39,9 @@ import com.xpn.xwiki.web.DownloadAction;
 import com.xpn.xwiki.web.SaveAction;
 import com.xpn.xwiki.web.ViewAction;
 
-import org.xwiki.context.ExecutionContext;
-
 /**
  * Back-end statistics storing service.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -70,7 +69,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Create new instance of XWikiStatsRegister and init statistics queue.
-     * 
+     *
      * @param context the XWiki context.
      */
     public XWikiStatsStoreService(XWikiContext context)
@@ -83,8 +82,8 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     @Override
     protected void declareProperties(ExecutionContext executionContext)
     {
-        xwikiContext.declareInExecutionContext(executionContext);
-        xwikiContext = null;
+        this.xwikiContext.declareInExecutionContext(executionContext);
+        this.xwikiContext = null;
     }
 
     /**
@@ -137,7 +136,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Store the statistics in the queue.
-     * 
+     *
      * @throws InterruptedException thread has been interrupted.
      * @throws StopStatsStoreException service received stop order.
      */
@@ -180,7 +179,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Add new statistic to store.
-     * 
+     *
      * @param statsRegisterItem the statistic store item.
      */
     public void add(XWikiStatsStoreItem statsRegisterItem)
@@ -194,7 +193,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Add all the statistics to the save queue.
-     * 
+     *
      * @param doc the document.
      * @param action the user action.
      * @param context the XWiki context.
@@ -229,7 +228,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Add visit statistics to the save queue.
-     * 
+     *
      * @param vobject the visit statistics object.
      * @param context the XWiki context.
      */
@@ -244,7 +243,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Add document statistics to the save queue.
-     * 
+     *
      * @param doc the document.
      * @param action the user action.
      * @param isVisit indicate if it's included in a visit.
@@ -268,7 +267,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
     /**
      * Add referer statistics to the save queue.
-     * 
+     *
      * @param doc the document.
      * @param context the XWiki context.
      */
@@ -283,7 +282,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
 /**
  * Item used to stop the statistics storing.
- * 
+ *
  * @version $Id$
  */
 class StopStatsRegisterObject implements XWikiStatsStoreItem
@@ -302,7 +301,7 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
 
 /**
  * Used to order stopping storing thread.
- * 
+ *
  * @version $Id$
  */
 class StopStatsStoreException extends Exception

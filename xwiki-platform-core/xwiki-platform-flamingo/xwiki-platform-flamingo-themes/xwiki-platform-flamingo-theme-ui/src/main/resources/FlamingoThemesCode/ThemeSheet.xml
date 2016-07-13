@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>FlamingoThemesCode</web>
+  <name>ThemeSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1402406596000</creationDate>
+  <parent>FlamingoThemesCode.ThemeClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1411984875000</date>
+  <contentUpdateDate>1411981358000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#if($doc.name == 'ThemeSheet')Theme Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+############################
+## JS, CSS AND TRANSLATIONS TO USE
+############################
+#set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet'))
+#set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
+#set($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'), {'rel': 'stylesheet'}))
+############################
+## GLOBALS
+############################
+#set($obj = $doc.getObject('FlamingoThemesCode.ThemeClass'))
+#set($isEdit = ($xcontext.action == 'edit'))
+############################
+## VARIABLES TO CUSTOMIZE
+############################
+#set($variables = {
+  "logos": {
+    "logo": "logo"
+  },
+  "base-colors": {
+    "text-color": "color",
+    "body-bg": "color",
+    "xwiki-page-content-bg" : "color",
+    "link-color": "color",
+    "brand-primary": "color",
+    "brand-success": "color",
+    "brand-info": "color",
+    "brand-warning": "color",
+    "brand-danger": "color",
+    "headings-color": "color",
+    "component-active-color" : "color",
+    "component-active-bg" : "color"
+  },
+  "typography" : {
+    "font-family-base": "font",
+    "font-family-sans-serif": "font",
+    "font-family-serif": "font",
+    "font-family-monospace": "font",
+    "font-size-base" : "size"
+  },
+  "buttons": {
+    "btn-font-weight" : "text",
+    "btn-default-color" : "color",
+    "btn-default-bg" : "color",
+    "btn-primary-color" : "color",
+    "btn-primary-bg" : "color",
+    "btn-success-color" : "color",
+    "btn-success-bg" : "color",
+    "btn-info-color" : "color",
+    "btn-info-bg" : "color",
+    "btn-warning-color" : "color",
+    "btn-warning-bg" : "color",
+    "btn-danger-color" : "color",
+    "btn-danger-bg" : "color",
+    "btn-default-border" : "color"
+  },
+  "navbar": {
+    "navbar-default-color" : "color",
+    "navbar-default-bg" : "color",
+    "navbar-default-link-color" : "color",
+    "navbar-default-link-hover-color" : "color",
+    "navbar-default-link-hover-bg" : "color",
+    "navbar-default-link-active-color":  "color",
+    "navbar-default-link-active-bg": "color",
+    "navbar-height" : "size"
+  },
+  "dropdowns" : {
+    "dropdown-bg" : "color",
+    "dropdown-border" : "color",
+    "dropdown-link-color" : "color",
+    "dropdown-link-hover-color" : "color",
+    "dropdown-link-hover-bg" : "color",
+    "dropdown-divider-bg" : "color"
+  },
+  "forms": {
+    "input-bg" : "color",
+    "input-border" : "color",
+    "input-color" : "color",
+    "input-border-focus" : "color",
+    "input-color-placeholder" : "color",
+    "legend-color" : "color",
+    "legend-border-color": "color"
+   },
+  "panels": {
+    "panel-bg" : "color",
+    "panel-default-text" : "color"
+  },
+  "breadcrumb": {
+    "breadcrumb-bg": "color",
+    "breadcrumb-color": "color",
+    "breadcrumb-separator": "escapedText"
+  },
+  "advanced": {
+    "lessCode": "textarea"
+  }
+})
+############################
+## DISPLAY VARIABLES PANEL
+############################
+#macro(displayVariablesPanel)
+  &lt;div class="col-xs-12 col-md-5"&gt;
+    &lt;div class="panel panel-primary" id="panel-theme-variables"&gt;
+      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.variables")&lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          #displayVariablesTabs()
+          #displayVariablesPanes()
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+############################
+## DISPLAY VARIABLES TABS
+############################
+#macro(displayVariablesTabs)
+  &lt;ul class="nav nav-pills nav-stacked col-xs-4"&gt;
+    #foreach($category in $variables.keySet())
+      &lt;li #if($velocityCount==1)class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+############################
+## DISPLAY VARIABLES PANES
+############################
+#macro(displayVariablesPanes)
+  &lt;div class="tab-content col-xs-8" id="bt-variables"&gt;
+    #foreach($category in $variables.keySet())
+      &lt;div class="tab-pane fade #if($velocityCount==1)in active#end" id="cat-$category"&gt;
+      &lt;h2&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/h2&gt;
+      #set($catVar = $variables.get($category))
+      #foreach($var in $catVar.keySet())
+        #set($varName = $var)
+        #set($varType = $catVar.get($varName))
+        &lt;div class="form-group"&gt;
+          &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
+          &lt;div class="col-xs-12"&gt;
+            #if($varType == 'logo')
+              #set($currentLogo = $obj.getValue('logo'))
+              &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
+                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
+                #foreach($attachment in $doc.getAttachmentList())
+                  #if($attachment.isImage())
+                    &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+                  #end
+                #end
+              &lt;/select&gt;
+            #elseif($varType == 'textarea')
+              #if($varName == 'lessCode')
+                &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
+              #end
+              &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
+                $!escapetool.xml($!doc.getValue($varName, $obj))
+              &lt;/textarea&gt;
+            #else
+              &lt;div class="input-group"&gt;
+                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end type-${varType}" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+              &lt;/div&gt;
+            #end
+          &lt;/div&gt;
+        &lt;/div&gt;
+      #end
+      &lt;/div&gt;
+    #end
+  &lt;/div&gt;
+#end
+############################
+## DISPLAY VARIABLES PANEL
+############################
+#macro(displayPreviewPanel)
+  &lt;div class="col-xs-12 #if($isEdit)col-md-7#end"&gt;
+    &lt;div class="panel panel-primary"&gt;
+      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.preview")&lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          #if($isEdit)
+            &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
+          #end
+          &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
+          &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
+          &lt;/iframe&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+############################
+## DISPLAY HIDDEN VARIABLES
+############################
+#macro(displayHiddenVariables)
+  &lt;div id="bt-variables" class="hidden"&gt;
+  #foreach($category in $variables.keySet())
+    #set($catVar = $variables.get($category))
+    #foreach($var in $catVar.keySet())
+      #set($varName = $var)
+      #set($varType = $catVar.get($varName))
+      #if ($varType == 'textarea')
+        &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="type-${varType}"&gt;
+          $!escapetool.xml($doc.getValue($varName, $obj))
+        &lt;/textarea&gt;
+      #else
+        &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($doc.getValue($varName, $obj))" class="type-${varType}"/&gt;
+      #end
+    #end
+  #end
+  &lt;/div&gt;
+#end
+############################
+## MAIN
+############################
+(%class="row"%)(((
+{{html}}
+  #if($isEdit)
+    #displayVariablesPanel()
+  #else
+    #displayHiddenVariables()
+  #end
+  #displayPreviewPanel()
+  ## Special data for computing URLs
+  &lt;span class="hidden" id="attachmentsURL" data-value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
+{{/html}}
+)))
+{{/velocity}}
+</content>
+  <object>
+    <name>FlamingoThemesCode.ThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.EditModeClass</className>
+    <guid>27bbf39f-be74-4cb2-99fc-b62027a9f33c</guid>
+    <class>
+      <name>XWiki.EditModeClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultEditMode>
+        <disabled>0</disabled>
+        <name>defaultEditMode</name>
+        <number>1</number>
+        <prettyName>Default Edit Mode</prettyName>
+        <size>15</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultEditMode>
+    </class>
+    <property>
+      <defaultEditMode>inline</defaultEditMode>
+    </property>
+  </object>
+  <object>
+    <name>FlamingoThemesCode.ThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>55955fbc-78ed-4062-94b3-19da854f013a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Require jQuery
+require(['jquery', 'xwiki-meta'], function($, xm) {
+  'use strict';
+
+  // Waiting jQuery to be ready
+  $(document).ready(function() {
+  
+    // Usefull variables
+    var iframe = $("#iframe");
+    var autoSync = $("#autosync");
+    var variableInputs = $("#bt-variables input");
+    
+    // Need IE9+ or any other recent browser
+    var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
+    if (match &amp;&amp; parseInt(match[1]) &lt; 9) {
+      iframe.parent().replaceWith("&lt;div class=\"panel-body\"&gt;&lt;div class=\"alert alert-danger\"&gt;$services.localization.render('platform.flamingo.themes.incompatiblebrowser')&lt;/div&gt;&lt;/div&gt;");
+      return;
+    }
+    
+    // Put a gray curtain in front of the iframe
+    var addCurtain = function() {
+      var iframePosition = iframe.position();
+      $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;").insertAfter(iframe);
+      var previewCurtain = $("#preview-curtain");
+      previewCurtain.width(iframe.outerWidth(true));
+      previewCurtain.height(iframe.outerHeight(true));
+      previewCurtain.css("left", iframePosition.left);
+      previewCurtain.css("right", iframePosition.right);
+    }
+    
+    // Remove the curtain
+    var removeCurtain = function() {
+      $("#preview-curtain").remove();
+    }
+    
+    // Function that waits the iframe to be fully loaded
+    var waitUntilIFrameIsLoaded = function(callback) {
+      var iframeHead = $(iframe).contents().find("head")[0];
+      if (iframeHead !== undefined) {
+        callback();
+      } else {
+        setTimeout(function(){ waitUntilIFrameIsLoaded(callback); }, 100);
+      }
+    };
+    
+    // Function that waits the iframe has loaded LESS
+    var waitUntilLessIsLoadedInIFrame = function(callback) {
+      if (iframe[0].contentWindow.lessJs !== undefined) {
+        callback();
+      } else {
+        setTimeout(function(){ waitUntilLessIsLoadedInIFrame(callback); }, 100 );
+      }
+    }
+    
+    // Refresh the preview
+    var refreshPreview = function () {
+      addCurtain();
+      // Get the variables' values
+      var varMap = {};
+      for (var i=0; i&lt;variableInputs.length; ++i) {
+        var variableInput = variableInputs[i];
+        // 'logo' is handled by the 'setLogo' function
+        // 'lessCode' is handled afterwards
+        if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
+          var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
+          var value = variableInput.value
+          // Some values need to be placed inside a string
+          if ($(variableInput).hasClass('type-escapedText')) {
+            value = '"' + value.replace('"', '\\"') + '"';
+          }
+          varMap[name] = value;
+        }
+      }
+      
+      // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file.
+      // It is handled by our LessCodePlugin.
+      iframe[0].contentWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
+      
+      // We run LESS in a thread in order to not block the main thread
+      setTimeout(function(){
+        // Run LESS (which use promises)
+        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain).catch(removeCurtain);
+      }, 10);
+    };
+    
+    // Function called when an input is changed by the user
+    var onChange = function (variableInput) {
+      if (autoSync.prop("checked")) {
+        var oldValue = variableInput.value;
+        setTimeout(function(){
+          if (variableInput.value == oldValue) {
+            refreshPreview();
+          }
+        }, 1000);
+      }
+    }
+    
+    // Function that change the logo in the iframe
+    var setLogo = function(event) {
+      var value = $("#var-logo").val();
+      var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
+      if (value == "") {
+        var url = "$xwiki.getSkinFile('logo.svg')";
+        iFrameLogo.attr("src", url);
+      } else {
+        var url = $("#attachmentsURL").attr('data-value');
+        iFrameLogo.attr("src", url.replace("__tochange__", value));
+      }
+    }
+    
+    // Function that adds LESS scripts to the iframe document
+    var initIframe = function() {
+      addCurtain();
+      var iframeHead = iframe.contents().find("head")[0];
+      
+      // 1: Add a link to the LESS source code of the skin
+      var link = document.createElement("link");
+      link.rel = "stylesheet/less";
+      link.type = "text/css";
+      link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
+      iframeHead.appendChild(link);
+      
+      // 2: Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable
+      // to the LESS code of the skin.
+      
+      // The plugin is an AMD module defined in an other page (we add a query string so require.js does not append the '.js' suffix).
+      var pluginURL = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['FlamingoThemesCode'], 'LessCodePluginJs')).getURL('jsx', 'r=1');
+      
+      // We add a script tag to the iframe that will load our plugin and the LESS preprocessor
+      var script = document.createElement("script");
+      script.innerHTML  = "\
+        require.config({ \n\
+          paths: { \n\
+            'lessJs': '$services.webjars.url('less', 'less.min.js')', \n\
+            'lessCodePlugin': '" + pluginURL + "' \n\
+          } \n\
+        }); \n\
+        // Now we load the LessCodePlugin BEFORE loading the LESS prepocessor. \n\
+        // This is needed because the 'less' variable defining the list of enabled plugins \n\
+        // must be declared *before* the LESS preprocessor. \n\
+        // See: http://lesscss.org/usage/#plugins-in-the-browser \n\
+        require(['lessCodePlugin'], function(lessCodePlugin) { \n\
+          // We defined it as a global variable so we can re-use it afterwards.\n\
+          window.lessCodePlugin = lessCodePlugin; \n\
+          less = { plugins: [lessCodePlugin] }; \n\
+          // Now we can load the LESS preprocessor. \n\
+          require(['lessJs'], function(lessJs) { \n\
+            // We defined it as a global variable so we can re-use it afterwards.\n\
+            window.lessJs = lessJs; \n\
+          }); \n\
+        });";
+      iframeHead.appendChild(script);
+      
+      // 3: Refresh the live preview
+      waitUntilLessIsLoadedInIFrame(function(){
+        removeCurtain();
+        // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
+        // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
+        // We refresh it in a thread to avoid blocking the browser.
+        setTimeout(refreshPreview, 1);
+      });
+    };
+    
+    // Initialize the iframe
+    waitUntilIFrameIsLoaded(initIframe);
+    // The user can navigate to an other page inside the iframe, so when the page changes (onload),
+    // we re-init the iframe to use LESS
+    iframe.load(initIframe);
+    // Initialize the event handlers
+    $("#refresh").click( function() { 
+      // We refresh it in a thread to avoid blocking the browser.
+      setTimeout(refreshPreview, 1);
+    });
+    for (var i=0; i&lt;variableInputs.length; ++i) {
+      var variableInput = variableInputs[i];
+      $(variableInput).on("change", function(){onChange(variableInput);});
+    }
+    // Event handler for the logo field
+    $("#var-logo").on("change", setLogo);
+    // Set the good logo at the start
+    setLogo();
+    
+    
+  });
+  
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>FlamingoThemesCode.ThemeSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>14468346-b5b5-48d4-95d7-99c026cdfc48</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
+require.config({
+  paths: {
+    'colpick': "$services.webjars.url('colpick', 'js/colpick')"
+  },
+  shim: {
+    'colpick' : ['jquery']
+  }
+});
+// Beginning of the script
+require(['jquery', 'colpick'], function($, Colpick) {
+
+  // Get the inputs that need to be enhanced
+  var inputs = $('.color-picker');
+  
+  // For each input
+  for (var i=0; i&lt;inputs.length; ++i) {
+    var input = $(inputs[i]);
+    var parent = input.parent();
+    
+    // Create the color preview box
+    parent.append('&lt;span class="input-group-addon"&gt;&lt;span class="color-preview"&gt;&lt;/span&gt;&lt;/span&gt;');
+    
+    // Update the color preview box
+    parent.find('.color-preview').css('background-color', input.val());
+    
+    // Enable the color picker
+    input.colpick({
+      layout: 'hex',
+      submit: true,
+      color: input.val(),
+      onSubmit: function(hsb, hex, rgb, el) {
+        var element = $(el);
+        // Hide the color picker
+        element.colpickHide();
+        // Update the filled value
+        element.val('#'+hex);
+        // Update the color preview box
+        element.parent().find('.color-preview').css('background-color', '#'+hex);
+        // Emit the "change" event
+        element.trigger('change');
+      }
+    });
+    
+    // If the user write a value manually
+    input.keyup(function(event){
+      var element = $(event.target);
+      // Update the color preview box
+      element.parent().find('.color-preview').css('background-color', element.val());
+      // Update the color picker
+      element.colpickSetColor(element.val(), false);
+    });
+  }
+  
+  // Hide the color picker if the user scrolls
+  $('.tab-content').scroll(function(){
+    // For each input
+    for (var i=0; i&lt;inputs.length; ++i) {
+      var input = inputs[i];
+      $(input).colpickHide();
+    }
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>Color picker</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>FlamingoThemesCode.ThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>f1f1f4fd-0eea-4189-a09e-0c1d71f1fc98</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#bt-variables {
+  border-left: 1px solid #ddd;
+  height: 525px;
+  overflow-y: auto;
+}
+
+#preview-curtain {
+  background-color: #ddd;
+  opacity: 0.9;
+  position: absolute;
+  text-align: center;
+  vertical-align: center;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>FlamingoThemesCode.ThemeSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e0d8fe93-ade9-49c9-a115-61218c3e4234</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.color-preview{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: text-top;
+}
+
+.colpick{
+  z-index: 10;
+}
+
+.colpick input{
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Color picker</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+</xwikidoc>

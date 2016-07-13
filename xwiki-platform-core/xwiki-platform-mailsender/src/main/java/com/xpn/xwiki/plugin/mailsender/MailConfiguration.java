@@ -26,8 +26,10 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.mail.MailSenderConfiguration;
 
 import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Represents a Mail Server configuration.
@@ -48,8 +50,14 @@ public class MailConfiguration
 
     private Properties extraProperties;
 
+    /**
+     * New Mail Sender module's configuration.
+     */
+    private MailSenderConfiguration mailSenderConfiguration;
+
     public MailConfiguration()
     {
+        this.mailSenderConfiguration = Utils.getComponent(MailSenderConfiguration.class);
         setPort(25);
         setHost("localhost");
     }
@@ -58,28 +66,28 @@ public class MailConfiguration
     {
         this();
 
-        String smtpServer = xwiki.getXWikiPreference("smtp_server");
+        String smtpServer = this.mailSenderConfiguration.getHost();
         if (!StringUtils.isBlank(smtpServer)) {
             setHost(smtpServer);
         }
 
-        int port = xwiki.getXWikiPreferenceAsInt("smtp_port", 25);
+        int port = this.mailSenderConfiguration.getPort();
         setPort(port);
 
-        String from = xwiki.getXWikiPreference("smtp_from");
+        String from = this.mailSenderConfiguration.getFromAddress();
         if (!StringUtils.isBlank(from)) {
             setFrom(from);
         }
 
-        String smtpServerUsername = xwiki.getXWikiPreference("smtp_server_username");
-        String smtpServerPassword = xwiki.getXWikiPreference("smtp_server_password");
+        String smtpServerUsername = this.mailSenderConfiguration.getUsername();
+        String smtpServerPassword = this.mailSenderConfiguration.getPassword();
         if (!StringUtils.isEmpty(smtpServerUsername) && !StringUtils.isEmpty(smtpServerPassword)) {
             setSmtpUsername(smtpServerUsername);
             setSmtpPassword(smtpServerPassword);
         }
 
-        String javaMailExtraProps = xwiki.getXWikiPreference("javamail_extra_props");
-        if (!StringUtils.isEmpty(javaMailExtraProps)) {
+        Properties javaMailExtraProps = this.mailSenderConfiguration.getAdditionalProperties();
+        if (!javaMailExtraProps.isEmpty()) {
             setExtraProperties(javaMailExtraProps);
         }
     }
@@ -139,6 +147,11 @@ public class MailConfiguration
         return !StringUtils.isEmpty(getSmtpUsername()) && !StringUtils.isEmpty(getSmtpPassword());
     }
 
+    public void setExtraProperties(Properties extraProperties)
+    {
+        this.extraProperties = extraProperties;
+    }
+
     public void setExtraProperties(String extraPropertiesString)
     {
         if (StringUtils.isEmpty(extraPropertiesString)) {
@@ -182,7 +195,7 @@ public class MailConfiguration
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (getHost() != null) {
             buffer.append("Host [" + getHost() + "]");

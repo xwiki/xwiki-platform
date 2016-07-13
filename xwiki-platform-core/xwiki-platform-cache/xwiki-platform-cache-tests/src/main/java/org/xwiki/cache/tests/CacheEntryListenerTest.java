@@ -171,7 +171,7 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
         /**
          * @param eventType the event type.
          */
-        public EventWaiter(EventType eventType)
+        EventWaiter(EventType eventType)
         {
             this.eventType = eventType;
         }

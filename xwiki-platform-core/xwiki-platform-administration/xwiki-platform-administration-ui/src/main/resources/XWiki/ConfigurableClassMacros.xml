@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>ConfigurableClassMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.ConfigurableClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016388000</creationDate>
-  <date>1373028868000</date>
-  <contentUpdateDate>1373028868000</contentUpdateDate>
+  <parent>XWiki.ConfigurableClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1418555451000</date>
+  <contentUpdateDate>1418555451000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.admin.configurable.macros.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -26,39 +43,6 @@
 ## Constants:
 #set($redirectParameter = 'xredirect')
 #set($nameOfThisDocument = 'XWiki.ConfigurableClass')
-
-
-#*
- * Any documents which are on the provided list ($documentNames) which are locked by the current user will be unlocked.
- * If this macro has programming rights, then they are unlocked programmatically, otherwise a javascript tag is
- * generated with ajax calls to cancel for all of the documents. If there are documents on this list which are not
- * locked by the current user, then they are ignored.
- *
- * @param $documentNames - List&lt;String&gt; - fullNames of documents which should be unlocked if they are locked by the
- *                                        current user.
- *###
-#macro(unlockDocuments $documentNames)
-  #if($documentNames.size() &gt; 0)
-    #set($sql = "doc.fullName=")
-    #foreach($documentName in $documentNames)
-      #set($sql = "${sql}'$documentName' or doc.fullName=")
-    #end
-    ## Trim the dangling ' or doc.fullName=?'
-    #set($sql = $sql.substring(0, $sql.lastIndexOf(' or doc.fullName=')))
-    #set($sql = ", XWikiLock lock where lock.docId=doc.id and lock.userName='$xcontext.getUser()' and (${sql})")
-    #set($namesOfdocumentsToUnlock = $services.query.hql($sql).addFilter('unique').execute())
-    ## Use ajax and hope the user runs javascript.
-    {{html}}
-      &lt;script type="text/javascript"&gt;
-        document.observe("xwiki:dom:loaded", function() {
-          #foreach($nameOflockedDocument in $namesOfdocumentsToUnlock)
-            new Ajax.Request("$xwiki.getURL($nameOflockedDocument, 'cancel', 'ajax=1')");
-          #end
-        });
-      &lt;/script&gt;
-    {{/html}}
-  #end## If output list size &gt; 0
-#end
 
 
 #*
@@ -132,7 +116,9 @@
   ##
 #end
 
-
+#*
+ * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass) xobjects found on this wiki.
+ *###
 #macro(findCustomSectionsToConfigure $adminMenu)
   #set ($outputList = [])
   #set ($global = ($editor == 'globaladmin'))
@@ -148,7 +134,7 @@
   ##
   #set ($query = "editor=$escapetool.url(${editor})")
   #if ($editor != 'globaladmin')
-    #set ($query = $query + "&amp;amp;space=$escapetool.url(${currentSpace})")
+    #set ($query = $query + "&amp;space=$escapetool.url(${currentSpace})")
   #end
   #foreach ($appName in $outputList)
     ##
@@ -161,6 +147,39 @@
     #end
     ##
     #foreach ($configurableObject in $app.getObjects($nameOfThisDocument))
+      #set ($displayInCategory = $app.getValue('displayInCategory', $configurableObject))
+      ## It's ok to not specify a category, in which case the app will be added to a default one (i.e. "applications")
+      #if ("$!displayInCategory" != '')
+        #if ($categoriesByName.containsKey($displayInCategory))
+          ## Add a new section in this category
+          #set ($appCategory = $categoriesByName.get($displayInCategory))
+        #else
+          ## Add a new section
+          #set($key = "admin.${displayInCategory.toLowerCase()}")
+          #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInCategory) #end
+          #set ($appCategory= {'id' : $displayInCategory, 'name' : $name, 'children': []})
+          #set ($discard = $categoriesByName.put($displayInCategory, $appCategory))
+          ## Insert at the specified position
+          #set ($displayBeforeCategory = $app.getValue('displayBeforeCategory', $configurableObject))
+          #if ("$!displayBeforeCategory" != '')
+            #set ($listPosition = $adminMenu.indexOf($categoriesByName.get($displayBeforeCategory)))
+            #if ($listPosition &gt; -1)
+              #set ($discard = $adminMenu.add($listPosition, $appCategory))
+            #else
+              #set ($discard = $adminMenu.add($appCategory))
+            #end
+          #else
+            #set ($discard = $adminMenu.add($appCategory))
+          #end
+        #end
+        #set ($categoryIcon = $app.getValue('categoryIcon', $configurableObject))
+        #if ("$!categoryIcon" != '')
+          #set ($appCategory.categoryIcon = $categoryIcon)
+        #end
+      #else
+        #set ($appCategory = $categoriesByName.get('applications'))
+      #end
+      ##
       #set ($displayInSection = $app.getValue('displayInSection', $configurableObject))
       ##
       ## If there is no section specified in the object, just skip it
@@ -178,7 +197,7 @@
         ## If there is no section for this configurable, then we will have to add one.
         #set($key = "admin.${displayInSection.toLowerCase()}")
         #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInSection) #end
-        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true})
+        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder')})
         #if ($app.getValue('configureGlobally', $configurableObject) != 1)
           #set ($appSection.perSpace = true)
         #end
@@ -187,7 +206,7 @@
           #set ($appSection.description = $services.localization.render($key))
         #end
         #set ($discard = $sectionsByName.put($displayInSection, $appSection))
-        #set ($discard = $categoriesByName.get('applications').children.add($appSection))
+        #set ($discard = $appCategory.children.add($appSection))
         #set ($newSection = true)
       #end
       ##
@@ -222,7 +241,7 @@
   #if(!$headingAlreadyShowing)
     #set($headingAlreadyShowing = true)
 
-    = {{translation key="admin.customize"/}} __[[$appName&gt;&gt;$appName]]__: =
+    = {{translation key="admin.customize"/}} [[$appName&gt;&gt;$appName]]: =
   #end
 #end
 
@@ -234,6 +253,12 @@
         ## Silently skip over this property.
       #else
         #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
+        ##
+        #set($hintKey = "${obj.xWikiClass.name}_${propName}.hint")
+        #set($hint = $services.localization.render($hintKey))
+        #if($hint == $hintKey)
+          #set($hint = $NULL)
+        #end
         ##
         ## Further processing of the field display HTML is needed.
         ## Step 1: Strip &lt;pre&gt; tags which $obj.display inserts, this won't affect content because it's escaped.
@@ -255,6 +280,9 @@
         #if($linkPrefix != '')
           #set($linkScript = "$linkPrefix$propName")
           &lt;a href="$escapetool.xml("#evaluate($linkScript)")" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
+        #end
+        #if ($hint)
+          &lt;span class="xHint"&gt;$hint&lt;/span&gt;
         #end
         &lt;/dt&gt;
         #if ($out.indexOf('type=''checkbox''') == -1)

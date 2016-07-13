@@ -50,12 +50,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link com.xpn.xwiki.user.api.XWikiAuthService}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
@@ -88,7 +87,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
-        String wikiName = context.getDatabase();
+        String wikiName = context.getWikiId();
 
         if (wikiName != null) {
             wikiName = wikiName.toLowerCase();
@@ -274,7 +273,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * Method to authenticate and set the cookie from a username and password passed as parameters
-     * 
+     *
      * @return null if the user is not authenticated properly
      */
     @Override
@@ -325,7 +324,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (principal != null) {
             // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
             // as the current wiki.
-            // TODO: Warning the code below will fail if current doc's wiki != current wiki.
             DocumentReference userDocumentReference =
                 this.currentDocumentReferenceResolver.resolve(principal.getName());
             contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
@@ -363,20 +361,20 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return null;
         }
 
-        // Trim the username to allow users to enter their names with spaces before or after
-        String cannonicalUsername = username.replaceAll(" ", "");
-
         // Check for empty usernames
-        if (cannonicalUsername.equals("")) {
+        if (StringUtils.isBlank(username)) {
             context.put("message", "nousername");
             return null;
         }
 
         // Check for empty passwords
-        if ((password == null) || (password.trim().equals(""))) {
+        if (StringUtils.isBlank(password)) {
             context.put("message", "nopassword");
             return null;
         }
+
+        // Trim the username to allow users to enter their names with spaces before or after
+        String cannonicalUsername = username.replaceAll(" ", "");
 
         // Check for superadmin
         if (isSuperAdmin(cannonicalUsername)) {
@@ -404,25 +402,18 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 susername = cannonicalUsername.substring(j + 1);
             }
 
-            String db = context.getDatabase();
+            String db = context.getWikiId();
 
             try {
                 // Set the context database to the specified wiki, if any
                 if (virtualXwikiName != null) {
-                    context.setDatabase(virtualXwikiName);
+                    context.setWikiId(virtualXwikiName);
                 }
                 // Check in the current database first
                 try {
                     String user = findUser(susername, context);
-                    if (user != null) {
-                        if (checkPassword(user, password, context)) {
-                            return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user
-                                : user);
-                        } else {
-                            context.put("message", "invalidcredentials");
-                        }
-                    } else {
-                        context.put("message", "invalidcredentials");
+                    if (user != null && checkPassword(user, password, context)) {
+                        return new SimplePrincipal(virtualXwikiName != null ? context.getWikiId() + ":" + user : user);
                     }
                 } catch (Exception e) {
                     // continue
@@ -430,31 +421,24 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
                 if (!context.isMainWiki()) {
                     // Then we check in the main database
-                    context.setDatabase(context.getMainXWiki());
+                    context.setWikiId(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
-                        if (user != null) {
-                            if (checkPassword(user, password, context)) {
-                                return new SimplePrincipal(context.getDatabase() + ":" + user);
-                            } else {
-                                context.put("message", "invalidcredentials");
-                                return null;
-                            }
-                        } else {
-                            context.put("message", "invalidcredentials");
-                            return null;
+                        if (user != null && checkPassword(user, password, context)) {
+                            return new SimplePrincipal(context.getWikiId() + ":" + user);
                         }
                     } catch (Exception e) {
                         context.put("message", "loginfailed");
                         return null;
                     }
-
-                } else {
-                    // error message was already set
-                    return null;
                 }
+
+                // No user found
+                context.put("message", "invalidcredentials");
+                return null;
+
             } finally {
-                context.setDatabase(db);
+                context.setWikiId(db);
             }
 
         } else {
@@ -469,7 +453,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String user;
 
         // First let's look in the cache
-        if (context.getWiki().exists(new DocumentReference(context.getDatabase(), "XWiki", username), context)) {
+        if (context.getWiki().exists(new DocumentReference(context.getWikiId(), "XWiki", username), context)) {
             user = "XWiki." + username;
         } else {
             // Note: The result of this search depends on the Database. If the database is
@@ -477,7 +461,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
-            Object[][] whereParameters = new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
+            Object[][] whereParameters = new Object[][] { { "doc.space", "XWiki" }, { "doc.name", username } };
 
             List<String> list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
@@ -554,7 +538,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc =
-                context.getWiki().getDocument(new DocumentReference(context.getDatabase(), "XWiki", wikiname), context);
+                context.getWiki().getDocument(new DocumentReference(context.getWikiId(), "XWiki", wikiname), context);
             if (userdoc.isNew()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("User page does not exist for user " + user);
@@ -583,7 +567,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * The authentication library we are using (SecurityFilter) requires that its URLs do not contain the context path,
      * in order to be usable with <tt>RequestDispatcher.forward</tt>. Since our URL factory include the context path in
      * the generated URLs, we use this method to remove (if needed) the context path.
-     * 
+     *
      * @param url The URL to process.
      * @param context The ubiquitous XWiki request context.
      * @return A <code>String</code> representation of the contextpath-free URL.
@@ -594,13 +578,32 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // XWiki uses contextPath in the wrong way, putting a / at the end, and not at the start. Fix this here.
         if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
             contextPath = "/" + StringUtils.chop(contextPath);
+        } else if ("/".equals(contextPath)) {
+            contextPath = "";
         }
 
-        // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.
-        // Apply the same escape method to compensate this.
-        contextPath = Util.escapeURL(contextPath);
-
         String urlPrefix = url.getProtocol() + "://" + url.getAuthority() + contextPath;
-        return StringUtils.removeStart(url.toExternalForm(), urlPrefix);
+
+        // Since the passed URL has been potentially modified by HttpServletResponse.encodeURL() we also need to call
+        // encodeURL on urlPrefix to have a matching result.
+        // Note that this allows rewrite filters to customize the URL as they wish (adding jsessionid,
+        // query string, etc). If the webapp is installed as root this means that they can add a leading slash,
+        // transforming for example "http://server" into "http://server/?jsessionid=xxx".
+        String encodedUrlPrefix = context.getResponse().encodeURL(urlPrefix);
+
+        // Remove a potential jsessionid in the URL
+        encodedUrlPrefix = encodedUrlPrefix.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+
+        // Also remove any query string that might have been added by an outbound URL rewrite rule
+        encodedUrlPrefix = StringUtils.substringBeforeLast(encodedUrlPrefix, "?");
+
+        // Since the encodeURL can potentially add a trailing slash, make sure that the relative URL we return always
+        // start with a leadig slash.
+        String strippedURL = StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
+        if (!strippedURL.startsWith("/")) {
+            strippedURL = "/" + strippedURL;
+        }
+
+        return strippedURL;
     }
 }

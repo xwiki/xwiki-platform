@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to convert documents between various office formats.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.0M2
  */
-@Unstable
 public interface OfficeConverter
 {
     /**

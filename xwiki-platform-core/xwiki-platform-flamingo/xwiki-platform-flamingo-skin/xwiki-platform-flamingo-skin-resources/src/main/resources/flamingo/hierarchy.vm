@@ -1,0 +1,18 @@
+#template('xwikivars.vm')
+#if($isInServletMode) ## Visible only in a page
+  #template('hierarchy_macros.vm')
+  #######################################################
+  ##                   CONTROLLER
+  ##
+  ## Call the appropiate breadcrumb depending on the 
+  ## configuration.
+  #######################################################
+  #if($services.parentchild.isParentChildMechanismEnabled())
+    #hierarchy_parentChild()
+  #else
+    ##
+    ## Default mode: display the hierarchy for the current page
+    ##
+    #hierarchy($NULL {'id': 'hierarchy', 'limit': 5, 'treeNavigation': true})
+  #end
+#end

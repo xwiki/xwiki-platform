@@ -19,15 +19,17 @@
  */
 package com.xpn.xwiki.web;
 
-
-public class PreviewForm extends EditForm {
+public class PreviewForm extends EditForm
+{
     private boolean releaseLock;
 
-    public boolean isReleaseLock() {
-        return releaseLock;
+    public boolean isReleaseLock()
+    {
+        return this.releaseLock;
     }
 
-    public void setReleaseLock(boolean releaseLock) {
+    public void setReleaseLock(boolean releaseLock)
+    {
         this.releaseLock = releaseLock;
     }
 

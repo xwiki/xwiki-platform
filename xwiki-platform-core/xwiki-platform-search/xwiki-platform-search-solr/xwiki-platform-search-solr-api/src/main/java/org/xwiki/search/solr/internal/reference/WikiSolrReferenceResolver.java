@@ -29,8 +29,9 @@ import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.FieldUtils;
@@ -62,6 +63,10 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Inject
     private QueryManager queryManager;
 
+    @Inject
+    @Named("explicit")
+    private EntityReferenceResolver<String> explicitEntityReferenceResolver;
+
     @Override
     public List<EntityReference> getReferences(EntityReference wikiReference) throws SolrIndexerException
     {
@@ -69,18 +74,19 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         // Ignore the wiki reference because it is not indexable.
 
-        List<String> spaces = null;
+        List<String> localSpaceRefs = null;
 
         // Make sure the list of spaces is from the requested wiki.
         try {
-            spaces = this.queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
+            localSpaceRefs = this.queryManager.getNamedQuery("getSpaces").setWiki(wikiReference.getName()).execute();
         } catch (QueryException e) {
             throw new SolrIndexerException("Failed to query wiki [" + wikiReference.getName() + "] spaces", e);
         }
 
         // Visit each space
-        for (String space : spaces) {
-            SpaceReference spaceReference = new SpaceReference(space, wikiReference);
+        for (String localSpaceRef : localSpaceRefs) {
+            EntityReference spaceReference =
+                this.explicitEntityReferenceResolver.resolve(localSpaceRef, EntityType.SPACE, wikiReference);
 
             try {
                 Iterables.addAll(result, this.spaceResolverProvider.get().getReferences(spaceReference));

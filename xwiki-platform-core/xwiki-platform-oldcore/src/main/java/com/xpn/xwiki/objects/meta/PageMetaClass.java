@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
  * Page Field Class allows to create a field for storing page references.
- * 
+ *
  * @version $Id$
  * @since 4.2M2
  */

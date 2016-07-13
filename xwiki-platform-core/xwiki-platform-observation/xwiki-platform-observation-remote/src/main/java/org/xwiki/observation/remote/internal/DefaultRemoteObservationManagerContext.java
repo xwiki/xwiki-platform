@@ -29,7 +29,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
  * Manager context properties specific to remote events.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

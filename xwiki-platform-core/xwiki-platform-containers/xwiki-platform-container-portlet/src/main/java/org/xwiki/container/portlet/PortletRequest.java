@@ -24,12 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.container.Request;
-import org.xwiki.url.XWikiURL;
 
 public class PortletRequest implements Request
 {
     private javax.portlet.PortletRequest portletRequest;
-    private XWikiURL xwikiURL;
 
     public PortletRequest(javax.portlet.PortletRequest portletRequest)
     {
@@ -39,16 +37,6 @@ public class PortletRequest implements Request
     public javax.portlet.PortletRequest getPortletRequest()
     {
         return this.portletRequest;
-    }
-
-    public XWikiURL getURL()
-    {
-        return this.xwikiURL;
-    }
-
-    public void setXWikiURL(XWikiURL url)
-    {
-        this.xwikiURL = url;
     }
 
     @Override

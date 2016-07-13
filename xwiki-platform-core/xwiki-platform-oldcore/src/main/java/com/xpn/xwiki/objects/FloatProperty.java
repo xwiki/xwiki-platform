@@ -19,5 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-public class FloatProperty extends NumberProperty {
+public class FloatProperty extends NumberProperty
+{
 }

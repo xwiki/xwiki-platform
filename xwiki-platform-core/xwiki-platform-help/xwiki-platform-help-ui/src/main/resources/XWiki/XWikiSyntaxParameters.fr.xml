@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParameters</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497957000</date>
+  <contentUpdateDate>1301497957000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParameters</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Advanced =
+
+== Paramètres ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Parameters ===
+
+En syntaxe XWiki 1.0, il n'y avait pas de possibilité de passer des paramètres et la seule façon de le faire était d'écrire du XHTML directement dans le contenu comme vous le voyez dans le tableau ci-dessous.
+
+|=Syntaxe XWiki 1.0|=XHTML généré
+|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;titre&lt;/h1&gt;
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;titre&lt;/h1&gt;
+}}})))
+
+=== 2.0 Parameters ===
+
+En syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, il est possible de passer des paramètres aux divers éléments de syntaxe et aussi aux blocs de texte. Vous pouvez utiliser ces paramètres par exemple pour créer des styl. Il est possible de choisir n'importe quelle paire clé/valeur. Le moteur de rendu XHTML va passer ces paramètres en tant que XHTML attributs à la représentation XHTML sous-jacente des éléments de syntaxe. 
+
+|=(% style="width="60%" %)Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=XHTML généré
+|((({{{
+(% class="myClass" style="myStyle" id="myId" %)
+= titre =
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;titre&lt;/h1&gt;
+}}})))</content>
+</xwikidoc>

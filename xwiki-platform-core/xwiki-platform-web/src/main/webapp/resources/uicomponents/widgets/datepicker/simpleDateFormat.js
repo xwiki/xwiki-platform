@@ -41,9 +41,14 @@ var Externals = (function (Externals) {
   }
 
   var regex = /('[^']*')|(G+|y+|M+|w+|W+|D+|d+|F+|E+|a+|H+|k+|K+|h+|m+|s+|S+|Z+)|([a-zA-Z]+)|([^a-zA-Z']+)/;
-  var monthNames = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
-  var dayNames = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
-  var TEXT2 = 0, TEXT3 = 1, NUMBER = 2, YEAR = 3, MONTH = 4, TIMEZONE = 5;
+  /*!
+  #set ($dateFormatSymbols = $datetool.getDateFormatSymbols($services.localization.getCurrentLocale()))
+  */
+  var monthNames = $jsontool.serialize($dateFormatSymbols.getMonths().subList(0, 12));
+  var monthShortNames = $jsontool.serialize($dateFormatSymbols.getShortMonths().subList(0, 12));
+  var dayNames = $jsontool.serialize($dateFormatSymbols.getWeekdays().subList(1, 8));
+  var dayShortNames = $jsontool.serialize($dateFormatSymbols.getShortWeekdays().subList(1, 8));
+  var TEXT2 = 0, WEEK_DAY = 1, NUMBER = 2, YEAR = 3, MONTH = 4, TIMEZONE = 5;
   var types = {
     G : TEXT2,
     y : YEAR,
@@ -53,7 +58,7 @@ var Externals = (function (Externals) {
     D : NUMBER,
     d : NUMBER,
     F : NUMBER,
-    E : TEXT3,
+    E : WEEK_DAY,
     a : TEXT2,
     H : NUMBER,
     k : NUMBER,
@@ -227,7 +232,7 @@ var Externals = (function (Externals) {
             rawData = 1 + Math.floor((date.getDate() - 1) / 7);
             break;
           case "E":
-            rawData = dayNames[date.getDay()];
+            rawData = date.getDay();
             break;
           case "a":
             rawData = (date.getHours() >= 12) ? "PM" : "AM";
@@ -262,8 +267,12 @@ var Externals = (function (Externals) {
           case TEXT2:
             formattedString += formatText(rawData, numberOfLetters, 2);
             break;
-          case TEXT3:
-            formattedString += formatText(rawData, numberOfLetters, 3);
+          case WEEK_DAY:
+            if (numberOfLetters >= 4) {
+              formattedString += dayNames[rawData];
+            } else {
+              formattedString += dayShortNames[rawData];
+            }
             break;
           case NUMBER:
             formattedString += formatNumber(rawData, numberOfLetters);
@@ -278,8 +287,10 @@ var Externals = (function (Externals) {
             }
             break;
           case MONTH:
-            if (numberOfLetters >= 3) {
-              formattedString += formatText(monthNames[rawData], numberOfLetters, numberOfLetters);
+            if (numberOfLetters >= 4) {
+              formattedString += monthNames[rawData];
+            } else if (numberOfLetters == 3) {
+              formattedString += monthShortNames[rawData];
             } else {
               // NB. Months returned by getMonth are zero-based
               formattedString += formatNumber(rawData + 1, numberOfLetters);

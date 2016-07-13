@@ -32,10 +32,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.TimezoneClass;
 
 /**
  * Update XWiki.XWikiPreferences document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
@@ -44,6 +45,11 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 @Singleton
 public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the field containing the time zone.
+     */
+    private static final String TIMEZONE_FIELD = "timezone";
+
     /**
      * Used to bind a class to a document sheet.
      */
@@ -82,14 +88,23 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |=
             bclass.addDBListField("colorTheme", "Color theme",
                 "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
+                    + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
+                    + "or theme.className='FlamingoThemesCode.ThemeClass') "
+                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate' "
+                    + "and doc.fullName<>'FlamingoThemesCode.ThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {
             bclass.removeField("baseskin");
             needsUpdate = true;
         }
+        needsUpdate |=
+            bclass.addDBListField("iconTheme", "Icon theme",
+                "select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, "
+                    + "StringProperty propName "
+                    + "where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' "
+                    + "and doc.fullName<>'IconThemesCode.IconThemeTemplate' "
+                    + "and theme.id = propName.id and propName.name = 'name'");
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
@@ -113,6 +128,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
+        needsUpdate |= bclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
@@ -143,8 +159,20 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
+        needsUpdate |= bclass.addStaticListField("leftPanelsWidth", "Width of the left panel column",
+            "---|Small|Medium|Large");
+        needsUpdate |= bclass.addStaticListField("rightPanelsWidth", "Width of the right panel column",
+            "---|Small|Medium|Large");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+
+        // Timezone. Handle upgrade since in the past we were using a standard text field with a custom displayer and
+        // we're now using a Timezone Class. Thus we need to remove any existing field to upgrade it.
+        if (!(bclass.getField(TIMEZONE_FIELD) instanceof TimezoneClass)) {
+            bclass.removeField(TIMEZONE_FIELD);
+            bclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
+            needsUpdate = true;
+        }
 
         // Only used by LDAP authentication service
 
@@ -160,6 +188,9 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
         needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);
         needsUpdate |= bclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
+        needsUpdate |= bclass.addBooleanField("ldap_update_photo", "Update user photo from LDAP", "yesno");
+        needsUpdate |= bclass.addTextField("ldap_photo_attachment_name", "Attachment name to save LDAP photo", 30);
+        needsUpdate |= bclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
         needsUpdate |= bclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5);
         needsUpdate |= bclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
         needsUpdate |= bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");

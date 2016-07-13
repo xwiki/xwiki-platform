@@ -46,11 +46,7 @@ public class ColorPicker extends PopupPanel implements SelectionHandler<String>
         setWidget(palette);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionHandler#onSelection(SelectionEvent)
-     */
+    @Override
     public void onSelection(SelectionEvent<String> event)
     {
         if (event.getSource() == getWidget()) {

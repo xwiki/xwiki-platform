@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 /**
  * Binds sheets to XWiki documents using the {@code XWiki.DocumentSheetBinding} class. Use this class if you want to
  * bind a custom sheet for a specific document.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */

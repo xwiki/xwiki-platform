@@ -32,7 +32,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 /**
  * Provide remote events specific configuration.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -61,7 +61,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     {
         List<String> channels = this.configurationSource.getProperty("observation.remote.channels", List.class);
 
-        return channels == null ? Collections.<String> emptyList() : channels;
+        return channels == null ? Collections.<String>emptyList() : channels;
     }
 
     @Override

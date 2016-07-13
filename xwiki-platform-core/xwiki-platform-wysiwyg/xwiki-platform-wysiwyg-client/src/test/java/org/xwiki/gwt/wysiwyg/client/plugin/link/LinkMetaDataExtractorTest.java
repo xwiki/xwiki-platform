@@ -60,11 +60,7 @@ public class LinkMetaDataExtractorTest extends WysiwygTestCase
      */
     private LinkMetaDataExtractor extractor;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -73,11 +69,7 @@ public class LinkMetaDataExtractorTest extends WysiwygTestCase
         extractor = new LinkMetaDataExtractor();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygTestCase#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         super.gwtTearDown();

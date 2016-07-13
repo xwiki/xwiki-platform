@@ -19,54 +19,51 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.jmock.Expectations;
+import static org.mockito.Mockito.when;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.ModelContext;
+import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Unit tests for {@link org.xwiki.configuration.internal.SpacePreferencesConfigurationSource}.
+ * Unit tests for {@link SpacePreferencesConfigurationSource}.
  *
  * @version $Id$
- * @since 2.4M2
  */
-@MockingRequirement(SpacePreferencesConfigurationSource.class)
-public class SpacePreferencesConfigurationSourceTest extends AbstractMockingComponentTestCase
+public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    private ConfigurationSource source;
+    private static final DocumentReference SPACE_DOCUMENT = new DocumentReference(CURRENT_WIKI, "currentspace",
+        SpacePreferencesConfigurationSource.DOCUMENT_NAME);
 
-    @Before
-    public void configure() throws Exception
+    public SpacePreferencesConfigurationSourceTest()
     {
-        this.source = getComponentManager().getInstance(ConfigurationSource.class, "space");
+        super(SpacePreferencesConfigurationSource.class);
+    }
+
+    @Override
+    public void before() throws Exception
+    {
+        super.before();
+
+        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(SPACE_DOCUMENT);
+    }
+
+    @Override
+    protected LocalDocumentReference getClassReference()
+    {
+        return SpacePreferencesConfigurationSource.CLASS_REFERENCE;
     }
 
     @Test
     public void getPropertyForStringWhenExists() throws Exception
     {
-        final DocumentReference webPreferencesReference = new DocumentReference("wiki", "space", "WebPreferences");
-        final DocumentReference xwikiPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiPreferences");
-        final DocumentReference currentDocument = new DocumentReference("wiki", "space", "page");
+        setStringProperty(SPACE_DOCUMENT, "key", "value");
 
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
-        getMockery().checking(new Expectations() {{
-            allowing(dab).getCurrentDocumentReference();
-                will(returnValue(currentDocument));
-            allowing(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("wiki")));
-            oneOf(dab).getProperty(webPreferencesReference, xwikiPreferencesReference, "key");
-                will(returnValue("value"));
-        }});
-
-        String result = this.source.getProperty("key", String.class);
+        String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
 
         Assert.assertEquals("value", result);
     }

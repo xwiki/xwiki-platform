@@ -20,6 +20,7 @@
 package com.xpn.xwiki.export.html;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -30,6 +31,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -42,6 +46,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.url.URLContextManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -53,7 +58,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
- * 
+ *
  * @version $Id$
  * @since XWiki Platform 1.3M1
  */
@@ -113,7 +118,7 @@ public class HtmlPackager
 
     /**
      * Modify the name of the package for which packager append ".zip".
-     * 
+     *
      * @param name the name of the page.
      */
     public void setName(String name)
@@ -131,7 +136,7 @@ public class HtmlPackager
 
     /**
      * Modify the description of the package.
-     * 
+     *
      * @param description the description of the package.
      */
     public void setDescription(String description)
@@ -149,7 +154,7 @@ public class HtmlPackager
 
     /**
      * Add a page to export.
-     * 
+     *
      * @param page the name of the page to export.
      */
     public void addPage(String page)
@@ -159,7 +164,7 @@ public class HtmlPackager
 
     /**
      * Add a range of pages to export.
-     * 
+     *
      * @param pages a range of pages to export.
      */
     public void addPages(Collection<String> pages)
@@ -169,7 +174,7 @@ public class HtmlPackager
 
     /**
      * Add rendered document to ZIP stream.
-     * 
+     *
      * @param pageName the name (used with {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page to
      *            render.
      * @param zos the ZIP output stream.
@@ -181,7 +186,8 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         DocumentReference docReference = resolver.resolve(pageName);
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 
@@ -205,9 +211,9 @@ public class HtmlPackager
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
 
-        String originalDatabase = context.getDatabase();
+        String originalDatabase = context.getWikiId();
         try {
-            context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
+            context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
             context.setDoc(doc);
             vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
             vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
@@ -216,18 +222,33 @@ public class HtmlPackager
             context.put(CONTEXT_TDOC, tdoc);
             vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
 
-            String content = context.getWiki().evaluateTemplate("view.vm", context);
+            String content = evaluateDocumentContent(context);
 
             zos.write(content.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } finally {
-            context.setDatabase(originalDatabase);
+            context.setWikiId(originalDatabase);
         }
+    }
+
+    private String evaluateDocumentContent(XWikiContext context) throws IOException
+    {
+        context.getWiki().getPluginManager().beginParsing(context);
+        Utils.enablePlaceholders(context);
+        String content;
+        try {
+            content = context.getWiki().evaluateTemplate("view.vm", context);
+            content = Utils.replacePlaceholders(content, context);
+        } finally {
+            Utils.disablePlaceholders(context);
+        }
+        content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
+        return content;
     }
 
     /**
      * Init provided {@link ExportURLFactory} and add rendered documents to ZIP stream.
-     * 
+     *
      * @param zos the ZIP output stream.
      * @param tempdir the directory where to copy attached files.
      * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the documents.
@@ -259,18 +280,19 @@ public class HtmlPackager
             execution.pushContext(executionContext);
 
             try {
-
                 VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
                 // At this stage we have a clean Velocity Context
                 VelocityContext vcontext = velocityManager.getVelocityContext();
 
+                // Set the URL Factories/Serializer to use
                 urlf.init(this.pages, tempdir, renderContext);
                 renderContext.setURLFactory(urlf);
+                Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
                 for (String pageName : this.pages) {
                     renderDocument(pageName, zos, renderContext, vcontext);
-                } 
+                }
             } finally {
                 execution.popContext();
             }
@@ -286,7 +308,7 @@ public class HtmlPackager
 
     /**
      * Apply export and create the ZIP package.
-     * 
+     *
      * @param context the XWiki context used to render pages.
      * @throws IOException error when creating the package.
      * @throws XWikiException error when render the pages.
@@ -313,16 +335,12 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (String skinName : urlf.getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getExportedSkinFiles(), context);
+        for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {
+            addSkinToZip(skinName, zos, urlf.getFilesystemExportContext().getExportedSkinFiles(), context);
         }
 
-        // add "resources" folder
-        File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExportedSkinFiles());
-
-        // Add attachments and generated skin files files to ZIP file
-        addDirToZip(tempdir, zos, "", null);
+        // Copy generated files in the ZIP file.
+        addDirToZip(tempdir, TrueFileFilter.TRUE, zos, "", null);
 
         zos.setComment(this.description);
 
@@ -336,7 +354,7 @@ public class HtmlPackager
 
     /**
      * Delete a directory and all with all it's content.
-     * 
+     *
      * @param directory the directory to delete.
      */
     private static void deleteDirectory(File directory)
@@ -351,9 +369,7 @@ public class HtmlPackager
             return;
         }
 
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
-
+        for (File file : files) {
             if (file.isDirectory()) {
                 deleteDirectory(file);
                 continue;
@@ -367,7 +383,7 @@ public class HtmlPackager
 
     /**
      * Add skin to the package in sub-directory "skins".
-     * 
+     *
      * @param skinName the name of the skin.
      * @param out the ZIP output stream where to put the skin.
      * @param context the XWiki context.
@@ -377,18 +393,24 @@ public class HtmlPackager
         XWikiContext context) throws IOException
     {
         File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
-        addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
+
+        // Don't include vm and LESS files by default
+        FileFilter filter = new NotFileFilter(new SuffixFileFilter(
+            new String[] { ".vm", ".less", "skin.properties" }));
+
+        addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
     }
 
     /**
      * Add a directory and all its sub-directories to the package.
-     * 
+     *
      * @param directory the directory to add.
+     * @param filter the files to include or exclude from the copy
      * @param out the ZIP output stream where to put the skin.
      * @param basePath the path where to put the directory in the package.
      * @throws IOException error when adding the directory to package.
      */
-    private static void addDirToZip(File directory, ZipOutputStream out, String basePath,
+    private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
         if (LOGGER.isDebugEnabled()) {
@@ -399,16 +421,15 @@ public class HtmlPackager
             return;
         }
 
-        File[] files = directory.listFiles();
+        File[] files = directory.listFiles(filter);
 
         if (files == null) {
             return;
         }
 
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
+        for (File file : files) {
             if (file.isDirectory()) {
-                addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
+                addDirToZip(file, filter, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
             } else {
                 String path = basePath + file.getName();
 

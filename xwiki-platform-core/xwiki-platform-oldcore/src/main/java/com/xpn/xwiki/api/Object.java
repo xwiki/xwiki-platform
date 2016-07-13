@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 public class Object extends Collection
 {
@@ -63,8 +64,12 @@ public class Object extends Collection
     public java.lang.Object get(String name)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(),
-                getXWikiContext());
+            XWikiDocument doc = getBaseObject().getOwnerDocument();
+            if (doc == null) {
+                doc =
+                    getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
+            }
+
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
@@ -74,8 +79,12 @@ public class Object extends Collection
     public java.lang.Object display(String name, String mode)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(),
-                getXWikiContext());
+            XWikiDocument doc = getBaseObject().getOwnerDocument();
+            if (doc == null) {
+                doc =
+                    getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
+            }
+
             return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
@@ -95,5 +104,11 @@ public class Object extends Collection
     public void set(String fieldname, java.lang.Object value)
     {
         getBaseObject().set(fieldname, value, getXWikiContext());
+    }
+
+    @Override
+    public BaseObjectReference getReference()
+    {
+        return getBaseObject().getReference();
     }
 }

@@ -20,9 +20,11 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,6 +35,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.LocaleUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +46,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 /**
  * Action that handles uploading document attachments. It saves all the uploaded files whose fieldname start with
  * {@code filepath}.
- * 
+ *
  * @version $Id$
  */
 public class UploadAction extends XWikiAction
@@ -81,7 +84,19 @@ public class UploadAction extends XWikiAction
             return false;
         }
 
+        // We need to clone the document before we modify it because the cached storage gives the same instance to other
+        // requests (until the cache is invalidated).
         XWikiDocument doc = context.getDoc().clone();
+
+        // It is possible to submit an attachment to a new document (the WYSIWYG content editor does it for instance).
+        // Let's make sure the new document is created with the right (default) language.
+        if (doc.isNew()) {
+            doc.setLocale(Locale.ROOT);
+            if (doc.getDefaultLocale() == Locale.ROOT) {
+                doc.setDefaultLocale(LocaleUtils
+                    .toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+            }
+        }
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
@@ -142,7 +157,7 @@ public class UploadAction extends XWikiAction
 
     /**
      * Attach a file to the current document.
-     * 
+     *
      * @param fieldName the target file field
      * @param filename
      * @param fileupload the {@link FileUploadPlugin} holding the form data
@@ -157,42 +172,34 @@ public class UploadAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         String username = context.getUser();
 
-        // Read XWikiAttachment
-        XWikiAttachment attachment = doc.getAttachment(filename);
-
-        if (attachment == null) {
-            attachment = new XWikiAttachment();
-            doc.getAttachmentList().add(attachment);
-        }
-
+        XWikiAttachment attachment;
         try {
-            attachment.setContent(fileupload.getFileItemInputStream(fieldName, context));
+            InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context);
+            attachment = doc.addAttachment(filename, contentInputStream, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
         }
 
-        attachment.setFilename(filename);
-        attachment.setAuthor(username);
-
-        // Add the attachment to the document
-        attachment.setDoc(doc);
-
+        // Set the document author
         doc.setAuthor(username);
         if (doc.isNew()) {
             doc.setCreator(username);
         }
 
-        // Adding a comment with a link to the download URL
+        // Calculate and store mime type
+        attachment.resetMimeType(context);
+
+        // Adding a comment with the name and revision of the added attachment.
         String comment;
         String nextRev = attachment.getNextVersion();
         ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
-        params.add(doc.getAttachmentRevisionURL(filename, nextRev, context));
+        params.add(nextRev);
         if (attachment.isImage(context)) {
-            comment = context.getMessageTool().get("core.comment.uploadImageComment", params);
+            comment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
         } else {
-            comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
         // Save the document.
@@ -213,7 +220,7 @@ public class UploadAction extends XWikiAction
     /**
      * Extract the corresponding attachment name for a given file field. It can either be specified in a separate form
      * input field, or it is extracted from the original filename.
-     * 
+     *
      * @param fieldName the target file field
      * @param fileupload the {@link FileUploadPlugin} holding the form data
      * @param context the current request context
@@ -265,7 +272,7 @@ public class UploadAction extends XWikiAction
         if (ajax) {
             try {
                 context.getResponse().getOutputStream()
-                    .println("error: " + context.getMessageTool().get((String) context.get("message")));
+                    .println("error: " + localizePlainOrKey((String) context.get("message")));
             } catch (IOException ex) {
                 LOGGER.error("Unhandled exception writing output:", ex);
             }

@@ -35,64 +35,63 @@ public class DocumentInfoAPI extends Api
     public DocumentInfo getDocInfo()
     {
         if (hasProgrammingRights()) {
-            return doc;
+            return this.doc;
         }
         return null;
     }
 
     public boolean isNew()
     {
-        return doc.isNew();
+        return this.doc.isNew();
     }
 
     public int getFileType()
     {
-        return doc.getFileType();
+        return this.doc.getFileType();
     }
 
     public void setFileType(int fileType)
     {
-        doc.setFileType(fileType);
+        this.doc.setFileType(fileType);
     }
 
     public String getFullName()
     {
-        return doc.getFullName();
+        return this.doc.getFullName();
     }
 
     /**
      * @return the language of the described document
-     * 
      * @since 2.2M1
      */
     public String getLanguage()
     {
-        return doc.getLanguage();
+        return this.doc.getLanguage();
     }
-    
+
     public int isInstallable()
     {
-        return doc.isInstallable();
+        return this.doc.isInstallable();
     }
 
     public int getAction()
     {
-        return doc.getAction();
+        return this.doc.getAction();
     }
 
     public void setAction(int action)
     {
-        doc.setAction(action);
+        this.doc.setAction(action);
     }
 
     public int testInstall(XWikiContext context)
     {
-        return doc.testInstall(false, context);
+        return this.doc.testInstall(false, context);
     }
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        return doc.testInstall(isAdmin, context);
+        return this.doc.testInstall(isAdmin, context);
     }
 
     public static String installStatusToString(int status)

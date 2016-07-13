@@ -63,12 +63,8 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         this.service = service;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroServiceAsync#getMacroDescriptor(String, String, AsyncCallback)
-     */
-    public void getMacroDescriptor(final String macroId, final String syntaxId,
+    @Override
+    public void getMacroDescriptor(final String macroId, final String syntaxId, final String wikiId,
         final AsyncCallback<MacroDescriptor> async)
     {
         // First let's look in the cache.
@@ -90,14 +86,19 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
                 }
             }
         }
+
+        // FIXME/TODO: Do we need an extra wiki level of caching?
+
         // The macro descriptor wasn't found in the cache. We have to make the request to the server.
-        service.getMacroDescriptor(macroId, syntaxId, new AsyncCallback<MacroDescriptor>()
+        service.getMacroDescriptor(macroId, syntaxId, wikiId, new AsyncCallback<MacroDescriptor>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 async.onFailure(caught);
             }
 
+            @Override
             public void onSuccess(MacroDescriptor result)
             {
                 if (result != null) {
@@ -106,6 +107,13 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
                 async.onSuccess(result);
             }
         });
+    }
+
+    @Override
+    public void getMacroDescriptor(final String macroId, final String syntaxId,
+        final AsyncCallback<MacroDescriptor> async)
+    {
+        getMacroDescriptor(macroId, syntaxId, null, async);
     }
 
     /**
@@ -124,24 +132,23 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
         macroDescriptorsForSyntax.put(descriptor.getId(), descriptor);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MacroServiceAsync#getMacroDescriptors(String, AsyncCallback)
-     */
-    public void getMacroDescriptors(final String syntaxId, final AsyncCallback<List<MacroDescriptor>> async)
+    @Override
+    public void getMacroDescriptors(final String syntaxId, final String wikiId,
+        final AsyncCallback<List<MacroDescriptor>> async)
     {
         List<MacroDescriptor> macroDescriptorListForSyntax = macroDescriptorList.get(syntaxId);
         if (macroDescriptorListForSyntax != null) {
             async.onSuccess(macroDescriptorListForSyntax);
         } else {
-            service.getMacroDescriptors(syntaxId, new AsyncCallback<List<MacroDescriptor>>()
+            service.getMacroDescriptors(syntaxId, wikiId, new AsyncCallback<List<MacroDescriptor>>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
+                @Override
                 public void onSuccess(List<MacroDescriptor> result)
                 {
                     if (result != null) {
@@ -151,5 +158,11 @@ public class MacroServiceAsyncCacheProxy implements MacroServiceAsync
                 }
             });
         }
+    }
+
+    @Override
+    public void getMacroDescriptors(final String syntaxId, final AsyncCallback<List<MacroDescriptor>> async)
+    {
+        getMacroDescriptors(syntaxId, null, async);
     }
 }

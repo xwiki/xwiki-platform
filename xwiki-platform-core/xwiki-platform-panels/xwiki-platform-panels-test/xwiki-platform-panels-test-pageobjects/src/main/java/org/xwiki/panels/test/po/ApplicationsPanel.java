@@ -23,7 +23,7 @@ import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents actions for the Panels.Appications panel.
+ * Represents actions for the Panels.Applications panel.
  *
  * @version $Id$
  * @since 4.3M2
@@ -46,14 +46,14 @@ public class ApplicationsPanel extends ViewPage
 
     public boolean containsApplication(String applicationName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(
-            "//ul[@class = 'applicationsPanel']/li//a[contains(text(), '" + applicationName + "')]")).size() == 1;
+        return getDriver().findElementsWithoutWaiting(By.xpath(
+            "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).size() == 1;
     }
 
     public ViewPage clickApplication(String applicationName)
     {
-        getUtil().findElementWithoutWaiting(getDriver(), By.xpath(
-            "//ul[@class = 'applicationsPanel']/li//a[contains(text(), '" + applicationName + "')]")).click();
+        getDriver().findElementWithoutWaiting(By.xpath(
+            "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).click();
         return new ViewPage();
     }
 }

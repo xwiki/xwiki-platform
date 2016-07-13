@@ -159,11 +159,7 @@ public class LinePlugin extends AbstractPlugin implements CommandListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         if (SUBMIT.equals(command)) {
@@ -175,11 +171,7 @@ public class LinePlugin extends AbstractPlugin implements CommandListener
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (SUBMIT.equals(command)) {

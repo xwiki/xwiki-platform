@@ -33,6 +33,11 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     public static final String MAXENTRIES_ID = "maxentries";
 
     /**
+     * @see #getLifespan()
+     */
+    public static final String LIFESPAN_ID = "lifespan";
+
+    /**
      * Create a new EntryEvictionConfiguration based on LRU algorithm.
      */
     public LRUEvictionConfiguration()
@@ -54,7 +59,7 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @param maxEntries the maximum entries the cache can contain.
+     * @param maxEntries see {@link #getMaxEntries()}
      */
     public void setMaxEntries(int maxEntries)
     {
@@ -62,12 +67,57 @@ public class LRUEvictionConfiguration extends EntryEvictionConfiguration
     }
 
     /**
-     * @return the maximum entries the cache can contain.
+     * @return the maximum entries the cache can contain. When the cache reaches that any element, the defined eviction
+     *         algorithm kicks in to remove existing cache entries.
      */
     public int getMaxEntries()
     {
         Object obj = get(MAXENTRIES_ID);
 
         return obj == null ? 0 : (Integer) get(MAXENTRIES_ID);
+    }
+
+    /**
+     * @param maxIdle see {@link #getMaxIdle()}
+     * @since 7.4M2
+     */
+    public void setMaxIdle(int maxIdle)
+    {
+        setTimeToLive(maxIdle);
+    }
+
+    /**
+     * @return the time a cache entry will continue to stay in the cache after being last accessed, in seconds. When
+     *         the time is reached, the entry is expired and removed from the cache. In addition, when the cache
+     *         reaches its maximum number of entries, the defined eviction algorithm is used (e.g. LRU) and thus an
+     *         entry can stay less time in the cache than its maximum defined time.
+     * @since 7.4M2
+     */
+    public int getMaxIdle()
+    {
+        return getTimeToLive();
+    }
+
+    /**
+     * @param lifespan see {@link #getLifespan()}
+     * @since 7.4M2
+     */
+    public void setLifespan(int lifespan)
+    {
+        put(LIFESPAN_ID, lifespan);
+    }
+
+    /**
+     * @return the maximum lifespan of a cache entry, after which the entry is expired and removed from the cache, in
+     *         seconds. In addition, when the cache reaches its maximum number of entries, the defined eviction
+     *         algorithm is used (e.g. LRU) and thus an entry can stay less time in the cache than its maximum defined
+     *         time.
+     * @since 7.4M2
+     */
+    public int getLifespan()
+    {
+        Object obj = get(LIFESPAN_ID);
+
+        return obj == null ? 0 : (Integer) get(LIFESPAN_ID);
     }
 }

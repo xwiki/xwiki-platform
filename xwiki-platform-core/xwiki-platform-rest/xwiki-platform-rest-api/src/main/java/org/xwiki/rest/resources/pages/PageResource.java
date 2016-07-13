@@ -34,14 +34,17 @@ import org.xwiki.rest.model.jaxb.Page;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}")
 public interface PageResource
 {
     @GET Page getPage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
-            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
+            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
+            @QueryParam("objects") @DefaultValue("false") Boolean withObjects,
+            @QueryParam("class") @DefaultValue("false") Boolean withClass,
+            @QueryParam("attachments") @DefaultValue("false") Boolean withAttachments
     ) throws XWikiRestException;
 
     @PUT Response putPage(

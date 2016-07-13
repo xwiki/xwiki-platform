@@ -22,66 +22,88 @@ package org.xwiki.model.internal.reference;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.CESCAPE;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.SEPARATORS;
-
 /**
- * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows
- * for example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code
- * from this class.
+ * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows for
+ * example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code from
+ * this class.
  *
  * @see AbstractEntityReferenceResolver
  * @version $Id$
  * @since 2.2M1
  */
-public abstract class AbstractStringEntityReferenceResolver  extends AbstractEntityReferenceResolver
-    implements EntityReferenceResolver<String>
+public abstract class AbstractStringEntityReferenceResolver extends AbstractEntityReferenceResolver implements
+    EntityReferenceResolver<String>, Initializable
 {
-    /**
-     * Map defining ordered entity types of a proper reference chain for a given entity type.
-     */
-    private static final Map<EntityType, EntityType[]> ENTITYTYPES = new HashMap<EntityType, EntityType[]>()
-    {
-        {
-            put(EntityType.DOCUMENT, new EntityType[]{EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.ATTACHMENT, new EntityType[]{EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.SPACE, new EntityType[]{EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.OBJECT, new EntityType[]{EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE,
-                EntityType.WIKI});
-            put(EntityType.OBJECT_PROPERTY, new EntityType[]{EntityType.OBJECT_PROPERTY, EntityType.OBJECT,
-                EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
-            put(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
-                EntityType.SPACE, EntityType.WIKI});
-        }
-    };
-
     /**
      * Array of character to unescape in entity names.
      */
-    private static final String[] ESCAPEMATCHING = new String[] {DBLESCAPE, ESCAPE};
+    private String[] escapeMatching;
 
     /**
-     * The replacement array corresponding to the array in {@link #ESCAPEMATCHING} array.
+     * The replacement array corresponding to the array in {@link #escapeMatching} array.
      */
-    private static final String[] ESCAPEMATCHINGREPLACE = new String[] {ESCAPE, StringUtils.EMPTY};
+    private String[] escapeMatchingReplace;
+
+    @Inject
+    private SymbolScheme symbolScheme;
+
+    private Map<EntityType, Map<Character, EntityType>> referenceSetup;
+
+    /**
+     * Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme.
+     */
+    public AbstractStringEntityReferenceResolver()
+    {
+        // Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme
+    }
+
+    /**
+     * Constructor to be used when using this class as a POJO and not as a component.
+     *
+     * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
+     *        between the Entity types, and the characters to escape and how to escape them)
+     */
+    public AbstractStringEntityReferenceResolver(SymbolScheme symbolScheme)
+    {
+        this.symbolScheme = symbolScheme;
+        initialize();
+    }
+
+    @Override
+    public void initialize()
+    {
+        this.referenceSetup = new HashMap<>();
+
+        Map<EntityType, Map<EntityType, Character>> separators = getSymbolScheme().getSeparatorSymbols();
+        for (Map.Entry<EntityType, Map<EntityType, Character>> separatorEntry : separators.entrySet()) {
+            Map<Character, EntityType> characterMap = new HashMap<>();
+            for (Map.Entry<EntityType, Character> characterEntry : separatorEntry.getValue().entrySet()) {
+                characterMap.put(characterEntry.getValue(), characterEntry.getKey());
+            }
+            this.referenceSetup.put(separatorEntry.getKey(), characterMap);
+        }
+
+        String escape = Character.toString(getSymbolScheme().getEscapeSymbol());
+        this.escapeMatching = new String[] { escape + escape, escape };
+        this.escapeMatchingReplace = new String[] { escape, StringUtils.EMPTY };
+    }
 
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
-        // TODO: Once we support nested spaces, handle the possibility of having nested spaces. The format is still
-        // to be defined but it could be for example: Wiki:Space1.Space2.Page
+        Map<Character, EntityType> typeSetup = getTypeSetup(type);
 
-        // First, check if there's a definition for the type
-        if (!SEPARATORS.containsKey(type)) {
-            throw new RuntimeException("No parsing definition found for Entity Type [" + type + "]");
+        // Check if the type require anything specific
+        if (typeSetup == null) {
+            return getEscapedReference(entityReferenceRepresentation, type, parameters);
         }
 
         // Handle the case when the passed representation is null. In this case we consider it similar to passing
@@ -94,108 +116,118 @@ public abstract class AbstractStringEntityReferenceResolver  extends AbstractEnt
         }
 
         EntityReference reference = null;
-        char[] separatorsForType = SEPARATORS.get(type);
-        EntityType[] entityTypesForType = ENTITYTYPES.get(type);
 
-        // Iterate over the representation string looking for iterators in the correct order (rightmost separator
-        // looked for first).
-        for (int i = 0; i < separatorsForType.length; i++) {
-            String name;
-            if (representation.length() > 0) {
-                name = getSegmentName(representation, separatorsForType[i], entityTypesForType[i], parameters);
-            } else {
-                // There's no definition for the current segment use default values
-                name = resolveDefaultValue(entityTypesForType[i], parameters);
-            }
+        EntityType currentType = type;
 
-            if (name != null) {
-                EntityReference newReference = new EntityReference(name, entityTypesForType[i]);
-                if (reference != null) {
-                    reference = reference.appendParent(newReference);
-                } else {
-                    reference = newReference;
+        while (typeSetup != null && !typeSetup.isEmpty()) {
+            // Search all characters for a non escaped separator. If found, then consider the part after the
+            // character as the reference name and continue parsing the part before the separator.
+            EntityType parentType = null;
+
+            int i = representation.length();
+            while (--i >= 0) {
+                char currentChar = representation.charAt(i);
+                int nextIndex = i - 1;
+                char nextChar = 0;
+                if (nextIndex >= 0) {
+                    nextChar = representation.charAt(nextIndex);
+                }
+
+                if (typeSetup.containsKey(currentChar)) {
+                    int numberOfEscapeChars =
+                        getNumberOfCharsBefore(getSymbolScheme().getEscapeSymbol(), representation, nextIndex);
+
+                    if (numberOfEscapeChars % 2 == 0) {
+                        parentType = typeSetup.get(currentChar);
+                        break;
+                    } else {
+                        // Unescape the character
+                        representation.delete(nextIndex, i);
+                        --i;
+                    }
+                } else if (nextChar == getSymbolScheme().getEscapeSymbol()) {
+                    // Unescape the character
+                    representation.delete(nextIndex, i);
+                    --i;
                 }
             }
+
+            reference = appendNewReference(reference, getNewReference(i, representation, currentType, parameters));
+
+            if (parentType != null) {
+                currentType = parentType;
+            } else {
+                currentType = typeSetup.values().iterator().next();
+            }
+
+            typeSetup = getTypeSetup(currentType);
         }
 
         // Handle last entity reference's name
-        String name;
-        if (representation.length() > 0) {
-            name = StringUtils.replaceEach(representation.toString(), ESCAPEMATCHING, ESCAPEMATCHINGREPLACE);
-        } else {
-            name = resolveDefaultValue(entityTypesForType[separatorsForType.length], parameters);
-        }
-
-        if (name != null) {
-            EntityReference newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
-            if (reference != null) {
-                reference = reference.appendParent(newReference);
-            } else {
-                reference = newReference;
-            }
-        }
+        reference = appendNewReference(reference, getEscapedReference(representation, currentType, parameters));
 
         return reference;
     }
 
     /**
-     * Retrieve a segment name.
+     * The default is extracted from the default {@link SymbolScheme}, but extending classes can override it.
      *
-     * @param representation the current string representation of the reference
-     * @param separator the separator for the segment
-     * @param entityType the type of the segment, used to get a default value if the name is empty
-     * @param parameters optional parameters, forwarded to get a default value
-     * @return the segment name
+     * @param type the type for which to get the setup
+     * @return the reference setup map for the requested type, consisting of &lt;parent separator, parent type&gt; pairs
+     * @since 7.4.1, 8.0M1
      */
-    private String getSegmentName(StringBuilder representation, char separator, EntityType entityType,
-        Object... parameters)
+    protected Map<Character, EntityType> getTypeSetup(EntityType type)
     {
-        String name = null;
+        return this.referenceSetup.get(type);
+    }
 
-        // Search all characters for a non escaped separator. If found, then consider the part after the character as
-        // the reference name and continue parsing the part before the separator.
-        boolean found = false;
-        int i = representation.length();
-        while (--i >= 0) {
-            char currentChar = representation.charAt(i);
-            int nextIndex = i - 1;
-            char nextChar = 0;
-            if (nextIndex >= 0) {
-                nextChar = representation.charAt(nextIndex);
+    private EntityReference getEscapedReference(CharSequence representation, EntityType type, Object... parameters)
+    {
+        EntityReference newReference;
+        if (representation.length() > 0) {
+            String name =
+                StringUtils.replaceEach(representation.toString(), this.escapeMatching, this.escapeMatchingReplace);
+            if (name != null) {
+                newReference = new EntityReference(name, type);
+            } else {
+                newReference = null;
             }
+        } else {
+            newReference = resolveDefaultReference(type, parameters);
+        }
 
-            if (currentChar == separator) {
-                int numberOfBackslashes = getNumberOfCharsBefore(CESCAPE, representation, nextIndex);
+        return newReference;
+    }
 
-                if (numberOfBackslashes % 2 == 0) {
-                    // Found a valid separator (not escaped), separate content on its left from content on its right
-                    if (i == representation.length() - 1) {
-                        name = resolveDefaultValue(entityType, parameters);
-                    } else {
-                        name = representation.substring(i + 1, representation.length());
-                    }
-                    representation.delete(i, representation.length());
-                    found = true;
-                    break;
-                } else {
-                    // Unescape the character
-                    representation.delete(nextIndex, i);
-                    --i;
-                }
-            } else if (nextChar == CESCAPE) {
-                // Unescape the character
-                representation.delete(nextIndex, i);
-                --i;
+    private EntityReference getNewReference(int i, StringBuilder representation, EntityType type, Object... parameters)
+    {
+        EntityReference newReference;
+
+        // Found a valid separator (not escaped), separate content on its left from content on its
+        // right
+        if (i == representation.length() - 1) {
+            newReference = resolveDefaultReference(type, parameters);
+        } else {
+            String name = representation.substring(i + 1, representation.length());
+            newReference = new EntityReference(name, type);
+        }
+
+        representation.delete(i < 0 ? 0 : i, representation.length());
+
+        return newReference;
+    }
+
+    private EntityReference appendNewReference(EntityReference reference, EntityReference newReference)
+    {
+        if (newReference != null) {
+            if (reference != null) {
+                return reference.appendParent(newReference);
+            } else {
+                return newReference;
             }
         }
 
-        // If not found then the full buffer is the current reference segment
-        if (!found) {
-            name = representation.toString();
-            representation.setLength(0);
-        }
-
-        return name;
+        return reference;
     }
 
     /**
@@ -215,5 +247,10 @@ public abstract class AbstractStringEntityReferenceResolver  extends AbstractEnt
         }
 
         return currentPosition - position;
+    }
+
+    protected SymbolScheme getSymbolScheme()
+    {
+        return this.symbolScheme;
     }
 }

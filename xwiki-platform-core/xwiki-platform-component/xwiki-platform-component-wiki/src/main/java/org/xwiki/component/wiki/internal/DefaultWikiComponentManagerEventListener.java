@@ -24,8 +24,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
@@ -38,14 +40,12 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.event.XARImportedEvent;
 
 /**
  * An {@link EventListener} responsible for registering all the wiki components when the application starts. It also
@@ -79,28 +79,23 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
     private List<WikiComponentBuilder> wikiComponentProviders;
 
     /**
-     * Used to serializes wiki pages reference in the log.
+     * Used to access the current {@link XWikiContext}.
      */
     @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
+    private Provider<XWikiContext> xcontextProvider;
 
-    /**
-     * The execution used to get the xwiki context, to reset the context grouplist cache.
-     */
     @Inject
-    private Execution execution;
+    private ObservationContext observationContext;
 
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event> asList(
+        return Arrays.asList(
             new DocumentCreatedEvent(),
             new DocumentUpdatedEvent(),
             new DocumentDeletedEvent(),
             new ApplicationReadyEvent(),
-            new WikiReadyEvent(),
-            new XARImportedEvent());
+            new WikiReadyEvent());
     }
 
     @Override
@@ -123,23 +118,15 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                 unregisterComponents(documentReference);
             }
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
-            registerComponents();
-        } else if (event instanceof XARImportedEvent) {
-            // When component documents are created from a XAR import, the XAR might also contain the document author or
-            // groups. In those cases, if the component document is imported _before_ the author or a group he belongs
-            // to, the rights evaluation can be wrong and prevent the component instantiation.
-            // We also need to clear the group cache since the list of groups might change during the import.
-            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            xcontext.remove("grouplist");
-            registerComponents();
+            // These 2 events are created when the database is ready. We register all wiki components.
+            registerAllComponents();
         }
-
     }
 
     /**
      * Register all the wiki components in the current wiki.
      */
-    private void registerComponents()
+    private void registerAllComponents()
     {
         // Retrieve all components definitions and register them.
         for (WikiComponentBuilder provider : this.wikiComponentProviders) {
@@ -149,27 +136,30 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                     for (WikiComponent component : components) {
                         this.wikiComponentManager.registerWikiComponent(component);
                     }
-                } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to register the wiki component located in the document [{}]. "
-                        + "Root cause: {}", this.compactWikiSerializer.serialize(reference), e.getMessage());
+                } catch (Exception e) {
+                    this.logger.warn("Failed to register the wiki component located in the document [{}]: {}",
+                        reference, ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }
     }
 
-
     /**
-     * Helper method to register wiki components from a given document.
+     * Register wiki components from a given document.
      * 
-     * @param document the document to register the components for.
+     * @param document the document to register the components for
      */
     private void registerComponents(DocumentModelBridge document)
     {
         DocumentReference documentReference = document.getDocumentReference();
-        // Unregister any existing component registered under this document, if any
+
+        // Unregister all wiki components registered under this document. We do this as otherwise we would need to
+        // handle the specific cases of xobject added, xobject updated, xobject deleted, etc. Instead we unregister
+        // all wiki components and re-register them all.
         unregisterComponents(documentReference);
 
-        for (WikiComponentBuilder provider : wikiComponentProviders) {
+        // Re-register all wiki components in the passed document
+        for (WikiComponentBuilder provider : this.wikiComponentProviders) {
             // Check whether the given document has a wiki component defined in it.
             if (provider.getDocumentReferences().contains(documentReference)) {
                 try {
@@ -180,13 +170,14 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                             this.wikiComponentManager.registerWikiComponent(component);
                         } catch (WikiComponentException e) {
                             this.logger.warn("Unable to register component(s) from document [{}]: {}",
-                                compactWikiSerializer.serialize(component.getDocumentReference()), e.getMessage());
+                                component.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
                         }
                     }
                 } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}",
-                        compactWikiSerializer.serialize(documentReference), e.getMessage());
+                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}", documentReference,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
+                break;
             }
         }
     }
@@ -201,8 +192,8 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
         try {
             this.wikiComponentManager.unregisterWikiComponents(documentReference);
         } catch (WikiComponentException e) {
-            this.logger.warn("Unable to unregister component(s) from document [{}]: {}",
-                compactWikiSerializer.serialize(documentReference), e.getMessage());
+            this.logger.warn("Unable to unregister component(s) from document [{}]: {}", documentReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

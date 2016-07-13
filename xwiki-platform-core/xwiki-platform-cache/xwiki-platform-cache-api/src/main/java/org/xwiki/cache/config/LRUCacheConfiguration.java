@@ -78,15 +78,24 @@ public class LRUCacheConfiguration extends CacheConfiguration
      * 
      * @param configurationId configuration identifier
      * @param maxSize maximum cache capacity
-     * @param timeToLive for how long cache entry will be valid (in seconds)
+     * @param maxIdle for how long cache entry will be valid (in seconds) since the last time it was used
      */
-    public LRUCacheConfiguration(String configurationId, int maxSize, int timeToLive)
+    public LRUCacheConfiguration(String configurationId, int maxSize, int maxIdle)
     {
         super(configurationId);
 
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(maxSize);
-        lru.setTimeToLive(timeToLive);
+        lru.setMaxIdle(maxIdle);
         put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
+    }
+
+    /**
+     * @return the eviction configuration as a {@link LRUEvictionConfiguration} instance
+     * @since 7.4M2
+     */
+    public LRUEvictionConfiguration getLRUEvictionConfiguration()
+    {
+        return (LRUEvictionConfiguration) get(EntryEvictionConfiguration.CONFIGURATIONID);
     }
 }

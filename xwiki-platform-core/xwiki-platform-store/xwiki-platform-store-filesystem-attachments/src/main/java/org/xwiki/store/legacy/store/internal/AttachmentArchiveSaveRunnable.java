@@ -73,7 +73,7 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
             return;
         }
         if (archive.getVersions().length == 0 && archive.getAttachment() != null) {
-            archive.updateArchive(null, context);
+            archive.updateArchive(context);
         }
 
         final Version[] versions = archive.getVersions();

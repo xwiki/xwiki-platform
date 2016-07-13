@@ -33,14 +33,14 @@ import com.xpn.xwiki.stats.impl.StatsUtil;
 
 /**
  * Statistics api. The Statistics module needs to be activated (xwiki.stats=1 in xwiki.cfg).
- * 
+ *
  * @version $Id$
  */
 public class StatsService extends Api
 {
     /**
      * Create new StatsService instance.
-     * 
+     *
      * @param context the XWiki context.
      */
     public StatsService(XWikiContext context)
@@ -56,7 +56,7 @@ public class StatsService extends Api
      * <p>
      * To be true the <code>xwiki.stats</code> setting in xwiki.cfg has to be <code>1</code>.
      * </p>
-     * 
+     *
      * @return {@code true} if the statistics module is enabled
      */
     public boolean isEnabledGlobally()
@@ -73,7 +73,7 @@ public class StatsService extends Api
      * <p>
      * <code>xwiki.stats.default</code> can be overwritten by <code>statistics</code> in <code>XWikiPreferences</code>.
      * </p>
-     * 
+     *
      * @return true if statistics are enabled for the context's wiki.
      */
     public boolean isEnabledForCurrentWiki()
@@ -90,7 +90,7 @@ public class StatsService extends Api
      * <p>
      * <code>xwiki.stats.default</code> can be overwritten by <code>statistics</code> in <code>XWikiPreferences</code>.
      * </p>
-     * 
+     *
      * @return true if statistics are enabled for the context's wiki.
      * @deprecated use {@link #isEnabledForCurrentWiki()}
      */
@@ -102,7 +102,7 @@ public class StatsService extends Api
 
     /**
      * Retrieves document statistics.
-     * 
+     *
      * @param action The action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the documents are ordered by the number of times they have been viewed so far.
      * @param scope The set of documents for which to retrieve statistics
@@ -110,9 +110,9 @@ public class StatsService extends Api
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of DocumentStats objects
      */
-    public List< ? > getDocumentStatistics(String action, Scope scope, Period period, Range range)
+    public List<?> getDocumentStatistics(String action, Scope scope, Period period, Range range)
     {
-        List< ? > stats = Collections.emptyList();
+        List<?> stats = Collections.emptyList();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {
@@ -124,16 +124,16 @@ public class StatsService extends Api
 
     /**
      * Retrieves visit statistics.
-     * 
+     *
      * @param action The action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the visitors are ordered by the number of pages they have viewed so far.
      * @param period The period of time
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of VisitStats objects
      */
-    public List< ? > getVisitStatistics(String action, Period period, Range range)
+    public List<?> getVisitStatistics(String action, Period period, Range range)
     {
-        List< ? > stats = Collections.emptyList();
+        List<?> stats = Collections.emptyList();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {
@@ -145,7 +145,7 @@ public class StatsService extends Api
 
     /**
      * Retrieves referrer statistics.
-     * 
+     *
      * @param domain The domain for which to retrieve statistics. To retrieve statistics for all domains use the empty
      *            string.
      * @param scope The scope of referred documents to use for filtering the results.
@@ -153,9 +153,9 @@ public class StatsService extends Api
      * @param range The sub-range to return from the entire result set. Use this parameter for pagination
      * @return A list of RefererStats objects
      */
-    public List< ? > getRefererStatistics(String domain, Scope scope, Period period, Range range)
+    public List<?> getRefererStatistics(String domain, Scope scope, Period period, Range range)
     {
-        List< ? > stats = Collections.emptyList();
+        List<?> stats = Collections.emptyList();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {
@@ -167,16 +167,16 @@ public class StatsService extends Api
 
     /**
      * Retrieves back-link statistics.
-     * 
+     *
      * @param domain the domain used for filtering the results
      * @param scope the scope of referred documents for which to retrieve statistics.
      * @param period the period of time
      * @param range the sub-range to return from the entire result set. Use this parameter for pagination
      * @return a list of DocumentStats objects
      */
-    public List< ? > getBackLinkStatistics(String domain, Scope scope, Period period, Range range)
+    public List<?> getBackLinkStatistics(String domain, Scope scope, Period period, Range range)
     {
-        List< ? > stats = Collections.emptyList();
+        List<?> stats = Collections.emptyList();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {
@@ -188,17 +188,17 @@ public class StatsService extends Api
 
     /**
      * Shows how the statistics for the specified action have evolved over the specified period of time.
-     * 
+     *
      * @param action the action for which to retrieve statistics.
      * @param scope the set of documents to consider.
      * @param period the period of time.
      * @param step the step used for sampling the period.
      * @return a map of (date, actionCount) pairs.
      */
-    public Map< ? , ? > getActionStatistics(String action, Scope scope, Period period,
+    public Map<?, ?> getActionStatistics(String action, Scope scope, Period period,
         Duration step)
     {
-        Map< ? , ? > stats = Collections.emptyMap();
+        Map<?, ?> stats = Collections.emptyMap();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {
@@ -210,14 +210,14 @@ public class StatsService extends Api
 
     /**
      * Returns the recently visited pages for a specific action.
-     * 
+     *
      * @param action ("view" or "edit").
      * @param size how many recent actions to retrieve.
      * @return a ArrayList of document names.
      */
-    public java.util.Collection< ? > getRecentActions(String action, int size)
+    public java.util.Collection<?> getRecentActions(String action, int size)
     {
-        java.util.Collection< ? > stats = Collections.emptyList();
+        java.util.Collection<?> stats = Collections.emptyList();
 
         XWikiStatsService statsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (statsService != null) {

@@ -21,11 +21,12 @@ package org.xwiki.extension.xar.internal.repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,27 +36,23 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.event.ExtensionInstalledEvent;
-import org.xwiki.extension.event.ExtensionUninstalledEvent;
-import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.internal.local.AbstractCachedExtensionRepository;
-import org.xwiki.extension.repository.result.CollectionIterableResult;
-import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
+import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarException;
 
 /**
  * Local repository proxy for XAR extensions.
@@ -66,26 +63,24 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named(XarExtensionHandler.TYPE)
-public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepository<XarInstalledExtension> implements
-    InstalledExtensionRepository, Initializable
+public class XarInstalledExtensionRepository extends AbstractInstalledExtensionRepository<XarInstalledExtension>
+    implements InstalledExtensionRepository, Initializable
 {
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
-        new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
-
     @Inject
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private transient Packager packager;
-
-    @Inject
-    private transient ObservationManager observation;
+    private Logger logger;
 
     /**
-     * The logger to log.
+     * Index used to find extensions owners of a document installed on a specific wiki.
      */
-    @Inject
-    private Logger logger;
+    private Map<DocumentReference, Collection<XarInstalledExtension>> documents = new ConcurrentHashMap<>();
+
+    /**
+     * Index used to find extensions owners of a document installed on root namespace.
+     */
+    private Map<LocalDocumentReference, Collection<XarInstalledExtension>> rootDocuments = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() throws InitializationException
@@ -94,65 +89,96 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
             this.installedRepository.getDescriptor().getURI()));
 
         loadExtensions();
-
-        this.observation.addListener(new EventListener()
-        {
-            @Override
-            public void onEvent(Event event, Object source, Object data)
-            {
-                LocalExtension extension = (LocalExtension) source;
-                if (extension.getType().equals(XarExtensionHandler.TYPE)) {
-                    updateXarExtension(extension);
-
-                    if (data != null) {
-                        for (InstalledExtension installedExtension : (Collection<InstalledExtension>) data) {
-                            updateXarExtension(installedExtension);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public String getName()
-            {
-                return XarInstalledExtensionRepository.class.getName();
-            }
-
-            @Override
-            public List<Event> getEvents()
-            {
-                return EVENTS;
-            }
-        });
     }
 
-    private void updateXarExtension(LocalExtension extension)
+    void pagesRemoved(ExtensionId extensionId, String namespace) throws UnsupportedNamespaceException
     {
-        if (this.extensions.containsKey(extension.getId())) {
-            if (!(extension instanceof InstalledExtension)) {
-                removeXarExtension(extension.getId());
-            }
-        } else {
-            if (extension instanceof InstalledExtension) {
-                try {
-                    addXarExtension((InstalledExtension) extension);
-                } catch (IOException e) {
-                    this.logger.error("Failed to parse extension [" + extension + "]", e);
+        pagesUpdated(extensionId, namespace, false);
+    }
+
+    void pagesAdded(ExtensionId extensionId, String namespace) throws UnsupportedNamespaceException
+    {
+        pagesUpdated(extensionId, namespace, true);
+    }
+
+    private void pagesUpdated(ExtensionId extensionId, String namespace, boolean add)
+        throws UnsupportedNamespaceException
+    {
+        XarInstalledExtension installedExtension = (XarInstalledExtension) getInstalledExtension(extensionId);
+
+        if (installedExtension != null) {
+            for (XarEntry xarEntry : installedExtension.getXarPackage().getEntries()) {
+                if (namespace != null) {
+                    DocumentReference reference = new DocumentReference(xarEntry,
+                        new WikiReference(XarHandlerUtils.getWikiFromNamespace(namespace)));
+
+                    synchronized (this.documents) {
+                        Collection<XarInstalledExtension> referenceExtensions = this.documents.get(reference);
+                        if (referenceExtensions != null || add) {
+                            Set<XarInstalledExtension> newSet = referenceExtensions != null
+                                ? new LinkedHashSet<>(referenceExtensions) : new LinkedHashSet<>();
+
+                            if (add) {
+                                newSet.add(installedExtension);
+                            } else {
+                                newSet.remove(installedExtension);
+                            }
+
+                            this.documents.put(reference, newSet);
+                        }
+                    }
+                } else {
+                    synchronized (this.rootDocuments) {
+                        Collection<XarInstalledExtension> referenceExtensions = this.rootDocuments.get(xarEntry);
+                        if (referenceExtensions != null || add) {
+                            Set<XarInstalledExtension> newSet = referenceExtensions != null
+                                ? new LinkedHashSet<>(referenceExtensions) : new LinkedHashSet<>();
+
+                            if (add) {
+                                newSet.add(installedExtension);
+                            } else {
+                                newSet.remove(installedExtension);
+                            }
+
+                            this.rootDocuments.put(xarEntry, newSet);
+                        }
+                    }
                 }
             }
         }
     }
 
-    private void addXarExtension(InstalledExtension extension) throws IOException
+    void updateCachedXarExtension(ExtensionId extensionId)
     {
-        XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this, this.packager);
+        InstalledExtension installedExtension = this.installedRepository.getInstalledExtension(extensionId);
+
+        if (installedExtension != null && installedExtension.getType().equals(XarExtensionHandler.TYPE)) {
+            if (getInstalledExtension(installedExtension.getId()) == null) {
+                try {
+                    addCacheXarExtension(installedExtension);
+                } catch (Exception e) {
+                    this.logger.error("Failed to parse extension [{}]", installedExtension.getId(), e);
+                }
+            }
+        } else {
+            removeCachedXarExtension(extensionId);
+        }
+    }
+
+    private void addCacheXarExtension(InstalledExtension installedExtension) throws IOException, XarException
+    {
+        XarInstalledExtension xarExtension = new XarInstalledExtension(installedExtension, this);
 
         addCachedExtension(xarExtension);
     }
 
-    private void removeXarExtension(ExtensionId extensionId)
+    protected void removeCachedXarExtension(ExtensionId extensionId)
     {
-        removeCachedExtension(this.extensions.get(extensionId));
+        XarInstalledExtension extension = (XarInstalledExtension) getInstalledExtension(extensionId);
+
+        if (extension != null) {
+            super.removeCachedExtension(extension);
+        }
     }
 
     private void loadExtensions()
@@ -160,64 +186,58 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
             if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
                 try {
-                    addXarExtension(localExtension);
-                } catch (IOException e) {
-                    this.logger.error("Failed to parse extension [" + localExtension + "]", e);
+                    addCacheXarExtension(localExtension);
+                } catch (Exception e) {
+                    this.logger.error("Failed to parse extension [{}]", localExtension.getId(), e);
                 }
             }
         }
     }
 
-    // LocalExtensionRepository
-
-    @Override
-    public int countExtensions()
+    /**
+     * @param reference the reference of the document
+     * @return the extension owners of the passed document
+     * @since 8.1M2
+     */
+    public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
     {
-        return this.extensions.size();
-    }
+        Collection<XarInstalledExtension> wikiExtensions = this.documents.get(reference);
+        Collection<XarInstalledExtension> rootExtensions = this.rootDocuments.get(reference);
 
-    @Override
-    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
-    {
-        List<InstalledExtension> installedExtensions = new ArrayList<InstalledExtension>(extensions.size());
-        for (InstalledExtension localExtension : this.extensions.values()) {
-            if (localExtension.isInstalled(namespace)) {
-                installedExtensions.add(localExtension);
-            }
+        List<XarInstalledExtension> allExtensions = new ArrayList<>();
+
+        if (wikiExtensions != null) {
+            allExtensions.addAll(wikiExtensions);
         }
 
-        return installedExtensions;
+        if (rootExtensions != null) {
+            allExtensions.addAll(rootExtensions);
+        }
+
+        return allExtensions;
     }
 
-    @Override
-    public Collection<InstalledExtension> getInstalledExtensions()
-    {
-        return (Collection) this.extensions.values();
-    }
-
-    @Override
-    public InstalledExtension getInstalledExtension(ExtensionId extensionId)
-    {
-        return this.extensions.get(extensionId);
-    }
+    // InstalledExtensionRepository
 
     @Override
     public InstalledExtension getInstalledExtension(String id, String namespace)
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        if (extension.getType().equals(XarExtensionHandler.TYPE)) {
-            extension = this.extensions.get(extension.getId());
-        } else {
-            extension = null;
+        if (extension != null) {
+            if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+                extension = this.extensions.get(extension.getId());
+            } else {
+                extension = null;
+            }
         }
 
         return extension;
     }
 
     @Override
-    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
-        throws InstallException
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency,
+        Map<String, Object> properties) throws InstallException
     {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -233,8 +253,8 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository.getBackwardDependencies(
-            id, namespace) : null;
+        return extension.getType().equals(XarExtensionHandler.TYPE)
+            ? this.installedRepository.getBackwardDependencies(id, namespace) : null;
     }
 
     @Override
@@ -243,27 +263,7 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 
-        return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository
-            .getBackwardDependencies(extensionId) : null;
-    }
-
-    @Override
-    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
-    {
-        Pattern patternMatcher = Pattern.compile(".*" + pattern + ".*");
-
-        List<Extension> result = new ArrayList<Extension>();
-
-        for (XarInstalledExtension extension : this.extensions.values()) {
-            if (patternMatcher.matcher(extension.getId().getId()).matches()
-                || patternMatcher.matcher(extension.getDescription()).matches()
-                || patternMatcher.matcher(extension.getSummary()).matches()
-                || patternMatcher.matcher(extension.getName()).matches()
-                || patternMatcher.matcher(extension.getFeatures().toString()).matches()) {
-                result.add(extension);
-            }
-        }
-
-        return new CollectionIterableResult<Extension>(this.extensions.size(), offset, result);
+        return extension.getType().equals(XarExtensionHandler.TYPE)
+            ? this.installedRepository.getBackwardDependencies(extensionId) : null;
     }
 }

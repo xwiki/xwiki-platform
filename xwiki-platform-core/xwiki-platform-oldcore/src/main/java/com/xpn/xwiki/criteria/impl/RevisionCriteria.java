@@ -23,7 +23,7 @@ import java.util.Date;
 
 /**
  * information about document versions used to retreive a set of document versions.
- * 
+ *
  * @version $Id$
  * @see com.xpn.xwiki.doc.XWikiDocument#getRevisions(RevisionCriteria, com.xpn.xwiki.XWikiContext)
  * @since 1.4M1
@@ -103,7 +103,7 @@ public class RevisionCriteria
 
     /**
      * Set the Period (time limits) desired for the results
-     * 
+     *
      * @param period
      */
     public void setPeriod(Period period)
@@ -121,7 +121,7 @@ public class RevisionCriteria
 
     /**
      * Set the Range (size limits) desired for the results
-     * 
+     *
      * @param range desired range @see Range
      */
     public void setRange(Range range)

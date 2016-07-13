@@ -43,7 +43,7 @@ public class XWikiLiquibaseLogger implements liquibase.logging.Logger
             + liquibase.Liquibase.class.getPackage().getName());
 
     /** "but failOnError was false" error message to be replaced for clarity. */
-    private static final String BUT_FAILONERROR_WAS_FALSE  = "but failOnError was false";
+    private static final String BUT_FAILONERROR_WAS_FALSE = "but failOnError was false";
 
     @Override
     public int getPriority()
@@ -51,7 +51,7 @@ public class XWikiLiquibaseLogger implements liquibase.logging.Logger
         // Liquibase use value between 1 and 5, so 6 will be prioritized
         return 6;
     }
-    
+
     @Override
     public void setName(String s)
     {

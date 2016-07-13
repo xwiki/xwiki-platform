@@ -48,34 +48,34 @@ public class XWikiBatcherStats
 
     public void resetStats()
     {
-        sqlList = new ArrayList();
-        preparedSQLCounter = 0;
-        executeBatchCounter = 0;
-        abortBatchCounter = 0;
-        resultSetCounter = 0;
-        addToBatchCounter = 0;
+        this.sqlList = new ArrayList();
+        this.preparedSQLCounter = 0;
+        this.executeBatchCounter = 0;
+        this.abortBatchCounter = 0;
+        this.resultSetCounter = 0;
+        this.addToBatchCounter = 0;
     }
 
     public List getSqlList()
     {
-        return sqlList;
+        return this.sqlList;
     }
 
     public List getRecentSqlList()
     {
-        return recentSqlList;
+        return this.recentSqlList;
     }
 
     public void resetRecentSqlList()
     {
-        recentSqlList = new ArrayList();
+        this.recentSqlList = new ArrayList();
     }
 
     public void addToSqlList(String sql)
     {
-        if (resetOnNextSQL) {
+        if (this.resetOnNextSQL) {
             resetRecentSqlList();
-            resetOnNextSQL = false;
+            this.resetOnNextSQL = false;
         }
         this.recentSqlList.add(sql);
         this.sqlList.add(sql);
@@ -83,12 +83,12 @@ public class XWikiBatcherStats
 
     public void resetOnNextSQL()
     {
-        resetOnNextSQL = true;
+        this.resetOnNextSQL = true;
     }
 
     public int getPreparedSQLCounter()
     {
-        return preparedSQLCounter;
+        return this.preparedSQLCounter;
     }
 
     public void incrementPreparedSQLCounter()
@@ -98,7 +98,7 @@ public class XWikiBatcherStats
 
     public int getExecuteBatchCounter()
     {
-        return executeBatchCounter;
+        return this.executeBatchCounter;
     }
 
     public void incrementExecuteBatchCounter()
@@ -108,7 +108,7 @@ public class XWikiBatcherStats
 
     public int getAbortBatchCounter()
     {
-        return abortBatchCounter;
+        return this.abortBatchCounter;
     }
 
     public void incrementAbortBatchCounter()
@@ -118,7 +118,7 @@ public class XWikiBatcherStats
 
     public int getResultSetCounter()
     {
-        return resultSetCounter;
+        return this.resultSetCounter;
     }
 
     public void incrementResultSetCounter()
@@ -128,7 +128,7 @@ public class XWikiBatcherStats
 
     public int getAddToBatchCounter()
     {
-        return addToBatchCounter;
+        return this.addToBatchCounter;
     }
 
     public void incrementAddToBatchCounter()
@@ -138,9 +138,9 @@ public class XWikiBatcherStats
 
     public void printSQLList(PrintStream out)
     {
-        out.println("SQL: number of queries " + sqlList.size());
-        for (int i = 0; i < sqlList.size(); i++) {
-            out.println("SQL: " + sqlList.get(i));
+        out.println("SQL: number of queries " + this.sqlList.size());
+        for (int i = 0; i < this.sqlList.size(); i++) {
+            out.println("SQL: " + this.sqlList.get(i));
         }
         out.flush();
     }
@@ -148,9 +148,9 @@ public class XWikiBatcherStats
     public void logSQLList()
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("SQL: number of queries " + sqlList.size());
-            for (int i = 0; i < sqlList.size(); i++) {
-                LOGGER.debug("SQL: " + sqlList.get(i));
+            LOGGER.debug("SQL: number of queries " + this.sqlList.size());
+            for (int i = 0; i < this.sqlList.size(); i++) {
+                LOGGER.debug("SQL: " + this.sqlList.get(i));
             }
         }
     }

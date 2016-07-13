@@ -56,11 +56,7 @@ public class LinePluginTest extends RichTextAreaTestCase
      */
     private LinePlugin plugin;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#onLoad(LoadEvent)
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         super.onLoad(event);
@@ -69,11 +65,7 @@ public class LinePluginTest extends RichTextAreaTestCase
         plugin.init(rta, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtTearDown()
-     */
+    @Override
     protected void gwtTearDown() throws Exception
     {
         plugin.destroy();

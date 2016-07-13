@@ -24,13 +24,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,19 +42,23 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Named("DistributionInitializerListener")
+@Singleton
 public class DistributionInitializerListener implements EventListener
 {
     /**
      * The list of events to listen to.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationStartedEvent(),
-        new ActionExecutingEvent("view"));
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new ActionExecutingEvent("view"),
+        new ActionExecutingEvent("distribution"));
 
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
     private DistributionManager distributionManager;
+
+    @Inject
+    private DistributionConfiguration distributionConfiguration;
 
     @Override
     public List<Event> getEvents()
@@ -72,15 +75,43 @@ public class DistributionInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
+        XWikiContext xcontext = (XWikiContext) arg2;
+        
+        // Do nothing if the automatic start of DW is disabled
+        if (!isAutoDistributionWizardEnabled(xcontext)) {
+            return;
+        }
+        
         DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
-        if (distributionState != DistributionState.NONE) {
-            if (event instanceof ApplicationStartedEvent) {
-                this.distributionManager.startFarmJob();
-            } else if (!((XWikiContext) arg2).isMainWiki()
-                && this.distributionManager.getUpgradeMode() == UpgradeMode.WIKI) {
-                startWikiJob(((XWikiContext) arg2).getDatabase());
+        // Start the Distribution Wizard only if the current user has the right to access it
+        if (distributionState != DistributionState.NONE && this.distributionManager.canDisplayDistributionWizard()) {
+            if (xcontext.isMainWiki()) {
+                if (this.distributionManager.getFarmJob() == null) {
+                    startFarmJob();
+                }
+            } else {
+                String wiki = xcontext.getWikiId();
+                if (this.distributionManager.getWikiJob(wiki) == null) {
+                    startWikiJob(wiki);
+                }
             }
+        }
+    }
+
+    /**
+     * @return if the automatic launch of DW is enabled
+     */
+    private boolean isAutoDistributionWizardEnabled(XWikiContext xcontext)
+    {
+        return xcontext.isMainWiki() ? distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
+                : distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
+    }
+
+    private synchronized void startFarmJob()
+    {
+        if (this.distributionManager.getFarmJob() == null) {
+            this.distributionManager.startFarmJob();
         }
     }
 

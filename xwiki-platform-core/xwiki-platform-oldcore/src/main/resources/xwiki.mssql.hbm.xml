@@ -75,6 +75,18 @@
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
     </class>
 
+    <!-- com.xpn.xwiki.doc.XWikiSpace root -->
+    <class name="com.xpn.xwiki.doc.XWikiSpace" table="xwikispace">
+        <id name="id" type="long" unsaved-value="undefined">
+            <column name="XWS_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="reference" type="string" unique="true" column="XWS_REFERENCE" length="255" index="SPACE_REFERENCE" not-null="true" />
+        <property name="name" type="string" column="XWS_NAME" length="255" index="SPACE_NAME" not-null="true" />
+        <property name="parent" type="string" column="XWS_PARENT" length="255" index="SPACE_PARENT" />
+        <property name="hidden" type="boolean" column="XWS_HIDDEN" length="255" index="SPACE_HIDDEN" not-null="true" />
+    </class>
+
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
             <key-property name="docId" column="XWR_DOCID" type="long" />
@@ -156,6 +168,7 @@
         <property name="docId" type="long" column="XWA_DOC_ID" index="ATT_DOC_ID" />
         <property name="filename" type="string" column="XWA_FILENAME" length="255" not-null="true" />
         <property name="filesize" type="integer" column="XWA_SIZE" />
+        <property name="mimeType" type="string" column="XWA_MIMETYPE" length="255"/>
         <property name="date" type="timestamp" column="XWA_DATE" index="ATT_DATE" not-null="true" />
         <property name="author" type="string" column="XWA_AUTHOR" length="255" index="ATT_AUTHOR" />
         <property name="version" type="string" column="XWA_VERSION" length="255" not-null="true" />

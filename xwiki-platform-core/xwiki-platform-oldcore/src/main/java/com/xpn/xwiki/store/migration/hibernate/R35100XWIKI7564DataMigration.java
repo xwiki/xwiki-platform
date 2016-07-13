@@ -46,7 +46,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 /**
  * Migration for XWIKI-7564: Manually change the SQL type of long binary columns from inline bytea to proper LOBs when
  * the underlying database is PostgreSQL.
- * 
+ *
  * @version $Id$
  * @since 3.5.1
  */
@@ -101,7 +101,7 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Hibernate {@link Work} class that reads an SQL script file and executes them.
-     * 
+     *
      * @version $Id$
      */
     private static class R35100Work implements Work

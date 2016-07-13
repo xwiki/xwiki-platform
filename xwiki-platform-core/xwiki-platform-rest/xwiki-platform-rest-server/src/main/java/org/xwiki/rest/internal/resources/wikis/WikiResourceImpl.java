@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -43,7 +44,8 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  *
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikiResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiResourceImpl")
 public class WikiResourceImpl extends XWikiResource implements WikiResource
 {
     /**
@@ -95,10 +97,10 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
                         "Can't access Package plugin API. Generally mean you don't have enough rights.");
             }
 
-            String database = xwikiContext.getDatabase();
+            String database = xwikiContext.getWikiId();
 
             try {
-                xwikiContext.setDatabase(wikiName);
+                xwikiContext.setWikiId(wikiName);
                 importer.setBackupPack(backup);
 
                 importer.Import(is);
@@ -130,7 +132,7 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
             } catch (IOException e) {
                 throw new WebApplicationException(e);
             } finally {
-                xwikiContext.setDatabase(database);
+                xwikiContext.setWikiId(database);
             }
 
             return DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiName);

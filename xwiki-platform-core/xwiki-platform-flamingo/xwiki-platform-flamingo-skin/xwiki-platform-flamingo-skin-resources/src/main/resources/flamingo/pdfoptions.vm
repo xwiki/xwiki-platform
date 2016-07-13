@@ -1,0 +1,135 @@
+###
+### PDF Export Options Template
+###
+#if(!$xwiki.hasAccessLevel("view"))
+  #template("accessdenied.vm")
+#elseif($doc.isNew())
+  $response.setStatus(404)
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #template('hierarchy.vm')
+    #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
+    #template('contentheader.vm')
+    #error($services.localization.render('core.rename.nonexistingDocument'))
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#else
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+    #template('hierarchy.vm')
+    #set($titleToDisplay = $services.localization.render('core.export.pdf.options.title'))
+    #template('contentheader.vm')
+    <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
+      <div class="hidden">
+        <input type="hidden" name="format" value="pdf" />
+      </div>
+      <dl>
+        #if($xwiki.isMultiLingual() && $doc.translationList.size() > 0)
+          <dt>
+            <label for="language">$services.localization.render('language')</label>
+            <span class="xHint">$services.localization.render('core.export.pdf.options.language.hint')</span>
+          </dt>
+          <dd>
+            <select size="1" id="language" name="language">
+            #set($defaultLanguage = "$!doc.defaultLocale")
+            #if($defaultLanguage == '')
+              #set($defaultLanguage = "$!doc.locale")
+              #if($defaultLanguage == '')
+                #set($defaultLanguage = 'default')
+              #end
+            #end
+            #set($languages = $doc.translationList)
+            #set($discard =  $languages.add($defaultLanguage))
+            #foreach($lang in $languages)
+              ## By default, we suggest that the export is done for current language set
+              #if($lang == "$tdoc.realLocale")
+                <option value="$lang" selected="selected">$lang $services.localization.render('core.export.pdf.options.currentLanguage')</option>
+              #else
+                <option value="$lang">$lang</option>
+              #end
+            #end
+            </select>
+          </dd>
+        #end  ## multi-lingual
+        ## Cover
+        <dt>
+          <label for="pdfcover">
+            <input id="pdfcover" name="pdfcover" type="checkbox" checked="checked" value="1" />
+            <input name="pdfcover" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.cover')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.cover.hint')</span>
+        </dt>
+        ## ToC
+        <dt>
+          <label for="pdftoc">
+            <input id="pdftoc" name="pdftoc" type="checkbox" checked="checked" value="1" />
+            <input name="pdftoc" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.toc')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.toc.hint')</span>
+        </dt>
+        ## Header
+        <dt>
+          <label for="pdfheader">
+            <input id="pdfheader" name="pdfheader" type="checkbox" checked="checked" value="1" />
+            <input name="pdfheader" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.header')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.header.hint')</span>
+        </dt>
+        ## Footer
+        <dt>
+          <label for="pdffooter">
+            <input id="pdffooter" name="pdffooter" type="checkbox" checked="checked" value="1" />
+            <input name="pdffooter" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.footer')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.footer.hint')</span>
+        </dt>
+        ## Comments
+        <dt>
+          <label for="comments">
+            <input id="comments" type="checkbox" name="comments" value="1" />
+            <input name="comments" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.comments')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.comments.hint')</span>
+        </dt>
+        ## Attachments
+        <dt>
+          <label for="attachments">
+            <input id="attachments" type="checkbox" name="attachments" value="1" />
+            <input name="attachments" type="hidden" value="0" />
+            $services.localization.render('core.export.pdf.options.images')
+          </label>
+          <span class="xHint">$services.localization.render('core.export.pdf.options.images.hint')</span>
+        </dt>
+      </dl>
+      #set ($originalParams = $urltool.parseQuery($request.qs))
+      <div class="buttons">
+        <span class="buttonwrapper"><input type="submit" value="$services.localization.render('export')" class="button" /></span>
+        <span class="buttonwrapper">
+          <a class="secondary button" href="$escapetool.xml($doc.getURL('view', $escapetool.url($originalParams)))">
+            $services.localization.render('cancel')
+          </a>
+        </span>
+      </div>
+      ## We preserve the original request parameters but we put them at the end so that they don't overwrite the
+      ## parameters from the PDF export form.
+      <div class="hidden">
+        #foreach ($entry in $originalParams.entrySet())
+          #foreach($value in $entry.value)
+            <input type="hidden" name="$escapetool.xml($entry.key)" value="$escapetool.xml($value)" />
+          #end
+        #end
+      </div>
+    </form>
+    <div class="clearfloats"></div>
+  </div>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end

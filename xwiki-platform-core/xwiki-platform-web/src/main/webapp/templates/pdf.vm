@@ -5,13 +5,20 @@
   #set($pdfdoc = $tdoc)
 #end
 #set($pdfobj = $pdfdoc.getObject('XWiki.PDFClass'))
+## put the current doc being exported in a variable, to allow accessing it from the pdftemplate properties (header, footer, etc).
+#set($pdfExportedDoc = $tdoc)
 #template("pdfhtmlheader.vm")
 #set ($withPageBreaks = false)
 #if ("$!{request.pagebreaks}" == '1')
   #set ($withPageBreaks = true)
 #end
 #if ($request.pages)
-  #foreach ($page in $request.getParameterValues('pages'))
+  #set ($pages = $request.getParameterValues('pages'))
+#else
+  #set ($pages = ["$doc.documentReference"])
+#end
+<div id="xwikicontent">
+  #foreach ($page in $pages)
     #set ($pageDoc = $xwiki.getDocument($page))
     $pageDoc.getRenderedContent()
     #if ($request.includechilds)
@@ -19,7 +26,7 @@
       #if (!$clevel)
         #set ($clevel = 0)
       #end
-      #includeChildren($page $withPageBreaks)
+      #includeChildren($pageDoc $withPageBreaks)
     #elseif ($request.includelinks)
       #set ($clevel = $mathtool.toInteger($request.includelinks))
       #if (!$clevel)
@@ -31,26 +38,12 @@
       #pagebreak()
     #end
   #end
-#else
-  <div id="xwikicontent">
-    $cdoc.getRenderedContent()
-  </div>
-  #if ($request.includechilds)
-    #set ($clevel = $mathtool.toInteger($request.includechilds))
-    #if (!$clevel)
-      #set ($clevel = 0)
-    #end
-    #includeChildren($cdoc $withPageBreaks)
-  #elseif ($request.includelinks)
-    #set ($clevel = $mathtool.toInteger($request.includelinks))
-    #if (!$clevel)
-      #set ($clevel = 0)
-    #end
-    #includeLinks($cdoc.fullName $withPageBreaks)
-  #end
-#end
+</div>
+## TODO: move that in a place common to old and new rendering footnotes
+#if ($doc.syntax.toIdString() == 'xwiki/1.0')
 #set($footnotes = "#putFootnotes()")
-$xwiki.renderText($footnotes, $doc)
+$doc.getRenderedContent($footnotes, 'xwiki/1.0')
+#end
 #if ("$!{request.comments}" == '1')
   #template("comments2.vm")
 #end

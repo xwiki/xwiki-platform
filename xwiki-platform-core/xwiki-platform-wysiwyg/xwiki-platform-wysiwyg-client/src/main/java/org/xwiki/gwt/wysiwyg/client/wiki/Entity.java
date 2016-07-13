@@ -74,11 +74,6 @@ public class Entity implements IsSerializable
         this.url = url;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
@@ -88,11 +83,6 @@ public class Entity implements IsSerializable
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object obj)
     {

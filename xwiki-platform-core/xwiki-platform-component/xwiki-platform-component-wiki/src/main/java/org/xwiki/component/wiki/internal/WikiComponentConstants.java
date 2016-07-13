@@ -19,6 +19,9 @@
  */
 package org.xwiki.component.wiki.internal;
 
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -35,24 +38,57 @@ public interface WikiComponentConstants
     String CLASS_AUTHOR = XWikiRightService.SUPERADMIN_USER;
 
     /**
+     * Space of the XClass documents.
+     */
+    EntityReference CLASS_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+
+    /**
      * The XClass defining a component implementation.
      */
+    @Deprecated
     String COMPONENT_CLASS = "XWiki.ComponentClass";
+
+    /**
+     * The XClass defining a component implementation.
+     */
+    EntityReference COMPONENT_CLASS_REFERENCE = new EntityReference("ComponentClass", EntityType.DOCUMENT)
+            .appendParent(CLASS_SPACE_REFERENCE);
 
     /**
      * The XClass defining a component injection.
      */
+    @Deprecated
     String DEPENDENCY_CLASS = "XWiki.ComponentDependencyClass";
+
+    /**
+     * The XClass defining a component injection.
+     */
+    EntityReference DEPENDENCY_CLASS_REFERENCE = new EntityReference("ComponentDependencyClass", EntityType.DOCUMENT)
+            .appendParent(CLASS_SPACE_REFERENCE);
 
     /**
      * The XClass defining a component method.
      */
+    @Deprecated
     String METHOD_CLASS = "XWiki.ComponentMethodClass";
+
+    /**
+     * The XClass defining a component method.
+     */
+    EntityReference METHOD_CLASS_REFRENCE =  new EntityReference("ComponentMethodClass", EntityType.DOCUMENT)
+            .appendParent(CLASS_SPACE_REFERENCE);
 
     /**
      * The XClass defining a component interface implementation.
      */
+    @Deprecated
     String INTERFACE_CLASS = "XWiki.ComponentInterfaceClass";
+
+    /**
+     * The XClass defining a component interface implementation.
+     */
+    EntityReference INTERFACE_CLASS_REFERENCE = new EntityReference("ComponentInterfaceClass", EntityType.DOCUMENT)
+            .appendParent(CLASS_SPACE_REFERENCE);
 
     /**
      * The name property of the {@link #INTERFACE_CLASS} XClass.

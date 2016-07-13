@@ -23,7 +23,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Represents a remote event with all its datas.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

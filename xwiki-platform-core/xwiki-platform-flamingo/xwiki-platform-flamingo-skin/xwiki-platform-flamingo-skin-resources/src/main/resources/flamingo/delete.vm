@@ -1,0 +1,238 @@
+#######################################################
+###              DELETE PAGE ACTION
+###              ------------------
+###
+#######################################################
+##
+#######################################################
+##                     GLOBALS
+#######################################################
+#set($fullmsg = '')
+#set($quote = '"')
+#set($hasInlinks = false)
+#######################################################
+##                     DISPLAY
+#######################################################
+#template("startpage.vm")
+<div class="main">
+  <div id="mainContentArea">
+    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+    #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
+    <div class="xcontent">
+      #template('contentheader.vm')
+      #controller()
+      <div class="clearfloats"></div>
+    </div> ## xcontent
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")
+#######################################################
+##                    CONTROLLER
+#######################################################
+#macro(controller)
+  #if("$!{request.jobId}" != '')
+    ## A delete job is running
+    #displayProgressBar()
+  #else
+    #if("$!{request.id}" != '')
+      ## request.id means that we are deleting a document from the recycle bin
+      #displayCompletelyDeleteConfirmMessage()
+    #else
+      #displayConfirmationPage()
+    #end
+  #end
+#end
+#######################################################
+##            DISPLAY CONFIRMATION PAGE
+#######################################################
+#macro(displayConfirmationPage)
+  <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+    #getChildren()
+    #getBacklinks()
+    #getChildren_legacy()
+    #displayConfirmMessage()
+  </form>
+#end
+#######################################################
+##              DISPLAY PROGRESS BAR
+#######################################################
+#macro(displayProgressBar)
+  #set($discard = $xwiki.jsfx.use("delete${jsExtension}", true))
+  #set($discard = $xwiki.ssfx.use('uicomponents/job/job.css', true))
+  #set($jobId = $request.jobId)
+  <div class="ui-progress" id="delete-progress-bar-container">
+    <p>$services.localization.render('core.delete.waitmessage')</p>
+    <div class="ui-progress-background">
+      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$!escapetool.xml($jobId)" data-progress="0" style="width: 0"></div>
+    </div>
+  </div>
+  <p class="successmessage hidden" id="successMessage">$services.localization.render('core.delete.success')</p>
+  <p class="errormessage hidden" id="errorMessage">$services.localization.render('core.delete.error')</p>
+#end
+#######################################################
+##                  DISPLAY PANEL
+#######################################################
+#macro(displayPanel $panelId $panelClass $heading $body)
+  <div class="panel $!panelClass">
+    <div class="panel-heading">
+      $heading
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+    </div>
+    <div class="panel-body collapse" id="$panelId">
+      $body
+    </div>
+  </div>
+#end
+#######################################################
+##                    CHILDREN
+#######################################################
+#macro(getChildren)
+  #if ($doc.name == 'WebHome') ## terminal documents have no child
+    #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
+    #set($childCount = $services.query.xwql($childCountXWQL).bindValue('space', "${doc.space}.%").bindValue('fullName', $doc.fullName).addFilter('unique').count())
+    #if ($childCount > 0)
+      ## Check if we should propose by default to affect children when the only remaining children (after the delete) would be the WebPreferences document.
+      #set ($webPreferencesDocumentReference = $services.model.createDocumentReference('WebPreferences', $doc.documentReference.lastSpaceReference))
+      #if ($childCount == 1 && $xwiki.exists($webPreferencesDocumentReference))
+        #set ($forceAffectChildren = " checked='checked'")
+      #end
+      #define($heading)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">Affect children</label> ($childCount)
+      #end
+      #define($body)
+        ##
+        ## List the documents to be deleted using a livetable
+        ##
+        #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
+        #set ($colprops = {
+          'doc.title'    : { 'link' : 'view' },
+          'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
+          'doc.author'   : { 'link' : 'author' }
+        })
+        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
+        #set ($options = { 
+          'url' : "$doc.getURL('get', $urlParameters)",
+          'translationPrefix' : 'platform.index.',
+          'outputOnlyHtml' : true
+        })
+        #livetable('deleteSpaceIndex' $collist $colprops $options)
+      #end
+      #displayPanel('panel-children', 'panel-default', $heading, $body)
+    #end
+  #end
+#end
+#######################################################
+##                 LEGACY CHILDREN
+##
+## Get the children document based on the legacy
+## parent/child relationship.
+#######################################################
+#macro(getChildren_legacy)
+  #if($services.parentchild.isParentChildMechanismEnabled())
+    #set($childrenStatement = 'where doc.fullName <> :parentFullName and (doc.parent = :parentFullName or (doc.parent = :parentName and doc.space = :parentSpace))')
+    #set($childrenQuery = $services.query.xwql($childrenStatement))
+    #set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+    #set($children = $childrenQuery.addFilter('unique').execute())
+    #if($children && $children.size() > 0)
+      #define($heading)
+        <strong>Orphans</strong> ($children.size())
+      #end
+      #define($message)
+        <ul>
+          #foreach($docname in $children)
+            #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+            <li><a href="$doc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
+          #end
+        </ul>
+      #end
+      #set($body = $services.localization.render('core.delete.orphansWarning', [$message]))
+      #displayPanel('panel-legacy-children', 'panel-default', $heading, $body)
+    #end
+  #end
+#end
+#######################################################
+##                 GET BACKLINKS
+##
+## Get the documents having some links to the current 
+## one.
+#######################################################
+#macro(getBacklinks)
+  #set($links = $doc.getBacklinks())
+  #if($links && $links.size() > 0)
+    #define($heading)
+     <strong>Backlinks</strong> ($links.size())
+    #end
+    #define($message)
+      <ul>
+      #foreach($docname in $links)
+        #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
+      #end
+      </ul>
+    #end
+    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
+    #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
+    #set($hasInlinks = true)
+  #end
+#end
+#######################################################
+##              DISPLAY CONFIRM MESSAGE
+#######################################################
+#macro(displayConfirmMessage)
+  #if($xwiki.hasRecycleBin())
+    #if($hasInlinks)
+      <p><strong>$services.localization.render('core.recyclebin.confirmWithInlinks')</strong></p>
+    #else
+      <p>$services.localization.render('core.recyclebin.confirm')</p>
+    #end
+  #else
+    #if($hasInlinks)
+      <p><strong>$services.localization.render('core.delete.confirmWithInlinks')</strong></p>
+    #else
+      <p>$services.localization.render('core.delete.confirm')</p>
+    #end
+  #end
+  <div class="hidden">
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+    <input type="hidden" name="confirm" value="1"/>
+    <input type="hidden" name="async" value="true"/>
+    #if("$!{request.xredirect}" != '')
+      <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+    #end
+  </div>
+  <button class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> $services.localization.render('core.delete.confirm.yes')</button>
+  #if("$!{request.xredirect}" != '')
+    #set($cancelUrl = "$request.xredirect")
+  #else
+    #set($cancelUrl = $doc.getURL())
+  #end
+  <a class="btn btn-primary" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('core.delete.confirm.no')</a>
+#end
+#######################################################
+##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE
+##
+## Display a confirmation message when the user wants 
+## to delete a page from the recycle bin.
+#######################################################
+#macro(displayCompletelyDeleteConfirmMessage)
+  #xwikimessageboxstart($services.localization.render('core.delete') $services.localization.render('core.recyclebin.completelyDeleteConfirm'))
+    <form action="$xwiki.relativeRequestURL" method="post">
+      <div class="hidden">
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+        <input type="hidden" name="confirm" value="1"/>
+        <input type="hidden" name="id" value="$!{escapetool.xml($request.id)}"/>
+        #if("$!{request.xredirect}" != '')
+          <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+        #end
+      </div>
+      <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
+      #if("$!{request.xredirect}" != '')
+        #set($cancelUrl = "$request.xredirect")
+      #else
+        #set($cancelUrl = $doc.getURL())
+      #end
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a></div>
+    </form>
+  #xwikimessageboxend()
+#end

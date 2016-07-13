@@ -38,9 +38,26 @@ public interface MacroService extends RemoteService
     /**
      * @param macroId a macro identifier
      * @param syntaxId a syntax identifier
+     * @param wikiId a wiki identifier
+     * @return an object describing the specified macro visible from the specified wiki
+     * @since 6.4M1
+     */
+    MacroDescriptor getMacroDescriptor(String macroId, String syntaxId, String wikiId);
+
+    /**
+     * @param macroId a macro identifier
+     * @param syntaxId a syntax identifier
      * @return an object describing the specified macro
      */
     MacroDescriptor getMacroDescriptor(String macroId, String syntaxId);
+
+    /**
+     * @param syntaxId a syntax identifier
+     * @param wikiId a wiki identifier
+     * @return the list of all the macro descriptors for the specified syntax visible from the specified wiki
+     * @since 6.4M1
+     */
+    List<MacroDescriptor> getMacroDescriptors(String syntaxId, String wikiId);
 
     /**
      * @param syntaxId a syntax identifier

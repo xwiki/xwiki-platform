@@ -21,6 +21,7 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
@@ -30,12 +31,13 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI-6691: Reduce the size of the ASE_REQUESTID column to 48-chars.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
 @Component
 @Named("R43000XWIKI6691")
+@Singleton
 public class R43000XWIKI6691DataMigration extends AbstractHibernateDataMigration
 {
     @Override

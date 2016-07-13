@@ -102,6 +102,8 @@ public class WysiwygEditor extends RichTextEditorController
             initializePlainTextArea();
         } else {
             ui = getRichTextEditor();
+            // Disable the rich text area if the wrapped plain text area is disabled or read-only.
+            getRichTextEditor().getTextArea().setEnabled(this.config.isEnabled());
         }
 
         // Resize the rich text area and hide the hook.
@@ -124,11 +126,6 @@ public class WysiwygEditor extends RichTextEditorController
         return sv;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextEditorController#onLoad(LoadEvent)
-     */
     @Override
     public void onLoad(LoadEvent event)
     {
@@ -191,9 +188,10 @@ public class WysiwygEditor extends RichTextEditorController
         tabs.selectTab(config.getSelectedTabIndex());
 
         // Enable the appropriate text area based on the type of input (source or HTML).
-        boolean richTextAreaEnabled = config.isInputConverted();
-        plainTextEditor.getTextArea().setEnabled(!richTextAreaEnabled);
-        getRichTextEditor().getTextArea().setEnabled(richTextAreaEnabled);
+        boolean inputConverted = config.isInputConverted();
+        boolean editorEnabled = this.config.isEnabled();
+        plainTextEditor.getTextArea().setEnabled(editorEnabled && !inputConverted);
+        getRichTextEditor().getTextArea().setEnabled(editorEnabled && inputConverted);
 
         saveRegistration(tabs.addBeforeSelectionHandler(switcher));
         saveRegistration(tabs.addSelectionHandler(new SelectionHandler<Integer>()
@@ -260,11 +258,7 @@ public class WysiwygEditor extends RichTextEditorController
         return config;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextEditorController#destroy()
-     */
+    @Override
     public void destroy()
     {
         super.destroy();

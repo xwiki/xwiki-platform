@@ -21,6 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Extends {@link DefaultStringEntityReferenceSerializer} to add the serialization of the Locale for Document
@@ -31,6 +32,15 @@ import org.xwiki.model.reference.EntityReference;
  */
 public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
+    /**
+     * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
+     *        between the Entity types, and the characters to escape and how to escape them)
+     */
+    public LocalizedStringEntityReferenceSerializer(SymbolScheme symbolScheme)
+    {
+        super(symbolScheme);
+    }
+
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
@@ -40,6 +50,11 @@ public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntit
         // Append parameters for DocumentReference (if any)
         if (currentReference instanceof DocumentReference) {
             DocumentReference documentReference = (DocumentReference) currentReference;
+            if (documentReference.getLocale() != null) {
+                representation.append('(').append(documentReference.getLocale()).append(')');
+            }
+        } else if (currentReference instanceof LocalDocumentReference) {
+            LocalDocumentReference documentReference = (LocalDocumentReference) currentReference;
             if (documentReference.getLocale() != null) {
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }

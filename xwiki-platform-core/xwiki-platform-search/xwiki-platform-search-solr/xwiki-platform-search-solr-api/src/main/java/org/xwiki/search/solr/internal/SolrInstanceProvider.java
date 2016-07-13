@@ -70,8 +70,8 @@ public class SolrInstanceProvider implements Provider<SolrInstance>, Initializab
         try {
             this.configuredInstance = this.componentManager.getInstance(SolrInstance.class, type);
         } catch (ComponentLookupException e) {
-            this.logger.error("", e);
-            throw new InitializationException("Failed to lookup configured Solr instance type [" + type + "]");
+            throw new InitializationException(String.format("Failed to lookup configured Solr instance type [%s]",
+                type), e);
         }
     }
 

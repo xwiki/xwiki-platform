@@ -53,11 +53,7 @@ public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkCo
         configJSONSerializer = new LinkConfigJSONSerializer();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         if (!super.isEnabled()) {
@@ -105,33 +101,18 @@ public class CreateLinkExecutable extends AbstractInsertElementExecutable<LinkCo
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#getCacheKeyPrefix()
-     */
     @Override
     protected String getCacheKeyPrefix()
     {
         return CreateLinkExecutable.class.getName();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#getSelectedElement()
-     */
     @Override
     protected AnchorElement getSelectedElement()
     {
         return LinkExecutableUtils.getSelectedAnchor(rta);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInsertElementExecutable#newElement()
-     */
     @Override
     protected AnchorElement newElement()
     {

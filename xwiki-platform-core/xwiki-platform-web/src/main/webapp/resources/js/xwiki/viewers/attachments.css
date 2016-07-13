@@ -33,6 +33,9 @@
 
 .attachment .xwikibuttonlinks {
   float: right;
+}
+
+.skin-colibri .attachment .xwikibuttonlinks {
   width: 60px;
 }
 
@@ -61,7 +64,7 @@
   margin: 5px 10px 5px 0 !important; /* !important is needed for Toucan. */
 }
 /* Attachment "toolbox" style */
-.attachment .xwikibuttonlinks a {
+.skin-colibri .attachment .xwikibuttonlinks a {
   width: 16px;
   height: 16px;
   text-indent: -1000em;
@@ -71,16 +74,16 @@
   float: right;
   margin: 0 0 0 4px;
 }
-.attachment .xwikibuttonlinks a.deletelink {
+.skin-colibri .attachment .xwikibuttonlinks a.deletelink {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
-.attachment .xwikibuttonlinks a.editlink {
+.skin-colibri .attachment .xwikibuttonlinks a.editlink {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
-.attachment .xwikibuttonlinks a.viewlink {
+.skin-colibri .attachment .xwikibuttonlinks a.viewlink {
   background-image: url("$xwiki.getSkinFile('icons/silk/eye.png')");
 }
-#AddAttachment {
+.skin-colibri #AddAttachment {
   border-top: 1px solid $theme.borderColor;
 }
 #AddAttachment legend {

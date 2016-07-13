@@ -36,6 +36,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,6 +56,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
@@ -62,7 +64,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
- * 
+ *
  * @version $Id$
  */
 public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
@@ -115,7 +117,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     /**
      * String between space and name in document full name.
      */
-    private static final String SAME_NAME_SEP = ".";
+    private static final String SPACE_NAME_SEP = ".";
 
     /**
      * Symbol use in HQL "like" command that means "all characters".
@@ -177,7 +179,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             configuration.setConfigurationId("xwiki.groupservice.usergroups");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             this.memberGroupsCache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
         } catch (CacheException e) {
@@ -197,7 +199,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     /**
      * Check whether the configuration specifies that every user is implicitly in XWikiAllGroup. Configured by the
      * {@code xwiki.authentication.group.allgroupimplicit} parameter in {@code xwiki.cfg}.
-     * 
+     *
      * @param context the current XWiki context
      * @return {@code true} if the group is implicit and all users should be by default in it, {@code false} if the
      *         group behaves as all other groups, containing only the users/subgroups that are explicitly listed inside
@@ -238,7 +240,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Check if provided member is equal to member name found in XWiki.XWikiGroups object.
-     * 
+     *
      * @param currentMember the member name found in XWiki.XWikiGroups object.
      * @param memberWiki the name of the wiki of the member.
      * @param memberSpace the name of the space of the member.
@@ -252,18 +254,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         boolean equals = false;
 
         if (memberWiki != null) {
-            equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberName);
+            equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP + memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(memberWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             equals |= currentMember.equals(memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
 
@@ -272,7 +274,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Remove user or group name from a group {@link XWikiDocument}.
-     * 
+     *
      * @param groupDocument the {@link XWikiDocument} containing group object.
      * @param memberWiki the name of the wiki of the member.
      * @param memberSpace the name of the space of the member.
@@ -308,8 +310,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     {
         List<Object> parameterValues = new ArrayList<Object>();
 
-        StringBuffer where =
-            new StringBuffer(
+        StringBuilder where =
+            new StringBuilder(
                 ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
         parameterValues.add(CLASS_XWIKIGROUPS);
 
@@ -320,14 +322,15 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         where.append(" and prop.value like ?");
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(memberWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + memberName + HQLLIKE_ALL_SYMBOL);
             } else {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + memberSpace + SAME_NAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
+                parameterValues.add(HQLLIKE_ALL_SYMBOL + memberSpace + SPACE_NAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
             }
         } else {
-            parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
+            parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP
+                + memberName + HQLLIKE_ALL_SYMBOL);
         }
 
         List<XWikiDocument> documentList =
@@ -413,14 +416,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     @Override
-    public List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
+    public List<?> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
         Object[][] order, XWikiContext context) throws XWikiException
     {
         return getAllMatchedUsersOrGroups(true, matchFields, withdetails, nb, start, order, context);
     }
 
     @Override
-    public List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
+    public List<?> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
         Object[][] order, XWikiContext context) throws XWikiException
     {
         return getAllMatchedUsersOrGroups(false, matchFields, withdetails, nb, start, order, context);
@@ -428,7 +431,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Create a "where clause" to use with {@link XWikiStoreInterface} searchDocuments and searchDocumentsNames methods.
-     * 
+     *
      * @param user if true search for users, otherwise search for groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -451,9 +454,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
         String classtemplate = user ? CLASSTEMPLATE_XWIKIUSERS : CLASSTEMPLATE_XWIKIGROUPS;
 
-        StringBuffer from = new StringBuffer(", BaseObject as obj");
+        StringBuilder from = new StringBuilder(", BaseObject as obj");
 
-        StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
         parameterValues.add(classtemplate);
         parameterValues.add("XWiki." + documentClass);
 
@@ -462,10 +465,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         // Manage object match strings
         if (matchFields != null) {
-            for (int i = 0; i < matchFields.length; ++i) {
-                String fieldName = (String) matchFields[i][0];
-                String type = (String) matchFields[i][1];
-                String value = (String) matchFields[i][2];
+            for (Object[] matchField : matchFields) {
+                String fieldName = (String) matchField[0];
+                String type = (String) matchField[1];
+                String value = (String) matchField[2];
 
                 if (type != null) {
                     String fieldPrefix;
@@ -493,7 +496,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             }
         }
 
-        StringBuffer orderString = new StringBuffer();
+        StringBuilder orderString = new StringBuilder();
 
         // Manage order
         if (order != null && order.length > 0) {
@@ -537,7 +540,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Search for all users or group with provided constraints and in a provided order.
-     * 
+     *
      * @param user if true search for users, otherwise search for groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -560,10 +563,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *             {@link XWikiStoreInterface#searchDocuments(String, int, int, List, XWikiContext)} or
      *             {@link XWikiStoreInterface#searchDocumentsNames(String, int, int, List, XWikiContext)}
      */
-    protected List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails, int nb,
+    protected List<?> getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails, int nb,
         int start, Object[][] order, XWikiContext context) throws XWikiException
     {
-        List< ? > groups = null;
+        List<?> groups = null;
 
         if (context.getWiki().getHibernateStore() != null) {
             List<Object> parameterValues = new ArrayList<Object>();
@@ -601,7 +604,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Return number of users or groups with provided constraints.
-     * 
+     *
      * @param user if true search for users, otherwise search for groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -622,7 +625,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
 
-        List< ? > list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
+        List<?> list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
 
         if (list == null || list.size() == 0) {
             return 0;
@@ -648,7 +651,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     /**
      * Create a query to filter provided group members. Generate the entire HQL query except the select part.
-     * 
+     *
      * @param groupFullName the fill wiki name of the group.
      * @param matchField a string to search in result to filter.
      * @param orderAsc if true, the result is ordered ascendent, if false it descendant. If null no order is applied.
@@ -659,7 +662,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     protected String createMatchGroupMembersWhereClause(String groupFullName, String matchField, Boolean orderAsc,
         Map<String, Object> parameterValues)
     {
-        StringBuffer queryString = new StringBuffer();
+        StringBuilder queryString = new StringBuilder();
 
         // Add from clause
         queryString.append(" FROM BaseObject as obj, StringProperty as field");
@@ -698,9 +701,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         DocumentReference memberReference = this.currentMixedDocumentReferenceResolver.resolve(member);
 
-        String currentWiki = context.getDatabase();
+        String currentWiki = context.getWikiId();
         try {
-            context.setDatabase(memberReference.getWikiReference().getName());
+            context.setWikiId(memberReference.getWikiReference().getName());
 
             Collection<DocumentReference> groupReferences =
                 getAllGroupsReferencesForMember(memberReference, nb, start, context);
@@ -710,7 +713,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 groupNames.add(this.localWikiEntityReferenceSerializer.serialize(groupReference));
             }
         } finally {
-            context.setDatabase(currentWiki);
+            context.setWikiId(currentWiki);
         }
 
         return groupNames;
@@ -724,7 +727,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         String prefixedFullName = this.entityReferenceSerializer.serialize(memberReference);
 
-        String key = context.getDatabase() + "/" + prefixedFullName;
+        String key = context.getWikiId() + "/" + prefixedFullName;
         synchronized (key) {
             if (this.memberGroupsCache == null) {
                 initCache(context);
@@ -741,7 +744,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 List<String> groupNames;
                 try {
                     Query query;
-                    if (memberReference.getWikiReference().getName().equals(context.getDatabase())
+                    if (memberReference.getWikiReference().getName().equals(context.getWikiId())
                         || (memberReference.getLastSpaceReference().getName().equals("XWiki") && memberReference
                             .getName().equals(XWikiRightService.GUEST_USER))) {
                         query =
@@ -777,10 +780,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
                 // itself are part of it.
                 if (isAllGroupImplicit(context)
-                    && memberReference.getWikiReference().getName().equals(context.getDatabase())
+                    && memberReference.getWikiReference().getName().equals(context.getWikiId())
                     && !memberReference.getName().equals(XWikiRightService.GUEST_USER)) {
                     DocumentReference currentXWikiAllGroup =
-                        new DocumentReference(context.getDatabase(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
+                        new DocumentReference(context.getWikiId(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
 
                     if (!currentXWikiAllGroup.equals(memberReference)) {
                         groupReferences.add(currentXWikiAllGroup);
@@ -813,7 +816,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         Map<String, Object> parameterValues = new HashMap<String, Object>();
         // //////////////////////////////////////
         // Create the query string
-        StringBuffer queryString = new StringBuffer("SELECT field.value");
+        StringBuilder queryString = new StringBuilder("SELECT field.value");
 
         queryString.append(' ').append(
             createMatchGroupMembersWhereClause(groupDocument.getFullName(), matchField, orderAsc, parameterValues));

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303158348000</creationDate>
+  <date>1307445978000</date>
+  <contentUpdateDate>1307445978000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language da generated from http://www.l10n.xwiki.org
+WikiManager.WikiCandidateMemberClass_status_accepted=Godkendt
+WikiManager.WikiCandidateMemberClass_status_pending=Venter
+WikiManager.WikiCandidateMemberClass_status_rejected=Afvist
+WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
+WikiManager.WikiCandidateMemberClass_type_request=Anmodning
+admin.xwiki.manageworkspace.description=Håndter indstillinger, såsom wiki navn, beskrivelse og medlemsskaber.
+admin.xwiki.members.title=Nuværende medlemmer
+admin.xwiki.usersconfiguration.title=Konfiguration
+admin.xwiki.workspaceusers.description=Håndter medlemskaber\: tilføj, fjern, invitér, godkend eller afvis wiki-medlemmer.
+core.menu.admin.wiki=Håndter wiki
+core.menu.type.wiki=Wiki
+core.menu.watchlist.add.wiki=Overvåg wiki
+core.menu.watchlist.remove.wiki=Overvåg ikke wiki
+platform.wiki.currentwiki.candidateAcceptedSuccess=Anmodning modtaget.
+platform.wiki.currentwiki.candidateHandledComment=Bemærkning\:
+platform.wiki.currentwiki.candidateHandledSaveComment=Behandlet kandidat {0} ({1}]
+platform.wiki.currentwiki.candidateRejectedSuccess=Anmodning afvist.
+platform.wiki.currentwiki.candidateReviewFailure=Fejl - Du kan ikke afvise denne invitation.
+platform.wiki.currentwiki.candidates.accept.label=Godkend
+platform.wiki.currentwiki.candidates.hint=Brugere som har anmodet om eller er inviteret til medlemskab i wikien.
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Afvis invitation
+platform.wiki.currentwiki.candidates.label=Kandidater
+platform.wiki.currentwiki.candidates.reject.label=Afvis
+platform.wiki.currentwiki.candidates.reviewer.label=Administrator\:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Besked fra Administrator\:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privat bemærkning\:
+platform.wiki.currentwiki.candidates.status.label=Status\:
+platform.wiki.currentwiki.candidates.type.label=Type\:
+platform.wiki.currentwiki.currentUserCanLeave=Du kan {0}forlade denne wiki{1}, hvis du vil
+platform.wiki.currentwiki.currentUserIsAdmin=Du er administrator for denne wiki.
+platform.wiki.currentwiki.currentUserIsMember=Du er medlem i denne wiki.
+platform.wiki.currentwiki.currentUserIsOwner=Du er ejer af denne wiki.
+platform.wiki.currentwiki.currentUserNotMember=Du er ikke medlem i denne wiki.
+platform.wiki.currentwiki.currentuserCanJoin=Hvis du ønsker det, kan du {0}blive medlem i denne wiki{1}.
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Mest aktive bidragydere.
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki information
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=For at se den fulde liste af wiki-deltagere, brug {0}medlemskabsoversigtsiden{1}.
+platform.wiki.currentwiki.invitation.view.label=Vis invitationen
+platform.wiki.currentwiki.invitationCancelFailure=Fejl - du kan ikke afvise denne invitation
+platform.wiki.currentwiki.invitationCancelNotification=Din invitation er blevet afvist og ikke længere aktiv.
+platform.wiki.currentwiki.invitationCancelSaveComment=Afviste invitation {0} ({1}
+platform.wiki.currentwiki.invitationCancelSuccess=Invitation er afvist.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Du er inviteret til at blive medlem i denne wiki
+platform.wiki.currentwiki.invite.button.label=Invitér
+platform.wiki.currentwiki.invite.message.hint=Besked til brugeren.
+platform.wiki.currentwiki.invite.message.label=Besked
+platform.wiki.currentwiki.invite.username.hint=Navn på bruger, der skal inviteres til wikien.
+platform.wiki.currentwiki.invite.username.label=Brugernavn
+platform.wiki.currentwiki.inviteNotification=Du er blevet inviteret til at deltage i wiki "{0}".
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} har allerede en ventende anmodning. Besvar den anmodning istedet.
+platform.wiki.currentwiki.inviteSaveComment=Bruger "{0}" er inviteret til wikien.
+platform.wiki.currentwiki.inviteSuccess={0} er inviteret.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} har allerede en invitation.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} er allerede medlem i wikien.
+platform.wiki.currentwiki.join.label=Tilmeld
+platform.wiki.currentwiki.joinNeedToLogin=For at blive medlem i denne wiki, skal du være logget ind.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Din tilmelding til wiki "{0}" er modtaget.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Du har tilmeldt dig denne wiki.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Din tilmelding til wiki "{0}" er blevet afslået.
+platform.wiki.currentwiki.joinreques.request.label=Tilmeld
+platform.wiki.currentwiki.joinrequest.cancel.label=Afbryd tilmelding
+platform.wiki.currentwiki.leave.label=Forlad wiki
+platform.wiki.currentwiki.managewikis.title=Wiki
+platform.wiki.currentwiki.member.add=Tilføj eller inviter brugere til wiki
+platform.wiki.currentwiki.panel.information.description.label=Beskrivelse
+platform.wiki.currentwiki.panel.information.members.label=Medlemmer
+platform.wiki.currentwiki.panel.information.name.label=Navn
+platform.wiki.currentwiki.prop.description.hint=En kort beskrivelse af wikien og dens formål.
+platform.wiki.currentwiki.prop.description.label=Beskrivelse
+platform.wiki.currentwiki.prop.membershipType.hint=Hvordan en bruger kan tilmelde sig denne wiki.
+platform.wiki.currentwiki.prop.membershipType.label=Medlemskabs type
+platform.wiki.currentwiki.prop.owner.hint=En bruger som har alle rettigheder over wikien.
+platform.wiki.currentwiki.prop.owner.label=Ejer
+platform.wiki.currentwiki.prop.secure.hint=Hvis aktiv vil alle wikiens eksterne URL''er starte med {0}https\:~/~/{1}.
+platform.wiki.currentwiki.prop.secure.label=Sikker (SSL)
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Wikiens officielle navn
+platform.wiki.currentwiki.prop.wikiprettyname.label=Officielt navn
+platform.wiki.currentwiki.welcome=Velkommen til {0}{1}{2} wiki.
+platform.wiki.currentwiki.wikiusers.title=Wiki medlemmer
+platform.wiki.panel.title=Wiki information
+</content>
+</xwikidoc>

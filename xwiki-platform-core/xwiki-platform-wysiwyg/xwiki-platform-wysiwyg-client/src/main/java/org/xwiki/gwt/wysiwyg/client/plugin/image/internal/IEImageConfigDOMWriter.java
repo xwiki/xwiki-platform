@@ -35,11 +35,6 @@ import com.google.gwt.dom.client.Node;
  */
 public class IEImageConfigDOMWriter extends ImageConfigDOMWriter
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ImageConfigDOMWriter#write(ImageConfig, ImageElement)
-     */
     @Override
     public void write(ImageConfig imageConfig, ImageElement image)
     {

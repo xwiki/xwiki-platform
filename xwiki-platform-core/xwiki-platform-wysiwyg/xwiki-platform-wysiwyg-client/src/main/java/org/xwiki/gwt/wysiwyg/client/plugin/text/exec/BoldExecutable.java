@@ -44,11 +44,7 @@ public class BoldExecutable extends ToggleInlineStyleExecutable
         super(rta, Style.FONT_WEIGHT, Style.FontWeight.BOLD, "strong");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ToggleInlineStyleExecutable#matchesStyle(Element)
-     */
+    @Override
     protected boolean matchesStyle(Element inputElement)
     {
         String fontWeight = inputElement.getComputedStyleProperty(getProperty().getJSName());

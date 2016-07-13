@@ -27,20 +27,24 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.model.LegacySpaceResolver;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Computes Image and Link URLs for attachments by using an absolute URLs but stores a Map in the XWiki Context to
  * associate attachment URLs to Attachment Entity References so that when executing a PDF export the custom URI Resolver
  * we use can stream image attachment content so that they are embedded in the PDF.
- * 
+ *
  * @version $Id$
  */
 public class PdfURLFactory extends FileSystemURLFactory
 {
+    private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
+
     /**
      * We delegate to the XWiki Servlet URL Factory for the creation of attachment URLs since we want links to
-     * attachments to be absolute. Image URLs are converted by the {@link PDFURIResolver}.
+     * attachments to be absolute. Image URLs are resolved by the {@link PDFResourceResolver}.
      */
     private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
 
@@ -53,58 +57,63 @@ public class PdfURLFactory extends FileSystemURLFactory
 
     /**
      * Key used to save image attachment data.
+     *
      * @see #saveAttachmentReference(java.net.URL, String, String, String, String, com.xpn.xwiki.XWikiContext)
      */
     static final String PDF_EXPORT_CONTEXT_KEY = "pdfExportImageURLMap";
 
     @Override
-    public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String wiki, XWikiContext context)
     {
-        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, action, querystring, wiki, context);
-        saveAttachmentReference(url, wiki, space, name, filename, context);
+        URL url =
+            this.servletURLFactory.createAttachmentURL(filename, spaces, name, action, querystring, wiki, context);
+        saveAttachmentReference(url, wiki, spaces, name, filename, context);
         return url;
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String wiki,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String wiki,
         XWikiContext context)
     {
-        URL url = this.servletURLFactory.createAttachmentURL(filename, space, name, revision, wiki, context);
-        saveAttachmentReference(url, wiki, space, name, filename, context);
+        URL url = this.servletURLFactory.createAttachmentURL(filename, spaces, name, revision, wiki, context);
+        saveAttachmentReference(url, wiki, spaces, name, filename, context);
         return url;
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
-        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, querystring,
-            xwikidb, context);
-        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        URL url =
+            this.servletURLFactory.createAttachmentRevisionURL(filename, spaces, name, revision, querystring, xwikidb,
+                context);
+        saveAttachmentReference(url, xwikidb, spaces, name, filename, context);
         return url;
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, long recycleId,
         String querystring, String xwikidb, XWikiContext context)
     {
-        URL url = this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, recycleId,
-            querystring, xwikidb, context);
-        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        URL url =
+            this.servletURLFactory.createAttachmentRevisionURL(filename, spaces, name, revision, recycleId, querystring,
+                xwikidb, context);
+        saveAttachmentReference(url, xwikidb, spaces, name, filename, context);
         return url;
     }
 
     /**
      * @param url the URL to save in the attachment map
      * @param wiki the wiki where the attachment is located
-     * @param space the space where the attachment is located
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param page the page where the attachment is located
      * @param fileName the name of the attachment file
      * @param context the XWiki Context where to find the attachment map that we add to
-     * @see PDFURIResolver
+     * @see PDFResourceResolver
      */
-    private void saveAttachmentReference(URL url, String wiki, String space, String page, String fileName,
+    private void saveAttachmentReference(URL url, String wiki, String spaces, String page, String fileName,
         XWikiContext context)
     {
         // Save Entity Reference pointed to by this URL in the Context so that it can be used at export time in the
@@ -112,10 +121,11 @@ public class PdfURLFactory extends FileSystemURLFactory
         Map<String, AttachmentReference> attachmentMap =
             (Map<String, AttachmentReference>) context.get(PDF_EXPORT_CONTEXT_KEY);
         if (attachmentMap == null) {
-            attachmentMap = new HashMap<String, AttachmentReference>();
+            attachmentMap = new HashMap<>();
             context.put(PDF_EXPORT_CONTEXT_KEY, attachmentMap);
         }
 
-        attachmentMap.put(url.toString(), new AttachmentReference(fileName, new DocumentReference(wiki, space, page)));
+        attachmentMap.put(url.toString(), new AttachmentReference(fileName,
+            new DocumentReference(wiki, this.legacySpaceResolver.resolve(spaces), page)));
     }
 }

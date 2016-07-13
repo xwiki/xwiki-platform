@@ -46,6 +46,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * {@inheritDoc}
      * <p>
      * Don't overwrite this method. Overwrite {@link #onSubmit(AsyncCallback)} instead and use {@link #getData()}.
+     * </p>
      * 
      * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
      */
@@ -98,6 +99,7 @@ public abstract class AbstractAutoSubmitWizardStep<T> extends AbstractNavigation
      * {@inheritDoc}
      * <p>
      * Overwrite if you want to change the input data.
+     * </p>
      * 
      * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
      */

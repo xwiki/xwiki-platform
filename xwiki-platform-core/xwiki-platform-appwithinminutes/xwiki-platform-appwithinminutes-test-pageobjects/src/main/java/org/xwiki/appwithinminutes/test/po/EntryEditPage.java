@@ -49,11 +49,6 @@ public class EntryEditPage extends InlinePage
     private static final String LABEL_XPATH_FORMAT = "//label[substring(@for, string-length(@for) - %s - 2) = '_0_%s']";
 
     /**
-     * The XPath that locates a form field.
-     */
-    private static final String FIELD_XPATH_FORMAT = "//*[substring(@name, string-length(@name) - %s - 2) = '_0_%s']";
-
-    /**
      * Retrieves the label of the specified form field.
      * 
      * @param fieldName the name of a form field
@@ -64,36 +59,6 @@ public class EntryEditPage extends InlinePage
         String xpath = String.format(LABEL_XPATH_FORMAT, fieldName.length(), fieldName);
         WebElement label = getForm().findElement(By.xpath(xpath));
         return label.getText();
-    }
-
-    /**
-     * Retrieves the value of the specified form field
-     * 
-     * @param fieldName the name of a form field
-     * @return the value of the specified form field
-     */
-    public String getValue(String fieldName)
-    {
-        String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        return new FormElement(getForm()).getFieldValue(By.xpath(xpath));
-    }
-
-    /**
-     * Sets the value of the specified form field
-     * 
-     * @param fieldName the name of a form field
-     * @param fieldValue the new value for the specified form field
-     */
-    public void setValue(String fieldName, String fieldValue)
-    {
-        String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        WebElement field = getForm().findElement(By.xpath(xpath));
-        if (field.getAttribute("name").equals(field.getAttribute("id"))) {
-            new FormElement(getForm()).setFieldValue(field, fieldValue);
-        } else {
-            xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
-            new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
-        }
     }
 
     /**

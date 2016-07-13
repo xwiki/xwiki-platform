@@ -19,6 +19,13 @@
  */
 package org.xwiki.uiextension;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.StringWriter;
 
 import org.apache.commons.collections.MapUtils;
@@ -37,13 +44,6 @@ import org.xwiki.uiextension.internal.WikiUIExtensionParameters;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiUIExtensionParametersTest}.
@@ -89,7 +89,7 @@ public class WikiUIExtensionParametersTest
     public void getParametersWithAnEmptyParametersProperty() throws Exception
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "", componentManager);
         Assert.assertEquals(MapUtils.EMPTY_MAP, parameters.get());
     }
 
@@ -97,9 +97,9 @@ public class WikiUIExtensionParametersTest
     public void getParametersWithAnEqualSignInAValue() throws Exception
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(velocityEngine.evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value")))
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
             .thenReturn(true);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("key=value", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "key=value", componentManager);
 
         // Since the StringWriter is created within the method, the value is "" and not "value".
         Assert.assertEquals("", parameters.get().get("key"));
@@ -109,9 +109,9 @@ public class WikiUIExtensionParametersTest
     public void getParametersWhenVelocityFails() throws Exception
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(velocityEngine.evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value")))
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
             .thenThrow(new XWikiVelocityException(""));
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("key=value", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "key=value", componentManager);
 
         // It should fail and put a warn in the logs
         Assert.assertEquals(null, parameters.get().get("key"));
@@ -123,16 +123,16 @@ public class WikiUIExtensionParametersTest
     public void getParametersFromTheSameRequestAndForTheSameWiki() throws Exception
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
-        when(velocityEngine.evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value")))
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
             .thenReturn(true);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("key=value", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "key=value", componentManager);
 
         // It should fail silently
         Assert.assertEquals("", parameters.get().get("key"));
         Assert.assertEquals("", parameters.get().get("key"));
 
         // Verify the evaluate is done only once
-        verify(velocityEngine).evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value"));
+        verify(velocityEngine).evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
     }
 
     @Test
@@ -140,25 +140,25 @@ public class WikiUIExtensionParametersTest
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki1"))
             .thenReturn(new WikiReference("wiki2"));
-        when(velocityEngine.evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value")))
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
             .thenReturn(true);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("key=value", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "key=value", componentManager);
 
         // It should fail silently
         Assert.assertEquals("", parameters.get().get("key"));
         Assert.assertEquals("", parameters.get().get("key"));
 
         // Verify the velocity evaluation has been done for both wikis.
-        verify(velocityEngine, times(2)).evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value"));
+        verify(velocityEngine, times(2)).evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
     }
 
     @Test
     public void getParametersFromDifferentRequests() throws Exception
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki1"));
-        when(velocityEngine.evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value")))
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
             .thenReturn(true);
-        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("key=value", componentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters("id", "key=value", componentManager);
 
         ExecutionContext ec1 = mock(ExecutionContext.class, "ec1");
         ExecutionContext ec2 = mock(ExecutionContext.class, "ec2");
@@ -169,6 +169,6 @@ public class WikiUIExtensionParametersTest
         Assert.assertEquals("", parameters.get().get("key"));
 
         // Verify the velocity evaluation has been done for both wikis.
-        verify(velocityEngine, times(2)).evaluate(eq(velocityContext), any(StringWriter.class), eq(""), eq("value"));
+        verify(velocityEngine, times(2)).evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value"));
     }
 }

@@ -1,0 +1,5 @@
+org.xwiki.wiki.template.internal.DefaultWikiTemplateManager
+org.xwiki.wiki.template.internal.WikiTemplatePropertyGroupProvider
+org.xwiki.wiki.template.internal.WikiTemplateClassDocumentInitializer
+org.xwiki.wiki.template.internal.TemplateWikiProvisioningJob
+org.xwiki.wiki.template.internal.migration.WikiTemplateMigration

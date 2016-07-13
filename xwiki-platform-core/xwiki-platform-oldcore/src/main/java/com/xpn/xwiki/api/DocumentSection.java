@@ -70,7 +70,7 @@ public class DocumentSection
 
     public String getSectionTitle()
     {
-        return sectionTitle;
+        return this.sectionTitle;
     }
 
     public void setSectionTitle(String sectionTitle)

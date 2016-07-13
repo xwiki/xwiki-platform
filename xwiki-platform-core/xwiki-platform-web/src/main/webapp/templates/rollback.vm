@@ -8,7 +8,7 @@
 <div class="layoutsection">
   <div id="contentcolumn" class="content hideleft hideright">
     #xwikimessageboxstart($services.localization.render('rollback') "$services.localization.render('readytorollback') $!{escapetool.xml($request.get('rev'))}?")
-    <form action="" method="post">
+    <form action="$xwiki.relativeRequestURL" method="post">
       <div>
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

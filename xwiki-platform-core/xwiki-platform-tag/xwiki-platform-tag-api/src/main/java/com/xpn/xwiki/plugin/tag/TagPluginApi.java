@@ -93,6 +93,19 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Get cardinality map of tags for list wiki spaces.
+     * 
+     * @param spaces the list of space to get tags in, as a comma separated, quoted string
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 8.1
+     */
+    public Map<String, Integer> getTagCountForSpaces(String spaces) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCountForSpaces(spaces, this.context);
+    }
+
+    /**
      * Get cardinality map of tags matching an hql query. Examples of usage:
      * <ul>
      * <li>

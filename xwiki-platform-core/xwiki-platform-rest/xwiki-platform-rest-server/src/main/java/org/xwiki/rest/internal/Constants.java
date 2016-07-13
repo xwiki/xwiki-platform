@@ -22,7 +22,7 @@ package org.xwiki.rest.internal;
 /**
  * @version $Id$
  */
-public class Constants
+public class Constants extends org.xwiki.rest.Constants
 {
     /**
      * The key used to store the XWiki component manager in the current Restlet context.
@@ -43,9 +43,4 @@ public class Constants
      *      com.xpn.xwiki.api.XWiki, Boolean)
      */
     public static final String ALLOWED_VALUES_ATTRIBUTE_NAME = "allowedValues";
-
-    /**
-     * The key used to store the current HTTP request object in the current Restlet context.
-     */
-    public static final String HTTP_REQUEST = "httpRequest";
 }

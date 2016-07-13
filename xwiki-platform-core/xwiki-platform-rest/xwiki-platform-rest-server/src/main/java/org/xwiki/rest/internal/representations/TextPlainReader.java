@@ -19,14 +19,12 @@
  */
 package org.xwiki.rest.internal.representations;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 
 import javax.ws.rs.ext.MessageBodyReader;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
@@ -36,13 +34,6 @@ public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiR
 {
     protected String getEntityAsString(InputStream entityStream) throws IOException
     {
-        StringWriter writer = new StringWriter();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            writer.write(line);
-        }
-
-        return writer.toString();
+        return IOUtils.toString(entityStream);
     }
 }

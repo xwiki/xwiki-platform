@@ -19,11 +19,16 @@
  */
 package org.xwiki.model.reference;
 
+import java.beans.Transient;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Provider;
+
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
@@ -35,9 +40,17 @@ import org.xwiki.model.EntityType;
 public class DocumentReference extends EntityReference
 {
     /**
+     * The {@link Type} for a {@code Provider<DocumentReference>}.
+     * 
+     * @since 7.2M1
+     */
+    public static final Type TYPE_PROVIDER =
+        new DefaultParameterizedType(null, Provider.class, DocumentReference.class);
+
+    /**
      * Parameter key for the locale.
      */
-    private static final String LOCALE = "LOCALE";
+    static final String LOCALE = "LOCALE";
 
     /**
      * Special constructor that transforms a generic entity reference into a {@link DocumentReference}. It checks the
@@ -103,8 +116,8 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * Create a new Document reference from wiki name, space name, page name and language.
-     * This is an helper function during transition from language to locale, it will be deprecated ASAP.
+     * Create a new Document reference from wiki name, space name, page name and language. This is an helper function
+     * during transition from language to locale, it will be deprecated ASAP.
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceName the name of the space containing the document, must not be null
@@ -113,8 +126,8 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
-        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
-            (language == null) ? null : new Locale(language));
+        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)), (language == null) ? null
+            : new Locale(language));
     }
 
     /**
@@ -122,12 +135,12 @@ public class DocumentReference extends EntityReference
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceNames an ordered list of the names of the spaces containing the document from root space to last one,
-     *                   must not be null
+     *            must not be null
      * @param pageName the name of the document
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName)
     {
-        super(pageName, EntityType.DOCUMENT, constructSpaceReference(wikiName, spaceNames));
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
     }
 
     /**
@@ -135,13 +148,13 @@ public class DocumentReference extends EntityReference
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceNames an ordered list of the names of the spaces containing the document from root space to last one,
-     *                   must not be null
+     *            must not be null
      * @param pageName the name of the document reference
      * @param locale the locale of the document reference, may be null
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName, Locale locale)
     {
-        super(pageName, EntityType.DOCUMENT, constructSpaceReference(wikiName, spaceNames));
+        super(pageName, EntityType.DOCUMENT, new SpaceReference(wikiName, spaceNames));
         setLocale(locale);
     }
 
@@ -183,12 +196,13 @@ public class DocumentReference extends EntityReference
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Overridden in order to verify the validity of the passed parent.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid document reference parent (ie a space
-     *            reference)
+     *                reference)
      */
     @Override
     protected void setParent(EntityReference parent)
@@ -207,8 +221,9 @@ public class DocumentReference extends EntityReference
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Overridden in order to verify the validity of the passed type.
+     * </p>
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a document type
@@ -244,14 +259,35 @@ public class DocumentReference extends EntityReference
     /**
      * @return the wiki reference of this document reference
      */
+    @Transient
     public WikiReference getWikiReference()
     {
         return (WikiReference) extractReference(EntityType.WIKI);
     }
 
     /**
+     * Create a new DocumentReference with passed wiki reference.
+     * 
+     * @param wikiReference the wiki reference to use
+     * @return a new document reference or the same if the passed wiki is already the current wiki
+     * @since 7.2M1
+     */
+    @Transient
+    public DocumentReference setWikiReference(WikiReference wikiReference)
+    {
+        WikiReference currentWikiReferene = getWikiReference();
+
+        if (currentWikiReferene.equals(wikiReference)) {
+            return this;
+        }
+
+        return new DocumentReference(this, currentWikiReferene, wikiReference);
+    }
+
+    /**
      * @return the space reference of the last space containing this document
      */
+    @Transient
     public SpaceReference getLastSpaceReference()
     {
         return (SpaceReference) extractReference(EntityType.SPACE);
@@ -260,6 +296,7 @@ public class DocumentReference extends EntityReference
     /**
      * @return space references of this document in an ordered list
      */
+    @Transient
     public List<SpaceReference> getSpaceReferences()
     {
         List<SpaceReference> references = new ArrayList<SpaceReference>();
@@ -275,24 +312,6 @@ public class DocumentReference extends EntityReference
         Collections.reverse(references);
 
         return references;
-    }
-
-    /**
-     * Create a space refererence from a wikiname and a list of space names.
-     *
-     * @param wikiName the wikiname
-     * @param spaceNames the list of space name from root to child
-     * @return the space reference
-     */
-    private static EntityReference constructSpaceReference(String wikiName, List<String> spaceNames)
-    {
-        EntityReference spaceReference = null;
-        EntityReference parent = new EntityReference(wikiName, EntityType.WIKI);
-        for (String spaceName : spaceNames) {
-            spaceReference = new EntityReference(spaceName, EntityType.SPACE, parent);
-            parent = spaceReference;
-        }
-        return spaceReference;
     }
 
     @Override

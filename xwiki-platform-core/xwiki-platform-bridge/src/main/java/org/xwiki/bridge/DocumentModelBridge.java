@@ -43,7 +43,7 @@ public interface DocumentModelBridge
     String getFullName();
 
     /**
-     * @return the document's reference
+     * @return the document's reference (without the document locale)
      * @since 2.2M1
      */
     DocumentReference getDocumentReference();
@@ -93,6 +93,9 @@ public interface DocumentModelBridge
     String getPageName();
     
     /**
+     * Return the full local space reference. For example a document located in sub-space <code>space11</code> of space
+     * <code>space1</code> will return <code>space1.space11</code>.
+     * 
      * @return the space to which the document belongs to (eg "Main")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
@@ -123,4 +126,10 @@ public interface DocumentModelBridge
      * @since 3.0M3
      */
     XDOM getXDOM();
+
+    /**
+     * @return the document's content author user reference
+     * @since 7.2M1
+     */
+    DocumentReference getContentAuthorReference();
 }

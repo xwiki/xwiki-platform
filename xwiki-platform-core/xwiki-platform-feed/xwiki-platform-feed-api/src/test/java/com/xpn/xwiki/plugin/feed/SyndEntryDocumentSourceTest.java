@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -89,7 +90,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         doc.setAuthor("Albatross");
         doc.setTitle("Fidis from MilkyWay");
         doc.setContent("blah blah blah..");
-        doc.setSyntax(Syntax.XWIKI_1_0);
+        doc.setSyntax(Syntax.XWIKI_2_1);
 
         initArticleClass();
 
@@ -107,7 +108,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
-        getContext().getWiki().getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+        getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
         source = new SyndEntryDocumentSource();
     }
@@ -315,7 +316,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 15;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/plain");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         source.setParams(params);
         doc.setStringValue(ARTICLE_CLASS_NAME, "content", "Somewhere in la Mancha, in a place..");
@@ -333,7 +334,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 16;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/html");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "Somewhere \n\tin   <i>la</i> <a href=\"http://www.mancha.es\">  Mancha</a>, in a place..");
@@ -348,7 +349,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         int maxLength = 17;
         Map params = new HashMap();
         params.put(SyndEntryDocumentSource.CONTENT_TYPE, "text/xml");
-        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(maxLength));
+        params.put(SyndEntryDocumentSource.CONTENT_LENGTH, maxLength);
         params.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, ARTICLE_CLASS_NAME + "_content");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content",
             "<text>Somewhere \n\tin   la <region>  Mancha</region>, in a place..</text>");
@@ -356,5 +357,19 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         String description = source(doc, params).getDescription().getValue();
         int descriptionLength = getXMLContentLength(description);
         Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
+    }
+    
+    public void testPreviewContentEncoding()
+    {
+        String snippet = "<p>Test ê</p>";
+        String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 10);
+        Assert.assertEquals(snippet, transformedHTML);
+        String transformedXML = SyndEntryDocumentSource.getXMLPreview(snippet, 10);
+        Assert.assertEquals(snippet, transformedXML);
+
+        String plainSnippet = " Test Text ê Rest ";
+        String previewExpected = "Test Text ê";
+        String transformedPlain = SyndEntryDocumentSource.getPlainPreview(plainSnippet, 12);
+        Assert.assertEquals(previewExpected, transformedPlain);
     }
 }

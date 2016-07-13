@@ -31,8 +31,12 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep;
+import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WikisFlavorDistributionStep;
+import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -46,40 +50,69 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
     @Override
     protected List<DistributionStep> createSteps()
     {
-        List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
+        List<DistributionStep> steps = new ArrayList<DistributionStep>(4);
 
-        // Step 1: Install/upgrade main wiki UI
-
+        // Step 1: Create admin user if needed
         try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                DefaultUIDistributionStep.ID));
+            steps.add(
+                this.componentManager.<DistributionStep>getInstance(DistributionStep.class, FirstAdminUserStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get default UI step instance");
+            this.logger.error("Failed to get first admin step instance", e);
         }
 
-        // Step 2: Upgrade mode
-
-        try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                UpgradeModeDistributionStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get upgrade mode step instance");
+        // Step 2: Install/upgrade main wiki UI
+        ExtensionId mainUI = getUIExtensionId();
+        if (mainUI != null && StringUtils.isNotBlank(mainUI.getId())) {
+            // ... but only if the main extension ID is defined
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                    DefaultUIDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get default UI step instance", e);
+            }
+        } else {
+            // Display the flavor step
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                    FlavorDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get flavor step instance", e);
+            }
         }
 
-        // Step 3: Upgrade outdated extensions
+        // Step 3: Upgrade other wikis
+        ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
+        if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
+            // ... but only if the wiki extension ID is defined
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                    WikisDefaultUIDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get all in one default UI step instance", e);
+            }
+        } else {
+            // Display the wikis flavor step
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                    WikisFlavorDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get all in one flavor step instance", e);
+            }
+        }
 
+        // Step 4: Upgrade outdated extensions
         try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                 OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get outdated extensions step instance");
+            this.logger.error("Failed to get outdated extensions step instance", e);
         }
 
         return steps;
     }
 
     @Override
-    public DistributionJobStatus< ? > getPreviousStatus()
+    public DistributionJobStatus<?> getPreviousStatus()
     {
         return this.distributionManager.getPreviousFarmJobStatus();
     }

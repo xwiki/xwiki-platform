@@ -28,10 +28,20 @@ package org.xwiki.rendering.wikimacro.internal;
 public interface WikiMacroConstants
 {
     /**
+     * Constant for representing XWiki.WikiMacroClass xwiki class space name.
+     */
+    String WIKI_MACRO_CLASS_SPACE = "XWiki";
+
+    /**
+     * Constant for representing XWiki.WikiMacroClass xwiki class page name.
+     */
+    String WIKI_MACRO_CLASS_PAGE = "WikiMacroClass";
+
+    /**
      * Constant for representing XWiki.WikiMacroClass xwiki class.
      */
-    String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
-    
+    String WIKI_MACRO_CLASS = WIKI_MACRO_CLASS_SPACE + '.' + WIKI_MACRO_CLASS_PAGE;
+
     /**
      * Constant for representing macro id property.
      */
@@ -56,7 +66,7 @@ public interface WikiMacroConstants
      * Name of the macro visibility property in the Wiki Macro Class.
      */
     String MACRO_VISIBILITY_PROPERTY = "visibility";
-    
+
     /**
      * Constant for representing macro inline support property.
      */
@@ -93,9 +103,19 @@ public interface WikiMacroConstants
     String MACRO_CODE_PROPERTY = "code";
 
     /**
+     * Constant for representing XWiki.WikiMacroParameterClass xwiki class space name.
+     */
+    String WIKI_MACRO_PARAMETER_CLASS_SPACE = "XWiki";
+
+    /**
+     * Constant for representing XWiki.WikiMacroParameterClass xwiki class page name.
+     */
+    String WIKI_MACRO_PARAMETER_CLASS_PAGE = "WikiMacroParameterClass";
+
+    /**
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
      */
-    String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
+    String WIKI_MACRO_PARAMETER_CLASS = WIKI_MACRO_PARAMETER_CLASS_SPACE + '.' + WIKI_MACRO_PARAMETER_CLASS_PAGE;
 
     /**
      * Constant for representing parameter name property. Same as MACRO_NAME_PROPERTY (Check style Fix)
@@ -111,9 +131,10 @@ public interface WikiMacroConstants
      * Constant for representing parameter mandatory property.
      */
     String PARAMETER_MANDATORY_PROPERTY = "mandatory";
-    
+
     /**
      * Constant for representing parameter defaultValue property.
+     * 
      * @since 2.3M1
      */
     String PARAMETER_DEFAULT_VALUE_PROPERTY = "defaultValue";

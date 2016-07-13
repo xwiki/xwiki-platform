@@ -20,37 +20,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="AnnotationCode.CreateForm" locale="">
   <web>AnnotationCode</web>
   <name>CreateForm</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AnnotationCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1265236156000</creationDate>
-  <date>1277457881000</date>
-  <contentUpdateDate>1277457881000</contentUpdateDate>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1440678876000</date>
+  <contentUpdateDate>1440678869000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="AnnotationCode.Macros" /}}
+  <content>{{include reference="AnnotationCode.Macros" /}}
+
+{{velocity output="false"}}
+#if ("$!{request.reference}" != '')
+  #set($annotationReference = $services.model.resolveDocument($request.reference))
+#elseif("$!{request.wiki}" != '' &amp;&amp; "$!{request.space}" != '' &amp;&amp; "$!{request.page}" != '')
+  #set($annotationReference = $services.model.createDocumentReference("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
+#end
+{{/velocity}}
 
 {{velocity}}
-#if("$!{request.wiki}" == "" || "$!{request.space}" == "" || "$!{request.page}" == "")
+#if(!$annotationReference)
   {{warning}}$services.localization.render('annotations.action.create.error.notarget'){{/warning}}
 #else
 ## pretty dirtish but it's so gonna do the job: don't display this form to users which don't have the right to create annotations, instead send a nice unauthorized message
-#if(!$services.annotations.canAddAnnotation("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
+#if(!$services.annotations.canAddAnnotation($annotationReference))
   #set($message = $services.localization.render('annotations.action.create.error.unauthorized'))
   #if ($xcontext.user.equals("XWiki.XWikiGuest"))
     #set($message = $services.localization.render('annotations.action.create.error.unauthorizedguest'))
@@ -68,8 +72,8 @@
 ## pretend that annotation author is current user, and annotation date is now
 ##Even if they get sent to the server, the server will overwrite with anything's logged in in there anyway
 #set($dispose = $annData.put("author", $xcontext.user))
-#set($dispose = $annData.put("date", $util.date))
-#displayCreateBox("$!{request.wiki}", "$!{request.space}", "$!{request.page}", $annData)
+#set($dispose = $annData.put("date", $datetool.date))
+#displayCreateBoxFromReference($annotationReference, $annData)
 {{/html}}
 #end
 {{/velocity}}</content>

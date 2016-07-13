@@ -36,6 +36,8 @@ XWiki.Dashboard = Class.create( {
     this.addURL = this.element.down('.metadata .addurl').readAttribute('href');
 
     this.sourcePage = this.element.down('.metadata .sourcepage').innerHTML;
+    // Note: Starting with XWiki 7.2RC1, "sourcespace" is the full space reference and can contain more than 1 space
+    // in the case of Nested Spaces (e.g. "space1.space2").
     this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
     this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
     this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');
@@ -237,11 +239,31 @@ XWiki.Dashboard = Class.create( {
     // get the gadget wizard and start adding a gadget
     Wysiwyg.onModuleLoad(function() {
       if (!this.gadgetWizard) {
-        this.gadgetWizard = new XWiki.GadgetWizard();
+        this.gadgetWizard = new XWiki.GadgetWizard(this.createGadgetWizardConfig());
       }
       this.gadgetWizard.add(this.onAddGadgetComplete.bind(this));
     }.bind(this));
   },
+
+  /**
+   * Creates a new configuration object to be passed to a GadgetWizard's constructor.
+   *
+   * Contains mainly context information like the current document, the source document and the syntax.
+   */
+  createGadgetWizardConfig : function () {
+    var config = {
+      // FIXME: use the 'xwiki-meta' require module instead of duplicating the code here.
+      wiki: document.documentElement.getAttribute('data-xwiki-wiki'),
+      space: document.documentElement.getAttribute('data-xwiki-space'),
+      page: document.documentElement.getAttribute('data-xwiki-page'),
+      syntax: XWiki.docsyntax,
+      soureceWiki: this.sourceWiki,
+      sourceSpace: this.sourceSpace,
+      sourcePage: this.sourcePage
+    }
+
+    return config;
+  }.bind(this),
 
   /**
    * Handles the command to actually add the gadget, after the user has filled in the wizard
@@ -332,7 +354,7 @@ XWiki.Dashboard = Class.create( {
         // and finally start the wizard with all this data
         Wysiwyg.onModuleLoad(function() {
           if (!this.gadgetWizard) {
-            this.gadgetWizard = new XWiki.GadgetWizard();
+            this.gadgetWizard = new XWiki.GadgetWizard(this.createGadgetWizardConfig());
           }
           this.gadgetWizard.edit(macroCall, title, function(gadgetInstance) {
             this.onEditGadgetComplete(gadgetId, gadgetInstance);

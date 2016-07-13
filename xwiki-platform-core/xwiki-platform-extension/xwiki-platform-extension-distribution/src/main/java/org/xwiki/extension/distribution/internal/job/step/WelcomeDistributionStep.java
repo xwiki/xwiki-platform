@@ -25,6 +25,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.0RC1
+ */
 @Component
 @Named(WelcomeDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

@@ -64,21 +64,13 @@ public class MenuBarSeparator extends AbstractSeparator implements AttachEvent.H
         super("menu");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSeparator#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return FEATURES;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSeparator#getUIObject(String)
-     */
+    @Override
     public UIObject getUIObject(String feature)
     {
         if (FEATURES[0].equals(feature)) {
@@ -106,11 +98,7 @@ public class MenuBarSeparator extends AbstractSeparator implements AttachEvent.H
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AttachEvent.Handler#onAttachOrDetach(AttachEvent)
-     */
+    @Override
     public void onAttachOrDetach(AttachEvent event)
     {
         if (event.isAttached()) {

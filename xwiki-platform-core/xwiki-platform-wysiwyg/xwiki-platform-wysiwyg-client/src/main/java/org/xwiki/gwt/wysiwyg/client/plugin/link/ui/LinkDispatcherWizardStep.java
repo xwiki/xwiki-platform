@@ -46,11 +46,6 @@ public class LinkDispatcherWizardStep extends ResourceReferenceParserWizardStep<
         setValidDirections(EnumSet.of(NavigationDirection.NEXT));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ResourceReferenceParserWizardStep#getNextStep()
-     */
     @Override
     public String getNextStep()
     {

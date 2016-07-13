@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.rendering.converter.ConversionException;
@@ -194,10 +195,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             configuration.setConfigurationId("xwiki.plugin.feedcache");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
-            lru.setTimeToLive(this.refreshPeriod);
+            lru.setMaxIdle(this.refreshPeriod);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.feedCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
+            this.feedCache = cacheManager.createNewLocalCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");
@@ -371,7 +373,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     nbfeedsErrors++;
                 }
 
-                UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+                UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
                 if (updateThread != null) {
                     updateThread.setNbLoadedFeeds(nbfeeds + updateThread.getNbLoadedFeeds());
                     updateThread.setNbLoadedFeedsErrors(nbfeedsErrors + updateThread.getNbLoadedFeedsErrors());
@@ -380,7 +382,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     obj.set("imgurl", context.get("feedimgurl"), context);
                     context.remove("feedimgurl");
                 }
-                obj.set("nb", new Integer(nb), context);
+                obj.set("nb", nb, context);
                 obj.set("date", new Date(), context);
 
                 // Update original document
@@ -390,7 +392,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return total;
     }
 
-    public int updateFeedsInSpace(String space, boolean fullContent, boolean oneDocPerEntry, boolean force,
+    public int updateFeedsInSpace(String spaceReference, boolean fullContent, boolean oneDocPerEntry, boolean force,
         XWikiContext context) throws XWikiException
     {
         // Make sure we have this class
@@ -398,14 +400,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         String sql =
             ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.space='"
-                + space + "'";
+                + spaceReference + "'";
         int total = 0;
         List<String> feedDocList = context.getWiki().getStore().searchDocumentsNames(sql, context);
         if (feedDocList != null) {
             for (int i = 0; i < feedDocList.size(); i++) {
                 String feedDocName = feedDocList.get(i);
                 try {
-                    total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, space, context);
+                    total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, spaceReference, context);
                 } catch (XWikiException e) {
                     // an exception occurred while updating feedDocName, don't fail completely, put the exception in the
                     // context and then pass to the next feed
@@ -427,10 +429,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer, XWikiContext context)
         throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread == null) {
             updateThread = new UpdateThread(space, fullContent, scheduleTimer, this, context);
-            this.updateThreads.put(context.getDatabase() + ":" + space, updateThread);
+            this.updateThreads.put(context.getWikiId() + ":" + space, updateThread);
             Thread thread = new Thread(updateThread);
             thread.start();
             return true;
@@ -441,7 +443,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public void stopUpdateFeedsInSpace(String space, XWikiContext context) throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread != null) {
             updateThread.stopUpdate();
         }
@@ -451,14 +453,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     {
         // make sure the update thread is removed.
         // this is called by the update thread when the loop is last exited
-        if (thread == this.updateThreads.get(context.getDatabase() + ":" + space)) {
-            this.updateThreads.remove(context.getDatabase() + ":" + space);
+        if (thread == this.updateThreads.get(context.getWikiId() + ":" + space)) {
+            this.updateThreads.remove(context.getWikiId() + ":" + space);
         }
     }
 
     public UpdateThread getUpdateThread(String space, XWikiContext context)
     {
-        return this.updateThreads.get(context.getDatabase() + ":" + space);
+        return this.updateThreads.get(context.getWikiId() + ":" + space);
     }
 
     public Collection<String> getActiveUpdateThreads()
@@ -614,7 +616,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             content =
                 StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
                     ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
-                    : "{{include document=\"XWiki.FeedEntryClassSheet\" /}}";
+                    : "{{include reference=\"XWiki.FeedEntryClassSheet\" /}}";
         } else {
             content = context.getWiki().Param("xwiki.plugins.feed.entryContent");
         }
@@ -658,11 +660,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("nb", "nb", 5, "integer");
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
             doc.setAuthorReference(doc.getCreatorReference());
         }
@@ -672,7 +674,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (StringUtils.isBlank(doc.getParent())) {
@@ -723,12 +725,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
         needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
 
-        if (StringUtils.isBlank(doc.getCreator())) {
+        if (doc.getCreatorReference() == null) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
 
-        if (StringUtils.isBlank(doc.getAuthor())) {
+        if (doc.getAuthorReference() == null) {
             needsUpdate = true;
             doc.setAuthorReference(doc.getCreatorReference());
         }
@@ -740,7 +742,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
 

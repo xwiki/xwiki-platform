@@ -19,6 +19,8 @@
  */
 package org.xwiki.display.internal;
 
+import org.xwiki.rendering.syntax.Syntax;
+
 /**
  * {@link DocumentDisplayer} parameters.
  * 
@@ -68,6 +70,11 @@ public class DocumentDisplayerParameters implements Cloneable
      * execution context. Otherwise the displayer should simply display the content of the provided document.
      */
     private boolean contentTranslated;
+
+    /**
+     * The target syntax to put in the transformation context.
+     */
+    private Syntax targetSyntax;
 
     /**
      * @return the id of the document section to display
@@ -201,6 +208,22 @@ public class DocumentDisplayerParameters implements Cloneable
     public void setContentTranslated(boolean contentTranslated)
     {
         this.contentTranslated = contentTranslated;
+    }
+
+    /**
+     * @return the target syntax to put in the transformation context.
+     */
+    public Syntax getTargetSyntax()
+    {
+        return this.targetSyntax;
+    }
+
+    /**
+     * @param targetSyntax the target syntax to put in the transformation context.
+     */
+    public void setTargetSyntax(Syntax targetSyntax)
+    {
+        this.targetSyntax = targetSyntax;
     }
 
     @Override

@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.XWikiResource;
@@ -36,26 +38,24 @@ import com.xpn.xwiki.api.XWiki;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
 public class SpacesResourceImpl extends XWikiResource implements SpacesResource
 {
     @Override
     public Spaces getSpaces(String wikiName, Integer start, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
-
         Spaces spaces = objectFactory.createSpaces();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
-
             List<String> spaceNames = queryManager.getNamedQuery("getSpaces").addFilter(
                     componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden")).setOffset(start)
-                    .setLimit(number).execute();
+                    .setLimit(number).setWiki(wikiName).execute();
 
             for (String spaceName : spaceNames) {
-                String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
+                List<String> spaceList = Utils.getSpacesFromSpaceId(spaceName);
+                String homeId = Utils.getPageId(wikiName, spaceList, "WebHome");
                 Document home = null;
 
                 XWiki xwikiApi = Utils.getXWikiApi(componentManager);
@@ -64,13 +64,11 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
                         home = Utils.getXWikiApi(componentManager).getDocument(homeId);
                     }
                     spaces.getSpaces().add(DomainObjectFactory
-                            .createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home));
+                            .createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceList, home));
                 }
             }
         } catch (Exception e) {
             throw new XWikiRestException(e);
-        } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return spaces;

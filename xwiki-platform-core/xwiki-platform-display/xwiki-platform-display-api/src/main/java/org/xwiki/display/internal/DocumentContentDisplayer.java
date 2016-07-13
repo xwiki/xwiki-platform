@@ -19,7 +19,6 @@
  */
 package org.xwiki.display.internal;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,12 +26,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -41,7 +43,8 @@ import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
@@ -99,11 +102,14 @@ public class DocumentContentDisplayer implements DocumentDisplayer
     @Inject
     private TransformationManager transformationManager;
 
+    @Inject
+    private ModelContext modelContext;
+
     /**
      * Used to get a parser for a specific syntax.
      */
     @Inject
-    private ComponentManager componentManager;
+    private ContentParser parser;
 
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
@@ -169,7 +175,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
-                    nameSpace, e.getMessage());
+                    nameSpace, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -212,14 +218,19 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         DocumentDisplayerParameters parameters)
     {
         Map<String, Object> backupObjects = new HashMap<String, Object>();
+        EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             // The following method call also clones the execution context.
             documentAccessBridge.pushDocumentInContext(backupObjects, document.getDocumentReference());
+            // Make sure to synchronize the context wiki with the context document's wiki.
+            modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
             return display(document, nameSpace, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             documentAccessBridge.popDocumentFromContext(backupObjects);
+            // Also restore the context wiki.
+            this.modelContext.setCurrentEntityReference(currentWikiReference);
         }
     }
 
@@ -273,6 +284,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 content.getFirstBlock(new CompositeBlockMatcher(new ClassBlockMatcher(HeaderBlock.class),
                     new BlockMatcher()
                     {
+                        @Override
                         public boolean match(Block block)
                         {
                             return ((HeaderBlock) block).getId().equals(parameters.getSectionId());
@@ -313,7 +325,8 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 } else {
                     // If the translated document has a different syntax then we have to parse its content using the
                     // syntax of the given document.
-                    return parseContent(translatedDocument.getContent(), document.getSyntax().toIdString());
+                    return parseContent(translatedDocument.getContent(), document.getSyntax(),
+                        document.getDocumentReference());
                 }
             }
         } catch (Exception e) {
@@ -326,14 +339,13 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      * Parses a string content.
      * 
      * @param content the content to parse
-     * @param syntaxId the syntax of the given content, used as a hint then looking up the parser component
+     * @param syntax the syntax of the given content
      * @return the result of parsing the given content
      */
-    private XDOM parseContent(String content, String syntaxId)
+    private XDOM parseContent(String content, Syntax syntax, DocumentReference source)
     {
         try {
-            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
-            return parser.parse(new StringReader(content));
+            return parser.parse(content, syntax, source);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

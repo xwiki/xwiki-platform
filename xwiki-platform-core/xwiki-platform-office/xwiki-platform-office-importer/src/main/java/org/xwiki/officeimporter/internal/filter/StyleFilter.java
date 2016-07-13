@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -38,7 +41,9 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/style")
+@Component
+@Named("officeimporter/style")
+@Singleton
 public class StyleFilter extends AbstractHTMLFilter
 {
     /**

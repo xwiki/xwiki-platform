@@ -25,6 +25,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
@@ -55,7 +56,7 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setDatabase(CURRENT_WIKI);
+        getContext().setWikiId(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =
@@ -67,5 +68,16 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getParent().getType());
         Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
+    }
+
+    @Test
+    public void testResolveDocumentFromObjectReference()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        ObjectReference objectReference = new ObjectReference("object", documentReference);
+
+        EntityReference reference = this.resolver.resolve(objectReference, EntityType.DOCUMENT);
+
+        Assert.assertEquals(documentReference, reference);
     }
 }

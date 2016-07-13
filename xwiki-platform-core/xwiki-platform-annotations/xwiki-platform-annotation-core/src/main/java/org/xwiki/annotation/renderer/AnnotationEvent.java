@@ -35,7 +35,7 @@ public class AnnotationEvent
      * 
      * @version $Id$
      */
-    public static enum AnnotationEventType
+    public enum AnnotationEventType
     {
         /**
          * Marks the start of an annotation.

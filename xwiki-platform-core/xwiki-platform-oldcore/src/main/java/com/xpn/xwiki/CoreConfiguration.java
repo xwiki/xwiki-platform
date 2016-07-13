@@ -28,7 +28,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * You can override the default values for each of the configuration properties below by defining them in XWiki's global
  * configuration file using a prefix of "core" followed by the property name. For example:
  * <code>core.defaultDocumentSyntax = xwiki/2.0</code>
- * 
+ *
  * @version $Id$
  * @since 1.8RC2
  */

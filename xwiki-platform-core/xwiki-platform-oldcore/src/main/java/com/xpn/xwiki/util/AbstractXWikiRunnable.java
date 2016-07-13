@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for any XWiki daemon class. It provide tools to initialize execution context.
- * 
+ *
  * @since 1.8.4,1.9RC1,2.0M1
  * @version $Id$
  */
@@ -46,9 +46,16 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
+    /**
+     * A reference to the Execution component to be used in {@link #cleanupExecutionContext()} when this thread is
+     * stopped. Since we're not inside a component we cannot inject this dependency so we initialize it in
+     * {@link #initExecutionContext()}. The reason we keep this reference is because this thread can be stopped after
+     * the Component Manager disposes its components so a lookup in {@link #cleanupExecutionContext()} can fail.
+     */
+    private Execution execution;
+
     protected AbstractXWikiRunnable()
     {
-
     }
 
     /**
@@ -79,12 +86,16 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     /**
      * Initialize execution context for the current thread.
-     * 
+     *
      * @return the new execution context
      * @throws ExecutionContextException error when try to initialize execution context
      */
     protected ExecutionContext initExecutionContext() throws ExecutionContextException
     {
+        // Keep a reference to the Execution component to avoid a lookup in #cleanupExecutionContext() in case this
+        // thread is stopped after the Component Manager disposes its components.
+        this.execution = Utils.getComponent(Execution.class);
+
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         ExecutionContext context = new ExecutionContext();
 
@@ -99,10 +110,9 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void cleanupExecutionContext()
     {
-        Execution ech = Utils.getComponent(Execution.class);
         // We must ensure we clean the ThreadLocal variables located in the Execution
         // component as otherwise we will have a potential memory leak.
-        ech.removeContext();
+        this.execution.removeContext();
     }
 
     @Override

@@ -20,15 +20,19 @@
 package com.xpn.xwiki.doc;
 
 import java.util.Date;
+import java.util.Locale;
+
+import org.xwiki.localization.LocaleUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.AbstractSimpleClass;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface} Immutable, because
  * we don't need modify deleted document.
- * 
+ *
  * @version $Id$
  * @since 1.2M1
  */
@@ -45,9 +49,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     private String fullName;
 
     /**
-     * @see XWikiDocument#getLanguage()
+     * @see XWikiDocument#getLocale()
      */
-    private String language;
+    private Locale locale;
 
     /**
      * date of delete action.
@@ -82,9 +86,10 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
         throws XWikiException
     {
         this.fullName = doc.getFullName();
-        this.language = doc.getLanguage();
+        this.locale = doc.getLocale();
         this.deleter = deleter;
         this.date = deleteDate;
+
         setDocument(doc, context);
     }
 
@@ -122,18 +127,31 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * @return {@link XWikiDocument#getLanguage()}
+     * @deprecated since 8.0M1, use {@link #getLocale()} instead
      */
+    @Deprecated
     public String getLanguage()
     {
-        return this.language;
+        return getLocale().toString();
     }
 
     /**
-     * @param language - {@link XWikiDocument#getLanguage()} to set
+     * @return {@link XWikiDocument#getLocale()}
+     * @since 8.0M1
      */
-    protected void setLanguage(String language)
+    public Locale getLocale()
     {
-        this.language = language;
+        return this.locale != null ? this.locale : Locale.ROOT;
+    }
+
+    /**
+     * @param locale - {@link XWikiDocument#getLanguage()} to set
+     * @deprecated since 8.0M1
+     */
+    @Deprecated
+    protected void setLanguage(String locale)
+    {
+        this.locale = LocaleUtils.toLocale(Util.normalizeLanguage(locale), Locale.ROOT);
     }
 
     /**
@@ -182,7 +200,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * export {@link XWikiDocument} to {@link XWikiDeletedDocument}.
-     * 
+     *
      * @param doc - deleted document
      * @param context - used in {@link XWikiDocument#toXML(XWikiContext)}
      * @throws XWikiException in error in {@link XWikiDocument#toXML(XWikiContext)}

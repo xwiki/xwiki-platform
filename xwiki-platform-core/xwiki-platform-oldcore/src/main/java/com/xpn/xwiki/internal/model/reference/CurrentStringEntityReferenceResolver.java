@@ -26,13 +26,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 
 /**
  * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
- * The behavior is the one defined in {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}
+ * The behavior is the one defined in {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider}
  * .
- * 
+ *
  * @version $Id$
  * @since 2.2M1
  */
@@ -43,11 +44,11 @@ public class CurrentStringEntityReferenceResolver extends AbstractStringEntityRe
 {
     @Inject
     @Named("current")
-    private EntityReferenceValueProvider provider;
+    private EntityReferenceProvider provider;
 
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
-        return this.provider.getDefaultValue(type);
+        return this.provider.getDefaultReference(type);
     }
 }

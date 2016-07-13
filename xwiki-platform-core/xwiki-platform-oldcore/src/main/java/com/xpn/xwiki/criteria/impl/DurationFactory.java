@@ -57,8 +57,7 @@ public class DurationFactory
     }
 
     /**
-     * Creates a new Duration instance having just the specified number of days. All the other
-     * fields are 0.
+     * Creates a new Duration instance having just the specified number of days. All the other fields are 0.
      *
      * @param days The number of days
      * @return A new Duration instance
@@ -69,8 +68,7 @@ public class DurationFactory
     }
 
     /**
-     * Creates a new Duration instance having just the specified number of weeks. All the other
-     * fields are 0.
+     * Creates a new Duration instance having just the specified number of weeks. All the other fields are 0.
      *
      * @param weeks The number of weeks
      * @return A new Duration instance
@@ -81,8 +79,7 @@ public class DurationFactory
     }
 
     /**
-     * Creates a new Duration instance having just the specified number of months. All the other
-     * fields are 0.
+     * Creates a new Duration instance having just the specified number of months. All the other fields are 0.
      *
      * @param months The number of months
      * @return A new Duration instance
@@ -93,8 +90,7 @@ public class DurationFactory
     }
 
     /**
-     * Creates a new Duration instance having just the specified number of years. All the other
-     * fields are 0.
+     * Creates a new Duration instance having just the specified number of years. All the other fields are 0.
      *
      * @param years The number of years
      * @return A new Duration instance

@@ -57,18 +57,33 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
     /** Checks the "always authenticate user for view" option. */
     public void forceAuthenticatedView()
     {
-        if (!this.forceAuthenticatedViewLink.getAttribute("alt").equals("yes")) {
-            this.forceAuthenticatedViewLink.click();
-            waitUntilElementHasAttributeValue(By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt", "yes");
-        }
+        setAuthenticatedView(true);
     }
 
     /** Unchecks the "always authenticate user for view" option. */
     public void unforceAuthenticatedView()
     {
-        if (!this.forceAuthenticatedViewLink.getAttribute("alt").equals("no")) {
+        setAuthenticatedView(false);
+    }
+
+    private void setAuthenticatedView(boolean enabled)
+    {
+        String desiredAltValue = enabled ? "yes" : "no";
+
+        if (!this.forceAuthenticatedViewLink.getAttribute("alt").equals(desiredAltValue)) {
             this.forceAuthenticatedViewLink.click();
-            waitUntilElementHasAttributeValue(By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt", "no");
+
+            // Wait for the setting to apply. Wait longer than usual in this case in an attempt to avoid some false
+            // positives in the tests.
+            int defaultTimeout = getDriver().getTimeout();
+            try {
+                getDriver().setTimeout(defaultTimeout * 2);
+                getDriver().waitUntilElementHasAttributeValue(
+                    By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt", desiredAltValue);
+            } finally {
+                // Restore the utils timeout for other tests.
+                getDriver().setTimeout(defaultTimeout);
+            }
         }
     }
 

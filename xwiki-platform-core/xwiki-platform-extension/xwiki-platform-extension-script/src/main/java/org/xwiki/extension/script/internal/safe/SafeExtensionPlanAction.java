@@ -23,9 +23,9 @@ import java.util.Collection;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
-import org.xwiki.extension.wrap.AbstractWrappingObject;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.wrap.AbstractWrappingObject;
 
 /**
  * Provide a public script access to an extension plan action.

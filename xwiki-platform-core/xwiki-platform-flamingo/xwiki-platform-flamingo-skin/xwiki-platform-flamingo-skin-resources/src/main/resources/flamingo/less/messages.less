@@ -1,0 +1,66 @@
+//
+// Messages
+// --------------------------------------------------
+
+.successmessage, .errormessage, .warningmessage, .infomessage,
+span.successmessage, span.errormessage, span.warningmessage, span.infomessage, 
+span.box { // Used by: Inline boxes and messages
+  padding: floor(@font-size-base * 0.2);
+}
+
+.box, .plainmessage, // Used by: Code Macro, Success Macro, etc.
+fieldset.xwikimessage { // Used by: Login form, Delete messages
+  .well;
+  overflow-x: auto;
+}
+
+.plainmessage {
+  background-repeat: no-repeat;
+}
+
+.successmessage {
+  .alert-success;
+}
+
+.errormessage {
+  .alert-danger;
+}
+
+.warningmessage {
+  .alert-warning;
+}
+
+.infomessage {
+  .alert-info;
+}
+
+// --------------------------------------------------
+// Error message
+// --------------------------------------------------
+
+// When the error is not inline, display it in a box
+div.xwikirenderingerror {
+  .box;
+  
+  // Put the description box just after the error box, which has a 20px margin (see bootstrap/wells.less).
+  & + .xwikirenderingerrordescription {
+    margin-top: -20px;
+  }
+}
+
+// In every cases, apply the DANGER styling from bootstrap
+span.xwikirenderingerror, div.xwikirenderingerror {
+  .alert-danger;
+}
+
+// The description of the error is always displayed as a block. Otherwise it would be difficult to read in 
+// some conditions (see: http://jira.xwiki.org/browse/XWIKI-11390).
+.xwikirenderingerrordescription {
+  .box;
+  .border-top-radius(0);
+  border-color: @alert-danger-border;
+  border-style: solid;
+  display: block;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}

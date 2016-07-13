@@ -80,8 +80,10 @@ public class ObjectPropertyReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to check the type to be a property type.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      */
@@ -96,8 +98,10 @@ public class ObjectPropertyReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden to ensure that the parent of a property is always an object.
+     * </p>
      * 
      * @see org.xwiki.model.reference.EntityReference#setParent(org.xwiki.model.reference.EntityReference)
      */

@@ -40,7 +40,7 @@ public class LightBoxRegistrationPage extends AbstractRegistrationPage
         UsersAdministrationSectionPage sectionPage = UsersAdministrationSectionPage.gotoPage();
         sectionPage.getUsersLiveTable().waitUntilReady();
         LightBoxRegistrationPage registrationPage = sectionPage.clickAddNewUser();
-        registrationPage.waitUntilElementIsVisible(By.id("register_first_name"));
+        registrationPage.getDriver().waitUntilElementIsVisible(By.id("register_first_name"));
         return registrationPage;
     }
 

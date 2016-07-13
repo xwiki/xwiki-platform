@@ -38,11 +38,7 @@ public class UndoExecutable extends AbstractHistoryExecutable
         super(history);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#execute(String)
-     */
+    @Override
     public boolean execute(String param)
     {
         if (getHistory().canUndo()) {
@@ -53,41 +49,25 @@ public class UndoExecutable extends AbstractHistoryExecutable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isEnabled()
-     */
+    @Override
     public boolean isEnabled()
     {
         return getHistory().canUndo();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         return getHistory().canRedo();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractHistoryExecutable#isSupported()
-     */
+    @Override
     public boolean isSupported()
     {
         return true;

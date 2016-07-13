@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#testLoadUserAfterUserDoc() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki">
+    <denyUser name="userA" />
+    <denyUser name="userB" />
+    <user name="userA" alt="a global user in local groupA">
+      <allowUser name="userA" />
+      <allowUser name="userB" />
+    </user>
+    <group name="groupA">
+      <user name="userA" />
+      <allowUser name="userB" />
+    </group>
+    <user name="userB" alt="another global user">
+      <allowGroup name="groupA" />
+    </user>
+  </wiki>
+  <wiki name="subwiki" alt="local wiki">
+    <space name="any space">
+      <document name="any document">
+        <allowUser name="wiki:XWiki.userA" />
+      </document>
+    </space>
+  </wiki>
+</wikis>
+

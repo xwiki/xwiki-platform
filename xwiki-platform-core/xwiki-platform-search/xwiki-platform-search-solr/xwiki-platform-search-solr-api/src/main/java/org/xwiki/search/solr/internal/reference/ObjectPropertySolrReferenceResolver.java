@@ -20,20 +20,14 @@
 package org.xwiki.search.solr.internal.reference;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObjectReference;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 
 /**
  * Resolve object properties references.
@@ -49,22 +43,6 @@ public class ObjectPropertySolrReferenceResolver extends AbstractSolrReferenceRe
     @Override
     public List<EntityReference> getReferences(EntityReference objectPropertyReference) throws SolrIndexerException
     {
-        // Avoid indexing passwords.
-        BaseObjectReference objectReference = new BaseObjectReference(objectPropertyReference.getParent());
-        DocumentReference classReference = objectReference.getXClassReference();
-
-        // FIXME: This is very bad, it's not this code job to know about things like PasswordClass
-        XWikiDocument xclassDocument;
-        try {
-            xclassDocument = getDocument(classReference);
-        } catch (Exception e) {
-            throw new SolrIndexerException("Failed to get document for xclass [" + classReference + "]", e);
-        }
-
-        if (!(xclassDocument.getXClass().get(objectPropertyReference.getName()) instanceof PasswordClass)) {
-            return Arrays.asList(objectPropertyReference);
-        }
-
-        return Collections.EMPTY_LIST;
+        return Arrays.asList(objectPropertyReference);
     }
 }

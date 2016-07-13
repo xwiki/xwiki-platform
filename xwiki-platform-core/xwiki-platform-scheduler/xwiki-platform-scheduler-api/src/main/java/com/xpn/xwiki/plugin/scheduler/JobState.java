@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import org.quartz.Trigger;
+import org.quartz.Trigger.TriggerState;
 
 /**
  * Wrapper around the Quartz trigger's inner state of a Scheduler Job. This class allows to query the actual status of a
@@ -29,8 +29,6 @@ import org.quartz.Trigger;
  */
 public class JobState
 {
-    private int state;
-
     public static final String STATE_NORMAL = "Normal";
 
     public static final String STATE_PAUSED = "Paused";
@@ -43,17 +41,36 @@ public class JobState
 
     public static final String STATE_NONE = "None";
 
+    private TriggerState state;
+
+    @Deprecated
     public JobState(int state)
     {
         setState(state);
     }
 
+    public JobState(TriggerState state)
+    {
+        setQuartzState(state);
+    }
+
+    @Deprecated
     public void setState(int state)
+    {
+        this.state = TriggerState.values()[state];
+    }
+
+    public void setQuartzState(TriggerState state)
     {
         this.state = state;
     }
 
     public int getState()
+    {
+        return this.state.ordinal();
+    }
+
+    public TriggerState getQuartzState()
     {
         return this.state;
     }
@@ -61,17 +78,17 @@ public class JobState
     public String getValue()
     {
         switch (this.state) {
-            case Trigger.STATE_NORMAL:
+            case NORMAL:
                 return JobState.STATE_NORMAL;
-            case Trigger.STATE_BLOCKED:
+            case BLOCKED:
                 return JobState.STATE_BLOCKED;
-            case Trigger.STATE_COMPLETE:
+            case COMPLETE:
                 return JobState.STATE_COMPLETE;
-            case Trigger.STATE_ERROR:
+            case ERROR:
                 return JobState.STATE_ERROR;
-            case Trigger.STATE_PAUSED:
+            case PAUSED:
                 return JobState.STATE_PAUSED;
-            case Trigger.STATE_NONE:
+            case NONE:
             default:
                 return JobState.STATE_NONE;
         }

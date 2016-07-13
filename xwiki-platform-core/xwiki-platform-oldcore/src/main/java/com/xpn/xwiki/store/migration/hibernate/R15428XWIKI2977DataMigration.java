@@ -39,9 +39,9 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI2977: Add a Globally Unique Identifier (GUID) to objects.
- * This data migration adds GUIDs to existing objects.
- * 
+ * Migration for XWIKI2977: Add a Globally Unique Identifier (GUID) to objects. This data migration adds GUIDs to
+ * existing objects.
+ *
  * @version $Id$
  */
 @Component

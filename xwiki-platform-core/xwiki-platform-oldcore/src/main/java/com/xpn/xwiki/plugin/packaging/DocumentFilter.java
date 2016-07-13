@@ -25,11 +25,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface DocumentFilter
 {
     /**
-     * Do actions at the import or export on a document. For example, remove comments or
-     * attachments, do some security check.
-     * 
+     * Do actions at the import or export on a document. For example, remove comments or attachments, do some security
+     * check.
+     *
      * @param doc document you want to filter
      * @param context xwiki context
      */
-    public void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException;
+    void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException;
 }

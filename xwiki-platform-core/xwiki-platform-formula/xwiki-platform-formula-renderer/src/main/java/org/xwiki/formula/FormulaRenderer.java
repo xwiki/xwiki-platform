@@ -37,7 +37,7 @@ public interface FormulaRenderer
      * 
      * @version $Id$
      */
-    public static enum Type
+    enum Type
     {
         /**
          * Portable Network Graphics, a lossless, free image format. See RFC 2083 for details. Best-looking results, but
@@ -98,7 +98,7 @@ public interface FormulaRenderer
      * 
      * @version $Id$
      */
-    public static enum FontSize
+    enum FontSize
     {
         // TODO: Check the correct pt sizes
         /** Script size. */

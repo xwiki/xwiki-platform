@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxImages</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497877000</date>
+  <contentUpdateDate>1301497877000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxImages</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Immagini ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Images ===
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultato
+|Immagine da un allegato nella pagina corrente|(((
+{{info}}Vedere [[Image Macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] per dettagli{{/info}}
+{{{{image:img.png}}}}
+)))|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine da un allegato di un altro documento|{{{{image:img.png|document=Space.Page}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine con parametri|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25" width="25"]]
+|Immagini raggiungibili con un URL|{{{http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+
+=== 2.0 Images ===
+|=Caratteristica|=Sintassi XWiki 2.0|=Risultato
+|Immagine da un allegato nella pagina corrente|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine da un allegato di un altro documento|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine con parametri|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25" width="25"]]
+|Immagini raggiungibili con un URL|{{{image:http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+
+{{velocity}}$subHeading  Specifiche per le Immagini in Sintassi XWiki 2.0 $subHeading{{/velocity}}
+
+{{info}}
+La parte tra ##( )## è richiesta, mentre le parti tra ##{ }## sono opzionali.
+{{/info}}
+
+Il formato completo di un'immagine è **##image~: (riferimento)##** oppure **##~[~[image~: (riferimento) {||parametri}]]##**
+
+* **##image~:##** Stringa richiesta che identifica la risora come immagine.
+* **##riferimento##**: Il riferimento all'immagine che sarà mostrata in una delle forme seguenti:
+** **URL**: Un qualunque URL ad un'immagine nel formato **##http:~/~/percorso/Nomeimmagine##**. Esempio: ##http:~/~/domain.org/path/img.png##
+** **Allegato** riferimento nel formato **##~{~{~{Nomewiki:} spazio.} pagina@} (Nomeimmagine)##**
+*** **##NomeWiki##**: Stringa opzionale che contiene il nome di un subwiki (animal) di una 'farm' di wiki. Il link punterà ad una pagina all'interno di quel subwiki. Esempio: ##miowiki##
+*** **##spazio##**: Nome opzionale di uno spazio del wiki. Se non si specifica uno spazio viene usato lo spazio corrente. Esempio: Main
+*** **##pagina##**: Stringa opzionale che contiene il nome di una pagina del wiki a cui l'immagine fa riferimento come allegato. Esempio: WebHome
+*** **##Nomeimmagine##**: Stringa richiesta con il nome dell'immagine allegata alla pagina così come è memorizzato nel wiki.
+* **##parametri##**: Elenco opzionale di parametri separati da uno spazio passati all'immagine. Esempio: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **Attributi HTML**: Tutti gli attributi definiti dallo standard HTML saranno aggiunti al codice HTML renderizzato ##&lt;img&gt;## tag.
+*** **##style##**: Informazioni sullo stile CSS che si deve applicare all'immagine. Esempio: ##style="float:right;height:50"## (immagina a destra, altezza 50 pixel), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (immagine centrata, larghezza 80% del blocco), ##style="vertical-align:bottom"## (il testo inzia in basso all'immagine)
+*** **##height##**: Parametro che definisce l'altezza visualizzata dell'immagine. Il valore dovrebbe essere in pixel (esempio: ##height="80"##) o in pixel relativi all'altezza del blocco contenente l'immagine (esempio: ##height="40%"##).
+*** **##width##**: Parametro che definisce la larghezza visualizzata dell'immagine. Il valore dovrebbe essere in pixel (esempio: ##width="80"##) o in pixel relativi alla larghezza del blocco contenente l'immagine (esempio: ##width="40%"##).
+*** **##title##**: Parametro che definisce il titolo visualizzato dell'immagine che sarà visibile quando ci si passa sopra con il mouse, per esempio. Esempio: ##title="La mia bella immagine"##
+*** **##alt##**: Parametro che definisce quale testo deve essere mostrato se il browser non è in grado di visualizzare l'immagine. Dal momento che questo è un attributo HTML richiesto XWiki userà il nome del file se il parametro ##alt## non è definito. Esempio: ##alt="img.png"##
+*** **Altro**: Una spiegazione più approfondita sul tag HTML ##&lt;img&gt;## tag che comprende altri attributi si può trovare su [[on w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+
+
+=== 2.1 Images ===
+
+|=Caratteristica|=Sintassi XWiki 2.1|=Risultato
+|Immagine da un allegato nella pagina corrente|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine da un allegato di un altro documento|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Immagine con parametri|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25" width="25"]]
+|Immagini raggiungibili con un URL|{{{image:http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Icona|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading Specifiche per le Immagini in Sintassi XWiki 2.1 $subHeading{{/velocity}}
+
+Il formato completo di un'immagine è **##image~: (riferimento)##** oppure **##~[~[image~: (riferimento) {||parametri}]]##**
+
+* **##image~:##** Stringa richiesta che identifica la risora come immagine.
+* **##riferimento##**: Il riferimento all'immagine che sarà mostrata in una delle forme seguenti:
+** **URL**: Un qualunque URL ad un'immagine nel formato **##protocollo:~/~/percorso/Nomeimmagine##**. Esempio: ##http:~/~/domain.org/path/img.png##
+** **Allegato** riferimento nel formato **##~{~{~{Nomewiki:} spazio.} pagina@} (Nomeimmagine)##**
+*** **##NomeWiki##**: Stringa opzionale che contiene il nome di un subwiki (animal) di una 'farm' di wiki. Il link punterà ad una pagina all'interno di quel subwiki. Esempio: ##miowiki##
+*** **##spazio##**: Nome opzionale di uno spazio del wiki. Se non si specifica uno spazio viene usato lo spazio corrente. Esempio: Main
+*** **##pagina##**: Stringa opzionale che contiene il nome di una pagina del wiki a cui l'immagine fa riferimento come allegato. Esempio: WebHome
+*** **##Nomeimmagine##**: Stringa richiesta con il nome dell'immagine allegata alla pagina così come è memorizzato nel wiki.
+** **Icona** riferimento nel formato **##{{{(icon:)}}} (iconName)##**. Esempio: **##icon:accept##**
+*** **##icon:##** Stringa richiesta che identifica il riferimento come un'icona da [[XWiki Icon Set&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##iconName##**: Stringa richiesta che identifica l'icona cui si fa riferimento. Esempio: ##accept##
+* **##parametri##**: Elenco opzionale di parametri separati da uno spazio passati all'immagine. Esempio: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **Attributi HTML**: Tutti gli attributi definiti dallo standard HTML saranno aggiunti al codice HTML renderizzato ##&lt;img&gt;## tag.
+*** **##style##**: Informazioni sullo stile CSS che si deve applicare all'immagine. Esempio: ##style="float:right;height:50"## (immagina a destra, altezza 50 pixel), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (immagine centrata, larghezza 80% del blocco), ##style="vertical-align:bottom"## (il testo inzia in basso all'immagine)
+*** **##height##**: Parametro che definisce l'altezza visualizzata dell'immagine. Il valore dovrebbe essere in pixel (esempio: ##height="80"##) o in pixel relativi all'altezza del blocco contenente l'immagine (esempio: ##height="40%"##).
+*** **##width##**: Parametro che definisce la larghezza visualizzata dell'immagine. Il valore dovrebbe essere in pixel (esempio: ##width="80"##) o in pixel relativi alla larghezza del blocco contenente l'immagine (esempio: ##width="40%"##).
+*** **##title##**: Parametro che definisce il titolo visualizzato dell'immagine che sarà visibile quando ci si passa sopra con il mouse, per esempio. Esempio: ##title="La mia bella immagine"##
+*** **##alt##**: Parametro che definisce quale testo deve essere mostrato se il browser non è in grado di visualizzare l'immagine. Dal momento che questo è un attributo HTML richiesto XWiki userà il nome del file se il parametro ##alt## non è definito. Esempio: ##alt="img.png"##
+*** **Altro**: Una spiegazione più approfondita sul tag HTML ##&lt;img&gt;## tag che comprende altri attributi si può trovare su [[on w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+** **##queryStringa##**: Consente di inviare richieste al server quando si crea il link per il download dell'immagine referenziata. Esempio: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## non avrà successo se i parametri ##width## e ##height## non vengono specificati oltre a ##queryString##!**)</content>
+</xwikidoc>

@@ -44,7 +44,7 @@ public class IntegerChartParam extends AbstractChartParam implements ChartParam
     public Object convert(String value) throws ParamException
     {
         try {
-            return new Integer(value);
+            return Integer.valueOf(value);
         } catch (NumberFormatException nfe) {
             throw new InvalidParamException("Noninteger value for the " + getName() + " parameter", nfe);
         }

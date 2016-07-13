@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
@@ -28,7 +30,8 @@ import org.xwiki.rest.resources.wikis.WikiAttachmentsResource;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikiAttachmentsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiAttachmentsResourceImpl")
 public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource implements WikiAttachmentsResource
 {
     @Override

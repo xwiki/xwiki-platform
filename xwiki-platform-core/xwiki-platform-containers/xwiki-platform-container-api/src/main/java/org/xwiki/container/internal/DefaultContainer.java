@@ -21,6 +21,8 @@ package org.xwiki.container.internal;
 
 import java.util.Stack;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -35,6 +37,7 @@ import org.xwiki.container.Session;
  * Objects.
  */
 @Component
+@Singleton
 public class DefaultContainer implements Container
 {
     /**
@@ -43,11 +46,11 @@ public class DefaultContainer implements Container
     @Deprecated
     private ApplicationContext applicationContext;
 
-    private ThreadLocal<Stack<Request>> request = new ThreadLocal<Stack<Request>>();
+    private ThreadLocal<Stack<Request>> request = new ThreadLocal<>();
 
-    private ThreadLocal<Stack<Response>> response = new ThreadLocal<Stack<Response>>();
+    private ThreadLocal<Stack<Response>> response = new ThreadLocal<>();
 
-    private ThreadLocal<Stack<Session>> session = new ThreadLocal<Stack<Session>>();
+    private ThreadLocal<Stack<Session>> session = new ThreadLocal<>();
 
     /**
      * @deprecated starting with 3.5M1, use the notion of Environment instead

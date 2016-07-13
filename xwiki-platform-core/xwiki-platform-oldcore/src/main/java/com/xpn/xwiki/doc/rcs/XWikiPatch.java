@@ -32,9 +32,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Contains differences between revisions. One field (diff for xml or full xml) for now.
- * Created for easy migration to future XWikiPatch system.
- * 
+ * Contains differences between revisions. One field (diff for xml or full xml) for now. Created for easy migration to
+ * future XWikiPatch system.
+ *
  * @version $Id$
  * @since 1.2M1
  */
@@ -69,7 +69,7 @@ public class XWikiPatch
      */
     public String getContent()
     {
-        return content;
+        return this.content;
     }
 
     /**
@@ -85,7 +85,7 @@ public class XWikiPatch
      */
     private boolean isContentDiff()
     {
-        return !content.startsWith("<");
+        return !this.content.startsWith("<");
     }
 
     /**
@@ -93,13 +93,13 @@ public class XWikiPatch
      */
     public boolean isDiff()
     {
-        if (content != null) {
-            if (isDiff != isContentDiff()) {
+        if (this.content != null) {
+            if (this.isDiff != isContentDiff()) {
                 LOGGER.warn("isDiff: Patch is inconsistent. Content and diff field are contradicting");
                 return isContentDiff();
             }
         }
-        return isDiff;
+        return this.isDiff;
     }
 
     /**
@@ -107,7 +107,7 @@ public class XWikiPatch
      */
     public void setDiff(boolean isDiff)
     {
-        if (content != null) {
+        if (this.content != null) {
             if (isDiff != isContentDiff()) {
                 LOGGER.warn("setDiff: Patch is inconsistent. Content and diff field are contradicting");
                 this.isDiff = isContentDiff();
@@ -119,7 +119,7 @@ public class XWikiPatch
 
     /**
      * Store the XML export of the document as the history patch; this will be a history milestone.
-     * 
+     *
      * @param version Document version to store in the history patch.
      * @param context Needed for serializing documents to xml.
      * @return Self, with the patch content set to the XML export of the document version.
@@ -133,7 +133,7 @@ public class XWikiPatch
 
     /**
      * Store the XML export of the document as the history patch; this will be a history milestone.
-     * 
+     *
      * @param versionXml Document version to store in the history patch, in the XML export format.
      * @return Self, with the patch content set to the XML export of the document version.
      * @throws XWikiException if any error occurs
@@ -146,9 +146,9 @@ public class XWikiPatch
     }
 
     /**
-     * Create history patch between originalVersion and newVersion as difference on the XML export
-     * of the two versions. The patch is created between newVersion and originalVersion.
-     * 
+     * Create history patch between originalVersion and newVersion as difference on the XML export of the two versions.
+     * The patch is created between newVersion and originalVersion.
+     *
      * @param originalVersion Original version of the document document.
      * @param newVersion Current version of the document.
      * @param context Needed for serializing documents to xml.
@@ -163,11 +163,10 @@ public class XWikiPatch
     }
 
     /**
-     * Create history patch between originalVersion and newVersion as difference on the XML export
-     * of the two versions. The patch is created between newVersion and originalVersion.
-     * 
-     * @param originalVersionXml Original version of the document document, in the XML export
-     *            format.
+     * Create history patch between originalVersion and newVersion as difference on the XML export of the two versions.
+     * The patch is created between newVersion and originalVersion.
+     *
+     * @param originalVersionXml Original version of the document document, in the XML export format.
      * @param newVersion Current version of the document.
      * @param context Needed for serializing documents to xml.
      * @return Self, with the patch content set to the generated diff between the two version.
@@ -181,11 +180,10 @@ public class XWikiPatch
     }
 
     /**
-     * Create history patch between originalVersion and newVersion as difference on the XML export
-     * of the two versions. The patch is created between newVersion and originalVersion.
-     * 
-     * @param originalVersionXml Original version of the document document, in the XML export
-     *            format.
+     * Create history patch between originalVersion and newVersion as difference on the XML export of the two versions.
+     * The patch is created between newVersion and originalVersion.
+     *
+     * @param originalVersionXml Original version of the document document, in the XML export format.
      * @param newVersionXml Current version of the document, in the XML export format.
      * @param docName Needed for the exception report.
      * @return Self, with the patch content set to the generated diff between the two version.
@@ -193,13 +191,13 @@ public class XWikiPatch
      */
     public XWikiPatch setDiffVersion(String originalVersionXml, String newVersionXml,
         String docName) throws XWikiException
-    {        
+    {
         try {
             // The history keeps reversed patches, from the most recent to the previous version.
             setContent(XWikiPatchUtils.getDiff(newVersionXml, originalVersionXml));
             setDiff(true);
         } catch (Exception e) {
-            Object[] args = {docName};
+            Object[] args = { docName };
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
                 XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
                 "Failed to create diff for doc {0}",
@@ -211,7 +209,7 @@ public class XWikiPatch
 
     /**
      * Patch text.
-     * 
+     *
      * @param origText - text to patch
      * @throws XWikiException if exception while patching
      */

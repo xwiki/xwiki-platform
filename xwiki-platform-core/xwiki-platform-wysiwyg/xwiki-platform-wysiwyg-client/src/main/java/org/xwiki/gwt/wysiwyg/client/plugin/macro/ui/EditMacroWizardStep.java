@@ -56,34 +56,26 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         /**
          * The call-back used to notify the wizard that this wizard step has finished loading.
          */
-        private final AsyncCallback< ? > wizardCallback;
+        private final AsyncCallback<?> wizardCallback;
 
         /**
          * Creates a new call-back for the request with the specified index.
          * 
          * @param wizardCallback the call-back used to notify the wizard that this wizard step has finished loading
          */
-        public MacroDescriptorAsyncCallback(AsyncCallback< ? > wizardCallback)
+        MacroDescriptorAsyncCallback(AsyncCallback<?> wizardCallback)
         {
             this.wizardCallback = wizardCallback;
             this.index = ++macroDescriptorRequestIndex;
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onFailure(Throwable)
-         */
+        @Override
         public void onFailure(Throwable caught)
         {
             wizardCallback.onFailure(caught);
         }
 
-        /**
-         * {@inheritDoc}
-         * 
-         * @see AsyncCallback#onSuccess(Object)
-         */
+        @Override
         public void onSuccess(MacroDescriptor result)
         {
             // If this is the response to the last request and the wizard step wasn't canceled in the mean time then..
@@ -133,21 +125,13 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         super(config, macroService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getResult()
-     */
+    @Override
     public Object getResult()
     {
         return macroCall;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#getStepTitle()
-     */
+    @Override
     public String getStepTitle()
     {
         String macroName =
@@ -155,12 +139,8 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         return Strings.INSTANCE.macro() + (macroName != null ? " : " + macroName : "");
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
-     */
-    public void init(Object data, AsyncCallback< ? > cb)
+    @Override
+    public void init(Object data, AsyncCallback<?> cb)
     {
         // Reset the model.
         macroCall = (MacroCall) data;
@@ -171,25 +151,18 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"),
+        String currentWikiId = getConfig().getParameter("wiki");
+        getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"), currentWikiId,
             new MacroDescriptorAsyncCallback(cb));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         macroCall = null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractMacroWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         if (validate()) {

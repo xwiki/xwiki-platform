@@ -1,0 +1,2 @@
+org.xwiki.filter.confluence.xml.internal.input.ConfluenceInputFilterStream
+org.xwiki.filter.confluence.xml.internal.input.ConfluenceInputFilterStreamFactory

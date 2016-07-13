@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogPostSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.BlogPostClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1226267213000</creationDate>
+  <parent>Blog.BlogPostClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1227223071000</date>
   <contentUpdateDate>1227223071000</contentUpdateDate>
   <version>1.1</version>
   <title>$!doc.getValue("title")</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.BlogCode"/}}
+  <content>{{include reference="Blog.BlogCode"/}}
 
-{{include document="Blog.CategoriesCode"/}}
+{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
-{{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
 $xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
@@ -42,6 +57,12 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
   #displayBlog([$tdoc] 'single' false false)
 #else
+  #if ("$!request.title" != '')
+    ## Use the page title specified on the request, if available, as blog post title. This is needed for instance when
+    ## we create the blog post using the Create Page wizard with the blog post template provider (the user is specifying
+    ## the page title).
+    #set ($discard = $entryObj.set('title', $request.title))
+  #end
   ; {{translation key='xe.blog.sheet.title'/}}
   : $doc.display('title', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.content'/}}
@@ -49,8 +70,19 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ; {{translation key='xe.blog.sheet.summary'/}}
   : $doc.display('extract', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.category'/}}
-  : (((#displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((())))))
-  #isPublished($entryObj $isPublished)
+  : ((({{html clean="false" wiki="true"}}#displayCategoryManagementTree('' 'selectable'){{/html}} (% class="clearfloats" %)((())))))
+  #if ($doc.isNew())
+    ## We're creating a new blog post. We handle this case differently because #isPublished returns true when the
+    ## property is not set (object missing) and thus the new blog post will appear as published. See also the comment
+    ## from the else branch below.
+    #set ($isPublished = false)
+  #else
+    ## We're editing an existing blog post. We need to check the original document because the current one can have
+    ## unsaved changes, which happens for instance after returning from preview.
+    #set ($originalDocument = $xwiki.getDocument($doc.documentReference))
+    #getEntryObject($originalDocument $originalEntryObj)
+    #isPublished($originalEntryObj $isPublished)
+  #end
   #if($isPublished)
     #if($doc.creator == $xcontext.user)
       #publishMessageBox($services.localization.render('xe.blog.sheet.publicationdate', [${doc.display('publishDate', 'view', $entryObj)}]))
@@ -63,9 +95,10 @@ $xwiki.ssx.use('Blog.ManageCategories')##
       ## The publish date was not set, force it to be the creation date
       $entryObj.set('publishDate', $doc.creationDate)
     #end
+    {{html clean="false" wiki="true"}}
     #publishMessageBox("$services.localization.render('xe.blog.sheet.notpublished') &lt;label&gt;**$services.localization.render('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}**&lt;/label&gt;\\&lt;label&gt;$services.localization.render('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
+    {{/html}}
   #end
 #end
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

@@ -31,7 +31,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Entry point of the Rights Manager plugin.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -53,7 +53,7 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
 
     /**
      * Construct the entry point of the Rights Manager plugin.
-     * 
+     *
      * @param name the identifier of the plugin.
      * @param className the class name of the entry point of the plugin.
      * @param context the XWiki context.

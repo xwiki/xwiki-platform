@@ -34,11 +34,14 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard;
 public class RichTextAreaImplIE extends RichTextAreaImplStandard
 {
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * NOTE: Remove this method as soon as Issue 3156 is fixed. <br />
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
-     * 
-     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3156"
+     * </p>
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3156.
+     * </p>
      */
     @Override
     protected void setHTMLImpl(String html)

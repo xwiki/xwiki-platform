@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * can now be achieved using {@link org.xwiki.rendering.transformation.Transformation rendering transformations} for
  * changing the rendering result, or {@link org.xwiki.observation.EventListener event listeners} for doing custom
  * actions when different events occur</li>
- *<li>perform extra initialization steps whenever starting the platform, or when loading each virtual wiki; this can be
+ * <li>perform extra initialization steps whenever starting the platform, or when loading each virtual wiki; this can be
  * achieved by writing {@link org.xwiki.observation.EventListener event listeners} that wait for
  * {@link org.xwiki.observation.event.ApplicationStartedEvent application events} or
  * {@link org.xwiki.bridge.event.WikiEvent wiki events}</li>
@@ -53,7 +53,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * inherited methods are never called. If a plugin wants to provide an implementation for one of the hook methods, it
  * must provide an implementation for it, even if that implementation only calls a parent method.
  * </p>
- * 
+ *
  * @version $Id$
  * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
@@ -63,14 +63,14 @@ public interface XWikiPluginInterface
     /**
      * The name which can be used for accessing this plugin from
      * {@link com.xpn.xwiki.XWiki#getPlugin(String, XWikiContext)}.
-     * 
+     *
      * @return the plugin name, usually a lowercase identifier
      */
     String getName();
 
     /**
      * Get a public scriptable API that can be used to call methods of the (privileged) plugin.
-     * 
+     *
      * @param plugin the plugin instance to wrap
      * @param context the current request context
      * @return an instance of the corresponding API, or {@code null} if the plugin doesn't want to expose a public API
@@ -79,7 +79,7 @@ public interface XWikiPluginInterface
 
     /**
      * Global initialization, called when the platform is started and the plugin list is initialized.
-     * 
+     *
      * @param context the current context, should not be stored since it will become mostly unreliable once the initial
      *            request is terminated
      * @throws XWikiException if the plugin fails to initialize
@@ -89,7 +89,7 @@ public interface XWikiPluginInterface
     /**
      * Initialization method called each time a virtual wiki is started, allowing plugins to perform initialization
      * tasks needed in each wiki.
-     * 
+     *
      * @param context the current request context
      */
     void virtualInit(XWikiContext context);
@@ -98,7 +98,7 @@ public interface XWikiPluginInterface
      * A "flush cache" method usually called by the global {@link com.xpn.xwiki.XWiki#flushCache(XWikiContext)},
      * requesting plugins to clear their cached data. When this method is called, plugins should discard all the
      * information they hold from the wiki and re-read it if needed.
-     * 
+     *
      * @param context the current request context
      */
     void flushCache(XWikiContext context);
@@ -109,7 +109,7 @@ public interface XWikiPluginInterface
      * method is called at most once per request. It is not called at all if the response is not rendered using a
      * velocity template, for example during the PDF export or for AJAX requests that don't send back a rendered
      * response.
-     * 
+     *
      * @param context the current request context
      * @see #endParsing(String, XWikiContext) the pair method called at the end of the response generation process
      */
@@ -121,7 +121,7 @@ public interface XWikiPluginInterface
      * plugin to initialize its per-rendering variables, or to modify the (velocity) context. This method can be called
      * multiple times per request, once for each time the 1.0 rendering engine is invoked. At this point the content is
      * not yet processed by any of the rendering components.
-     * 
+     *
      * @param context the current request context
      * @see #endRendering(XWikiContext) the pair method called at the end of the content processing
      */
@@ -132,7 +132,7 @@ public interface XWikiPluginInterface
      * {@link #startRenderingHandler(String, XWikiContext)}. At this point the content has already been processed by all
      * of the important rendering components (Velocity, Radeox, Groovy). The content can be altered before returning,
      * and the rendering process will continue on the returned value.
-     * 
+     *
      * @param content the current content being rendered; already processed by Radeox, Velocity and Groovy
      * @param context the current request context
      * @return the processed content, must be the same as the input content if no processing is needed
@@ -144,7 +144,7 @@ public interface XWikiPluginInterface
      * before {@link #outsidePREHandler(String, XWikiContext)}. The content can be altered before returning. This method
      * should be avoided, since the place where the hook is used isn't actually reliable, since at this point the
      * rendering process is almost done.
-     * 
+     *
      * @param content the current content being rendered; already processed by Radeox, Velocity and Groovy
      * @param context the current request context
      * @return the processed content, must be the same as the input content if no processing is needed
@@ -158,7 +158,7 @@ public interface XWikiPluginInterface
      * Hook method called during the 1.0 rendering process, once for each line of content outside {@code pre} blocks,
      * after {@link #startRenderingHandler(String, XWikiContext)} and before
      * {@link #endRenderingHandler(String, XWikiContext)}. The content can be altered before returning.
-     * 
+     *
      * @param line the current line being rendered; already processed by Radeox, Velocity and Groovy
      * @param context the current request context
      * @return the processed line, must be the same as the input content if no processing is needed
@@ -170,7 +170,7 @@ public interface XWikiPluginInterface
      * Hook method called during the 1.0 rendering process, once for each line of content inside {@code pre} blocks,
      * after {@link #startRenderingHandler(String, XWikiContext)} and before
      * {@link #endRenderingHandler(String, XWikiContext)}. The content can be altered before returning.
-     * 
+     *
      * @param line the current line being rendered; already processed by Radeox, Velocity and Groovy
      * @param context the current request context
      * @return the processed line, must be the same as the input content if no processing is needed
@@ -182,7 +182,7 @@ public interface XWikiPluginInterface
      * Hook method called during the 1.0 rendering process, after {@link #outsidePREHandler(String, XWikiContext)} and
      * right before {@link #endRendering(XWikiContext)}. The content can be altered before returning, and the returned
      * value is the one coming out of the rendering process.
-     * 
+     *
      * @param content the current content being rendered; already processed by Radeox, Velocity and Groovy
      * @param context the current request context
      * @return the processed content, must be the same as the input content if no processing is needed
@@ -196,7 +196,7 @@ public interface XWikiPluginInterface
      * clean up its per-rendering variables, or to modify the (velocity) context. This method can be called multiple
      * times per request, once for each time the 1.0 rendering engine is invoked. At this point the content is processed
      * by all of the rendering components and is ready to be included in the response.
-     * 
+     *
      * @param context the current request context
      * @see #endRenderingHandler(String, XWikiContext) allows to also alter the rendering result
      */
@@ -208,7 +208,7 @@ public interface XWikiPluginInterface
      * post-process the response. This method is called at most once per request. It is not called at all if the
      * response is not rendered using a velocity template, for example during the PDF export or for AJAX requests that
      * don't send back a rendered response.
-     * 
+     *
      * @param content the full response to send to the client
      * @param context the current request context
      * @return the post-processed content, must be the same as the input content if no processing is needed
@@ -220,7 +220,7 @@ public interface XWikiPluginInterface
      * Plugin extension point allowing the plugin to perform modifications to an attachment when the user opens a
      * document attachment. The plugin is passed the original attachment and it has to return the new modified
      * attachment.
-     * 
+     *
      * @param attachment the original attachment
      * @param context the current request context
      * @return the modified attachment

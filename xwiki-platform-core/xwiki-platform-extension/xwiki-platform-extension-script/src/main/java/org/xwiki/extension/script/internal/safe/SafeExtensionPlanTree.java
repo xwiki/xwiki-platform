@@ -19,9 +19,10 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
 import org.xwiki.extension.job.plan.ExtensionPlanTree;
+import org.xwiki.script.internal.safe.SafeCollection;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan tree.

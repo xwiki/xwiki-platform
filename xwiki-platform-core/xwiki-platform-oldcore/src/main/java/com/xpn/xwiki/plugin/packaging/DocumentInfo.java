@@ -65,26 +65,26 @@ public class DocumentInfo
 
     public XWikiDocument getDoc()
     {
-        return doc;
+        return this.doc;
     }
 
     public boolean isNew()
     {
-        return doc.isNew();
+        return this.doc.isNew();
     }
 
     public void changeSpace(String Space)
     {
-        if (doc.getSpace().compareTo("XWiki") != 0) {
+        if (this.doc.getSpace().compareTo("XWiki") != 0) {
             return;
         }
-        doc.setSpace(Space);
-        installable = INSTALL_IMPOSSIBLE;
+        this.doc.setSpace(Space);
+        this.installable = INSTALL_IMPOSSIBLE;
     }
 
     public int getFileType()
     {
-        return fileType;
+        return this.fileType;
     }
 
     public void setFileType(int fileType)
@@ -94,58 +94,58 @@ public class DocumentInfo
 
     public String getFullName()
     {
-        return (doc.getFullName());
+        return (this.doc.getFullName());
     }
 
     public String getLanguage()
     {
-        return (doc.getLanguage());
+        return (this.doc.getLanguage());
     }
 
     public int isInstallable()
     {
-        return installable;
+        return this.installable;
     }
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package test install document " + ((doc == null) ? "" : getFullName()) + " "
-                + ((doc == null) ? "" : getLanguage()));
+            LOGGER.debug("Package test install document " + ((this.doc == null) ? "" : getFullName()) + " "
+                + ((this.doc == null) ? "" : getLanguage()));
         }
 
-        installable = INSTALL_IMPOSSIBLE;
+        this.installable = INSTALL_IMPOSSIBLE;
 
         try {
             if (this.doc == null) {
-                return installable;
+                return this.installable;
             }
             try {
                 if ((!isAdmin) && (!context.getWiki().checkAccess("edit", this.doc, context))) {
-                    return installable;
+                    return this.installable;
                 }
-                XWikiDocument doc1 = context.getWiki().getDocument(doc.getFullName(), context);
+                XWikiDocument doc1 = context.getWiki().getDocument(this.doc.getFullName(), context);
                 boolean isNew = doc1.isNew();
                 if (!isNew) {
-                    if ((doc.getLanguage() != null) && (!doc.getLanguage().equals(""))) {
-                        isNew = !doc1.getTranslationList(context).contains(doc.getLanguage());
+                    if ((this.doc.getLanguage() != null) && (!this.doc.getLanguage().equals(""))) {
+                        isNew = !doc1.getTranslationList(context).contains(this.doc.getLanguage());
                     }
                 }
 
                 if (!isNew) {
-                    installable = INSTALL_ALREADY_EXIST;
-                    return installable;
+                    this.installable = INSTALL_ALREADY_EXIST;
+                    return this.installable;
                 }
             } catch (XWikiException e) {
-                installable = INSTALL_IMPOSSIBLE;
-                return installable;
+                this.installable = INSTALL_IMPOSSIBLE;
+                return this.installable;
             }
-            installable = INSTALL_OK;
-            return installable;
+            this.installable = INSTALL_OK;
+            return this.installable;
         } finally {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Package test install document " + ((doc == null) ? "" : getFullName()) + " "
-                    + ((doc == null) ? "" : getLanguage()) + " result " + installable);
+                LOGGER.debug("Package test install document " + ((this.doc == null) ? "" : getFullName()) + " "
+                    + ((this.doc == null) ? "" : getLanguage()) + " result " + this.installable);
             }
         }
     }
@@ -190,7 +190,7 @@ public class DocumentInfo
 
     public int getAction()
     {
-        return action;
+        return this.action;
     }
 
     public void setAction(int action)

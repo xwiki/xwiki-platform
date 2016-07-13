@@ -28,7 +28,7 @@ public class PropAddForm extends XWikiForm
 
     public String getPropName()
     {
-        return propName;
+        return this.propName;
     }
 
     public void setPropName(String propName)
@@ -38,7 +38,7 @@ public class PropAddForm extends XWikiForm
 
     public String getPropType()
     {
-        return propType;
+        return this.propType;
     }
 
     public void setPropType(String propType)

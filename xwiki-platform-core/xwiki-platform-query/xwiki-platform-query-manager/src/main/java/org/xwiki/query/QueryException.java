@@ -43,16 +43,17 @@ public class QueryException extends Exception
         this.query = query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getMessage()
     {
         if (query == null) {
             return super.getMessage();
         } else {
-            return super.getMessage() + ". Query statement = [" + query.getStatement() + "]";
+            if (query.isNamed()) {
+                return super.getMessage() + ". Named query = [" + query.getStatement() + "]";
+            } else {
+                return super.getMessage() + ". Query statement = [" + query.getStatement() + "]";
+            }
         }
     }
 }

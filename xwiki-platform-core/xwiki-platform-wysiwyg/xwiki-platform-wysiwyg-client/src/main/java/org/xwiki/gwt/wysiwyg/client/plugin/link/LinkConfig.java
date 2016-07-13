@@ -31,7 +31,7 @@ public class LinkConfig extends EntityConfig
     /**
      * Link types.
      */
-    public static enum LinkType
+    public enum LinkType
     {
         /** External link (default for any unrecognized link). */
         EXTERNAL("wikiexternallink"),

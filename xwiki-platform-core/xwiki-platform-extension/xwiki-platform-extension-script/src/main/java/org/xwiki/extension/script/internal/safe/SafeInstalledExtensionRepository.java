@@ -20,6 +20,7 @@
 package org.xwiki.extension.script.internal.safe;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.context.Execution;
@@ -29,8 +30,11 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a local extension repository.
@@ -39,8 +43,8 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository> extends
-    SafeSearchableExtensionRepository<T> implements InstalledExtensionRepository
+public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository>
+    extends SafeAdvancedSearchableExtensionRepository<T> implements InstalledExtensionRepository
 {
     /**
      * @param repository wrapped repository
@@ -48,7 +52,7 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);
@@ -77,6 +81,13 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
     {
+        return installExtension(extension, namespace, dependency, Collections.<String, Object>emptyMap());
+    }
+
+    @Override
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency,
+        Map<String, Object> properties)
+    {
         if (!this.hasProgrammingRight) {
             setError(new UnsupportedOperationException(FORBIDDEN));
 
@@ -86,7 +97,7 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
         setError(null);
 
         try {
-            return safe(getWrapped().installExtension(extension, namespace, dependency));
+            return safe(getWrapped().installExtension(extension, namespace, dependency, properties));
         } catch (InstallException e) {
             setError(e);
         }
@@ -162,5 +173,32 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     public InstalledExtension resolve(ExtensionId extensionId)
     {
         return (InstalledExtension) super.resolve(extensionId);
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(String pattern, String namespace, int offset,
+        int nb) throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(pattern, namespace, offset, nb));
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(String namespace, ExtensionQuery query)
+        throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(namespace, query));
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(ExtensionQuery query) throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(query));
+    }
+
+    @Override
+    public IterableResult<InstalledExtension> searchInstalledExtensions(Collection<String> namespaces,
+        ExtensionQuery query) throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(namespaces, query));
     }
 }

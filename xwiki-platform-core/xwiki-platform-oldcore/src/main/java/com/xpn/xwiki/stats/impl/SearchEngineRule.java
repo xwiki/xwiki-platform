@@ -21,7 +21,7 @@ package com.xpn.xwiki.stats.impl;
 
 /**
  * Matching tool able to find if a referer is a particular search engine.
- * 
+ *
  * @version $Id$
  */
 public class SearchEngineRule
@@ -30,7 +30,7 @@ public class SearchEngineRule
      * The search engine server address.
      */
     private String host;
-    
+
     /**
      * The regular expression to match.
      */
@@ -51,7 +51,7 @@ public class SearchEngineRule
      */
     public String getHost()
     {
-        return host;
+        return this.host;
     }
 
     /**
@@ -61,13 +61,13 @@ public class SearchEngineRule
     {
         this.host = host;
     }
-    
+
     /**
      * @return the regular expression to match.
      */
     public String getRegEx()
     {
-        return regEx;
+        return this.regEx;
     }
 
     /**

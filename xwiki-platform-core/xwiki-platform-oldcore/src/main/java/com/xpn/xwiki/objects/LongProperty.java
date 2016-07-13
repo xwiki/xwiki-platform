@@ -19,5 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-public class LongProperty  extends NumberProperty {
+public class LongProperty extends NumberProperty
+{
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+  <infos>
+    <name>XAR Extension</name>
+    <description>Description</description>
+    <licence>LGPL</licence>
+    <author>Author</author>
+    <version>1.0</version>
+    <backupPack>false</backupPack>
+    <preserveVersion>false</preserveVersion>
+  </infos>
+  <files>
+    <file defaultAction="0" language="">space1.page1</file>
+    <file defaultAction="0" language="">space2.page2</file>
+  </files>
+</package>

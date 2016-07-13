@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Attachments;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/attachments")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/attachments")
 public interface AttachmentsAtPageVersionResource
 {
     @GET Attachments getAttachmentsAtPageVersion(

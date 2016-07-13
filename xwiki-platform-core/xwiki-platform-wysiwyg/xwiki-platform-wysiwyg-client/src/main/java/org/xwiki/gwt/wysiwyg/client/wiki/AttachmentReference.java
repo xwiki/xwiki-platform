@@ -113,11 +113,6 @@ public class AttachmentReference implements IsSerializable
         return entityReference;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#hashCode()
-     */
     @Override
     public int hashCode()
     {
@@ -129,11 +124,6 @@ public class AttachmentReference implements IsSerializable
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Object#equals(Object)
-     */
     @Override
     public boolean equals(Object obj)
     {

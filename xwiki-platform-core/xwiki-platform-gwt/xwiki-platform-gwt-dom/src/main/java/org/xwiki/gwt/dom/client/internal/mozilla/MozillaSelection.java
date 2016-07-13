@@ -43,6 +43,7 @@ public class MozillaSelection extends DefaultSelection
      * {@inheritDoc}
      * <p>
      * Removes the ghost resize handlers (visible around images and tables) as well as other trailing graphics.
+     * </p>
      * 
      * @see DefaultSelection#removeAllRanges()
      */

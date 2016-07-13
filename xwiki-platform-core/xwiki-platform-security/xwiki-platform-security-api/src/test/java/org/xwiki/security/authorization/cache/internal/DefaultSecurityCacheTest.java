@@ -34,6 +34,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -69,7 +70,10 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-@ComponentList(DefaultStringEntityReferenceSerializer.class)
+@ComponentList({
+    DefaultStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
+})
 public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
     @Rule

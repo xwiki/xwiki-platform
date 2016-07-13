@@ -50,6 +50,7 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rest.XWikiRestException;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -59,7 +60,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Component
 @Named("org.xwiki.annotation.rest.internal.AnnotationsRESTResource")
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/annotations")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotations")
 @Singleton
 public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 {
@@ -87,17 +88,20 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      * @return annotations of a given XWiki page. Note that we're returning a response holding the AnnotatedContent
      *         instead of an AnnotatedContent object because we need to be able to set custom expire fields to prevent
      *         IE from caching this resource.
+     * @throws XWikiRestException when failing to parse space
      */
     @GET
     public Response doGetAnnotatedContent(@PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("wikiName") String wiki)
+        @PathParam("wikiName") String wiki) throws XWikiRestException
     {
         try {
-            // Initialize the context with the correct value.
-            updateContext(wiki, space, page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
 
-            DocumentReference docRef = new DocumentReference(wiki, space, page);
-            String documentName = referenceSerializer.serialize(docRef);
+            // Initialize the context with the correct value.
+            updateContext(documentReference);
+
+            String documentName = referenceSerializer.serialize(documentReference);
+
             // check access to this function
             if (!annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -149,17 +153,20 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      * @param page the name of the document to add annotation on
      * @param request the request object with the annotation to be added
      * @return AnnotationRequestResponse, responseCode = 0 if no error
+     * @throws XWikiRestException when failing to parse space
      */
     @POST
     public AnnotationResponse doPostAnnotation(@PathParam("wikiName") String wiki,
         @PathParam("spaceName") String space, @PathParam("pageName") String page, AnnotationAddRequest request)
+        throws XWikiRestException
     {
         try {
-            // Initialize the context with the correct value.
-            updateContext(wiki, space, page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
 
-            DocumentReference docRef = new DocumentReference(wiki, space, page);
-            String documentName = referenceSerializer.serialize(docRef);
+            // Initialize the context with the correct value.
+            updateContext(documentReference);
+
+            String documentName = referenceSerializer.serialize(documentReference);
 
             // check access to this function
             if (!annotationRightService.canAddAnnotation(documentName, getXWikiUser())) {

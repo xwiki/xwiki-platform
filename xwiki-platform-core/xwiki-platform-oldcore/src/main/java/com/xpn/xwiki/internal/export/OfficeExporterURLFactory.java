@@ -32,7 +32,7 @@ import com.xpn.xwiki.pdf.impl.FileSystemURLFactory;
  * <p>
  * Note: We extend {@link FileSystemURLFactory} for convenience. This is just a temporary solution. The entire export
  * code needs to be redesigned.
- * 
+ *
  * @version $Id$
  * @since 3.1M1
  */

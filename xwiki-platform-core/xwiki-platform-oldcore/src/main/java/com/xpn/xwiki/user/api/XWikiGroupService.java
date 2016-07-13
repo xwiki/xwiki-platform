@@ -30,33 +30,33 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Interface giving access to users and groups management.
- * 
+ *
  * @version $Id$
  */
 public interface XWikiGroupService
 {
-    public void init(XWiki xwiki, XWikiContext context) throws XWikiException;
+    void init(XWiki xwiki, XWikiContext context) throws XWikiException;
 
-    public void initCache(XWikiContext context) throws XWikiException;
+    void initCache(XWikiContext context) throws XWikiException;
 
-    public void initCache(int iCapacity, XWikiContext context) throws XWikiException;
+    void initCache(int iCapacity, XWikiContext context) throws XWikiException;
 
-    public void flushCache();
+    void flushCache();
 
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */
     @Deprecated
-    public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
+    Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
     /**
      * Adding the user to the group cache.
      */
-    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
+    void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
 
     /**
      * Remove user or group name from all groups.
-     * 
+     *
      * @param userOrGroupWiki the name of the wiki of the member.
      * @param userOrGroupSpace the name of the space of the member.
      * @param userOrGroupName the name of the member.
@@ -64,24 +64,24 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
+    void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
      */
     @Deprecated
-    public List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
+    List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
      */
     @Deprecated
-    public List<String> listAllGroups(XWikiContext context) throws XWikiException;
+    List<String> listAllGroups(XWikiContext context) throws XWikiException;
 
     /**
      * Search for all users with provided constraints and in a provided order.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -103,12 +103,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting users.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+    List<?> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 
     /**
      * Search for all groups with provided constraints and in a provided order.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -131,12 +131,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+    List<?> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 
     /**
      * Return number of users with provided constraints.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -153,7 +153,7 @@ public interface XWikiGroupService
 
     /**
      * Return number of groups with provided constraints.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -170,7 +170,7 @@ public interface XWikiGroupService
 
     /**
      * Get all groups containing provided member in the provided member wiki.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
      * @param start the index of the first found member to return.
@@ -179,12 +179,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
+    Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException;
 
     /**
      * Get all groups containing provided member in the current wiki.
-     * 
+     *
      * @param memberReference the member. Can be either user or group.
      * @param limit the maximum number of result to return.
      * @param offset the index of the first found member to return.
@@ -193,12 +193,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since 2.4M2
      */
-    public Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
+    Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
         int offset, XWikiContext context) throws XWikiException;
 
     /**
      * Get all members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -207,12 +207,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
+    Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException;
 
     /**
      * Get members of provided group.
-     * 
+     *
      * @param group the group.
      * @param matchField a string to search in result to filter.
      * @param nb the maximum number of result to return.
@@ -223,12 +223,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since 1.6M1
      */
-    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+    Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException;
 
     /**
      * Return the number of groups containing provided member.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param context the XWiki context.
      * @return the number of groups.
@@ -239,7 +239,7 @@ public interface XWikiGroupService
 
     /**
      * Return the number of members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param context the XWiki context.
      * @return the number of members.

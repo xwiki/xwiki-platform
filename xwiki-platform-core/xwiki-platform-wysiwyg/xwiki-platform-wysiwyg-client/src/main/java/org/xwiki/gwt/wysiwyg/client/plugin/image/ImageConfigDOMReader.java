@@ -43,11 +43,7 @@ public class ImageConfigDOMReader implements ConfigDOMReader<ImageConfig, ImageE
      */
     private static final String START_IMAGE = "startimage:";
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigDOMReader#read(com.google.gwt.dom.client.Element)
-     */
+    @Override
     public ImageConfig read(ImageElement image)
     {
         ImageConfig config = new ImageConfig();

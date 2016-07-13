@@ -1,0 +1,10 @@
+@import "import3.less";
+
+.my-mixin(@color){
+  color: @color;
+  border-color: @color;
+}
+
+body{
+  .my-mixin(red);
+}

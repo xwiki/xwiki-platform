@@ -19,12 +19,6 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.DOM4JCSSStyleSheet;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,14 +39,21 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.avalon.framework.configuration.DefaultConfiguration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.fop.apps.EnvironmentProfile;
+import org.apache.fop.apps.EnvironmentalProfileFactory;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.PageSequenceResults;
 import org.apache.velocity.VelocityContext;
@@ -71,7 +72,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xml.EntityResolver;
@@ -89,10 +89,15 @@ import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import info.informatica.doc.dom4j.CSSStylableElement;
+import info.informatica.doc.dom4j.XHTMLDocument;
+import info.informatica.doc.dom4j.XHTMLDocumentFactory;
+import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
  * Document into PDF, passing through HTML, valid XHTML, styled XHTML, and XSL-FO.
- * 
+ *
  * @version $Id$
  */
 public class PdfExportImpl implements PdfExport
@@ -110,12 +115,12 @@ public class PdfExportImpl implements PdfExport
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfExportImpl.class);
 
     /** Document name resolver. */
-    private static DocumentReferenceResolver<String> referenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private static DocumentReferenceResolver<String> referenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** Document name serializer. */
-    private static EntityReferenceSerializer<String> referenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.TYPE_STRING);
+    private static EntityReferenceSerializer<String> referenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
 
     /** Provides access to document properties. */
     private static DocumentAccessBridge dab = Utils.getComponent(DocumentAccessBridge.class);
@@ -137,44 +142,73 @@ public class PdfExportImpl implements PdfExport
     // Fields initialization
     static {
         // ----------------------------------------------------------------------
-        // CSS4J configuration
-        // ----------------------------------------------------------------------
-        XHTMLDocumentFactory xdf = (XHTMLDocumentFactory) XHTMLDocumentFactory.getInstance();
-        // Override the default stylesheet with an empty one
-        xdf.setUserAgentStyleSheet((DOM4JCSSStyleSheet) xdf.getCSSStyleSheetFactory().createStyleSheet());
-
-        // ----------------------------------------------------------------------
         // FOP configuration
         // ----------------------------------------------------------------------
-        fopFactory = FopFactory.newInstance();
-        try {
-            Environment environment = Utils.getComponent(Environment.class);
-            String fontsPath = environment.getResource(FONTS_PATH).getPath();
-            Execution execution = Utils.getComponent(Execution.class);
-            XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            if (xcontext != null) {
-                XWikiRequest request = xcontext.getRequest();
-                if (request != null && request.getSession() != null) {
-                    fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
+
+        EnvironmentProfile environmentProfile = EnvironmentalProfileFactory.createDefault(new File(".").toURI(),
+            Utils.getComponent(PDFResourceResolver.class));
+        FopFactoryBuilder builder = new FopFactoryBuilder(environmentProfile);
+
+        // Load configuration
+        Configuration configuration = null;
+        try (InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml")) {
+            if (fopConfigurationFile != null) {
+                configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Wrong FOP configuration: " + ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        if (configuration != null) {
+            // Get a writable configuration instance
+            DefaultConfiguration writableConfiguration = null;
+            if (configuration instanceof DefaultConfiguration) {
+                writableConfiguration = (DefaultConfiguration) configuration;
+            } else {
+                try {
+                    writableConfiguration = new DefaultConfiguration(configuration, true);
+                } catch (ConfigurationException e) {
+                    // Should never happen
+                    LOGGER.error("Failed to copy configuration", e);
                 }
             }
-            fopFactory.getFontManager().setFontBaseURL(fontsPath);
-        } catch (Throwable ex) {
-            LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
-                + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
-                + "FOP cannot access this directory. If this is an upgrade from a previous version, "
-                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
-        }
-        InputStream fopConfigurationFile = PdfExportImpl.class.getResourceAsStream("/fop-config.xml");
-        if (fopConfigurationFile != null) {
-            try {
-                fopFactory.setUserConfig(new DefaultConfigurationBuilder().build(fopConfigurationFile));
-            } catch (Exception ex) {
-                LOGGER.warn("Wrong FOP configuration: " + ex.getMessage());
-            } finally {
-                IOUtils.closeQuietly(fopConfigurationFile);
+
+            if (writableConfiguration != null) {
+                // Add XWiki fonts folder to the configuration
+                try {
+                    Environment environment = Utils.getComponent(Environment.class);
+                    String fontsPath = environment.getResource(FONTS_PATH).getPath();
+                    Execution execution = Utils.getComponent(Execution.class);
+                    XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+                    if (xcontext != null) {
+                        XWikiRequest request = xcontext.getRequest();
+                        if (request != null && request.getSession() != null) {
+                            fontsPath = request.getSession().getServletContext().getRealPath(FONTS_PATH);
+                        }
+                    }
+
+                    DefaultConfiguration rendererConfiguration =
+                        (DefaultConfiguration) writableConfiguration.getChild("renderer");
+                    if (rendererConfiguration != null) {
+                        DefaultConfiguration fontsConfiguration =
+                            (DefaultConfiguration) rendererConfiguration.getChild("fonts");
+                        DefaultConfiguration directoryConfiguration = new DefaultConfiguration("directory");
+                        directoryConfiguration.setValue(fontsPath);
+                        fontsConfiguration.addChild(directoryConfiguration);
+
+                    }
+                } catch (Throwable ex) {
+                    LOGGER.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
+                        + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
+                        + "FOP cannot access this directory. If this is an upgrade from a previous version, "
+                        + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+                }
+
+                builder.setConfiguration(writableConfiguration);
             }
         }
+
+        fopFactory = builder.build();
     }
 
     @Override
@@ -184,8 +218,7 @@ public class PdfExportImpl implements PdfExport
     }
 
     @Override
-    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context)
-        throws XWikiException
+    public void export(XWikiDocument doc, OutputStream out, ExportType type, XWikiContext context) throws XWikiException
     {
         // Note: The passed document is not used currently since we're calling pdf.vm and that
         // velocity template uses the XWiki Context to get the current doc or its translations.
@@ -226,22 +259,22 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Cleans up an HTML document, turning it into valid XHTML.
-     * 
+     *
      * @param input the source HTML to process
      * @return the cleaned up source
      */
     private String convertToStrictXHtml(String input)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Cleaning HTML: " + input);
-        }
+        LOGGER.debug("Cleaning HTML:\n{}", input);
 
         HTMLCleaner cleaner = Utils.getComponent(HTMLCleaner.class);
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(config.getFilters());
         filters.add(Utils.getComponent(HTMLFilter.class, "uniqueId"));
         config.setFilters(filters);
-        return HTMLUtils.toString(cleaner.clean(new StringReader(input), config));
+        String result = HTMLUtils.toString(cleaner.clean(new StringReader(input), config));
+        LOGGER.debug("Cleaned XHTML:\n{}", result);
+        return result;
     }
 
     /**
@@ -250,7 +283,7 @@ public class PdfExportImpl implements PdfExport
      * Note: This method is protected just allow other exporters to hook their code and use the PDF export
      * infrastructure. This is just a temporary solution. The PDF export code needs to be redesigned because it has
      * parts than can be reused for other export formats.
-     * 
+     *
      * @param xhtml the source document to transform
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
@@ -260,17 +293,13 @@ public class PdfExportImpl implements PdfExport
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Final XHTML for export: " + xhtml);
-        }
+        LOGGER.debug("Final XHTML for export:\n{}", xhtml);
 
         // XSL Transformation to XML-FO
         String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
         // Debug output
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XSL-FO source: " + xmlfo);
-        }
+        LOGGER.debug("Final XSL-FO source:\n{}", xmlfo);
 
         renderXSLFO(xmlfo, out, type, context);
     }
@@ -284,7 +313,7 @@ public class PdfExportImpl implements PdfExport
      * <li>An eventual post-processing transformation which cleans up the temporary XSL-FO in order to avoid FOP bugs;
      * it uses the <tt>fop.xsl</tt> file, or the <tt>fopxsl</tt> property of the applied PDFTemplate.</li>
      * </ol>
-     * 
+     *
      * @param xhtml the XHTML document to convert
      * @param context the current request context
      * @return the resulting XML-FO document
@@ -293,12 +322,13 @@ public class PdfExportImpl implements PdfExport
     private String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
         String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 
     /**
      * Convert an XSL-FO document into PDF.
-     * 
+     *
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
@@ -310,9 +340,6 @@ public class PdfExportImpl implements PdfExport
     {
         try {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-
-            // Use a custom URI Resolver to handle embedding images in the exported PDF.
-            foUserAgent.setURIResolver(new PDFURIResolver(context));
 
             // Construct fop with desired output format
             Fop fop = fopFactory.newFop(type.getMimeType(), foUserAgent, out);
@@ -349,7 +376,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Applies an XSLT transformation to an XML document.
-     * 
+     *
      * @param xml the XML document to convert
      * @param xslt the XSLT to apply
      * @return the converted document
@@ -378,7 +405,7 @@ public class PdfExportImpl implements PdfExport
      * The content found in these locations is concatenated. The CSS rules are applied on the document, and the
      * resulting style properties are embedded in the document, inside <tt>style</tt> attributes. The resulting XHTML
      * document with the inlined style is then serialized and returned.
-     * 
+     *
      * @param html the valid XHTML document to style
      * @param context the current request context
      * @return the document with inlined style
@@ -391,13 +418,14 @@ public class PdfExportImpl implements PdfExport
         if (style != null) {
             css += style;
         }
-        return applyCSS(html, css, context);
+        // Don't apply CSS if there's no CSS to apply!
+        return StringUtils.isBlank(css) ? html : applyCSS(html, css, context);
     }
 
     /**
      * Apply a CSS style sheet to an XHTML document and return the document with the resulting style properties inlined
      * in <tt>style</tt> attributes.
-     * 
+     *
      * @param html the valid XHTML document to style
      * @param css the style sheet to apply
      * @param context the current request context
@@ -405,7 +433,10 @@ public class PdfExportImpl implements PdfExport
      */
     private String applyCSS(String html, String css, XWikiContext context)
     {
+        LOGGER.debug("Applying the following CSS:\n{}", css);
         try {
+            //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
+
             // Prepare the input
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);
@@ -440,7 +471,7 @@ public class PdfExportImpl implements PdfExport
     /**
      * Recursively inline the computed style that applies to a DOM Element into the {@code style} attribute of that
      * Element.
-     * 
+     *
      * @param element the Element whose style should be inlined
      */
     private void applyInlineStyle(Element element)
@@ -466,7 +497,7 @@ public class PdfExportImpl implements PdfExport
      * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
      * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
-     * 
+     *
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
@@ -481,7 +512,7 @@ public class PdfExportImpl implements PdfExport
      * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
      * <li>the <tt>fop.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
-     * 
+     *
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
@@ -491,15 +522,14 @@ public class PdfExportImpl implements PdfExport
     }
 
     /**
-     * Get an XSLT file. The content is searched in:
-     * <ol>
-     * <li>the <tt>fopxsl</tt> property of the current <tt>PDFTemplate</tt></li>
-     * <li>the <tt>fop.xsl</tt> resource (usually a file inside <tt>xwiki-core-*.jar</tt>)</li>
-     * </ol>
-     * 
-     * @param propertyName the name of the <tt>XWiki.PDFClass</tt> property to read from the current PDFTemplate
-     *            document
-     * @param fallbackFile the name of a resource file to use when the PDFTemplate does not contain an override
+     * Get an XSLT file.
+     *
+     * @param propertyName the name of the xproperty from which to read the XSLT file.
+     *                     See {@link #getPDFTemplateProperty(String, XWikiContext)} for details on how this property
+     *                     is resolved. If the property doesn't point to any XSLT file then the fallback file parameter
+     *                     is used instead
+     * @param fallbackFile the name of a resource file to use when no XSLT content was found using the passed
+     *                     {@code propertyName}
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
@@ -509,30 +539,44 @@ public class PdfExportImpl implements PdfExport
         if (!StringUtils.isBlank(xsl)) {
             try {
                 return IOUtils.toInputStream(xsl, context.getWiki().getEncoding());
-            } catch (IOException ex) {
-                // This really shouldn't happen
+            } catch (IOException e) {
+                // This really shouldn't happen since it would mean that the encoding is either invalid or doesn't
+                // exist in the JVM.
+                LOGGER.error("Couldn't get XSLT for PDF exporting. Invalid or not existing encoding [{}]",
+                    context.getWiki().getEncoding(), e);
             }
         }
         return getClass().getClassLoader().getResourceAsStream(fallbackFile);
     }
 
     /**
-     * Read a property from the current PDFTemplate document, and pass it through the Velocity engine.
-     * 
-     * @param propertyName the property to read
+     * Extract XSLT file content using the following algorithm:
+     * <ul>
+     *   <li>Check if a query string named {@code pdftemplate} exists and if so use its value as the reference to
+     *       a document containing a XWiki.PDFClass xobject from which to extract the XSLT data. If not defined
+     *       (or if empty) then use the current document as the document having the XWiki.PDFClass xobject.</li>
+     *   <li>Read the value of the xproperty named after the passed {@code propertyName} parameter. If the document
+     *       or the property don't exist, then return an empty String. Otherwise execute Velocity on the xproperty's
+     *       value and return this.</li>
+     * </ul>
+     *
+     * @param propertyName the xproperty containing the XSLT to return
      * @param context the current request context
-     * @return the content of the property, velocity-parsed, or an empty string if there's no such property in the
-     *         current PDFTemplate
+     * @return the content of the xproperty, velocity-parsed, or an empty string if there's no such property
      */
     private String getPDFTemplateProperty(String propertyName, XWikiContext context)
     {
         String pdftemplate = context.getRequest().getParameter("pdftemplate");
-        String currentWiki = dab.getCurrentDocumentReference().getRoot().getName();
-        DocumentReference templateReference = dab.getCurrentDocumentReference();
-        DocumentReference classReference = new DocumentReference(currentWiki, "XWiki", "PDFClass");
 
+        DocumentReference templateReference;
+        DocumentReference classReference;
         if (StringUtils.isNotEmpty(pdftemplate)) {
             templateReference = referenceResolver.resolve(pdftemplate);
+            classReference = new DocumentReference(templateReference.getWikiReference().getName(), "XWiki", "PDFClass");
+        } else {
+            templateReference = dab.getCurrentDocumentReference();
+            String currentWiki = dab.getCurrentDocumentReference().getRoot().getName();
+            classReference = new DocumentReference(currentWiki, "XWiki", "PDFClass");
         }
 
         String result = (String) dab.getProperty(templateReference, classReference, propertyName);
@@ -542,25 +586,19 @@ public class PdfExportImpl implements PdfExport
         String templateName = referenceSerializer.serialize(templateReference);
         try {
             StringWriter writer = new StringWriter();
-            VelocityEngine engine = velocityManager.getVelocityEngine();
-            try {
-                VelocityContext vcontext = velocityManager.getVelocityContext();
-                engine.startedUsingMacroNamespace(templateName);
-                velocityManager.getVelocityEngine().evaluate(vcontext, writer, templateName, result);
-                result = writer.toString();
-            } finally {
-                engine.stoppedUsingMacroNamespace(templateName);
-            }
-        } catch (XWikiVelocityException ex) {
-            LOGGER
-                .warn("Velocity errors while parsing pdf export extension [" + templateName + "]: " + ex.getMessage());
+            VelocityContext vcontext = velocityManager.getVelocityContext();
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, templateName, result);
+            result = writer.toString();
+        } catch (XWikiVelocityException e) {
+            LOGGER.warn("Error applying Velocity to the [{}] property of the [{}] document. Using the property's value "
+                + "without applying Velocity.", propertyName, templateName, ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
     }
 
     /**
      * Create an XWikiException object with the given source, export type and error type.
-     * 
+     *
      * @param source the source exception that is forwarded
      * @param exportType the type of the export performed while the exception occurred, PDF or RTF
      * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}
@@ -568,7 +606,7 @@ public class PdfExportImpl implements PdfExport
      */
     private XWikiException createException(Throwable source, ExportType exportType, int errorType)
     {
-        return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType, "Exception while exporting "
-            + exportType.getExtension(), source);
+        return new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, errorType,
+            "Exception while exporting " + exportType.getExtension(), source);
     }
 }

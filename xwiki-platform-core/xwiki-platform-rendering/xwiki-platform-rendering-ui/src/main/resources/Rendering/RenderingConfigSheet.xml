@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="Rendering.RenderingConfigSheet" locale="">
+  <web>Rendering</web>
+  <name>RenderingConfigSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1463218663000</creationDate>
+  <parent>Rendering.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1463506039000</date>
+  <contentUpdateDate>1463506039000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Rendering Configuration Sheet</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($configDocName = 'Rendering.RenderingConfig')
+#set ($configDoc = $xwiki.getDocument($configDocName))
+#set ($configClassName = 'Rendering.RenderingConfigClass')
+#set ($configObj = $configDoc.getObject($configClassName))
+## =======================================================
+## Step 1: Migrate Rendering config data
+## =======================================================
+## We bundle Rendering.RenderingConfig without a Rendering.RenderingConfigClass xobject, allowing us to migrate Rendering configuration
+## that were previously stored in the xwiki.rendering.syntaxes property in xwiki.cfg.
+#if ($xcontext.action == 'admin' &amp;&amp; "$!configObj" == '')
+  ## Create the xobject
+  #set ($configObj = $configDoc.newObject($configClassName))
+  ## Get the disabled syntaxes value from the old location and set them as the current disabled syntaxes
+  ## Also convert from Syntax to String
+  #set ($disabledSyntaxes = [])
+  #foreach ($disabledSyntax in $services.rendering.disabledSyntaxes)
+    #set ($discard = $disabledSyntaxes.add($disabledSyntax.toIdString())) 
+  #end
+  #set ($discard = $configObj.set('disabledSyntaxes', $disabledSyntaxes))
+  ## Save the new xobject!
+  #set ($discard = $configDoc.save('Migrated Rendering configuration found in xwiki.cfg (xwiki.rendering.syntaxes)', true))
+#end
+## =======================================================
+## Step 2: Display form
+## =======================================================
+#set ($params = {
+  'general': ['disabledSyntaxes']
+})
+#set ($paramDoc = $configDoc)
+#set ($paramClass = $configClassName)
+{{/velocity}}
+
+{{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
+</xwikidoc>

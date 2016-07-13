@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
@@ -110,8 +111,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 + "set in the context as the current document.");
         }
 
-        DocumentReference docReference = this.macroDocumentReferenceResolver.resolve(parameters.getDocument(),
-            context.getCurrentMacroBlock());
+        DocumentReference docReference =
+            this.macroDocumentReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
 
         boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
 
@@ -129,7 +130,15 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                         + "context document provided [" + parameters.getDocument() + "] has programming rights.");
                 }
 
-                result = this.contentParser.parse(content, context, true, false).getChildren();
+                MetaData metadata = new MetaData();
+                metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
+                metadata.addMetaData(MetaData.BASE, parameters.getDocument());
+
+                XDOM xdom = this.contentParser.parse(content, context, true, metadata, false);
+
+                // Keep metadata so that the result stay associated to context properties when inserted in the parent
+                // XDOM
+                result = Arrays.asList((Block) new MetaDataBlock(xdom.getChildren(), xdom.getMetaData()));
 
             } finally {
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
@@ -141,10 +150,6 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 throw new MacroExecutionException("Failed to render page in the context of [" + docReference + "]", e);
             }
         }
-
-        // Step 4: Wrap Blocks in a MetaDataBlock with the "source" metadata specified so that potential relative
-        // links/images are resolved correctly at render time.
-        result = Arrays.asList((Block) new MetaDataBlock(result, MetaData.SOURCE, parameters.getDocument()));
 
         return result;
     }

@@ -63,8 +63,8 @@ public class DefaultChartParams2 extends ChartParams
     {
         set(SERIES, "columns");
 
-        set(HEIGHT, new Integer(600));
-        set(WIDTH, new Integer(500));
+        set(HEIGHT, 600);
+        set(WIDTH, 500);
         set(LINK_ATTRIBUTES, new HashMap());
         set(IMAGE_ATTRIBUTES, new HashMap());
 
@@ -187,8 +187,8 @@ public class DefaultChartParams2 extends ChartParams
 
         set(prefix + CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX, new Double(CategoryAxis.DEFAULT_CATEGORY_MARGIN));
         set(prefix + CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX, CategoryLabelPositions.STANDARD);
-        set(prefix + CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX, new Integer(4));
-        set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX, new Integer(1));
+        set(prefix + CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX, 4);
+        set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX, 1);
         set(prefix + CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX, new Float(0.0f));
     }
 

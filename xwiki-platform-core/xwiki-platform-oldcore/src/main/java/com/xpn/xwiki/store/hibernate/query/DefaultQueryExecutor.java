@@ -33,7 +33,7 @@ import org.xwiki.query.QueryExecutor;
 /**
  * The default QueryExecutor, this uses The HqlQueryExecutor since XWikiHibernateStore is the default store. Wrapping
  * the HQL executor with this allows the main store hint in xwiki.cfg to be used to select the QueryExecutor.
- * 
+ *
  * @version $Id$
  * @since 3.2M2
  */

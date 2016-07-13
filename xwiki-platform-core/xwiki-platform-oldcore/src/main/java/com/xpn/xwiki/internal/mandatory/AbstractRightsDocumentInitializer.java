@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.internal.mandatory;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
@@ -37,13 +33,10 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * XWiki.XWikiPreferences class.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
-@Component
-@Named("XWiki.XWikiPreferences")
-@Singleton
 public abstract class AbstractRightsDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     /**

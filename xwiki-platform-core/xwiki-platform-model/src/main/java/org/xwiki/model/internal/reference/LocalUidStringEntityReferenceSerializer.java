@@ -22,6 +22,7 @@ package org.xwiki.model.internal.reference;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -30,14 +31,17 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
-
 /**
+ * <p>
  * Serialize a reference into a unique identifier string within a wiki. Its similar to the
  * {@link UidStringEntityReferenceSerializer}, but is made appropriate for a wiki independent storage.
- *
- * ie: The string created looks like 5:space3:doc for the wiki:space.doc document.
- * and 5:space3:doc15:xspace.class[0] for the wiki:space.doc^wiki:xspace.class[0] object.
+ * </p>
+ * <p>
+ * The string created looks like {@code 5:space3:doc} for the {@code wiki:space.doc} document reference. and
+ * {@code 5:space3:doc15:xspace.class[0]} for the wiki:space.doc^wiki:xspace.class[0] object. (with {@code 5} being the
+ * length of the space name, i.e the length of {@code space} and {@code 3} being the length of the page name, i.e. the
+ * length of {@code doc}).
+ * </p>
  *
  * @version $Id$
  * @since 4.0M1
@@ -48,6 +52,15 @@ import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKIS
 @Singleton
 public class LocalUidStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
 {
+    /**
+     * Unique instance of the uid serializer.
+     */
+    public static final LocalUidStringEntityReferenceSerializer INSTANCE =
+        new LocalUidStringEntityReferenceSerializer();
+
+    @Inject
+    private SymbolScheme symbolScheme;
+
     @Override
     public String serialize(EntityReference reference, Object... parameters)
     {
@@ -58,14 +71,16 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
         StringBuilder representation = new StringBuilder();
         List<EntityReference> references = reference.getReversedReferenceChain();
         EntityReference wikiReference = references.get(0);
+
+        int index;
         if (wikiReference.getType() == EntityType.WIKI) {
-            references.remove(0);
+            index = 1;
         } else {
-            wikiReference = null;
+            index = 0;
         }
 
-        for (EntityReference currentReference : references) {
-            serializeEntityReference(currentReference, representation, wikiReference, parameters);
+        for (; index < reference.size(); ++index) {
+            serializeEntityReference(references.get(index), representation, wikiReference, parameters);
         }
 
         return representation.toString();
@@ -87,7 +102,9 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
         // FIXME: Not really nice to parse here the serialized XClass reference to remove its wiki name when local.
         // This also why this is not a simple derived class of UidStringEntityReferenceSerializer.
         if (wikiReference != null && currentReference.getType() == EntityType.OBJECT) {
-            if (name.startsWith(wikiReference.getName() + WIKISEP)) {
+            if (name.startsWith(wikiReference.getName()
+                + this.symbolScheme.getSeparatorSymbols().get(EntityType.SPACE).get(EntityType.WIKI)))
+            {
                 name = name.substring(wikiReference.getName().length() + 1);
             }
         }

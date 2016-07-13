@@ -20,19 +20,29 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -73,13 +83,13 @@ public class ImportTest extends AbstractPackageTest
 
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
-        
+
         // mock a store that would also handle translations
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
             getContext()});
-        this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+        this.mockXWikiStore.stubs().method("loadXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -96,8 +106,8 @@ public class ImportTest extends AbstractPackageTest
                     }
                 }
             });
-        this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
+        this.mockXWikiStore.stubs().method("saveXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -114,8 +124,8 @@ public class ImportTest extends AbstractPackageTest
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
+        this.mockXWikiStore.stubs().method("deleteXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -130,8 +140,8 @@ public class ImportTest extends AbstractPackageTest
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("getTranslationList").will(
-            new CustomStub("Implements XWikiStoreInterface.getTranslationList")
+        this.mockXWikiStore.stubs().method("getTranslationList")
+            .will(new CustomStub("Implements XWikiStoreInterface.getTranslationList")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -184,7 +194,7 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
         doc1.setDefaultLanguage("en");
 
-        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
+        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"}, null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -213,6 +223,69 @@ public class ImportTest extends AbstractPackageTest
     }
 
     /**
+     * Test the regular document import when the XAR is tagged as extension.
+     * 
+     * @throws Exception
+     */
+    public void testImportExtension() throws Exception
+    {
+        ExtensionId extensionId = new ExtensionId("test", "1.0");
+
+        XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
+        doc1.setDefaultLanguage("en");
+
+        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"}, extensionId);
+
+        // Store the extension in the local repository
+        DefaultLocalExtension localExtension = new DefaultLocalExtension(null, extensionId, "xar");
+        File file = File.createTempFile("temp", ".xar");
+        FileUtils.writeByteArrayToFile(file, zipFile);
+        localExtension.setFile(file);
+        LocalExtensionRepository localeRepository = getComponentManager().getInstance(LocalExtensionRepository.class);
+        localeRepository.storeExtension(localExtension);
+
+        // Listen to extension installed event
+        Mock extensionListener = mock(EventListener.class);
+        extensionListener.stubs().method("getEvents").will(returnValue(Arrays.asList(new ExtensionInstalledEvent())));
+        extensionListener.stubs().method("getName").will(returnValue("extension installed listener"));
+        extensionListener.expects(once()).method("onEvent");
+        ObservationManager observationManager = getComponentManager().getInstance(ObservationManager.class);
+        observationManager.addListener((EventListener) extensionListener.proxy());
+
+        // make sure no data is in the packager from the other tests run
+        this.pack = new Package();
+        // import and install this document
+        this.pack.Import(zipFile, getContext());
+        this.pack.install(getContext());
+
+        // check if it is there
+        XWikiDocument foundDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImport"), getContext());
+        assertFalse(foundDocument.isNew());
+
+        XWikiDocument nonExistingDocument =
+            this.xwiki.getDocument(new DocumentReference("Test", "Test", "DocImportNonexisting"), getContext());
+        assertTrue(nonExistingDocument.isNew());
+
+        XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertSame(foundDocument, foundTranslationDocument);
+
+        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
+        doc1Translation.setLanguage("fr");
+        doc1Translation.setDefaultLanguage("en");
+        this.xwiki.saveDocument(doc1Translation, getContext());
+        foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
+        assertNotSame(foundDocument, foundTranslationDocument);
+
+        // Check that the extension has been registered
+        InstalledExtensionRepository installedExtensionRepository =
+            getComponentManager().getInstance(InstalledExtensionRepository.class);
+        assertNotNull(installedExtensionRepository.getInstalledExtension(extensionId));
+        assertNotNull(installedExtensionRepository.getInstalledExtension(extensionId.getId(), "wiki:"
+            + getContext().getWikiId()));
+    }
+
+    /**
      * Test the regular document import with non-ascii document title.
      * 
      * @throws Exception
@@ -222,7 +295,7 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
         doc1.setDefaultLanguage("zh");
 
-        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8");
+        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8", null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -242,14 +315,14 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertSame(foundDocument, foundTranslationDocument);
 
-        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        XWikiDocument doc1Translation =
+            new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
         doc1Translation.setLanguage("fr");
         doc1Translation.setDefaultLanguage("zh");
         this.xwiki.saveDocument(doc1Translation, getContext());
         foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertNotSame(foundDocument, foundTranslationDocument);
     }
-
 
     /**
      * Test the regular document import with non-ascii document title and non-utf8 platform encoding.
@@ -264,7 +337,8 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
         doc1.setDefaultLanguage("zh");
 
-        byte[] zipFile = this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8");
+        byte[] zipFile =
+            this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"UTF-8"}, "UTF-8", null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -287,7 +361,8 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument foundTranslationDocument = foundDocument.getTranslatedDocument("fr", getContext());
         assertSame(foundDocument, foundTranslationDocument);
 
-        XWikiDocument doc1Translation = new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
+        XWikiDocument doc1Translation =
+            new XWikiDocument(new DocumentReference("Test", "Test", "\u60A8\u597D\u4E16\u754C"));
         doc1Translation.setLanguage("fr");
         doc1Translation.setDefaultLanguage("zh");
         this.xwiki.saveDocument(doc1Translation, getContext());
@@ -296,7 +371,7 @@ public class ImportTest extends AbstractPackageTest
     }
 
     /**
-     * Test the regular document import.  Test XAR file built with commons compress.
+     * Test the regular document import. Test XAR file built with commons compress.
      * 
      * @throws Exception
      */
@@ -305,7 +380,8 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImport"));
         doc1.setDefaultLanguage("en");
 
-        byte[] zipFile = this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
+        byte[] zipFile =
+            this.createZipFileUsingCommonsCompress(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"}, null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -343,7 +419,7 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument doc1 = new XWikiDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"));
         doc1.setDefaultLanguage("en");
 
-        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"});
+        byte[] zipFile = this.createZipFile(new XWikiDocument[] {doc1}, new String[] {"ISO-8859-1"}, null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();
@@ -361,7 +437,7 @@ public class ImportTest extends AbstractPackageTest
         XWikiDocument overwritingDoc = new XWikiDocument(new DocumentReference("Test", "Test", "DocImportOverwrite"));
         overwritingDoc.setContent(newContent);
 
-        zipFile = this.createZipFile(new XWikiDocument[] {overwritingDoc}, new String[] {"ISO-8859-1"});
+        zipFile = this.createZipFile(new XWikiDocument[] {overwritingDoc}, new String[] {"ISO-8859-1"}, null);
 
         // use a new packager because we need to clean-up import data (files list, doucument data)
         this.pack = new Package();
@@ -395,7 +471,8 @@ public class ImportTest extends AbstractPackageTest
 
         // import and install those twice with tests
         byte[] zipFile =
-            this.createZipFile(new XWikiDocument[] {original, translation}, new String[] {"ISO-8859-1", "ISO-8859-1"});
+            this.createZipFile(new XWikiDocument[] {original, translation}, new String[] {"ISO-8859-1", "ISO-8859-1"},
+                null);
 
         // make sure no data is in the packager from the other tests run
         this.pack = new Package();

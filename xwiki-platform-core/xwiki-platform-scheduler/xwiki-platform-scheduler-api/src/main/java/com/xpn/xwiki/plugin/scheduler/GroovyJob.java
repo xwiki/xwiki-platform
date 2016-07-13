@@ -19,17 +19,16 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 
 /**
  * The task that will get executed by the Scheduler when the Job is triggered. This task in turn calls a Groovy script
@@ -54,7 +53,7 @@ public class GroovyJob extends AbstractJob
      *            retrieved
      * @throws JobExecutionException if the script fails to execute or if the user didn't have programming rights when
      *             the Job was scheduled
-     * @see Job#execute(org.quartz.JobExecutionContext)
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
@@ -62,33 +61,29 @@ public class GroovyJob extends AbstractJob
         try {
             JobDataMap data = jobContext.getJobDetail().getJobDataMap();
 
-            // The XWiki context was saved in the Job execution data map. Get it as we'll retrieve
-            // the script to execute from it.
-            XWikiContext context = (XWikiContext) data.get("context");
-
             // Get the job XObject to be executed
             BaseObject object = (BaseObject) data.get("xjob");
 
             // Force context document
-            XWikiDocument jobDocument = context.getWiki().getDocument(object.getName(), context);
-            context.setDoc(jobDocument);
-            context.put("sdoc", jobDocument);
+            XWikiDocument jobDocument = getXWikiContext().getWiki().getDocument(object.getName(), getXWikiContext());
+            getXWikiContext().setDoc(jobDocument);
+            getXWikiContext().put("sdoc", jobDocument);
 
-            if (context.getWiki().getRightService().hasProgrammingRights(context)) {
+            if (getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
 
                 // Make the Job execution data available to the Groovy script
                 Binding binding = new Binding(data.getWrappedMap());
 
                 // Execute the Groovy script
-                GroovyShell shell = new GroovyShell(binding);
+                GroovyShell shell = new GroovyShell(Thread.currentThread().getContextClassLoader(), binding);
                 shell.evaluate(object.getLargeStringValue("script"));
             } else {
-                throw new JobExecutionException("The user [" + context.getUser() + "] didn't have "
-                    + "programming rights when the job [" + jobContext.getJobDetail().getName() + "] was scheduled.");
+                throw new JobExecutionException("The user [" + getXWikiContext().getUser() + "] didn't have "
+                    + "programming rights when the job [" + jobContext.getJobDetail().getKey() + "] was scheduled.");
             }
         } catch (CompilationFailedException e) {
-            throw new JobExecutionException("Failed to execute script for job [" + jobContext.getJobDetail().getName()
-                + "]", e, true);
+            throw new JobExecutionException(
+                "Failed to execute script for job [" + jobContext.getJobDetail().getKey() + "]", e, true);
         } catch (Exception e) {
             e.printStackTrace();
         }

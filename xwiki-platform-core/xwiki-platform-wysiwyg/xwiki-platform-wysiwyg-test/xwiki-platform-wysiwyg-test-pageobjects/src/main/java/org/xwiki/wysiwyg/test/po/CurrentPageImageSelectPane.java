@@ -49,7 +49,7 @@ public class CurrentPageImageSelectPane extends WizardStepElement
     public CurrentPageImageSelectPane waitToLoad()
     {
         super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xImagesSelector"));
+        getDriver().waitUntilElementIsVisible(By.className("xImagesSelector"));
         return this;
     }
 

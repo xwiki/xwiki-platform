@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1264862667000</creationDate>
+  <date>1271949711000</date>
+  <contentUpdateDate>1271949711000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+admin.annotations=Anotaciones
+annotations.action.create.cancel.text=Cancelar
+annotations.action.create.error.notarget=No se ha especificado el documento destino para el que se crearán las anotaciones.
+annotations.action.create.error.unauthorized=No está autorizado a añadir anotaciones a este documento.
+annotations.action.create.error.unauthorizedguest=No está autorizado a añadir anotaciones a este docimento. Pruebe primero a autenticarse.
+annotations.action.create.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+annotations.action.create.form.loaderror=Falló\:
+annotations.action.create.helpmessage=Para anotar un trozo de texto, seleccionelo y pinche {0}.
+annotations.action.create.loaderror=Falló\:
+annotations.action.create.submit.text=Añadir anotación
+annotations.action.create.success=La anotación ha sido añadida con éxito
+annotations.action.delete.confirm=¿Está seguro de que quiere borrar esta anotación?
+annotations.action.delete.done=Anotación borrada
+annotations.action.delete.failed=Fallo al borrar la anotación\:
+annotations.action.delete.inProgress=Borrando anotación...
+annotations.action.delete.text=[Borrar]
+annotations.action.delete.tooltip=Borrar esta anotación
+annotations.action.edit.cancel.text=Cancelar
+annotations.action.edit.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
+annotations.action.edit.loaderror=Falló\:
+annotations.action.edit.submit.text=Actualizar
+annotations.action.edit.success=La anotación se ha actualizado con éxito.
+annotations.action.edit.text=[Editar]
+annotations.action.edit.tooltip=Editar esta anotación
+annotations.action.validate.loaderror=Falló\:
+annotations.action.validate.success=La anotación ha sido validada con éxito.
+annotations.action.validate.text=[Validar]
+annotations.action.validate.tooltip=Validar la actualización automática del texto seleccionado de esta anotación
+annotations.action.view.error.notfound=Esta anotación ya no existe. Por favor, refresque la página para obtener una vista actualizada.
+annotations.action.view.form.loaderror=Falló\:
+annotations.action.view.hide.text=ocultar
+annotations.altered.text=Esta anotación no pudo mostrarse porque el texto anotado no se encontró en el documento.
+annotations.annotated.error.noannotatedelement=Las anotaciones no ha podido cargarse porque el contenido no está disponible.
+annotations.annotated.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+annotations.annotated.loaderror=Falló\:
+annotations.annotated.loaderror.wrongresponse=Respuesta del servidor mal formateada
+annotations.annotated.loading=Cargando documento anotado
+annotations.config.activate.explanation=Los siguientes dos ajustes le permiten configurar en que espacios están activas las anotaciones. El primer ajuste indica la regla general, mientras la segunda lista indica para cuales espacios no debe aplicarse. Por ejemplo, activado "yes" y espacios excluidos "XWiki" y "Main" significa que las anotaciones estarán activas en todos los espacios a excepción de "XWiki" y "Main", mientras que activado "no" y espacios excluidos "Documents" significa que las anotaciones sólo estarán activas en el espacio "Documents".
+annotations.config.activate.title=Ajustes de activación de anotaciones
+annotations.config.display.title=Ajustes de presentación de anotaciones
+annotations.config.title=Panel de configuración de anotaciones
+annotations.config.type.explanation=Añada propiedades a esta clase si quiere propiedades adicionales para sus anotaciones.
+annotations.config.type.title=Ajustes de tipo de anotación
+annotations.filters.anyvalue=cualquier valor
+annotations.filters.clearvalue=limpiar
+annotations.filters.nooption=No hay valores que filtrar para "{0}"
+annotations.filters.show=Refine el criterio de presentación
+annotations.menu.loaderror=Falló\:
+annotations.menu.loading=Cargando ajustes de anotaciones
+annotations.settings.display=Mostrar anotaciones
+annotations.settings.error.notarget=No se ha especificado el documento para el que se quieren obtener las opciones de anotaciones.
+annotations.settings.error.wrongsyntax=Las anotaciones no están disponibles para los documentos con sintaxis XWiki/1.0.
+annotations.tab.info.noannotations=Este documento no tiene anotaciones
+annotations.title=Anotaciones
+annotations.updated.text=Esta anotación fue reposicionada automáticamente después de una actualización del documento. Originalmente\:
+</content>
+</xwikidoc>

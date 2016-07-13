@@ -1,0 +1,2 @@
+org.xwiki.url.internal.filesystem.FilesystemResourceReferenceSerializer
+org.xwiki.url.internal.filesystem.FilesystemExportContextProvider

@@ -139,7 +139,7 @@ public class Mail
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (getFrom() != null) {
             buffer.append("From [" + getFrom() + "]");
@@ -178,7 +178,7 @@ public class Mail
 
     private String toStringHeaders()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (Map.Entry<String, String> header : getHeaders().entrySet()) {
             buffer.append('[');
             buffer.append(header.getKey());

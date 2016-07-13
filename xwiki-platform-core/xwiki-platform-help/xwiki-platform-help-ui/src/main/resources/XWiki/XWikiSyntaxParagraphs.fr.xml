@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497947000</date>
+  <contentUpdateDate>1301497947000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Mise en forme =
+
+== Paragraphes ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Paragraphs ===
+
+Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
+
+{{info}}
+La syntaxe XWiki 2.0 tient compte des sauts de ligne, ce qui n'est pas le cas en syntaxe XWiki 1.0 où il faut insérer une double barre de fraction inversée {{{\\}}}.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Paragraphe simple|Ceci est un paragraphe simple|Ceci est un paragraphe
+|Paragraphe sur plusieurs lignes |Paragraphe sur{{{\\}}}
+plusieurs lignes|Paragraphe sur
+plusieurs lignes
+|Deux paragraphes|Le premier paragraphe
+\\Le deuxième paragraphe|Le premier paragraphe
+\\Le deuxième paragraphe
+|Paragraphe  personnalisé|&lt;p style="text-align:center;
+color:blue"&gt;
+Paragraphe centré et bleu&lt;/p&gt;|(% style="text-align: center; color: blue;" %)
+Paragraphe centré et bleu
+
+=== 2.0 Paragraphs ===
+
+Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
+
+{{info}}
+La syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}} tient compte des sauts de ligne, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Paragraphe simple|Ceci est un paragraphe|Ceci est un paragraphe
+|Paragraphe sur plusieurs lignes |Paragraphe sur
+plusieurs lignes|Paragraphe sur
+plusieurs lignes
+|Deux paragraphes|Le premier paragraphe
+\\Le deuxième paragraphe|Le premier paragraphe
+\\Le deuxième paragraphe
+|Paragraphe personnalisé|{{{(% style="text-align:center;
+color:blue" %)}}}
+Paragraphe centré et bleu|(% style="text-align: center; color: blue;" %)
+Paragraphe centré et bleu</content>
+</xwikidoc>

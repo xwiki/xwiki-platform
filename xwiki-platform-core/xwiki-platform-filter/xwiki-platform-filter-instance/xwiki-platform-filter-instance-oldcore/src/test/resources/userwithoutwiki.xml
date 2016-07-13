@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<user name="user">
+  <p>
+    <parameters>
+      <entry>
+        <string>firstname</string>
+        <string>user1 first name</string>
+      </entry>
+      <entry>
+        <string>lastname</string>
+        <string>user1 last name</string>
+      </entry>
+      <entry>
+        <string>email</string>
+        <string>user1@email.ext</string>
+      </entry>
+      <entry>
+        <string>active</string>
+        <boolean>true</boolean>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2000-01-10 00:00:00.0 UTC</date>
+      </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2000-01-11 00:00:00.0 UTC</date>
+      </entry>
+    </parameters>
+  </p>
+</user>

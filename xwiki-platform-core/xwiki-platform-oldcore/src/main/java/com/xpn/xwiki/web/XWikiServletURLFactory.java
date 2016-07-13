@@ -20,13 +20,22 @@
 package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,6 +48,11 @@ import com.xpn.xwiki.util.Util;
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
+
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+
+    private EntityResourceActionLister actionLister = Utils.getComponent(EntityResourceActionLister.class);
 
     /**
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
@@ -63,7 +77,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Creates a new URL factory that uses the server URL and context path specified by the given XWiki context. This
      * constructor should be used only in tests. Make sure {@link XWikiContext#setURL(URL)} is called before this
      * constructor.
-     * 
+     *
      * @param context
      */
     public XWikiServletURLFactory(XWikiContext context)
@@ -84,7 +98,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     /**
      * Returns the part of the URL identifying the web application. In a normal install, that is <tt>xwiki/</tt>.
-     * 
+     *
      * @return The configured context path.
      */
     public String getContextPath()
@@ -143,7 +157,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         final String surl = getXWikiHomeParameterAsString(context);
         if (!StringUtils.isEmpty(surl)) {
             try {
-                return new URL(surl);
+                return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
                 LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
                     + " Ignoring parameter.");
@@ -161,30 +175,30 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL getServerURL(XWikiContext context) throws MalformedURLException
     {
-        return getServerURL(context.getDatabase(), context);
+        return getServerURL(context.getWikiId(), context);
     }
 
     /**
      * Get the url of the server EG: http://www.xwiki.org/ This function sometimes will return a URL with a trailing /
      * and other times not. This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
      * never does.
-     * 
-     * @param xwikidb the name of the database (subwiki) if null it is assumed to be the same as the wiki which we are
-     *            currently displaying.
+     *
+     * @param wikiId the identifier of the wiki, if null it is assumed to be the same as the wiki which we are currently
+     *            displaying.
      * @param context the XWikiContext used to determine the current wiki and the value if the xwiki.home parameter if
      *            needed as well as access the xwiki server document if in virtual mode.
      * @return a URL containing the protocol, host, and port (if applicable) of the server to use for the given
      *         database.
      */
-    public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
+    public URL getServerURL(String wikiId, XWikiContext context) throws MalformedURLException
     {
-        if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
+        if (wikiId == null || wikiId.equals(context.getOriginalWikiId())) {
             // This is the case if we are getting a URL for a page which is in
             // the same wiki as the page which is now being displayed.
             return this.serverURL;
         }
 
-        if (context.isMainWiki(xwikidb)) {
+        if (context.isMainWiki(wikiId)) {
             // Not in the same wiki so we are in a subwiki and we want a URL which points to the main wiki.
             // if xwiki.home is set then lets return that.
             final URL homeParam = getXWikiHomeParameter(context);
@@ -193,18 +207,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        URL url = context.getWiki().getServerURL(xwikidb, context);
+        URL url = context.getWiki().getServerURL(wikiId, context);
         return url == null ? this.serverURL : url;
     }
 
     @Override
-    public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context)
+    public URL createURL(String spaces, String name, String action, boolean redirect, XWikiContext context)
     {
-        return createURL(web, name, action, context);
+        return createURL(spaces, name, action, context);
     }
 
     @Override
-    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+    public URL createURL(String spaces, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
         // Action and Query String transformers
@@ -219,84 +233,105 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
-        addName(newpath, name, action, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
-            newpath.append("?");
-            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append("?");
+            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
-            newpath.append("#");
-            newpath.append(encode(anchor, context));
+            path.append("#");
+            path.append(encode(anchor, context));
         }
 
+        URL result;
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            result = normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
-            return null;
+            result = null;
         }
+
+        return result;
     }
 
-    private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)
+    private void addServletPath(StringBuilder path, String xwikidb, XWikiContext context)
     {
         if (xwikidb == null) {
-            xwikidb = context.getDatabase();
+            xwikidb = context.getWikiId();
         }
 
-        String spath = context.getWiki().getServletPath(xwikidb, context);
-        newpath.append(spath);
+        path.append(context.getWiki().getServletPath(xwikidb, context));
     }
 
-    private void addAction(StringBuffer newpath, String action, XWikiContext context)
+    private void addAction(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
         boolean showViewAction = context.getWiki().showViewAction(context);
-        if ((!"view".equals(action) || (showViewAction))) {
-            newpath.append(action);
-            newpath.append("/");
+
+        // - Always output the action if it's not "view" or if showViewAction is true
+        // - Output "view/<first space name>" when the first space name is an action name and the action is View
+        // (and showViewAction = false)
+        if ((!"view".equals(action) || (showViewAction))
+            || (!showViewAction && spaceReference != null && "view".equals(action)
+            && this.actionLister.listActions().contains(
+                spaceReference.extractFirstReference(EntityType.SPACE).getName())))
+        {
+            path.append(action).append("/");
         }
     }
 
-    private void addSpace(StringBuffer newpath, String space, String action, XWikiContext context)
+    private void addSpaces(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
-        boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
-        if (skipDefaultSpace) {
-            String defaultSpace = context.getWiki().getDefaultSpace(context);
-            skipDefaultSpace = (space.equals(defaultSpace)) && ("view".equals(action));
-        }
-        if (!skipDefaultSpace) {
-            newpath.append(encode(space, context));
-            newpath.append("/");
+        for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
+            appendSpacePathSegment(path, reference, context);
         }
     }
 
-    private void addName(StringBuffer newpath, String name, String action, XWikiContext context)
+    private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference, XWikiContext context)
+    {
+        path.append(encode(spaceReference.getName(), context)).append('/');
+    }
+
+    private void addName(StringBuilder path, String name, String action, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
             || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
-            newpath.append(encode(name, context));
+            path.append(encode(name, context));
         }
     }
 
-    protected void addFileName(StringBuffer newpath, String filename, XWikiContext context)
+    protected void addFileName(StringBuilder path, String fileName, XWikiContext context)
     {
-        addFileName(newpath, filename, true, context);
+        addFileName(path, fileName, true, context);
     }
 
-    protected void addFileName(StringBuffer newpath, String filename, boolean encode, XWikiContext context)
+    protected void addFileName(StringBuilder path, String fileName, boolean encode, XWikiContext context)
     {
-        newpath.append("/");
+        path.append("/");
         if (encode) {
-            newpath.append(encode(filename, context).replace("+", "%20"));
+            // Encode the given file name as a single path segment.
+            path.append(encode(fileName, context).replace("+", "%20"));
         } else {
-            newpath.append(filename);
+            try {
+                // The given file name is actually a file path and so we need to encode each path segment separately.
+                path.append(new URI(null, null, fileName, null));
+            } catch (URISyntaxException e) {
+                LOGGER.debug("Failed to encode the file path [{}]. Root cause: [{}]", fileName,
+                    ExceptionUtils.getRootCauseMessage(e));
+                // Use the raw file path as a fall-back.
+                path.append(fileName);
+            }
         }
     }
 
@@ -306,21 +341,21 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+    public URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context)
     {
-        return this.createURL(web, name, action, querystring, anchor, xwikidb, context);
+        return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
     @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append("skins/");
-        newpath.append(skin);
-        addFileName(newpath, filename, false, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        path.append("skins/");
+        path.append(skin);
+        addFileName(path, filename, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -328,16 +363,20 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
-        addAction(newpath, "skin", context);
-        addSpace(newpath, web, "skin", context);
-        addName(newpath, name, "skin", context);
-        addFileName(newpath, filename, false, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(path, null, "skin", context);
+        addSpaces(path, spaceReference, "skin", context);
+        addName(path, name, "skin", context);
+        addFileName(path, filename, false, context);
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -347,28 +386,28 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
+        StringBuilder path = new StringBuilder(this.contextPath);
         if (forceSkinAction) {
-            addServletPath(newpath, context.getDatabase(), context);
-            addAction(newpath, "skin", context);
+            addServletPath(path, context.getWikiId(), context);
+            addAction(path, null, "skin", context);
         }
-        newpath.append("resources");
-        addFileName(newpath, filename, false, context);
+        path.append("resources");
+        addFileName(path, filename, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
         }
     }
 
-    public URL createTemplateURL(String filename, XWikiContext context)
+    public URL createTemplateURL(String fileName, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        newpath.append("templates");
-        addFileName(newpath, filename, false, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        path.append("templates");
+        addFileName(path, fileName, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -376,11 +415,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
-            && isContextDoc(xwikidb, web, name, context)) {
+            && isContextDoc(xwikidb, spaces, name, context)) {
             try {
                 String docRevision = context.get("rev").toString();
                 XWikiAttachment attachment =
@@ -389,7 +428,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     action = "viewattachrev";
                 } else {
                     long arbId = findDeletedAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
-                    return createAttachmentRevisionURL(filename, web, name, attachment.getVersion(), arbId,
+                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
@@ -399,20 +438,24 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
-        addName(newpath, name, action, context);
-        addFileName(newpath, filename, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
+        addFileName(path, filename, context);
 
         if (!StringUtils.isEmpty(querystring)) {
-            newpath.append("?");
-            newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append("?");
+            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
         }
 
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (Exception e) {
             return null;
         }
@@ -421,42 +464,51 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     /**
      * Check if a document is the original context document. This is needed when generating attachment revision URLs,
      * since only attachments of the context document should also be versioned.
-     * 
+     *
      * @param wiki the wiki name of the document to check
-     * @param space the space name of the document to check
+     * @param spaces the space names of the document to check
      * @param name the document name of the document to check
      * @param context the current request context
      * @return {@code true} if the provided document is the same as the current context document, {@code false}
      *         otherwise
      */
-    protected boolean isContextDoc(String wiki, String space, String name, XWikiContext context)
+    protected boolean isContextDoc(String wiki, String spaces, String name, XWikiContext context)
     {
         if (context == null || context.getDoc() == null) {
             return false;
         }
-        XWikiDocument doc = context.getDoc();
-        return doc.getDocumentReference().getLastSpaceReference().getName().equals(space)
-            && doc.getDocumentReference().getName().equals(name)
-            && (wiki == null || doc.getDocumentReference().getWikiReference().getName().equals(wiki));
+
+        // Use the local serializer so that we don't serialize the wiki part since all we want to do is compare the
+        // passed spaces represented as a String with the current doc's spaces.
+        EntityReferenceSerializer<String> serializer =
+            Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        DocumentReference currentDocumentReference = context.getDoc().getDocumentReference();
+        return serializer.serialize(currentDocumentReference.getLastSpaceReference()).equals(spaces)
+            && currentDocumentReference.getName().equals(name)
+            && (wiki == null || currentDocumentReference.getWikiReference().getName().equals(wiki));
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
-        return createAttachmentRevisionURL(filename, web, name, revision, -1, querystring, xwikidb, context);
+        return createAttachmentRevisionURL(filename, spaces, name, revision, -1, querystring, xwikidb, context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
-        String querystring, String xwikidb, XWikiContext context)
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
+        long recycleId, String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
-        StringBuffer newpath = new StringBuffer(this.contextPath);
-        addServletPath(newpath, xwikidb, context);
-        addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
-        addName(newpath, name, action, context);
-        addFileName(newpath, filename, context);
+        StringBuilder path = new StringBuilder(this.contextPath);
+        addServletPath(path, xwikidb, context);
+
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        addAction(path, spaceReference, action, context);
+        addSpaces(path, spaceReference, action, context);
+        addName(path, name, action, context);
+        addFileName(path, filename, context);
 
         String qstring = "rev=" + revision;
         if (recycleId >= 0) {
@@ -465,11 +517,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             qstring += "&" + querystring;
         }
-        newpath.append("?");
-        newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
+        path.append("?");
+        path.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
 
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -483,7 +535,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * An URL is considered to be external if its server component doesn't match the server of the current request URL.
      * This means that URLs are made relative with respect to the current request URL rather than the current wiki set
      * on the XWiki context. Let's take an example:
-     * 
+     *
      * <pre>
      * {@code
      * request URL: http://playground.xwiki.org/xwiki/bin/view/Sandbox/TestURL
@@ -496,7 +548,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * (2) /xwiki/bin/view/Spage/Page
      * }
      * </pre>
-     * 
+     *
      * @param url the URL to convert
      * @return the converted URL as a string
      * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
@@ -510,33 +562,31 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (url != null) {
                 String surl = url.toString();
 
-                if (!surl.startsWith(serverURL.toString())) {
+                if (!surl.startsWith(this.serverURL.toString())) {
                     // External URL: leave it as is.
                     relativeURL = surl;
                 } else {
                     // Internal XWiki URL: convert to relative.
-                    StringBuffer sbuf = new StringBuffer(url.getPath());
+                    StringBuilder relativeURLBuilder = new StringBuilder(url.getPath());
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
-                        sbuf.append("?");
-                        sbuf.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
-                        // sbuf.append(querystring.replaceAll("&","&amp;"));
+                        relativeURLBuilder.append("?").append(
+                            StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
                     }
 
                     String anchor = url.getRef();
                     if (!StringUtils.isEmpty(anchor)) {
-                        sbuf.append("#");
-                        sbuf.append(anchor);
+                        relativeURLBuilder.append("#").append(anchor);
                     }
 
-                    relativeURL = Util.escapeURL(sbuf.toString());
+                    relativeURL = relativeURLBuilder.toString();
                 }
             }
         } catch (Exception e) {
             LOGGER.error("Failed to create URL", e);
         }
 
-        return relativeURL;
+        return StringUtils.defaultIfEmpty(relativeURL, "/");
     }
 
     @Override
@@ -547,7 +597,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         try {
             final URL servurl = getServerURL(context);
             // if use apache mod_proxy we needed to know external host address
-            return new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
+            return normalizeURL(new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile()),
+                context);
         } catch (MalformedURLException e) {
             // This should not happen
             LOGGER.error("Failed to create request URL", e);
@@ -589,5 +640,66 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         return -1;
+    }
+
+    /**
+     * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used for
+     * example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
+     * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
+     * <p/>
+     * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
+     * strip it since we don't want to have that in our URLs as it can cause issues with:
+     * <ul>
+     * <li>security</li>
+     * <li>SEO</li>
+     * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     * different as they'll get different URLs everytime they call the XWiki server</li>
+     * </ul>
+     * See why jsessionid are considered harmful <a
+     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
+     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     *
+     * @param url the URL to encode and normalize
+     * @param context the XWiki Context used to get access to the Response for encoding the URL
+     * @return the normalized URL
+     * @throws MalformedURLException if the passed URL is invalid
+     */
+    protected static URL normalizeURL(URL url, XWikiContext context) throws MalformedURLException
+    {
+        return normalizeURL(url.toExternalForm(), context);
+    }
+
+    /**
+     * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used for
+     * example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
+     * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
+     * <p/>
+     * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
+     * strip it since we don't want to have that in our URLs as it can cause issues with:
+     * <ul>
+     * <li>security</li>
+     * <li>SEO</li>
+     * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     * different as they'll get different URLs everytime they call the XWiki server</li>
+     * </ul>
+     * See why jsessionid are considered harmful <a
+     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
+     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     *
+     * @param url the URL to encode and normalize
+     * @param context the XWiki Context used to get access to the Response for encoding the URL
+     * @return the normalized URL
+     * @throws MalformedURLException if the passed URL is invalid
+     */
+    protected static URL normalizeURL(String url, XWikiContext context) throws MalformedURLException
+    {
+        // For robust session tracking, all URLs emitted by a servlet should be encoded. Otherwise, URL rewriting
+        // cannot be used with browsers which do not support cookies.
+        String encodedURLAsString = context.getResponse().encodeURL(url);
+
+        // Remove a potential jsessionid in the URL
+        encodedURLAsString = encodedURLAsString.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+
+        return new URL(encodedURLAsString);
     }
 }

@@ -69,7 +69,7 @@ public class ImportAdministrationSectionPage extends ViewPage
     public List<String> getPackageNames()
     {
         List<String> names = new ArrayList<String>();
-        for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(),
+        for (WebElement element : getDriver().findElementsWithoutWaiting(
             By.xpath("//div[@id='packagelistcontainer']//a[@class='package']")))
         {
             names.add(element.getText());
@@ -80,7 +80,7 @@ public class ImportAdministrationSectionPage extends ViewPage
     public void selectPackage(String packageName)
     {
         getDriver().findElement(By.linkText(packageName)).click();
-        waitUntilElementIsVisible(By.id("packageDescription"));
+        getDriver().waitUntilElementIsVisible(By.id("packageDescription"));
     }
 
     public void deletePackage(String packageName)
@@ -90,7 +90,8 @@ public class ImportAdministrationSectionPage extends ViewPage
         // Click on ok button
         ConfirmationModal confirmationModal = new ConfirmationModal();
         confirmationModal.clickOk();
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']"));
         getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']")).click();
     }
 
@@ -99,12 +100,12 @@ public class ImportAdministrationSectionPage extends ViewPage
         // Click submit
         this.importPackageLink.click();
         // Wait for the "Import successful message"
-        this.waitUntilElementIsVisible(By.xpath("//div[@id='packagecontainer']/div[@class='infomessage']"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='packagecontainer']/div[@class='infomessage']"));
     }
 
     public ViewPage clickImportedPage(String pageName)
     {
-        this.waitUntilElementIsVisible(By.linkText(pageName));
+        getDriver().waitUntilElementIsVisible(By.linkText(pageName));
         getDriver().findElement(By.linkText(pageName)).click();
         return new ViewPage();
     }

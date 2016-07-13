@@ -254,10 +254,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
         return createPropStat();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
+    @Override
     public MultiStatusResponse alterProperties(List changeList) throws DavException
     {
         for (Object next : changeList) {
@@ -462,10 +460,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
             || resourceName.equals("mach_kernel")
             || resourceName.equals("Backups.backupdb");
     }
-    
-    /**
-     * {@inheritDoc}    
-     */
+
+    @Override
     public int hashCode()
     {
         return getResourcePath().hashCode();

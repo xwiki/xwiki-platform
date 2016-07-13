@@ -67,11 +67,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -121,11 +117,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         for (Picker picker : pickers.keySet()) {
@@ -138,11 +130,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ChangeHandler#onChange(ChangeEvent)
-     */
+    @Override
     public void onChange(ChangeEvent event)
     {
         Command command = pickers.get(event.getSource());
@@ -152,11 +140,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractStatefulPlugin#update()
-     */
+    @Override
     public void update()
     {
         for (Map.Entry<Picker, Command> entry : pickers.entrySet()) {

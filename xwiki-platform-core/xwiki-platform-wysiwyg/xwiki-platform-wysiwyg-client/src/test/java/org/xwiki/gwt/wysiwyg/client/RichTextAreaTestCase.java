@@ -28,11 +28,7 @@ import org.xwiki.gwt.user.client.ui.rta.AbstractRichTextAreaTestCase;
  */
 public class RichTextAreaTestCase extends AbstractRichTextAreaTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractRichTextAreaTestCase#getModuleName()
-     */
+    @Override
     public String getModuleName()
     {
         return WysiwygTestCase.MODULE_NAME;

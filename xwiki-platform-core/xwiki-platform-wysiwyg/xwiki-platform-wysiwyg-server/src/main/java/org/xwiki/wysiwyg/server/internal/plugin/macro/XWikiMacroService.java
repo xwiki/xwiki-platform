@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,8 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * XWiki specific implementation of {@link MacroService}.
@@ -77,10 +80,42 @@ public class XWikiMacroService implements MacroService
     @Inject
     private MacroDescriptorTranslator macroDescriptorTranslator;
 
+    /**
+     * Used to set the current wiki, depending on the request.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Override
+    public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId, String wikiId)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        String newWikiId = wikiId;
+        if (newWikiId == null) {
+            newWikiId = xcontext.getWikiId();
+        }
+
+        String oldWikiId = xcontext.getWikiId();
+        if (oldWikiId != newWikiId) {
+            // Set the requested context wiki.
+            xcontext.setWikiId(newWikiId);
+        }
+
+        try {
+            return macroDescriptorTranslator.translate(getUntranslatedMacroDescriptor(macroId, syntaxId));
+        } finally {
+            // Reset the context's current wiki.
+            if (oldWikiId != newWikiId) {
+                xcontext.setWikiId(oldWikiId);
+            }
+        }
+    }
+
     @Override
     public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId)
     {
-        return macroDescriptorTranslator.translate(getUntranslatedMacroDescriptor(macroId, syntaxId));
+        return getMacroDescriptor(macroId, syntaxId, null);
     }
 
     /**
@@ -92,7 +127,7 @@ public class XWikiMacroService implements MacroService
     {
         try {
             MacroId macroIdObject = new MacroId(macroId, syntaxFactory.createSyntaxFromIdString(syntaxId));
-            Macro< ? > macro = macroManager.getMacro(macroIdObject);
+            Macro<?> macro = macroManager.getMacro(macroIdObject);
             org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
 
             ParameterDescriptor contentDescriptor = null;
@@ -163,7 +198,7 @@ public class XWikiMacroService implements MacroService
     {
         ParameterType parameterType = new ParameterType();
         if (type instanceof Class) {
-            Class< ? > parameterClass = (Class< ? >) type;
+            Class<?> parameterClass = (Class<?>) type;
             parameterType.setName(parameterClass.getName());
             if (parameterClass.isEnum()) {
                 Object[] parameterClassConstants = parameterClass.getEnumConstants();
@@ -180,8 +215,21 @@ public class XWikiMacroService implements MacroService
     }
 
     @Override
-    public List<MacroDescriptor> getMacroDescriptors(String syntaxId)
+    public List<MacroDescriptor> getMacroDescriptors(String syntaxId, String wikiId)
     {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        String newWikiId = wikiId;
+        if (newWikiId == null) {
+            newWikiId = xcontext.getWikiId();
+        }
+
+        String oldWikiId = xcontext.getWikiId();
+        if (oldWikiId != newWikiId) {
+            // Set the requested context wiki.
+            xcontext.setWikiId(newWikiId);
+        }
+
         try {
             Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
             List<MacroDescriptor> descriptors = new ArrayList<MacroDescriptor>();
@@ -205,6 +253,17 @@ public class XWikiMacroService implements MacroService
         } catch (Exception e) {
             throw new RuntimeException("Exception while retrieving the list of macro descriptors for syntax ["
                 + syntaxId + "].", e);
+        } finally {
+            // Reset the context's current wiki.
+            if (oldWikiId != newWikiId) {
+                xcontext.setWikiId(oldWikiId);
+            }
         }
+    }
+
+    @Override
+    public List<MacroDescriptor> getMacroDescriptors(String syntaxId)
+    {
+        return getMacroDescriptors(syntaxId, null);
     }
 }

@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -42,7 +44,9 @@ import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
  * @version $Id$
  * @since 2.0M1
  */
-@Component("html")
+@Component
+@Named("html")
+@Singleton
 public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializable
 {
     /**

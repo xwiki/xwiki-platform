@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * XWD_ARCHIVE field, as it will prevent saving documents, since that column used to have a NOT NULL constraint. Also,
  * Hibernate does not delete columns/tables that don't appear in the mapping file, so the column must be manually
  * dropped.
- * 
+ *
  * @version $Id$
  * @since 1.3M2
  * @since 1.2.2

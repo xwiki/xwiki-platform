@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Collections;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -28,17 +26,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Action for disabling a property definition of the current class. The property to disable is specified in the {@code
- * propname} request parameter, and the class is the one defined in the requested document.
- * 
+ * Action for disabling a property definition of the current class. The property to disable is specified in the
+ * {@code propname} request parameter, and the class is the one defined in the requested document.
+ *
  * @version $Id$
  * @since 2.4M2
  */
 public class PropDisableAction extends AbstractPropChangeAction
 {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void changePropertyDefinition(BaseClass xclass, String propertyName, XWikiContext context)
         throws XWikiException
@@ -47,7 +42,7 @@ public class PropDisableAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.disableField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.disableClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(doc,
+            localizePlainOrKey("core.model.xclass.disableClassProperty.versionSummary", propertyName), true, context);
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForNoAdminFarmAccess() -->
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#testInheritancePolicyForNoAdminFarmAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="main wiki allowing all but admin access to userA">
     <user name="userA" />
@@ -9,6 +9,7 @@
     <allowUser type="delete" name="userA" />
     <allowUser type="register" name="userA" />
     <allowUser type="login" name="userA" />
+    <allowUser type="script" name="userA" />
 
     <space name="any space">
       <document name="any document" />
@@ -63,6 +64,7 @@
       <allowUser type="edit" name="wiki:XWiki.userA" />
       <allowUser type="comment" name="wiki:XWiki.userA" />
       <allowUser type="delete" name="wiki:XWiki.userA" />
+      <allowUser type="script" name="wiki:XWiki.userA" />
 
       <document name="any document" />
 

@@ -24,6 +24,13 @@ import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered before a document is updated.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance which is going to be saved</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 2.7RC1

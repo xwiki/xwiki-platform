@@ -22,10 +22,13 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Classes;
@@ -36,16 +39,20 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
 public class ClassesResourceImpl extends XWikiResource implements ClassesResource
 {
+    @Inject
+    private ModelFactory utils;
+
     @Override
     public Classes getClasses(String wikiName, Integer start, Integer number) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            getXWikiContext().setWikiId(wikiName);
 
             List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
@@ -56,15 +63,14 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
 
             for (String className : ri) {
                 com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
-                classes.getClazzs().add(
-                        DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass));
+                classes.getClazzs().add(this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass));
             }
 
             return classes;
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

@@ -27,7 +27,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current wiki in the
@@ -47,18 +49,44 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
      */
     public static final String ID = "wiki";
 
+    private static final String KEY_PREFIX = ID + ':';
+
+    @Inject
+    private WikiDescriptorManager wikis;
+
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
     private ComponentManager rootComponentManager;
 
-    /**
-     * Default constructor.
-     */
-    public WikiComponentManager()
+    private String getCurrentWiki()
     {
-        super(EntityType.WIKI);
+        return this.wikis.getCurrentWikiId();
+    }
+
+    @Override
+    protected EntityReference getCurrentReference()
+    {
+        String currentWikiId = getCurrentWiki();
+
+        return currentWikiId != null ? new WikiReference(currentWikiId) : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override default implementation with one much better for performances.
+     * </p>
+     * 
+     * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
+     */
+    @Override
+    protected String getKey()
+    {
+        String wiki = getCurrentWiki();
+
+        return wiki != null ? KEY_PREFIX + wiki : null;
     }
 
     @Override

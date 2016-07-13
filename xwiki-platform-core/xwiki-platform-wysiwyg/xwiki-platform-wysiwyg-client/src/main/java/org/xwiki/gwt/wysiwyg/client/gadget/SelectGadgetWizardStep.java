@@ -48,11 +48,6 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
         getValidationMessage().setText(Strings.INSTANCE.gadgetNoGadgetSelected());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectMacroWizardStep#getStepTitle()
-     */
     @Override
     public String getStepTitle()
     {
@@ -60,9 +55,11 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc}
+     * <p>
      * Overridden here to send a GadgetInstance to the edit gadget step, which will also contain the title of the
      * gadget, not only the content.
+     * </p>
      * 
      * @see org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep#getResult()
      */
@@ -73,8 +70,7 @@ public class SelectGadgetWizardStep extends SelectMacroWizardStep
         GadgetInstance gadgetInstance = new GadgetInstance();
         gadgetInstance.setMacroCall(superResult);
         // prefill the title of the gadget with the name of the macro
-        gadgetInstance.setTitle(superResult.getName());
-
+        gadgetInstance.setTitle("$services.localization.render('rendering.macro." + superResult.getName() + ".name')");
         return gadgetInstance;
     }
 }

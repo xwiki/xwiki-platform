@@ -23,7 +23,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Represents an Artifact Item in the plugin configuration.
- * 
+ *
  * @version $Id$
  * @since 3.4M1
  */
@@ -31,7 +31,7 @@ public class ArtifactItem
 {
     /**
      * Group Id of Artifact.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -39,7 +39,7 @@ public class ArtifactItem
 
     /**
      * Name of Artifact.
-     * 
+     *
      * @parameter
      * @required
      */
@@ -47,14 +47,14 @@ public class ArtifactItem
 
     /**
      * Version of Artifact.
-     * 
+     *
      * @parameter
      */
     private String version;
 
     /**
      * Type of Artifact (War, Jar, etc).
-     * 
+     *
      * @parameter
      * @required
      */
@@ -62,7 +62,7 @@ public class ArtifactItem
 
     /**
      * Classifier for Artifact (tests,sources,etc).
-     * 
+     *
      * @parameter
      */
     private String classifier;
@@ -72,7 +72,7 @@ public class ArtifactItem
      */
     public String getArtifactId()
     {
-        return artifactId;
+        return this.artifactId;
     }
 
     /**
@@ -88,7 +88,7 @@ public class ArtifactItem
      */
     public String getGroupId()
     {
-        return groupId;
+        return this.groupId;
     }
 
     /**
@@ -104,7 +104,7 @@ public class ArtifactItem
      */
     public String getType()
     {
-        return type;
+        return this.type;
     }
 
     /**
@@ -120,7 +120,7 @@ public class ArtifactItem
      */
     public String getVersion()
     {
-        return version;
+        return this.version;
     }
 
     /**
@@ -136,7 +136,7 @@ public class ArtifactItem
      */
     public String getClassifier()
     {
-        return classifier;
+        return this.classifier;
     }
 
     /**
@@ -165,13 +165,13 @@ public class ArtifactItem
         builder.append(StringUtils.defaultString(this.version, "?"));
         builder.append(':');
         builder.append(this.type);
-        
+
         return builder.toString();
     }
 
     /**
      * Convert empty string into <code>null</code>.
-     * 
+     *
      * @param in the value to filter
      * @return null the passer value or null if it's empty
      */

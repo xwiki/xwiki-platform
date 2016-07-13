@@ -39,7 +39,7 @@ import com.xpn.xwiki.XWikiContext;
  * Convert all document event to remote events and back to local events.
  * <p>
  * It also make sure the context contains the proper information like the user or the wiki.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -51,7 +51,7 @@ public class WikiEventConverter extends AbstractXWikiEventConverter
     /**
      * The events supported by this converter.
      */
-    private Set<Class< ? extends Event>> events = new HashSet<Class< ? extends Event>>()
+    private Set<Class<? extends Event>> events = new HashSet<Class<? extends Event>>()
     {
         {
             add(WikiDeletedEvent.class);

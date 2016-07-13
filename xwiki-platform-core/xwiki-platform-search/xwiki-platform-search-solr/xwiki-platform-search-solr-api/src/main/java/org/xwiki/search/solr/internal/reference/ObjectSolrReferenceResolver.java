@@ -59,14 +59,14 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
      */
     @Inject
     @Named("object_property")
-    protected Provider<SolrReferenceResolver> objectPropertyResolverProvider;
+    private Provider<SolrReferenceResolver> objectPropertyResolverProvider;
 
     /**
      * Used to resolve document references.
      */
     @Inject
     @Named("document")
-    protected Provider<SolrReferenceResolver> documentResolverProvider;
+    private Provider<SolrReferenceResolver> documentResolverProvider;
 
     /**
      * Reference to String serializer. Used for fields such as class and fullname that are relative to their wiki and
@@ -74,7 +74,7 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
      */
     @Inject
     @Named("local")
-    protected EntityReferenceSerializer<String> localSerializer;
+    private EntityReferenceSerializer<String> localSerializer;
 
     @Override
     public List<EntityReference> getReferences(EntityReference objectReference) throws SolrIndexerException
@@ -121,8 +121,8 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         StringBuilder builder = new StringBuilder();
 
-        EntityReference spaceReference = reference.extractReference(EntityType.SPACE);
-        builder.append(documentResolverProvider.get().getQuery(spaceReference));
+        EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
+        builder.append(this.documentResolverProvider.get().getQuery(documentReference));
 
         builder.append(QUERY_AND);
 

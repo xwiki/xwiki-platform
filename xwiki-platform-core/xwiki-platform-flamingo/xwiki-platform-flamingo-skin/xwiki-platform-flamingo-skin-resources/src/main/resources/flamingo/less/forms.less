@@ -1,0 +1,119 @@
+//
+// Forms
+// --------------------------------------------------
+
+textarea, select, input[type="text"], input[type="password"] {
+  &:extend(.form-control all);
+  display: inline-block;
+  max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
+  width: auto;
+}
+
+select.input-sm, input[type="text"].input-sm, input[type="password"].input-sm {
+  .input-sm;
+}
+
+select.input-lg, input[type="text"].input-lg, input[type="password"].input-lg {
+  .input-lg;
+}
+
+input[type="radio"], 
+input[type="checkbox"] {
+  display: inline-block;
+  margin-right: (@padding-base-horizontal / 2);
+}
+
+textarea {
+  height: auto;
+  font-family: @font-family-monospace;
+}
+
+.placeholder(@color: @text-muted);
+
+/* For browsers that don't support the placeholder attribute. */
+input[type="text"].empty {
+  .text-muted;
+}
+
+/* Overrides Bootstrap generic select[size] selector, since it should be applied only for size>1 */
+select[size="0"], select[size="1"] {
+  height: @input-height-base;
+}
+
+.xform {
+  input[type="text"], input[type="password"], select, textarea {
+    width: 100%;
+  }
+  dl {
+    dt {
+      margin-top: floor(@font-size-base * 1.4);
+      position: relative;
+      &:first-of-type {
+        margin-top: 0;
+      }
+      label {
+        color: @text-color;
+        font-size: 0.85em;
+        font-weight: 700;
+        margin-bottom: 0.3em;
+        text-transform: uppercase;
+        .buttonwrapper a {
+          .btn-xs;
+          line-height: 1.3em;
+          margin: 0;
+          position: absolute;
+          right: 0;
+          text-transform: none;
+          top: 0;
+        }
+      }
+    }
+  }
+  label {
+    margin: 0;
+    font-weight: normal;
+  }
+  .xRequired {
+    margin-left: 1ex;
+  }
+  .xHint, .xRequired, .xErrorMsg {
+    .text-muted-smaller;
+    font-weight: 400;
+    text-transform: none;
+  }
+  .xHint {
+    display: block;
+  }
+  .xErrorMsg {
+    color: @state-danger-text;
+  }
+  .xErrorField {
+    border-color: @state-danger-border;
+  }
+}
+
+.xformInline {
+  label {
+    text-transform: uppercase;
+    margin-right: 0.5em;
+  }
+  input[type="text"] {
+    vertical-align: middle;
+  }
+}
+
+.xwiki-form-listclass {
+  display: block;
+}
+
+/* Validation messages do not have the place to be displayed at the right of the input field, because the width of the fields is 100%. */
+.LV_validation_message {
+  display: block;
+}
+
+// Forms on the navbar ==================================================
+@media screen and (max-width: @screen-xs-max) {
+  .navbar-form {
+    margin: 0 0;
+  }
+}

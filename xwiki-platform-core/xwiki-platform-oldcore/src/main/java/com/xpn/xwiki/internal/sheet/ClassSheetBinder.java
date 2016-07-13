@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
  * Binds sheets to XWiki classes using the {@code XWiki.ClassSheetBinding} class. This implementation should be used for
  * sheets designed to display objects of a specific class. This type of sheets are usually applied when a document
  * containing an object of the bound class is displayed.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */

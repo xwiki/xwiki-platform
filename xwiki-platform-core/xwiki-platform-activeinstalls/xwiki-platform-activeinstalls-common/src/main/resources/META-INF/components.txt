@@ -1,0 +1,2 @@
+org.xwiki.activeinstalls.internal.DefaultJestClientManager
+org.xwiki.activeinstalls.internal.DefaultActiveInstallsConfiguration

@@ -19,8 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.merge.MergeUtils;
+import com.google.common.base.Objects;
 
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
@@ -33,7 +32,10 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public String getValue()
     {
-        return this.value;
+        // A null String does not make much sense (the whole property would not be in the xobject in that case) and we
+        // have to make sure something saved as empty string will come back as such in Oracle (which has a very
+        // annoying "empty string is stored as null" behavior)
+        return this.value != null ? this.value : "";
     }
 
     @Override
@@ -46,31 +48,21 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public String toText()
     {
-        String value = getValue();
-        if (value != null) {
-            return value;
-        }
-
-        return "";
+        return getValue();
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        // Same Java object, they sure are equal
-        if (this == obj) {
-            return true;
-        }
-
         if (!super.equals(obj)) {
             return false;
         }
-
-        if ((getValue() == null) && (((BaseStringProperty) obj).getValue() == null)) {
-            return true;
+        
+        if (!(obj instanceof BaseStringProperty)) {
+            return false;
         }
-
-        return getValue().equals(((BaseStringProperty) obj).getValue());
+        
+        return Objects.equal(this.getValue(), ((BaseStringProperty) obj).getValue());
     }
 
     @Override
@@ -84,11 +76,5 @@ public class BaseStringProperty extends BaseProperty
     {
         BaseStringProperty property = (BaseStringProperty) clone;
         property.setValue(getValue());
-    }
-
-    @Override
-    protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
-    {
-        setValue(MergeUtils.mergeCharacters((String) previousValue, (String) newValue, getValue(), mergeResult));
     }
 }

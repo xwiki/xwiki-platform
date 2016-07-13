@@ -70,7 +70,7 @@ public final class ObjectMethodsProxy
      */
     private static Integer proxyHashCode(Object proxy)
     {
-        return new Integer(System.identityHashCode(proxy));
+        return System.identityHashCode(proxy);
     }
 
     /**

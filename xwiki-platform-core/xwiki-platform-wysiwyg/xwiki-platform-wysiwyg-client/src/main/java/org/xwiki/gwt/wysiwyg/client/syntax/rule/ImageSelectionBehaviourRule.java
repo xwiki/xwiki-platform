@@ -33,21 +33,13 @@ import org.xwiki.gwt.wysiwyg.client.syntax.ValidationRule;
  */
 public class ImageSelectionBehaviourRule implements ValidationRule
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#areValid(RichTextArea)
-     */
+    @Override
     public boolean areValid(RichTextArea textArea)
     {
         return !textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ValidationRule#getFeatures()
-     */
+    @Override
     public String[] getFeatures()
     {
         return new String[] {"bold", "italic", "underline", "strikethrough", "subscript", "superscript",

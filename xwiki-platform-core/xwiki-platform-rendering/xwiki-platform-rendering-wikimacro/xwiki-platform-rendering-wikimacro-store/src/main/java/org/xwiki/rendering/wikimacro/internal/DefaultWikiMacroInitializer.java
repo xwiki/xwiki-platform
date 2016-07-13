@@ -24,14 +24,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -41,13 +42,11 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
-import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * A {@link DefaultWikiMacroInitializer} providing wiki macros.
@@ -77,11 +76,22 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named(WIKI_MACRO_CLASS)
+    private MandatoryDocumentInitializer wikiMacroInitializer;
+
+    @Inject
+    @Named(WIKI_MACRO_PARAMETER_CLASS)
+    private MandatoryDocumentInitializer wikiMacroParameterInitializer;
+
     /**
      * The logger to log.
      */
     @Inject
     private Logger logger;
+
+    @Inject
+    private SpaceReferenceResolver<String> spaceReferenceResolver;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -122,7 +132,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         XWikiContext xcontext = getContext();
 
         // Register the wiki macros that exist
-        String originalWiki = xcontext.getDatabase();
+        String originalWiki = xcontext.getWikiId();
         try {
             if (!local) {
                 Set<String> wikiNames = new HashSet<String>();
@@ -136,7 +146,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 registerMacrosForWiki(wiki, xcontext);
             }
         } finally {
-            xcontext.setDatabase(originalWiki);
+            xcontext.setWikiId(originalWiki);
         }
     }
 
@@ -149,13 +159,13 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacrosForWiki(String wikiName, XWikiContext xcontext)
     {
         try {
-            this.logger.debug("Registering wiki macros for wiki {}", wikiName);
+            this.logger.debug("Registering all wiki macros found in wiki [{}]", wikiName);
 
             // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
             // registration of macros registered for the current wiki will work.
             // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current user
             // (see below) to the WikiMacroManager's implementation.
-            xcontext.setDatabase(wikiName);
+            xcontext.setWikiId(wikiName);
 
             // Make sure classes exists and are up to date in this wiki
             installOrUpgradeWikiMacroClasses();
@@ -164,9 +174,12 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                 // In the database the space and page names are always specified for a document. However the wiki
                 // part isn't, so we need to replace the wiki reference with the current wiki.
+                // Note that the space part can contain one or more spaces since XWiki 7.2 and the introduction of
+                // Nested Spaces.
+                SpaceReference spaceReference =
+                    this.spaceReferenceResolver.resolve((String) wikiMacroDocumentData[0], new WikiReference(wikiName));
                 DocumentReference wikiMacroDocumentReference =
-                    new DocumentReference((String) wikiMacroDocumentData[1], new SpaceReference(
-                        (String) wikiMacroDocumentData[0], new WikiReference(wikiName)));
+                    new DocumentReference((String) wikiMacroDocumentData[1], spaceReference);
 
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
@@ -200,7 +213,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
         XWikiContext xcontext)
     {
-        this.logger.debug("Found macro: {}", wikiMacroDocumentReference);
+        this.logger.debug("Registering macro in document [{}]...", wikiMacroDocumentReference);
 
         DocumentReference originalAuthor = xcontext.getUserReference();
         try {
@@ -208,7 +221,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
 
             this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
 
-            this.logger.debug("Registered macro " + wikiMacroDocumentReference);
+            this.logger.debug("Macro [{}] from document [{}] is now registered.",
+                macro.getDescriptor().getId().getId(), wikiMacroDocumentReference);
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error
@@ -221,84 +235,22 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         }
     }
 
-    private boolean setWikiMacroClassesDocumentFields(XWikiDocument doc, String title)
-    {
-        boolean needsUpdate = false;
-
-        if (StringUtils.isBlank(doc.getCreator())) {
-            needsUpdate = true;
-            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthorReference(doc.getCreatorReference());
-        }
-        if (StringUtils.isBlank(doc.getParent())) {
-            needsUpdate = true;
-            doc.setParent("XWiki.XWikiClasses");
-        }
-        if (StringUtils.isBlank(doc.getTitle())) {
-            needsUpdate = true;
-            doc.setTitle(title);
-        }
-        if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
-            doc.setSyntax(Syntax.XWIKI_2_0);
-        }
-        if (!doc.isHidden()) {
-            needsUpdate = true;
-            doc.setHidden(true);
-        }
-
-        return needsUpdate;
-    }
-
     @Override
     public void installOrUpgradeWikiMacroClasses() throws Exception
     {
         XWikiContext xcontext = getContext();
 
         // Install or Upgrade XWiki.WikiMacroClass
-        XWikiDocument doc = xcontext.getWiki().getDocument(WIKI_MACRO_CLASS, xcontext);
-        BaseClass bclass = doc.getXClass();
+        XWikiDocument doc = xcontext.getWiki().getDocument(this.wikiMacroInitializer.getDocumentReference(), xcontext);
 
-        boolean needsUpdate = false;
-
-        needsUpdate |= setWikiMacroClassesDocumentFields(doc, "XWiki Wiki Macro Class");
-        needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
-        needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
-        needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
-        needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
-        needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
-        needsUpdate |=
-            bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
-                "Current User|Current Wiki|Global", "select", "|");
-        needsUpdate |=
-            bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
-                "Optional|Mandatory|No content", "select", "|");
-        needsUpdate |=
-            bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
-                "Content description (Not applicable for \"No content\" type)", 40, 5);
-        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
-
-        if (needsUpdate) {
+        if (this.wikiMacroInitializer.updateDocument(doc)) {
             update(doc);
         }
 
         // Install or Upgrade XWiki.WikiMacroParameterClass
         doc = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
-        bclass = doc.getXClass();
 
-        needsUpdate = false;
-
-        needsUpdate |= setWikiMacroClassesDocumentFields(doc, "XWiki Wiki Macro Parameter Class");
-        needsUpdate |= bclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
-        needsUpdate |= bclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
-        needsUpdate |= bclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
-        needsUpdate |= bclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
-
-        if (needsUpdate) {
+        if (this.wikiMacroParameterInitializer.updateDocument(doc)) {
             update(doc);
         }
     }

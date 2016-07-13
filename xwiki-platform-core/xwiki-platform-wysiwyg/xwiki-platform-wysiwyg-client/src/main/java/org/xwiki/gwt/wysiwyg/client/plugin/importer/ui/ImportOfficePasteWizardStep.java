@@ -115,18 +115,14 @@ public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep i
         display().add(filterStylesCheckBox);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void init(Object data, AsyncCallback< ? > cb)
     {
         textArea.setHTML("");
         cb.onSuccess(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         return this.result;
@@ -142,17 +138,13 @@ public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep i
         this.result = result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
         textArea.setHTML("");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
         pasteFilter.filter(textArea.getDocument());
@@ -162,12 +154,14 @@ public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep i
         } else {
             importService.cleanOfficeHTML(officeHTML, "wysiwyg", getHTMLCleaningParams(), new AsyncCallback<String>()
             {
+                @Override
                 public void onSuccess(String result)
                 {
                     setResult(result);
                     async.onSuccess(true);
                 }
 
+                @Override
                 public void onFailure(Throwable thrown)
                 {
                     async.onFailure(thrown);
@@ -195,11 +189,7 @@ public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep i
         return params;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadHandler#onLoad(LoadEvent)
-     */
+    @Override
     public void onLoad(LoadEvent event)
     {
         if (event.getSource() == textArea) {

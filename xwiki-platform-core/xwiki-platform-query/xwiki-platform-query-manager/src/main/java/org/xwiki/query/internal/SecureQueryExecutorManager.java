@@ -26,11 +26,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.query.SecureQuery;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * {@link QueryExecutorManager} with access rights checking.
@@ -45,70 +47,29 @@ import org.xwiki.query.QueryExecutorManager;
 @Singleton
 public class SecureQueryExecutorManager implements QueryExecutorManager
 {
-    /**
-     * Nested {@link QueryExecutorManager}.
-     */
     @Inject
-    private QueryExecutorManager nestedQueryExecutorManager;
+    private QueryExecutorManager defaultQueryExecutorManager;
 
-    /**
-     * Bridge to xwiki-core for checking programming right.
-     */
     @Inject
-    private DocumentAccessBridge bridge;
-
-    /**
-     * @param statement the statement to evaluate.
-     * @return true if the statement is complete, false otherwise.
-     */
-    private boolean isShortFormStatement(String statement)
-    {
-        boolean isShortStatement = false;
-        String lcStatement = statement.trim().toLowerCase();
-
-        isShortStatement |= lcStatement.startsWith(", ");
-        isShortStatement |= lcStatement.startsWith("from");
-        isShortStatement |= lcStatement.startsWith("where");
-        isShortStatement |= lcStatement.startsWith("order");
-
-        return isShortStatement;
-    }
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        if (query.isNamed() && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Named queries requires programming right", query, null);
+        if (query instanceof SecureQuery) {
+            SecureQuery secureQuery = (SecureQuery) query;
+            // Force checking current author rights
+            secureQuery.checkCurrentAuthor(true);
+        } else if (!this.authorization.hasAccess(Right.PROGRAM)) {
+            throw new QueryException("Unsecure query require programming right", query, null);
         }
-        if (!Query.XWQL.equals(query.getLanguage()) && !Query.HQL.equals(query.getLanguage())
-                && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Query languages others than XWQL or HQL require programming right", query, null);
-        }
-        if (!isShortFormStatement(query.getStatement()) && !getBridge().hasProgrammingRights()) {
-            throw new QueryException("Full form statements requires programming right", query, null);
-        }
-        return getNestedQueryExecutorManager().execute(query);
+
+        return this.defaultQueryExecutorManager.execute(query);
     }
 
     @Override
     public Set<String> getLanguages()
     {
-        return getNestedQueryExecutorManager().getLanguages();
-    }
-
-    /**
-     * @return {@link DocumentAccessBridge}
-     */
-    protected DocumentAccessBridge getBridge()
-    {
-        return this.bridge;
-    }
-
-    /**
-     * @return nested {@link QueryExecutorManager}
-     */
-    protected QueryExecutorManager getNestedQueryExecutorManager()
-    {
-        return this.nestedQueryExecutorManager;
+        return this.defaultQueryExecutorManager.getLanguages();
     }
 }

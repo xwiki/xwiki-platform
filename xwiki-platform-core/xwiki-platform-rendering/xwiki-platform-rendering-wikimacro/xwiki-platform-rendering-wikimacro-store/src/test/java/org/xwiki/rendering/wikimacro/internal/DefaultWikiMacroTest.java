@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jmock.Expectations;
+import org.jmock.api.Invocation;
+import org.jmock.lib.action.CustomAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +44,9 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -79,10 +84,14 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
     private XWikiDocument user;
 
+    private WikiDescriptorManager mockWikiDescriptorManager;
+
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
     }
 
     @Override
@@ -91,6 +100,23 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
+                will(new CustomAction("WikiDescriptorManager#getCurrentWikiId")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        return getContext().getWikiId();
+                    }
+                });
+            }
+        });
+
+        final ContextualAuthorizationManager mockCam = getContextualAuthorizationManager();
+
         final XWiki mockXWiki = getMockery().mock(XWiki.class);
         final XWikiGroupService mockXWikiGroupService = getMockery().mock(XWikiGroupService.class);
 
@@ -98,17 +124,17 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         this.xwiki20Parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
 
-        this.wikiMacroDocumentReference = new DocumentReference(getContext().getDatabase(), "space", "macroPage");
+        this.wikiMacroDocumentReference = new DocumentReference(getContext().getWikiId(), "space", "macroPage");
         this.wikiMacroManager = getComponentManager().getInstance(WikiMacroManager.class);
 
         this.wikiMacroDocument = new XWikiDocument(wikiMacroDocumentReference);
 
         final XWikiRightService rightService = new XWikiRightServiceImpl();
 
-        this.user = new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "user"));
+        this.user = new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "user"));
         this.user.setNew(false);
         BaseObject userObject = new BaseObject();
-        userObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiusers"));
+        userObject.setXClassReference(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiusers"));
         this.user.addXObject(userObject);
 
         this.wikiMacroDocument.setCreatorReference(this.user.getAuthorReference());
@@ -117,12 +143,15 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
         // Setup an XWikiPreferences document granting programming rights to user
         final XWikiDocument prefs =
-            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"));
+            new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreferences"));
         final BaseObject mockGlobalRightObj = getMockery().mock(BaseObject.class);
 
         getMockery().checking(new Expectations()
         {
             {
+                allowing(mockCam).hasAccess(Right.PROGRAM);
+                will(returnValue(true));
+
                 allowing(mockXWiki).getDocument(with(equal(wikiMacroDocumentReference)), with(any(XWikiContext.class)));
                 will(returnValue(wikiMacroDocument));
 

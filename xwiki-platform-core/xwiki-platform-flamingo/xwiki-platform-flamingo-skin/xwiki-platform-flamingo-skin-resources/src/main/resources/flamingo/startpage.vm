@@ -1,0 +1,18 @@
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#if($displayMainMenu)
+  <div id="menuview">
+    #template("menus_view.vm")
+  </div>
+#end
+#template("header.vm")
+
+<div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
+<div id="contentcontainerinner">
+<div class="leftsidecolumns">
+#if($hidecolumns && ($!hidecolumns == 1))
+  <div id="contentcolumn" class="contenthidelefthideright">
+#else
+  <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
+#end

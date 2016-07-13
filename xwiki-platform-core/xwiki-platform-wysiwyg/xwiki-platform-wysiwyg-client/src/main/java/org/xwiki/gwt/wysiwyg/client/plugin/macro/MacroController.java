@@ -66,11 +66,7 @@ public class MacroController implements DoubleClickHandler, KeyDownHandler
         return registrations;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
-     */
+    @Override
     public void onDoubleClick(DoubleClickEvent event)
     {
         if (event.getSource() == plugin.getTextArea() && isMacroCurrentlySelected()) {
@@ -78,11 +74,7 @@ public class MacroController implements DoubleClickHandler, KeyDownHandler
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
-     */
+    @Override
     public void onKeyDown(KeyDownEvent event)
     {
         int keyCode = event.getNativeKeyCode();

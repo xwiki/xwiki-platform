@@ -33,13 +33,17 @@ import com.google.gwt.dom.client.IFrameElement;
 public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari
 {
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * NOTE: Remove this method as soon as Issue 3147 is fixed. <br />
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
+     * </p>
+     * <ul>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3147</li>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3156</li>
+     * </ul>
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#setHTMLImpl(String)
-     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3147"
-     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3156"
      */
     @Override
     protected void setHTMLImpl(String html)

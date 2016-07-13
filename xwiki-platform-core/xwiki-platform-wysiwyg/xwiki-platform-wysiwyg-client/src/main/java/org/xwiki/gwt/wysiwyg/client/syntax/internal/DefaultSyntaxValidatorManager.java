@@ -37,31 +37,19 @@ public class DefaultSyntaxValidatorManager implements SyntaxValidatorManager
      */
     private final Map<String, SyntaxValidator> validators = new HashMap<String, SyntaxValidator>();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidatorManager#addSyntaxValidator(SyntaxValidator)
-     */
+    @Override
     public SyntaxValidator addSyntaxValidator(SyntaxValidator validator)
     {
         return validators.put(validator.getSyntax(), validator);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidatorManager#getSyntaxValidator(String)
-     */
+    @Override
     public SyntaxValidator getSyntaxValidator(String syntax)
     {
         return validators.get(syntax);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidatorManager#removeSyntaxValidator(String)
-     */
+    @Override
     public SyntaxValidator removeSyntaxValidator(String syntax)
     {
         return validators.remove(syntax);

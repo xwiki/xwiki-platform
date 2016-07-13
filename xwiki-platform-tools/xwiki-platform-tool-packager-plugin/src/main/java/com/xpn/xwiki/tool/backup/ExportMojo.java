@@ -19,15 +19,15 @@
  */
 package com.xpn.xwiki.tool.backup;
 
+import java.io.File;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import java.io.File;
-
 /**
  * Maven 2 plugin to export a set of XWiki documents from an existing database to the file system.
- * 
+ *
  * @version $Id$
  * @goal export
  */

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.ClassSheet" locale="">
+  <web>XWiki</web>
+  <name>ClassSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1375380137000</creationDate>
+  <parent>XWiki.XWikiClasses</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1445594256000</date>
+  <contentUpdateDate>1445594204000</contentUpdateDate>
+  <version>1.1</version>
+  <title>#sheetTitle('Default Class Sheet')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{template name="locationPicker_macros.vm" /}}
+
+{{velocity}}
+## This document can be copied in order to be customized so we cannot rely on its name to determine if the currently
+## displayed document is a class or the class sheet itself. We look for the sheet descriptor instead.
+#set ($isSheet = $doc.getObject('XWiki.SheetDescriptorClass'))
+#if ($isSheet)
+  ## Viewing the sheet document itself.
+  You can edit this page to change the default presentation of classes, or you can copy it to create a customized view just for one or several classes.
+#elseif ("$!request.bindSheet" != '' &amp;&amp; $hasEdit)
+  #if ($services.csrf.isTokenValid($request.getParameter('form_token')))
+    ## Bind the sheet to the class.
+    #set ($classSheetReference = $services.model.resolveDocument($request.bindSheet))
+    #if ($services.sheet.bindClassSheet($doc, $classSheetReference))
+      $doc.save('Bind class sheet.')
+    #end
+    $response.sendRedirect($request.xredirect)
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL())
+  #end
+  ## Stop processing, since we already sent a redirect.
+  #stop
+#elseif("$!request.docName" != '')
+  ## Request for creating a new instance. We don't actually create a new instance here, we just redirect to the edit mode.
+  #set ($targetSpaceRef = $services.model.resolveSpace($request.spaceName))
+  #set ($targetDocRef = $services.model.createDocumentReference($request.docName, $targetSpaceRef))
+  #if (!$xwiki.exists($targetDocRef) &amp;&amp; $services.security.authorization.hasAccess('edit', $targetDocRef))
+    ## Compute the default edit mode to ensure backward compatibility with documents still using the deprecated inline action.
+    #set ($editAction = $xwiki.getDocument($request.template).getDefaultEditMode())
+    $response.sendRedirect($xwiki.getURL($targetDocRef, $editAction, $escapetool.url({
+      'template': $request.template,
+      'parent': $request.parent,
+      'title': $request.docName
+    })))
+    ## Stop processing, since we already sent a redirect.
+    #stop
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+## If this sheet is explicitly bound to the displayed class then print the class document content before the
+## sheet output. Class authors can put the description of the class in the class document content.
+#set($classSheetReference = $services.model.createDocumentReference($doc.wiki, 'XWiki', 'ClassSheet'))
+#if($services.sheet.getDocumentSheets($doc).contains($classSheetReference))
+  {{include reference="" /}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if (!$isSheet)
+  #set ($defaultDocName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #if ($doc.name == $defaultDocName)
+    ## Non-terminal document. Use the last space name as class name.
+    #set ($className = $doc.documentReference.parent.name)
+  #else
+    ## Terminal document. Use the document name as class name.
+    #set ($className = $doc.name)
+  #end
+  #set ($className = $stringtool.removeEnd($className, 'Class'))
+  ## Determine the class sheets.
+  #set ($classSheetReferences = $services.sheet.getClassSheets($doc))
+  #if ($classSheetReferences.isEmpty())
+    ## There is no class sheet explicitly bound to this class. Fall-back on naming convention.
+    ## Before XWiki 2.0, the default class sheet was suffixed with "ClassSheet". Since 2.0, the suffix is just "Sheet".
+    #set ($defaultClassSheetReference = $services.model.createDocumentReference("${className}ClassSheet",
+      $doc.documentReference.parent))
+    #if (!$xwiki.exists($defaultClassSheetReference))
+      #set ($defaultClassSheetReference = $services.model.createDocumentReference("${className}Sheet",
+        $doc.documentReference.parent))
+    #end
+  #end
+  ## Determine the template using naming convention.
+  ## Before XWiki 2.0, the default class template was suffixed with "ClassTemplate". Since 2.0, the suffix is just "Template".
+  #set ($classTemplateReference = $services.model.createDocumentReference("${className}ClassTemplate",
+    $doc.documentReference.parent))
+  #if (!$xwiki.exists($classTemplateReference))
+    #set ($classTemplateReference = $services.model.createDocumentReference("${className}Template",
+      $doc.documentReference.parent))
+  #end
+  #set($classTemplateDoc = $xwiki.getDocument($classTemplateReference))
+  #set($hasClassSheets = !$classSheetReferences.isEmpty() || $xwiki.exists($defaultClassSheetReference))
+  #set($hasClassTemplate = !$classTemplateDoc.isNew())
+  #if(!$defaultSpace)
+    #set($defaultSpace = $doc.space)
+  #end
+  #if(!$defaultParent)
+    #set($defaultParent = ${doc.fullName})
+  #end
+
+  #if($doc.getxWikiClass().properties.size() == 0)
+    {{warning}}The class does not have any properties yet. You can use the {{html}}&lt;a href="$doc.getURL('edit', 'editor=class')"&gt;class editor&lt;/a&gt;{{/html}} to define them.{{/warning}}
+  #else
+    = Class properties =
+    #foreach($property in $doc.getxWikiClass().properties)
+      * $services.rendering.escape("$property.prettyName ($property.name: $xwiki.metaclass.get($property.classType).prettyName)", $xwiki.currentContentSyntaxId)
+    #end
+    * //You can use the class editor to {{html}}&lt;a href="$doc.getURL('edit', 'editor=class')"&gt;add or modify the class properties&lt;/a&gt;{{/html}}.//
+
+  #end
+  #if ($hasClassSheets &amp;&amp; $hasClassTemplate)
+    = Create a new page =
+    #if("$!targetDocRef" != '' &amp;&amp; $xwiki.exists($targetDocRef))
+
+      {{warning}}The target page already exists. Please choose a different name, or [[view the existing page&gt;&gt;$services.model.serialize($targetDocRef)]]{{/warning}}
+    #elseif("$!targetDocRef" != '')
+
+      {{warning}}You don't have permission to create that page{{/warning}}
+    #end
+
+    {{html}}
+    &lt;form action="$doc.getURL()" id="newdoc" method="post" class="xform half"&gt;
+      &lt;div class="hidden"&gt;
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+        &lt;input type="hidden" name="parent" value="${defaultParent}"/&gt;
+        &lt;input type="hidden" name="template" value="${classTemplateDoc}"/&gt;
+        &lt;input type="hidden" name="sheet" value="1"/&gt;
+      &lt;/div&gt;
+      #locationPicker({
+        'id': 'target',
+        'title': {
+          'label': 'core.create.title',
+          'hint': 'core.create.title.hint',
+          'name': 'docTitle',
+          'placeholder': 'core.create.name.placeholder'
+        },
+        'preview': {
+          'label': 'core.create.locationPreview.label',
+          'hint': 'core.create.locationPreview.hint'
+        },
+        'parent': {
+          'label': 'core.create.spaceReference.label',
+          'hint': 'core.create.spaceReference.hint',
+          'name': 'spaceName',
+          'reference': $services.model.resolveSpace($defaultSpace),
+          'placeholder': 'core.create.spaceReference.placeholder'
+        },
+        'name': {
+          'label': 'core.create.name.label',
+          'hint': 'core.create.name.hint',
+          'name': 'docName',
+          'placeholder': 'core.create.name.placeholder'
+        }
+      })
+      &lt;p&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;input type="submit" value="Create this page" class="button"/&gt;
+        &lt;/span&gt;
+      &lt;/p&gt;
+    &lt;/form&gt;
+    {{/html}}
+
+  #end ## has class sheet and class template
+  = Existing pages =
+
+  {{html}}
+  #set ($columns = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+  #set ($columnsProperties = {
+    'doc.title': {'type': 'text', 'size': 30, 'link': 'view', 'filterable': false},
+    'doc.location': {'type': 'text', 'filterable': true, 'html': true},
+    'doc.date': {'type': 'date'},
+    'doc.author': {'type': 'text', 'link': 'author'},
+    '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['edit', 'delete']}
+  })
+  #set ($options = {
+    'className': $doc.fullName,
+    'translationPrefix' : 'platform.index.',
+    'rowCount': 10,
+    'outputOnlyHtml': true
+  })
+  #livetable("classEntries" $columns $columnsProperties $options)
+  {{/html}}
+
+  = The class sheets =
+  #if (!$hasClassSheets || !$hasClassTemplate)
+
+    Before using this class you must first create a sheet and a template for it. Follow the instructions below to do this.
+  #end
+
+  {{info}}The //Sheet// allows you to control the presentation of pages of this type. You can use the default presentation, which enumerates all the available fields, or you can design your own presentation. You can also choose different presentations for the viewing and for the editing modes.{{/info}}
+
+  #if(!$hasClassSheets)
+    {{html}}
+      &lt;form action="$xwiki.getURL($defaultClassSheetReference, 'save', 'editor=wiki')" method="post"&gt;
+        &lt;div&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
+          &lt;input type="hidden" name="xredirect" value="${doc.URL}"/&gt;
+          #set ($sheetContent = $xwiki.getDocument('XWiki.ObjectSheet').getContent().replace('XWiki.MyClass', $doc.fullName))
+          ## We have to encode the new line characters in order to preserve them, otherwise they are replace with a
+          ## space when the HTML is cleaned.
+          ## FIXME: Use a dedicated escape tool method when XCOMMONS-405 is implemented.
+          #set ($sheetContent = $escapetool.xml($sheetContent).replaceAll("\n", '&amp;#10;'))
+          &lt;input type="hidden" name="content" value="$sheetContent"/&gt;
+          &lt;input type="hidden" name="title" value="${escapetool.h}if(${escapetool.d}doc.name == '$escapetool.xml($defaultClassSheetReference.name)')$escapetool.xml($className) Sheet${escapetool.h}{else}${escapetool.d}services.display.title(${escapetool.d}doc, {'displayerHint': 'default'})${escapetool.h}end"/&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Create the sheet" class="button"/&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    {{/html}}
+  #else
+    #set($defaultClassSheetDoc = $xwiki.getDocument($defaultClassSheetReference))
+    #if($classSheetReferences.isEmpty() &amp;&amp; !$defaultClassSheetDoc.getObject('XWiki.SheetClass'))
+      ## The sheet is not bound to the class.
+      #set($xredirect = $xwiki.relativeRequestURL)
+      #set($defaultClassSheetStringReference = $services.model.serialize($defaultClassSheetReference, "default"))
+      #set($bindURL = $doc.getURL('view', "bindSheet=${escapetool.url($defaultClassSheetStringReference)}&amp;xredirect=${escapetool.url($xredirect)}&amp;form_token=$!{services.csrf.getToken()}"))
+      {{warning}}
+        The sheet is not bound to the class so it won't be applied automatically when a page that has an object of this class is displayed.#if ($hasEdit) {{html}}&lt;a href="$bindURL"&gt;Bind the sheet to the class »&lt;/a&gt;.{{/html}}#end
+      {{/warning}}
+
+    #end
+    #if ($classSheetReferences.size() &lt; 2)
+      #set($classSheetDoc = $defaultClassSheetDoc)
+      #if(!$classSheetReferences.isEmpty())
+        #set($classSheetDoc = $xwiki.getDocument($classSheetReferences.get(0)))
+      #end
+      #set ($sheetPath = "#hierarchy($classSheetDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
+      [[View the sheet page ($sheetPath.trim()) »&gt;&gt;${classSheetDoc.fullName}]]
+    #else
+      The following class sheets are bound to this class:
+
+      #foreach($classSheetReference in $classSheetReferences)
+        * [[$services.model.serialize($classSheetReference, "default")]]
+      #end
+    #end
+  #end
+
+  = The class template =
+
+    {{info}}The //Template// is the page used as the model when creating a new page of this type. It contains an instance of your //Class//.{{/info}}
+
+  #if (!$hasClassTemplate)
+    {{html}}
+      &lt;form action="$classTemplateDoc.getURL('save', 'editor=wiki')" method="post"&gt;
+        &lt;div&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
+          &lt;input type="hidden" name="xredirect" value="${doc.URL}"/&gt;
+          &lt;input type="hidden" name="title" value="$className Template"/&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Create the template" class="button"/&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    {{/html}}
+  #else
+    #if(!$classTemplateDoc.getObject(${doc.fullName}))
+      #set($xredirect = $xwiki.relativeRequestURL)
+      #set($createUrl = $classTemplateDoc.getURL('objectadd', "classname=${escapetool.url($doc.fullName)}&amp;amp;xredirect=${escapetool.url($xredirect)}&amp;amp;form_token=$!{services.csrf.getToken()}"))
+      {{warning}}
+        The template does not contain an object of type //$className//. {{html}}&lt;a href="$createUrl"&gt;Add a $className object to the template »&lt;/a&gt;.{{/html}}
+      {{/warning}}
+
+    #end
+    #set ($templatePath = "#hierarchy($classTemplateDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
+    [[View the template page ($templatePath.trim()) »&gt;&gt;${classTemplateDoc.fullName}]]
+  #end
+
+#end## !$isSheet
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.ClassSheet</name>
+    <number>0</number>
+    <className>XWiki.SheetDescriptorClass</className>
+    <guid>4d854769-efce-441c-8594-349c458b880e</guid>
+    <class>
+      <name>XWiki.SheetDescriptorClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <action>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>action</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Action</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </action>
+    </class>
+    <property>
+      <action>view</action>
+    </property>
+  </object>
+</xwikidoc>

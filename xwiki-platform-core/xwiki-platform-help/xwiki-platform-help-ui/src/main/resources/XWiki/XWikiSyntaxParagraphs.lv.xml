@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497947000</date>
+  <contentUpdateDate>1301497947000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Mainīt =
+
+== Rindkopas ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Paragraphs ===
+Rindkopas tiek atdalītas ar vienu vai vairāk tukšām rindām.
+
+{{info}}
+XWiki 2.0 sintaksē viens rindas pārnesums tiek ņemts vērā, bet XWiki 1.0 sintaksē tas netika ņemts vērā.
+{{/info}}
+
+|=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
+|Vienkārša rindkopa|Šī ir rindkopa|Šī ir rindkopa
+|Rindkopa vairākām rindām|Rindkopa ar{{{\\}}}\\
+vairākām rindām|Rindkopa ar
+vairākām rindām
+|Divas rindkopas|1. rindkopa
+\\2. rindkopa|1. rindkopa
+\\2. rindkopa|
+|Rindkopa ar parametriem |&lt;p style="text-align:center;color:blue"&gt;Centrēta rindkopa ar zilu tekstu&lt;/p&gt;|(% style="text-align:center;color:blue" %)
+Centrēta rindkopa ar zilu tekstu|
+=== 2.0 Paragraphs ===
+
+Rindkopas tiek atdalītas ar vienu vai vairāk tukšām rindām.
+
+{{info}}
+XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē viens rindas pārnesums tiek ņemts vērā, bet XWiki 1.0 sintaksē tas netika ņemts vērā.
+{{/info}}
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse|=Rezultāts
+|Vienkārša rindkopa|Šī ir rindkopa|Šī ir rindkopa
+|Rindkopa vairākām rindām|Rindkopa ar
+vairākām rindām|Rindkopa ar
+vairākām rindām
+|Divas rindkopas|1. rindkopa
+\\2. rindkopa|1. rindkopa
+\\2. rindkopa
+|Rindkopa ar parametriem |{{{(% style="text-align:center;color:blue" %)}}}
+Centrēta rindkopa ar zilu tekstu|(% style="text-align:center;color:blue" %)
+Centrēta rindkopa ar zilu tekstu
+</content>
+</xwikidoc>

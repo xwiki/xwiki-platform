@@ -773,7 +773,7 @@ public class ChartParams
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator it = valueMap.keySet().iterator();
         while (it.hasNext()) {
             String name = (String) it.next();

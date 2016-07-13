@@ -36,22 +36,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public abstract class AbstractEntityListSelectorWizardStep<C extends EntityConfig, E extends Entity> extends
     AbstractListSelectorWizardStep<EntityLink<C>, E>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListSelectorWizardStep#isSelectedByDefault(Object)
-     */
     @Override
     protected boolean isSelectedByDefault(E listItemData)
     {
         return listItemData.getReference().equals(getData().getDestination().getEntityReference());
     };
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractListSelectorWizardStep#saveSelectedValue(AsyncCallback)
-     */
     @Override
     protected void saveSelectedValue(final AsyncCallback<Boolean> async)
     {

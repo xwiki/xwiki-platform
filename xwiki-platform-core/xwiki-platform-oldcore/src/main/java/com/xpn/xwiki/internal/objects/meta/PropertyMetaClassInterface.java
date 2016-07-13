@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.classes.ClassInterface;
  * Represents a meta class that defines a type of property that can be used in a XClass. An XClass property has meta
  * properties like "relational storage", "display type", "separator", "multiple selection", etc. which are specified by
  * its meta class.
- * 
+ *
  * @version $Id$
  * @since 4.3M2
  */

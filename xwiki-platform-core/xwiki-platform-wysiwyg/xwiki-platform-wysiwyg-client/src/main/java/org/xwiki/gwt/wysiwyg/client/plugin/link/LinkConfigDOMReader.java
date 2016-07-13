@@ -46,11 +46,7 @@ public class LinkConfigDOMReader implements ConfigDOMReader<LinkConfig, AnchorEl
      */
     private final ImageConfigDOMReader imageConfigHTMLParser = new ImageConfigDOMReader();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigDOMReader#read(com.google.gwt.dom.client.Element)
-     */
+    @Override
     public LinkConfig read(AnchorElement anchor)
     {
         LinkConfig linkConfig = new LinkConfig();

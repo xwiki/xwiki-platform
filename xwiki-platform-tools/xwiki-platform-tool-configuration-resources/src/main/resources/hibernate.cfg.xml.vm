@@ -41,30 +41,28 @@
     <property name="show_sql">false</property>
     <property name="use_outer_join">true</property>
 
-    <property name="connection.pool_size">2</property>
-    <property name="statement_cache.size">2</property>
-
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
     <property name="jdbc.use_scrollable_resultset">false</property>
 
-    <!-- DBCP Connection Pooling configuration
+    <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
+         at http://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
     <property name="dbcp.defaultAutoCommit">false</property>
-    <property name="dbcp.maxActive">50</property>
+    <property name="dbcp.maxTotal">50</property>
     <property name="dbcp.maxIdle">5</property>
-    <property name="dbcp.maxWait">30000</property>
-    <property name="dbcp.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.maxWait">120000</property>
-    <property name="dbcp.ps.maxIdle">20</property>
+    <property name="dbcp.maxWaitMillis">30000</property>
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
-    <!-- Setting dbcp.ps.maxActive configuration tells DBCP whether to cache Prepared Statement or not.
+    <!-- Setting "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" will tell DBCP to cache
+         Prepared Statements (it's off by default). Note that for backward compatibility the "dbcp.ps.maxActive" is also
+         supported and when set it'll set "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" to
+         value of "dbcp.ps.maxActive".
 
          Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
          schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
-         prepared statement there's no performance loss. see http://jira.xwiki.org/browse/XWIKI-1740.
+         prepared statement there's no performance loss by not caching Prepared Statements at the DBCP level.
+         See http://jira.xwiki.org/browse/XWIKI-1740.
          Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :)
 
          Note 2: The same applies to PostGreSQL.
@@ -88,6 +86,9 @@
     <!-- Configuration for the default database.
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
+
+         If you want the main wiki database to be different than "xwiki" (or the default schema for schema based engines)
+         you will also have to set the property xwiki.db in xwiki.cfg file
     -->
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
 ## have preferred to use an empty value but I couldn't make that work with Maven.
@@ -97,7 +98,11 @@
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
-
+## Note: This is starting the line in order not to put extra spaces when generated
+#if ($xwikiDb == 'mysql' || $xwikiDb == 'oracle')
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)
     <property name="xwiki.virtual_mode">$xwikiDbVirtualMode</property>
@@ -111,6 +116,10 @@
     <property name="connection.SetBigStringTryClob">true</property>
     <property name="jdbc.batch_size">0</property>
 #end
+
+    <property name="hibernate.connection.charSet">UTF-8</property>
+    <property name="hibernate.connection.useUnicode">true</property>
+    <property name="hibernate.connection.characterEncoding">utf8</property>
 
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
@@ -126,13 +135,17 @@
 
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
+         Notes:
+           - if you want the main wiki database to be different than "xwiki"
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:mysql://localhost/xwiki</property>
+    <property name="connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -147,8 +160,11 @@
 
     <!-- HSQLDB configuration.
          Uncomment if you want to use HSQLDB and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "PUBLIC" (the default HSQLDB schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
-    <property name="connection.url">jdbc:hsqldb:file:/some/path/xwikidb;shutdown=true</property>
+    <property name="connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
@@ -172,6 +188,8 @@
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
              doesn't support database creation (see http://jira.xwiki.org/browse/XWIKI-8753)
+           - if you want the main wiki database to be different than "xwiki" (or "public" in schema mode)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
@@ -196,9 +214,11 @@
          Uncomment if you want to use Oracle and comment out other database configurations.
          Notes:
            - the 2 properties named "connection.SetBigStringTryClob" and
-             "jdbc.batch_size". They are required to tell Oracle to allow CLOBs larger than 32K.
+             "jdbc.batch_size" are required to tell Oracle to allow CLOBs larger than 32K.
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
+           - if you want the main wiki schema to be different than "xwiki"
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="connection.username">xwiki</property>
@@ -208,7 +228,8 @@
     <property name="connection.SetBigStringTryClob">true</property>
     <property name="jdbc.batch_size">0</property>
     <property name="jdbc.use_streams_for_binary">false</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -223,11 +244,15 @@
 
     <!-- Derby configuration.
          Uncomment if you want to use Derby and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "APP" (the default Derby schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.derby.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -236,6 +261,29 @@
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmDerbyExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+#end
+    -->
+
+    <!-- H2 configuration.
+         Uncomment if you want to use H2 and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "PUBLIC" (the default H2 schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
+
+    <property name="connection.url">jdbc:h2:${environment.permanentDirectory}/database/xwiki</property>
+    <property name="connection.username">sa</property>
+    <property name="connection.password"></property>
+    <property name="connection.driver_class">org.h2.Driver</property>
+    <property name="dialect">org.hibernate.dialect.H2Dialect</property>
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+## Note: This is starting the line in order not to put extra spaces when generated
+#foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+#end
+## Note: This is starting the line in order not to put extra spaces when generated
+#foreach($mapping in $!xwikiDbHbmH2ExtraMappings.split(","))
     <mapping resource="$mapping"/>
 #end
     -->

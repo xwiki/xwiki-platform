@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="ExtensionCode.ExtensionClass" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1359990173000</creationDate>
-  <date>1359997467000</date>
-  <contentUpdateDate>1359997467000</contentUpdateDate>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1444141789000</date>
+  <contentUpdateDate>1426084654000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
   <class>
     <name>ExtensionCode.ExtensionClass</name>
     <customClass/>
@@ -34,7 +51,7 @@
     <validationScript/>
     <authors>
       <cache>0</cache>
-      <customDisplay>{{include document="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
+      <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
       <disabled>0</disabled>
       <displayType>input</displayType>
       <multiSelect>1</multiSelect>
@@ -53,6 +70,30 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </authors>
+    <category>
+      <cache>0</cache>
+      <classname>ExtensionCode.ExtensionCategoryClass</classname>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <idField>id</idField>
+      <multiSelect>0</multiSelect>
+      <name>category</name>
+      <number>16</number>
+      <picker>0</picker>
+      <prettyName>Category</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort>value</sort>
+      <sql/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField>name</valueField>
+      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+    </category>
     <customInstallationOnly>
       <customDisplay/>
       <defaultValue>0</defaultValue>
@@ -144,6 +185,32 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </installation>
+    <issueManagementSystem>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>issueManagementSystem</name>
+      <number>20</number>
+      <picker>0</picker>
+      <prettyName>Issue Management System</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </issueManagementSystem>
+    <issueManagementURL>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>issueManagementURL</name>
+      <number>21</number>
+      <picker>0</picker>
+      <prettyName>Issue Management URL</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </issueManagementURL>
     <lastVersion>
       <customDisplay/>
       <disabled>0</disabled>
@@ -191,6 +258,53 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </name>
+    <properties>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <multiSelect>1</multiSelect>
+      <name>properties</name>
+      <number>17</number>
+      <picker>0</picker>
+      <prettyName>Properties</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators>|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </properties>
+    <scmconnection>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>scmconnection</name>
+      <number>18</number>
+      <picker>0</picker>
+      <prettyName>Sources connection</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </scmconnection>
+    <scmdevconnection>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>scmdevconnection</name>
+      <number>19</number>
+      <picker>0</picker>
+      <prettyName>Sources dev connection</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </scmdevconnection>
     <source>
       <customDisplay/>
       <disabled>0</disabled>
@@ -270,6 +384,10 @@
     </website>
   </class>
   <object>
+    <name>ExtensionCode.ExtensionClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>3b8efbcb-ecec-4be1-ad78-34ff59766b6f</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -293,13 +411,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>ExtensionCode.ExtensionClass</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>3b8efbcb-ecec-4be1-ad78-34ff59766b6f</guid>
     <property>
       <sheet>ExtensionCode.ExtensionSheet</sheet>
     </property>
   </object>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

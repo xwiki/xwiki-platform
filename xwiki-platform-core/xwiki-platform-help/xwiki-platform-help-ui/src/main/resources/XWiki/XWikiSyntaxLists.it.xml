@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLists</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497917000</date>
+  <contentUpdateDate>1301497917000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLists</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Elenchi ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Lists ===
+
+{{info}}Alcuni degli stili mostrati non funzionano con tutti i browser. Per un elenco completo seguire [[questo link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Elenco puntato|((({{{
+* voce 1
+** voce 2
+*** voce 3
+* voce 4
+}}})))|(((
+* voce 1
+** voce 2
+*** voce 3
+* voce 4
+)))
+|Elenco numerato|((({{{
+1. voce 1
+11. voce 2
+111. voce 3
+1. voce 4
+}}})))|(((
+1. voce 1
+11. voce 2
+111. voce 3
+1. voce 4
+)))
+|Elenco misto|((({{{
+1. voce 1
+1*. voce 2
+1*. voce 3
+1. voce 4
+}}})))|(((
+1. voce 1
+1*. voce 2
+1*. voce 3
+1. voce 4
+)))
+|Elenco puntato con quadratino|((({{{
+- voce 1
+- voce 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* voce 1
+* voce 2
+)))
+|Elenco puntato con punto pieno|(((
+&lt;ul style="list-style-type: disc"&gt;
+  &lt;li&gt;voce 1&lt;/li&gt;
+  &lt;li&gt;voce 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: disc" %)
+* voce 1
+* voce 2
+)))
+|Elenco alfabetico minuscolo|((({{{
+a. voce 1
+a. voce 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* voce 1
+* voce 2
+)))
+|Elenco alfabetico Maiuscolo|((({{{
+A. voce 1
+A. voce 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* voce 1
+* voce 2
+)))
+|Elenco con numeri Romani minuscoli|((({{{
+i. voce 1
+i. voce 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* voce 1
+* voce 2
+)))
+|Elenco con numeri Romani Maiuscoli|((({{{
+I. voce 1
+I. voce 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* voce 1
+* voce 2
+)))
+|Elenco con lettere Greche minuscole|((({{{
+g. voce 1
+g. voce 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* voce 1
+* voce 2
+)))
+|Elenco con lettere Greche Maiuscole|((({{{
+G. voce 1
+G. voce 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Hiragana|((({{{
+h. voce 1
+h. voce 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Hiragana Iroha|((({{{
+H. voce 1
+H. voce 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Katakana|((({{{
+k. voce 1
+k. voce 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Katakana Iroha|((({{{
+K. voce 1
+K. voce 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Armene|((({{{
+&lt;ul style="list-style-type: armenian"&gt;
+  &lt;li&gt;voce 1&lt;/li&gt;
+  &lt;li&gt;voce 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Ebraiche|((({{{
+j. voce 1
+j. voce 2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Georgiane|((({{{
+&lt;ul style="list-style-type: georgian"&gt;
+  &lt;li&gt;voce 1&lt;/li&gt;
+  &lt;li&gt;voce 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* voce 1
+* voce 2
+)))
+|Elenco ideogrammi Cinesi CJK|((({{{
+&lt;ul style="list-style-type: cjk-ideographic"&gt;
+  &lt;li&gt;voce 1&lt;/li&gt;
+  &lt;li&gt;voce 2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* voce 1
+* voce 2
+)))
+
+=== 2.0 Lists ===
+
+{{info}}Alcuni degli stili mostrati non funzionano con tutti i browser. Per un elenco completo seguire [[questo link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|Elenco puntato|((({{{
+* voce 1
+** voce 2
+*** voce 3
+* voce 4
+}}})))|(((
+* voce 1
+** voce 2
+*** voce 3
+* voce 4
+)))
+|Elenco numerato|((({{{
+1. voce 1
+11. voce 2
+111. voce 3
+1. voce 4
+}}})))|(((
+1. voce 1
+11. voce 2
+111. voce 3
+1. voce 4
+)))
+|Elenco misto|((({{{
+1. voce 1
+1*. voce 2
+1*. voce 3
+1. voce 4
+}}})))|(((
+1. voce 1
+1*. voce 2
+1*. voce 3
+1. voce 4
+)))
+|Elenco puntato con quadratino|((({{{
+(% style="list-style-type: square" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* voce 1
+* voce 2
+)))
+|Elenco puntato con punto pieno|((({{{
+(% style="list-style-type: disc" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* voce 1
+* voce 2
+)))
+|Elenco alfabetico minuscolo|((({{{
+(% style="list-style-type: lower-alpha" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* voce 1
+* voce 2
+)))
+|Elenco alfabetico Maiuscolo|((({{{
+(% style="list-style-type: upper-alpha" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* voce 1
+* voce 2
+)))
+|Elenco con numeri Romani minuscoli|((({{{
+(% style="list-style-type: lower-roman" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* voce 1
+* voce 2
+)))
+|Elenco con numeri Romani Maiuscoli|((({{{
+(% style="list-style-type: upper-roman" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* voce 1
+* voce 2
+)))
+|Elenco con lettere Greche minuscole|((({{{
+(% style="list-style-type: lower-greek" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* voce 1
+* voce 2
+)))
+|Elenco con lettere Greche Maiuscole|((({{{
+(% style="list-style-type: upper-greek" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Hiragana|((({{{
+(% style="list-style-type: hiragana" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Hiragana Iroha|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Katakana|((({{{
+(% style="list-style-type: katakana" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* voce 1
+* voce 2
+)))
+|Elenco Giapponese Katakana Iroha|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Armene|((({{{
+(% style="list-style-type: armenian" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Ebraiche|((({{{
+(% style="list-style-type: hebrew" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* voce 1
+* voce 2
+)))
+|Elenco lettere Georgiane|((({{{
+(% style="list-style-type: georgian" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* voce 1
+* voce 2
+)))
+|Elenco ideogrammi Cinesi CJK|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* voce 1
+* voce 2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* voce 1
+* voce 2
+)))</content>
+</xwikidoc>

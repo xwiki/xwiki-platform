@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package>
+<infos>
+<name>XWiki Platform - Search - Solr - UI</name>
+<description>Allows searching on the wiki using Apache Solr</description>
+<backupPack>false</backupPack>
+</infos>
+<files>
+<file language="en" defaultAction="0">space.anew</file>
+<file language="en" defaultAction="0">space.blegacy</file>
+<file language="en" defaultAction="0">space.cnew</file>
+</files>
+</package>

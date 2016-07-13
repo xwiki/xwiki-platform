@@ -31,25 +31,24 @@ import com.xpn.xwiki.objects.PropertyInterface;
  * {@link PropertyInterface}) and an instance (object) of a meta class (implements {@link ObjectInterface}), where the
  * meta class defines the meta properties of an XClass property (e.g. "relational storage", "display type", "separator",
  * "multiple selection", etc.)
- * 
+ *
  * @version $Id$
  */
 public interface PropertyClassInterface extends ObjectInterface, PropertyInterface
 {
-    public String toString(BaseProperty property);
+    String toString(BaseProperty property);
 
-    public BaseProperty fromString(String value);
+    BaseProperty fromString(String value);
 
-    public BaseProperty fromValue(Object value);
+    BaseProperty fromValue(Object value);
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context);
+    void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+    void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+    void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 
-    public BaseProperty newProperty();
+    BaseProperty newProperty();
 
-    public void flushCache();
+    void flushCache();
 }

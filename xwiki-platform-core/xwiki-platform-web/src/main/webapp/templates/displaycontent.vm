@@ -1,0 +1,21 @@
+############################################################################
+## Display  current document content with a possible URL parameter:
+## 
+## * htmlHeaderAndFooter: if true, display the HTML headers and footers
+## 
+############################################################################
+$services.progress.pushLevel(3)
+$services.progress.startStep('Display the header')
+#if($request.htmlHeaderAndFooter == 'true')
+  #template("htmlheader.vm")
+#end
+$services.progress.endStep()
+$services.progress.startStep('Display the content')
+#template('rendercontent.vm')
+$services.progress.endStep()
+$services.progress.startStep('Display the footer')
+#if($request.htmlHeaderAndFooter == 'true')
+  #template("htmlfooter.vm")
+#end
+$services.progress.endStep()
+$services.progress.popLevel()

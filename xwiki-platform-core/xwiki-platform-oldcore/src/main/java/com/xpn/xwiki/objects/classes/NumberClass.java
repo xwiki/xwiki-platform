@@ -100,19 +100,19 @@ public class NumberClass extends PropertyClass
         try {
             if (ntype.equals("integer")) {
                 if ((value != null) && (!value.equals(""))) {
-                    nvalue = new Integer(value);
+                    nvalue = Integer.valueOf(value);
                 }
             } else if (ntype.equals("float")) {
                 if ((value != null) && (!value.equals(""))) {
-                    nvalue = new Float(value);
+                    nvalue = Float.valueOf(value);
                 }
             } else if (ntype.equals("double")) {
                 if ((value != null) && (!value.equals(""))) {
-                    nvalue = new Double(value);
+                    nvalue = Double.valueOf(value);
                 }
             } else {
                 if ((value != null) && (!value.equals(""))) {
-                    nvalue = new Long(value);
+                    nvalue = Long.valueOf(value);
                 }
             }
         } catch (NumberFormatException e) {

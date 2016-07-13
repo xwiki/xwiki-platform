@@ -60,29 +60,14 @@ public interface ModelBridge
     String getCurrentAction();
 
     /**
-     * @param document a document
-     * @return {@code true} if the given document has programming rights, {@code false} otherwise
-     */
-    boolean hasProgrammingRights(DocumentModelBridge document);
-
-    /**
-     * Sets the content author of the given document.
+     * Checks if the given document is the current document on the execution context. If the passed document is a
+     * translation then it is compared with the current document translation.
      * 
-     * @param document a document
-     * @param contentAuthorReference specifies the content author
+     * @param document the document to check
+     * @return {@code true} if the given document is the current document or its current translation, {@code false}
+     *         otherwise
      */
-    void setContentAuthorReference(DocumentModelBridge document, DocumentReference contentAuthorReference);
-
-    /**
-     * @param document a document
-     * @return the content author of the given document
-     */
-    DocumentReference getContentAuthorReference(DocumentModelBridge document);
-
-    /**
-     * @return the current document from the XWiki context
-     */
-    DocumentModelBridge getCurrentDocument();
+    boolean isCurrentDocument(DocumentModelBridge document);
 
     /**
      * Unlike {@link org.xwiki.bridge.DocumentAccessBridge#pushDocumentInContext(Map, DocumentReference)} which puts on
@@ -101,4 +86,13 @@ public interface ModelBridge
      * @return the type of XObjects attached to the given document
      */
     Set<DocumentReference> getXObjectClassReferences(DocumentModelBridge document);
+
+    /**
+     * Sets the document that should be used for checking programming rights.
+     * 
+     * @param document the document used to check for programming rights
+     * @return the previous security document or {@code null} if no security document was set before
+     * @since 6.3M1
+     */
+    DocumentModelBridge setSecurityDocument(DocumentModelBridge document);
 }

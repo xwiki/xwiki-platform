@@ -1,0 +1,557 @@
+#template('extension.vm')
+
+#macro (handleExtensionHistoryRequest)
+  #if ($request.action == 'export')
+    #exportExtensionHistory
+  #elseif ($request.action == 'replay')
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #replayExtensionHistory
+    #else
+      $response.sendError(401, $services.localization.render('extension.history.invalidCSRFToken'))
+    #end
+  #elseif ($request.action == 'continue')
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #continueExtensionHistoryReplay($request.jobId)
+    #else
+      $response.sendError(401, $services.localization.render('extension.history.invalidCSRFToken'))
+    #end
+  #elseif ($request.data == 'sources')
+    #displayExtensionHistorySourcesList
+  #elseif ($request.data == 'records')
+    #getExtensionHistoryRecords
+    #if ($records && $records.size() > 0)
+      #displayExtensionHistoryRecords($records)
+    #end
+  #elseif ($request.data == 'replayPlan')
+    #displayExtensionHistoryReplayPlan
+  #elseif ($request.data == 'replayStatus')
+    #maybeDisplayExtensionHistoryReplayStatus($request.jobId)
+  #elseif ($xcontext.action == 'get' && $isAjaxRequest)
+    #maybeDisplayExtensionHistoryRecordsForm
+  #else
+    #set ($discard = $xwiki.ssfx.use('uicomponents/extension/history.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/extension/history.js'))
+    <div class="extension-history">
+      #displayCurrentJobInfo
+      #displayExtensionHistorySourcesForm
+      #maybeDisplayExtensionHistoryRecordsForm
+    </div>
+  #end
+#end
+
+#macro (exportExtensionHistory)
+  #set ($discard = $response.setContentType('application/xml'))
+  #set ($discard = $response.addHeader('Content-disposition', "attachment; filename*=utf-8''extensionHistory.xml"))
+  #set ($records = $request.getParameterValues('extensionHistoryRecord'))
+  #if ($records && $records.size() > 0)
+    ## Export the oldest history records first.
+    #foreach ($i in [$mathtool.sub($records.size(), 1)..0])
+      $records.get($i)
+    #end
+  #end
+#end
+
+#macro (replayExtensionHistory)
+  ## The history records should be in the right order (oldest first) in the replay plan.
+  #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
+  #set ($records = $services.extension.history.deserialize($serializedRecords))
+  #set ($job = $services.extension.history.replay($records))
+  #if ($job)
+    #if ($isAjaxRequest)
+      #set ($discard = $response.setContentType('application/json'))
+      $jsontool.serialize({'jobId': $job.request.id.get(2)})
+    #else
+      #getExtensionHistoryURL($redirectURL 'view' {
+        'data': 'replayStatus',
+        'jobId': $job.request.id.get(2)
+      })
+      $response.sendRedirect($redirectURL)
+    #end
+  #else
+    $response.sendError(400, $exceptiontool.getRootCauseMessage($services.extension.history.lastError))
+  #end
+#end
+
+#macro (continueExtensionHistoryReplay $replayJobId)
+  #set ($replayJobStatus = $services.extension.history.getReplayJobStatus($replayJobId))
+  #if ($hasGlobalAdmin && $replayJobStatus && $replayJobStatus.state == 'WAITING')
+    #answerExtensionJobQuestion($replayJobStatus)
+  #end
+  #getExtensionHistoryURL($redirectURL "#if ($isAjaxRequest)get#{else}view#end" {
+    'data': 'replayStatus',
+    'jobId': $replayJobId
+  })
+  $response.sendRedirect($redirectURL)
+#end
+
+#macro (displayCurrentJobInfo)
+  #set ($currentJobStatus = $services.extension.currentJobStatus)
+  #if ($currentJobStatus)
+    #set ($jobId = $stringtool.join($currentJobStatus.request.id, '/'))
+    #if ($jobId.startsWith('extension/history'))
+      #getExtensionHistoryURL($jobStatusURL 'view' {
+        'data': 'replayStatus',
+        'jobId': $stringtool.substringAfterLast($jobId, '/')
+      })
+      #set ($message = $services.localization.render('extension.history.currentJobInfo.replay',
+        ["<a href='$jobStatusURL'>", '</a>']))
+    #else
+      #set ($jobType = $currentJobStatus.request.getProperty('job.type'))
+      #set ($message = $services.localization.render('extension.history.currentJobInfo',
+        ["<strong>$jobType</strong>", "<strong>$jobId</strong>"]))
+    #end
+    <div class="box infomessage">$services.icon.renderHTML('info') $message</div>
+  #end
+#end
+
+#macro (displayExtensionHistorySourcesForm)
+  #set ($sourceLabel = $request.source)
+  #if (!$sourceLabel)
+    #set ($sourceLabel = $services.localization.render('extension.history.sources.localHistory'))
+  #end
+  <div class="extension-history-sources-selector opened">
+    <div class="extension-history-sources-header">
+      <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
+      <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
+      $services.localization.render('extension.history.records.source', ["<em>$escapetool.xml($sourceLabel)</em>"])
+    </div>
+    <div class="extension-history-sources-body">
+      #displayExtensionHistorySources
+      <div class="extension-history-source">
+        <div>
+          $services.icon.renderHTML('add')
+          <span class="extension-history-source-name">
+            $services.localization.render('extension.history.sources.importHistoryFile')
+          </span>
+        </div>
+        #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/upload.js', {
+          'forceSkinAction': true,
+          'language': $xcontext.locale
+        }))
+        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css', true))
+        <form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"
+            class="extension-history-source-upload">
+          <div class="hidden">
+            <input type="hidden" name="form_token" value="$!services.csrf.token" />
+            #getExtensionHistoryURL($xredirect 'get' {'data': 'sources'})
+            <input type="hidden" name="xredirect" value="$xredirect" />
+          </div>
+          <input type="file" name="filepath" />
+        </form>
+      </div>
+    </div>
+  </div>
+#end
+
+#macro (displayExtensionHistorySources)
+  <ul class="extension-history-sources">
+    #displayExtensionHistorySourcesList
+  </ul>
+#end
+
+#macro (displayExtensionHistorySourcesList)
+  #getExtensionHistoryURL($recordsURL 'get' {})
+  <li class="extension-history-source#if (!$request.source) selected#end" data-recordsURL="$recordsURL">
+    $services.icon.renderHTML('database')
+    #getExtensionHistoryURL($sourceURL 'view' {})
+    <a href="$sourceURL" class="extension-history-source-name">
+      $services.localization.render('extension.history.sources.localHistory')
+    </a>
+  </li>
+  #displayExtensionHistoryFileSources
+#end
+
+#macro (displayExtensionHistoryFileSources)
+  #set ($uploadDoc = $xwiki.getDocument('XWiki.ExtensionHistoryUploads'))
+  #foreach ($attachment in $uploadDoc.attachmentList)
+    #if ($attachment.mimeType == 'application/xml')
+      #displayExtensionHistoryFileSource($attachment)
+    #end
+  #end
+#end
+
+#macro (displayExtensionHistoryFileSource $attachment)
+  #getExtensionHistoryURL($recordsURL 'get' {'source': $attachment.filename})
+  <li class="extension-history-source#if ($request.source == $attachment.filename) selected#end"
+      data-recordsURL="$recordsURL" data-fileName="$escapetool.xml($attachment.filename)">
+    <div>
+      $services.icon.renderHTML('attach')
+      #getExtensionHistoryURL($sourceURL 'view' {'source': $attachment.filename})
+      <a href="$sourceURL" class="extension-history-source-name">
+        $escapetool.xml($attachment.filename)</a>
+      <span class="extension-history-source-version">$attachment.version</span>
+      #if ($services.security.authorization.hasAccess('edit', $uploadDoc.documentReference))
+        #getExtensionHistoryURL($xredirect 'view' {})
+        #set ($deleteURL = $uploadDoc.getAttachmentURL($attachment.filename, 'delattachment', $escapetool.url({
+          'form_token': $services.csrf.token,
+          'xredirect': $xredirect
+        })))
+        #set ($deleteHint = $services.localization.render('extension.history.source.deleteHint'))
+        #set ($deleteConfirmation = $services.localization.render('extension.history.source.deleteConfirmation'))
+        <a class="deleteLink" href="$deleteURL" title="$escapetool.xml($deleteHint)"
+            data-confirmation="$escapetool.xml($deleteConfirmation)">
+          $services.icon.renderHTML('cross')
+        </a>
+      #end
+    </div>
+    <div class="extension-history-source-author">
+      $services.localization.render('extension.history.source.authorDateAndSize', [
+        $xwiki.getUserName($attachment.author),
+        $xwiki.formatDate($attachment.date),
+        "#dynamicsize($attachment.filesize)"
+      ])
+    </div>
+  </li>
+#end
+
+#macro (maybeDisplayExtensionHistoryRecordsForm)
+  #getExtensionHistoryRecords
+  #if ($records && $records.size() > 0)
+    #displayExtensionHistoryRecordsForm($records)
+  #else
+    <div class="extension-history-records-form">
+      <ul class="extension-history-records">
+        <li class="extension-history-record">
+          <div class="box infomessage">
+            $services.icon.renderHTML('info')
+            $services.localization.render('extension.history.noRecords')
+          </div>
+        </li>
+      </ul>
+    </div>
+  #end
+  #if ($hasProgramming && !$isAjaxRequest)
+    #displayExtensionHistoryReplayOptions()
+  #end
+#end
+
+#macro (displayExtensionHistoryRecordsForm $records)
+  #getExtensionHistoryURL($recordsFormActionURL 'get' {})
+  <form method="post" action="$recordsFormActionURL" class="extension-history-records-form">
+    <div class="hidden">
+      <input type="hidden" name="form_token" value="$services.csrf.token" />
+    </div>
+    #displayExtensionHistoryRecords($records)
+    <div class="extension-history-actions">
+      <button class="btn btn-default" name="action" value="export" type="submit">
+        <span class="glyphicon glyphicon-download-alt"></span>
+        $services.localization.render('extension.history.records.export')
+      </button>
+      #if ($hasGlobalAdmin)
+        <button class="btn btn-default" name="data" value="replayPlan" type="submit">
+          $services.icon.renderHTML('repeat')
+          $services.localization.render('extension.history.records.replay')
+        </button>
+      #end
+    </div>
+  </form>
+#end
+
+#macro (getExtensionHistoryRecords)
+  #if ($request.source)
+    ## History File
+    #set ($sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
+    #set ($records = [])
+    #set ($limit = $NULL)
+    #if ($sourceFile.mimeType == 'application/xml')
+      #set ($records = $services.extension.history.read($sourceFile.contentInputStream))
+      ## Display the most recent records first.
+      #set ($discard = $collectionstool.reverse($records))
+    #end
+  #else
+    ## Local History
+    ## Show by default only the jobs that affect the wiki.
+    #set ($jobTypes = ['install', 'uninstall', 'repairxar'])
+    #set ($limit = 10)
+    #set ($recordsFilter = $services.extension.history.records)
+    #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $limit))
+  #end
+#end
+
+#macro (displayExtensionHistoryRecords $records)
+  <ul class="extension-history-records">
+    #foreach ($record in $records)
+      <li class="extension-history-record $!escapetool.xml($record.jobType)">
+        #displayExtensionHistoryRecord($record)
+      </li>
+    #end
+    #if ($limit && $records.size() >= $limit)
+      #getExtensionHistoryURL($moreURL 'get' {
+        'data': 'records',
+        'offsetRecordId': $records.get($mathtool.sub($records.size(), 1)).id
+      })
+      <li class="extension-history-record">
+        <a href="$moreURL" class="more">$services.localization.render('extension.history.records.more')</a>
+      </li>
+    #end
+  </ul>
+#end
+
+#macro (displayExtensionHistoryRecord $record $selector $hideDate)
+  <div>
+    ##
+    ## Selector
+    ##
+    #if ($selector)
+      $selector
+    #else
+      <input type="checkbox" name="extensionHistoryRecord"
+        value="$escapetool.xml($services.extension.history.serialize($record))" />
+    #end
+    ##
+    ## Icon
+    ##
+    #set ($iconByJobType = {
+      'install': 'add',
+      'uninstall': 'delete',
+      'repairxar': 'wrench'
+    })
+    #set ($icon = $iconByJobType.get($record.jobType))
+    <span class="extension-history-record-icon">
+      #if ($icon)
+        $services.icon.renderHTML($icon)
+      #end
+    </span>
+    ##
+    ## Extensions
+    ##
+    #set ($extensions = [])
+    #foreach ($extensionId in $record.request.extensions)
+      #set ($discard = $extensions.add("#displayExtensionHistoryRecord_extension($extensionId)"))
+    #end
+    <span>$stringtool.join($extensions, ', ')</span>
+    ##
+    ## Namespaces
+    ##
+    #set ($namespaces = [])
+    #if (!$record.request.hasNamespaces())
+      #set ($discard = $namespaces.add($services.localization.render('global namespace')))
+    #elseif ($record.request.namespaces.size() > 1 || $record.request.namespaces.get(0) != "wiki:$xcontext.database")
+      #foreach ($namespace in $record.request.namespaces)
+        #set ($discard = $namespaces.add("#displayExtensionNamespace($namespace)"))
+      #end
+    #end
+    #if ($namespaces.size() > 0)
+      <span class="extension-history-record-namespaces">(in $stringtool.join($namespaces, ', '))</span>
+    #end
+  </div>
+  ##
+  ## User & Date
+  ##
+  #set ($userReference = $record.request.getProperty('user.reference'))
+  #set ($label = "extension.history.record.${record.jobType}User#if (!$hideDate)AndDate#end")
+  <div class="extension-history-record-user">
+    $services.localization.render($label, [$xwiki.getUserName("$!userReference"), $xwiki.formatDate($record.endDate)])
+  </div>
+#end
+
+#macro (displayExtensionHistoryRecord_extension $extensionId)
+  #set ($extension = $services.extension.resolve($extensionId.id, $extensionId.version))
+  #if ($extension)
+    #set ($extensionURL = "#getExtensionURL($extensionId.id, $extensionId.version)")
+    <a href="$extensionURL" class="extension-link">#displayExtensionName($extension)</a>
+  #else
+    $extensionId.id
+  #end
+  <span class="extension-history-record-version">$!extensionId.version</span>
+#end
+
+#macro (displayExtensionHistoryReplayOptions)
+  #getExtensionHistoryURL($replayOptionsSubmitURL 'get' {})
+  <form method="post" action="$replayOptionsSubmitURL" class="hidden extension-history-replay-options xform">
+    <h2>$services.localization.render('extension.history.replayOptions.title')</h2>
+    <dl>
+      <dt>
+        <label>
+          <input type="checkbox" name="preserveUsers" value="true"/>
+          $services.localization.render('extension.history.replayOptions.preserveUsers.label')
+        </label>
+        <span class="xHint">$services.localization.render('extension.history.replayOptions.preserveUsers.hint')</span>
+      </dt>
+      <dt>
+        <label for="namespaces">
+          $services.localization.render('extension.history.replayOptions.namespaces.label')
+        </label>
+        <span class="xHint">$services.localization.render('extension.history.replayOptions.namespaces.hint')</span>
+      </dt>
+      <dd><input type="text" id="namespaces" name="namespaces" value="$xcontext.database" /></dd>
+    </dl>
+    <div>
+      <button class="btn btn-primary" name="data" value="replayPlan" type="submit">
+        $services.localization.render('extension.history.replayOptions.continue')
+      </button>
+      <a href="#" class="btn btn-default">$services.localization.render('extension.history.replayOptions.cancel')</a>
+    </div>
+  </form>
+#end
+
+#macro (displayExtensionHistoryReplayPlan)
+  #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
+  #set ($records = $services.extension.history.deserialize($serializedRecords))
+  ## The replay plan should include the oldest history records first (because the oldest records are replayed first).
+  #set ($discard = $collectionstool.reverse($records))
+  ## Modify the records based on the replay options.
+  #set ($preserveUsers = $request.preserveUsers == 'true')
+  #set ($namespaces = [])
+  #foreach ($namespace in $request.namespaces.split('\s+'))
+    #if ($namespace.indexOf(':') < 0)
+      #set ($discard = $namespaces.add("wiki:$namespace"))
+    #end
+  #end
+  #set ($records = $services.extension.history.createReplayPlan($records, $preserveUsers, $namespaces))
+  #getExtensionHistoryURL($replayPlanSubmitURL 'get' {})
+  <form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan">
+    <h2>$services.localization.render('extension.history.replayPlan.title')</h2>
+    #if ($records && $records.size() > 0)
+      <div class="hidden">
+        <input type="hidden" name="form_token" value="$services.csrf.token" />
+      </div>
+      <div class="xHint">$services.localization.render('extension.history.replayPlan.hint')</div>
+      <ul class="extension-history-records">
+        #foreach ($record in $records)
+          <li class="extension-history-record $!escapetool.xml($record.jobType)">
+            #set ($selector = "<input type='hidden' name='extensionHistoryRecord'
+              value='$escapetool.xml($services.extension.history.serialize($record))' />")
+            #displayExtensionHistoryRecord($record $selector true)
+          </li>
+        #end
+      </ul>
+    #else
+      <div class="box infomessage">
+        $services.icon.renderHTML('info')
+        $services.localization.render('extension.history.replayPlan.empty')
+      </div>
+    #end
+    <div class="extension-history-actions">
+      #if ($hasGlobalAdmin && $records && $records.size() > 0)
+        <button class="btn btn-primary" name="action" value="replay" type="submit">
+          $services.localization.render('extension.history.replayPlan.start')
+        </button>
+      #end
+      <a href="#" class="btn btn-default">
+        $services.localization.render('extension.history.replayPlan.cancel')
+      </a>
+    </div>
+  </form>
+#end
+
+#macro (maybeDisplayExtensionHistoryReplayStatus $replayJobId)
+  #set ($replayJobStatus = $services.extension.history.getReplayJobStatus($replayJobId))
+  #if ($replayJobStatus)
+    #set ($discard = $xwiki.ssfx.use('uicomponents/extension/history.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/extension/history.js'))
+    #displayExtensionHistoryReplayStatus($replayJobStatus)
+  #else
+    <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
+    <div class="box infomessage">
+      $services.icon.renderHTML('info')
+      $services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])
+    </div>
+  #end
+#end
+
+#macro (displayExtensionHistoryReplayStatus $replayJobStatus)
+  #set ($currentRecordNumber = $replayJobStatus.currentRecordNumber)
+  #set ($replayJobState = $replayJobStatus.state)
+  #set ($finished = $replayJobState == 'FINISHED')
+  #set ($waiting = $replayJobState == 'WAITING')
+  ## TODO: Find a better way to detect if the replay job has failed. Checking if there are errors in the log is not
+  ## reliable because there can be error logs like "Collision found on object [...]" that don't prevent the replay job
+  ## from finishing successfully. The last log message cannot be used either because it is always an info log like this
+  ## "Finished job of type [...] with identifier [...]".
+  #set ($success = $finished && $replayJobStatus.log.getLogs('ERROR').isEmpty())
+  #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
+  #getExtensionHistoryURL($extensionHistoryURL 'get' {})
+  <div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"
+      data-extensionHistoryURL="$extensionHistoryURL">
+    <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
+    <div class="xHint">
+      $services.localization.render('extension.history.replayStatus.hint',
+        [$xwiki.getUserName($userReference), $xwiki.formatDate($replayJobStatus.startDate)])
+    </div>
+    <ul class="extension-history-records">
+      #foreach ($record in $replayJobStatus.request.records)
+        #set ($classNames = ['extension-history-record', $escapetool.xml($record.jobType)])
+        #if (!$finished && $foreach.index == $currentRecordNumber)
+          #set ($discard = $classNames.add('loading'))
+        #end
+        <li class="$stringtool.join($classNames, ' ')">
+          #set ($selector = '')
+          #if ($foreach.index < $replayJobStatus.currentRecordNumber)
+            #set ($selector = 'check')
+          #elseif ($foreach.index == $currentRecordNumber && $finished)
+            #if ($success)
+              #set ($selector = 'check')
+            #else
+              #set ($selector = 'error')
+            #end
+          #end
+          #if ($selector != '')
+            #set ($selector = "<span class='extension-history-record-status
+              $selector'>$services.icon.renderHTML($selector)</span>")
+          #end
+          #displayExtensionHistoryRecord($record $selector true)
+        </li>
+      #end
+    </ul>
+    #if (!$finished)
+      #displayJobProgressBar($replayJobStatus)
+    #end
+    <div class="extension-history-replay-log">
+      <div class="collapse-toggle xHint" data-target-xpath="following-sibling::*">
+        <span class="icon-closed">$services.icon.renderHTML('caret-right')</span>
+        <span class="icon-opened">$services.icon.renderHTML('caret-down')</span>
+        $services.localization.render('extension.history.replayStatus.replayLog')
+      </div>
+      #printStatusLog($replayJobStatus)
+    </div>
+    #if ($waiting)
+      <form class="extension-question xform" action="$extensionHistoryURL" method="post">
+        <div class="hidden">
+          <input type="hidden" name="form_token" value="$services.csrf.token" />
+          <input type="hidden" name="jobId" value="$escapetool.xml($replayJobId)" />
+        </div>
+        #displayExtensionDetails_progressQuestion($NULL $replayJobStatus)
+        #if ($hasGlobalAdmin)
+          <div class="extension-history-actions">
+            <button class="btn btn-primary" name="action" value="continue" type="submit">
+              $services.localization.render('extension.history.replayStatus.continue')
+            </button>
+          </div>
+        #end
+      </form>
+    #end
+  </div>
+#end
+
+#macro (getExtensionHistoryURL $return $action $params)
+  #set ($extensionHistoryDocRef = $services.model.createDocumentReference($NULL, 'XWiki', 'ExtensionHistory'))
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($params))
+  #if (!$xwiki.exists($extensionHistoryDocRef))
+    #if ($action == 'get')
+      #set ($discard = $parameters.put('xpage', 'extensionHistory'))
+    #else
+      #set ($discard = $parameters.put('xpage', 'view'))
+      #set ($discard = $parameters.put('viewer', 'extensionHistory'))
+    #end
+  #end
+  #set ($_url = $xwiki.getURL($extensionHistoryDocRef, $action, $escapetool.url($parameters)))
+  #set ($return = $NULL)
+  #setVariable("$return" $_url)
+#end
+
+#if ($request.xpage == 'extensionHistory' || $request.viewer == 'extensionHistory')
+  #if ($request.viewer == 'extensionHistory')
+    <div id="document-title">
+      <h1>$services.localization.render('extension.history')</h1>
+    </div>
+  #else
+    #template('xwikivars.vm')
+  #end
+  #if ($request.extensionId && ($request.extensionVersion || $request.extensionVersionConstraint))
+    #handleExtensionRequest
+  #else
+    #handleExtensionHistoryRequest
+  #end
+#end

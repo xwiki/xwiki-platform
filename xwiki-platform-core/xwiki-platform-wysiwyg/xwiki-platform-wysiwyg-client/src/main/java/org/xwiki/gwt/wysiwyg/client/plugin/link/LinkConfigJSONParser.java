@@ -30,11 +30,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
  */
 public class LinkConfigJSONParser implements ConfigJSONParser<LinkConfig>
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ConfigJSONParser#parse(String)
-     */
+    @Override
     public LinkConfig parse(String json)
     {
         JavaScriptObject jsObj = JavaScriptObject.fromJson(json);

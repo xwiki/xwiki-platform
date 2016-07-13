@@ -1,0 +1,28 @@
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="test">
+      <wikiDocument name="page1">
+        <p>
+          <parameters>
+            <entry>
+              <string>locale</string>
+              <locale>en</locale>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocumentLocale>
+          <wikiDocumentRevision revision="1.42">
+            <p>
+              <parameters>
+                <entry>
+                  <string>content</string>
+                  <string>content1</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

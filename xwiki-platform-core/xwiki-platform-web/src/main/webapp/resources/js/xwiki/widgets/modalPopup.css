@@ -30,12 +30,21 @@
   padding: 0;
   margin: auto;
   position: relative;
-  width: 400px;
   color: $theme.panelTextColor;
   border: 1px solid $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
   border-radius: 4px;
   box-shadow: 0 0 7px $theme.borderColor;
+}
+.xdialog-box {
+  max-height: 100%; /* Needed because of position: fixed */
+  overflow: auto; 
+  width: auto;
+}
+@media (min-width: 768px) { /* Should be: @screen-sm-min */
+  .xdialog-box {
+    width: 400px; /* Should be: @modal-md */
+  }
 }
 .xdialog-box .xdialog-content {
   margin: .8em;

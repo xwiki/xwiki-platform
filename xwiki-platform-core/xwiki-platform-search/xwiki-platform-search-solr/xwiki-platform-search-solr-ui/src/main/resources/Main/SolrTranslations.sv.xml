@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Main.SolrSearch</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1385047506000</creationDate>
+  <date>1433258948000</date>
+  <contentUpdateDate>1433258948000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language sv generated from http://www.l10n.xwiki.org
+solr.admin.error.norights=Administrationsrättigheter krävs för tillgång till denna sektion.
+solr.admin.error.notallowed=Du har ej rättigheter att genomföra denna operation.
+solr.admin.indexing.action.hint=Operation att utföra på indexet.
+solr.admin.indexing.action.label=Operation
+solr.admin.indexing.action.select_delete=Ta bort från index
+solr.admin.indexing.action.select_index=Lägg till i index
+solr.admin.indexing.action.select_reindex=Indexera om
+solr.admin.indexing.query.hint=Sökutryck för att begränsa de dokument i indexet som påverkas av vald operation.  Detta kan utelämnas.
+solr.admin.indexing.query.label=Anpassat sökutryck
+solr.admin.indexing.title=Indexerar
+solr.admin.indexing.wiki.hint=Winin för vilket vald operation skall genomföras.
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.select_farm=Hela farmen
+solr.admin.status.queueSize.hint=Antal entiteter som återstår att indexera, omindexera eller ta bort från indexet (beroende på aktuell operation).
+solr.admin.status.queueSize.label=Köstorlek
+solr.admin.status.title=Status
+solr.admin.submit=Utför
+solr.admin.title=Solr sökadministration
+solr.facet.date.after=Efter {0}
+solr.facet.date.any=Alla datum
+solr.facet.date.applyCustomInterval=Applicera
+solr.facet.date.before=Före {0}
+solr.facet.date.between=Från {0} till {1}
+solr.facet.date.customInterval=Anpassat datum och tidsintervall
+solr.facet.date.end=Slutdatum och tid
+solr.facet.date.last30Days=Senaste 30 dagarna
+solr.facet.date.last7Days=Senaste sju dagarna
+solr.facet.date.olderThan30Days=Äldre än 30 dagar
+solr.facet.date.start=Startdatum och tid
+solr.facet.date.today=Idag
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.image.icon=Ikon
+solr.facet.fileType.other.octet-stream=Binärdata
+solr.facet.fileType.text.java-source=Javakällkod
+solr.facet.fileType.text.javascript=Javascript
+solr.facet.fileType.text.plain=Text
+solr.facet.fileType.text.sh=Skript (bourne shell)
+solr.facet.size.any=Alla storlekar
+solr.facet.size.between=Mellan {0} och {1}
+solr.facet.size.large=Stora
+solr.facet.size.lessThan=Mindre än {0}
+solr.facet.size.medium=Medium
+solr.facet.size.moreThan=Mer än {0}
+solr.facet.size.small=Små
+solr.facet.size.tiny=Pyttesmå
+solr.facets.collapseAll=Kollapsa alla
+solr.facets.emptyValue=Inget värde
+solr.facets.expandAll=Expandera alla
+solr.facets.hint=Välj en kategori och aktivera filter på nuvarande sökresultat
+solr.facets.moreValues={0} fler
+solr.facets.resetAll=Återställ alla
+solr.facets.title=Filtrera
+solr.field.attauthor=Uppladdad av
+solr.field.attcontent=Bilageinnehåll
+solr.field.attdate=Uppladdningsdatum
+solr.field.attsize=Filstorlek
+solr.field.author=Senaste författare
+solr.field.author_display=Författare
+solr.field.class=Objekttyp
+solr.field.class.definedBy=Definierad av {0} » {1}
+solr.field.comment=Kommentarer
+solr.field.creationdate=Datum skapad
+solr.field.creator=Skapare
+solr.field.creator_display=Ursprunglig författare
+solr.field.date=Senast ändrad
+solr.field.doccontent=Renderat dokumentinnehåll
+solr.field.doccontentraw=Dokumentets wikitext
+solr.field.filename=Bilagenamn
+solr.field.locale=Språk
+solr.field.locale.emptyValue=Inget språk
+solr.field.locale.emptyValue.hint=Vissa dokument har inget språk angivet eftersom de innehåller skript (skrivna på något maskinspråk) eller innehåler delar av användargränssnittet som visas på aktuellt språk (såsom denna sida).
+solr.field.mimetype=Filtyp
+solr.field.name=Sida
+solr.field.name_exact=Sida
+solr.field.objcontent=Objekt
+solr.field.propertyname=Egenskapsnamn
+solr.field.propertyvalue=Egenskapsvärde
+solr.field.space=Rum
+solr.field.space_exact=Rum
+solr.field.title=Titel
+solr.field.type=Resultattyp
+solr.field.wiki=Wiki
+solr.filterBy.fileType.archive=Arkiv
+solr.filterBy.fileType.audio=Ljud
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.image=Bild
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.other=Annan
+solr.filterBy.fileType.presentation=Presentation
+solr.filterBy.fileType.spreadsheet=Kalkylark
+solr.filterBy.fileType.text=Text
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.word=Word
+solr.filterBy.type.attachment=Bilaga
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.object=Objekt
+solr.filterBy.type.object_property=Objektegenskap
+solr.result.author=Ändrad av {0} {1}
+solr.result.highlightAll=Markera alla matchningar
+solr.result.language=Språk
+solr.result.location=Hittat i {0} » {1} » {2}
+solr.result.mediaType=Filtyp {0}
+solr.result.uploadedBy=Uppladad av {0} {1} ({2})
+solr.sortBy=Sortera efter\:
+solr.sortBy.attauthor_display_sort=Uppladdad av
+solr.sortBy.attdate_sort=Uppladdningsdatum
+solr.sortBy.attsize_sort=Filstorlek
+solr.sortBy.author_display_sort=Senaste författare
+solr.sortBy.date=Datum
+solr.sortBy.filename_sort=Filnamn
+solr.sortBy.score=Relevans
+solr.sortBy.title_sort=Titel
+solr.sortOrder.asc=Stigande
+solr.sortOrder.desc=Fallande
+</content>
+</xwikidoc>

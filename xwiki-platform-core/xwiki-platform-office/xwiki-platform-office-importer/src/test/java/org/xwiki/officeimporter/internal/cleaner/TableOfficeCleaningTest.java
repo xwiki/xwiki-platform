@@ -56,8 +56,8 @@ public class TableOfficeCleaningTest extends AbstractHTMLCleaningTest
     public void testEmptyCellsArePreserved()
     {
         String html =
-            "<table><thead><tr><th><br/></th><th></th></tr></thead>"
-                + "<tbody><tr><td></td><td><br/></td></tr></tbody></table>";
+            "<table><thead><tr><th><br /></th><th></th></tr></thead>"
+                + "<tbody><tr><td></td><td><br /></td></tr></tbody></table>";
         assertCleanHTML(html, html);
     }
 

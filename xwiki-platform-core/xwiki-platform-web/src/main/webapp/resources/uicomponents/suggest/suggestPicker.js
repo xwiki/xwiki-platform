@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 /**
  * Add-on for the Suggest widget which allows multiple values to be selected and displayed in a list. It requires an existing input and a Suggest instance already bound to the input.
  */
@@ -111,12 +130,15 @@ var XWiki = (function (XWiki) {
     var sourceIndex = 0;
     this.input.value = values[index];
     this.suggest.doAjaxRequests(-1, {
+      parameters: {'exactMatch': true},
       onSuccess: function(response) {
         if (found) return;
         var suggestions = this.suggest.parseResponse(response, this.suggest.sources[sourceIndex]) || [];
         for (var i = 0; i < suggestions.length; i++) {
           if (this.matchesSelectedValue(values[index], suggestions[i])) {
             found = true;
+            // Make sure the selected value is kept as is (submitting without changes must preserve the previous value).
+            suggestions[i].value = values[index];
             this.addItem(suggestions[i]);
             return;
           }
@@ -165,6 +187,7 @@ var XWiki = (function (XWiki) {
    * @param event the click event fired by the browser
    */
   removeItem : function(event) {
+    if (this.input.readOnly || this.input.disabled) return;
     var item = event.findElement('li');
     item.remove();
     this.notifySelectionChange(item);
@@ -200,7 +223,7 @@ var XWiki = (function (XWiki) {
    * @return true if the item existed and has been re-enabled, false otherwise
    */
   acceptAlreadyAddedItem : function (key) {
-    var input = $(this.getInputId(key));
+    var input = this.list ? this.list.down('input[id="' + this.getInputId(key).replace(/[^a-zA-Z0-9_-]/g, '\\$&') + '"]') : $(this.getInputId(key));
     if (input) {
       input.checked = true;
       this.notifySelectionChange(input.up('li') || input);
@@ -284,16 +307,17 @@ var XWiki = (function (XWiki) {
    * Meta-maintenance of the accepted items list: show/hide the "delete all" button, refresh the Sortable behavior.
    */
   updateListTools : function () {
+    var enabled = !this.input.readOnly && !this.input.disabled;
     // Show/hide the "delete all" button
     if (this.clearTool) {
-      if (this.list.childElements().length > 1) {
+      if (enabled && this.list.childElements().length > 1) {
         this.clearTool.show();
       } else {
         this.clearTool.hide();
       }
     }
     // Refresh the Sortable behavior to take into account the new items
-    if (this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
+    if (enabled && this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
       Sortable.create(this.list);
       this.list.addClassName('sortable');
     }
@@ -328,6 +352,8 @@ var XWiki = (function (XWiki) {
   detach : function() {
     this.clearTool && this.clearTool.stopObserving('click').remove();
     this.list && this.list.remove();
+    this.input.name = this.inputName;
+    this.input.removeClassName("accept-value");
   }
 });
   return XWiki;

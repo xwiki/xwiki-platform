@@ -1,0 +1,69 @@
+#template('tree_macros.vm')
+
+#set ($isDocumentTreeAvailable = $xwiki.exists('XWiki.DocumentTree'))
+
+## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
+#set ($docTreeConfig = {
+  'filterByClass': '',
+  'filterHiddenDocuments': true,
+  'hierarchyMode': 'reference',
+  'limit': 15,
+  'root': '',
+  'showAddAttachment': false,
+  'showAddDocument': false,
+  'showAttachments': true,
+  'showClassProperties': false,
+  'showDocumentTitle': true,
+  'showObjects': false,
+  'showOnlyViewable': true,
+  'showRoot': false,
+  'showSpaces': false,
+  'showTerminalDocuments': true,
+  'showTranslations': true,
+  'showWikiPrettyName': true,
+  'showWikis': false
+})
+
+#macro (documentTree $options)
+  ## Default values for configuration options that concern the display and behavior of the tree
+  ## (these are not passed to the Document Tree Source).
+  #set ($macro.options = {
+    'readOnly': true,
+    'compact': false
+  })
+  #set ($discard = $macro.options.putAll($docTreeConfig))
+  #set ($discard = $macro.options.putAll($options))
+  ## showChildDocuments is deprecated since 7.2M2. Fall-back on hierarchyMode for backwards compatibility.
+  #set ($showChildDocuments = $macro.options.remove('showChildDocuments'))
+  #if ($showChildDocuments == 'true')
+    #set ($macro.options.hierarchyMode = 'parentchild')
+  #end
+  #set ($resourceParams = {'outputSyntax': 'plain'})
+  #foreach ($entry in $docTreeConfig.entrySet())
+    #set ($value = $macro.options.get($entry.key))
+    #if ("$!value" != '' && $value != "$!entry.value")
+      #set ($discard = $resourceParams.put($entry.key, $value))
+    #end
+  #end
+  #set ($macro.options.reference = "path:$xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url($resourceParams))")
+  #set ($editable = $macro.options.remove('readOnly') != 'true')
+  #set ($macro.options.dragAndDrop = $editable)
+  #set ($macro.options.contextMenu = $editable)
+  #set ($isFullWidthAvailable = $macro.options.remove('compact') != 'true')
+  #set ($macro.options.icons = $isFullWidthAvailable)
+  #set ($macro.options.edges = $isFullWidthAvailable)
+  ## We use directly FontAwesome for the tree node icons for two reasons:
+  ## * the XWiki icon set (available through the icon themes) is limited
+  ## * jsTree expects an URL/path or a CSS class name as the value of the tree node icon configuration when JSON source is
+  ##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
+  ##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
+  ##   configuration becomes complex.
+  ## We don't load the FontAwesome CSS directly from its WebJar because it contains some relative paths that currently are
+  ## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
+  ## SSX instead.
+  #set ($discard = $xwiki.ssx.use('IconThemes.FontAwesome'))
+  ## Include also the fix for the FontAwesome loading issue on IE8.
+  #set ($discard = $xwiki.jsx.use('IconThemes.FontAwesome'))
+  #set ($_options = $macro.options)
+  #tree($_options)
+#end

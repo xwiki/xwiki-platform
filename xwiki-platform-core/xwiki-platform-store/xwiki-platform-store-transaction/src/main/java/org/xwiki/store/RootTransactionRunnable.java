@@ -31,7 +31,9 @@ public class RootTransactionRunnable<T> extends StartableTransactionRunnable<T>
 {
     /**
      * {@inheritDoc}
+     * <p>
      * This implementation throws an exception because it may not be used in a rootTR.
+     * </p>
      *
      * @see TransactionRunnable#runIn(TransactionRunnable<U>)
      */

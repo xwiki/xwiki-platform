@@ -20,11 +20,12 @@
 package com.xpn.xwiki.plugin.tag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -72,6 +73,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * L10N key for the "tag added" document edit comment.
      */
     public static final String DOC_COMMENT_TAG_ADDED = "plugin.tag.editcomment.added";
+
+    private static final Pattern LIKE_ESCAPE = Pattern.compile("[_%\\\\]");
+
+    private static final String LIKE_REPLACEMENT = "\\\\$0";
+
+    private static final String LIKE_APPEND = ".%";
 
     /**
      * Tag plugin constructor.
@@ -178,20 +185,73 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Get cardinality map of tags for a specific wiki space.
+     * Get cardinality map of tags for a specific wiki space (including sub spaces).
      * 
-     * @param space the wiki space to get tags from. If blank, return tags for the whole wiki.
+     * @param spaceReference the local reference of the space to get tags from. If blank, return tags for the whole
+     *            wiki.
      * @param context XWiki context.
      * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      * @since 1.2
      */
-    public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
+    public Map<String, Integer> getTagCount(String spaceReference, XWikiContext context) throws XWikiException
     {
-        if (!StringUtils.isBlank(space)) {
-            return getTagCountForQuery("", "doc.space = ?", Collections.singletonList(space), context);
+        if (!StringUtils.isBlank(spaceReference)) {
+            StringBuilder where = new StringBuilder();
+            where.append('(');
+            where.append("doc.space = ?");
+            where.append(" OR ");
+            where.append("doc.space LIKE ?");
+            where.append(')');
+
+            // Make sure to escape the LIKE syntax
+            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
+
+            return getTagCountForQuery("", where.toString(),
+                Arrays.asList(spaceReference, escapedSpaceReference + LIKE_APPEND), context);
         }
+
         return getTagCount(context);
+    }
+
+
+    /**
+     * Get cardinality map of tags for a list of wiki spaces (including sub spaces).
+     * For example "'Main','Sandbox'" for all tags in the "Main" and "Sandbox" spaces,
+     * or "'Apo''stroph'" for all tags in the space "Apo'stroph".
+     * 
+     * @param spaces the list of space to get tags in, as a comma separated, quoted space references strings.
+     * @param context XWiki context.
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: space list parse error, DB problems, etc).
+     * @since 8.2M1
+     */
+    public Map<String, Integer> getTagCountForSpaces(String spaces, XWikiContext context) throws XWikiException
+    {
+        List<String> spaceRefList = TagParamUtils.spacesParameterToList(spaces);
+
+        List<Object> queryParameter = new ArrayList<>();
+        StringBuilder where = new StringBuilder();
+        boolean first = true;
+        for (String spaceReference : spaceRefList) {
+            if (first) {
+                where.append("(doc.space = ? ");
+                first = false;
+            } else {
+                where.append(" OR doc.space = ? ");
+            }
+            queryParameter.add(spaceReference);
+            where.append("OR doc.space LIKE ?");
+            String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
+            queryParameter.add(escapedSpaceReference + LIKE_APPEND);
+        }
+        // if first is true the "for" loop never ran, and spaces is empty
+        // so only close brace if first is false
+        if (!first) {
+            where.append(')');
+        }
+
+        return getTagCountForQuery("", where.toString(), queryParameter, context);
     }
 
     /**
@@ -223,14 +283,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @since 1.18
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
      */
-    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
-            XWikiContext context) throws XWikiException
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+        XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, context);
     }
 
     /**
-     * Get documents with the given tags.
+     * Get non-hidden documents with the given tags.
      *
      * @param tag a list of tags to match.
      * @param context XWiki context.
@@ -240,6 +300,22 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getDocumentsWithTag(tag, context);
+    }
+
+    /**
+     * Get documents with the given tags.
+     *
+     * @param tag a list of tags to match.
+     * @param includeHiddenDocuments if true then also include hidden documents
+     * @param context XWiki context.
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 6.2M1
+     */
+    public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
+        throws XWikiException
+    {
+        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, context);
     }
 
     /**
@@ -300,9 +376,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             tags.add(tag);
             setDocumentTags(document, tags, context);
 
-            List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tag);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tag);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -358,7 +432,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (added) {
             setDocumentTags(document, documentTags, context);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tags);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -426,9 +500,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (needsUpdate) {
             setDocumentTags(document, tags, context);
-            List<String> commentArgs = new ArrayList<String>();
-            commentArgs.add(tag);
-            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+            String comment = localizePlainOrKey("plugin.tag.editcomment.removed", tag);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -453,14 +525,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
-        List<String> docNamesToProcess = getDocumentsWithTag(tag, context);
+        // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
+        // accessible to users, it's just not visible for simple users; it doesn't change permissions.
+        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, context);
         if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
-        List<String> commentArgs = new ArrayList<String>();
-        commentArgs.add(tag);
-        commentArgs.add(newTag);
-        String comment = context.getMessageTool().get("plugin.tag.editcomment.renamed", commentArgs);
+
+        String comment = localizePlainOrKey("plugin.tag.editcomment.renamed", tag, newTag);
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
@@ -497,7 +569,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult deleteTag(String tag, XWikiContext context) throws XWikiException
     {
-        List<String> docsToProcess = getDocumentsWithTag(tag, context);
+        // Since we're deleting a tag, we want to delete it even if the document is hidden. A hidden document is still
+        // accessible to users, it's just not visible for simple users; it doesn't change permissions.
+        List<String> docsToProcess = getDocumentsWithTag(tag, true, context);
 
         if (docsToProcess.size() == 0) {
             return TagOperationResult.NO_EFFECT;

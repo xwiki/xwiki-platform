@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Update XWiki.TagClass document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */

@@ -25,7 +25,7 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
 /**
  * Base class for all attachment {@link org.xwiki.observation.event.Event events}.
- * 
+ *
  * @version $Id$
  * @since 2.6RC2
  */
@@ -56,7 +56,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only attachment events affecting the document matching the passed document
      * name.
-     * 
+     *
      * @param documentName the name of the updated document to match
      * @param name the name of the attachment added/updated/deleted
      */
@@ -69,7 +69,7 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
 
     /**
      * Constructor using a custom {@link EventFilter}.
-     * 
+     *
      * @param eventFilter the filter to use for matching events
      */
     public AbstractAttachmentEvent(EventFilter eventFilter)
@@ -79,11 +79,11 @@ public abstract class AbstractAttachmentEvent extends AbstractDocumentEvent
 
     /**
      * Retrieves the name of the attachment added/updated/deleted in the event.
-     * 
+     *
      * @return name name of the attachment
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 }

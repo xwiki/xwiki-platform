@@ -1,0 +1,5 @@
+org.xwiki.webjars.internal.WebJarsResourceReferenceResolver
+org.xwiki.webjars.internal.WebjarsResourceReferenceSerializer
+org.xwiki.webjars.internal.WebJarsResourceReferenceHandler
+org.xwiki.webjars.internal.FilesystemResourceReferenceSerializer
+org.xwiki.webjars.script.WebJarsScriptService

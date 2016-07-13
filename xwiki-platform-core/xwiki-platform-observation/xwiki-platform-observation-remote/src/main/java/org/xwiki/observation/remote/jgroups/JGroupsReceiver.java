@@ -23,9 +23,9 @@ import org.jgroups.Receiver;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Provide a @Role for JGRoups {@link Receiver} interface. Can be implemented using channel name as hint to
- * provide a specific {@link Receiver} to a channel.
- * 
+ * Provide a @Role for JGRoups {@link Receiver} interface. Can be implemented using channel name as hint to provide a
+ * specific {@link Receiver} to a channel.
+ *
  * @version $Id$
  * @since 2.0M3
  */

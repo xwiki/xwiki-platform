@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497998000</date>
+  <contentUpdateDate>1301497998000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxId</name>
+        <number>4</number>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxId</name>
+        <number>3</number>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxTextFormatting</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>de0b3c6e-5217-4bb2-9f8d-6d7482ac9ff2</guid>
+    <property>
+      <category>1</category>
+    </property>
+    <property>
+      <maxSyntaxId>2.0</maxSyntaxId>
+    </property>
+    <property>
+      <minSyntaxId>1.0</minSyntaxId>
+    </property>
+    <property>
+      <section>2</section>
+    </property>
+  </object>
+  <content>= Editing =
+
+== Text Formatting ==
+
+=== 1.0 Text Formatting ===
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Bold|{{{*bold*}}}|**bold**
+|Underline|{{{__underline___}}}|__underline__
+|Italics|{{{~~italic~~}}}|//italic//
+|Striked out|{{{--strike--}}}|--strike--
+|Monospace|&lt;tt&gt;monospace&lt;/tt&gt;|##monospace##
+|Superscript|some &lt;sup&gt;superscript&lt;/sup&gt;|some ^^superscript^^
+|Subscript|some &lt;sub&gt;subscript&lt;/sub&gt;|some ,,subscript,,
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+New in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} over XWiki Syntax 1.0:
+* Spaces are allowed just after the syntax symbols (for example in XWiki Syntax 1.0, this was not possible: * bold *).
+* Use double symbols when there was only a single symbol in XWiki Syntax 1.0 so that it's less likely that the user will mistakenly use them in text.
+* Ability to span several lines (wasn't possible in XWiki Syntax 1.0).
+{{/info}}
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Bold|{{{**bold**}}}|**bold**
+|Underline|{{{__underline__}}}|__underline__
+|Italics|{{{//italic//}}}|//italic//
+|Striked out|{{{--strike--}}}|--strike--
+|Monospace|{{{##monospace##}}}|##monospace##
+|Superscript|{{{some ^^superscript^^}}}|some ^^superscript^^
+|Subscript|{{{some ,,subscript,,}}}|some ,,subscript,,</content>
+</xwikidoc>

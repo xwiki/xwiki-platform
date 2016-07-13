@@ -21,6 +21,8 @@ package com.xpn.xwiki.store;
 
 import static org.mockito.Mockito.*;
 
+import javax.inject.Provider;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -67,6 +69,9 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
 
         Execution execution = getMocker().getInstance(Execution.class);
         when(execution.getContext()).thenReturn(executionContext);
+
+        Provider<XWikiContext> xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.context);
 
         XWiki wiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(wiki);

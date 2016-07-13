@@ -59,12 +59,12 @@ public class UpdateThread extends AbstractXWikiRunnable
 
     private XWikiContext xwikiContext;
 
-    public UpdateThread(String space, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
+    public UpdateThread(String spaceReference, boolean fullContent, int scheduleTimer, FeedPlugin feedPlugin,
         XWikiContext context)
     {
         this.xwikiContext = context.clone();
         this.fullContent = fullContent;
-        this.space = space;
+        this.space = spaceReference;
         this.feedPlugin = feedPlugin;
         this.scheduleTimer = scheduleTimer;
     }

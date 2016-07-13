@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
  * one) as providers while keeping backward compatibility. When defining new property types you should not extend this
  * class but rather create a new {@link PropertyClassProvider} that creates an instance of this class and adds new meta
  * properties using {@link #safeput(String, com.xpn.xwiki.objects.PropertyInterface)}.
- * 
+ *
  * @version $Id$
  */
 public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInterface, PropertyClassProvider
@@ -164,6 +164,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
      * <p>
      * This method is deprecated. Use directly the {@link PropertyClassProvider} if you need a new XClass property
      * instance.
+     * </p>
      */
     @Override
     public BaseCollection newObject(XWikiContext context) throws XWikiException

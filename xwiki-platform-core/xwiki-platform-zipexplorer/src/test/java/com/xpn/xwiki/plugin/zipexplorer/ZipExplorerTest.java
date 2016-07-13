@@ -36,6 +36,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.junit.Assert;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin} class.
@@ -88,8 +90,11 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDownloadAttachmentWithInvalidZipURL() throws Exception
     {
+        Mock mockDocument = mock(XWikiDocument.class);
+        mockDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("wiki", "Main", "Document")));
         XWikiAttachment originalAttachment =
-            createAttachment("someFile.txt", "Some text".getBytes(), (XWikiDocument) mock(XWikiDocument.class).proxy());
+            createAttachment("someFile.txt", "Some text".getBytes(), (XWikiDocument) mockDocument.proxy());
         XWikiContext context = createXWikiContext("http://server/xwiki/bin/download/Main/Document/someFile.txt");
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
@@ -103,6 +108,9 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         Mock mockDocument = mock(XWikiDocument.class);
         mockDocument.stubs().method("setContentDirty");
         mockDocument.stubs().method("setMetaDataDirty");
+        mockDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("wiki", "Main", "Document")));
+
         XWikiAttachment originalAttachment =
             createAttachment("zipfile.zip", createZipFile(zipFileContent),
                 (XWikiDocument) mockDocument.proxy());
@@ -120,8 +128,11 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDownloadAttachmentWhenURLIsNotZipFile() throws Exception
     {
+        Mock mockDocument = mock(XWikiDocument.class);
+        mockDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("wiki", "Main", "Document")));
         XWikiAttachment originalAttachment =
-            createAttachment("somefile.whatever", null, (XWikiDocument) mock(XWikiDocument.class).proxy());
+            createAttachment("somefile.whatever", null, (XWikiDocument) mockDocument.proxy());
 
         XWikiContext context = createXWikiContext("http://server/xwiki/bin/download/Main/Document/somefile.whatever");
 
@@ -132,8 +143,11 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDownloadAttachmentWhenURLIsZipButNotPointingInsideZip() throws Exception
     {
+        Mock mockDocument = mock(XWikiDocument.class);
+        mockDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("wiki", "Main", "Document")));
         XWikiAttachment originalAttachment =
-            createAttachment("zipfile.zip", null, (XWikiDocument) mock(XWikiDocument.class).proxy());
+            createAttachment("zipfile.zip", null, (XWikiDocument) mockDocument.proxy());
 
         XWikiContext context = createXWikiContext("http://server/xwiki/bin/download/Main/Document/zipfile.zip");
 
@@ -201,6 +215,8 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockDocument = mock(XWikiDocument.class);
         XWikiDocument document = (XWikiDocument) mockDocument.proxy();
+        mockDocument.stubs().method("getDocumentReference").will(returnValue(
+            new DocumentReference("wiki", "Main", "Document")));
         XWikiAttachment attachment = createAttachment("zipfile.zip", createZipFile("Some content"), document);
         mockDocument.stubs().method("clone").will(returnValue(mockDocument.proxy()));
         mockDocument.stubs().method("getAttachment").will(returnValue(attachment));
@@ -229,6 +245,8 @@ public class ZipExplorerTest extends AbstractBridgedXWikiComponentTestCase
         mockAttachment.stubs().method("getContent").will(returnValue((content == null) ? new byte[0] : content));
         mockAttachment.stubs().method("getContentInputStream").will(
             returnValue(new ByteArrayInputStream((content == null) ? new byte[0] : content)));
+        mockAttachment.stubs().method("getReference").will(returnValue(
+            new AttachmentReference(filename, document.getDocumentReference())));
         return (XWikiAttachment) mockAttachment.proxy();
     }
 

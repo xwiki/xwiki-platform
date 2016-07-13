@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ro</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1307189790000</date>
+  <contentUpdateDate>1307189790000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language ro generated from http://www.l10n.xwiki.org
+platform.wiki.browse._actions=Acțtiuni
+platform.wiki.browse._actions.cancelJoinRequest=Anulează Cerere
+platform.wiki.browse._actions.delete=Șterge
+platform.wiki.browse._actions.leave=Părăsește
+platform.wiki.browse._actions.viewInvitation=Vezi Invitație
+platform.wiki.browse.description=Descriere
+platform.wiki.browse.doc.creationDate=Data Creării
+platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.membershipType=Tipul de Membru
+platform.wiki.browse.owner=Posesor
+platform.wiki.browse.wikiprettyname=Nume
+platform.wiki.create.error.wikiname.databasealreadyexists=O bază de date cu acest identificator deja exista
+platform.wiki.create.error.wikiname.empty=Identificatorul nu poate fi gol
+platform.wiki.create.error.wikiname.wikialreadyexists=Acest identificator este deja folosit
+platform.wiki.create.members=MEMBRI
+platform.wiki.create.title=Creează un nou wiki
+platform.wiki.create.wizard.desc.wikiname=Identificatorul unic al noului wiki
+platform.wiki.create.wizard.step.cleaningUp=Curățare
+platform.wiki.create.wizard.step.cleaningUp.confirm=Confirmă
+platform.wiki.create.wizard.step.create=Creează
+platform.wiki.create.wizard.step.nameAndType=Pasul 1 -- Alege un nume
+platform.wiki.create.wizard.step.nameAndType.shortname=Nume
+platform.wiki.create.wizard.step.next=Pasul următor
+platform.wiki.create.wizard.step.previous=Pasul anterior
+platform.wiki.delete.confirmation.no=Nu
+platform.wiki.delete.confirmation.yes=Da
+platform.wiki.error.exceptionWithMessage=Exceptie\: {0}
+platform.wiki.error.oneParameterNotSpecified=Parametrul ''{0}''  nu a fost specificat
+platform.wiki.error.parameterAcceptsMultipleValues=Acceptă valori multiple
+platform.wiki.form.requiredField=Obligatoriu
+platform.wiki.prop.membershipType.label=Tipul de Membru
+platform.wiki.prop.owner=Posesor
+platform.wiki.sheet.prop.description=Descriere
+platform.wiki.sheet.prop.homepage=Pagina de start
+platform.wiki.sheet.prop.owner=Posesor
+platform.wiki.users.delete.title=Șterge Wiki "{0}"
+platform.wiki.users.invitation.accept.label=Acceptă
+platform.wiki.users.invitation.postpone.label=Mai târziu
+platform.wiki.users.invitation.reject.label=Respinge
+platform.wiki.users.invitation.reply.title=Răspunde
+platform.wiki.users.join.no=Nu
+platform.wiki.users.join.request.cancel.label=Înapoi
+platform.wiki.users.join.request.cancelNo=Nu
+platform.wiki.users.join.request.cancelYes=Da
+platform.wiki.users.join.request.message.label=Mesaj
+platform.wiki.users.join.request.send.label=Trimite Cerere
+platform.wiki.users.join.yes=Da
+platform.wiki.users.leave.confirmation.no=Nu
+platform.wiki.users.leave.confirmation.yes=Da
+platform.wiki.users.leave.title=Părăsește Wiki
+platform.wiki.users.profile.activity.show=arată activitatea
+</content>
+</xwikidoc>

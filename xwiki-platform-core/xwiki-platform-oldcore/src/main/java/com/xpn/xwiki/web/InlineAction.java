@@ -55,16 +55,20 @@ public class InlineAction extends XWikiAction
             vcontext.put("doc", vdoc2);
 
             String parent = peform.getParent();
-            if (parent != null)
+            if (parent != null) {
                 doc2.setParent(parent);
+            }
             String creator = peform.getCreator();
-            if (creator != null)
+            if (creator != null) {
                 doc2.setCreator(creator);
+            }
             String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage != null) && !defaultLanguage.equals(""))
+            if ((defaultLanguage != null) && !defaultLanguage.equals("")) {
                 doc2.setDefaultLanguage(defaultLanguage);
-            if (doc2.getDefaultLanguage().equals(""))
+            }
+            if (doc2.getDefaultLanguage().equals("")) {
                 doc2.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+            }
             try {
                 doc2.readFromTemplate(peform, context);
             } catch (XWikiException e) {
@@ -87,8 +91,9 @@ public class InlineAction extends XWikiAction
             /* Setup a lock */
             try {
                 XWikiLock lock = doc.getLock(context);
-                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce()))
+                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce())) {
                     doc.setLock(context.getUser(), context);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 // Lock should never make XWiki fail

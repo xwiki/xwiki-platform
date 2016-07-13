@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxDefinitionLists</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497789000</date>
+  <contentUpdateDate>1301497789000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxDefinitionLists</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxId</name>
+        <number>4</number>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </maxSyntaxId>
+      <minSyntaxId>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxId</name>
+        <number>3</number>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </minSyntaxId>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxDefinitionLists</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>cbdc87a1-bfcf-4f04-b3ed-8838802e9ae5</guid>
+    <property>
+      <category>1</category>
+    </property>
+    <property>
+      <maxSyntaxId>2.0</maxSyntaxId>
+    </property>
+    <property>
+      <minSyntaxId>1.0</minSyntaxId>
+    </property>
+    <property>
+      <section>5</section>
+    </property>
+  </object>
+  <content>= Editing =
+
+== Definition Lists ==
+
+=== 1.0 Definition Lists ===
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Standard definition|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; term
+: definition
+)))
+|Nested definitions|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term 1&lt;/dt&gt;
+  &lt;dd&gt;definition 1
+    &lt;dl&gt;
+      &lt;dt&gt;term 2&lt;/dt&gt;
+      &lt;dd&gt;definition 2&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+)))
+|Parametrized definition|((({{{
+&lt;dl style="color:blue"&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+(% style="color:blue" %)
+; term
+: definition
+)))
+
+=== 2.0 Definition Lists ===
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Standard definition|((({{{
+; term
+: definition
+}}})))|(((
+; term
+: definition
+)))
+|Nested definitions|((({{{
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+}}})))|(((
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+)))
+|Parametrized definition|((({{{
+(% style="color:blue" %)
+; term
+: definition
+}}})))|(((
+(% style="color:blue" %)
+; term
+: definition
+)))</content>
+</xwikidoc>

@@ -114,11 +114,7 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         return featureRules != null && featureRules.size() > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidator#addValidationRule(ValidationRule)
-     */
+    @Override
     public void addValidationRule(ValidationRule rule)
     {
         String[] features = rule.getFeatures();
@@ -128,21 +124,13 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidator#getSyntax()
-     */
+    @Override
     public String getSyntax()
     {
         return syntax;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidator#isValid(String, RichTextArea)
-     */
+    @Override
     public boolean isValid(String feature, RichTextArea textArea)
     {
         if (hasValidationRules(feature)) {
@@ -155,11 +143,7 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SyntaxValidator#removeValidationRule(ValidationRule)
-     */
+    @Override
     public void removeValidationRule(ValidationRule rule)
     {
         String[] features = rule.getFeatures();

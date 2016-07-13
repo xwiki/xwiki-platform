@@ -168,10 +168,12 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
 
     /**
      * {@inheritDoc}
+     * <ul>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3147</li>
+     * <li>http://code.google.com/p/google-web-toolkit/issues/detail?id=3156</li>
+     * </ul>
      * 
      * @see com.google.gwt.user.client.ui.RichTextArea#setHTML(String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3156
      */
     @Override
     public void setHTML(String html)

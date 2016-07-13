@@ -22,44 +22,28 @@ package com.xpn.xwiki.doc;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-
-import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -68,12 +52,12 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private static final String DOCWIKI = "Wiki";
+    private static final String DOCWIKI = "WikiDescriptor";
 
     private static final String DOCSPACE = "Space";
 
@@ -92,8 +76,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private XWikiDocument translatedDocument;
 
     private Mock mockXWiki;
-
-    private Mock mockXWikiRenderingEngine;
 
     private Mock mockXWikiVersioningStore;
 
@@ -137,8 +119,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki = mock(XWiki.class);
 
-        this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
-
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
 
@@ -153,7 +133,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiRightService = mock(XWikiRightService.class);
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
-        this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
@@ -187,12 +166,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
 
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
+
+        // Set the default link label generator format to %np for some tests below.
+        // We need to do this since we don't depend on xwiki-platform-rendering-configuration-default (which contains
+        // an overridden RenderingConfiguration impl that sets the format to %np by default).
+        DefaultRenderingConfiguration renderingConfiguration =
+            getComponentManager().getInstance(RenderingConfiguration.class);
+        renderingConfiguration.setLinkLabelFormat("%np");
     }
 
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
+        getContextualAuthorizationManager().stubs()
+            .method("hasAccess").with(eq(Right.PROGRAM)).will(returnValue(true));
 
         // Setup display configuration.
         this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
@@ -206,6 +195,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(this.mockVelocityEngine.proxy()));
         velocityEngineEvaluateStub = new CustomStub("Implements VelocityEngine.evaluate")
         {
+            @Override
             public Object invoke(Invocation invocation) throws Throwable
             {
                 // Output the given text without changes.
@@ -239,6 +229,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetDisplayWhenNoTitleButSectionExists()
     {
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
         this.document.setContent("Some content\n1 Title");
         this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
             .will(velocityEngineEvaluateStub);
@@ -313,5 +305,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
+    }
+
+    public void testSetAbsoluteParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
+        assertEquals("docspace.docpage2", doc.getParent());
     }
 }

@@ -1,0 +1,55 @@
+#######################################################
+###                SIBLINGS PAGE
+###              ------------------
+#######################################################
+##
+#######################################################
+##                   HEADER
+#######################################################
+#if($request.xpage == 'siblings')
+  #template("startpage.vm")
+    <div class="main layoutsubsection">
+      <div id="mainContentArea">
+        <div class="xcontent">
+#end
+#######################################################
+##                    TITLE
+#######################################################
+#set ($titleToDisplay = $services.localization.render('core.siblings.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+#template('contentheader.vm')
+#######################################################
+##               DISPLAY SIBLINGS
+#######################################################
+##
+## List the sibling documents using a livetable
+##
+#set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+#set ($colprops = {
+  'doc.title'    : { 'link' : 'view', 'sortable': false },
+  'doc.author'   : { 'link' : 'author', 'type': 'text', 'filterable': true},
+  'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
+  '_actions'     : { 'actions': ['copy', 'rename', 'rights', 'delete'] }
+})
+#set ($parent = $services.model.serialize($doc.documentReference.lastSpaceReference, 'local'))
+#set ($queryFilters = "unique")
+#if ("$!request.displayHidden" == '')
+  #set ($queryFilters = "${queryFilters},hidden")
+#end
+#set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($parent)&exclude=$escapetool.url($doc.fullName)&queryFilters=$queryFilters")
+#set ($options = { 
+  'url' : "$doc.getURL('get', $urlParameters)",
+  'translationPrefix' : 'platform.index.',
+  'outputOnlyHtml' : true
+})
+#livetable('siblingsIndex' $collist $colprops $options)
+## Load the hierarchy JS file because the locations of documents in the livetable results are displayed as hierarchy
+#set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
+#######################################################
+##                   FOOTER
+#######################################################
+#if($request.xpage == 'siblings')
+        </div> ## xcontent
+      </div> ## mainContentArea
+    </div> ## main
+  #template("endpage.vm")
+#end

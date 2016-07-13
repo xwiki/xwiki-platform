@@ -326,22 +326,22 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      * @param space the REST spaceName path parameter
      * @param page the REST pageName path parameter
      */
-    protected void updateContext(String wiki, String space, String page)
+    protected void updateContext(DocumentReference documentReference)
     {
         try {
             // Set the database to the current wiki.
             XWikiContext deprecatedContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            deprecatedContext.setDatabase(wiki);
+            deprecatedContext.setWikiId(documentReference.getWikiReference().getName());
 
             // Set the document to the current document.
             XWiki xwiki = deprecatedContext.getWiki();
             XWikiDocument currentDocument =
-                xwiki.getDocument(new DocumentReference(wiki, space, page), deprecatedContext);
+                xwiki.getDocument(documentReference, deprecatedContext);
             deprecatedContext.setDoc(currentDocument);
         } catch (Exception e) {
             // Just log it.
             logger.log(Level.SEVERE,
-                String.format("Failed to update the context for page [%s:%s.%s].", wiki, space, page), e);
+                String.format("Failed to update the context for page [%s].", documentReference), e);
         }
     }
     

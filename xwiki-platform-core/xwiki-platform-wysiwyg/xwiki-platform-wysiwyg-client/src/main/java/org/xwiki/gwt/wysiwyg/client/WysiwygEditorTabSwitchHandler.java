@@ -123,11 +123,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         domSelectionPreserver = new SelectionPreserver(editor.getRichTextEditor().getTextArea());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BeforeSelectionHandler#onBeforeSelection(BeforeSelectionEvent)
-     */
+    @Override
     public void onBeforeSelection(BeforeSelectionEvent<Integer> event)
     {
         int currentlySelectedTab = ((TabPanel) event.getSource()).getTabBar().getSelectedTab();
@@ -163,11 +159,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         ActionEvent.fire(editor.getRichTextEditor().getTextArea(), actionNames[event.getItem()]);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SelectionHandler#onSelection(SelectionEvent)
-     */
+    @Override
     public void onSelection(SelectionEvent<Integer> event)
     {
         if (event.getSelectedItem() == WysiwygEditorConfig.WYSIWYG_TAB_INDEX) {
@@ -220,12 +212,14 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         }
         sourceCallback = new CancelableAsyncCallback<String>(new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 sourceCallback = null;
                 onSwitchToSourceFailure(caught);
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 sourceCallback = null;
@@ -277,7 +271,9 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, false);
 
         // Enable the source editor in order to be able to submit its content.
-        editor.getPlainTextEditor().getTextArea().setEnabled(true);
+        if (editor.getConfig().isEnabled()) {
+            editor.getPlainTextEditor().getTextArea().setEnabled(true);
+        }
         // Store the initial value of the plain text area in case it is submitted without gaining focus.
         editor.getPlainTextEditor().submit();
         // Remember the fact that the submitted value is not HTML for the case when the editor is loaded from cache.
@@ -312,6 +308,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
             // selection object after it was hidden. The internal selection object is null at this point.
             Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
             {
+                @Override
                 public void execute()
                 {
                     restoreDOMSelection();
@@ -327,6 +324,7 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
                 // selection object after it was hidden. The internal selection object is null at this point.
                 Scheduler.get().scheduleDeferred(new com.google.gwt.user.client.Command()
                 {
+                    @Override
                     public void execute()
                     {
                         // Double check the selected tab.
@@ -371,11 +369,13 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         params.put("source", source);
         reloader.reload(params, new AsyncCallback<Void>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 onSwitchToWysiwygFailure(caught);
             }
 
+            @Override
             public void onSuccess(Void result)
             {
                 onSwitchToWysiwygSuccess();
@@ -396,12 +396,14 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         }
         wysiwygCallback = new CancelableAsyncCallback<String>(new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 wysiwygCallback = null;
                 onSwitchToWysiwygFailure(caught);
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 wysiwygCallback = null;
@@ -455,7 +457,9 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Enable the rich text area in order to be able to edit and submit its content.
         // We have to enable the rich text area before initializing the rich text editor because some of the editing
         // features are loaded only when the rich text area is enabled.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, true);
+        if (editor.getConfig().isEnabled()) {
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, true);
+        }
         // Initialize the rich text editor if this is the first time we switch to WYSIWYG tab.
         editor.maybeInitializeRichTextEditor();
         // Restore the DOM selection before executing the commands.

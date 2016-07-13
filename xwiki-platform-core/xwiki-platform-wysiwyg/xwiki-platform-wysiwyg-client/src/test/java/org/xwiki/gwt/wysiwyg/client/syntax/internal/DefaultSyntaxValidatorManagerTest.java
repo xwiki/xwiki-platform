@@ -30,11 +30,7 @@ import org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidatorManager;
  */
 public class DefaultSyntaxValidatorManagerTest extends AbstractSyntaxValidatorManagerTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSyntaxValidatorManagerTest#newSyntaxValidatorManager()
-     */
+    @Override
     protected SyntaxValidatorManager newSyntaxValidatorManager()
     {
         return new DefaultSyntaxValidatorManager();

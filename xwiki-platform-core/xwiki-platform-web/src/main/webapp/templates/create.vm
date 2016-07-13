@@ -7,12 +7,8 @@
     ## default to creating a Page. 
     ## ---------------------------------------------------------------------------------------------------------
     #set($tocreate = $request.getParameter('tocreate'))
-    #if(!$tocreate || ($tocreate == '') || ($tocreate != 'space'))
-      #if($doc.isNew())
-        #set ($title = $services.localization.render('core.create.newPageTitle', [$!{escapetool.xml($doc.fullName)}]))
-      #else
-        #set ($title = $services.localization.render('core.create.pageTitle'))
-      #end
+    #if("$!tocreate" != 'space')
+      #set ($title = $services.localization.render('core.create.pageTitle'))
     #else
       #set ($title = $services.localization.render('core.create.spaceTitle'))
     #end

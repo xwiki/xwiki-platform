@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.pages;
 
+import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
@@ -34,7 +35,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PageTranslationResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PageTranslationResourceImpl")
 public class PageTranslationResourceImpl extends ModifiablePageResource implements PageTranslationResource
 {
     @Override

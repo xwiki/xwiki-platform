@@ -1,0 +1,44 @@
+##
+## Template used to generate the hierarchy of the document on which it is applied by always using the reference-based
+## hierarchy mode, regardless of the configured hierarchy mode used in the page breadcrumbs.
+##
+## Initially made to be used in an AJAX call when generating the location preview of a new page.
+##
+#template('hierarchy_macros.vm')
+##
+## Parse the document reference from the request (default to current)
+##
+#set ($documentReference = $NULL)
+#if ("$!request.reference" != '')
+  #set ($documentReference = $services.model.resolveDocument($request.reference))
+#end
+##
+## Parse the options from the request
+##
+#set ($options = {})
+#if ("$!request.displayTitle" != '')
+  #set ($displayTitle = ($request.displayTitle == 'true'))
+  #set ($discard = $options.put('displayTitle', $displayTitle))
+#end
+#if ("$!request.excludeSelf" != '')
+  #set ($excludeSelf = ($request.excludeSelf == 'true'))
+  #set ($discard = $options.put('excludeSelf', $excludeSelf))
+#end
+#if ("$!request.id" != '')
+  #set($discard = $options.put('id', $escapetool.xml($request.id)))
+#end
+#if ("$!request.limit" != '')
+  #set ($limit = $mathtool.toInteger($request.limit))
+  #set ($discard = $options.put('limit', $limit))
+#end
+#if ("$!request.local" != '')
+  #set ($local = ($request.local == 'true'))
+  #set ($discard = $options.put('local', $local))
+#end
+#if ("$!request.treeNavigation" != '')
+  #set ($discard = $options.put('treeNavigation', $request.treeNavigation.equals('true')))
+#end
+##
+## Display the hierarchy
+##
+#hierarchy($documentReference, $options)

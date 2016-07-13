@@ -126,7 +126,7 @@ public class StaticListClassFieldEditPane extends ClassFieldEditPane
     {
         By xpath = By.xpath(".//*[local-name() = 'option' or @type = 'radio' or @type = 'checkbox']");
         List<WebElement> selectedItems = new ArrayList<WebElement>();
-        for (WebElement item : getUtil().findElementsWithoutWaiting(getDriver(), defaultValueContainer, xpath)) {
+        for (WebElement item : getDriver().findElementsWithoutWaiting(defaultValueContainer, xpath)) {
             if (item.isSelected()) {
                 selectedItems.add(item);
             }
@@ -144,7 +144,7 @@ public class StaticListClassFieldEditPane extends ClassFieldEditPane
     {
         By xpath = By.xpath(".//*[@value = '" + value + "']");
         try {
-            return getUtil().findElementWithoutWaiting(getDriver(), defaultValueContainer, xpath);
+            return getDriver().findElementWithoutWaiting(defaultValueContainer, xpath);
         } catch (Exception e) {
             return null;
         }
@@ -157,7 +157,7 @@ public class StaticListClassFieldEditPane extends ClassFieldEditPane
     public String getPreviewInputType()
     {
         By xpath = By.xpath(".//*[local-name() = 'select' or (local-name() = 'input' and not(@type = 'hidden'))]");
-        List<WebElement> inputs = getUtil().findElementsWithoutWaiting(getDriver(), defaultValueContainer, xpath);
+        List<WebElement> inputs = getDriver().findElementsWithoutWaiting(defaultValueContainer, xpath);
         if (inputs.size() > 0) {
             WebElement input = inputs.get(0);
             return "select".equalsIgnoreCase(input.getTagName()) ? "select" : input.getAttribute("type").toLowerCase();
@@ -170,7 +170,7 @@ public class StaticListClassFieldEditPane extends ClassFieldEditPane
      */
     public StaticListItemsEditor getItemsEditor()
     {
-        return new StaticListItemsEditor(getUtil().findElementWithoutWaiting(getDriver(), getContainer(),
+        return new StaticListItemsEditor(getDriver().findElementWithoutWaiting(getContainer(),
             By.className("staticListEditor")));
     }
 }

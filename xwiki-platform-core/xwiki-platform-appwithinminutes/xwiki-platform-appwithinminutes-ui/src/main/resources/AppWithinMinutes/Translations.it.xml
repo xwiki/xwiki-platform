@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1323097478000</creationDate>
+  <date>1445422650000</date>
+  <contentUpdateDate>1445422591000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language it generated from http://www.l10n.xwiki.org
+platform.appwithinminutes.appHomePageActionsHeading=Azioni
+platform.appwithinminutes.appHomePageAddEntryHint=Aggiungi una nuova voce
+platform.appwithinminutes.appHomePageAddEntryLabel=Aggiungi
+platform.appwithinminutes.appHomePageEntryNameLabel=Nome della voce\:
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=Elimina
+platform.appwithinminutes.appLiveTableEditEntryActionName=Modifica
+platform.appwithinminutes.appLiveTableHeading=Voci
+platform.appwithinminutes.appNameEmptyError=Inserire il nome dell'applicazione.
+platform.appwithinminutes.appNameHint=Il nome dell'applicazione determina l'URL della home page dell'applicazione, lo spazio in cui i dati dell'applicazione saranno memorizzati e anche il nome della classe che descriverà la struttura dell'applicazione.
+platform.appwithinminutes.appNameIsUsedWarning=Quest'applicazione esiste già. Se si continua con il passo successivo verrà modificata l'applicazione esistente.
+platform.appwithinminutes.appNameLabel=Nome dell'Applicazione
+platform.appwithinminutes.appNamePageTitle=Crea Applicazione
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Classe dell'applicazione
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Spazio per i dati dell'applicazione
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL della home page dell'applicazione
+platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autore
+platform.appwithinminutes.appsLiveTable.doc.date=Data aggiornamento
+platform.appwithinminutes.appsLiveTable.doc.space=Nome Applicazione
+platform.appwithinminutes.appsLiveTableHeading=Applicazioni
+platform.appwithinminutes.classEditorAdvancedCategoryName=Avanzata
+platform.appwithinminutes.classEditorBindSheetSaveComment=Collegamento dello sheet della classe
+platform.appwithinminutes.classEditorBooleanFieldName=Booleano
+platform.appwithinminutes.classEditorCanvasHint=Trascinare i campi della palette e lasciarli in quest'area.
+platform.appwithinminutes.classEditorConfigureFieldLabel=Configura
+platform.appwithinminutes.classEditorDBListFieldName=Elenco Database
+platform.appwithinminutes.classEditorDateFieldName=Data
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Pulisci
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Oggi
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Ora
+platform.appwithinminutes.classEditorDeleteFieldLabel=Elimina
+platform.appwithinminutes.classEditorDuplicateFieldNameError=La classe ha due campi con lo stesso nome\: {0}
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valore di Default
+platform.appwithinminutes.classEditorGroupsFieldName=Gruppo
+platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop per cambiare l'ordine
+platform.appwithinminutes.classEditorMoveFieldLabel=Sposta
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Questa classe ha più di un foglio (sheet).
+platform.appwithinminutes.classEditorNumberFieldName=Numero
+platform.appwithinminutes.classEditorPaletteHint=Fare il Drag&amp;Drop dei campi che sono nella palette per creare il vostro modulo.
+platform.appwithinminutes.classEditorPaletteTitle=Palette dei Campi
+platform.appwithinminutes.classEditorPickersCategoryName=Scelta
+platform.appwithinminutes.classEditorPreviewFieldHint=Nascondi il riquadro di configurazione e applica le modifiche
+platform.appwithinminutes.classEditorPreviewFieldLabel=Anteprima
+platform.appwithinminutes.classEditorSheetSaveComment=Aggiornamento foglio (sheet) della classe
+platform.appwithinminutes.classEditorStandardCategoryName=Standard
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Aggiungi
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Elimina
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valore
+platform.appwithinminutes.classEditorStaticListFieldName=Elenco Statico
+platform.appwithinminutes.classEditorStringFieldName=Testo Breve
+platform.appwithinminutes.classEditorTemplateSaveComment=Aggiornamento valori di default
+platform.appwithinminutes.classEditorTextAreaFieldName=Testo Lungo
+platform.appwithinminutes.classEditorUpdateSheetHint=Ricreare il foglio (sheet) usato per visualizzare e modificare gli oggetti di questa classe ({0}).
+platform.appwithinminutes.classEditorUpdateSheetLabel=Aggiornamento sheet della classe
+platform.appwithinminutes.classEditorUpdateTemplateHint=Salvare i valori di default dei campi nel modello della classe ({0}).
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Aggiornamento modello della classe
+platform.appwithinminutes.classEditorUsersFieldName=Utente
+platform.appwithinminutes.createAppButtonLabel=Crea un'Applicazione
+platform.appwithinminutes.description=Creazione di applicazioni web collaborative in pochi minuti, grazie al potente sistema di gestione dati strutturati di XWiki.
+platform.appwithinminutes.homePageTitle=Un'App in Pochi Minuti
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Elenco delle azioni che si possono effettuare sulla voce dell'applicazione, come modifica e eliminazione
+platform.appwithinminutes.liveTableEditorActionsColumnName=Azioni
+platform.appwithinminutes.liveTableEditorAddColumnHint=Aggiungi
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Colonna speciale che mostra i links agli allegati della pagina della voce
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Allegati
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Colonna speciale che mostra l'avatar dell'utente. Funziona solo per una tabella legata alla classe XWiki.XWikiUsers
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Campi della Classe
+platform.appwithinminutes.liveTableEditorColumnsHint=Selezionare le colonne che si vogliono includere nella live table visualizzata nella home page dell'applicazione.
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=Elimina
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle? &lt;a href\=""&gt;Sì&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDescriptionHint=La descrizione contiene un breve riassunto di cosa fa l'applicazione e il tipo di dati che gestisce.
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=L'ultimo utente che ha modificato una voce dell'applicazione
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Ultimo Autore
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La data in cui la voce dell'applicazione é stata creata
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Data di Creazione
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=L'utente che ha creato la voce dell'applicazione
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creatore
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=La data in cui la voce dell'applicazione é stata modificata
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Data dell'aggiornamneto
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Il nome della pagina che contiene la voce dell'applicazione, preceduto dal nome dello spazio
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nome completo dlla Pagina
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=Il nome della pagina che contiene la voce dell'applicazione
+platform.appwithinminutes.liveTableEditorDocNameColumnName=Nome della Pagina
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Lo spazio della pagina che contiene la voce dell'applicazione
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Spazio
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=Il titolo della pagina che contiene la voce dell'applicazione
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=Titolo della Pagina
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Colonne Generiche
+platform.appwithinminutes.liveTableEditorHelpDescription=Le colonne delle live table generiche sono indipendenti dalla struttura dell'applicazione. Danno informazioni sulle pagine che contengono le voci dell'applicazione.
+platform.appwithinminutes.liveTableEditorHelpTitle=Suggerimento
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Colonna speciale che mostra le immagini allegate alla pagina della voce
+platform.appwithinminutes.liveTableEditorImagesColumnName=Imamgini
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop per cambiare l'ordine
+platform.appwithinminutes.liveTableEditorSaveComment=Aggiorna LiveTable
+platform.appwithinminutes.wizardStep1Description=Fornire un nome per l'applicazione.
+platform.appwithinminutes.wizardStep1Name=Nome
+platform.appwithinminutes.wizardStep1Title=Nome dell'applicazione
+platform.appwithinminutes.wizardStep2Description=Generare la struttura dell'applicazione specificando i tipi di dati che conterrà.
+platform.appwithinminutes.wizardStep2Name=Struttura
+platform.appwithinminutes.wizardStep2Title=Definire la struttura dell'applicazione
+platform.appwithinminutes.wizardStep3Description=Personalizzazione della home page dell'applicazione.
+platform.appwithinminutes.wizardStep3Name=Presentazione
+platform.appwithinminutes.wizardStep3Title=Personalizzazione della home page dell'applicazione
+platform.appwithinminutes.wizardStepFinishButtonLabel=Finito
+platform.appwithinminutes.wizardStepFinishButtonTip=Vai alla home page dell'applicazione
+platform.appwithinminutes.wizardStepHeading=Passo {0} — {1}
+platform.appwithinminutes.wizardStepHelpDescription=Questa composizione assistita vi guiderà nella costruzione dell'applicazione. Questi passi configureranno il modo in cui verrà visualizzata l'applicazione e che tipo di informazioni conterrà\:
+platform.appwithinminutes.wizardStepHelpTitle=Passi
+platform.appwithinminutes.wizardStepNextButtonLabel=Passo Successivo
+platform.appwithinminutes.wizardStepNextButtonTip=Vai al passo successivo
+platform.appwithinminutes.wizardStepPreviousButtonLabel=Passo Precedente
+platform.appwithinminutes.wizardStepPreviousButtonTip=Vai al passo precedente
+</content>
+</xwikidoc>

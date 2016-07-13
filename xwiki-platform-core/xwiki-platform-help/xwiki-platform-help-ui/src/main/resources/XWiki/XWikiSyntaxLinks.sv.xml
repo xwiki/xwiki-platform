@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1454940903000</date>
+  <contentUpdateDate>1454940903000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+==  Länkar ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Links ===
+
+|=(% style="width:20%" %)Formateringstyp|=XWiki syntax 1.0|=(% style="width:20%" %)Resultat
+|Länk till sida i aktuellt rum|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
+|Länk med etikett|{{{[etikett&gt;WebHome]}}}|[[etikett&gt;&gt;WebHome]]
+|Länk med wikisyntax i etikett|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;fetstilad etikett&lt;/strong&gt;&lt;/a&gt;}}}|[[**fetstilad etikett**&gt;&gt;WebHome]]
+|Länk till en sida i specificerat rum|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
+|Länk till underwiki|{{{[underwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
+|Länk som öppnas i nytt fönster|{{{[etikett&gt;WebHome&gt;_blank]}}}|[[etikett&gt;&gt;WebHome||rel="__blank"]]
+|Länk till URL direkt i text|{{{Detta är en URL: http://xwiki.org}}}|Detta är en URL: http://xwiki.org
+|Länk till en URL |{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
+|Etiketterad länk till URL|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Länk till e-postadress|{{{[sven@svensson.se&gt;mailto:sven@svensson.se]}}}|[[sven@svensson.se&gt;&gt;mailto:sven@svensson.se]]
+|Bildlänk|{{{&lt;a href="$xwiki.getURL("Rum1.Sida1")"&gt;{image:img.png|document=Rum2.Sida2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Bildlänk med bildparametrar|{{{&lt;a href="$xwiki.getURL("Rum1.Sida1")"&gt;{image:img.png|document=Rum2.Sida2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Länk till bilaga på aktuell sida|(((
+{{info}}Se [[Bilagemakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Länk till bilaga på annan sida|(((
+{{info}}Se [[Bilagemakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{{{attach:text|document=Rum.Sida|file=mg.png}}}}
+)))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+
+
+{{velocity}}$subHeading XWiki syntax 1.0 Länkspecifikation{{/velocity}}
+
+{{info}}
+Delarna angivna inom ##( )## är obligatoriska, delarna angivna inom ##[ ]## får utelämnas en av de två angivna tecknen angivna inom ##{ }## måste anges om motsvarande valfria del angivits.
+{{/info}}
+
+Det fullständiga formatet för en länk är **##[etikett {| eller &gt;}]+(resurs)(@interWikiAlias)+({| eller &gt;} mål)+##**
+
+* **##etikett##**: En sträng som visas som länknamn.  Kan utelämnas.  Exempel: ##Min sida##.
+* **##resurs##**: Den fullständiga länkadressen på följande syntax: **##(referens) [?querySträng] [#ankare]##**
+** **##referens##**: Länkreferensen som kan vara en av
+*** **En URI** på formen **##protokoll:sökväg##** (exempel: ##http:~/~/xwiki.org##, ##mailto~:sven@svensson.se##), eller
+*** Referens till **en wikisida** på formen **##~[~[wikiNamn:] rum.] (sida)##**. Exempel: ##WebHome##, ##Main.WebHome##, ##minwiki:Main.WebHome##
+**** **##wikiNamn##**:  En sträng som anger namnet på en virtuell wiki.  Länken pekar på en sida inuti motsvarade virtuella wiki.  Kan utelämnas.  Exempel: ##minwiki##.
+**** **##rum##**: Ett rumsnamn.  Om inget rum anges används aktuellt rum.  Exempel: ##Main##.
+**** **##sidae##**: En obligatorisk sträng som anger namnet på den länkade wikisidan.  Exempel: ##WebHome##
+** **##querySträng##**: En query-sträng, vilken kan utelämnas.  Används för att ange parametrar till URLen.  Exempel: ##"mindata1=5&amp;amp;mindata2=Hej"##.
+** **##ankare##**: Ett ankarnamn (vilket får utelämnas) som pekar på en ankardefinition på sidan som refereras av länken.  I XWiki skapas ankare automatiskt för varje rubrik bestående av bokstaven H (som i engelskans heading) följt av rubriknamnet.  De svenska bokstäverna å, ä och ö utelämnas alltid ur ankarnamnet.  Detta gäller även för alla tecken som ej är bokstäver eller siffror, exempelvis blanktecken, punk och komma.  En länk till sektionen XWiki syntax 1.0 Länkspecifikation kan alltså skapas via ankaret ##HXWikisyntax10Lnkspecifikation##.
+* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+* **##mål##**: En fakultativ sträng som motstvarar ##target##-attributet för ett ##A##-element i HTML.  Om denna utelämnas öppnas länken i aktuellt fönster eller tabb.  Exempel:  ##_self##, ##_blank##.
+
+=== 2.0 Links ===
+
+|=(% style="width:20%" %)Formateringstyp|=XWiki syntax 2.0|=(% style="width:20%" %)Resultat
+|Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
+|Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
+|Länk med wikisyntax i etikett|{{{[[**fetstilad etikett**&gt;&gt;WebHome]]}}}|[[**fetstilad etikett**&gt;&gt;WebHome]]
+|Länk till en sida i specificerat rum|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Länk till underwiki|{{{[[underwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Länk som öppnas i nytt fönster|{{{[[etikett&gt;&gt;WebHome||rel="__blank"]]}}}|[[etikett&gt;&gt;WebHome||rel="__blank"]]
+|Länk till URL direkt i text|{{{Detta är en URL: http://xwiki.org}}}|Detta är en URL: http://xwiki.org
+|Länk till en URL |{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Etiketterad länk till URL|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Länk till e-postadress|{{{[[sven@svensson.se&gt;&gt;mailto:sven@svensson.se]]}}}|[[sven@svensson.se&gt;&gt;mailto:sven@svensson.se]]
+|Bildlänk|{{{[[image:Rum2.Sida2@img.png&gt;&gt;Rum1.Sida1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Bildlänk med bildparametrar|{{{[[[[image:Rum2.Sida2@img.png||width="26" height="26"]]&gt;&gt;Rum1.Sida1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Länk till bilaga på aktuell sida|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Länk till bilaga på annan sida|{{{[[text&gt;&gt;attach:Rum.Sida@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+
+
+{{velocity}}$subHeading XWiki syntax 2.0 Länkspecification $subHeading{{/velocity}}
+
+{{info}}
+Delarna inom ##( )## är obligatoriska och delarna inom ##[ ]## får utelämnas.
+{{/info}}
+
+Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [@interWikiAlias] [||parametrar]##**
+
+* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Exempel: ##Min Sida##
+* **##resurs##**: Den fullständiga länkreferensen på följande syntax: **##(referens) [?querySträng] [#ankare]##**
+** **##referens##**: Länkreferensen på en av följande format:
+*** **URL**: En URL på formatet **##protokoll:~/~/sökväg##**. Exempel: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
+*** **Wikisida** på formen **##~[~[wikiNamn:] rum.] (sida)##**. Exempel: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiNamn##**: En sträng (vilken kan utelämnas) som anger namnet på den virtuella wikin.  Länken kommer att peka på en sida inuti den namngivna wikin.  Exempel: ##minwiki##
+**** **##rum##**: Ett rum i wikin.  Om inget anges används det aktuella rummet, dvs samma rum som sidan som innehåller länken.  Exempel: ##Main##
+**** **##sida##**: Namnet på den länkade sidan. Exempel: ##WebHome##
+*** **Bilaga** på formatet **##attach~: [wikisidnamn@] (bilagenamn)##**. Exempel: ##attach~:img.png##, ##attach~:minwiki:Main.WebHome@img.png##
+**** **##attach~:##**: Den sträng som identifierar resursen som en bilaga.  (Från engelskans "attachment" vilket betyder "bilaga".)
+**** **##wikisidnamn##**: En sträng vilken kan utelämnas som refererar till det dokument bilagan tillhör.  Se punkten "wikisida" ovan.
+**** **##bilagenamn##**: Namnet på själva bilagan.  (Notera att XWiki ibland ändrar filnamnet på filer som laddas upp som bilaga.)
+*** **E-postadress** på formatet **##mailto~: (e-postadress)##** (###ankare## får ej användas här). Exempel: ##mailto~:sven@svensson.se##
+**** **##mailto~:##**: Den sträng som identifierar resursen som en e-postadress.  (Från engelskans "mail to" vilket betyder "e-brev till".)
+**** **##epostadress##**: Den e-postadress som skall vara mål för länken.  Exempel: "##sven@svensson.se##"
+** **##querySträng##**: En query-sträng (vilken får utelämnas) som anger parametrar som skall vara med i den renderade URL:en.  Exempel: ##mindata1=5&amp;mindata2=Hej##
+** **##ankare##**: Ett ankarnamn (vilket får utelämnas) som pekar på en ankardefinition på sidan som refereras av länken.  I XWiki skapas ankare automatiskt för varje rubrik bestående av bokstaven H (som i engelskans heading) följt av rubriknamnet.  De svenska bokstäverna å, ä och ö utelämnas alltid ur ankarnamnet.  Detta gäller även för alla tecken som ej är bokstäver eller siffror, exempelvis blanktecken, punk och komma.  En länk till sektionen XWiki syntax 2.0 Länkspecifikation kan alltså skapas via ankaret ##HXWikisyntax20Lnkspecifikation##.
+* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+* **##parameters##**: En utelämningsbar lista med parametrar till länken. Exempel: ##rel="~_~_blank"## (öppna i nytt fönster)
+
+=== 2.1 Links ===
+
+|=Formateringstyp|=XWiki syntax 2.1|=Resultat
+|Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
+|Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
+|Länk med wikisyntax i etikett|{{{[[**fetstilad etikett**&gt;&gt;WebHome]]}}}|[[**fetstilad etikett**&gt;&gt;WebHome]]
+|Länk till en sida i specificerat rum|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|Länk till underwiki|{{{[[underwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
+|Länk som öppnas i nytt fönster|{{{[[etikett&gt;&gt;WebHome||rel="__blank"]]}}}|[[etikett&gt;&gt;WebHome||rel="__blank"]]
+|Länk till URL direkt i text|{{{Detta är en URL: http://xwiki.org}}}|Detta är en URL: http://xwiki.org
+|Länk till en URL |{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
+|Etiketterad länk till URL|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Länk till e-postadress|{{{[[sven@svensson.se&gt;&gt;mailto:sven@svensson.se]]}}}|[[sven@svensson.se&gt;&gt;mailto:sven@svensson.se]]
+|Bildlänk|{{{[[image:Rum2.Sida2@img.png&gt;&gt;Rum1.Sida1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Bildlänk med bildparametrar|{{{[[[[image:Rum2.Sida2@img.png||width="26" height="26"]]&gt;&gt;Rum1.Sida1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Länk till bilaga på aktuell sida|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Länk till bilaga på annan sida|{{{[[text&gt;&gt;attach:Rum.Sida@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page||anchor=anchor]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|Link to a Heading in a page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+
+{{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
+
+{{velocity}}$subHeading XWiki syntax 2.1 länkspecifikation{{/velocity}}
+
+{{info}}
+Delarna inom ##( )## är obligatoriska och delarna inom ##[ ]## får utelämnas.
+{{/info}}
+
+Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [||parametrar]##**
+
+* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Exempel: ##Min Sida##
+* **##resurs##**: En obligatorisk sträng med länkreferensen på en av följande former:
+** **URL**: En URL på formatet **##[url:] protokoll:~/~/sökväg##**. Exempel: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** En sträng (vilken får utelämnas) som identifierar resursen som en URL.
+*** **Wikisida** på formen **##[doc:] ~[~[wikiNamn:] rum.] (sida)##**. Exempel: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+*** **##doc:##** En sträng (vilken får utelämnas) som identifierar resursen som en wikisida.
+*** **##wikiNamn##**: En sträng (vilken kan utelämnas) som anger namnet på den virtuella wikin.  Länken kommer att peka på en sida inuti den namngivna wikin.  Exempel: ##minwiki##
+*** **##rum##**: Ett rum i wikin.  Om inget anges används det aktuella rummet, dvs samma rum som sidan som innehåller länken.  Exempel: ##Main##
+*** **##sida##**: Namnet på den länkade sidan. Exempel: ##WebHome##
+** **InterWiki-sidnamn** på formen **##interwiki: {{{(interWikiAlias:)}}} (sida)##**. Exempel: ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** En obligatorisk sträng som identifierar resursen som en InterWiki-länk.
+*** **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+*** **##sida##**: En obligatorisk sträng som anger namnet på den länkade sidan. Example: ##XWiki##
+** **Bilaga** på formatet **##attach~: [wikisidnamn@] (bilagenamn)##**. Exempel: ##attach~:img.png##, ##attach~:minwiki:Main.WebHome@img.png##
+*** **##attach~:##**: Den sträng som identifierar resursen som en bilaga.  (Från engelskans "attachment" vilket betyder "bilaga".)
+*** **##wikisidnamn##**: En sträng vilken kan utelämnas som refererar till det dokument bilagan tillhör.  Se punkten "wikisida" ovan.
+*** **##bilagenamn##**: Namnet på själva bilagan.  (Notera att XWiki ibland ändrar filnamnet på filer som laddas upp som bilaga.)
+** **E-postadress** på formatet **##mailto~: (e-postadress)##** (###ankare## får ej användas här). Exempel: ##mailto~:sven@svensson.se##
+*** **##mailto~:##**: Den sträng som identifierar resursen som en e-postadress.  (Från engelskans "mail to" vilket betyder "e-brev till".)
+*** **##epostadress##**: Den e-postadress som skall vara mål för länken.  Exempel: "##sven@svensson.se##"
+** **Relativ sökväg** på servern på formatet **##path: (sökväg)##**. Exempel: ##path:$doc.getURL('reset')## producerar måladressen ##http:~/~/server.domän.se/xwiki/bin/reset/Rum/Sida## where ##/xwiki/bin/reset/Rum/Sida## produceras av ##$doc.getURL('reset')##.
+*** **##path:##** En obligatorisk sträng som identifierar resursen som en relativ sökväg.  (Från engelskans "path", vilket betyder "sökväg".)
+*** **##sökväg##**: En obligatorisk sträng som anger den på servern relativa sökvägen till resursen som skall länkas.
+** **UNC** på formen **##unc: (sökväg)##**. Länken renderas som en ##file:~/~/##-länk. Exempel: ##unc:C:\Windows\##, ##unc:~\~\minserver\path\img.png##, ##unc:home/user/nånfil##
+*** **##sökväg##**: En obligatorisk sträng som anger lokal resurs för användaren. Exempel: ##C:\Windows\##, ##~\~\minserver\sökväg\img.png##, ##home/user/nånfil##
+* **##parameters##**: En utelämningsbar lista separerad med blankstegstecken med parametrar till länken.  Exempel: ##queryString="mindata1=5&amp;mindata2=Hej" anchor="HTableOfContents" rel="~_~_blank"##
+** **##queryString##**: En query-sträng (vilken får utelämnas) som anger parametrar som skall vara med i den renderade URL:en.  Exempel: ##url:http:~/~/domän.com/sökväg||queryString="mindata1=5&amp;mindata2=Hej"## producerar måladressen ##http:~/~/domän.com/sökväg?mindata1=5&amp;mindata2=Hej##
+** **##anchor##**: Ett ankarnamn (vilket får utelämnas) som pekar på en ankardefinition på sidan som refereras av länken.  I XWiki skapas ankare automatiskt för varje rubrik bestående av bokstaven H (som i engelskans heading) följt av rubriknamnet.  De svenska bokstäverna å, ä och ö utelämnas alltid ur ankarnamnet.  Detta gäller även för alla tecken som ej är bokstäver eller siffror, exempelvis blanktecken, punk och komma.  En länk till sektionen XWiki syntax 2.1 Länkspecifikation kan alltså skapas via ankaret ##HXWikisyntax21Lnkspecifikation##.  Exempel: ##url:http:~/~/domän.com/sökväg||anchor="HTableOfContents"## producerar måladressen ##http:~/~/domän.com/sökväg#HTableOfContents##
+** **##rel##**: En parameter (som får utelämnas) som anger hur länken skall öppnas. Exempel: ##rel="~_~_blank"## (öppnar länken i nytt fönster)</content>
+</xwikidoc>

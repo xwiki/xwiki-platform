@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space1</web>
+  <name>page1</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>XWiki.creator</creator>
+  <creationDate>1297952360000</creationDate>
+  <author>XWiki.author</author>
+  <customClass/>
+  <contentAuthor>XWiki.contentAuthor</contentAuthor>
+  <date>1297952371000</date>
+  <contentUpdateDate>1297952371000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <content>content1</content>
+</xwikidoc>

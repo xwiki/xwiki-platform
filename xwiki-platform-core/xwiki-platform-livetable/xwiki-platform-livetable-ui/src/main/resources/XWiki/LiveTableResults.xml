@@ -1,43 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.LiveTableResults" locale="">
   <web>XWiki</web>
   <name>LiveTableResults</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1252454400000</creationDate>
-  <date>1267453099000</date>
-  <contentUpdateDate>1267453099000</contentUpdateDate>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1460110722000</date>
+  <contentUpdateDate>1460110722000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.results')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="XWiki.LiveTableResultsMacros" /}}
+  <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 
 {{velocity wiki="false"}}
 #set ($extra = '')
 #set ($params = [])
 #if ("$!request.space" != '')
-  #set ($extra = "${extra} and doc.space = ?")
+  #set ($extra = "${extra} AND doc.space = ?")
   #set ($discard = $params.add($request.space))
+#end
+#if ("$!request.location" != '')
+  #set ($extra = "${extra} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+  #set ($locationFilterValue = $request.location)
+  ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as wildcards).
+  ## However, it is not what the user expects (e.g. http://jira.xwiki.org/browse/XWIKI-12608).
+  ## As a consequence, we must escape these characters.
+  ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+  ## Since we use '!' for the escaping, we also double existing ones.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+  ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
+  ## (the space separator) or "/" (as it is in the document name).
+  ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+  ## to filter on different levels:
+  ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+  ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
+  #set ($discard = $params.add("%${locationFilterValue}%"))
 #end
 #if ("$!request.parent" != '')
   #set ($extra = "${extra} and doc.parent = ?")
   #set ($discard = $params.add($request.parent))
 #end
 #if ("$!request.orphaned" == '1')
-  #set ($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
+  #set ($homepage = $services.wiki.getById($services.wiki.currentWikiId).mainPageReference)
+  #set ($homepageFullName = $services.model.serialize($homepage, 'local'))
+  ## On Oracle the empty parent is actually null.
+  #set ($extra = "${extra} and (doc.parent = '' or doc.parent is null) and doc.fullName &lt;&gt; ?")
+  #set ($discard = $params.add($homepageFullName))
 #end
 #gridresultwithfilter("$!request.classname" $request.collist.split(',') '' "${extra}" $params)
 {{/velocity}}</content>

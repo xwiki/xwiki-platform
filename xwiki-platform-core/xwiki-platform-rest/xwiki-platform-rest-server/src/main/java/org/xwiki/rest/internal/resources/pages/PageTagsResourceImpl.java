@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.pages;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -46,14 +47,15 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PageTagsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PageTagsResourceImpl")
 public class PageTagsResourceImpl extends ModifiablePageResource implements PageTagsResource
 {
     @Override
     public Tags getPageTags(String wikiName, String spaceName, String pageName) throws XWikiRestException
     {
         try {
-            String pageId = Utils.getPageId(wikiName, spaceName, pageName);
+            String pageId = Utils.getPageId(wikiName, parseSpaceSegments(spaceName), pageName);
             List<String> tagNames = getTagsFromDocument(pageId);
 
             Tags tags = objectFactory.createTags();
@@ -95,7 +97,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
             }
 
             XWikiDocument xwikiDocument =
-                    Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                    Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                             Utils.getXWikiContext(componentManager));
             BaseObject xwikiObject = xwikiDocument.getObject("XWiki.TagClass", 0);
 

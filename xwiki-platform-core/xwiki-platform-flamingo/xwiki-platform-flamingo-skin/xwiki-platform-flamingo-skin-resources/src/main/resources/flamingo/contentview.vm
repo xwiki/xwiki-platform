@@ -1,0 +1,57 @@
+$services.progress.pushLevel(4)
+
+###
+### Display document contents in "view" mode.
+###
+## -------------------------------
+## Compute the content to display 
+## -------------------------------
+$services.progress.startStep('Compute the content to display')
+#template("contentvars.vm")
+$services.progress.endStep()
+
+## ----------------------------------------------------------------------------
+## Compute title to display and modify rendered content accordingly
+## ----------------------------------------------------------------------------
+$services.progress.startStep('Compute title to display and modify rendered content accordingly')
+#template("titlevars.vm")
+$services.progress.endStep()
+
+## ----------------------------
+## Display the title
+## ----------------------------
+$services.progress.startStep('Display the title and content')
+<div class="xcontent">
+  #template('contentheader.vm')
+  ## --------------------------------------------------------------------------
+  ## Drop permissions as they are no longer needed. This allows us not to have
+  ## to review the code below for security holes since nothing bad can happen.
+  ## --------------------------------------------------------------------------
+  $xcontext.dropPermissions()
+  ## ----------------------------
+  ## Display the rendered content
+  ## ----------------------------
+  <div class="row">
+    <div id="xwikicontent" class="col-xs-12">
+      #if ("$!exception" != '')
+        #displayUnhandledException($exception)
+      #else
+        $renderedContent
+      #end
+    </div>
+  </div>
+</div>
+$services.progress.endStep()
+
+## -----------------------------------------------------------------------------------
+## Display the footnotes if the document is in 1.0 syntax and if there are any defined
+## -----------------------------------------------------------------------------------
+## TODO: move that in a place common to old and new rendering footnotes
+#if ($doc.syntax.toIdString() == 'xwiki/1.0')
+$services.progress.startStep('Display the footnotes')
+#set($footnotes = "#putFootnotes()")
+$doc.getRenderedContent($footnotes, 'xwiki/1.0')
+$services.progress.endStep()
+#end
+
+$services.progress.popLevel()

@@ -1,0 +1,9 @@
+org.xwiki.activeinstalls.internal.client.ActiveInstallsInitializerListener
+org.xwiki.activeinstalls.internal.client.DefaultPingSender
+org.xwiki.activeinstalls.internal.client.data.DistributionPingDataProvider
+org.xwiki.activeinstalls.internal.client.data.ExtensionPingDataProvider
+org.xwiki.activeinstalls.internal.client.data.DatePingDataProvider
+org.xwiki.activeinstalls.internal.client.data.JavaPingDataProvider
+org.xwiki.activeinstalls.internal.client.data.OsPingDataProvider
+org.xwiki.activeinstalls.internal.client.data.DatabasePingDataProvider
+org.xwiki.activeinstalls.internal.client.data.ServletContainerPingDataProvider

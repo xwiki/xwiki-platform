@@ -31,8 +31,9 @@ public class RedirectAction extends XWikiAction
 
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null) || (redirect.equals("")))
+        if ((redirect == null) || (redirect.equals(""))) {
             redirect = context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
+        }
         sendRedirect(response, redirect);
         return false;
     }

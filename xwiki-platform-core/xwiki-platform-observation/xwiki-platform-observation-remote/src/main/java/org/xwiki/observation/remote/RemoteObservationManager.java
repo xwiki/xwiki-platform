@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Provide apis to manage the event network interface.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -35,7 +35,7 @@ public interface RemoteObservationManager
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate {@link org.xwiki.observation.ObservationManager}.
-     * 
+     *
      * @param event the event
      */
     void notify(LocalEventData event);
@@ -45,14 +45,14 @@ public interface RemoteObservationManager
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate network.
-     * 
+     *
      * @param event the event
      */
     void notify(RemoteEventData event);
 
     /**
      * Stop a running channel.
-     * 
+     *
      * @param channelId the identifier of the channel to stop
      * @throws RemoteEventException error when trying to stop a running channel
      */
@@ -60,7 +60,7 @@ public interface RemoteObservationManager
 
     /**
      * Start a channel.
-     * 
+     *
      * @param channelId the identifier of the channel to start
      * @throws RemoteEventException error when trying to start a channel
      */

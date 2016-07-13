@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 import org.incava.util.diff.Diff;
 import org.incava.util.diff.Difference;
 import org.xwiki.annotation.maintainer.DiffService;
@@ -37,6 +39,7 @@ import org.xwiki.component.annotation.Component;
  * @since 2.3M1
  */
 @Component(hints = {"default", "character" })
+@Singleton
 public class CharacterDiffService implements DiffService
 {
     @Override

@@ -1,0 +1,15 @@
+##################################################
+# The annotation ends where the verbatim block ends
+# http://jira.xwiki.org/browse/XWIKI-8057
+##################################################
+.source
+To be, or {{{not to}}} be, that is the question:
+.rendered
+<p>To be, or <tt class="wikimodel-verbatim">not to</tt> be, that is the question:</p>
+.annotation
+0
+XWiki.XWikiGuest
+Alternative to being
+not to
+.annotated
+<p>To be, or <tt class="wikimodel-verbatim"><span class="annotation ID0">not to</span></tt> be, that is the question:</p>

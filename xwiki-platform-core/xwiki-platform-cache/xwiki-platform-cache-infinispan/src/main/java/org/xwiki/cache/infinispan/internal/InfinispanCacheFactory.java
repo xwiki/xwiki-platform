@@ -87,7 +87,7 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable, Disp
     {
         // Container
         // Note that the reason we lazy load the container is because we want to be able to use the Cache in
-        // environments when there's no container.
+        // environments where there's no container.
 
         try {
             this.environment = this.componentManager.getInstance(Environment.class);
@@ -145,7 +145,7 @@ public class InfinispanCacheFactory implements CacheFactory, Initializable, Disp
     @Override
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
-        InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration);
+        InfinispanConfigurationLoader loader = new InfinispanConfigurationLoader(configuration, this.environment);
 
         String cacheName = configuration.getConfigurationId();
 

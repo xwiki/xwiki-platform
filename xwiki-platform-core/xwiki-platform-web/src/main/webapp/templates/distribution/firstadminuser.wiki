@@ -1,0 +1,98 @@
+##!source.syntax=xwiki/2.1
+{{translation key="platform.extension.distributionWizard.firstadminuserStepDescription"/}}
+
+{{velocity}}
+  #if (!$xcontext.userReference && $request.xwikiname && $request.register_password)
+    ## Validation
+    #set($validUser = true)
+    ## Empty user name
+    #if ("!{$request.xwikiname}" == '')
+      #set($validUser = false)
+      {{error}}{{translation key="platform.extension.distributionWizard.firstadminuser.error.emptyUserName"/}}{{/error}}
+
+    #end
+    #if ("!{$request.register_password}" == '')
+      #set($validUser = false)
+      {{error}}{{translation key="platform.extension.distributionWizard.firstadminuser.error.emptyPassword"/}}{{/error}}
+
+    #end
+    #if ("!{$request.register_password}" != "!{$request.register2_password}")
+      #set($validUser = false)
+      {{error}}{{translation key="platform.extension.distributionWizard.firstadminuser.error.passwordMismatch"/}}{{/error}}
+
+    #end
+    ##
+    #if ($validUser)
+      #set($userProperties  = {})
+      #set($void = $userProperties.put('first_name', $request.register_first_name))
+      #set($void = $userProperties.put('last_name', $request.register_last_name))
+      #set($void = $userProperties.put('password', $request.register_password))
+      #set($void = $userProperties.put('email', $request.register_email))
+      #set($void = $userProperties.put('active', '1'))
+      ## Create the user
+      #set($createResult = $xwiki.getXWiki().createUser($request.xwikiname, $userProperties, $xcontext.context))
+      #if ($createResult == 1)
+        ## Set the user as wiki owner
+        #set($descriptor = $services.wiki.currentWikiDescriptor)
+        #set($void = $descriptor.setOwnerId("XWiki.${request.xwikiname}"));
+        #set($void = $services.wiki.saveDescriptor($descriptor))
+        ##
+        ## Authenticate the user
+        #set($principal = $xwiki.getXWiki().authService.checkAuth($request.xwikiname, $request.register_password, 'true', $xcontext.context))
+      #end
+    #end
+  #end
+  ##
+  #if ($xcontext.userReference)
+    {{success}}{{translation key="platform.extension.distributionWizard.firstadminuser.success.connected" parameters="'${xwiki.getPlainUserName($xcontext.userReference)}'"/}}{{/success}}
+    #set ($showCompleteStepButton = true)
+  #end
+{{/velocity}}
+
+{{velocity}}
+#if (!$xcontext.userReference)
+  {{html}}
+  <form id="register" action="" method="post" class="xform third">
+    <div>
+      #set($class = $xwiki.getClass('XWiki.XWikiUsers'))
+      #set($obj = $doc.newObject('XWiki.XWikiUsers'))
+      #if($request.register_first_name)
+        $obj.set('first_name', $request.register_first_name)
+      #end
+      #if($request.register_last_name)
+        $obj.set('last_name', $request.register_last_name)
+      #end
+      #if($request.register_email)
+        $obj.set('email', $request.register_email)
+      #end
+      <dl>
+        #set($prop = $class.first_name)
+        <dt><label for="register_${prop.name}">$services.localization.render('core.register.firstName')</label></dt>
+        <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+
+        #set($prop = $class.last_name)
+        <dt><label for="register_${prop.name}">$services.localization.render('core.register.lastName')</label></dt>
+        <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+
+        <dt><label for="register_username">$services.localization.render('core.register.username') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
+        <dd><input name="xwikiname" id="register_username" type="text" size="20" onfocus="prepareName(document.forms.register);" value="$!{request.register_username}"/></dd>
+
+        #set($prop = $class.password)
+        <dt><label for="register_${prop.name}">$services.localization.render('core.register.password') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
+        <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
+
+        <dt><label for="register2_${prop.name}">$services.localization.render('core.register.passwordRepeat') <span class="xRequired">$services.localization.render('core.validation.required')</span></label></dt>
+        <dd>$doc.displayEdit($prop, 'register2_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
+
+        #set($prop = $class.email)
+        <dt><label for="register_${prop.name}">$services.localization.render('core.register.email')</label></dt>
+        <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
+      </dl>
+    </div>
+    <div class="buttons"><span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.extension.distributionWizard.firstadminuser.registerAndLogin')" class="button"/></span></div>
+  </form>
+  {{/html}}
+
+  #set ($canCloseWizard = true)
+#end
+{{/velocity}}

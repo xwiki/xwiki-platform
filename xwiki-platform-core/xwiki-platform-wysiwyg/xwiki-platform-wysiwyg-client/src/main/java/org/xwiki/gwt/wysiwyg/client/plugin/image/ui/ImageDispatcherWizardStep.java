@@ -55,11 +55,7 @@ public class ImageDispatcherWizardStep extends ResourceReferenceParserWizardStep
         setValidDirections(EnumSet.of(NavigationDirection.NEXT));
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ResourceReferenceParserWizardStep#getNextStep()
-     */
+    @Override
     public String getNextStep()
     {
         if (allowExternalImages && getData().getDestination().getType() != ResourceType.ATTACHMENT) {

@@ -34,22 +34,14 @@ import com.google.gwt.dom.client.Node;
  */
 public class IELinePlugin extends LinePlugin implements InnerHTMLListener
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinePlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
         getTextArea().getDocument().addInnerHTMLListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LinePlugin#destroy()
-     */
+    @Override
     public void destroy()
     {
         getTextArea().getDocument().removeInnerHTMLListener(this);
@@ -57,12 +49,15 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
     }
 
     /**
-     * {@inheritDoc}<br/>
+     * {@inheritDoc}
+     * <p>
      * If the caret is inside an empty block level container and we insert an empty line before then the caret doesn't
      * remain in its place. We have to reset the caret.
+     * </p>
      * 
      * @see LinePlugin#insertEmptyLine(Node, Range)
      */
+    @Override
     protected void insertEmptyLine(Node container, Range caret)
     {
         super.insertEmptyLine(container, caret);
@@ -73,11 +68,7 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InnerHTMLListener#onInnerHTMLChange(Element)
-     */
+    @Override
     public void onInnerHTMLChange(Element element)
     {
         element.ensureEditable();

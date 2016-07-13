@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>SearchSuggestSourceSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1376498001000</creationDate>
+  <parent>XWiki.SearchSuggestSourceClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1378790524000</date>
+  <contentUpdateDate>1378790447000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($className = 'XWiki.SearchSuggestSourceClass')
+#set ($class = $xwiki.getDocument($className).xWikiClass)
+#if (!$object &amp;&amp; "$!request.xobjectNumber" != '')
+  #set ($object = $doc.getObject($className, $mathtool.toInteger($request.xobjectNumber)))
+#end
+#if (!$object)
+  #set ($object = $doc.getObject($className, true))
+#end
+#set ($discard = $doc.use($object))
+#set ($prefix = "${className}_${object.number}_")
+## We include the 'get' action because we use it when adding a new search suggest source through AJAX.
+#set ($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline' || $xcontext.action == 'get')
+(% class="xform" %)(((
+#foreach ($property in $class.properties)
+  #set ($displayFormType = $property.getProperty('displayFormType'))
+  #set ($isCheckbox = $editing &amp;&amp; $property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
+  ; {{html wiki="true"}}
+    &lt;label#if ($editing) for="${prefix}$property.name"#end&gt;
+      #if ($isCheckbox)
+        $doc.display($property.name, 'edit')
+      #end
+      $property.translatedPrettyName
+    &lt;/label&gt;
+    {{/html}}##
+    #set ($hintKey = "${className}_${property.name}.hint")
+    #if ($services.localization.get($hintKey))
+      (% class="xHint" %){{translation key="$hintKey"/}}##
+    #end
+
+  #if (!$isCheckbox)
+    : #if ($editing)
+        $doc.display($property.name, 'edit')
+      #else
+        {{{$!object.getProperty($property.name).value}}}
+      #end
+  #end
+#end
+)))
+{{/velocity}}</content>
+</xwikidoc>

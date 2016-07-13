@@ -58,7 +58,7 @@ public class ScopeFactory
 
     /**
      * Creates a new scope associated with the specified page.
-     * 
+     *
      * @param pageName A page name
      * @return A new Scope instance
      */
@@ -69,7 +69,7 @@ public class ScopeFactory
 
     /**
      * Creates a new scope associated with the specified space and matching all its pages.
-     * 
+     *
      * @param spaceName A space name
      * @return A new Scope instance
      */
@@ -80,7 +80,7 @@ public class ScopeFactory
 
     /**
      * Creates a new scope associated with the specified space.
-     * 
+     *
      * @param spaceName A space name
      * @param deep <code>true</code> for matching all its pages; <code>false</code> for matching this space as a unit
      * @return A new Scope instance
@@ -92,7 +92,7 @@ public class ScopeFactory
 
     /**
      * Creates a new scope associated with the specified wiki and matching all its spaces.
-     * 
+     *
      * @param wikiName A wiki name
      * @return A new Scope instance
      */
@@ -103,7 +103,7 @@ public class ScopeFactory
 
     /**
      * Creates a new scope associated with the specified wiki.
-     * 
+     *
      * @param wikiName A wiki name
      * @param deep <code>true</code> for matching all its spaces; <code>false</code> for matching this wiki as a unit
      * @return A new Scope instance

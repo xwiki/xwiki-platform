@@ -1,9 +1,15 @@
 #if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  #userPicker_import($isMultiSelect)
-  #set($id = $escapetool.xml("${prefix}${name}"))
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
-    class="suggestUsers#if ($isMultiSelect) multipleSelection#end" />
+  #set ($id = "${prefix}${name}")
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value
+  })
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
+  #end
+  #userPicker($isMultiSelect $parameters)
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])
@@ -13,27 +19,7 @@
     #end
   #end
   #if ($selectedUsers.size() > 0)
-    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-    <ul class="users">
-    #foreach ($user in $selectedUsers)
-      #set ($userReference = $services.model.resolveDocument($user))
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          #getUserAvatarURL($userReference $avatarURL 30)
-          <img src="$escapetool.xml($avatarURL.url)" class="icon"
-            alt="$escapetool.xml($xwiki.getUserName($user, false))" />
-        </div>
-        <div class="user-name">$xwiki.getUserName($user)</div>
-        <div>
-          <span class="user-alias">$escapetool.xml($userReference.name)</span>
-          ## Display the wiki only for local users.
-          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">$escapetool.xml($userReference.wikiReference.name)</span>
-          #end
-        </div>
-      </li>
-    #end
-    </ul>
+    #displayUser($selectedUsers)
   #end
 #elseif ($type == 'hidden')
   #set($id = $escapetool.xml("${prefix}${name}"))

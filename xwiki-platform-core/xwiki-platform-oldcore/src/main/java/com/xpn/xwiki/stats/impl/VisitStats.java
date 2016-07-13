@@ -27,14 +27,14 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 
 /**
  * The visit statistics database object.
- * 
+ *
  * @version $Id$
  */
 public class VisitStats extends XWikiStats
 {
     /**
      * The properties of visit statistics object.
-     * 
+     *
      * @version $Id$
      */
     public enum Property
@@ -116,13 +116,13 @@ public class VisitStats extends XWikiStats
 
     /**
      * Store previous object to be able to remove it from the database later.
-     * 
+     *
      * @param vobject the previous object.
      */
     public void rememberOldObject(VisitStats vobject)
     {
-        if (oldObject == null) {
-            oldObject = vobject;
+        if (this.oldObject == null) {
+            this.oldObject = vobject;
         }
     }
 
@@ -131,7 +131,7 @@ public class VisitStats extends XWikiStats
      */
     public void unrememberOldObject()
     {
-        oldObject = null;
+        this.oldObject = null;
     }
 
     /**
@@ -139,7 +139,7 @@ public class VisitStats extends XWikiStats
      */
     public VisitStats getOldObject()
     {
-        return oldObject;
+        return this.oldObject;
     }
 
     /**

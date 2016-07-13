@@ -71,6 +71,6 @@ public class AccessDeniedException extends AuthorizationException
     public AccessDeniedException(Right right, DocumentReference userReference, EntityReference entityReference,
         Throwable t)
     {
-        super(userReference, entityReference, "Access denied", t);
+        super(right, userReference, entityReference, "Access denied", t);
     }
 }

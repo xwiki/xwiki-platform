@@ -30,41 +30,50 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
- * Contains information about document version.
- * Mutable.
+ * Contains information about document version. Mutable.
+ *
  * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<XWikiRCSNodeInfo>
 {
     /**
-     * composite primary id of class. 
+     * composite primary id of class.
      */
-    private XWikiRCSNodeId    id;
+    private XWikiRCSNodeId id;
+
     /**
      * date of this modification.
      */
-    private Date    date      = new Date();
+    private Date date = new Date();
+
     /**
      * author of modification.
      */
-    private String  author    = XWikiRightService.GUEST_USER_FULLNAME;
+    private String author = XWikiRightService.GUEST_USER_FULLNAME;
+
     /**
      * modification's comment.
      */
-    private String  comment   = "";
+    private String comment = "";
+
     /**
      * is this version diff or full version. read-only
      */
-    private boolean isDiff     = true;
+    private boolean isDiff = true;
+
     /**
      * reference to its XWikiRCSNodeContent.
      */
     private SoftReference<XWikiRCSNodeContent> contentRef;
+
     /**
      * default constructor used in Hibernate to load this class.
      */
-    public XWikiRCSNodeInfo() { }
+    public XWikiRCSNodeInfo()
+    {
+    }
+
     /**
      * @param id - primary key.
      */
@@ -72,13 +81,15 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     {
         setId((XWikiRCSNodeId) id.clone());
     }
+
     /**
      * @return primary key.
      */
     public XWikiRCSNodeId getId()
     {
-        return id;
+        return this.id;
     }
+
     /**
      * @param id - primary key.
      */
@@ -86,13 +97,15 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     {
         this.id = id;
     }
+
     /**
      * @return date of this modification.
      */
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
+
     /**
      * @param updateDate - date of this modification.
      */
@@ -100,6 +113,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     {
         this.date = updateDate;
     }
+
     /**
      * @return get author of modification.
      */
@@ -108,8 +122,9 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
         // For Oracle and other databases, an empty string is equivalent to a NULL and thus
         // we had to remove the NOT-NULL condition on this field. Hence we need to test if it's
         // null here and return an empty string so that all code calling this will not be impacted.
-        return author != null ? author : "";
+        return this.author != null ? this.author : "";
     }
+
     /**
      * @param updateAuthor - author of modification.
      */
@@ -117,6 +132,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     {
         this.author = updateAuthor;
     }
+
     /**
      * @return modification's comment.
      */
@@ -125,8 +141,9 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
         // For Oracle and other databases, an empty string is equivalent to a NULL and thus
         // we had to remove the NOT-NULL condition on this field. Hence we need to test if it's
         // null here and return an empty string so that all code calling this will not be impacted.
-        return comment != null ? comment : "";
+        return this.comment != null ? this.comment : "";
     }
+
     /**
      * @param comment - modification's comment.
      */
@@ -134,23 +151,25 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     {
         this.comment = comment;
     }
+
     /**
      * @return is modification minor.
      */
     public boolean isMinorEdit()
     {
-        return id.getVersion().at(1) != 1;
+        return this.id.getVersion().at(1) != 1;
     }
+
     /**
      * @return is patch or full version.
      */
     public boolean isDiff()
     {
-        return isDiff;
+        return this.isDiff;
     }
+
     /**
-     * @param diff - is patch (true) or full version (false).
-     * Should not be used directly.
+     * @param diff - is patch (true) or full version (false). Should not be used directly.
      * @see XWikiPatch#setDiff(boolean)
      */
     public void setDiff(boolean diff)
@@ -166,24 +185,25 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     public XWikiRCSNodeContent getContent(XWikiContext context) throws XWikiException
     {
         XWikiRCSNodeContent nodeContent = null;
-        if (contentRef != null) {
-            nodeContent = contentRef.get();
+        if (this.contentRef != null) {
+            nodeContent = this.contentRef.get();
         }
         if (nodeContent != null || context == null) {
             return nodeContent;
         }
         nodeContent = context.getWiki().getVersioningStore()
             .loadRCSNodeContent(this.id, true, context);
-        contentRef = new SoftReference<XWikiRCSNodeContent>(nodeContent);
+        this.contentRef = new SoftReference<XWikiRCSNodeContent>(nodeContent);
         return nodeContent;
     }
+
     /**
      * @param content - {@link XWikiRCSNodeContent} for this node.
      */
     public void setContent(XWikiRCSNodeContent content)
     {
         content.setId(getId());
-        contentRef = new SoftReference<XWikiRCSNodeContent>(content);
+        this.contentRef = new SoftReference<XWikiRCSNodeContent>(content);
         setDiff(content.getPatch().isDiff());
     }
 

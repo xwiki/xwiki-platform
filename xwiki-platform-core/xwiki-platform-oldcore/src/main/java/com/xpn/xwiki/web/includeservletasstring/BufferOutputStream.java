@@ -31,43 +31,43 @@ public class BufferOutputStream extends ServletOutputStream
     /** Creates a new instance of BufferOutputStream */
     public BufferOutputStream()
     {
-        buffer = new ByteArrayOutputStream();
+        this.buffer = new ByteArrayOutputStream();
     }
 
     @Override
     public void write(int b) throws IOException
     {
-        buffer.write(b);
+        this.buffer.write(b);
     }
 
     @Override
     public void write(byte b[]) throws IOException
     {
-        buffer.write(b);
+        this.buffer.write(b);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException
     {
-        buffer.write(b, off, len);
+        this.buffer.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException
     {
-        buffer.flush();
+        this.buffer.flush();
     }
 
     @Override
     public void close() throws IOException
     {
-        buffer.close();
+        this.buffer.close();
     }
 
     public byte[] getContentsAsByteArray() throws IOException
     {
         flush();
-        return buffer.toByteArray();
+        return this.buffer.toByteArray();
     }
 
 }

@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -42,12 +43,13 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Migration for XWIKI-7726: Unable to delete attachments larger than 10 mb using the jetty + hsql distribution. Early
  * versions of the HSQLDialect ignored the specified minimum length of LOB columns, creating them with the default
  * length of 16M. Thus, the precision of existing CLOB and BLOB columns must be manually extended to the required 1G.
- * 
+ *
  * @version $Id$
  * @since 4.2M3
  */
 @Component
 @Named("R42000XWIKI7726")
+@Singleton
 public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
 {
     @Override
@@ -89,7 +91,7 @@ public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Hibernate {@link Work} class doing the actual work of this migrator.
-     * 
+     *
      * @version $Id$
      */
     private static class R42000Work implements Work
@@ -106,7 +108,7 @@ public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Increase the size of one column.
-         * 
+         *
          * @param tableName the name of the table to process
          * @param columnName the name of the column to process
          * @param connection the database connection to use

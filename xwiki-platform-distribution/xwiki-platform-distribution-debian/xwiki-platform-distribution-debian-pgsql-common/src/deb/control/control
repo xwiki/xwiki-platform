@@ -1,0 +1,15 @@
+Package: xwiki-pgsql-common
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-common (= [[version]]), postgresql, libpg-java
+Provides: xwiki-database
+Suggests: xwiki-tomcat7-pgsql | xwiki-tomcat8-pgsql
+Replaces: xwiki-database
+Conflicts: xwiki-enterprise-database, xwiki-enterprise-pgsql-common
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

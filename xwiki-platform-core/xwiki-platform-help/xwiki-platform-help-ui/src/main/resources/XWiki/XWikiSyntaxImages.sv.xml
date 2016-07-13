@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxImages</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497877000</date>
+  <contentUpdateDate>1301497877000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxImages</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Images ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Images ===
+
+|=Formateringstyp|=XWiki syntax 1.0|=Resultat
+|Bild från bilaga till aktuell sida|(((
+{{info}}Se [[bildmakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{{{image:img.png}}}}
+)))|image:XWiki.XWikiSyntaxImages@img.png
+|Bild från bilaga i annat dokument|{{{{image:img.png|document=Rum.Sida}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Bild med parametrar|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Bild från URL|{{{http://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+=== 2.0 Images ===
+
+|=Formateringstyp|=XWiki syntax 2.0|=Resultat
+|Bild från bilaga till aktuell sida|{{{image:img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+|Bild från bilaga i annat dokument|{{{image:Rum.Sida@img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+|Bild med parametrar|{{{[[image:img.png||width="25" height="25"]]}}}|[[image::XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Bild från URL|{{{image:http://some/url/img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+
+
+{{velocity}}$subHeading XWiki Syntax 2.0 bildspecifikation $subHeading{{/velocity}}
+
+
+{{info}}
+Delarna inom ##( )## är obligatoriska och delarna inom ##{ }## får utelämnas.
+{{/info}}
+
+Det fullständiga formatet för bilder är antingen **##image~: (referens)##** eller **##~[~[image~: (referens) {||parametrar}]]##**
+
+* **##image~:##** En obligatorisk sträng som identifierar resursen som en bild.
+* **##referens##**: Referensen till bilden som skall visas på ett av följande format:
+** **URL**: En URL till en bild på formatet **##http:~/~/sökväg/bildnamn##**. Exempel: ##http:~/~/domän.org/sökväg/bild.png##
+** **Bilaga** referens på formatet **##~{~{~{wikinamn:} rum.} sida@} (bildnamn)##**
+*** **##wikiNamn##**: En sträng (vilken kan utelämnas) som anger namnet på den virtuella wikin.  Bildreferensen kommer att peka på en bild inuti den namngivna wikin.  Exempel: ##minwiki##
+*** **##rum##**: Ett rum i wikin.  Om inget anges används det aktuella rummet, dvs samma rum som sidan som innehåller länken.  Exempel: ##Main##
+*** **##sida##**: En sträng (vilken kan utelämnas) som anger namnet på sidan som bildbilagan tillhör.  Exempel: ##WebHome##
+*** **##bildnamn##**: En obligatorisk sträng som anger namnet på bildbilagan.  (Notera att XWiki ibland ändrar filnamnet på filer som laddas upp som bilaga.)
+* **##parametrar##**: En utelämnings bar lista separerad av blankstegstecken med parametrar till bilden.  Exempel: ##width="800" height="600" alt="img.png" title="Min fina bild"##
+** **HTML-attribut**:  Alla attribut definierade i HTML-standarden för taggen ##&lt;img&gt;## kan användas.
+*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
+*** **##height##**: Parameter som anger höjden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt höjden på bildens omgivande block (exempel: ##height="40%"##).
+*** **##width##**: Parameter som anger bredden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt bredden på bildens omgivande block (exempel: ##height="40%"##). 
+*** **##title##**: Parameter som anger texten som blir synlig då muspekaren hålls över bilden. Exempel: ##title="Min fina bild"##
+*** **##alt##**: Parameter som anger ersättningstext om webbläsaren ej kan visa bilder.  Eftersom denna parameter är obligatorisk i HTML kommer XWiki att använda filnamnet istället om denna parameter utelämnas.  Exempel: ##alt="img.png"##
+*** **Mer**: En mer omfattande beskrivning av HTML-taggen ##&lt;img&gt;## inklusive fler attribut kan man läsa om [[på w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+
+=== 2.1 Images ===
+
+|=Formateringstyp|=XWiki syntax 2.1|=Resultat
+|Bild från bilaga till aktuell sida|{{{image:img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+|Bild från bilaga i annat dokument|{{{image:Rum.Sida@img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+|Bild med parametrar|{{{[[image:img.png||width="25" height="25"]]}}}|[[image::XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Bild från URL|{{{image:http://some/url/img.png}}}|image::XWiki.XWikiSyntaxImages@img.png
+|Ikon|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading XWiki Syntax 2.1 Image Specification $subHeading{{/velocity}}
+
+
+{{info}}
+Delarna inom ##( )## är obligatoriska och delarna inom ##{ }## får utelämnas.
+{{/info}}
+
+Det fullständiga formatet för bilder är antingen **##image~: (referens)##** eller **##~[~[image~: (referens) {||parametrar}]]##**
+
+* **##image~:##** En obligatorisk sträng som identifierar resursen som en bild.
+* **##referens##**: Referensen till bilden som skall visas på ett av följande format:
+** **URL**: En URL till en bild på formatet **##http:~/~/sökväg/bildnamn##**. Exempel: ##http:~/~/domän.org/sökväg/bild.png##
+** **Bilaga** referens på formatet **##~{~{~{wikinamn:} rum.} sida@} (bildnamn)##**
+*** **##wikiNamn##**: En sträng (vilken kan utelämnas) som anger namnet på den virtuella wikin.  Bildreferensen kommer att peka på en bild inuti den namngivna wikin.  Exempel: ##minwiki##
+*** **##rum##**: Ett rum i wikin.  Om inget anges används det aktuella rummet, dvs samma rum som sidan som innehåller länken.  Exempel: ##Main##
+*** **##sida##**: En sträng (vilken kan utelämnas) som anger namnet på sidan som bildbilagan tillhör.  Exempel: ##WebHome##
+*** **##bildnamn##**: En obligatorisk sträng som anger namnet på bildbilagan.  (Notera att XWiki ibland ändrar filnamnet på filer som laddas upp som bilaga.)
+** **Ikon** referens på formatet **##{{{(icon:)}}} (ikonnamn)##**. Exempel: **##icon:accept##**
+*** **##icon:##** En obligatorisk sträng som identifierar bildreferensen som en ikon från [[XWikis ikonsamling&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##ikonnamn##**: En obligatorisk sträng som anger namnet på ikonen. Exempel: ##accept##
+* **##parametrar##**: En utelämnings bar lista separerad av blankstegstecken med parametrar till bilden.  Exempel: ##width="800" height="600" alt="img.png" title="Min fina bild"##
+** **HTML-attribut**:  Alla attribut definierade i HTML-standarden för taggen ##&lt;img&gt;## kan användas.
+*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
+*** **##height##**: Parameter som anger höjden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt höjden på bildens omgivande block (exempel: ##height="40%"##).
+*** **##width##**: Parameter som anger bredden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt bredden på bildens omgivande block (exempel: ##height="40%"##). 
+*** **##title##**: Parameter som anger texten som blir synlig då muspekaren hålls över bilden. Exempel: ##title="Min fina bild"##
+*** **##alt##**: Parameter som anger ersättningstext om webbläsaren ej kan visa bilder.  Eftersom denna parameter är obligatorisk i HTML kommer XWiki att använda filnamnet istället om denna parameter utelämnas.  Exempel: ##alt="img.png"##
+*** **Mer**: En mer omfattande beskrivning av HTML-taggen ##&lt;img&gt;## inklusive fler attribut kan man läsa om [[på w3.org&gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]].
+** **##queryString##**: Det går även att ange parametrar till nedladdningslänken för bilden.  Exempel: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## kommer att misslyckas om både ##width##- och ##height##-parametrarna specificerats utöver ##queryString##!**)</content>
+</xwikidoc>

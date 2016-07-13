@@ -103,7 +103,18 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     @Override
     public String getHomePath()
     {
-        return this.configuration.getProperty(PREFIX + "homePath", this.defaultHomePath);
+        String homePath = this.configuration.getProperty(PREFIX + "homePath");
+        if (homePath == null) {
+            // Fallback to the environment variable so anybody can set it for the execution of the functional tests,
+            // in accord with their system.
+            homePath = System.getenv("XWIKI_OFFICE_HOME");
+            if (homePath == null) {
+                // Finally fallback to the default value
+                homePath = this.defaultHomePath;
+            }
+        }
+        
+        return homePath;
     }
 
     @Override

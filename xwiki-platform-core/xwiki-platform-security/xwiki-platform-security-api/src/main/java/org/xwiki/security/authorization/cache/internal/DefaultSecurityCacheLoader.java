@@ -21,9 +21,11 @@ package org.xwiki.security.authorization.cache.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,13 +39,16 @@ import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationSettler;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityEntryReader;
+import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
 import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
+import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.internal.UserBridge;
 
 /**
@@ -87,6 +92,47 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     /** Provide the configured authorization settler. */
     @Inject
     private Provider<AuthorizationSettler> authorizationSettlerProvider;
+
+    /**
+     * Implementation of the SecurityRuleEntry.
+     */
+    private final class EmptySecurityRuleEntry extends AbstractSecurityRuleEntry
+    {
+        /** Reference of the related entity. */
+        private final SecurityReference reference;
+
+        /**
+         * @param reference reference of the related entity
+         */
+        private EmptySecurityRuleEntry(SecurityReference reference)
+        {
+            this.reference = reference;
+        }
+
+        /**
+         * @return the reference of the related entity
+         */
+        @Override
+        public SecurityReference getReference()
+        {
+            return reference;
+        }
+
+        /**
+         * @return an empty list of rules
+         */
+        @Override
+        public Collection<SecurityRule> getRules()
+        {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return true;
+        }
+    }
 
     @Override
     public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity)
@@ -203,24 +249,58 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         SecurityReference entityWiki)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
-        Collection<GroupSecurityReference> groups = new HashSet<GroupSecurityReference>();
+        // First, we try to get the groups of the user from the cache
+        Collection<GroupSecurityReference> groups = securityCache.getGroupsFor(user, entityWiki); 
+        if (groups != null) {
+            // Since we have then in the cache, it means that the entry is already loaded
+            return groups;
+        }
+        
+        // Otherwise we have to load the entry
+        groups = new HashSet<GroupSecurityReference>();
 
-        // Load the user and related groups into the cache
-        Collection<GroupSecurityReference> globalGroups = new HashSet<GroupSecurityReference>();
-        loadUserEntry(user, userWiki, null, globalGroups);
-        groups.addAll(globalGroups);
+        // Public access could not appear in any group, no need to load it carefully, just optimized here
+        if (user.getOriginalReference() == null) {
+            if (securityCache.get(user) == null) {
+                // Main wiki entry should be loaded
+                getRules(user);
+            }
+            if (entityWiki != null) {
+                // Ensure there is a Public shadow in the subwiki of the checked entity
+                securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+            }
+            return groups;
+        }
+
+        // If the user is global and we are looking for rules inside a subwiki
         if (entityWiki != null) {
-            // Entity is in a local wiki for a global user
-            Collection<GroupSecurityReference> localGroups;
-            // Load shadows of user's global group into the cache
+            // Optim: We know we will have to load at least the rules concerning the local groups of the user, but we 
+            // can try to get the global groups of that user, meaning that we would not have to load the rules
+            // concerning them via the bridge.
+            Collection<GroupSecurityReference> globalGroups = securityCache.getGroupsFor(user, null);
+            if (globalGroups == null) {
+                // No luck, the cache has no information about the global groups, so we will load them too
+                globalGroups = new HashSet<>();
+                loadUserEntry(user, userWiki, null, globalGroups);
+            }
+            groups.addAll(globalGroups);
+
+            // Now we load the rules concerning the shadows of the global groups in the subwiki
             for (GroupSecurityReference group : globalGroups) {
-                localGroups = new HashSet<GroupSecurityReference>();
+                Collection<GroupSecurityReference> localGroups = new HashSet<>();
                 loadUserEntry(group, userWiki, entityWiki, localGroups);
                 groups.addAll(localGroups);
             }
-            // Load shadow of the user into the cache
-            localGroups = new HashSet<GroupSecurityReference>();
+            
+            // And finally we load the rules concerning the shadow of the user
+            Collection<GroupSecurityReference> localGroups = new HashSet<>();
             loadUserEntry(user, userWiki, entityWiki, localGroups);
+            groups.addAll(localGroups);
+            
+        } else {
+            // We have to load the rules concerning the groups of the user inside the wiki of that user
+            Collection<GroupSecurityReference> localGroups = new HashSet<>();
+            loadUserEntry(user, userWiki, null, localGroups);
             groups.addAll(localGroups);
         }
 
@@ -254,9 +334,17 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 
         // Loads all immediate groups recursively, collecting indirect groups along the way
         for (GroupSecurityReference group : groups) {
+            // Loads the group only if it has never been seen before, avoid infinite recursion
             if (allGroups.add(group)) {
-                // Call in recursion only if the group has never been seen before, avoid infinite recursion
-                loadUserEntry(group, (entityWiki != null) ? entityWiki : userWiki, null, allGroups);
+                Collection<GroupSecurityReference> groupsOfGroup = securityCache.getGroupsFor(group, entityWiki);
+                // But we load the groups only if they are not in the cache
+                if (groupsOfGroup == null) {
+                    loadUserEntry(group, (entityWiki != null) ? entityWiki : userWiki, null, allGroups);
+                } else {
+                    allGroups.addAll(groupsOfGroup);
+                }
+                
+                // Do not forget to add this group into the list of user's groups
                 userGroups.add(group);
             }
         }
@@ -266,10 +354,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // Store a shadow entry for a global user/group involved in a local wiki
             securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), userGroups);
         } else {
-            // If not yet in the cache, retrieve associated rules store the user/group in the cache
-            if (securityCache.get(user) == null) {
-                loadUserEntry(user, userGroups);
-            }
+            // Store or upgrade document entry into a user/group entry in the cache
+            // While the document rules could be already loaded in the cache, even if these rules should stay the same,
+            // we need to reload them as a user/group to have the security rules reference properly typed and
+            // recognized by the cache as a user. (cfr. XWIKI-12016)
+            loadUserEntry(user, userGroups);
         }
     }
 
@@ -317,11 +406,25 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
     {
         Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
+        List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
         for (SecurityReference ref : entity.getReversedSecurityReferenceChain()) {
             SecurityRuleEntry entry = securityCache.get(ref);
             if (entry == null) {
-                entry = securityEntryReader.read(ref);
-                securityCache.add(entry);
+                if (Right.getEnabledRights(ref.getType()).isEmpty()) {
+                    // Do not call the reader on entity that will give useless rules
+                    entry = new EmptySecurityRuleEntry(ref);
+                    emptyRuleEntryTail.add(entry);
+                } else {
+                    entry = securityEntryReader.read(ref);
+                    if (!emptyRuleEntryTail.isEmpty()) {
+                        // Add intermediate empty rules sets to the cache to hold this significant one
+                        for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
+                            securityCache.add(emptyRuleEntry);
+                        }
+                        emptyRuleEntryTail.clear();
+                    }
+                    securityCache.add(entry);
+                }
             }
             rules.push(entry);
         }

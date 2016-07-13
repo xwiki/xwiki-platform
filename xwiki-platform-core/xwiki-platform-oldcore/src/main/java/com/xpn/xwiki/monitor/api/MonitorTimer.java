@@ -39,22 +39,22 @@ public class MonitorTimer
 
     public void setStartDate()
     {
-        startDate = new Date();
+        this.startDate = new Date();
     }
 
     public void setEndDate()
     {
-        endDate = new Date();
+        this.endDate = new Date();
     }
 
     public long getDuration()
     {
-        return endDate.getTime() - startDate.getTime();
+        return this.endDate.getTime() - this.startDate.getTime();
     }
 
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public void setName(String name)
@@ -64,7 +64,7 @@ public class MonitorTimer
 
     public String getDetails()
     {
-        return details;
+        return this.details;
     }
 
     public void setDetails(String details)
@@ -77,15 +77,15 @@ public class MonitorTimer
     {
         StringBuffer str = new StringBuffer();
         str.append(" Name: ");
-        str.append(name);
+        str.append(this.name);
         str.append(" Details: ");
         str.append(" Start Date: ");
-        str.append(startDate);
+        str.append(this.startDate);
         str.append(" End Date: ");
-        str.append(endDate);
+        str.append(this.endDate);
         str.append(" Duration: ");
         try {
-            str.append(endDate.getTime() - startDate.getTime());
+            str.append(this.endDate.getTime() - this.startDate.getTime());
         } catch (Exception e) {
         }
         return str.toString();

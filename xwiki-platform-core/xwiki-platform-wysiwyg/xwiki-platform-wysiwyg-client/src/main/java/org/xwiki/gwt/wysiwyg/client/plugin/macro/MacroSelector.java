@@ -96,11 +96,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         displayer.getTextArea().getCommandManager().removeCommandListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
-     */
+    @Override
     public void onMouseUp(MouseUpEvent event)
     {
         if (event.getSource() == displayer.getTextArea()) {
@@ -116,11 +112,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
-     */
+    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getSource() == displayer.getTextArea()) {
@@ -128,11 +120,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         if (RESET.equals(command)) {
@@ -144,11 +132,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         if (sender == displayer.getTextArea().getCommandManager()) {
@@ -156,11 +140,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#update()
-     */
+    @Override
     public void update()
     {
         // Clear previously selected macros.
@@ -184,11 +164,7 @@ public class MacroSelector implements Updatable, MouseUpHandler, KeyUpHandler, C
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Updatable#canUpdate()
-     */
+    @Override
     public boolean canUpdate()
     {
         return displayer.getTextArea().isAttached() && displayer.getTextArea().isEnabled();

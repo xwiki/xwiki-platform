@@ -46,10 +46,12 @@ public class InsertBlockHTMLExecutable extends InsertHTMLExecutable
      * <p>
      * The given node is most likely a block-level element and thus we need to split the DOM tree up to the nearest flow
      * container starting from the point indicated by the given range.
+     * </p>
      * <p>
      * NOTE: The node is not wrapped by the range after the insertion. The range is collapsed and placed in the split
      * point after the inserted node. If you wish to select the inserted node then override this method and select the
      * node after insertion.
+     * </p>
      * 
      * @see InsertHTMLExecutable#insertNode(Range, Node)
      */

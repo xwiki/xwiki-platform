@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Main</web>
+  <name>SolrDateFacet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1393225024000</creationDate>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1393226895000</date>
+  <contentUpdateDate>1393226669000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
+#set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+#macro (displaySearchFacetValues_date $facetValues)
+  #set ($discard = $xwiki.ssx.use('Main.SolrDateFacet'))
+  #set ($discard = $xwiki.jsx.use('Main.SolrDateFacet'))
+  ##
+  ## Build the list of date intervals.
+  ##
+  ## 1. Predefined date intervals.
+  ## We use the start of the day as point of reference instead of the current precise date &amp; time in order for the date
+  ## facet to be properly cached (during that day). Otherwise, if we use NOW in a filter range query then a new cache
+  ## entry is generated for each search request because NOW is expanded to the actual date &amp; time in the filter query.
+  ## See http://searchhub.org/2012/02/23/date-math-now-and-filter-queries/ for details.
+  #set ($startOfToday = $xwiki.jodatime.dateTime.withTimeAtStartOfDay())
+  ## Solr indexes the dates in UTC timezone.
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($startOfToday = $startOfToday.toDateTime($utcTimezone))
+  #set ($startOfTomorrow = $startOfToday.plusDays(1))
+  #set ($intervals = [
+    {
+      'label': $services.localization.render('solr.facet.date.today'),
+      'start': $startOfToday,
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY TO NOW/DAY+1DAY}',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last7Days'),
+      'start': $startOfToday.minusDays(7),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-7DAYS TO NOW/DAY+1DAY}',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last30Days'),
+      'start': $startOfToday.minusDays(30),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-30DAYS TO NOW/DAY+1DAY}',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.olderThan30Days'),
+      'end'  : $startOfToday.minusDays(30),
+      'name' : '[* TO NOW/DAY-30DAYS}',
+      'count': 0
+    }
+  ])
+  ## 2. Date intervals specified on the request.
+  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($iso8601Formatter = $iso8601Formatter.withZone($utcTimezone))
+  #if ($facetRequestValues)
+    #set ($selectedIntervals = [])
+    #foreach ($selectedValue in $facetRequestValues)
+      ## Determine if the value/range is custom.
+      #set ($custom = true)
+      #foreach ($interval in $intervals)
+        #if ($interval.name == $selectedValue)
+          #set ($discard = $selectedIntervals.add($interval))
+          #set ($custom = false)
+          #break
+        #end
+      #end
+      #if ($custom)
+        #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+        #if ($rangeMatcher.matches())
+          #set ($range = [$rangeMatcher.group(1), $rangeMatcher.group(2)])
+          #foreach ($point in $range)
+            #if ($point == '*')
+              #set ($point = $NULL)
+            #else
+              #set ($point = $iso8601Formatter.parseDateTime($point))
+            #end
+            #set ($discard = $range.set($foreach.index, $point))
+          #end
+          #set ($discard = $selectedIntervals.add({
+            'start': $range.get(0),
+            'end'  : $range.get(1),
+            'name' : $selectedValue,
+            'count': 0
+          }))
+        #end
+      #end
+    #end
+    #set ($intervals = $selectedIntervals)
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $dateValue.compareTo($interval.start) &gt;= 0)
+          &amp;&amp; (!$interval.end || $dateValue.compareTo($interval.end) &lt; 0))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the unselected date intervals that don't have matches.
+  #if (!$facetRequestValues)
+    #set ($intervalsWithMatches = [])
+    #foreach ($interval in $intervals)
+      #if ($interval.count &gt; 0)
+        #set ($discard = $intervalsWithMatches.add($interval))
+      #end
+    #end
+    #set ($intervals = $intervalsWithMatches)
+  #end
+  ##
+  ## Display date intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue {} 'displaySearchFacetValue_date')&lt;/li&gt;
+    #end
+    #if (!$facetRequestValues)
+      ## Allow users to specify a custom interval.
+      &lt;li class="customDateInterval"&gt;
+        #displaySearchFacetValue_customDateInterval()
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_customDateInterval)
+  ## A simple date picker widget.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
+  ## Used to parse and serialize the selected date using the specified date format.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
+  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  &lt;label&gt;
+    &lt;input type="checkbox" class="hidden" /&gt;
+    &lt;span class="itemName"&gt;
+      $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
+    &lt;/span&gt;
+  &lt;/label&gt;
+  &lt;form action="$xwiki.getURL('Main.SolrDateFacet', 'get')"&gt;
+    &lt;div class="hidden"&gt;
+      ## Reset the pagination because the number of results can change when a facet is applied.
+      #extendQueryString($url {
+        $facetRequestParameter: ['[* TO *]'],
+        'firstIndex': [],
+        'timezoneOffset': []
+      })
+      &lt;input type="hidden" name="xredirect" value="$escapetool.xml($url)" /&gt;
+      &lt;input type="hidden" name="facet" value="$escapetool.xml($facetRequestParameter)" /&gt;
+      ## This will be overwritten on the client side (with the TimeZone indicated by the browser).
+      #set ($timeZoneOffset = $datetool.timeZone.getOffset($datetool.date.time) / 60000)
+      &lt;input type="hidden" name="timezoneOffset" value="$timeZoneOffset" /&gt;
+    &lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_startDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.start'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_startDate" name="startDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dd&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_endDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.end'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_endDate" name="endDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dt&gt;
+    &lt;/dl&gt;
+    &lt;div&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'solr.facet.date.applyCustomInterval'))" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#end
+
+#macro (displaySearchFacetValue_date $facetPrettyValue)
+  #if ($facetValue.label)
+    $escapetool.xml($facetValue.label)
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Compute the client timezone.
+    #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+    #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+    #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+    #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+    ## Obtain a date printer.
+    #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+    #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+    #set ($datePrinter = $datePrinter.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.date.before',
+        [$datePrinter.print($facetValue.end)]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.date.after',
+        [$datePrinter.print($facetValue.start)]))
+    #else
+      $services.localization.render('solr.facet.date.between',
+        ["$datePrinter.print($facetValue.start)&lt;br/&gt;", $datePrinter.print($facetValue.end)])
+    #end
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.date.any'))
+  #end
+#end
+
+#macro (convertDateFormat $dateString $inputFormat $dateParser $datePrinter $return)
+  ## We don't use the given date parser directly because it can throw IllegalArgumentException.
+  #set ($date = $datetool.toDate($inputFormat, $dateString, $services.localization.currentLocale))
+  #if ($date)
+    #set ($date = $datePrinter.print($dateParser.parseDateTime($dateString)))
+  #else
+    #set ($date = '*')
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $date)
+#end
+
+#macro (handleCustomDateInterval)
+  ## Compute the client timezone.
+  #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+  #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+  #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+  #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+  ## Obtain a date parser.
+  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  #set ($dateParser = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+  #set ($dateParser = $dateParser.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+  ## Obtain a date printer (Solr indexes the dates in ISO8601 format with UTC timezone).
+  #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($datePrinter = $datePrinter.withZone($utcTimezone))
+  ## Convert the given dates.
+  #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
+  #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
+  #set ($interval = "[$startDate TO $endDate}")
+  #set ($xredirect = $request.xredirect.replaceFirst(
+    "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
+    $escapetool.url({
+      $request.facet: $interval,
+      'timezoneOffset': $request.timezoneOffset
+    })))
+  $response.sendRedirect($xredirect)
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
+  #handleCustomDateInterval()
+#elseif ($facetValues)
+  {{html}}#displaySearchFacetValues_date($facetValues){{/html}}
+#end
+{{/velocity}}</content>
+  <object>
+    <name>Main.SolrDateFacet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>93004dd8-6a0c-42d1-a211-ad01e9a90f75</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  var maybeEnhanceCustomDateInterval = function() {
+    // Hide the custom date interval form by default.
+    var form = $(this).find('form').hide();
+
+    // Toggle the form when the user selects the corresponding option. We pass null to prevent animation.
+    $(this).find('.itemName').prev('input[type="checkbox"]').removeClass('hidden').click($.proxy(form, 'toggle', null));
+
+    // Use the client TimeZone when searching and displaying dates on the server.
+    // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+    // and we need (local time - UTC) on the server.
+    form.find('input[name="timezoneOffset"]').val(-new Date().getTimezoneOffset());
+  };
+
+  var enhanceDateFacets = function(elements) {
+    $(elements).find('.search-facet .customDateInterval').each(maybeEnhanceCustomDateInterval);
+  };
+
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceDateFacets(data.elements);
+  });
+
+  enhanceDateFacets(document.body);
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Main.SolrDateFacet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>bf532c45-ba03-4161-994b-722fa065e72c</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.search-facet-body .customDateInterval label {
+  display: block;
+}
+.search-facet-body .customDateInterval .itemName {
+  cursor: pointer;
+}
+.search-facet-body .customDateInterval form {
+  margin-top: .5em;
+}
+.search-facet-body .customDateInterval dl {
+  margin: 0;
+}
+.search-facet-body .customDateInterval input {
+  margin-bottom: .3em;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

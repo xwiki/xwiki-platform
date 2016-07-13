@@ -22,19 +22,24 @@ package org.xwiki.store.locks.dummy.internal;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.store.locks.LockProvider;
 import org.xwiki.store.locks.internal.DefaultReadWriteLock;
 
 /**
  * A provider of fake locks.
- * Used for cases when a lock is demanded by the code but the perticular operation does not require one.
+ * Used for cases when a lock is demanded by the code but the particular operation does not require one.
  * Also useful for disabling locking.
  *
  * @version $Id$
  * @since 4.3M2
  */
-@Component("dummy")
+@Component
+@Named("dummy")
+@Singleton
 public class DummyLockProvider implements LockProvider
 {
     /**

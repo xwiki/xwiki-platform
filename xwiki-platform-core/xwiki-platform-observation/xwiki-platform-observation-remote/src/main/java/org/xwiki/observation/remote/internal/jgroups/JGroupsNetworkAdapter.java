@@ -49,7 +49,7 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 
 /**
  * JGroups based implementation of {@link NetworkAdapter}.
- * 
+ *
  * @version $Id$
  * @since 2.0RC1
  */
@@ -153,7 +153,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
 
     /**
      * Create a new channel.
-     * 
+     *
      * @param channelId the identifier of the channel to create
      * @return the new channel
      * @throws Exception failed to create new channel
@@ -182,7 +182,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter
 
     /**
      * Load channel configuration.
-     * 
+     *
      * @param channelId the identifier of the channel
      * @return the channel configuration
      * @throws IOException failed to load configuration file

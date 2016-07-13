@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.internal.HiddenDocumentFilter;
+import org.xwiki.query.internal.UniqueDocumentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,7 +48,7 @@ public final class TagQueryUtils
     /**
      * Hint of the "hidden" QueryFilter.
      */
-    public static final String HIDDEN_QUERYFILTER_HINT = "hidden";
+    public static final String HIDDEN_QUERYFILTER_HINT = HiddenDocumentFilter.HINT;
 
     /**
      * Utility class, private constructor.
@@ -72,7 +74,7 @@ public final class TagQueryUtils
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -124,7 +126,7 @@ public final class TagQueryUtils
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues((List<Object>) params);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -157,7 +159,7 @@ public final class TagQueryUtils
     }
 
     /**
-     * Get documents with the given tags.
+     * Get non-hidden documents with the passed tags.
      *
      * @param tag a list of tags to match.
      * @param context XWiki context.
@@ -166,8 +168,25 @@ public final class TagQueryUtils
      */
     public static List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
+        return getDocumentsWithTag(tag, false, context);
+    }
+
+    /**
+     * Get documents with the passed tags with the result depending on whether the caller decides to include
+     * hidden documents or not.
+     *
+     * @param tag a list of tags to match.
+     * @param includeHiddenDocuments if true then include hidden documents
+     * @param context XWiki context.
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 6.2M1
+     */
+    public static List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
+        throws XWikiException
+    {
         List<String> results;
-        List<Object> parameters = new ArrayList<Object>();
+        List<Object> parameters = new ArrayList<>();
         parameters.add(TagPlugin.TAG_CLASS);
         parameters.add(tag);
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.className=? and "
@@ -177,7 +196,10 @@ public final class TagQueryUtils
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues(parameters);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.getComponent(QueryFilter.class, UniqueDocumentFilter.HINT));
+            if (!includeHiddenDocuments) {
+                query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
+            }
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,

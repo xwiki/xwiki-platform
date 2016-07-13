@@ -34,7 +34,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 /**
  * Action used to post a comment on a page, adds a comment object to the document and saves it, requires comment right
  * but not edit right.
- * 
+ *
  * @version $Id$
  */
 public class CommentAddAction extends XWikiAction
@@ -67,6 +67,7 @@ public class CommentAddAction extends XWikiAction
         } else {
             // className = XWiki.XWikiComments
             String className = baseclass.getName();
+            // Create a new comment object and mark the document as dirty.
             BaseObject object = doc.newObject(className, context);
             // TODO The map should be pre-filled with empty strings for all class properties, just like in
             // ObjectAddAction, so that properties missing from the request are still added to the database.
@@ -88,11 +89,9 @@ public class CommentAddAction extends XWikiAction
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
             doc.setAuthorReference(context.getUserReference());
-            // Consider comments not being content.
-            doc.setContentDirty(false);
-            // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
-            doc.setMetaDataDirty(true);
-            xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
+
+            // Save the new comment.
+            xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {
@@ -117,7 +116,7 @@ public class CommentAddAction extends XWikiAction
     /**
      * Checks the request parameter captcha_answer against the captcha module. This makes xwiki-core dependant on
      * xwiki-captcha and should be removed as soon as possible.
-     * 
+     *
      * @param context The XWikiContext for getting the request and whether guest comment requires a captcha.
      * @return true if the captcha answer is correct or if no captcha answer and captcha is not required.
      * @throws XWikiException if something goes wrong in the captcha module.

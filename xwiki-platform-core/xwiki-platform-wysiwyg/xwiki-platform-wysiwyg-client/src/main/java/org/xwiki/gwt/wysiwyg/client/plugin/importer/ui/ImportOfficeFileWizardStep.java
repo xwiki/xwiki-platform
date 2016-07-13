@@ -151,13 +151,12 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         display().add(hint);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void onAttachmentUploaded(Attachment attach, final AsyncCallback<Boolean> async)
     {
         importService.officeToXHTML(attach, getHTMLCleaningParams(), new AsyncCallback<String>()
         {
+            @Override
             public void onSuccess(String result)
             {
                 ImportOfficeFileWizardStep.this.result = result;
@@ -165,6 +164,7 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
                 async.onSuccess(true);
             }
 
+            @Override
             public void onFailure(Throwable thrown)
             {
                 // Display the error and avoid submit operation from continuing.
@@ -174,9 +174,7 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public Object getResult()
     {
         return this.result;
@@ -204,11 +202,6 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         return params;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractFileUploadWizardStep#getTargetPageReference()
-     */
     @Override
     protected WikiPageReference getTargetPageReference()
     {

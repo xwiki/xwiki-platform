@@ -1,0 +1,33 @@
+################################
+##       COMPANY LOGO
+################################
+#if("$!{themeDocFullName}" == '')
+  #set($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+#end
+#if($themeDocFullName == '')
+  #set($themeDocFullName = 'ColorThemes.DefaultColorTheme')
+#end
+#set($themeDoc = $xwiki.getDocument($themeDocFullName))
+#set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+#if($themeObj)
+  #set($logoname = $themeObj.getValue('logo'))
+#else
+  #set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
+  #set($logoname = $themeObj.getValue('logoImage'))
+#end
+#if("$!{logoname}" != '')
+  #set($logourl = $themeDoc.getAttachmentURL($logoname))
+#else
+  #set($logoname = $xwiki.getSkinPreference('logo', 'logo.svg'))
+  #set($logo = $!prefdoc.getAttachment($logoname))
+  #if(!$logo)
+    #set($logourl = $xwiki.getSkinFile($logoname))
+  #else
+    #set($logourl = $prefdoc.getAttachmentURL($logo.filename))
+  #end
+#end
+<div id="companylogo">
+  <a href="$!xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)" title="Home" rel="home" #if(!$displayPageHeader)class="navbar-brand"#end>
+    <img src="$!logourl" alt="Wiki Logo"/>
+  </a>
+</div>

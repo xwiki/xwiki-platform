@@ -114,7 +114,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     /**
      * Schedule the given XObject to be executed according to its parameters. Errors are returned in the context map.
      * Scheduling can be called for example: <code> #if($xwiki.scheduler.scheduleJob($job)!=true)
-     * #error($context.get("error") #else #info("Job scheduled") #end </code>
+     * #error($xcontext.get("error") #else #info("Job scheduled") #end </code>
      * Where $job is an XObject, instance of the {@link SchedulerPlugin#XWIKI_JOB_CLASS} XClass
      * 
      * @param object the XObject to be scheduled, an instance of the XClass XWiki.SchedulerJobClass
@@ -330,7 +330,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Give, for a XObject job in a {@link JobState#STATE_NORMAL} state, the next date at which the job will be
      * executed, according to its cron expression. Errors are returned in the context map. Can be called for example:
      * <code> #set($firetime = $xwiki.scheduler.getNextFireTime($job))
-     * #if (!$firetime || $firetime=="") #error($context.get("error") #else #info("Fire time :
+     * #if (!$firetime || $firetime=="") #error($xcontext.get("error") #else #info("Fire time :
      * $firetime") #end </code>
      * Where $job is an XObject, instance of the {@link SchedulerPlugin#XWIKI_JOB_CLASS} XClass
      * 

@@ -19,6 +19,12 @@
  */
 package com.xpn.xwiki.objects;
 
+import static org.junit.Assert.*;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
@@ -26,8 +32,6 @@ import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.web.Utils;
-
-import org.junit.Assert;
 
 /**
  * Unit tests for {@link DateProperty}.
@@ -43,15 +47,44 @@ public class DatePropertyTest
     @Rule
     public ComponentManagerRule componentManager = new ComponentManagerRule();
 
+    @Before
+    public void setUp()
+    {
+        Utils.setComponentManager(this.componentManager);
+    }
+
+    @Test
+    public void setValue()
+    {
+        Date date = new Date();
+        DateProperty property = new DateProperty();
+        property.setValue(date);
+        assertSame(date, property.getValue());
+    }
+
+    /**
+     * Verify that we use {@link Date} for storing the date.
+     * 
+     * @see "XWIKI-8648: DateProperty#equals pretty much never works between a document loaded from the database and a document loaded from the XAR for example"
+     */
+    @Test
+    public void setValueWithExtendedDate()
+    {
+        Timestamp timestamp = new Timestamp(new Date().getTime());
+        DateProperty property = new DateProperty();
+        property.setValue(timestamp);
+        assertSame(Date.class, property.getValue().getClass());
+        assertEquals(timestamp.getTime(), ((Date) property.getValue()).getTime());
+    }
+
     /**
      * Verify that we can set a date that is null (<a href="http://jira.xwiki.org/browse/XWIKI-8837">XWIKI-8837</a>).
      */
     @Test
     public void setValueWithNullDate()
     {
-        Utils.setComponentManager(this.componentManager);
         DateProperty property = new DateProperty();
         property.setValue(null);
-        Assert.assertNull(property.getValue());
+        assertNull(property.getValue());
     }
 }

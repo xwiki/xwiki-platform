@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -41,7 +42,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectPropertiesAtPageVersionResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectPropertiesAtPageVersionResourceImpl")
 public class ObjectPropertiesAtPageVersionResourceImpl extends XWikiResource implements
         ObjectPropertiesAtPageVersionResource
 {
@@ -55,7 +57,7 @@ public class ObjectPropertiesAtPageVersionResourceImpl extends XWikiResource imp
             Document doc = documentInfo.getDocument();
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             xwikiDocument = Utils.getXWiki(componentManager)
                     .getDocument(xwikiDocument, doc.getVersion(), Utils.getXWikiContext(componentManager));
@@ -72,7 +74,8 @@ public class ObjectPropertiesAtPageVersionResourceImpl extends XWikiResource imp
             properties.getProperties().addAll(object.getProperties());
 
             String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectAtPageVersionResource.class, doc.getWiki(),
-                doc.getSpace(), doc.getName(), version, object.getClassName(), object.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), version, object.getClassName(), 
+                    object.getNumber()).toString();
 
             Link objectLink = objectFactory.createLink();
             objectLink.setHref(objectUri);

@@ -23,7 +23,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * An event triggered when the XWiki application is ready to service requests.
- *
+ * 
  * @version $Id$
  * @since 4.0M2
  */

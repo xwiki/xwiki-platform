@@ -48,7 +48,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
      * @version $Id$
      * @since 2.0.1
      */
-    public static enum ImportWizardStep
+    public enum ImportWizardStep
     {
         /**
          * Office file import wizard step.
@@ -98,9 +98,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
         this.setProvider(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public WizardStep getStep(String name)
     {
         ImportWizardStep requestedStep = parseStepName(name);

@@ -28,7 +28,7 @@ import com.xpn.xwiki.plugin.packaging.PackageException;
 
 /**
  * Export a set of XWiki documents from an existing database into the file system.
- * 
+ *
  * @version $Id$
  */
 public class Exporter extends AbstractPackager
@@ -36,7 +36,7 @@ public class Exporter extends AbstractPackager
     /**
      * Export documents from an existing loaded XWiki database. The database is defined by its passed name and by an
      * Hibernate configuration file.
-     * 
+     *
      * @param exportDirectory the directory where to export the documents
      * @param databaseName some database name (TODO: find out what this name is really)
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and

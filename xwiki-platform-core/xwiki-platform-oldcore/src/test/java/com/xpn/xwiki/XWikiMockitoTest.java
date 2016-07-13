@@ -19,43 +19,68 @@
  */
 package com.xpn.xwiki;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.url.XWikiURLManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiURLFactory;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWiki}.
@@ -78,42 +103,48 @@ public class XWikiMockitoTest
     /**
      * A mock {@link XWikiContext};
      */
-    private XWikiContext context = mock(XWikiContext.class);
+    private XWikiContext context = new XWikiContext();
+
+    private ConfigurationSource xwikiCfgConfigurationSource;
+
+    private XWikiStoreInterface storeMock;
 
     @Before
     public void setUp() throws Exception
     {
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(EntityReferenceValueProvider.class);
-        mocker.registerMockComponent(SyntaxFactory.class);
-        mocker.registerMockComponent(PrivilegedTemplateRenderer.class);
-        mocker.registerMockComponent(XWikiURLManager.class);
-        mocker.registerMockComponent(Environment.class);
-        mocker.registerMockComponent(ObservationManager.class);
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
+        this.mocker.registerMockComponent(EntityReferenceProvider.class);
+        this.mocker.registerMockComponent(SyntaxFactory.class);
+        this.mocker.registerMockComponent(ResourceReferenceManager.class);
+        this.mocker.registerMockComponent(Environment.class);
+        this.mocker.registerMockComponent(ObservationManager.class);
+        this.mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();
-        when(context.getWiki()).thenReturn(xwiki);
+        this.context.setWiki(this.xwiki);
 
-        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
-        xwiki.setStore(store);
+        this.storeMock = mock(XWikiStoreInterface.class);
+        xwiki.setStore(storeMock);
 
         XWikiVersioningStoreInterface versioningStore = mock(XWikiVersioningStoreInterface.class);
         xwiki.setVersioningStore(versioningStore);
+
+        this.xwikiCfgConfigurationSource = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikicfg");
     }
 
     /**
@@ -130,12 +161,6 @@ public class XWikiMockitoTest
         when(target.isNew()).thenReturn(true);
         when(target.getDocumentReference()).thenReturn(targetReference);
 
-        // After the source is copied into the target document, the target document has an attachment.
-        XWikiAttachment attachment = mock(XWikiAttachment.class);
-        XWikiAttachmentContent attachmentContent = mock(XWikiAttachmentContent.class);
-        when(target.getAttachmentList()).thenReturn(Collections.singletonList(attachment));
-        when(attachment.getAttachment_content()).thenReturn(attachmentContent);
-
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
         when(source.copyDocument(targetReference, context)).thenReturn(target);
@@ -144,39 +169,10 @@ public class XWikiMockitoTest
 
         Assert.assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
 
-        // Dirty flags must be reset in order to prevent the save method from incrementing the attachment version.
-        verify(attachment).setMetaDataDirty(false);
-        verify(attachmentContent).setContentDirty(false);
+        // The target document needs to be new in order for the attachment version to be preserved on save.
+        verify(target).setNew(true);
 
-        // Attachments must be saved separately to avoid incrementing their version.
-        verify(target).saveAllAttachments(false, true, context);
-    }
-
-    /**
-     * Verify that {@link XWiki#copyDocument(DocumentReference, DocumentReference, XWikiContext)} doesn't fail if the
-     * document to copy has a broken attachment.
-     */
-    @Test
-    public void copyDocumentWithBrokenAttachment() throws Exception
-    {
-        DocumentReference targetReference = new DocumentReference("bar", "Space", "Target");
-        XWikiDocument target = mock(XWikiDocument.class);
-        when(target.isNew()).thenReturn(true);
-        when(target.getDocumentReference()).thenReturn(targetReference);
-
-        // After the source is copied into the target document, the target document has an attachment.
-        XWikiAttachment attachment = mock(XWikiAttachment.class);
-        when(target.getAttachmentList()).thenReturn(Collections.singletonList(attachment));
-        // The attachment is broken (suppose we couldn't load its content).
-        when(attachment.getAttachment_content()).thenReturn(null);
-
-        DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
-        XWikiDocument source = mock(XWikiDocument.class);
-        when(source.copyDocument(targetReference, context)).thenReturn(target);
-
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
-
-        Assert.assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
+        verify(xwiki.getStore()).saveXWikiDoc(target, context);
     }
 
     /**
@@ -203,7 +199,7 @@ public class XWikiMockitoTest
         String revision = "3.5";
         when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
 
-        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+        this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
         xwiki.rollback(document, revision, context);
 
@@ -252,12 +248,267 @@ public class XWikiMockitoTest
         AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
         xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
 
-        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+        DocumentReference reference = document.getDocumentReference();
+        this.mocker.registerMockComponent(ContextualLocalizationManager.class);
+        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context)))
+            .thenReturn(new XWikiDocument(reference));
 
         xwiki.rollback(document, revision, context);
 
         verify(attachmentRecycleBinStore, never()).saveToRecycleBin(same(currentAttachment), any(String.class),
             any(Date.class), same(context), eq(true));
         verify(oldAttachment, never()).setMetaDataDirty(true);
+    }
+
+    @Test
+    public void deleteAllDocumentsAndWithoutSendingToTrash() throws Exception
+    {
+        XWiki xwiki = new XWiki();
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        when(document.getDocumentReference()).thenReturn(reference);
+
+        // Make sure we have a trash for the test.
+        XWikiRecycleBinStoreInterface recycleBinStoreInterface = mock(XWikiRecycleBinStoreInterface.class);
+        xwiki.setRecycleBinStore(recycleBinStoreInterface);
+        when(xwikiCfgConfigurationSource.getProperty("xwiki.recyclebin", "1")).thenReturn("1");
+
+        // Configure the mocked Store to later verify if it's called
+        XWikiStoreInterface storeInterface = mock(XWikiStoreInterface.class);
+        xwiki.setStore(storeInterface);
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+
+        xwiki.deleteAllDocuments(document, false, xwikiContext);
+
+        // Verify that saveToRecycleBin is never called since otherwise it would mean the doc has been saved in the
+        // trash
+        verify(recycleBinStoreInterface, never()).saveToRecycleBin(any(XWikiDocument.class), any(String.class),
+            any(Date.class), any(XWikiContext.class), any(Boolean.class));
+
+        // Verify that deleteXWikiDoc() is called
+        verify(storeInterface).deleteXWikiDoc(document, xwikiContext);
+    }
+
+    @Test
+    public void deleteDocument() throws Exception
+    {
+        final DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+
+        final XWikiDocument originalDocument = mock(XWikiDocument.class);
+        when(document.getOriginalDocument()).thenReturn(originalDocument);
+
+        this.xwiki.deleteDocument(document, this.context);
+
+        ObservationManager observation = this.mocker.getInstance(ObservationManager.class);
+
+        Matcher<XWikiDocument> matcher = new ArgumentMatcher<XWikiDocument>()
+        {
+            @Override
+            public boolean matches(Object item)
+            {
+                XWikiDocument doc = (XWikiDocument) item;
+
+                return doc.getDocumentReference().equals(documentReference)
+                    && doc.getOriginalDocument() == originalDocument;
+            }
+        };
+
+        // Make sure the right events have been sent
+        verify(observation).notify(eq(new DocumentDeletingEvent(documentReference)), argThat(matcher),
+            same(this.context));
+        verify(observation).notify(eq(new DocumentDeletedEvent(documentReference)), argThat(matcher),
+            same(this.context));
+
+        verifyNoMoreInteractions(observation);
+    }
+
+    @Test
+    public void getPlainUserName() throws XWikiException
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
+        when(document.getDocumentReference()).thenReturn(userReference);
+        when(this.storeMock.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(document);
+        BaseObject userObject = mock(BaseObject.class);
+        when(document.getObject("XWiki.XWikiUsers")).thenReturn(userObject);
+
+        when(userObject.getStringValue("first_name")).thenReturn("first<name");
+        when(userObject.getStringValue("last_name")).thenReturn("last'name");
+        assertEquals("first<name last'name", xwiki.getPlainUserName(userReference, context));
+
+        when(userObject.getStringValue("first_name")).thenReturn("first<name");
+        when(userObject.getStringValue("last_name")).thenReturn("");
+        assertEquals("first<name", xwiki.getPlainUserName(userReference, context));
+
+        when(userObject.getStringValue("first_name")).thenReturn("");
+        when(userObject.getStringValue("last_name")).thenReturn("last'name");
+        assertEquals("last'name", xwiki.getPlainUserName(userReference, context));
+    }
+
+    @Test
+    public void getURLWithDotsAndBackslashInSpaceName() throws Exception
+    {
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        context.setURLFactory(urlFactory);
+
+        DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
+
+        EntityReferenceSerializer<String> serializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("somescapedspace");
+
+        this.xwiki.getURL(reference, "view", null, null, context);
+
+        verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
+    }
+
+    @Test
+    public void getURLWithLocale() throws Exception
+    {
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        context.setURLFactory(urlFactory);
+
+        DocumentReference reference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
+
+        EntityReferenceSerializer<String> serializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(serializer.serialize(reference.getLastSpaceReference())).thenReturn("Space");
+
+        this.xwiki.getURL(reference, "view", null, null, context);
+        verify(urlFactory).createURL("Space", "Page", "view", "language=fr", null, "wiki", context);
+
+        this.xwiki.getURL(reference, "view", "language=ro", null, context);
+        verify(urlFactory).createURL("Space", "Page", "view", "language=ro&language=fr", null, "wiki", context);
+    }
+
+    @Test
+    public void getEntityURLWithDefaultAction() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("tennis", Arrays.asList("Path", "To"), "Success");
+        AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
+
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        context.setURLFactory(urlFactory);
+
+        EntityReferenceSerializer<String> localSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localSerializer.serialize(documentReference.getLastSpaceReference())).thenReturn("Path.To");
+
+        // Document Entity
+        DocumentReferenceResolver<EntityReference> documentResolver =
+            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
+        when(documentResolver.resolve(documentReference)).thenReturn(documentReference);
+
+        this.xwiki.getURL(documentReference, this.context);
+        verify(urlFactory).createURL("Path.To", "Success", "view", null, null, "tennis", this.context);
+
+        // Attachment Entity
+        AttachmentReferenceResolver<EntityReference> attachmentResolver =
+            this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
+        when(attachmentResolver.resolve(attachmentReference)).thenReturn(attachmentReference);
+
+        this.xwiki.getURL(attachmentReference, this.context);
+        verify(urlFactory).createAttachmentURL("image.png", "Path.To", "Success", "download", null, "tennis",
+            this.context);
+    }
+
+    @Test
+    public void getSpacePreference() throws Exception
+    {
+        this.mocker.registerMockComponent(ConfigurationSource.class, "wiki");
+        ConfigurationSource spaceConfiguration = this.mocker.registerMockComponent(ConfigurationSource.class, "space");
+
+        when(this.xwikiCfgConfigurationSource.getProperty(anyString(), anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArgumentAt(1, String.class);
+            }
+        });
+
+        WikiReference wikiReference = new WikiReference("wiki");
+        SpaceReference space1Reference = new SpaceReference("space1", wikiReference);
+        SpaceReference space2Reference = new SpaceReference("space2", space1Reference);
+
+        // Without preferences and current doc
+
+        assertEquals("", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("defaultvalue", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+
+        // Without preferences but with current doc
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
+
+        assertEquals("", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("defaultvalue", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+
+        // With preferences
+
+        final Map<String, Map<String, String>> spacesPreferences = new HashMap<>();
+        Map<String, String> space1Preferences = new HashMap<>();
+        space1Preferences.put("pref", "prefvalue1");
+        space1Preferences.put("pref1", "pref1value1");
+        Map<String, String> space2Preferences = new HashMap<>();
+        space2Preferences.put("pref", "prefvalue2");
+        space2Preferences.put("pref2", "pref2value2");
+        spacesPreferences.put(space1Reference.getName(), space1Preferences);
+        spacesPreferences.put(space2Reference.getName(), space2Preferences);
+
+        when(spaceConfiguration.getProperty(anyString(), same(String.class))).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                if (context.getDoc() != null) {
+                    Map<String, String> spacePreferences =
+                        spacesPreferences.get(context.getDoc().getDocumentReference().getParent().getName());
+                    if (spacePreferences != null) {
+                        return spacePreferences.get(invocation.getArgumentAt(0, String.class));
+                    }
+                }
+
+                return null;
+            }
+        });
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space1Reference)));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref2", this.context));
+
+        this.context.setDoc(new XWikiDocument(new DocumentReference("document", space2Reference)));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", this.context));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", this.context));
+        assertEquals("pref2value2", this.xwiki.getSpacePreference("pref2", this.context));
+
+        assertEquals("", this.xwiki.getSpacePreference("nopref", space1Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("nopref", space1Reference, "defaultvalue", this.context));
+        assertEquals("prefvalue1", this.xwiki.getSpacePreference("pref", space1Reference, this.context));
+        assertEquals("prefvalue1",
+            this.xwiki.getSpacePreference("pref", space1Reference, "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", space1Reference, this.context));
+        assertEquals("", this.xwiki.getSpacePreference("pref2", space1Reference, this.context));
+
+        assertEquals("", this.xwiki.getSpacePreference("nopref", space2Reference, this.context));
+        assertEquals("defaultvalue",
+            this.xwiki.getSpacePreference("nopref", space2Reference, "defaultvalue", this.context));
+        assertEquals("prefvalue2", this.xwiki.getSpacePreference("pref", space2Reference, this.context));
+        assertEquals("prefvalue2",
+            this.xwiki.getSpacePreference("pref", space2Reference, "defaultvalue", this.context));
+        assertEquals("pref1value1", this.xwiki.getSpacePreference("pref1", space2Reference, this.context));
+        assertEquals("pref2value2", this.xwiki.getSpacePreference("pref2", space2Reference, this.context));
     }
 }

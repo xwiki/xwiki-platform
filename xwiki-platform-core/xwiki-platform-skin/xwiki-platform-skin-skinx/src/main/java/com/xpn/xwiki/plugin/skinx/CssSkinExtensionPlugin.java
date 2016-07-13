@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -31,6 +34,10 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 {
     /** The name of the XClass storing the code for this type of extensions. */
     public static final String SSX_CLASS_NAME = "XWiki.StyleSheetExtension";
+
+    /** The local reference of the XClass storing the code for this type of extensions. */
+    public static final LocalDocumentReference SSX_CLASS_REFERENCE = new LocalDocumentReference("XWiki",
+        "StyleSheetExtension");
 
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
@@ -69,10 +76,15 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
-        return "<link rel='stylesheet' type='text/css' href='"
-            + context.getWiki().getURL(documentName, PLUGIN_NAME,
-                "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context),
-                context) + "'/>";
+        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
+        if (!isAccessible(documentReference, context)) {
+            // No access to view the Skin Extension's document. Don`t generate any link to avoid a useless network
+            // request always leading to a 403 Error.
+            return "";
+        }
+
+        return String.format("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />",
+                getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
     }
 
     @Override

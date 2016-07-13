@@ -22,11 +22,11 @@ package org.xwiki.appwithinminutes.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
-import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
@@ -34,30 +34,17 @@ import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 /**
  * Represents the actions available when editing the application home page. This is also the third step of the App
  * Within Minutes wizard, in which the presentation of the application home page is customized.
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
-public class ApplicationHomeEditPage extends InlinePage
+public class ApplicationHomeEditPage extends ApplicationEditPage
 {
     @FindBy(xpath = "//a[. = 'Previous Step']")
     private WebElement previousStepButton;
 
     @FindBy(id = "wizard-next")
     private WebElement finishButton;
-
-    /**
-     * The form used to edit the application home page overwrites the save button because it needs to process the
-     * submitted data. Otherwise the request is forwarded by the action filter to the save action.
-     */
-    @FindBy(name = "xaction_save")
-    private WebElement saveButton;
-
-    /**
-     * @see #saveButton
-     */
-    @FindBy(name = "xaction_saveandcontinue")
-    private WebElement saveAndContinueButton;
 
     @FindBy(id = "availableColumns")
     private WebElement availableColumns;
@@ -75,7 +62,7 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Clicks on the Previous Step button.
-     * 
+     *
      * @return the page that represents the previous step of the App Within Minutes wizard
      */
     public ApplicationClassEditPage clickPreviousStep()
@@ -86,29 +73,13 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Clicks on the Finish button.
-     * 
+     *
      * @return the page that represents the application home page
      */
     public ApplicationHomePage clickFinish()
     {
         finishButton.click();
         return new ApplicationHomePage();
-    }
-
-    @Override
-    public <T extends ViewPage> T clickSaveAndView()
-    {
-        saveButton.click();
-        return createViewPage();
-    }
-
-    @Override
-    public void clickSaveAndContinue()
-    {
-        saveAndContinueButton.click();
-
-        // Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
     }
 
     @SuppressWarnings("unchecked")
@@ -120,7 +91,7 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Sets the application description.
-     * 
+     *
      * @param description the new application description
      */
     public void setDescription(String description)
@@ -133,13 +104,15 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Sets the application icon.
-     * 
+     *
      * @param icon the icon to set
      */
     public void setIcon(String icon)
     {
         applicationIconInput.clear();
         applicationIconInput.sendKeys(icon);
+        // Send 'escape' to close the icon picker after having filled the input.
+        applicationIconInput.sendKeys(Keys.ESCAPE);
     }
 
     /**
@@ -152,7 +125,7 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Adds a new live table column.
-     * 
+     *
      * @param columnLabel the label of the live table column to be added
      */
     public void addLiveTableColumn(String columnLabel)
@@ -164,7 +137,7 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Removes the live table column with the specified label.
-     * 
+     *
      * @param columnLabel the label of the live table column to be removed
      */
     public void removeLiveTableColumn(String columnLabel)
@@ -178,14 +151,14 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Reorders the live table columns by moving one column before another.
-     * 
+     *
      * @param columnToMove the label of the live table column to be moved
      * @param beforeColumn the label of the reference column
      */
     public void moveLiveTableColumnBefore(String columnToMove, String beforeColumn)
     {
         new Actions(getDriver()).clickAndHold(getLiveTableColumn(columnToMove))
-            .moveToElement(getLiveTableColumn(beforeColumn), -3, 0).release().perform();
+            .moveToElement(getLiveTableColumn(beforeColumn), 0, 0).release().perform();
     }
 
     /**
@@ -196,7 +169,7 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getUtil().findElementWithoutWaiting(getDriver(), getForm(), By.xpath(xpath));
+        return getDriver().findElementWithoutWaiting(getForm(), By.xpath(xpath));
     }
 
     /**
@@ -208,7 +181,7 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getUtil().findElementsWithoutWaiting(getDriver(), getForm(), By.xpath(xpath)).size() > 0;
+        return getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).size() > 0;
     }
 
     /**
@@ -223,14 +196,13 @@ public class ApplicationHomeEditPage extends InlinePage
 
     /**
      * Removes all deprecated columns or simply hides the warning message based on the given boolean value.
-     * 
+     *
      * @param yes {@code true} to remove all deprecated columns, {@code false} to just hide the warning message
      */
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
-        WebElement warningMessage =
-            getUtil().findElementWithoutWaiting(getDriver(), getForm(), By.className("warningmessage"));
-        getUtil().findElementWithoutWaiting(getDriver(), warningMessage, By.linkText(yes ? "Yes" : "No")).click();
+        WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
+        getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No")).click();
     }
 
     /**
@@ -239,8 +211,7 @@ public class ApplicationHomeEditPage extends InlinePage
      */
     public boolean isDeprecatedLiveTableColumnsWarningDisplayed()
     {
-        List<WebElement> warnings =
-            getUtil().findElementsWithoutWaiting(getDriver(), getForm(), By.className("warningmessage"));
+        List<WebElement> warnings = getDriver().findElementsWithoutWaiting(getForm(), By.className("warningmessage"));
         return warnings.size() == 1 && warnings.get(0).isDisplayed();
     }
 

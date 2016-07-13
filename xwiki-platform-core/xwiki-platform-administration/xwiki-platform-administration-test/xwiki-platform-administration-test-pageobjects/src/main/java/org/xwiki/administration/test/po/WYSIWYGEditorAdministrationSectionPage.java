@@ -86,5 +86,7 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
     public void clickSave()
     {
         this.saveButton.click();
+        // The configuration is saved without reloading the page. Wait until the page is really saved.
+        waitForNotificationSuccessMessage("Saved");
     }
 }

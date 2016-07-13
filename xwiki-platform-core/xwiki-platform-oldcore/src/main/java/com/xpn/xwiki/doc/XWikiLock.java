@@ -24,9 +24,13 @@ import java.util.Date;
 public class XWikiLock
 {
     protected String userName;
+
     protected long docId;
+
     protected Date date;
-    public XWikiLock(long docId, String userName) {
+
+    public XWikiLock(long docId, String userName)
+    {
         this.setDocId(docId);
         this.setUserName(userName);
         this.setDate(new Date());
@@ -39,27 +43,33 @@ public class XWikiLock
         this.setDocId(0);
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUserName()
+    {
+        return this.userName;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(String userName)
+    {
         this.userName = userName;
     }
 
-    public long getDocId() {
-        return docId;
+    public long getDocId()
+    {
+        return this.docId;
     }
 
-    public void setDocId(long docId) {
+    public void setDocId(long docId)
+    {
         this.docId = docId;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDate()
+    {
+        return this.date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Date date)
+    {
         this.date = date;
     }
 }

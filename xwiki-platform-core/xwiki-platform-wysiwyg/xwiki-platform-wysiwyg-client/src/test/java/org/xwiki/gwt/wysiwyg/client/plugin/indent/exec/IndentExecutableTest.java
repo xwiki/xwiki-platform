@@ -37,11 +37,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
      */
     private Executable executable;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see RichTextAreaTestCase#gwtSetUp()
-     */
+    @Override
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
@@ -59,6 +55,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ul><li>one</li><li>two</li></ul>");
@@ -84,6 +81,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestIndentDisabledOnFirstItem();
@@ -135,6 +133,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 String rtaInnerHTML = "<p>xwiki rocks!</p><ul><li>foo<ul><li>bar</li></ul></li></ul>";
@@ -165,6 +164,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestIndentDisabledWhenEntireListIsSelected();
@@ -204,6 +204,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 String rtaInnerHTML =
@@ -233,6 +234,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ul><li>one</li><li>two<ul><li>three</li></ul></li></ul>");
@@ -258,6 +260,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ul><li>foo</li><li>bar<ul><li>foobar</li></ul></li></ul>");
@@ -286,6 +289,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ul><li>one<ul><li>one plus one</li></ul></li><li>two</li></ul>");
@@ -311,6 +315,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ol><li>one</li><li>two</li><li>three</li><li>four</li></ol>");
@@ -338,6 +343,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ol><li>one<ul><li>under 1</li><li>under 2</li></ul>"
@@ -367,6 +373,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 rta.setHTML("<ol><li>one<ul><li>under</li></ul></li><li>two</li><li>three</li>" + "<li>four</li></ol>");
@@ -397,6 +404,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestIndentSublistFragmentAndListFragment();
@@ -437,6 +445,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
     {
         deferTest(new Command()
         {
+            @Override
             public void execute()
             {
                 doTestIndentSublistFragmentWithTrailingTextAndListFragment();

@@ -43,7 +43,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * Contains document history. Allows to load any version of document.
- * 
+ *
  * @version $Id$
  */
 public class XWikiDocumentArchive
@@ -55,8 +55,7 @@ public class XWikiDocumentArchive
     private SortedMap<Version, XWikiRCSNodeInfo> versionToNode = new TreeMap<Version, XWikiRCSNodeInfo>();
 
     /**
-     * SortedSet of Version - versions which has full document, not patch. Latest version is always
-     * full.
+     * SortedSet of Version - versions which has full document, not patch. Latest version is always full.
      */
     private SortedSet<Version> fullVersions = new TreeSet<Version>();
 
@@ -105,17 +104,17 @@ public class XWikiDocumentArchive
     protected void updateNode(XWikiRCSNodeInfo node)
     {
         Version ver = node.getId().getVersion();
-        versionToNode.put(ver, node);
+        this.versionToNode.put(ver, node);
         if (!node.isDiff()) {
-            fullVersions.add(ver);
+            this.fullVersions.add(ver);
         } else {
-            fullVersions.remove(ver);
+            this.fullVersions.remove(ver);
         }
     }
 
     /**
      * Make a patch. It is store only modified nodes(latest). New nodes need be saved after.
-     * 
+     *
      * @param newnode - new node information
      * @param doc - document for that patch created
      * @param context - used for loading node contents and generating xml
@@ -149,7 +148,7 @@ public class XWikiDocumentArchive
     /** @return {@link XWikiDocument#getId()} - primary key */
     public long getId()
     {
-        return id;
+        return this.id;
     }
 
     /** @param id = {@link XWikiDocument#getId()} */
@@ -161,7 +160,7 @@ public class XWikiDocumentArchive
     /** @return collection of XWikiRCSNodeInfo order by version desc */
     public Collection<XWikiRCSNodeInfo> getNodes()
     {
-        return versionToNode.values();
+        return this.versionToNode.values();
     }
 
     /**
@@ -173,7 +172,7 @@ public class XWikiDocumentArchive
     {
         int[] ito = vto.getNumbers();
         ito[1]--;
-        return versionToNode.subMap(vfrom, new Version(ito)).values();
+        return this.versionToNode.subMap(vfrom, new Version(ito)).values();
     }
 
     /** @param versions - collection of XWikiRCSNodeInfo */
@@ -203,7 +202,7 @@ public class XWikiDocumentArchive
 
     /**
      * Deserialize class. Used in {@link com.xpn.xwiki.plugin.packaging.PackagePlugin}.
-     * 
+     *
      * @param text - archive in JRCS format
      * @throws XWikiException if parse error
      */
@@ -217,11 +216,11 @@ public class XWikiDocumentArchive
                 XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
                 updateNode(nodeInfo);
-                updatedNodeInfos.add(nodeInfo);
-                updatedNodeContents.add(nodeContent);
+                this.updatedNodeInfos.add(nodeInfo);
+                this.updatedNodeContents.add(nodeContent);
             }
         } catch (Exception e) {
-            Object[] args = {text, new Long(getId())};
+            Object[] args = { text, new Long(getId()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
                 XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
                 "Exception while constructing archive for JRCS string [{0}] for document [{1}]", e, args);
@@ -230,7 +229,7 @@ public class XWikiDocumentArchive
 
     /**
      * Update history with new document version.
-     * 
+     *
      * @param doc - document for this version
      * @param author - author of version
      * @param date - date of version
@@ -254,13 +253,13 @@ public class XWikiDocumentArchive
         XWikiRCSNodeContent newContent = makePatch(newNode, doc, context);
 
         updateNode(newNode);
-        updatedNodeInfos.add(newNode);
-        updatedNodeContents.add(newContent);
+        this.updatedNodeInfos.add(newNode);
+        this.updatedNodeContents.add(newContent);
     }
 
     /**
      * Remove document versions from vfrom to vto, inclusive.
-     * 
+     *
      * @param newerVersion - start version
      * @param olderVersion - end version
      * @param context - used for loading nodes content
@@ -307,8 +306,8 @@ public class XWikiDocumentArchive
         // if (firstVersionBefore == null) => nothing else to do, except delete
         for (Iterator<XWikiRCSNodeInfo> it = getNodes(upperBound, lowerBound).iterator(); it.hasNext();) {
             XWikiRCSNodeInfo ni = it.next();
-            fullVersions.remove(ni.getId().getVersion());
-            deletedNodes.add(ni);
+            this.fullVersions.remove(ni.getId().getVersion());
+            this.deletedNodes.add(ni);
             it.remove();
         }
     }
@@ -338,7 +337,7 @@ public class XWikiDocumentArchive
             doc.setMostRecent(version.equals(getLatestVersion()));
             return doc;
         } catch (Exception e) {
-            Object[] args = {version.toString(), new Long(getId())};
+            Object[] args = { version.toString(), new Long(getId()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                 "Exception while reading version [{0}] for document id [{1,number}]", e, args);
@@ -346,10 +345,9 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * Return the XML corresponding to a version. If the version node contains just a diff, then
-     * restore the complete XML by applying all patches from the nearest full version to the
-     * requested version.
-     * 
+     * Return the XML corresponding to a version. If the version node contains just a diff, then restore the complete
+     * XML by applying all patches from the nearest full version to the requested version.
+     *
      * @param version The version to retrieve.
      * @param context The {@link com.xpn.xwiki.XWikiContext context}.
      * @return The XML corresponding to the version.
@@ -374,13 +372,13 @@ public class XWikiDocumentArchive
      */
     public XWikiRCSNodeInfo getNode(Version version)
     {
-        return version == null ? null : (XWikiRCSNodeInfo) versionToNode.get(version);
+        return version == null ? null : (XWikiRCSNodeInfo) this.versionToNode.get(version);
     }
 
     /** @return latest version in history for document. null if none. */
     public Version getLatestVersion()
     {
-        return versionToNode.size() == 0 ? null : (Version) versionToNode.firstKey();
+        return this.versionToNode.size() == 0 ? null : (Version) this.versionToNode.firstKey();
     }
 
     /** @return latest node in history for document. null if none. */
@@ -396,7 +394,7 @@ public class XWikiDocumentArchive
     public Version getNextVersion(Version ver)
     {
         // headMap is exclusive
-        SortedMap<Version, XWikiRCSNodeInfo> headmap = versionToNode.headMap(ver);
+        SortedMap<Version, XWikiRCSNodeInfo> headmap = this.versionToNode.headMap(ver);
         return (headmap.size() == 0) ? null : headmap.lastKey();
     }
 
@@ -407,7 +405,7 @@ public class XWikiDocumentArchive
     public Version getPrevVersion(Version ver)
     {
         // tailMap is inclusive
-        SortedMap<Version, XWikiRCSNodeInfo> tailmap = versionToNode.tailMap(ver);
+        SortedMap<Version, XWikiRCSNodeInfo> tailmap = this.versionToNode.tailMap(ver);
         if (tailmap.size() <= 1) {
             return null;
         }
@@ -422,10 +420,10 @@ public class XWikiDocumentArchive
      */
     public Version getNearestFullVersion(Version ver)
     {
-        if (fullVersions.contains(ver)) {
+        if (this.fullVersions.contains(ver)) {
             return ver;
         }
-        SortedSet<Version> headSet = fullVersions.headSet(ver);
+        SortedSet<Version> headSet = this.fullVersions.headSet(ver);
         return (headSet.size() == 0) ? null : headSet.last();
     }
 
@@ -450,29 +448,29 @@ public class XWikiDocumentArchive
     /** reset history. history becomes empty. */
     public void resetArchive()
     {
-        versionToNode.clear();
-        fullVersions.clear();
-        deletedNodes.addAll(updatedNodeInfos);
-        updatedNodeInfos.clear();
-        updatedNodeContents.clear();
+        this.versionToNode.clear();
+        this.fullVersions.clear();
+        this.deletedNodes.addAll(this.updatedNodeInfos);
+        this.updatedNodeInfos.clear();
+        this.updatedNodeContents.clear();
     }
 
     /** @return mutable Set of {@link XWikiRCSNodeInfo} which are need for delete */
     public Set<XWikiRCSNodeInfo> getDeletedNodeInfo()
     {
-        return deletedNodes;
+        return this.deletedNodes;
     }
 
     /** @return mutable Set of {@link XWikiRCSNodeInfo} which are need for saveOrUpdate */
     public Set<XWikiRCSNodeInfo> getUpdatedNodeInfos()
     {
-        return updatedNodeInfos;
+        return this.updatedNodeInfos;
     }
 
     /** @return mutable Set of {@link XWikiRCSNodeContent} which are need for update */
     public Set<XWikiRCSNodeContent> getUpdatedNodeContents()
     {
-        return updatedNodeContents;
+        return this.updatedNodeContents;
     }
 
     /**

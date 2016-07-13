@@ -64,9 +64,6 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
         this.selectionLimitedToCurrentPage = selectionLimitedToCurrentPage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getRequiredStep()
     {
@@ -80,11 +77,6 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorAggregatorWizardStep#getStepInstance(String)
-     */
     @Override
     protected WizardStep getStepInstance(String name)
     {
@@ -116,11 +108,6 @@ public class AttachmentSelectorAggregatorWizardStep<T extends EntityConfig> exte
         this.allPagesSelector = allPagesSelector;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorAggregatorWizardStep#getStepNames()
-     */
     @Override
     protected List<String> getStepNames()
     {

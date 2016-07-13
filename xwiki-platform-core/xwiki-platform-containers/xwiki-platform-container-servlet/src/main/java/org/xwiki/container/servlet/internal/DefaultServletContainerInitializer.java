@@ -25,7 +25,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -66,12 +65,6 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     private ComponentManager componentManager;
 
     /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
-
-    /**
      * @deprecated starting with 3.5M1, use the notion of Environment instead
      */
     @Deprecated
@@ -98,7 +91,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         // 3) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            ExecutionContext ec = execution.getContext();
+            ExecutionContext ec = this.execution.getContext();
             String key = "xwikicontext";
             if (ec.hasProperty(key)) {
                 ec.setProperty(key, xwikiContext);

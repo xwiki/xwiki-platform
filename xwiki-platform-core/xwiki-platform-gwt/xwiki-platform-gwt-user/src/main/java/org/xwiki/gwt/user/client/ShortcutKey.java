@@ -32,7 +32,7 @@ public class ShortcutKey
     /**
      * A modifier key.
      */
-    public static enum ModifierKey
+    public enum ModifierKey
     {
         /**
          * Common modifier keys.

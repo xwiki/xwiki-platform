@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>8.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -38,6 +36,7 @@
    </description>
   <properties>
     <mavenVersion>3.0.5</mavenVersion>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Maven -->
@@ -49,13 +48,20 @@
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
-      <version>1.7</version>
     </dependency>
     <!-- Plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>2.3</version>
+      <version>2.4.3</version>
+      <exclusions>
+        <!-- We draw version 1.0-alpha-9-stable-1 but org.xwiki.commons:xwiki-commons-tool-xar-plugin draws
+             org.codehaus.plexus:plexus-container-default:1.5.5 -->
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- XWiki -->
     <dependency>
@@ -72,6 +78,14 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-environment-servlet</artifactId>
+        </exclusion>
+        <!-- Exclude org.apache.maven:maven-model:3.1.0 which is drawn from
+             org.xwiki.commons:xwiki-commons-extension-api. Ideally we would upgrade to Maven 3.1.0 but this would
+             mean that Maven 3.0.x couldn't be used anymore to build XWiki so FTM we continue basing this plugin code
+             on Maven 3.0.x -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -110,14 +124,14 @@
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
          pom.xml that uses this packager plugin is built after those deps are built -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-colibri</artifactId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>
@@ -151,6 +165,24 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-lesscss-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-lesscss-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-skin-skinx</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -158,19 +190,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-server</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <classifier>shared</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-webdav-server</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -211,21 +230,77 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-oldcore</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <version>${smartgwt.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-servlet</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-transformation-icon</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- We need to pick a URL implementation @ runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-standard</artifactId>
+      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Wiki API + Wiki Script Services are core modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Delete/Copy/Rename/Move actions are now in the Refactoring module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Use Logback as the logging implementation -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -260,7 +335,8 @@
     <profile>
       <id>integration-tests</id>
       <!-- The integration tests use only the local maven repository (as specified by the dedicated settings.xml) and so
-        we have to make sure the required dependencies are present in the local maven repository by listing them here. -->
+           we have to make sure the required dependencies are present in the local maven repository by listing them
+           here. -->
       <dependencies>
         <!-- Used by package-simple integration test -->
         <dependency>
@@ -279,11 +355,14 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <postBuildHookScript>verify</postBuildHookScript>
               <goals>
                 <goal>clean</goal>
                 <goal>package</goal>
               </goals>
-              <debug>true</debug>
+              <!-- Don't display debug logs by default because it takes more time and one test asserts that there's no
+                   extra debug log displayed since we don't want that when we execute this plugin on projects -->
+              <debug>false</debug>
             </configuration>
             <executions>
               <execution>

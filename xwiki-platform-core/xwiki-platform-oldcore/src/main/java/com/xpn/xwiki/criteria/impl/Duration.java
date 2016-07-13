@@ -20,11 +20,10 @@
 package com.xpn.xwiki.criteria.impl;
 
 /**
- * Immutable duration for retrieving statistics. A duration of time is uniquely identified by its
- * span. For instance, a duration of 3 minutes doesn't imply a specific start time. It can start at
- * any time, but it takes just 3 minutes. A Duration can be used to sample a Period of time. For
- * instance the period between November 1th 2007 and December 1th 2007 can be divided in samples
- * each having a duration of 3 days.
+ * Immutable duration for retrieving statistics. A duration of time is uniquely identified by its span. For instance, a
+ * duration of 3 minutes doesn't imply a specific start time. It can start at any time, but it takes just 3 minutes. A
+ * Duration can be used to sample a Period of time. For instance the period between November 1th 2007 and December 1th
+ * 2007 can be divided in samples each having a duration of 3 days.
  */
 public class Duration
 {
@@ -40,7 +39,7 @@ public class Duration
      */
     public Duration(int years, int months, int weeks, int days)
     {
-        span = new org.joda.time.Period(years, months, weeks, days, 0, 0, 0, 0);
+        this.span = new org.joda.time.Period(years, months, weeks, days, 0, 0, 0, 0);
     }
 
     /**
@@ -53,7 +52,7 @@ public class Duration
      */
     public Duration(int years, int months, int weeks, int days, int hours)
     {
-        span = new org.joda.time.Period(years, months, weeks, days, hours, 0, 0, 0);
+        this.span = new org.joda.time.Period(years, months, weeks, days, hours, 0, 0, 0);
     }
 
     /**
@@ -61,7 +60,7 @@ public class Duration
      */
     public int getYears()
     {
-        return span.getYears();
+        return this.span.getYears();
     }
 
     /**
@@ -69,7 +68,7 @@ public class Duration
      */
     public int getMonths()
     {
-        return span.getMonths();
+        return this.span.getMonths();
     }
 
     /**
@@ -77,7 +76,7 @@ public class Duration
      */
     public int getWeeks()
     {
-        return span.getWeeks();
+        return this.span.getWeeks();
     }
 
     /**
@@ -85,7 +84,7 @@ public class Duration
      */
     public int getDays()
     {
-        return span.getDays();
+        return this.span.getDays();
     }
 
     /**
@@ -93,6 +92,6 @@ public class Duration
      */
     public int getHours()
     {
-        return span.getHours();
+        return this.span.getHours();
     }
 }

@@ -45,7 +45,7 @@ public class TaggablePage extends ViewPage
      */
     public boolean hasTag(String tagName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), this.tagsContainer, getTagLocator(tagName)).size() > 0;
+        return getDriver().findElementsWithoutWaiting(this.tagsContainer, getTagLocator(tagName)).size() > 0;
     }
 
     /**
@@ -65,11 +65,11 @@ public class TaggablePage extends ViewPage
      */
     public boolean removeTag(String tagName)
     {
-        List<WebElement> toDelete = getUtil().findElementsWithoutWaiting(getDriver(), this.tagsContainer,
+        List<WebElement> toDelete = getDriver().findElementsWithoutWaiting(this.tagsContainer,
             By.xpath("//a[contains(@href, '&tag=" + tagName + "') and . = 'X']"));
         if (toDelete.size() > 0) {
             toDelete.get(0).click();
-            waitUntilElementDisappears(getTagLocator(tagName));
+            getDriver().waitUntilElementDisappears(getTagLocator(tagName));
             return true;
         }
         return false;
@@ -83,15 +83,14 @@ public class TaggablePage extends ViewPage
     public AddTagsPane addTags()
     {
         this.tagsContainer.findElement(By.linkText("[+]")).click();
-        waitUntilElementDisappears(By.xpath("//*[@id = 'xdocTags']//a[. = '[+]']"));
+        getDriver().waitUntilElementDisappears(By.xpath("//*[@id = 'xdocTags']//a[. = '[+]']"));
         return new AddTagsPane();
     }
     
     public TagPage clickOnTag(String tagName)
     {
-        WebElement tag =
-            getUtil()
-                .findElementWithoutWaiting(getDriver(), By.xpath("//span[@class='tag']/a[. = '" + tagName + "' ]"));
+        WebElement tag = getDriver().findElementWithoutWaiting(
+            By.xpath("//span[@class='tag']/a[. = '" + tagName + "' ]"));
         tag.click();
         return new TagPage();
     }

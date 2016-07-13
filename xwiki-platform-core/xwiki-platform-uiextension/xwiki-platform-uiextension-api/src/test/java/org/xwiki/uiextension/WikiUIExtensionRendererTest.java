@@ -19,6 +19,7 @@
  */
 package org.xwiki.uiextension;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +29,9 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.uiextension.internal.WikiUIExtensionRenderer;
@@ -37,9 +40,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import org.junit.Assert;
-
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +47,7 @@ public class WikiUIExtensionRendererTest
 {
     private Execution execution;
 
-    private Transformation macroTransformation;
+    private RenderingContext renderingContext;
 
     private ContentParser contentParser;
 
@@ -63,7 +63,9 @@ public class WikiUIExtensionRendererTest
     {
         execution = cm.registerMockComponent(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        macroTransformation = cm.registerMockComponent(Transformation.class, "macro");
+        renderingContext = mock(MutableRenderingContext.class);
+        cm.registerComponent(RenderingContext.class, renderingContext);
+        cm.registerMockComponent(Transformation.class, "macro");
         contentParser = cm.registerMockComponent(ContentParser.class);
         when(execution.getContext()).thenReturn(executionContext);
         xdom = mock(XDOM.class);
@@ -76,7 +78,7 @@ public class WikiUIExtensionRendererTest
         XWikiDocument xdoc = mock(XWikiDocument.class);
         XWiki xwiki = mock(XWiki.class);
 
-        when(contentParser.parse(eq(""), eq(Syntax.XWIKI_2_1))).thenReturn(xdom);
+        when(contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(xdom);
         when(xdom.clone()).thenReturn(xdom);
         when(execution.getContext().getProperty("xwikicontext")).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xwiki);

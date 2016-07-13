@@ -37,6 +37,7 @@ public interface WikiServiceAsync
      * @deprecated Multiwiki is on by default, starting with XWiki 5.0.
      * @param async object used for asynchronous communication between server and client
      */
+    @Deprecated
     void isMultiWiki(AsyncCallback<Boolean> async);
 
     /**

@@ -27,7 +27,7 @@
     #set($sourcespace = "$!{request.sourceSpaceName}")
     #set($sourcepage = "$!{request.sourcePageName}")
     ##------------------------------------------------
-    ## Get source reference
+    ## Get target reference
     ##------------------------------------------------
     #set($targetwiki = "$!{request.targetWikiName}")
     #if("$!targetwiki" == "")
@@ -46,24 +46,63 @@
     ## Decide whether to perform the copy or display the copy form
     ##-------------------------------------------------------------
     #if($sourcewiki != "" && $sourcespace != "" && $sourcepage != "" && $targetwiki != "" && $targetspace != "" && $targetpage != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      #set($sourceDocReference = $services.model.createDocumentReference($sourcewiki, $sourcespace, $sourcepage))
-      #set($targetDocReference = $services.model.createDocumentReference($targetwiki, $targetspace, $targetpage))
-      #if($xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
-        #if($escapedLanguage)
-          #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
-          #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
-        #else
-          #set($fromurl = $xwiki.getURL($sourceDocReference))
-          #set($tourl = $xwiki.getURL($targetDocReference))
-        #end
-        #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
-        #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
-        #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
+      #set ($locale = $services.localization.toLocale($language))
+      #set ($sourceWikiReference = $services.model.createWikiReference($sourcewiki))
+      #set ($sourceSpaceReference = $services.model.resolveSpace($sourcespace, 'explicit', $sourceWikiReference))
+      #set ($sourceDocReference = $services.model.createEntityReference($sourcepage, 'DOCUMENT', $sourceSpaceReference))
+      #set ($sourceDocReference = $services.model.createDocumentReference($sourceDocReference, $locale))
+      #set ($targetWikiReference = $services.model.createWikiReference($targetwiki))
+      #set ($targetSpaceReference = $services.model.resolveSpace($targetspace, 'explicit', $targetWikiReference))
+      #set ($targetDocReference = $services.model.createEntityReference($targetpage, 'DOCUMENT', $targetSpaceReference))
+      #set ($targetDocReference = $services.model.createDocumentReference($targetDocReference, $locale))
+      ##-----------------------------------------------------------
+      ## If the target document already exists and is not a redirect placeholder, warn the user.
+      ##-----------------------------------------------------------
+      #if ($xwiki.exists($targetDocReference) && "$!request.overwrite" != 'true'
+          && !$xwiki.getDocument($targetDocReference).getObject('XWiki.RedirectClass'))
+        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        <form action="$xwiki.relativeRequestURL" class="xform third">
+          ## CSRF prevention
+          <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+          <input type="hidden" name="xpage" value="copy" />
+          <input type="hidden" name="overwrite" value="true" />
+          <input type="hidden" name="sourceWikiName" value="$escapetool.xml($sourcewiki)" />
+          <input type="hidden" name="sourceSpaceName" value="$escapetool.xml($sourcespace)" />
+          <input type="hidden" name="sourcePageName" value="$escapetool.xml($sourcepage)" />
+          <input type="hidden" name="targetWikiName" value="$escapetool.xml($targetwiki)" />
+          <input type="hidden" name="targetSpaceName" value="$escapetool.xml($targetspace)" />
+          <input type="hidden" name="targetPageName" value="$escapetool.xml($targetpage)" />
+          <div class="buttons">
+            <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>
+            <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">$services.localization.render('core.copy.changeTarget')</a></span>
+            <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
+          </div>
+        </form>
       #else
-        #error($services.localization.render('core.rename.targetNotWritable'))
+        #set ($success = false)
+        #set ($copyAsJob = $services.refactoring.copyAs($sourceDocReference, $targetDocReference))
+        #try()
+          #set ($discard = $copyAsJob.join())
+          #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
+          #set ($success = $copyAsJobStatus.log.getLogs('ERROR').isEmpty())
+        #end
+        #if ($success)
+          #if($escapedLanguage)
+            #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
+            #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
+          #else
+            #set($fromurl = $xwiki.getURL($sourceDocReference))
+            #set($tourl = $xwiki.getURL($targetDocReference))
+          #end
+          #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
+          #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
+          #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
+        #else
+          #error($services.localization.render('core.rename.targetNotWritable'))
+        #end
       #end
     #else
-    <form action="" class="xform third">
+    <form action="$xwiki.relativeRequestURL" class="xform third">
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -73,7 +112,8 @@
       ##------------------
       ## Wiki Source field
       ##------------------
-      #if($xwiki.hasProgrammingRights())
+      #set ($displayWikiFields = ($xcontext.userReference.wikiReference.name == $xcontext.mainWikiName) && $xwiki.hasSubWikis())
+      #if ($displayWikiFields)
       <dt>
         <label for="sourceWikiName">$services.localization.render('core.copy.sourcewiki')</label>
         <span class="xHint">$services.localization.render('core.copy.sourcewiki.hint')</span>
@@ -119,7 +159,7 @@
       ##------------------
       ## Wiki Target field
       ##------------------
-      #if($xwiki.hasProgrammingRights())
+      #if ($displayWikiFields)
       <dt>
         <label for="targetWikiName">$services.localization.render('core.copy.targetwiki')</label>
         <span class="xHint">$services.localization.render('core.copy.targetwiki.hint')</span>

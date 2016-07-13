@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.cache.tests.CacheEntryListenerTest.EventType;
 
@@ -52,6 +54,11 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
         this.supportEvictionEvent = supportEvictionEvent;
     }
 
+    protected void customizeEviction(EntryEvictionConfiguration eviction)
+    {
+
+    }
+
     // ///////////////////////////////////////////////////////::
     // Tests
 
@@ -68,9 +75,12 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
+        customizeEviction(lec);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
+
+        Assert.assertNotNull(cache);
 
         CacheEntryListenerTest eventListener;
         if (this.supportEvictionEvent) {
@@ -79,8 +89,6 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
         } else {
             eventListener = null;
         }
-
-        Assert.assertNotNull(cache);
 
         cache.set(KEY, VALUE);
 
@@ -106,24 +114,80 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
      * @throws Exception error
      */
     @Test
-    public void testCreateAndDestroyCacheLRUTimeToLive() throws Exception
+    public void testCreateAndDestroyCacheLRUMAxIdle() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-        lec.setTimeToLive(1);
+        lec.setMaxIdle(1);
+        customizeEviction(lec);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
 
         Assert.assertNotNull(cache);
 
+        CacheEntryListenerTest eventListener;
+        if (this.supportEvictionEvent) {
+            eventListener = new CacheEntryListenerTest();
+            cache.addCacheEntryListener(eventListener);
+        } else {
+            eventListener = null;
+        }
+
         cache.set(KEY, VALUE);
 
         Assert.assertEquals(VALUE, cache.get(KEY));
 
-        Thread.sleep(1100);
+        if (eventListener != null) {
+            Assert.assertTrue("No value has expired from the cache after provided max idle time",
+                eventListener.waitForEntryEvent(EventType.REMOVE));
+            Assert.assertSame(VALUE, eventListener.getRemovedEvent().getEntry().getValue());
+        }
+
+        Assert.assertNull(cache.get(KEY));
+
+        cache.dispose();
+    }
+
+    /**
+     * Validate the maximum time to live constraint.
+     * 
+     * @throws Exception error
+     */
+    @Test
+    public void testCreateAndDestroyCacheLRULifespan() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        CacheConfiguration conf = new CacheConfiguration();
+        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
+        lec.setLifespan(1);
+        customizeEviction(lec);
+        conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
+
+        Cache<Object> cache = factory.newCache(conf);
+
+        Assert.assertNotNull(cache);
+
+        CacheEntryListenerTest eventListener;
+        if (this.supportEvictionEvent) {
+            eventListener = new CacheEntryListenerTest();
+            cache.addCacheEntryListener(eventListener);
+        } else {
+            eventListener = null;
+        }
+
+        cache.set(KEY, VALUE);
+
+        Assert.assertEquals(VALUE, cache.get(KEY));
+
+        if (eventListener != null) {
+            Assert.assertTrue("No value has expired from the cache after provide lifespan",
+                eventListener.waitForEntryEvent(EventType.REMOVE));
+            Assert.assertSame(VALUE, eventListener.getRemovedEvent().getEntry().getValue());
+        }
 
         Assert.assertNull(cache.get(KEY));
 
@@ -140,15 +204,24 @@ public abstract class AbstractEvictionGenericTestCache extends AbstractGenericTe
     {
         CacheFactory factory = getCacheFactory();
 
-        CacheConfiguration conf = new CacheConfiguration();
-        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
+        LRUCacheConfiguration conf = new LRUCacheConfiguration();
+        LRUEvictionConfiguration lec = conf.getLRUEvictionConfiguration();
         lec.setMaxEntries(1);
-        lec.setTimeToLive(1);
-        conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
+        lec.setMaxIdle(1);
+        lec.setLifespan(1);
+        customizeEviction(lec);
 
         Cache<Object> cache = factory.newCache(conf);
 
         Assert.assertNotNull(cache);
+
+        CacheEntryListenerTest eventListener;
+        if (this.supportEvictionEvent) {
+            eventListener = new CacheEntryListenerTest();
+            cache.addCacheEntryListener(eventListener);
+        } else {
+            eventListener = null;
+        }
 
         cache.set(KEY, VALUE);
 

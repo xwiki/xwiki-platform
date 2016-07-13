@@ -34,20 +34,22 @@ public class XWikiSecurityManager extends SecurityManager
     @Override
     public void checkPermission(Permission perm)
     {
-        if (enabled) {
+        if (this.enabled) {
             // Under this security manager we refuse reflect code
-            if (perm instanceof ReflectPermission)
+            if (perm instanceof ReflectPermission) {
                 throw new SecurityException();
+            }
         }
     }
 
     @Override
     public void checkPermission(Permission perm, Object context)
     {
-        if (enabled) {
+        if (this.enabled) {
             // Under this security manager we refuse reflect code
-            if (perm instanceof ReflectPermission)
+            if (perm instanceof ReflectPermission) {
                 throw new SecurityException();
+            }
         }
     }
 

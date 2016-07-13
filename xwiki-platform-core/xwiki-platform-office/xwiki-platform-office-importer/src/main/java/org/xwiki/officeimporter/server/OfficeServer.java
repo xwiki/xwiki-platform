@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component interface for managing the office server connection / process.
@@ -30,13 +29,12 @@ import org.xwiki.stability.Unstable;
  * @since 5.0M2
  */
 @Role
-@Unstable
 public interface OfficeServer
 {
     /**
      * Enumeration used to represent the office server state.
      */
-    public enum ServerState
+    enum ServerState
     {
         /**
          * Connected.
@@ -68,7 +66,7 @@ public interface OfficeServer
          * 
          * @param description description of current server state
          */
-        private ServerState(String description)
+        ServerState(String description)
         {
             this.description = description;
         }

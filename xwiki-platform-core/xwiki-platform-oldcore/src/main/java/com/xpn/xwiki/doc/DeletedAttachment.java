@@ -28,7 +28,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 /**
  * Archive of deleted attachment, stored in {@link com.xpn.xwiki.store.AttachmentRecycleBinStore}. Immutable, because
  * deleted attachments should not be modified.
- * 
+ *
  * @version $Id$
  * @since 1.4M1
  */
@@ -54,7 +54,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * XML export of the full attachment, with content and history.
-     * 
+     *
      * @see XWikiAttachment#toXML(boolean, boolean, XWikiContext)
      */
     private String xml;
@@ -66,7 +66,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * A constructor with all the information about the deleted attachment.
-     * 
+     *
      * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
@@ -86,7 +86,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #id}.
-     * 
+     *
      * @return The synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
      */
     public long getId()
@@ -96,7 +96,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #id}.
-     * 
+     *
      * @param id The synthetic id to set. Used only by hibernate.
      */
     protected void setId(long id)
@@ -106,7 +106,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #docId}.
-     * 
+     *
      * @return The id of the document this attachment belonged to.
      */
     public long getDocId()
@@ -116,7 +116,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #docId}.
-     * 
+     *
      * @param docId The id of the document to set. Used only by hibernate.
      */
     protected void setDocId(long docId)
@@ -126,7 +126,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #docName}.
-     * 
+     *
      * @return The name of the document this attachment belonged to.
      */
     public String getDocName()
@@ -136,7 +136,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #docName}.
-     * 
+     *
      * @param docName The document name to set. Used only by hibernate.
      */
     protected void setDocName(String docName)
@@ -146,7 +146,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #filename}.
-     * 
+     *
      * @return The name of the attachment.
      */
     public String getFilename()
@@ -156,7 +156,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #filename}.
-     * 
+     *
      * @param filename The attachment filename to set. Used only by hibernate.
      */
     protected void setFilename(String filename)
@@ -166,7 +166,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #date}.
-     * 
+     *
      * @return The date of the delete action.
      */
     public Date getDate()
@@ -176,7 +176,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #date}.
-     * 
+     *
      * @param date The date of the delete action to set. Used only by Hibernate.
      */
     protected void setDate(Date date)
@@ -186,7 +186,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #deleter}.
-     * 
+     *
      * @return the user who deleted the attachment, as its document name (e.g. {@code XWiki.Admin})
      */
     public String getDeleter()
@@ -196,7 +196,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #deleter}.
-     * 
+     *
      * @param deleter The user which has removed the document to set. Used only by Hibernate.
      */
     protected void setDeleter(String deleter)
@@ -206,7 +206,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Getter for {@link #xml}.
-     * 
+     *
      * @return XML serialization of {@link XWikiAttachment}
      */
     public String getXml()
@@ -216,7 +216,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Setter for {@link #xml}.
-     * 
+     *
      * @param xml XML serialization of {@link XWikiAttachment}. Used only by Hibernate.
      */
     protected void setXml(String xml)
@@ -226,7 +226,7 @@ public class DeletedAttachment extends AbstractSimpleClass
 
     /**
      * Export {@link XWikiAttachment} to {@link DeletedAttachment}.
-     * 
+     *
      * @param attachment the deleted attachment
      * @param context the current context, used in the XML export
      * @throws XWikiException if an exception occurs during the XML export
@@ -240,7 +240,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
      * restore the attachment to its owner document, it simply recomposes an {@link XWikiAttachment} object from the
      * saved data.
-     * 
+     *
      * @return restored attachment
      * @param attachment optional object where to put the attachment data, if not <code>null</code>
      * @param context the current {@link XWikiContext context}

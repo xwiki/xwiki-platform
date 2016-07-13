@@ -61,7 +61,7 @@
       <xsl:apply-templates select="@*|node()" />
     </xsl:copy>
     <!-- Write the table of contents after the last child -->
-    <xsl:for-each select="//*[@id = 'xwikimaincontainer']/*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
+    <xsl:for-each select="//*[@id = 'xwikicontent']/*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
       <!-- Transforming the flat headings structure into an hierarchical structure based on nested ordered lists is hard 
         to do with XSLT 1.0 (a complete solution would have to generate empty list items when heading levels are missing: when there 
         is a level 3 heading after a level 1 heading). A solution using XSLT 2.0 is described here http://www.xmlplease.com/tocxhtml 
@@ -89,5 +89,19 @@
     <xsl:attribute name="{local-name()}">
       <xsl:value-of select="substring-before(., '?')" />
     </xsl:attribute>
+  </xsl:template>
+
+  <!-- It seems the Office server doesn't understand the INS and DEL HTML elements so we have to use CSS instead. -->
+  <xsl:template match="//xhtml:ins">
+    <xsl:element name="span">
+      <xsl:attribute name="style">text-decoration:underline</xsl:attribute>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="//xhtml:del">
+    <xsl:element name="span">
+      <xsl:attribute name="style">text-decoration:line-through</xsl:attribute>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:element>
   </xsl:template>
 </xsl:stylesheet>

@@ -1,0 +1,45 @@
+//
+// Breadcrumbs
+// --------------------------------------------------
+
+.breadcrumb {
+  > li {
+    + li:before {
+      content: "@{breadcrumb-separator}"; /* No additional space needed */
+    }
+
+    // Styles for the tree navigation.
+    &.dropdown {
+      > .dropdown-toggle {
+        color: @breadcrumb-color;
+        cursor: pointer;
+        /* Match the separator padding */
+        margin-left: 5px;
+
+        :hover {
+          color: @breadcrumb-active-color;
+        }
+      }
+
+      > .dropdown-menu {
+        /* Leave more padding around the tree. */
+        padding: 5px 10px 5px 0;
+        /* The breadcrumb uses a smaller font size. */
+        .text-smaller;
+
+        a {
+          /* Reset the link color inside the tree. */
+          color: @link-color;
+        }
+      }
+    }
+  }
+
+  > .active {
+    &:last-of-type {
+      a {
+        color: @breadcrumb-active-color;
+      }
+    }
+  }
+}

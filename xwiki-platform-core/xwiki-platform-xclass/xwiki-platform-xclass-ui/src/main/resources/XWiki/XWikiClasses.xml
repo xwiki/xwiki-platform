@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.XWikiClasses" locale="">
+  <web>XWiki</web>
+  <name>XWikiClasses</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1252450800000</creationDate>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1445603843000</date>
+  <contentUpdateDate>1445601108000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Data types</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{template name="locationPicker_macros.vm" /}}
+
+{{velocity}}
+#if ($request.space &amp;&amp; $request.name)
+  #set ($className = "#toXMLName($stringtool.removeEnd($request.name, 'Class'))")
+  #set ($classTitle = $stringtool.removeEnd($request.title, 'Class'))
+  #if ("$!classTitle" == '')
+    #set ($classTitle = $className)
+  #end
+  #set ($classTitle = "$classTitle Class")
+  #set ($classSpaceReference = $services.model.resolveSpace($request.space))
+  #set ($classReference = $services.model.createEntityReference("${className}Class", 'DOCUMENT', $classSpaceReference))
+  #if ($services.security.authorization.hasAccess('edit', $classReference))
+    $response.sendRedirect($xwiki.getURL($classReference, 'edit', $escapetool.url({
+      'editor': 'wiki',
+      'template': $request.template,
+      'parent': $request.parent,
+      'title': $classTitle
+    })))
+    ## Stop processing, since we already sent a redirect.
+    #stop
+  #end
+#end
+{{/velocity}}
+This tool allows to define structured data types (classes) in your wiki. Please consult the [[developer's guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/DevGuide/]] to get familiar with the XWiki data model and the public APIs.
+
+= Templates for new data types =
+
+Here are the templates and sheets for creating new classes:
+
+* [[Default code for displaying a class&gt;&gt;ClassSheet]]
+* [[Document template for new classes&gt;&gt;ClassTemplate]]
+* [[Default code for displaying class instances (objects)&gt;&gt;ObjectSheet]]
+
+= Create a new data type =
+
+Choose a simple title, such as //Article//, //Book//, //Employee//. '//Class//' will be appended at the end automatically.
+
+{{velocity}}
+#if ("$!classReference" != '')
+  {{warning}}You don't have permission to create that class{{/warning}}
+
+#end
+{{html}}
+&lt;form action="$doc.URL" method="post" class="xform half"&gt;
+  &lt;div class="hidden"&gt;
+    &lt;input type="hidden" name="parent" value="XWiki.XWikiClasses"/&gt;
+    &lt;input type="hidden" name="template" value="XWiki.ClassTemplate"/&gt;
+  &lt;/div&gt;
+  #locationPicker({
+    'id': 'target',
+    'title': {
+      'label': 'core.create.title',
+      'hint': 'Title of the new class',
+      'name': 'title',
+      'placeholder': 'New Class'
+    },
+    'preview': {
+      'label': 'core.create.locationPreview.label',
+      'hint': 'Location in the page hierarchy where this new class will be created'
+    },
+    'parent': {
+      'label': 'core.create.spaceReference.label',
+      'hint': 'Parent of the new class',
+      'name': 'space',
+      'reference': $doc.documentReference.parent,
+      'placeholder': 'Path.To.Class'
+    },
+    'name': {
+      'label': 'core.create.name.label',
+      'hint': 'Name of the new class',
+      'name': 'name',
+      'placeholder': 'New Class'
+    }
+  })
+  &lt;p&gt;
+    &lt;span class="buttonwrapper"&gt;
+      &lt;input type="submit" value="Create this Class" class="button"/&gt;
+    &lt;/span&gt;
+  &lt;/p&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}
+
+= Data types defined in this wiki =
+
+{{velocity}}
+{{html}}
+#set ($columns = ['doc.title', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+#set ($columnsProperties = {
+  'doc.title': {'type': 'text', 'size': 30, 'link': 'view', 'filterable': false},
+  'doc.location': {'type': 'text', 'filterable': true, 'html': true},
+  'doc.date': {'type': 'date'},
+  'doc.author': {'type': 'text', 'link': 'author'},
+  '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['edit', 'delete']}
+})
+#set ($options = {
+  'resultPage': 'XWiki.XWikiClassesLiveTableResults',
+  'translationPrefix' : 'platform.index.',
+  'rowCount': 10,
+  'outputOnlyHtml': true,
+  'queryFilters': []
+})
+#livetable("classes" $columns $columnsProperties $options)
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

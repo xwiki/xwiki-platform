@@ -39,7 +39,7 @@ public class AttachedImageSelectPane extends WizardStepElement
     public AttachedImageSelectPane waitToLoad()
     {
         super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xSelectorAggregatorStep"));
+        getDriver().waitUntilElementIsVisible(By.className("xSelectorAggregatorStep"));
         return this;
     }
 

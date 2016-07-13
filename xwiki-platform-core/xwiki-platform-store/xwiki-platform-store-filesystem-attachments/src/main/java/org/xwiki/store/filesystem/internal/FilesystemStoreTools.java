@@ -86,8 +86,7 @@ public interface FilesystemStoreTools
      * @param docRef a reference to the document to get deleted attachments for.
      * @return a map of maps which provide FileProviders by deletion dates and filenames.
      */
-    Map<String, Map<Date, DeletedAttachmentFileProvider>>
-    deletedAttachmentsForDocument(final DocumentReference docRef);
+    Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(final DocumentReference docRef);
 
     /**
      * @return the absolute path to the directory where the files are stored.

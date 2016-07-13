@@ -126,11 +126,7 @@ public class LinkMenuExtension extends MenuItemUIExtensionAdaptor
         addFeature("linkRemove", removeLink);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MenuItemUIExtensionAdaptor#onAttach(AttachEvent)
-     */
+    @Override
     protected void onAttach(AttachEvent event)
     {
         boolean editMode = plugin.getTextArea().getCommandManager().isEnabled(Command.UNLINK);

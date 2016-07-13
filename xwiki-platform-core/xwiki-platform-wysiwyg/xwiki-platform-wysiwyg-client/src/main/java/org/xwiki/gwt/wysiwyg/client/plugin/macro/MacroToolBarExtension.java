@@ -128,11 +128,7 @@ public class MacroToolBarExtension implements ClickHandler
         return toolBarExtension;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickHandler#onClick(ClickEvent)
-     */
+    @Override
     public void onClick(ClickEvent event)
     {
         Widget sender = (Widget) event.getSource();

@@ -21,6 +21,8 @@ package com.xpn.xwiki.plugin.skinx;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -34,6 +36,10 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
 {
     /** The name of the XClass storing the code for this type of extensions. */
     public static final String JSX_CLASS_NAME = "XWiki.JavaScriptExtension";
+
+    /** The local reference of the XClass storing the code for this type of extensions. */
+    public static final LocalDocumentReference JSX_CLASS_REFERENCE = new LocalDocumentReference("XWiki",
+        "JavaScriptExtension");
 
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
@@ -78,9 +84,15 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
+        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
+        if (!isAccessible(documentReference, context)) {
+            // No access to view the Skin Extension's document. Don`t generate any link to avoid a useless network
+            // request always leading to a 403 Error.
+            return "";
+        }
+
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
-        result.append(context.getWiki().getURL(documentName, PLUGIN_NAME,
-            "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context), context));
+        result.append(getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
         String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
         Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;

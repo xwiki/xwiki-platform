@@ -30,6 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,6 +41,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
@@ -81,11 +85,12 @@ public class DBListClass extends ListClass
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
-                        result.add(new ListItem(res[0].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0])));
                     } else if (res.length == 2) {
-                        result.add(new ListItem(res[0].toString(), res[1].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0]), toStringButEmptyIfNull(res[1])));
                     } else {
-                        result.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
+                        result.add(new ListItem(toStringButEmptyIfNull(res[0]), toStringButEmptyIfNull(res[1]),
+                            toStringButEmptyIfNull(res[2])));
                     }
                 }
             }
@@ -93,18 +98,34 @@ public class DBListClass extends ListClass
         return result;
     }
 
+    private String toStringButEmptyIfNull(Object object)
+    {
+        if (object == null) {
+            return "";
+        } else {
+            return object.toString();
+        }
+    }
+
     public List<ListItem> getDBList(XWikiContext context)
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            XWiki xwiki = context.getWiki();
-            String query = getQuery(context);
+            String hqlQuery = getQuery(context);
 
-            if (query == null) {
+            if (hqlQuery == null) {
                 list = new ArrayList<ListItem>();
             } else {
                 try {
-                    list = makeList(xwiki.search(query, context));
+                    // We need the query manager
+                    QueryManager queryManager = Utils.getComponent(QueryManager.class);
+                    // We create the query
+                    Query query = queryManager.createQuery(hqlQuery, Query.HQL);
+                    // The DBlist may come from an other wiki
+                    String wikiName = getReference().extractReference(EntityType.WIKI).getName();
+                    query.setWiki(wikiName);
+                    // We execute the query to create the list of values.
+                    list = makeList(query.execute());
                 } catch (Exception e) {
                     LOGGER.error("Failed to get the list", e);
                     list = new ArrayList<ListItem>();
@@ -174,7 +195,7 @@ public class DBListClass extends ListClass
      * If there are two columns selected, use the first one as the stored value and the second one as the displayed
      * value.
      * </p>
-     * 
+     *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */
@@ -346,7 +367,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             return this.cachedDBList;
         } else {
-            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName());
+            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName());
         }
     }
 
@@ -355,7 +376,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             this.cachedDBList = cachedDBList;
         } else {
-            context.put(context.getDatabase() + ":" + getFieldFullName(), cachedDBList);
+            context.put(context.getWikiId() + ":" + getFieldFullName(), cachedDBList);
         }
     }
 
@@ -426,8 +447,11 @@ public class DBListClass extends ListClass
     // the result of the second query, to retrieve the value
     public String getValue(String val, String sql, XWikiContext context)
     {
+        String lowerCaseSQL = sql.toLowerCase();
+
         // Make sure the query does not contain ORDER BY, as it will fail in certain databases.
-        int orderByPos = sql.toLowerCase().lastIndexOf("order by");
+        // TODO: dangerous: "order by" could be inside a string in the query
+        int orderByPos = lowerCaseSQL.lastIndexOf("order by ");
         if (orderByPos >= 0) {
             sql = sql.substring(0, orderByPos);
         }
@@ -436,7 +460,8 @@ public class DBListClass extends ListClass
 
         String newsql = sql.substring(0, sql.indexOf(firstCol));
         newsql += secondCol + " ";
-        newsql += sql.substring(sql.indexOf("from"));
+        // TODO: dangerous: "from" could be inside a string in the query
+        newsql += sql.substring(lowerCaseSQL.indexOf("from "));
         newsql += "and " + firstCol + "='" + val + "'";
 
         Object[] list = null;
@@ -458,7 +483,7 @@ public class DBListClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         // input display
-        if (getDisplayType().equals("input")) {
+        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
@@ -467,9 +492,11 @@ public class DBListClass extends ListClass
             boolean setInpVal = true;
 
             BaseProperty prop = (BaseProperty) object.safeget(name);
-            String val = "";
+            String value = "";
+            String databaseValue = "";
             if (prop != null) {
-                val = prop.toText();
+                value = this.toFormString(prop);
+                databaseValue = prop.toText();
             }
 
             if (isPicker()) {
@@ -494,12 +521,12 @@ public class DBListClass extends ListClass
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
                         hidden.setDisabled(isDisabled());
-                        if (val != null && !val.equals("")) {
-                            hidden.setValue(val);
+                        if (StringUtils.isNotEmpty(value)) {
+                            hidden.setValue(value);
                         }
                         buffer.append(hidden.toString());
 
-                        input.setValue(getValue(val, hibquery, context));
+                        input.setValue(getValue(databaseValue, hibquery, context));
                         setInpVal = false;
                     }
                 }
@@ -525,12 +552,12 @@ public class DBListClass extends ListClass
                 input.setID(prefix + name);
             }
             if (setInpVal == true) {
-                input.setValue(val);
+                input.setValue(value);
             }
 
             input.setDisabled(isDisabled());
             buffer.append(input.toString());
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
+        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);

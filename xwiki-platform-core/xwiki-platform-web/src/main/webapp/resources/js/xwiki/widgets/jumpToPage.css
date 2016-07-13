@@ -1,3 +1,7 @@
+.jump-dialog {
+  overflow: visible;
+}
+
 .xdialog-box .buttons {
   margin-top: 10px;
 }

@@ -23,18 +23,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanTree;
+import org.xwiki.job.internal.script.safe.SafeJobStatus;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan.
  * 
+ * @param <J> the type of the job status
  * @version $Id$
  * @since 4.0M2
  */
-public class SafeExtensionPlan extends SafeJobStatus<ExtensionPlan> implements ExtensionPlan
+public class SafeExtensionPlan<J extends ExtensionPlan> extends SafeJobStatus<J> implements ExtensionPlan
 {
     /**
      * @see #getActions()
@@ -45,7 +47,7 @@ public class SafeExtensionPlan extends SafeJobStatus<ExtensionPlan> implements E
      * @param plan the wrapped plan
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeExtensionPlan(ExtensionPlan plan, ScriptSafeProvider< ? > safeProvider)
+    public SafeExtensionPlan(J plan, ScriptSafeProvider<?> safeProvider)
     {
         super(plan, safeProvider);
     }

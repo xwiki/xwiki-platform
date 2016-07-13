@@ -1,0 +1,78 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{template name="distribution/macros.vm" output="false"/}}
+
+{{velocity}}
+#if ("$!request.action" == '')
+  ## Display the step.
+  (% class="description" %)
+  {{translation key="platform.extension.distributionWizard.wikisStepDescription"/}}
+
+  ## We use HTML here because definition lists don't support block content in wiki syntax (XRENDERING-233).
+  {{html}}
+  #set ($wikis = [])
+  #foreach ($wikiName in $xwiki.wikiNames)
+    ## The main wiki is handled in the first step.
+    #if ($wikiName != $xcontext.mainWikiName)
+      #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
+      #if ("$!wikiPrettyName.trim()" == '')
+        #set ($wikiPrettyName = $wikiName)
+      #end
+      #set ($discard = $wikis.add({
+        'name': $wikiName,
+        'prettyName': $wikiPrettyName
+      }))
+    #end
+  #end
+  #set ($wikis = $sorttool.sort($wikis, 'prettyName'))
+  #set ($hasPagination = false)
+  #set ($paginationParams = {
+    'defaultItemsPerPage': 10
+  })
+  #paginationPrepareParams($paginationParams)
+  #if ($wikis.size() > $paginationParams.itemsPerPage)
+    #set ($hasPagination = true)
+    #set ($paginationParams.totalItems = $wikis.size())
+    #set ($requestParams = {})
+    #set ($discard = $requestParams.putAll($request.getParameterMap()))
+    #set ($discard = $requestParams.remove($paginationParams.itemParamName))
+    #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+    #set ($paginationParams.url = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+    #pagination($paginationParams)
+  #end
+  <dl>
+  #set ($lastItem = $mathtool.min($wikis.size(), $mathtool.add($paginationParams.firstItem,
+    $paginationParams.itemsPerPage)))
+  #foreach ($wiki in $wikis.subList($paginationParams.firstItem, $lastItem))
+    #set ($extensionId = $services.distribution.getUIExtensionId($wiki.name))
+    #set ($extension = $services.extension.resolve($extensionId.id, $extensionId.version.value))
+    ## The extension display uses this variable to determine the extension status.
+    #set ($extensionNamespace = "wiki:$wiki.name")
+    <dt>#displayExtensionNamespace($extensionNamespace)</dt>
+    <dd>
+      #maybeRepairPreviousUI($wiki.name $extension)
+      <div class="recommendedUI">
+        #if ($extension)
+          #displayExtensionAndUpdateStepButtons($extension)
+        #else
+          <div class="box infomessage">
+            $services.localization.render('extensions.advancedSearch.noResults',
+            ["<strong>$!escapetool.xml($extensionId.id)</strong>",
+            "<strong>$!escapetool.xml($extensionId.version)</strong>"])
+          </div>
+        #end
+      </div>
+    </dd>
+  #end
+  </dl>
+  #if ($hasPagination)
+    #set ($paginationParams.position = 'bottom')
+    #pagination($paginationParams)
+  #end
+  {{/html}}
+  ## It's not mandatory to upgrade all the wikis in this step because the upgrade can be performed later by accessing
+  ## each wiki separately.
+  #set ($showCompleteStepButton = true)
+#end
+{{/velocity}}

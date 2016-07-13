@@ -30,7 +30,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
  * Defines the meta properties of a groups XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

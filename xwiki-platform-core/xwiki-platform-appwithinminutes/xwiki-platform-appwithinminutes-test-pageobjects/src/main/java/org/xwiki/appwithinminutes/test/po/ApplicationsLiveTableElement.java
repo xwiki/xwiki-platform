@@ -19,6 +19,7 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
+import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -57,6 +58,28 @@ public class ApplicationsLiveTableElement extends LiveTableElement
     public boolean isApplicationListed(String appName)
     {
         return hasRow(APP_NAME_COLUMN_TITLE, appName);
+    }
+
+    /**
+     * @param appPath the application path
+     * @return {@code true} if the specified application is listed, {@code false} otherwise
+     */
+    public boolean isApplicationListed(String... appPath)
+    {
+        return hasRow(APP_NAME_COLUMN_TITLE, join(appPath));
+    }
+
+    public ApplicationHomePage viewApplication(String... path)
+    {
+        String escapedPath = join(path).replace("'", "''");
+        getDriver().findElementWithoutWaiting(
+            By.xpath("//td[contains(@class, 'doc_space')]/a[. = '" + escapedPath + "']")).click();
+        return new ApplicationHomePage();
+    }
+
+    private String join(String... path)
+    {
+        return StringUtils.join(path, " \u00BB ");
     }
 
     /**

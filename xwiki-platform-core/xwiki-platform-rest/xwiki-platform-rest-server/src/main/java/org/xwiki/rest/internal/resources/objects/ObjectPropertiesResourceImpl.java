@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -39,7 +40,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectPropertiesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectPropertiesResourceImpl")
 
 public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements ObjectPropertiesResource
 {
@@ -64,7 +66,8 @@ public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements
             properties.getProperties().addAll(object.getProperties());
 
             String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, doc.getWiki(),
-                doc.getSpace(), doc.getName(), object.getClassName(), object.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), object.getClassName(),
+                    object.getNumber()).toString();
             Link objectLink = objectFactory.createLink();
             objectLink.setHref(objectUri);
             objectLink.setRel(Relations.OBJECT);

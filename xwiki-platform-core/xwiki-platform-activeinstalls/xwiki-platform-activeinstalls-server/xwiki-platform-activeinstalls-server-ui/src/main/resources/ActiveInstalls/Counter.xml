@@ -1,0 +1,1255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>ActiveInstalls</web>
+  <name>Counter</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>ActiveInstalls.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1398951564000</creationDate>
+  <date>1399016714000</date>
+  <contentUpdateDate>1398951564000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Active Installs Counters</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>digits.png</filename>
+    <filesize>24246</filesize>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1378812594000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAANQAAARtCAMAAAAaipuEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
+bWFnZVJlYWR5ccllPAAAAYBQTFRFrKysxMTEubm5YGBgCQkJbW1tLCwseHh4n5+fsbGxXV1diIiI
+vb29KCgopaWlTU1NlpaWUlJSjIyMaWlpDAwMKioqZWVlmpqaICAgjo6OtbW1cXFxzMzMSUlJgYGB
+mJiYQkJCdHR0JCQkkJCQVVVVycnJqampJiYmGhoaHR0dQEBA2tra9fX1+fn5GBgYFBQU+vr69/f3
+Ojo6+Pj45+fnPz8/PDw87+/vMzMzPT092dnZ09PTOTk5EBAQNzc3Ozs79vb24uLi7OzsPj4+9PT0
+7e3t5OTk8PDwHBwcODg48/Pz4ODgNjY26Ojo6urq3Nzc6enp/v7+8fHxQUFB6+vr7u7u0tLSMTEx
+Ly8vLi4uNTU10NDQz8/P8vLyNDQ01dXV39/fMDAw1NTU4+Pj0dHR5ubm1tbWfX193d3d19fX4eHh
++/v7/Pz8kpKS2NjYhISE/f39nZ2dhoaGWVlZExMTCwsLRUVFy8vLIiIiEhISDg4OFhYWBwcHBAQE
+CgoK////2g/oTQAAXMxJREFUeNrsnYtD2sj79UELKKiICEVdXKV8X8CKoqwV22pttSrWXrB1vbS6
+ur2wXaCibBXFJf/6m2RmkplkJoQYW9xfnt3t1iRjciCEXM7nOTaOr9z+4UOh7jesw/0cB+vHDWq6
+bPx/q72+saWlmZmZMaHeijWiKDB1bCT66yYY+OMGGRL1LPjkwYO5uSVxbXB9cIVSgYljwvzgM2Hc
+jxtkSFQx/wStCqwLrgytT/pJXNHM0tJwkfuBg4yJuj8GViWva4xeM3BVZ/c5ftB09iBzcLAn1IZQ
+C/QC86bhIANrMibK9nh6WliZuDpxfeh1JArMEBaZ43dZ24YzhlU3qoBU0iRxvvOxMMjImoyJOqGs
+aklzVR0c1xuLRCKxJqq7lzO2JoOiso/5lfFrA+sTV4itVFqBUOICTzq4VLQaiTQnK5oytCaTRc2x
+1sSv6s9YVayILmlgoT8NrekaotC6wMrkteH1AK5IWNVgVapGusD8SLU6aGhNRkUtZLNwbXB9cIWK
+ArOEhTq4tqqqItTCFmgztKZriHpMrupJo1V1harUYugRq8vQmoyKEr5islnwIsI1yiuVVyCUuET2
+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
+AFfL2h82RGKXAAAAAElFTkSuQmCC
+</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ActiveInstalls.Counter</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>1bea7d44-ca53-4039-9875-7ad391f5aff3</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Apple-Style Flip Counter
+ * Version 0.5.3 - May 7, 2011
+ *
+ * Copyright (c) 2010 Chris Nanney
+ * http://cnanney.com/journal/code/apple-style-counter-revisited/
+ *
+ * Licensed under MIT
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+
+var flipCounter = function(d, options){
+
+        // Default values
+        var defaults = {
+                value: 0,
+                inc: 1,
+                pace: 1000,
+                auto: true,
+                tFH: 39,
+                bFH: 64,
+                fW: 53,
+                bOffset: 390
+        };
+
+        var     doc = window.document,
+        divId = typeof d !== 'undefined' &amp;&amp; d !== '' ? d : 'flip-counter',
+        div = doc.getElementById(divId);
+
+    var o = {};
+    for (var opt in defaults) {
+        o[opt] = (opt in options) ? options[opt] : defaults[opt];
+    }
+
+        var digitsOld = [], digitsNew = [], subStart, subEnd, x, y, nextCount = null, newDigit, newComma,
+        best = {
+                q: null,
+                pace: 0,
+                inc: 0
+        };
+
+        /**
+         * Sets the value of the counter and animates the digits to new value.
+         *
+         * Example: myCounter.setValue(500); would set the value of the counter to 500,
+         * no matter what value it was previously.
+         *
+         * @param {int} n
+         *   New counter value
+         */
+        this.setValue = function(n){
+                if (isNumber(n)){
+                        x = o.value;
+                        y = n;
+                        o.value = n;
+                        digitCheck(x,y);
+                }
+                return this;
+        };
+
+        /**
+         * Sets the increment for the counter. Does NOT animate digits.
+         */
+        this.setIncrement = function(n){
+                o.inc = isNumber(n) ? n : defaults.inc;
+                return this;
+        };
+
+        /**
+         * Sets the pace of the counter. Only affects counter when auto == true.
+         *
+         * @param {int} n
+         *   New pace for counter in milliseconds
+         */
+        this.setPace = function(n){
+                o.pace = isNumber(n) ? n : defaults.pace;
+                return this;
+        };
+
+        /**
+         * Sets counter to auto-incrememnt (true) or not (false).
+         *
+         * @param {bool} a
+         *   Should counter auto-increment, true or false
+         */
+        this.setAuto = function(a){
+                if (a &amp;&amp; ! o.auto){
+                        o.auto = true;
+                        doCount();
+                }
+                if (! a &amp;&amp; o.auto){
+                        if (nextCount) clearNext();
+                        o.auto = false;
+                }
+                return this;
+        };
+
+        /**
+         * Increments counter by one animation based on set 'inc' value.
+         */
+        this.step = function(){
+                if (! o.auto) doCount();
+                return this;
+        };
+
+        /**
+         * Adds a number to the counter value, not affecting the 'inc' or 'pace' of the counter.
+         *
+         * @param {int} n
+         *   Number to add to counter value
+         */
+        this.add = function(n){
+                if (isNumber(n)){
+                        x = o.value;
+                        o.value += n;
+                        y = o.value;
+                        digitCheck(x,y);
+                }
+                return this;
+        };
+
+        /**
+         * Subtracts a number from the counter value, not affecting the 'inc' or 'pace' of the counter.
+         *
+         * @param {int} n
+         *   Number to subtract from counter value
+         */
+        this.subtract = function(n){
+                if (isNumber(n)){
+                        x = o.value;
+                        o.value -= n;
+                        if (o.value &gt;= 0){
+                                y = o.value;
+                        }
+                        else{
+                                y = "0";
+                                o.value = 0;
+                        }
+                        digitCheck(x,y);
+                }
+                return this;
+        };
+
+        /**
+         * Increments counter to given value, animating by current pace and increment.
+         *
+         * @param {int} n
+         *   Number to increment to
+         * @param {int} t (optional)
+         *   Time duration in seconds - makes increment a 'smart' increment
+         * @param {int} p (optional)
+         *   Desired pace for counter if 'smart' increment
+         */
+        this.incrementTo = function(n, t, p){
+                if (nextCount) clearNext();
+
+                // Smart increment
+                if (typeof t != 'undefined'){
+                        var time = isNumber(t) ? t * 1000 : 10000,
+                        pace = typeof p != 'undefined' &amp;&amp; isNumber(p) ? p : o.pace,
+                        diff = typeof n != 'undefined' &amp;&amp; isNumber(n) ? n - o.value : 0,
+                        cycles, inc, check, i = 0;
+                        best.q = null;
+
+                        // Initial best guess
+                        pace = (time / diff &gt; pace) ? Math.round((time / diff) / 10) * 10 : pace;
+                        cycles = Math.floor(time / pace);
+                        inc = Math.floor(diff / cycles);
+
+                        check = checkSmartValues(diff, cycles, inc, pace, time);
+
+                        if (diff &gt; 0){
+                                while (check.result === false &amp;&amp; i &lt; 100){
+                                        pace += 10;
+                                        cycles = Math.floor(time / pace);
+                                        inc = Math.floor(diff / cycles);
+
+                                        check = checkSmartValues(diff, cycles, inc, pace, time);
+                                        i++;
+                                }
+
+                                if (i == 100){
+                                        // Could not find optimal settings, use best found so far
+                                        o.inc = best.inc;
+                                        o.pace = best.pace;
+                                }
+                                else{
+                                        // Optimal settings found, use those
+                                        o.inc = inc;
+                                        o.pace = pace;
+                                }
+
+                                doIncrement(n, true, cycles);
+                        }
+
+                }
+                // Regular increment
+                else{
+                        doIncrement(n);
+                }
+
+        }
+
+        /**
+         * Gets current value of counter.
+         */
+        this.getValue = function(){
+                return o.value;
+        }
+
+        /**
+         * Stops all running increments.
+         */
+        this.stop = function(){
+                if (nextCount) clearNext();
+                return this;
+        }
+
+        //---------------------------------------------------------------------------//
+
+        function doCount(){
+                x = o.value;
+                o.value += o.inc;
+                y = o.value;
+                digitCheck(x,y);
+                if (o.auto === true) nextCount = setTimeout(doCount, o.pace);
+        }
+
+        function doIncrement(n, s, c){
+                var val = o.value,
+                smart = (typeof s == 'undefined') ? false : s,
+                cycles = (typeof c == 'undefined') ? 1 : c;
+
+                if (smart === true) cycles--;
+
+                if (val != n){
+                        x = o.value,
+                        o.auto = true;
+
+                        if (val + o.inc &lt;= n &amp;&amp; cycles != 0) val += o.inc
+                        else val = n;
+
+                        o.value = val;
+                        y = o.value;
+
+                        digitCheck(x,y);
+                        nextCount = setTimeout(function(){doIncrement(n, smart, cycles)}, o.pace);
+                }
+                else o.auto = false;
+        }
+
+        function digitCheck(x,y){
+                digitsOld = splitToArray(x);
+                digitsNew = splitToArray(y);
+                var diff,
+                xlen = digitsOld.length,
+                ylen = digitsNew.length;
+                if (ylen &gt; xlen){
+                        diff = ylen - xlen;
+                        while (diff &gt; 0){
+                                addDigit(ylen - diff + 1, digitsNew[ylen - diff]);
+                                diff--;
+                        }
+                }
+                if (ylen &lt; xlen){
+                        diff = xlen - ylen;
+                        while (diff &gt; 0){
+                                removeDigit(xlen - diff);
+                                diff--;
+                        }
+                }
+                for (var i = 0; i &lt; xlen; i++){
+                        if (digitsNew[i] != digitsOld[i]){
+                                animateDigit(i, digitsOld[i], digitsNew[i]);
+                        }
+                }
+        }
+
+        function animateDigit(n, oldDigit, newDigit){
+                var speed, step = 0, w, a,
+                bp = [
+                        '-' + o.fW + 'px -' + (oldDigit * o.tFH) + 'px',
+                        (o.fW * -2) + 'px -' + (oldDigit * o.tFH) + 'px',
+                        '0 -' + (newDigit * o.tFH) + 'px',
+                        '-' + o.fW + 'px -' + (oldDigit * o.bFH + o.bOffset) + 'px',
+                        (o.fW * -2) + 'px -' + (newDigit * o.bFH + o.bOffset) + 'px',
+                        (o.fW * -3) + 'px -' + (newDigit * o.bFH + o.bOffset) + 'px',
+                        '0 -' + (newDigit * o.bFH + o.bOffset) + 'px'
+                ];
+
+                if (o.auto === true &amp;&amp; o.pace &lt;= 300){
+                        switch (n){
+                                case 0:
+                                        speed = o.pace/6;
+                                        break;
+                                case 1:
+                                        speed = o.pace/5;
+                                        break;
+                                case 2:
+                                        speed = o.pace/4;
+                                        break;
+                                case 3:
+                                        speed = o.pace/3;
+                                        break;
+                                default:
+                                        speed = o.pace/1.5;
+                                        break;
+                        }
+                }
+                else{
+                        speed = 80;
+                }
+                // Cap on slowest animation can go
+                speed = (speed &gt; 80) ? 80 : speed;
+
+                function animate(){
+                        if (step &lt; 7){
+                                w = step &lt; 3 ? 't' : 'b';
+                                a = doc.getElementById(divId + "_" + w + "_d" + n);
+                                if (a) a.style.backgroundPosition = bp[step];
+                                step++;
+                                if (step != 3) setTimeout(animate, speed);
+                                else animate();
+                        }
+                }
+
+                animate();
+        }
+
+        // Creates array of digits for easier manipulation
+        function splitToArray(input){
+                return input.toString().split("").reverse();
+        }
+
+        // Adds new digit
+        function addDigit(len, digit){
+                var li = Number(len) - 1;
+                newDigit = doc.createElement("ul");
+                newDigit.className = 'cd';
+                newDigit.id = divId + '_d' + li;
+                newDigit.innerHTML = '&lt;li class="t" id="' + divId + '_t_d' + li + '"&gt;&lt;/li&gt;&lt;li class="b" id="' + divId + '_b_d' + li + '"&gt;&lt;/li&gt;';
+
+                if (li % 3 == 0){
+                        newComma = doc.createElement("ul");
+                        newComma.className = 'cd';
+                        newComma.innerHTML = '&lt;li class="s"&gt;&lt;/li&gt;';
+                        div.insertBefore(newComma, div.firstChild);
+                }
+
+                div.insertBefore(newDigit, div.firstChild);
+                doc.getElementById(divId + "_t_d" + li).style.backgroundPosition = '0 -' + (digit * o.tFH) + 'px';
+                doc.getElementById(divId + "_b_d" + li).style.backgroundPosition = '0 -' + (digit * o.bFH + o.bOffset) + 'px';
+        }
+
+        // Removes digit
+        function removeDigit(id){
+                var remove = doc.getElementById(divId + "_d" + id);
+                div.removeChild(remove);
+
+                // Check for leading comma
+                var first = div.firstChild.firstChild;
+                if ((" " + first.className + " ").indexOf(" s ") &gt; -1 ){
+                        remove = first.parentNode;
+                        div.removeChild(remove);
+                }
+        }
+
+        // Sets the correct digits on load
+        function initialDigitCheck(init){
+                // Creates the right number of digits
+                var initial = init.toString(),
+                count = initial.length,
+                bit = 1, i;
+                for (i = 0; i &lt; count; i++){
+                        newDigit = doc.createElement("ul");
+                        newDigit.className = 'cd';
+                        newDigit.id = divId + '_d' + i;
+                        newDigit.innerHTML = newDigit.innerHTML = '&lt;li class="t" id="' + divId + '_t_d' + i + '"&gt;&lt;/li&gt;&lt;li class="b" id="' + divId + '_b_d' + i + '"&gt;&lt;/li&gt;';
+                        div.insertBefore(newDigit, div.firstChild);
+                        if (bit != (count) &amp;&amp; bit % 3 == 0){
+                                newComma = doc.createElement("ul");
+                                newComma.className = 'cd';
+                                newComma.innerHTML = '&lt;li class="s"&gt;&lt;/li&gt;';
+                                div.insertBefore(newComma, div.firstChild);
+                        }
+                        bit++;
+                }
+                // Sets them to the right number
+                var digits = splitToArray(initial);
+                for (i = 0; i &lt; count; i++){
+                        doc.getElementById(divId + "_t_d" + i).style.backgroundPosition = '0 -' + (digits[i] * o.tFH) + 'px';
+                        doc.getElementById(divId + "_b_d" + i).style.backgroundPosition = '0 -' + (digits[i] * o.bFH + o.bOffset) + 'px';
+                }
+                // Do first animation
+                if (o.auto === true) nextCount = setTimeout(doCount, o.pace);
+        }
+
+        // Checks values for smart increment and creates debug text
+        function checkSmartValues(diff, cycles, inc, pace, time){
+                var r = {result: true}, q;
+                // Test conditions, all must pass to continue:
+                // 1: Unrounded inc value needs to be at least 1
+                r.cond1 = (diff / cycles &gt;= 1) ? true : false;
+                // 2: Don't want to overshoot the target number
+                r.cond2 = (cycles * inc &lt;= diff) ? true : false;
+                // 3: Want to be within 10 of the target number
+                r.cond3 = (Math.abs(cycles * inc - diff) &lt;= 10) ? true : false;
+                // 4: Total time should be within 100ms of target time.
+                r.cond4 = (Math.abs(cycles * pace - time) &lt;= 100) ? true : false;
+                // 5: Calculated time should not be over target time
+                r.cond5 = (cycles * pace &lt;= time) ? true : false;
+
+                // Keep track of 'good enough' values in case can't find best one within 100 loops
+                if (r.cond1 &amp;&amp; r.cond2 &amp;&amp; r.cond4 &amp;&amp; r.cond5){
+                        q = Math.abs(diff - (cycles * inc)) + Math.abs(cycles * pace - time);
+                        if (best.q === null) best.q = q;
+                        if (q &lt;= best.q){
+                                best.pace = pace;
+                                best.inc = inc;
+                        }
+                }
+
+                for (var i = 1; i &lt;= 5; i++){
+                        if (r['cond' + i] === false){
+                                r.result = false;
+                        }
+                }
+                return r;
+        }
+
+        // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric/1830844
+        function isNumber(n) {
+                return !isNaN(parseFloat(n)) &amp;&amp; isFinite(n);
+        }
+
+        function clearNext(){
+                clearTimeout(nextCount);
+                nextCount = null;
+        }
+
+        // Start it up
+       initialDigitCheck(o.value);
+};</code>
+    </property>
+    <property>
+      <name>Flip Counter</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ActiveInstalls.Counter</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>c9875024-62d2-40e9-8630-db455ce98af5</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+
+var totalCounterValue1 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var totalInstallsCounter1 = new flipCounter("totalCounter1", {value: totalCounterValue1, auto:false});
+
+var totalCounterValue2 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var totalInstallsCounter2 = new flipCounter("totalCounter2", {value: totalCounterValue2, auto:false});
+
+var activeCounterValue1 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var activeInstallsCounter1 = new flipCounter("activeCounter1", {value: activeCounterValue1, auto:false});
+
+var activeCounterValue2 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var activeInstallsCounter2 = new flipCounter("activeCounter2", {value: activeCounterValue2, auto:false});
+
+setInterval(function(){ 
+  var totalCounterValue1 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  totalInstallsCounter1.setValue(totalCounterValue1);
+
+  var totalCounterValue2 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  totalInstallsCounter2.setValue(totalCounterValue2);
+
+  var activeCounterValue1 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  activeInstallsCounter1.setValue(activeCounterValue1);
+
+  var activeCounterValue2 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  activeInstallsCounter2.setValue(activeCounterValue2);
+}, 5000);
+
+});</code>
+    </property>
+    <property>
+      <name>Counter usage</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ActiveInstalls.Counter</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>dd08555d-5961-4f7e-8871-561a6a7a94e0</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.flip-counter ul.cd{float:left;list-style-type:none;margin:0;padding:0}
+.flip-counter li{background:url($xwiki.getAttachmentURL('ActiveInstalls.Counter', 'digits.png')) 0 0 no-repeat}
+.flip-counter li.t{background-position:0 0;width:53px;height:39px}
+.flip-counter li.b{background-position:0 0;width:53px;height:64px}
+.flip-counter li.s{background-position:-53px -1030px;width:14px;height:103px}</code>
+    </property>
+    <property>
+      <name>Flip Counter CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

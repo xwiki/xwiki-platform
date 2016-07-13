@@ -51,4 +51,10 @@ public class BlockTranslationMessage extends BlockTranslationMessageElement impl
     {
         return this.rawSource;
     }
+
+    @Override
+    public String toString()
+    {
+        return getRawSource();
+    }
 }

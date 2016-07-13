@@ -47,7 +47,7 @@ public class LinkCheckerTest extends AbstractTest
 
         // Since the LinkChecker works asynchronously there's small possibility that the link hasn't been added
         // before the livetable displays, thus we wait till we get the link state.
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             public Boolean apply(WebDriver driver)
             {

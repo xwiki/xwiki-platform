@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package>
+  <infos>
+    <name>package name</name>
+    <description>package description</description>
+    <licence>license</licence>
+    <author>author</author>
+    <extensionId>extension:id</extensionId>
+    <version>1.0</version>
+    <backupPack>false</backupPack>
+  </infos>
+  <files>
+    <file language="" defaultAction="0">Space.Page</file>
+    <file language="" defaultAction="0">Space.Translations</file>
+    <file language="fr" defaultAction="0">Space.Translations</file>
+    <file language="" defaultAction="1">Space.SkippedPage</file>
+    <file language="" defaultAction="2">Space.MergedPage</file>
+    <file language="" defaultAction="1">Space.SkippedTranslations</file>
+    <file language="fr" defaultAction="1">Space.SkippedTranslations</file>
+    <file language="" defaultAction="2">Space.MergedTranslations</file>
+    <file language="fr" defaultAction="2">Space.MergedTranslations</file>
+  </files>
+</package>

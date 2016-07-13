@@ -1,0 +1,186 @@
+###
+### Template used by the livetable macro to display documents when calling it from inside other templates. It is meant
+### as a light data source for the livetable macro when it can not rely on more feature-rich document sources like
+### XWiki.LivetableResults. It supports basic document listing, sorting and pagination.
+###
+$response.setContentType("application/json")
+##
+## WHERE
+##
+#set ($whereQueryPart = 'WHERE 1=1')
+#set ($queryParams = [])
+## Display all documents in an exact given space (doesn't support Nested Spaces). Can be useful for backward
+## compatibility for example or if there's a need to list exactly the content of a given space.
+#if ("$!request.space" != '')
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
+  #set ($discard = $queryParams.add($request.space))
+#end
+## Display all documents in a space, including Nested Spaces
+#if ("$!request.childrenOf" != '')
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ? AND doc.fullName <> ?")
+  #set ($discard = $queryParams.add("$!{request.childrenOf}.%"))
+  #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
+#end
+## Exclude some documents
+#set ($excludes = $request.getParameterValues('exclude'))
+#if ("$!excludes" != '')
+  #foreach ($exclude in $excludes)
+    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?")
+    #set ($discard = $queryParams.add($exclude))
+  #end
+#end
+#if ("$!request.get('doc.location')" != '')
+  ## Location is a special case, that we need to handle separatly.
+  ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+  #set ($locationFilterValue = $request.get('doc.location'))
+  ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as wildcards).
+  ## However, it is not what the user expects (e.g. http://jira.xwiki.org/browse/XWIKI-12608).
+  ## As a consequence, we must escape these characters.
+  ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+  ## Since we use '!' for the escaping, we also double existing ones.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+  ## Because the user might filter with "/" as separator we replace that by "%", because it could be "." 
+  ## (the space separator) or "/" (as it is in the document name).
+  ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+  ## to filter on different levels:
+  ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+  ##        On the other hand, it will also returns: "BlogForIntrospection", which might be unexpected.
+  #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%'))
+  #set ($discard = $queryParams.add("%${locationFilterValue}%"))
+#end
+##
+## ORDER
+##
+#set ($order = "$!request.sort")
+#set ($orderQueryPart = '')
+#if ($order != '')
+  #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
+  #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
+    #set($orderDirection = 'desc')
+  #end
+  ## Sorting by doc.location is not supported by the DB, since the location field does not exist.
+  #if ($order == 'doc.location')
+    ## So we filter on the document full name instead, which is the expected behavior.
+    #set ($order = 'doc.fullName')
+  #end
+  ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
+  #set ($orderQueryPart = "order by ${order} ${orderDirection}")
+#end
+##
+## OFFSET and LIMIT
+##
+#set ($offset = $mathtool.toInteger($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set ($offset = $offset - 1)
+#if (!$offset || $offset < 0)
+  #set($offset = 0)
+#end
+#set ($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
+##
+## Build the query
+##
+#set ($queryString = "$!{whereQueryPart} $!{orderQueryPart}")
+#set ($query = $services.query.hql($queryString))
+## Apply query filters if defined. Otherwise use default
+#foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
+  #set ($query = $query.addFilter($queryFilter))
+#end
+#set ($query = $query.setLimit($limit).setOffset($offset).bindValues($queryParams))
+#if ("$!request.wiki" != '')
+  #set ($query = $query.setWiki($request.wiki))
+#end
+##
+## Execute the query and build the results
+##
+#set ($items = $query.execute())
+#set ($map = {})
+#set ($discard = $map.put('totalrows', $query.count()))
+#set ($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+#set ($discard = $map.put('offset', $mathtool.add($offset, 1)))
+#if("$!request.sql" != '')
+  ## Add debug infos
+  #set($discard = $map.put('sql', $queryString))
+  #set($discard = $map.put('params', $queryParams))
+#end
+#template('hierarchy_macros.vm')
+#set ($rows = [])
+#foreach ($item in $items)
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
+  ## only the document name is returned. When more than the document name is returned the $item variable is a list
+  #if ($item.size())
+    ## Extract doc name and doc language from $item
+    #set ($docName = $item[0])
+    #set ($docLanguage = $item[1])
+  #else
+    #set ($docName = $item)
+    #set ($docLanguage = '')
+  #end
+  #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
+  #set ($row = {'doc_viewable' : $viewable})
+  #if (!$viewable)
+    #set ($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+  #else
+    #set ($itemDoc = $xwiki.getDocument($docName))
+    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+    ## result is a translation
+    #if ("$!docLanguage" != "" && $xwiki.getLanguagePreference() != $docLanguage)
+      #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #set ($isTranslation = true)
+    #else
+      #set ($translatedDoc = $itemDoc.translatedDocument)
+      #set ($isTranslation = false)
+    #end
+    #set ($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
+    #if ($isTranslation)
+      ## Display the language after the document name so that not all translated documents have the same name displayed
+      #set ($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+    #else
+      #set ($discard = $row.put('doc_name', $itemDoc.name))
+    #end
+    #set ($discard = $row.put('doc_fullName', $fullname))
+    #set ($location = "#hierarchy($itemDoc.documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
+    #set ($discard = $row.put('doc_location', $location))
+    #set ($discard = $row.put('doc_space', $itemDoc.space))
+    #set ($discard = $row.put('doc_url', $xwiki.getURL($docName)))
+    #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
+    #set ($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
+    #set ($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
+    #set ($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
+    #set ($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
+    #set ($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
+    #set ($row.doc_hasrights = $row.doc_hasedit && $isAdvancedUser)
+    #set ($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
+    #set ($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
+    #set ($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
+    #set ($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&step=1')))
+    ## Compute the 'edit rights' URL
+    #if($itemDoc.name == 'WebHome')
+      ## For nested pages, use the page administration
+      #set($webPreferencesReference = $services.model.createEntityReference('WebPreferences', 'DOCUMENT', $itemDoc.documentReference.lastSpaceReference))
+      #set($editRightsURL = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&section=PageRights'))
+    #else
+      ## For terminal pages, use the old rights editor
+      ## TODO: we should create a page administration for terminal pages too
+      #set($editRightsURL = $itemDoc.getURL('edit', 'editor=rights'))
+    #end
+    #set ($discard = $row.put('doc_rights_url', $editRightsURL))
+    #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+    #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+    #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+    #set ($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
+    #set ($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+    #set ($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
+    ## Ignore other columns
+  #end
+  #set ($discard = $rows.add($row))
+#end
+#set ($discard = $map.put('rows', $rows))
+##
+## Serialize the JSON
+##
+$jsontool.serialize($map)

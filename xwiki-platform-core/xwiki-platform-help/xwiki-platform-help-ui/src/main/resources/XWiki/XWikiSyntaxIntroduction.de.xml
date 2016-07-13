@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300892851000</creationDate>
+  <date>1301497886000</date>
+  <contentUpdateDate>1301497886000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Allgemeines =
+
+== Einführung ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Introduction ===
+
+Die XWiki Syntax 1.0 war der erste Ansatz, eine Syntax im Wiki-stil in XWiki zu implementieren. Diese hat einige Limitierungen, und manche Formatierungen können nur durch direkten Einsatz von HTML erzeugt werden. Daher empfehlen wir die Verwendung der neueren Syntaxen. XWiki Syntax 1.0 wird nur noch aus Gründen der Rückwärtskompatibilität angeboten.
+
+Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengenhülle um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.0 Introduction ===
+
+Beginnend mit XWiki Enterprise Version 1.7 und darüber haben wir eine neue Wiki Syntax eingeführt. Daher haben wir die alte Syntax die //XWiki Syntax 1.0// benannt und die neue Syntax wird sinnigerweise //XWiki Syntax 2.0// genannt. Die Hauptgründe für die Einführung der neuen Syntax waren:
+
+* Die Einschränkungen und Mehrdeutigkeiten der XWiki 1.0 Syntax (welche sowohl durch Radeox - der zugrunde liegenden Rendering-Engine - und TWiki inspiriert wurde) beheben.
+** Nicht optimale Symbole. Zum Beispiel war das Symbol für Fettdruck ein einzelner Stern. Dies hat Probleme verursacht, wenn der Nutzer Texte eingab, die Sterne beinhalteten, da dieser Text fälschlicherweise als fett angenommen wurde, auch wenn er das nicht war. Daher haben wir die Syntax robuster gemacht, indem überall mindestens doppelte Zeichen verwendet werden.
+** Mehrdeutigkeiten. Zum Beispiel gab es eine Mehrdeutigkeit zwischen einem fettengedruckten Element, dass die Zeile begann, und einer Aufzählungsliste. Diese Mehrdeutigkeiten mussten beseitigt werden, damit u.a. der WYSIWYG Editor  beiden Fälle unterscheiden kann.
+* Um näher an der [[Creole 1.0 Syntax&gt;&gt;http://www.wikicreole.org/]] zu sein, welche ein Standard für Wiki Syntax wird. Zusätzlich hat die Creole Gemeinde sich die Zeit genommen, um alle existierenden Wiki Syntaxen zu analysieren, bevor sie sich für Symbole entschieden haben. Diese Entscheidungen sind daher sehr gut.
+
+Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengen um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.1 Introduction ===
+
+Die XWiki Syntax 2.1 ist die aktuell empfohlene Wiki Syntax. Gegenüber der XWiki Syntax 2.0 wurden einige Verbesserungen eingeführt. Einige Gründe für die Entwicklung dieser neuen Syntax sind:
+
+* Die Link- und Bildsyntax wurde für bessere Klarheit, Konsistenz und Erweiterbarkeit vereinheitlicht.
+* Möglichkeit zum Anzeigen von Piktogrammen, zum Einbetten von Bildern mittels 'data:'-URLs sowie zum Verlinken von Dateien mittels der UNC Notation und dem Verlinken zu relativen URLs wurden hinzugefügt.
+
+{{info}}
+Da die XWiki Syntax 2.1 auf der XWiki Syntax 2.0 basiert, bleibt die gesamte XWiki Syntax 2.0 gültig, solange die 2.1 Spezifikation nichts anderes besagt.
+{{/info}}
+
+Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengenhülle um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
+</xwikidoc>

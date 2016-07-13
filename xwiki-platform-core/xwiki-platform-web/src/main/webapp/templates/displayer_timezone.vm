@@ -1,0 +1,21 @@
+#if ($type == 'edit' || $type == 'search')
+  #if($xwiki.jodatime)
+    <select id='$prefix$name' name='$prefix$name'>
+      <option value="" #if($value == $tz)selected="selected"#end>$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>
+      #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())
+        <option value="$tz" #if($value == $tz)selected="selected"#end>$tz</option>
+      #end
+    </select>
+  #else
+    <input id='$prefix$name' name='$prefix$name' type="text" value="$!value"/>
+  #end
+#elseif ($type == 'view' || $type == 'rendered')
+$!value
+#elseif ($type == 'hidden')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  <input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml($value)" />
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,97 +25,85 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>8.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.1</gwt.version>
-    <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
+    <gwt.version>2.7.0</gwt.version>
+    <gwt.maven.plugin.version>2.7.0</gwt.maven.plugin.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Follow the specifications regarding the WebJar content path. -->
+    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <!-- The bootstrap version is used is several places -->
+    <bootstrap.version>3.3.6</bootstrap.version>
+    <batik.version>1.8</batik.version>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
       <!-- Jython engine -->
+      <!-- We use a customized Jython JAR here because the standard one contains lots of useless files creating conflicts -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.4-rc1</version>
+        <version>2.7.0-xwiki-3</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.3.4.Final</version>
+        <version>3.6.10.Final</version>
       </dependency>
-      <!-- Apache Tika used by Lucene and Office modules -->
+      <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.4</version>
+        <version>1.13</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.4</version>
+        <version>1.13</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
-          <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
           <exclusion>
-            <groupId>org.gagravarr</groupId>
-            <artifactId>vorbis-java-core</artifactId>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
           </exclusion>
-          <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
-               require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <!-- Exclude so that we control our own version of it. Note that Tika uses it for reading encrypted PDFs  -->
           <exclusion>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
           </exclusion>
-          <!-- Tika Parsers 1.3 depends on bcmail-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
-               require bcmail-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
+          <!-- Exclude so that we control our own version of it. Note that Tika uses it for reading encrypted PDFs  -->
           <exclusion>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15</artifactId>
+            <artifactId>bcmail-jdk15on</artifactId>
           </exclusion>
-          <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
-      	  <exclusion>
-      	    <artifactId>asm-debug-all</artifactId>
-      	    <groupId>org.ow2.asm</groupId>
+          <!-- Tika depends on junrar for handling RAR files and junrar itself depends on Commons VFS2 which depends on
+               org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.4. AFAIK we shouldn't require this dependency and
+               we can safely exclude it. The other reason for excluding it is that it itself depends on
+               regexp:regexp:jar:1.3 and this causes some duplicate class conflicts with Xalan, and we already depend
+               on jakarta-regexp:jakarta-regexp. -->
+          <exclusion>
+            <artifactId>regexp</artifactId>
+            <groupId>regexp</groupId>
+          </exclusion>
+          <!-- We don't need it the way we use Tika and it causes various conflicts -->
+          <exclusion>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <groupId>org.apache.cxf</groupId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <!-- See the explanation in the tika-parsers exclusion above -->
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm</artifactId>
-        <version>4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk16</artifactId>
-        <version>1.46</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcmail-jdk16</artifactId>
-        <version>1.46</version>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>
@@ -165,27 +151,16 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.1</version>
-      </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
-        <groupId>struts</groupId>
-        <artifactId>struts</artifactId>
-        <version>1.2.9</version>
+        <groupId>org.apache.struts</groupId>
+        <artifactId>struts-core</artifactId>
+        <version>1.3.10</version>
         <exclusions>
           <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
           <exclusion>
             <groupId>antlr</groupId>
             <artifactId>antlr</artifactId>
-          </exclusion>
-          <!-- We use a more recent version of Xalan (see above) -->
-          <exclusion>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
           </exclusion>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -207,20 +182,18 @@
         <artifactId>gwt-servlet</artifactId>
         <version>${gwt.version}</version>
       </dependency>
-      <dependency>
-        <!-- SmartGWT is used only for its tree widget. -->
-        <!-- If you remove or move this dependency don't forget to update the repository section at the bottom. -->
-        <groupId>com.smartgwt</groupId>
-        <artifactId>smartgwt</artifactId>
-        <version>${smartgwt.version}</version>
-        <!-- Only needed at build time -->
-        <scope>provided</scope>
-      </dependency>
       <!-- Used at least in Solr Search and in Infinispan Cache -->
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
-        <version>4.1.4</version>
+        <version>4.4.1</version>
+        <exclusions>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>stax-api</artifactId>
+            <groupId>javax.xml.stream</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
@@ -228,18 +201,86 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
-      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
-           on bcprov and bcmail for jdk14. -->
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.0.19</version>
+      </dependency>
+      <!-- Used directly and indirectly in various projects. -->
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.9.4</version>
+      </dependency>
+      <!-- Common WebJars -->
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>requirejs</artifactId>
+        <version>2.2.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>2.2.2</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>${bootstrap.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <!-- All Batik artifacts should be in sync -->
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-rasterizer</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-bridge</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-css</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-util</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-codec</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-ext</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-extension</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-transcoder</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-gvt</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-svg-dom</artifactId>
+        <version>${batik.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -304,7 +345,28 @@
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
             </excludes>
+            <systemProperties combine.children="append">
+              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
+              <property>
+                <name>screenshotDirectory</name>
+                <value>${basedir}/target/screenshots</value>
+              </property>
+            </systemProperties>
+            <!-- Verify that unit tests don't output anything to stdout/stderr -->
+            <properties>
+              <property>
+                <name>listener</name>
+                <value>org.xwiki.test.CaptureConsoleRunListener</value>
+              </property>
+            </properties>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${commons.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
@@ -323,12 +385,66 @@
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
+          <executions>
+            <execution>
+              <!-- Minify the WebJar resources before packing the jar. -->
+              <id>minify-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>compress</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
+                <excludes>
+                  <exclude>**/*.min.*</exclude>
+                </excludes>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
           <configuration>
             <skip>${xwiki.minification.skip}</skip>
+            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
             <jswarn>false</jswarn>
-            <!-- Overwrite the resource files with the minimized version. -->
-            <nosuffix>true</nosuffix>
+            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
+              currently more widely used in the JavaScript world. -->
+            <suffix>.min</suffix>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.cj.jshintmojo</groupId>
+          <artifactId>jshint-maven-plugin</artifactId>
+          <version>1.6.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>lint</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <globals>require,define</globals>
+            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
+            <options>camelcase,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,maxlen:120</options>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <!-- Copy the WebJar resources to the right path before packing the jar. -->
+              <id>copy-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -348,43 +464,31 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
         <configuration>
-          <!-- List of specific CLIRR excludes. Example:
-
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/ircbot/IRCBot</className>
-              <method>void initialize(java.lang.String)</method>
-              <justification>IRCBot is still a young API. Added a new initialize() method to support installing the
-                IRC Bot application in a subwiki</justification>
-            </difference>
-
-             See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
-          -->
-          <ignored>
-            <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>6006</differenceType>
-              <className>com/xpn/xwiki/XWikiContext</className>
-              <field>TYPE_PROVIDER</field>
-              <justification>This field is not meant to be be modified, the final was just forgotten.</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/util/TidyMessageLogger</className>
-              <justification>Has been moved to xwiki-platform-feed-api since it was the only module using it. We also
-              dropped Tidy in favor of HTMLCleaner.</justification>
-            </difference>
-          </ignored>
-          <excludes>
-            <exclude>**/internal/**</exclude>
-            <exclude>**/test/**</exclude>
-            <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Google API plugin has been retired -->
-            <exclude>com/xpn/xwiki/plugin/google/GooglePlugin*</exclude>
-          </excludes>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "java": {
+                  "filter": {
+                    "packages": {
+                      "regex": true,
+                      "include": ["org\\.xwiki\\..*"],
+                      "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?"]
+                    }
+                  }
+                },
+                "ignore": [
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.rendering.parser.ContentParser",
+                    "justification": "No actual breakage. Class was moved to another module"
+                  }
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>
@@ -399,9 +503,11 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>
+    <module>xwiki-platform-application</module>
     <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
@@ -412,71 +518,83 @@
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
-    <module>xwiki-platform-colibri</module>
-    <module>xwiki-platform-colorthemes</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
     <module>xwiki-platform-containers</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-dashboard</module>
+    <module>xwiki-platform-diffplugin</module>
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
-    <module>xwiki-platform-faq</module>
     <module>xwiki-platform-feed</module>
+    <module>xwiki-platform-filter</module>
+    <module>xwiki-platform-flamingo</module>
+    <module>xwiki-platform-flavor</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>
+    <module>xwiki-platform-icon</module>
     <module>xwiki-platform-index</module>
+    <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
-    <module>xwiki-platform-ircbot</module>
-    <module>xwiki-platform-jira</module>
+    <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
+    <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
+    <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-model</module>
+    <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
     <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
+    <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
     <module>xwiki-platform-repository</module>
+    <module>xwiki-platform-resource</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-sandbox</module>
+    <module>xwiki-platform-sharepage</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
     <module>xwiki-platform-security</module>
-    <module>xwiki-platform-selenium</module>
     <module>xwiki-platform-sheet</module>
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
+    <module>xwiki-platform-svg</module>
     <module>xwiki-platform-tag</module>
+    <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
+    <module>xwiki-platform-vfs</module>
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
-    <module>xwiki-platform-wiki-manager</module>
-    <module>xwiki-platform-workspace</module>
+    <module>xwiki-platform-webjars</module>
+    <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>
+    <module>xwiki-platform-xar</module>
+    <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
-    <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>

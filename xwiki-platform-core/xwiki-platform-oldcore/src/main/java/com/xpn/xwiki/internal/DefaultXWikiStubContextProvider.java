@@ -20,10 +20,12 @@
 package com.xpn.xwiki.internal;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,7 +38,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Default implementation of XWikiStubContextProvider.
- * 
+ *
  * @todo make DefaultXWikiStubContextProvider able to generate a stub context from scratch some way, it will need some
  *       refactor around XWiki class for this to be possible. The current limitation is that without a first request
  *       this provider is unusable.
@@ -53,6 +55,9 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
     @Inject
     private Logger logger;
 
+    @Inject
+    private Provider<DocumentReference> defaultDocumentReferenceProvider;
+
     /**
      * The initial stub XWikiContext.
      */
@@ -67,7 +72,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
         newContext.setUserReference(null);
         newContext.setLanguage(null);
-        newContext.setDatabase(context.getMainXWiki());
+        newContext.setWikiId(context.getMainXWiki());
 
         // Cleanup
         newContext.flushClassCache();
@@ -100,6 +105,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         }
 
         this.initialContext = newContext;
+
         this.logger.debug("Stub context initialized.");
     }
 
@@ -128,7 +134,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
             }
 
             // We make sure to not share the same document instance with several threads
-            stubContext.setDoc(new XWikiDocument());
+            stubContext.setDoc(new XWikiDocument(this.defaultDocumentReferenceProvider.get()));
         } else {
             stubContext = null;
         }

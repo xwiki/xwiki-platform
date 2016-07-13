@@ -1,0 +1,12 @@
+Package: xwiki-tomcat8-mysql
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-mysql-common (= [[version]]), xwiki-tomcat8-common (= [[version]])
+Conflicts: xwiki-enterprise-tomcat8-mysql
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

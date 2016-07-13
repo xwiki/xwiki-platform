@@ -171,24 +171,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
     public void setSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
         if (displayWikiSelector) {
-            wikiService.isMultiWiki(new AsyncCallback<Boolean>()
-            {
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
-                }
-
-                public void onSuccess(Boolean result)
-                {
-                    if (result) {
-                        setWikiSelection(imageReference, cb);
-                    } else {
-                        setSpaceSelection(imageReference, cb);
-                    }
-                }
-            });
+            setWikiSelection(imageReference, cb);
         } else {
             setSpaceSelection(imageReference, cb);
         }
@@ -284,21 +267,19 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
         });
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ChangeHandler#onChange(ChangeEvent)
-     */
+    @Override
     public void onChange(ChangeEvent event)
     {
         if (event.getSource() == wikiSelector) {
             spaceSelector.setWiki(wikiSelector.getSelectedWiki());
             spaceSelector.refreshList(spaceSelector.getSelectedSpace(), new AsyncCallback<List<String>>()
             {
+                @Override
                 public void onFailure(Throwable caught)
                 {
                 }
 
+                @Override
                 public void onSuccess(List<String> result)
                 {
                     pageSelector.setWiki(wikiSelector.getSelectedWiki());
@@ -373,25 +354,19 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
         display().removeStyleName(STYLE_LOADING);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public VerticalResizePanel display()
     {
         return (VerticalResizePanel) super.display();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         return pageWizardStep.getNextStep();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void initializeSelection(AsyncCallback< ? > cb)
     {
         if (!StringUtils.isEmpty(getData().getData().getReference())
@@ -408,41 +383,30 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onCancel()
     {
         pageWizardStep.onCancel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         pageWizardStep.onSubmit(async);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void addNavigationListener(NavigationListener listener)
     {
         pageWizardStep.addNavigationListener(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void removeNavigationListener(NavigationListener listener)
     {
         pageWizardStep.removeNavigationListener(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setActive()
     {
@@ -453,11 +417,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
         }
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractSelectorWizardStep#getResult()
-     */
     @Override
     public Object getResult()
     {

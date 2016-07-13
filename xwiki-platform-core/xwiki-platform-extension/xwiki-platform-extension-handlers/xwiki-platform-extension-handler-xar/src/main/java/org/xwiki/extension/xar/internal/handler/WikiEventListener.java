@@ -19,9 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,14 +31,17 @@ import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
+import org.xwiki.extension.ExtensionDependency;
+import org.xwiki.extension.ExtensionException;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionHandler;
+import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.observation.EventListener;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
@@ -51,37 +52,32 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Singleton
 @Named("extension.xar.WikiCopiedListener")
-public class WikiEventListener implements EventListener
+public class WikiEventListener extends AbstractEventListener
 {
     /**
-     * The list of events observed.
+     * The install request property that specifies which user triggered the install.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new WikiCopiedEvent(), new WikiCreatedEvent(),
-        new WikiDeletedEvent());
+    private static final String PROPERTY_USER_REFERENCE = "user.reference";
 
     @Inject
-    private Provider<InstalledExtensionRepository> installedRepositoryProvider;
+    private InstalledExtensionRepository installedRepository;
+
+    /**
+     * Used to install the extension itself depending of its type.
+     */
+    @Inject
+    private ExtensionHandlerManager extensionHandlerManager;
 
     @Inject
     @Named("xar")
     private Provider<ExtensionHandler> xarHandlerProvider;
 
     @Inject
-    private Execution execution;
-
-    @Inject
     private Logger logger;
 
-    @Override
-    public String getName()
+    public WikiEventListener()
     {
-        return "extension.xar.WikiCopiedListener";
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
+        super("extension.xar.WikiCopiedListener", new WikiCopiedEvent(), new WikiCreatedEvent(), new WikiDeletedEvent());
     }
 
     @Override
@@ -101,22 +97,38 @@ public class WikiEventListener implements EventListener
         String sourceNamespace = "wiki:" + event.getSourceWikiId();
         String targetNamespace = "wiki:" + event.getTargetWikiId();
 
-        InstalledExtensionRepository installedRepository = this.installedRepositoryProvider.get();
-
         Collection<InstalledExtension> installedExtensions =
-            installedRepository.getInstalledExtensions(sourceNamespace);
+            this.installedRepository.getInstalledExtensions(sourceNamespace);
 
         for (InstalledExtension installedExtension : installedExtensions) {
-            // TODO: take care of dependencies first
-            if (!installedExtension.isInstalled(null)) {
-                try {
-                    installedRepository.installExtension(installedExtension, targetNamespace,
-                        installedExtension.isDependency(sourceNamespace));
-                } catch (InstallException e) {
-                    this.logger.error(
-                        "Failed to copy install state for extension [{}] from namespace [{}] to namespace [{}]",
-                        installedExtension, sourceNamespace, targetNamespace, e);
+            copyInstalledExtension(installedExtension, sourceNamespace, targetNamespace);
+        }
+    }
+
+    private void copyInstalledExtension(InstalledExtension installedExtension, String sourceNamespace,
+        String targetNamespace)
+    {
+        if (!installedExtension.isInstalled(targetNamespace) && !installedExtension.isInstalled(null)) {
+            // Copy dependencies first
+            for (ExtensionDependency dependency : installedExtension.getDependencies()) {
+                InstalledExtension installedDependency =
+                    this.installedRepository.getInstalledExtension(dependency.getId(), sourceNamespace);
+                if (installedDependency != null) {
+                    copyInstalledExtension(installedDependency, sourceNamespace, targetNamespace);
                 }
+            }
+
+            // Copy extension
+            try {
+                // Installed extension
+                this.extensionHandlerManager.initialize(installedExtension, targetNamespace);
+
+                // Register extension as installed
+                this.installedRepository.installExtension(installedExtension, targetNamespace,
+                    installedExtension.isDependency(sourceNamespace));
+            } catch (ExtensionException e) {
+                this.logger.error("Failed to copy extension [{}] from namespace [{}] to namespace [{}]",
+                    installedExtension, sourceNamespace, targetNamespace, e);
             }
         }
     }
@@ -125,14 +137,12 @@ public class WikiEventListener implements EventListener
     {
         String namespace = "wiki:" + event.getWikiId();
 
-        InstalledExtensionRepository installedRepository = this.installedRepositoryProvider.get();
-
-        Collection<InstalledExtension> installedExtensions = installedRepository.getInstalledExtensions(namespace);
+        Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(namespace);
 
         for (InstalledExtension installedExtension : installedExtensions) {
             if (!installedExtension.isInstalled(null)) {
                 try {
-                    installedRepository.uninstallExtension(installedExtension, namespace);
+                    this.installedRepository.uninstallExtension(installedExtension, namespace);
                 } catch (UninstallException e) {
                     this.logger.error("Failed to uninstall extension [{}] from namespace [{}]", installedExtension,
                         namespace, e);
@@ -145,16 +155,22 @@ public class WikiEventListener implements EventListener
     {
         String namespace = "wiki:" + event.getWikiId();
 
-        InstalledExtensionRepository installedRepository = this.installedRepositoryProvider.get();
-
-        Collection<InstalledExtension> installedExtensions = installedRepository.getInstalledExtensions(null);
-
-        ExtensionHandler xarHandler = xarHandlerProvider.get();
+        Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setProperty("user.reference", context.getUserReference());
+        DocumentReference userReference = context.getUserReference();
+        if (userReference != null) {
+            installRequest.setProperty(PROPERTY_USER_REFERENCE, userReference);
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USER_REFERENCE, userReference.toString());
+        }
+        installRequest.setVerbose(false);
         // TODO: make it interactive ? (require wiki creation to be job based)
         installRequest.setInteractive(false);
+
+        ExtensionHandler xarHandler = this.xarHandlerProvider.get();
 
         for (InstalledExtension installedExtension : installedExtensions) {
             if (installedExtension.getType().equals(XarExtensionHandler.TYPE)) {

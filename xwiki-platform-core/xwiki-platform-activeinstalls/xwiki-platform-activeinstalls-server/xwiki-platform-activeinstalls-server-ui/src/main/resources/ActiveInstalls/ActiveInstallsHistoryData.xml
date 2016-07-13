@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>ActiveInstalls</web>
+  <name>ActiveInstallsHistoryData</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1399398031000</creationDate>
+  <parent>ActiveInstalls.ActiveInstallsHistory</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1399402012000</date>
+  <contentUpdateDate>1399402012000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Active Installs History Data</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="ActiveInstalls.QueryVariables"/}}
+{{velocity}}
+#set ($query = "
+{
+     ""query"": {
+        ""query_string"": {
+           ""lowercase_expanded_terms"": false,
+           ""query"": ""distributionId:\""$distributionId\"" $snapshotQueryFragment""
+        }
+     },
+    ""aggs"": {
+        ""activeinstalls_over_time"" : {
+            ""date_histogram"" : {
+                ""field"" : ""_timestamp"",
+                ""interval"" : ""week""
+            },
+            ""aggs"" : {
+                ""instanceId_count"" : {
+                    ""cardinality"" : {
+                        ""field"" : ""instanceId""
+                    }
+                }
+            }
+        }
+    }
+}
+")
+#set ($result = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
+#set ($headingLine = "|=Date|=Active Installs Count")
+#if (!$result)
+  #set ($errorText = $!services.activeinstalls.lastError)
+  {{error}}{{{$errorText}}}{{/error}}
+
+  ## Still generate an empty table so that the chart macro using it doesn't fail!
+  $headingLine
+#else
+  ## Generate table with data
+  #set ($jsonItems = $result.getAsJsonObject('aggregations').getAsJsonObject('activeinstalls_over_time').getAsJsonArray('buckets'))
+  $headingLine
+  #foreach ($jsonItem in $jsonItems)
+    ## Don't output the last item since all the data for the day have not been gathered yet and the result is thus false for the day
+    #if ($foreach.hasNext)
+      #set ($date = $datetool.toDate($jsonItem.getAsJsonPrimitive('key').getAsLong()))
+      |$datetool.format('yyyy-MM-dd', $date)|$jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

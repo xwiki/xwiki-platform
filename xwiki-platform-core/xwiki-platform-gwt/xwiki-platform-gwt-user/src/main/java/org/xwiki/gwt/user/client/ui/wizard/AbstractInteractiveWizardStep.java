@@ -60,6 +60,7 @@ public abstract class AbstractInteractiveWizardStep extends AbstractNavigationAw
      * {@inheritDoc}
      * <p>
      * You can safely use this method to access the panel and add widget to it.
+     * </p>
      * 
      * @see AbstractNavigationAwareWizardStep#display()
      */

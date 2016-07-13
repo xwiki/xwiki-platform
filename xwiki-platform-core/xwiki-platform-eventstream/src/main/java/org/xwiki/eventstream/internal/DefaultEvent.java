@@ -336,10 +336,7 @@ public class DefaultEvent implements Event
             this.parameters = new HashMap<String, String>();
         }
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString()
     {

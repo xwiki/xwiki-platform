@@ -34,7 +34,7 @@ public final class TextRange extends NativeRange
     /**
      * A unit defining a fragment of a text range. It is used when moving the end points of a text range.
      */
-    public static enum Unit
+    public enum Unit
     {
         /**
          * A character.

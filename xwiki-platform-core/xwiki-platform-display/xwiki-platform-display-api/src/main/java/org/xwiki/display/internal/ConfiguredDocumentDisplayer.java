@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -87,8 +88,8 @@ public class ConfiguredDocumentDisplayer implements DocumentDisplayer
         try {
             return componentManager.getInstance(DocumentDisplayer.class, documentDisplayerHint);
         } catch (ComponentLookupException e) {
-            logger.warn("Failed to lookup document displayer with hint [{}]. Using default document displayer.",
-                documentDisplayerHint);
+            logger.warn("Failed to lookup document displayer with hint [{}] (Root cause: [{}]). "
+                + "Using default document displayer.", documentDisplayerHint, ExceptionUtils.getRootCauseMessage(e));
             try {
                 return componentManager.getInstance(DocumentDisplayer.class);
             } catch (ComponentLookupException ex) {

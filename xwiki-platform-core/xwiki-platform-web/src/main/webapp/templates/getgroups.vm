@@ -1,4 +1,4 @@
-$response.setContentType("application/x-json")
+$response.setContentType("application/json")
 #set ($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set( $off = $offset - 1 )
@@ -19,7 +19,7 @@ $response.setContentType("application/x-json")
      #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
      #if( $docProps.contains( $key )) 
         #set ($arr = [])
-        #set( $discard = $arr.add( null ) ) ## this may be variable...
+        #set( $discard = $arr.add( $NULL ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr))
         #set( $discard = $orderList.add( "$key" ))

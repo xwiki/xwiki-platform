@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Synchronizes the objects in a document with their current classes, by removing any deprecated properties.
- * 
+ *
  * @version $Id$
  * @since 2.4M2
  */
@@ -68,8 +68,8 @@ public class ObjectsSynchronizeAction extends XWikiAction
         // Set the new author
         doc.setAuthorReference(context.getUserReference());
 
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xobject.synchronizeObjects.versionSummary"),
-            true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.model.xobject.synchronizeObjects.versionSummary"), true,
+            context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -82,9 +82,6 @@ public class ObjectsSynchronizeAction extends XWikiAction
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -95,7 +92,7 @@ public class ObjectsSynchronizeAction extends XWikiAction
 
     /**
      * Remove deprecated fields (properties deleted from the XClass) from an object.
-     * 
+     *
      * @param object the object to synchronize
      * @param context the current request context
      */

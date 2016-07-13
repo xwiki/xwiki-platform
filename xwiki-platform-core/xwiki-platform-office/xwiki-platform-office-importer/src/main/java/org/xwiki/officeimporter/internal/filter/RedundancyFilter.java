@@ -22,6 +22,9 @@ package org.xwiki.officeimporter.internal.filter;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.component.annotation.Component;
@@ -37,7 +40,9 @@ import org.xwiki.xml.html.filter.ElementSelector;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/redundancy")
+@Component
+@Named("officeimporter/redundancy")
+@Singleton
 public class RedundancyFilter extends AbstractHTMLFilter
 {
     /**

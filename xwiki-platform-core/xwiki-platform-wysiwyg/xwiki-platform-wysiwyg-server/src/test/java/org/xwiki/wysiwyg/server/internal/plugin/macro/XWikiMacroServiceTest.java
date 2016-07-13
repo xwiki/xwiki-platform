@@ -19,13 +19,16 @@
  */
 package org.xwiki.wysiwyg.server.internal.plugin.macro;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.Assert;
+import javax.inject.Provider;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,6 +44,8 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wysiwyg.server.plugin.macro.MacroDescriptorTranslator;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Unit tests for {@link XWikiMacroService}.
@@ -105,6 +110,12 @@ public class XWikiMacroServiceTest
             new org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor();
         when(macroDescriptorTranslator.translate(any(org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor.class)))
             .thenReturn(translatedDescriptor);
+
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWikiId()).thenReturn("xwiki");
+
+        Provider<XWikiContext> contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(contextProvider.get()).thenReturn(xcontext);
 
         Assert.assertSame(translatedDescriptor, mocker.getComponentUnderTest().getMacroDescriptor(macroId, syntaxId));
 

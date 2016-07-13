@@ -24,13 +24,19 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
+/**
+ * List and allow to upgrade outdated extensions.
+ * 
+ * @version $Id$
+ * @since 5.0RC1
+ */
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -40,6 +46,9 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
+
+    @Inject
+    private transient Logger logger;
 
     public OutdatedExtensionsDistributionStep()
     {
@@ -52,29 +61,46 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            UpgradeMode upgradeMode = this.distributionManager.getUpgradeMode();
+            if (isMainWiki()) {
+                Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions();
 
-            Collection<InstalledExtension> installedExtensions;
-            if (upgradeMode == UpgradeMode.ALLINONE) {
-                installedExtensions = this.installedRepository.getInstalledExtensions();
-            } else {
-                installedExtensions = this.installedRepository.getInstalledExtensions(getNamespace());
-            }
+                // Upgrade outdated extensions only when there is invalid extensions
+                for (InstalledExtension extension : installedExtensions) {
+                    Collection<String> installedNamespaces = extension.getNamespaces();
+                    if (installedNamespaces == null) {
+                        if (!extension.isValid(null)) {
+                            this.logger.debug("Enabling outdate extension step on main wiki "
+                                + "because extension [{}] is invalid on root namespace", extension.getId());
 
-            // Upgrade outdated extensions only when there is outdated extensions
-            for (InstalledExtension extension : installedExtensions) {
-                Collection<String> installedNamespaces = extension.getNamespaces();
-                if (installedNamespaces == null) {
-                    if (!extension.isValid(null)) {
-                        setState(null);
-                        break;
-                    }
-                } else {
-                    for (String installedNamespace : installedNamespaces) {
-                        if (!extension.isValid(installedNamespace)) {
                             setState(null);
                             break;
                         }
+                    } else {
+                        for (String installedNamespace : installedNamespaces) {
+                            if (!extension.isValid(installedNamespace)) {
+                                this.logger.debug("Enabling outdate extension step on main wiki "
+                                    + "because extension [{}] is invalid on namespace [{}]", extension.getId(),
+                                    installedNamespace);
+
+                                setState(null);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                String currentNamespace = getNamespace();
+                Collection<InstalledExtension> installedExtensions =
+                    this.installedRepository.getInstalledExtensions(currentNamespace);
+
+                // Upgrade outdated extensions only when there is invalid extensions
+                for (InstalledExtension extension : installedExtensions) {
+                    if (!extension.isValid(currentNamespace)) {
+                        this.logger.debug("Enabling outdate extension step on wiki [{}]"
+                            + "because extension [{}] is invalid", getWiki(), extension.getId());
+
+                        setState(null);
+                        break;
                     }
                 }
             }

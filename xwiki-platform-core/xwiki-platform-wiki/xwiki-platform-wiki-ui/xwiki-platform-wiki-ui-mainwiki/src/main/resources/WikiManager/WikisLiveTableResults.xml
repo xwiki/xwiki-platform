@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>WikisLiveTableResults</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1293832800000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1293832800000</date>
+  <contentUpdateDate>1293832800000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.livetable.results')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="WikiManager.WikisLiveTableResultsMacros" /}}
+
+{{velocity wiki="false"}}
+#set($from =  "")
+#set($extra = "")
+#set($params = [])
+## Restrict to the list of wiki I can see
+#set ($extra = "${extra} and doc.name IN (")
+#set ($separator = "")
+#foreach ($wiki in $services.wiki.getAll())
+  ## XWiki.XWikiComments is a mandatory document that it must exists and we should have acces to it
+  #set ($testPageReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiComments'))
+  #if ($xwiki.hasAccessLevel('view', $xcontext.user, $testPageReference) || ($services.wiki.user.getUserScope($wiki.id)!='LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE') || $services.wiki.user.hasPendingInvitation($xcontext.userReference, $wiki.id))
+    #set ($extra = "${extra}${separator}'XWikiServer${stringtool.capitalize($wiki.id)}'")
+    #set ($separator = ",")
+  #end
+#end
+#set ($extra = "${extra})")
+## Restrict to templates only
+#if("$!request.onlyTemplates" == '1')
+  #set($from = "${from}, BaseObject objTemplate, IntegerProperty propTemplate")
+  #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value='1'")
+#end
+#set($columns = [])
+#foreach($c in $request.collist.split(","))
+  #if($c != 'membershipType')
+    #set($discard = $columns.add($c))
+  #end
+#end
+#gridresultwithfilter("$!request.classname" $columns "${from}" "${extra}" $params)
+{{/velocity}}</content>
+</xwikidoc>

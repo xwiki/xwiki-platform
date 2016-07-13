@@ -62,11 +62,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
         super(rta, null, null, null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ToggleInlineStyleExecutable#removeStyle(Text, int, int)
-     */
+    @Override
     protected TextFragment removeStyle(Text text, int firstCharIndex, int lastCharIndex)
     {
         // Make sure we remove the style only from the selected text.
@@ -228,11 +224,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
         } while (ancestor != null && ancestor != top);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ToggleInlineStyleExecutable#isExecuted()
-     */
+    @Override
     public boolean isExecuted()
     {
         // NOTE: This is just a trick that forces removeStyle to be called each time execute is called. Returning false
@@ -240,11 +232,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ToggleInlineStyleExecutable#getParameter()
-     */
+    @Override
     public String getParameter()
     {
         // No parameter.

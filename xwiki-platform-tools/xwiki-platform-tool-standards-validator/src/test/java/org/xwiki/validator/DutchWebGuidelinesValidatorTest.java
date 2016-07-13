@@ -53,7 +53,7 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     private String getErrors(DutchWebGuidelinesValidator validator)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         for (ValidationError error : validator.getErrors()) {
             buffer.append(error + "\n");

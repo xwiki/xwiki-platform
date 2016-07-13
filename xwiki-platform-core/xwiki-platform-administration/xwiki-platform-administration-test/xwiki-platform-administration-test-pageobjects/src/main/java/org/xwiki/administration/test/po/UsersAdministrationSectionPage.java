@@ -31,6 +31,8 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class UsersAdministrationSectionPage extends AdministrationSectionPage
 {
+    public static final String ADMINISTRATION_SECTION_ID = "Users";
+
     @FindBy(id = "addNewUser")
     private WebElement addNewUserButton;
 
@@ -44,14 +46,13 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
      */
     public static UsersAdministrationSectionPage gotoPage()
     {
-        UsersAdministrationSectionPage page = new UsersAdministrationSectionPage();
-        page.getDriver().get(page.getURL());
-        return page;
+        AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
+        return new UsersAdministrationSectionPage();
     }
 
     public UsersAdministrationSectionPage()
     {
-        super("Users");
+        super(ADMINISTRATION_SECTION_ID);
         usersLiveTable = new LiveTableElement("userstable");
     }
 

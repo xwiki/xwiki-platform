@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Defines the meta properties of a text area XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface XWikiRequest extends HttpServletRequest
 {
-    public String get(String name);
+    String get(String name);
 
-    public HttpServletRequest getHttpServletRequest();
+    HttpServletRequest getHttpServletRequest();
 
-    public Cookie getCookie(String cookieName);
+    Cookie getCookie(String cookieName);
 }

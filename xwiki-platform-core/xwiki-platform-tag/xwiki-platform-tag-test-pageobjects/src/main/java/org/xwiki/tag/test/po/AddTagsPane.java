@@ -54,7 +54,7 @@ public class AddTagsPane extends BaseElement
     /**
      * The XPATH expression used to locate the add button inside the {@link #addTagsForm}.
      */
-    private By addButtonLocator = By.xpath("//input[@type = 'submit' and @value = 'add']");
+    private By addButtonLocator = By.xpath("//form[@class = 'tag-add-form']//input[@type = 'submit']");
 
     /**
      * @param tags comma separated list of tags to add
@@ -74,7 +74,7 @@ public class AddTagsPane extends BaseElement
     public boolean add()
     {
         // Wait for no error notifications to be displayed because after that we wait for one to show up.
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -87,7 +87,7 @@ public class AddTagsPane extends BaseElement
 
         // Wait until the add tags panel disappears or
         // an error notification is shown to indicate something is wrong and the tag cannot be saved.
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -98,7 +98,7 @@ public class AddTagsPane extends BaseElement
         });
 
         // If the add tags panel is still visible then there was a problem adding the tags.
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.className(FORM_CLASS_NAME)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(By.className(FORM_CLASS_NAME)).size() == 0;
     }
 
     /**
@@ -106,6 +106,6 @@ public class AddTagsPane extends BaseElement
      */
     public void cancel()
     {
-        addTagsForm.findElement(By.xpath("//input[@type = 'reset' and @value = 'cancel']")).click();
+        addTagsForm.findElement(By.xpath("//form[@class = 'tag-add-form']//input[@type = 'reset']")).click();
     }
 }

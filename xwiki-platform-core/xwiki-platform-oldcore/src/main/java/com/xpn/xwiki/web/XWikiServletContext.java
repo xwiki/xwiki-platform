@@ -36,42 +36,42 @@ public class XWikiServletContext implements XWikiEngineContext
 
     public ServletContext getServletContext()
     {
-        return scontext;
+        return this.scontext;
     }
 
     @Override
     public Object getAttribute(String name)
     {
-        return scontext.getAttribute(name);
+        return this.scontext.getAttribute(name);
     }
 
     @Override
     public void setAttribute(String name, Object value)
     {
-        scontext.setAttribute(name, value);
+        this.scontext.setAttribute(name, value);
     }
 
     @Override
     public String getRealPath(String path)
     {
-        return scontext.getRealPath(path);
+        return this.scontext.getRealPath(path);
     }
 
     @Override
     public URL getResource(String name) throws MalformedURLException
     {
-        return scontext.getResource(name);
+        return this.scontext.getResource(name);
     }
 
     @Override
     public InputStream getResourceAsStream(String name)
     {
-        return scontext.getResourceAsStream(name);
+        return this.scontext.getResourceAsStream(name);
     }
 
     @Override
     public String getMimeType(String filename)
     {
-        return scontext.getMimeType(filename);
+        return this.scontext.getMimeType(filename);
     }
 }

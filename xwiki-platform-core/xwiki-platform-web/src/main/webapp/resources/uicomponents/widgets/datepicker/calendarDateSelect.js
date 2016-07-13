@@ -26,13 +26,19 @@ Element.buildAndAppend = function(type, options, style) {
 };
 var nil = null;
 
+/*!
+#set ($currentLocale = $services.localization.getCurrentLocale())
+#set ($dateFormatSymbols = $datetool.getDateFormatSymbols($currentLocale))
+#set ($calendar = $datetool.toCalendar(0, $currentLocale))
+*/
 Date.one_day = 24*60*60*1000;
-Date.weekdays = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerWeekDayNames'))".split(/\s*,\s*/);
-for(var i = 0; i < Date.weekdays.length; i++) {
-  Date.weekdays[i] = Date.weekdays[i].substring(0, 3);
+Date.first_day_of_week = $mathtool.sub($calendar.getFirstDayOfWeek(), 1);
+var weekdays = $jsontool.serialize($dateFormatSymbols.getWeekdays().subList(1, 8));
+Date.weekdays = []
+for(var i = 0; i < 7; i++) {
+  Date.weekdays[i] = weekdays[(i + Date.first_day_of_week) % 7].substring(0, 3);
 }
-Date.first_day_of_week = $services.localization.render('platform.appwithinminutes.classEditorDatePickerFirstWeekDay');
-Date.months = "$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorDatePickerMonthNames'))".split(/\s*,\s*/);
+Date.months = $jsontool.serialize($dateFormatSymbols.getMonths().subList(0, 12));
 Date.padded2 = function(hour) {
   var padded2 = parseInt(hour, 10);
   if (hour < 10) {

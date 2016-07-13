@@ -21,18 +21,20 @@ package org.xwiki.url;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
-import org.xwiki.url.internal.ExtendedURL;
+import org.xwiki.resource.CreateResourceReferenceException;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link org.xwiki.url.internal.ExtendedURL}.
+ * Unit tests for {@link ExtendedURL}.
  *
  * @version $Id$
  * @since 5.1M1
@@ -43,7 +45,7 @@ public class ExtendedURLTest
     public void withoutPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/some/path");
-        ExtendedURL extendedURL = new ExtendedURL(url);
+        ExtendedURL extendedURL = new ExtendedURL(url, null);
         assertEquals(new URI("http://localhost:8080/some/path"), extendedURL.getURI());
         assertEquals(2, extendedURL.getSegments().size());
         assertThat(extendedURL.getSegments(), hasItems("some", "path"));
@@ -60,6 +62,16 @@ public class ExtendedURLTest
     }
 
     @Test
+    public void withPrefixAndNoSlashAfter() throws Exception
+    {
+        URL url = new URL("http://localhost:8080/xwiki");
+        ExtendedURL extendedURL = new ExtendedURL(url, "xwiki");
+        assertEquals(new URI("http://localhost:8080/xwiki"), extendedURL.getURI());
+        assertEquals(0, extendedURL.getSegments().size());
+        assertTrue(extendedURL.getSegments().isEmpty());
+    }
+
+    @Test
     public void withPrefixStartingWithSlash() throws Exception
     {
         URL url = new URL("http://localhost:8080/xwiki/path");
@@ -70,13 +82,23 @@ public class ExtendedURLTest
     }
 
     @Test
+    public void withPrefixStartingWithSlashAndNoSlashAfter() throws Exception
+    {
+        URL url = new URL("http://localhost:8080/xwiki");
+        ExtendedURL extendedURL = new ExtendedURL(url, "/xwiki");
+        assertEquals(new URI("http://localhost:8080/xwiki"), extendedURL.getURI());
+        assertEquals(0, extendedURL.getSegments().size());
+        assertTrue(extendedURL.getSegments().isEmpty());
+    }
+
+    @Test
     public void withInvalidPrefix() throws Exception
     {
         URL url = new URL("http://localhost:8080/some/path");
         try {
             new ExtendedURL(url, "/xwiki");
             fail("Should have thrown an exception here");
-        } catch (URLCreationException e) {
+        } catch (CreateResourceReferenceException e) {
             assertEquals("URL Path [/some/path] doesn't start with [/xwiki]", e.getMessage());
         }
     }
@@ -84,8 +106,8 @@ public class ExtendedURLTest
     @Test
     public void equality() throws Exception
     {
-        ExtendedURL extendedURL1 = new ExtendedURL(new URL("http://localhost:8080/some/path"));
-        ExtendedURL extendedURL2 = new ExtendedURL(new URL("http://localhost:8080/some/path"));
+        ExtendedURL extendedURL1 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
+        ExtendedURL extendedURL2 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
         assertEquals(extendedURL1, extendedURL2);
     }
 
@@ -94,9 +116,9 @@ public class ExtendedURLTest
     {
         try {
             // Invalid URL since the space in the page name isn't encoded.
-            new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page name"));
+            new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page name"), null);
             fail("Should have thrown an exception here");
-        } catch (URLCreationException expected) {
+        } catch (CreateResourceReferenceException expected) {
             assertEquals("Invalid URL [http://host/xwiki/bin/view/space/page name]", expected.getMessage());
         }
     }
@@ -104,7 +126,8 @@ public class ExtendedURLTest
     @Test
     public void withEncodedChars() throws Exception
     {
-        ExtendedURL extendedURL = new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page%20name?param=%2D"));
+        ExtendedURL extendedURL =
+            new ExtendedURL(new URL("http://host/xwiki/bin/view/space/page%20name?param=%2D"), null);
         assertThat(extendedURL.getSegments(), hasItem("page name"));
         assertEquals("param=-", extendedURL.getURI().getQuery());
     }
@@ -115,14 +138,30 @@ public class ExtendedURLTest
     @Test
     public void ignoreSpecialPathParameters() throws Exception
     {
-        ExtendedURL extendedURL = new ExtendedURL(new URL(
-            "http://host/xwiki/bin/view/space;param1=value1/page;param2=value2"));
+        ExtendedURL extendedURL = new ExtendedURL(
+            new URL("http://host/xwiki/bin/view/space;param1=value1/page;param2=value2"), "xwiki");
         assertThat(extendedURL.getSegments(), hasItem("space"));
         assertThat(extendedURL.getSegments(), hasItem("page"));
 
         // Ensure we don't remove ";" when they are encoded in order to allow the ";" character to be in document names
         // for example.
-        extendedURL = new ExtendedURL(new URL("http://host/xwiki/bin/view/space/my%3Bpage"));
+        extendedURL = new ExtendedURL(new URL("http://host/xwiki/bin/view/space/my%3Bpage"), "xwiki");
         assertThat(extendedURL.getSegments(), hasItem("my;page"));
+    }
+
+    @Test
+    public void serialize() throws Exception
+    {
+        // Without parameters
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "with/slash", "with space"));
+        assertEquals("/one/with%2Fslash/with+space", extendedURL.serialize());
+        assertEquals("/one/with%2Fslash/with+space", extendedURL.toString());
+
+        // With parameters
+        Map<String, List<String>> parameters = new LinkedHashMap<>();
+        parameters.put("key1", Arrays.asList("value1"));
+        parameters.put("key2", Arrays.asList("value2", "value3"));
+        extendedURL = new ExtendedURL(Arrays.asList("one", "with/slash", "with space"), parameters);
+        assertEquals("/one/with%2Fslash/with+space?key1=value1&key2=value2&key2=value3", extendedURL.serialize());
     }
 }

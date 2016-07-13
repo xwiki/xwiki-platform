@@ -46,7 +46,7 @@ public class Period
     /**
      * Creates a new time Period from the specified start time to the specified end time. Both ends of the period are
      * given as time stamps (the number of milliseconds from 1970-01-01T00:00:00Z)
-     * 
+     *
      * @param start The period start as the number of milliseconds from 1970-01-01T00:00:00Z
      * @param end The period end as the number of milliseconds from 1970-01-01T00:00:00Z
      */

@@ -19,9 +19,12 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -34,7 +37,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListener;
+import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -61,7 +64,7 @@ import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 public class DefaultSecurityCache implements SecurityCache, Initializable
 {
     /** Default capacity for security cache. */
-    private static final int DEFAULT_CAPACITY = 500;
+    private static final int DEFAULT_CAPACITY = 10000;
 
     /** Separator used for composing key for the cache. */
     private static final String KEY_CACHE_SEPARATOR = "@@";
@@ -89,7 +92,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
-
+   
     /**
      * @return a new configured security cache
      * @throws InitializationException if a CacheException arise during creation
@@ -267,25 +270,66 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     this.parents.add(parent);
                     parent.addChild(this);
                 }
-                for (GroupSecurityReference group : groups) {
-                    if (group.equals(parentReference)) {
-                        continue;
-                    }
-                    SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
-                        ? DefaultSecurityCache.this.getShadowEntry(group,
-                            ((SecurityShadowEntry) entry).getWikiReference())
-                        : DefaultSecurityCache.this.getEntry(group);
-                    if (parent == null) {
-                        throw new ParentEntryEvictedException();
-                    }
-                    this.parents.add(parent);
-                    parent.addChild(this);
-                }
+                addParentGroups(groups, parentReference);
                 logNewEntry();
             } else {
                 this.parents = null;
                 logNewEntry();
             }
+        }
+
+        /**
+         * Add provided groups as parent of this entry, excluding the main parent reference.
+         *
+         * @param groups the list of groups to add.
+         * @param parentReference the main parent reference to exclude.
+         * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
+         */
+        private void addParentGroups(Collection<GroupSecurityReference> groups,
+            SecurityReference parentReference) throws ParentEntryEvictedException
+        {
+            for (GroupSecurityReference group : groups) {
+                if (group.equals(parentReference)) {
+                    continue;
+                }
+                SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
+                    ? DefaultSecurityCache.this.getShadowEntry(group,
+                        ((SecurityShadowEntry) entry).getWikiReference())
+                    : DefaultSecurityCache.this.getEntry(group);
+                if (parent == null) {
+                    throw new ParentEntryEvictedException();
+                }
+                this.parents.add(parent);
+                parent.addChild(this);
+            }
+        }
+
+        /**
+         * Update an existing cached security rule entry with parents groups if it does not have any already.
+         *
+         * @param groups the groups to be added to this entry, if null or empty nothing will be done.
+         * @throws ParentEntryEvictedException if one of the groups has been evicted from the cache.
+         */
+        boolean updateParentGroups(Collection<GroupSecurityReference> groups)
+            throws ParentEntryEvictedException
+        {            
+            if (isUser() || !(entry instanceof SecurityRuleEntry)) {
+                return false;
+            }
+
+            if (groups != null && !groups.isEmpty()) {
+                if (this.parents == null) {
+                    this.parents = new ArrayList<SecurityCacheEntry>(groups.size());
+                    addParentGroups(groups, null);
+                } else {
+                    SecurityCacheEntry parent = this.parents.iterator().next();
+                    this.parents = new ArrayList<SecurityCacheEntry>(groups.size() + 1);
+                    this.parents.add(parent);
+                    addParentGroups(groups, parent.entry.getReference());
+                }
+            }
+
+            return true;
         }
 
         /**
@@ -384,6 +428,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
                 }
             }
+        }
+
+        /**
+         * @return true if the entity is a user.
+         */
+        public boolean isUser()
+        {
+            return entry.getReference() instanceof UserSecurityReference;
         }
     }
 
@@ -515,13 +567,29 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private boolean isAlreadyInserted(String key, SecurityEntry entry) throws ConflictingInsertionException
     {
+        try {
+            return isAlreadyInserted(key, entry, null);
+        } catch (ParentEntryEvictedException e) {
+            // Impossible to reach
+            return true;
+        }
+    }
+
+    private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
         SecurityCacheEntry oldEntry = cache.get(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread have inserted an entry which is different from this entry!
-                throw new ConflictingInsertionException();               
+                throw new ConflictingInsertionException();
             }
-            // Another thread have already inserted this entry.
+            // If the user/group has been completed
+            if (oldEntry.updateParentGroups(groups)) {
+                // Upgrade it to a user/group entry
+                oldEntry.entry = entry;
+            }
+            
             return true;
         }
         // The slot is available
@@ -567,7 +635,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
         writeLock.lock();
         try {
-            if (isAlreadyInserted(key, entry)) {
+            if (isAlreadyInserted(key, entry, groups)) {
                 return;
             }
             cache.set(key, newSecurityCacheEntry(entry, groups));
@@ -594,11 +662,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
         if (entry instanceof SecurityRuleEntry) {
-            return (groups == null || groups.isEmpty())
+            return (groups == null)
                 ? new SecurityCacheEntry((SecurityRuleEntry) entry)
                 : new SecurityCacheEntry((SecurityRuleEntry) entry, groups);
         } else {
-            return (groups == null || groups.isEmpty())
+            return (groups == null)
                 ? new SecurityCacheEntry((SecurityShadowEntry) entry)
                 : new SecurityCacheEntry((SecurityShadowEntry) entry, groups);
         }
@@ -730,14 +798,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Listener for cache events, to properly dispose entries removed.
      */
-    private class Listener implements CacheEntryListener<SecurityCacheEntry>
+    private class Listener extends AbstractCacheEntryListener<SecurityCacheEntry>
     {
-        @Override
-        public void cacheEntryAdded(
-            CacheEntryEvent<SecurityCacheEntry> securityCacheEntryCacheEntryEvent)
-        {
-        }
-
         @Override
         public void cacheEntryRemoved(CacheEntryEvent<SecurityCacheEntry> event)
         {
@@ -751,11 +813,112 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 }
             }
         }
+    }
+    
+    @Override
+    public Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki)
+    {
+        Collection<GroupSecurityReference> groups = new HashSet<>();
+        
+        SecurityCacheEntry userEntry = (entityWiki != null) ? getShadowEntry(user, entityWiki) : getEntry(user);
+        
+        // If the user is not in the cache, or if it is, but not as a user, but as a regular document
+        if (userEntry == null || !userEntry.isUser()) {
+            // In that case, the ancestors are not fully loaded
+            return null;
+        }
 
-        @Override
-        public void cacheEntryModified(
-            CacheEntryEvent<SecurityCacheEntry> securityCacheEntryCacheEntryEvent)
-        {
+        // We are going to get the parents of the security cache entry recursively, that is why we use a stack
+        // (instead of using the execution stack which would be more costly).
+        Deque<SecurityCacheEntry> entriesToExplore = new ArrayDeque<>();
+        
+        // Special case if the user is a shadow.
+        if (entityWiki != null) {
+            // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
+            addParentsWhenEntryIsShadow(userEntry, user, groups, entriesToExplore);
+        } else {
+            // We start with the current user
+            entriesToExplore.add(userEntry);
+        }
+        
+        // Let's go
+        while (!entriesToExplore.isEmpty()) {
+            SecurityCacheEntry entry = entriesToExplore.pop();
+            
+            // We add the parents of the current entry
+            addParentsToTheListOfEntriesToExplore(entry.parents, groups, entriesToExplore);
+            
+            // If the entry has a shadow (in the concerned subwiki), we also add the parents of the shadow
+            if (entityWiki != null) {
+                GroupSecurityReference entryRef = (GroupSecurityReference) entry.getEntry().getReference();
+                if (entryRef.isGlobal()) {
+                    SecurityCacheEntry shadow = getShadowEntry(entryRef, entityWiki);
+                    if (shadow != null) {
+                        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, entry);
+                    }
+                }
+            }
+        }
+        
+        return groups;
+    }
+    
+    private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore)
+    {
+        SecurityCacheEntry originalEntry = getEntry(user);
+
+        // We add the parents of the original (but not the original, otherwise we could have the same group twice)
+        addParentsToTheListOfEntriesToExplore(originalEntry.parents, groups, entriesToExplore);
+        // And we add the parent groups of the shadow
+        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, originalEntry);
+    }
+
+    /**
+     * Add the parents of an entry to the list of entries to explore.
+     *
+     * @param parents the parents of the entry
+     * @param groups the collection where we store the found groups
+     * @param entriesToExplore the collection holding the entries we still have to explore
+     */
+    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore)
+    {
+        addParentsToTheListOfEntriesToExplore(parents, groups, entriesToExplore, null);
+    }
+
+    /**
+     * Add the parents of an entry to the list of entries to explore.
+     *
+     * @param parents the parents of the entry
+     * @param groups the collection where we store the found groups
+     * @param entriesToExplore the collection holding the entries we still have to explore
+     * @param originalEntry the original entry of the current entry (if the current entry is a shadow), null otherwise
+     */
+    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore, SecurityCacheEntry originalEntry)
+    {
+        if (parents == null) {
+            return;
+        }
+        
+        for (SecurityCacheEntry parent : parents) {            
+            // skip this parent if the entry is a shadow and the parent is the original entry
+            // (ie: don't explore the original entry)
+            if (originalEntry != null && parent == originalEntry) {
+                continue;
+            }
+            
+            // Add the parent group (if we have not already seen it)
+            SecurityReference parentRef = parent.getEntry().getReference();
+            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
+                entriesToExplore.add(parent);
+            }
         }
     }
+
+    
 }

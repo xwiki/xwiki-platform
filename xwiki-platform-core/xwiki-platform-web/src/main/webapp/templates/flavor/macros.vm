@@ -1,0 +1,108 @@
+########################################################
+## Display a custom picker to select a flavor.
+## -----------------------------
+##
+## @param $fieldName name of the input field (has to be a valid XML id)
+## @param $defaultValue the default flavor to use (extension id, eg: "org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki-6.4.5")
+## @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first flavor
+## @param $cssClass class to add to the div (could be 'xwiki-flavor-select-small', 'xwiki-flavor-select-medium', 'xwiki-flavor-select-tall' or any other class)
+## @param $noFlavorButton display the no flavor button
+#########################################################
+#macro(displayFlavorPicker $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $noFlavorButton)
+  ## TODO: put this in a webjar instead
+  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true}))
+  <div class="xwiki-flavor-picker $!cssClass">
+    ## Filter
+    <input type="text" id="${escapetool.xml($fieldName)}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>
+    ## Results
+    <div class="ui-progress-background hidden" id="xwiki-flavor-picker-progress-background">
+      <div class="ui-progress-bar green" id="xwiki-flavor-picker-progress-bar"/>
+      #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
+      ###if ($flavorSearchJobStatus)
+      ##  <input type="hidden" value="$flavorSearchJobStatus.state"/>
+      ###else
+        <input type="hidden" value=""/>
+      ###end
+    </div>
+    <div class="xwiki-flavor-picker-results-container">
+      #displayFlavorPicker_results($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, 0)
+    </div>
+    ## No flavor option
+    #if($noFlavorButton)
+      <input type="radio" name="${escapetool.xml($fieldName)}" value="noFlavor" id="${escapetool.xml($fieldName)}_noFlavor" class="xwiki-flavor-picker-noflavor" #if($defaultValue=='noFlavor')checked="checked"#end>
+      <label for="${escapetool.xml($fieldName)}_noFlavor">$services.localization.render('flavor.picker.noflavor')</label>
+    #end
+  </div>
+#end
+##
+#macro(displayFlavorPicker_results $fieldName $defaultValue $firstIsDefaultIfDefaultNull $offset)
+  #set ($resultsPerPage = 20)
+  #if ("$!request.filter" != '')
+    #set ($flavorQuery = $services.flavor.createFlavorQuery($request.filter))
+  #else
+    #set ($flavorQuery = $services.flavor.createFlavorQuery())
+  #end
+  ##set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
+  #set ($flavorSearchJobStatus = $services.flavor.getSearchValidFlavorsStatus())
+  #if (!$flavorSearchJobStatus)
+    #set ($flavorSearchJob = $services.flavor.searchValidFlavors())
+    #set ($flavorSearchJobStatus = $flavorSearchJob.status)
+  #end
+  #set ($flavors = $flavorSearchJobStatus.flavors)
+  #*
+  #set ($jobFlavors = $flavorSearchJobStatus.flavors)
+  ## TODO: put back pagination
+  ## Apply offset
+  #set ($flavors = $jobFlavors.subList($offset, $jobFlavors.size()))
+  ## Apply limit
+  #if ($resultsPerPage > 0)
+    #if ($resultsPerPage > $flavors.size())
+      #set($limit = $flavors.size())
+    #else
+      #set($limit = $resultsPerPage)
+    #end
+    #set ($flavors = $flavors.subList(0, $limit))
+  #end
+  *#
+  <div class="xwiki-flavor-picker-results">
+    <input type="hidden" name="fieldName" value="${escapetool.xml($fieldName)}" />
+    <ul>
+    #*
+    #foreach ($flavor in $flavors)
+      #set ($value = "${flavor.id.id}:::${flavor.id.version}")
+      #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+        #set ($checked = 'checked="checked"')
+        #set ($class = 'xwiki-flavor-picker-option-selected')
+      #else
+        #set ($checked = '')
+        #set ($class = '')
+      #end
+      <li class="xwiki-flavor-picker-option $class">
+        <input type="radio" name="${escapetool.xml($fieldName)}" value="$escapetool.xml($value)" id="${escapetool.xml($fieldName)}_${velocityCount}" $checked/>
+        <span class="xwiki-flavor-picker-option-icon">$services.icon.renderHTML('wiki')</span>
+        <div>
+          <label for="${escapetool.xml($fieldName)}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end#if($flavor.name)$escapetool.xml($flavor.name)#else$flavor.id.id#end#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
+          #if ($flavor.authors.size() > 0)
+            <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
+          #end
+          #if ("$!flavor.summary" != '')
+            <p class="xHint">$flavor.summary</p>
+          #end
+        </div>
+      </li>
+    #end
+    *#
+    </ul>
+    ## TODO: put back pagination
+    #*
+    #set($paginationParameters = {
+      'url' : $xwiki.relativeRequestURL,
+      'totalItems' : $jobFlavors.size(),
+      'defaultItemsPerPage' : $resultsPerPage,
+      'position': 'top'
+    })
+    #pagination($paginationParameters)
+    *#
+  </div>
+#end

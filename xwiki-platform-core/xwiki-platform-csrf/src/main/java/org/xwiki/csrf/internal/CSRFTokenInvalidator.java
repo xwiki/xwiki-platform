@@ -41,7 +41,7 @@ import org.xwiki.observation.event.Event;
  */
 // FIXME This is currently disabled because at the time this event is sent, the user has already been removed from the
 // context, so we're messing things up for guests.
-@Component
+@Component(staticRegistration = false)
 @Named("csrf-token-invalidator")
 @Singleton
 public class CSRFTokenInvalidator implements EventListener

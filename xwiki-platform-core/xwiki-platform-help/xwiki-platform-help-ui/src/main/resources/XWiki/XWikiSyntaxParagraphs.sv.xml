@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497947000</date>
+  <contentUpdateDate>1301497947000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Redigera =
+
+== Stycken ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Paragraphs ===
+
+Stycken är textelement som separeras av två eller flera nyradstecken.
+
+{{info}}
+I XWiki syntax 2.0 är nyradstecken signifikanta, vilket inte är fallet i XWiki syntax 1.0 och i Creole.
+{{/info}}
+
+(% style="width:100%" %)
+|=Formateringstyp|=XWiki syntax 1.0|=Resultat
+|Stycke|Detta är ett stycke|Detta är ett stycke
+|Flerradigt stycke|Stycke med{{{\\}}}\\flera rader|Stycke med\\flera rader
+|Två stycken|Stycke ett\\\\Stycke två|Stycke ett\\\\Stycke två
+|Parametriserade stycken|&lt;p style="text-align:center;color:blue"&gt;Centrerat stycke med blå text&lt;/p&gt;|(% style="text-align:center;color:blue" %)\\Centrerat stycke med blå text
+
+=== 2.0 Paragraphs ===
+
+Stycken är textelement som separeras av två eller flera nyradstecken.
+
+{{info}}
+I XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}} är nyradstecken signifikanta, vilket inte är fallet i XWiki syntax 1.0 och i Creole.
+{{/info}}
+
+(% style="width:100%" %)
+|=Formateringstyp|=XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Stycke|Detta är ett stycke|Detta är ett stycke
+|Flerradigt stycke|Stycke med\\flera rader|Stycke med\\flera rader
+|Två stycken|Stycke ett\\\\Stycke två|Stycke ett\\\\Stycke två
+|Parametriserade stycken|{{{(% style="text-align:center;color:blue" %)}}}\\Centrerat stycke med blå text|(% style="text-align:center;color:blue" %)\\Centrerat stycke med blå text
+</content>
+</xwikidoc>

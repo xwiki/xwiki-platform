@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxScripts</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497979000</date>
+  <contentUpdateDate>1301497979000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxScripts</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programmering =
+
+== Skript ==
+
+=== 1.0 Skript-koder ===
+
+{{info}}I XWiki Syntax 1.0 var det muligt at indsætte Velocity-kode direkte i siden. Dette kan føre til problemer, når f.eks. brugeren ved et uheld indsætter Velocity-kommandoer. Det overbelaster også sider, der ikke har brug for Velocity-indhold. Der er andre tekniske begrænsninger. Det samme gælder Groovy-kode.{{/info}}
+
+|=Feature|=XWiki Syntax 1.0
+|Velocity script|((({{{
+#set ($var = "whatever")
+}}})))
+|Groovy script|((({{{
+&lt;%
+def var = "whatever"
+%&gt;
+}}})))
+
+=== 2.0 Skript-koder ===
+
+{{info}}I XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} skal Velocity-koder ved at bruge ###velocity### makroer. Det samme gælder for Groovy-koder.{{/info}}
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
+|Velocity script|((({{{
+{{velocity}}
+#set ($var = "whatever")
+{{/velocity}}
+}}})))
+|Groovy script|((({{{
+{{groovy}}
+def var = "whatever"
+{{/groovy}}
+}}})))</content>
+</xwikidoc>

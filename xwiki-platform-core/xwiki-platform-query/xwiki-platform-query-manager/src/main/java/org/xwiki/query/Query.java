@@ -36,10 +36,12 @@ public interface Query
      * Indicator for Hibernate Query Language.
      */
     String HQL = "hql";
+
     /**
      * Indicator for XPath language.
      */
     String XPATH = "xpath";
+
     /**
      * Indicator for XWiki Query Language.
      */
@@ -140,13 +142,13 @@ public interface Query
     Query setOffset(int offset);
 
     /**
-     * @return limit  limit of result list.
+     * @return limit limit of result list.
      * @see #setLimit(int)
      */
     int getLimit();
 
     /**
-     * @return offset  offset of query result.
+     * @return offset offset of query result.
      * @see #setOffset(int)
      */
     int getOffset();

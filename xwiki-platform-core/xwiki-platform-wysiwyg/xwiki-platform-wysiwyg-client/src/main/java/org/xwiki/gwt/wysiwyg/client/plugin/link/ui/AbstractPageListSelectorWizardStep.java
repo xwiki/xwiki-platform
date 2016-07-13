@@ -58,27 +58,18 @@ public abstract class AbstractPageListSelectorWizardStep extends
         display().addStyleName("xPagesSelector");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectHelpLabel()
     {
         return Strings.INSTANCE.linkSelectWikipageHelpLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSelectErrorMessage()
     {
         return Strings.INSTANCE.linkNoPageSelectedError();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<WikiPage> getListItem(WikiPage data)
     {
@@ -110,12 +101,10 @@ public abstract class AbstractPageListSelectorWizardStep extends
     protected String serializeDocumentReference(WikiPageReference reference)
     {
         String separator = " \u00BB ";
-        return reference.getWikiName() + separator + reference.getSpaceName() + separator + reference.getPageName();
+        return reference.getWikiName() + separator + reference.getSpacePrettyName() + separator
+            + reference.getPageName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ListItem<WikiPage> getNewOptionListItem()
     {
@@ -127,9 +116,7 @@ public abstract class AbstractPageListSelectorWizardStep extends
         return item;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getNextStep()
     {
         // check out the selection, if it's a new page option

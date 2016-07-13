@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.office;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +31,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
-import org.xwiki.office.viewer.OfficeViewer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.office.OfficeMacroParameters;
@@ -54,7 +61,10 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
      * The component used to view the office attachments.
      */
     @Inject
-    private OfficeViewer officeViewer;
+    private OfficeResourceViewer officeViewer;
+
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * Used to transform the passed attachment reference macro parameter into a typed {@link AttachmentReference}
@@ -63,6 +73,13 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
     @Inject
     @Named("macro")
     private AttachmentReferenceResolver<String> macroAttachmentReferenceResolver;
+
+    @Inject
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * Default constructor.
@@ -79,11 +96,20 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
     public List<Block> execute(OfficeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        AttachmentReference attachmentReference = resolve(context.getCurrentMacroBlock(), parameters);
-        Map<String, String> viewParameters =
-            Collections.singletonMap("filterStyles", String.valueOf(parameters.isFilterStyles()));
+        // Check if the office server is started and if not, generate an error.
+        if (!this.officeServer.getState().equals(OfficeServer.ServerState.CONNECTED)) {
+            throw new MacroExecutionException("The wiki needs to be connected to an office server in order to view "
+                + "office files. Ask your administrator to configure such a server.");
+        }
+
+        ResourceReference resourceReference = getResourceReference(context.getCurrentMacroBlock(), parameters);
+
+        Map<String, Object> viewParameters = new HashMap<String, Object>();
+        viewParameters.put("filterStyles", parameters.isFilterStyles());
+        viewParameters.put("ownerDocument", getOwnerDocument(context.getCurrentMacroBlock()));
+
         try {
-            return this.officeViewer.createView(attachmentReference, viewParameters).getChildren();
+            return this.officeViewer.createView(resourceReference, viewParameters).getChildren();
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to view office attachment.", e);
         }
@@ -95,24 +121,40 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
         return false;
     }
 
-    /**
-     * Transform the value of the 'attachment' macro parameter into a typed {@link AttachmentReference} object.
-     * 
-     * @param block an XDOM block that can provide meta data to be used to resolve the attachment reference
-     * @param parameters the macro parameters, including the 'attachment' parameter
-     * @return the typed {@link AttachmentReference} object that points to the office file to display
-     * @throws MacroExecutionException if the attachment parameter is not specified or empty
-     */
-    private AttachmentReference resolve(MacroBlock block, OfficeMacroParameters parameters)
+    private DocumentReference getOwnerDocument(MacroBlock block)
+    {
+        return this.macroDocumentReferenceResolver.resolve("", block);
+    }
+
+    private ResourceReference getResourceReference(MacroBlock block, OfficeMacroParameters parameters)
         throws MacroExecutionException
     {
-        String reference = parameters.getAttachment();
+        ResourceReference resourceReference = parameters.getReference();
 
-        if (StringUtils.isEmpty(reference)) {
-            throw new MacroExecutionException(
-                "You must specify the 'attachment' parameter pointing to the office file to display.");
+        // Default reference is attachment
+        // Make sure to provide full reference for attachment
+        if (resourceReference == null || resourceReference.getType().equals(ResourceType.ATTACHMENT)
+            || !resourceReference.isTyped()) {
+            AttachmentReference attachmentReference;
+
+            if (resourceReference == null) {
+                // Support former way of indicating the file to view
+                String reference = parameters.getAttachment();
+
+                if (StringUtils.isEmpty(reference)) {
+                    throw new MacroExecutionException(
+                        "You must specify the 'reference' parameter pointing to the office file to display.");
+                }
+
+                attachmentReference = this.macroAttachmentReferenceResolver.resolve(reference, block);
+            } else {
+                attachmentReference =
+                    this.macroAttachmentReferenceResolver.resolve(resourceReference.getReference(), block);
+            }
+
+            resourceReference = new AttachmentResourceReference(this.serializer.serialize(attachmentReference));
         }
 
-        return this.macroAttachmentReferenceResolver.resolve(reference, block);
+        return resourceReference;
     }
 }

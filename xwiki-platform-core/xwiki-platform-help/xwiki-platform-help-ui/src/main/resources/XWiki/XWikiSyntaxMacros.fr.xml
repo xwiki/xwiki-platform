@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxMacros</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1380707156000</date>
+  <contentUpdateDate>1380707156000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxMacros</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programmer =
+
+== Macros ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Macros ===
+
+En syntaxe XWiki 1.0, il y a deux types de macros:
+
+* Les macros Velocity appelées en utilisant la syntaxe ###macroname(param1 ... paramN)##
+* Les macros Radeox appelées en utilisant la syntaxe ##{macroname:param1=value1|...|paramN=valueN}##
+
+{{info}}
+Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0
+|Macro Velocity|(((
+{{{#info("Un fragment de texte")}}}
+)))
+|Macros Radeox|(((
+{{{{code:java}
+Du contenu Java
+{code}}}}
+)))
+
+=== 2.0 Macros ===
+
+En syntaxe XWiki 2.0, il y a aussi deux types de macros:
+
+* Les macros Velocity appelées en utilisant la syntaxe ##~#macroname(param1 ... paramN)## dans la Macro Velocity
+* Les macros XWiki appelées en utilisant la syntaxe##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}##
+
+{{info}}
+Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Macro|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+
+{{info}}
+Les macros Radeox ne peuvent pas être utilisées en syntaxe XWiki 2.0. C'est la raison pour laquelle elles ont été ré-écrites comme des macros XWiki. 
+{{/info}}</content>
+</xwikidoc>

@@ -31,7 +31,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -40,11 +42,13 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
 
 /**
- * Converts HTML into/from xwiki/2.0 syntax.
+ * Converts HTML into/from markup syntax.
  * 
  * @version $Id$
  */
@@ -52,6 +56,8 @@ import org.xwiki.rendering.transformation.TransformationContext;
 @Singleton
 public class DefaultHTMLConverter implements HTMLConverter
 {
+    private static final String TRANSFORMATION_ID = "wysiwygtxid";
+
     /**
      * Logger.
      */
@@ -85,6 +91,12 @@ public class DefaultHTMLConverter implements HTMLConverter
     private SyntaxFactory syntaxFactory;
 
     /**
+     * Used to update the rendering context.
+     */
+    @Inject
+    private RenderingContext renderingContext;
+
+    /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
      * <p>
      * NOTE: We execute only macro transformations because they are the only transformations protected by the WYSIWYG
@@ -110,21 +122,22 @@ public class DefaultHTMLConverter implements HTMLConverter
      * syntax.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
     {
         try {
             // Clean
-            String html = htmlCleaner.clean(dirtyHTML);
+            String html = this.htmlCleaner.clean(dirtyHTML);
 
             // Parse & Render
             // Note that transformations are not executed when converting XHTML to source syntax.
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory printRendererFactory =
-                componentManager.getInstance(PrintRendererFactory.class, syntaxId);
-            xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
+                this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
+            this.xhtmlStreamParser.parse(new StringReader(html), printRendererFactory.createRenderer(printer));
 
             return printer.toString();
         } catch (Exception e) {
@@ -138,18 +151,15 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Parse
-            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
+            Parser parser = this.contextComponentManager.getInstance(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
-            // Execute macro transformations
-            TransformationContext txContext = new TransformationContext();
-            txContext.setXDOM(xdom);
-            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntaxId));
-            macroTransformation.transform(xdom, txContext);
+            // Execute the macro transformation
+            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            xhtmlRenderer.render(xdom, printer);
+            this.xhtmlRenderer.render(xdom, printer);
 
             return printer.toString();
         } catch (Exception e) {
@@ -163,31 +173,42 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Clean
-            String html = htmlCleaner.clean(dirtyHTML);
+            String html = this.htmlCleaner.clean(dirtyHTML);
 
             // Parse
-            XDOM xdom = xhtmlParser.parse(new StringReader(html));
+            XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
 
             // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
             // data is used as the default syntax for macro content. We have to change this to the specified syntax
             // because HTML is used only to be able to edit the source syntax in the WYSIWYG editor.
-            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+            Syntax syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
-            // Execute macro transformations
-            TransformationContext txContext = new TransformationContext();
-            txContext.setXDOM(xdom);
-            txContext.setSyntax(syntax);
-            macroTransformation.transform(xdom, txContext);
+            // Execute the macro transformation
+            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            xhtmlRenderer.render(xdom, printer);
+            this.xhtmlRenderer.render(xdom, printer);
 
             return printer.toString();
         } catch (Exception e) {
             this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while refreshing HTML", e);
         }
+    }
+
+    private void executeMacroTransformation(XDOM xdom, Syntax syntax) throws TransformationException, ParseException
+    {
+        TransformationContext txContext = new TransformationContext();
+        txContext.setXDOM(xdom);
+        txContext.setSyntax(syntax);
+
+        // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
+        // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined
+        // in the first one...
+        txContext.setId(TRANSFORMATION_ID);
+
+        ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation, txContext, xdom);
     }
 }

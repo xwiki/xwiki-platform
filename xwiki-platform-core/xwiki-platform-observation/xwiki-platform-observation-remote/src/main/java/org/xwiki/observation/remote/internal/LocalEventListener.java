@@ -41,7 +41,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 /**
  * Register to {@link org.xwiki.observation.ObservationManager} for all events and send them to
  * {@link RemoteObservationManager}.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -85,7 +85,7 @@ public class LocalEventListener implements EventListener
         List<Event> events;
 
         if (this.configuration.isEnabled()) {
-            events = Collections.<Event> singletonList(AllEvent.ALLEVENT);
+            events = Collections.<Event>singletonList(AllEvent.ALLEVENT);
         } else {
             events = Collections.emptyList();
         }

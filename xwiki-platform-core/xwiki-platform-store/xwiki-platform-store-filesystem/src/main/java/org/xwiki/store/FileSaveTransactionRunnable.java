@@ -99,7 +99,9 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
 
     /**
      * {@inheritDoc}
+     * <p>
      * Obtain the lock and make sure the temporary and backup files are deleted.
+     * </p>
      *
      * @see TransactionRunnable#preRun()
      */
@@ -111,7 +113,9 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
 
     /**
      * {@inheritDoc}
+     * <p>
      * Write the data from the provider to the temporary file.
+     * </p>
      *
      * @see TransactionRunnable#run()
      */
@@ -139,8 +143,10 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
 
     /**
      * {@inheritDoc}
+     * <p>
      * Move whatever is in the main file location into backup and move
      * the temp file into the main location.
+     * </p>
      *
      * @see TransactionRunnable#onCommit()
      */
@@ -152,11 +158,6 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
         this.tempFile.renameTo(this.toSave);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see TransactionRunnable#onRollback()
-     */
     protected void onRollback()
     {
         // If this is false then we know run() has not yet happened and we know there is nothing to do.
@@ -171,8 +172,10 @@ public class FileSaveTransactionRunnable extends StartableTransactionRunnable<Tr
 
     /**
      * {@inheritDoc}
+     * <p>
      * Once this is called, there is no going back.
      * Remove temporary and backup files and unlock the lock.
+     * </p>
      *
      * @see TransactionRunnable#onComplete()
      */

@@ -19,18 +19,14 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.EventListener;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -42,13 +38,8 @@ import org.xwiki.observation.event.Event;
 @Component
 @Singleton
 @Named("distribution.wiki.WikiDistributionWikiEventListener")
-public class WikiDistributionWikiEventListener implements EventListener
+public class WikiDistributionWikiEventListener extends AbstractEventListener
 {
-    /**
-     * The list of events observed.
-     */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new WikiCopiedEvent(), new WikiDeletedEvent());
-
     /**
      * The component used to get information about the current distribution.
      */
@@ -56,21 +47,11 @@ public class WikiDistributionWikiEventListener implements EventListener
     private DistributionManager distributionManager;
 
     /**
-     * The logger.
+     * Setup event listener properties.
      */
-    @Inject
-    private Logger logger;
-
-    @Override
-    public String getName()
+    public WikiDistributionWikiEventListener()
     {
-        return "distribution.wiki.WikiDistributionWikiEventListener";
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
+        super("distribution.wiki.WikiDistributionWikiEventListener", new WikiCopiedEvent(), new WikiDeletedEvent());
     }
 
     @Override

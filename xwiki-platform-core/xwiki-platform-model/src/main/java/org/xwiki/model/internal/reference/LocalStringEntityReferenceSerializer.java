@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -31,12 +34,31 @@ import org.xwiki.model.reference.EntityReference;
  * 
  * @version $Id$
  * @since 2.2M1
- * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
  */
-@Deprecated
-@Component("local")
+@Component
+@Named("local")
+@Singleton
 public class LocalStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
+    /**
+     * Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme.
+     */
+    public LocalStringEntityReferenceSerializer()
+    {
+        // Empty constructor, to be used by the Component Manager, which will also inject the Symbol Scheme
+    }
+
+    /**
+     * Constructor to be used when using this class as a POJO and not as a component.
+     *
+     * @param symbolScheme the scheme to use for serializing the passed references (i.e. defines the separators to use
+     *        between the Entity types, and the characters to escape and how to escape them)
+     */
+    public LocalStringEntityReferenceSerializer(SymbolScheme symbolScheme)
+    {
+        super(symbolScheme);
+    }
+
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)

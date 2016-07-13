@@ -1,0 +1,36 @@
+## Serialize in JSON a XAR package descriptor
+## @since 7.2M2
+#############################################
+$response.setContentType("application/json")
+#if("$!request.document" == "")
+ #set($packageDoc = $doc)
+#else 
+ #set($packageDoc = $xwiki.getDocument($request.document))
+#end
+#if("$!request.package" == "")
+ #set($error = "No package name was given")
+#else
+ #set($attachment = $packageDoc.getAttachment($request.package))
+ #if ($attachment)
+  #set($package = $services.xar.getXarPackage($attachment.contentInputStream, true))
+  #set($infos = {
+      "name" : $package.packageName,
+      "description" : $package.packageDescription,
+      "licence" : $package.packageLicense,
+      "author" : $package.packageAuthor,
+      "version" : $package.packageVersion,
+      "backup" : $package.isPackageBackupPack(),
+      "extension": $package.getPackageExtensionId()
+    })
+
+  #set($json = {
+      "infos" : $infos,
+      "entities" : $services.model.toTree($package.entries)
+    })
+
+   $jsontool.serialize($json)
+ #else
+  #set($error = "XAR package not found")
+ #end
+#end
+#if("$!error" != "") {"error":  "$error"} #end

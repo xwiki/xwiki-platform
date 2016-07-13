@@ -78,6 +78,8 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
         this.hook = hook;
 
         textArea = new TextArea();
+        textArea.setEnabled(!hook.getPropertyBoolean("disabled"));
+        textArea.setReadOnly(hook.getPropertyBoolean("readOnly"));
         textArea.setStyleName("xPlainTextEditor");
         textArea.setHeight(Math.max(hook.getOffsetHeight(), 100) + "px");
         textArea.addBlurHandler(this);
@@ -135,22 +137,14 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
         return loading;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see BlurHandler#onBlur(BlurEvent)
-     */
+    @Override
     public void onBlur(BlurEvent event)
     {
         // Update the value of the hook element in case it is submitted.
         submit();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClosingHandler#onWindowClosing(ClosingEvent)
-     */
+    @Override
     public void onWindowClosing(ClosingEvent event)
     {
         // Allow the browser to cache the plain text when the user navigates away from the current page.

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -37,7 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectAtPageVersionResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectAtPageVersionResourceImpl")
 public class ObjectAtPageVersionResourceImpl extends XWikiResource implements ObjectAtPageVersionResource
 {
     @Override
@@ -50,7 +52,7 @@ public class ObjectAtPageVersionResourceImpl extends XWikiResource implements Ob
             Document doc = documentInfo.getDocument();
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             xwikiDocument = Utils.getXWiki(componentManager)
                     .getDocument(xwikiDocument, doc.getVersion(), Utils.getXWikiContext(componentManager));

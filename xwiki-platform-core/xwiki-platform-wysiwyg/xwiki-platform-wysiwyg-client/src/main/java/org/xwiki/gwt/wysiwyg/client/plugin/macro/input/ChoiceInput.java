@@ -39,32 +39,20 @@ public class ChoiceInput extends AbstractInput
         initWidget(list);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#setFocus(boolean)
-     */
+    @Override
     public void setFocus(boolean focused)
     {
         ((Focusable) getWidget()).setFocus(focused);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#getValue()
-     */
+    @Override
     public String getValue()
     {
         ListBox list = (ListBox) getWidget();
         return list.getSelectedIndex() < 0 ? null : list.getValue(list.getSelectedIndex());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInput#setValue(String)
-     */
+    @Override
     public void setValue(String value)
     {
         ((ListBox) getWidget()).setSelectedIndex(indexOf(value));

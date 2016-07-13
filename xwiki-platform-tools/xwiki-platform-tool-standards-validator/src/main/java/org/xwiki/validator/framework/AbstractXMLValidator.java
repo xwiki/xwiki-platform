@@ -29,8 +29,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xwiki.validator.ValidationError;
-import org.xwiki.validator.Validator;
 import org.xwiki.validator.ValidationError.Type;
+import org.xwiki.validator.Validator;
 
 /**
  * XML based standard validator.
@@ -47,12 +47,12 @@ public abstract class AbstractXMLValidator implements Validator
     /**
      * Error handler.
      */
-    private XMLErrorHandler errorHandler = new XMLErrorHandler();
+    protected XMLErrorHandler errorHandler = new XMLErrorHandler();
 
     /**
      * XML document builder.
      */
-    private DocumentBuilder documentBuilder;
+    protected DocumentBuilder documentBuilder;
 
     /**
      * Indicate if the XML itself is validated.

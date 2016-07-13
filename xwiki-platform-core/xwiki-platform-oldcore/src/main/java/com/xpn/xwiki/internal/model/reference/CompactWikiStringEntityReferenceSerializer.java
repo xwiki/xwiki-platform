@@ -19,24 +19,30 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Generate an entity reference string that doesn't contain the wiki reference part if the passed reference matches the
  * current wiki. The space reference and page references are always printed.
- * 
+ *
  * @version $Id$
  * @since 2.2M1
  */
-@Component("compactwiki")
+@Component
+@Named("compactwiki")
+@Singleton
 public class CompactWikiStringEntityReferenceSerializer extends CompactStringEntityReferenceSerializer
 {
     @Override
-    protected String resolveDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
     {
         if (type == EntityType.WIKI) {
-            return super.resolveDefaultValue(type, parameters);
+            return super.resolveDefaultReference(type, parameters);
         }
 
         return null;

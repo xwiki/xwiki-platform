@@ -1,0 +1,43 @@
+#######################################################
+###                BACKLINKS PAGE
+###              ------------------
+#######################################################
+##
+#######################################################
+##                   HEADER
+#######################################################
+#if($request.xpage == 'backlinks')
+  #template("startpage.vm")
+    <div class="main layoutsubsection">
+      <div id="mainContentArea">
+        <div class="xcontent">
+#end
+#######################################################
+##                   TITLE
+#######################################################
+#set($titleToDisplay = $services.localization.render('core.backlinks.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+#template('contentheader.vm')
+#######################################################
+##                  CONTENT
+#######################################################
+#set($backLinks = $doc.getBacklinks())
+#if ($backLinks.isEmpty())
+  <p>$services.localization.render('core.backlinks.noBackLink')</p>
+#else
+  <p>$services.localization.render('core.backlinks.description')</p>
+  <ul>
+    #foreach($docName in $backLinks)
+      #set($rdoc = $xwiki.getDocument($docName).getTranslatedDocument())
+      <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
+    #end
+  </ul>
+#end
+#######################################################
+##                   FOOTER
+#######################################################
+#if($request.xpage == 'backlinks')
+        </div> ## xcontent
+      </div> ## mainContentArea
+    </div> ## main
+  #template("endpage.vm")
+#end

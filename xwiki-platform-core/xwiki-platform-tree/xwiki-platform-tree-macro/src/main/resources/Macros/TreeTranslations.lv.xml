@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Macros.Tree</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1424704114000</creationDate>
+  <date>1424704928000</date>
+  <contentUpdateDate>1424704928000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+rendering.macro.tree.content.description=Lai aprakstītu koka struktūru, jūs varat izmantot iegultu HTML. Papildu informācijai skatiet http\://www.jstree.com/docs/html/
+rendering.macro.tree.description=Parāda koka hierarhiju saskaņā ar makrosa saturu un parametriem
+rendering.macro.tree.name=Koks
+rendering.macro.tree.parameter.checkboxes.description=Vai rādīt izvēles rūtiņu visiem koka zariem, lai ļautu iezīmēt uzreiz vairākus koka mezglus.
+rendering.macro.tree.parameter.checkboxes.name=Izvēles rūtiņas
+rendering.macro.tree.parameter.class.description=Papildu CSS klase ar kurām var pielāgot koka HTML elementus
+rendering.macro.tree.parameter.class.name=Klase
+rendering.macro.tree.parameter.contextMenu.description=Vai rādīt uz koka mezgliem lietotājam ar labo peles klikšķi atveramu izvēlni
+rendering.macro.tree.parameter.contextMenu.name=Izvēlne
+rendering.macro.tree.parameter.dragAndDrop.description=Vai ļaut lietotājam ar vilkšanu un ievietošanu pārvaldīt koka mezglus.
+rendering.macro.tree.parameter.dragAndDrop.name=Vilkt un ievietot
+rendering.macro.tree.parameter.edges.description=Vai rādīt savienojošās līnijas starp koka bērniem un vecākiem mezgliem.
+rendering.macro.tree.parameter.edges.name=Līnijas
+rendering.macro.tree.parameter.finder.description=Rādīt teksta lauku, kurā var ievadīt kokā meklējamās vērtības. Lauks ir attēlots virs koka un tajā darbojas priekšāteicējs, kas piedāvā vērtības saskaņā ar koka saturu.
+rendering.macro.tree.parameter.finder.name=Meklēšanas lauks
+rendering.macro.tree.parameter.icons.description=Vai rādīt koka mezglu ikonas. Ja visi koka mezgli ir ar to pašu veidu, ikonas var nerādīt, lai ietaupītu vietu.
+rendering.macro.tree.parameter.icons.name=Ikonas
+rendering.macro.tree.parameter.links.description=Koka mezglu uzraksti tiks rādīti kā hipersaites uz attiecīgo resursu.
+rendering.macro.tree.parameter.links.name=Saites
+rendering.macro.tree.parameter.openTo.description=Mezgla identifikators, sākot ar kuru atvērt koka saturu. Tiks atvērti arī visi izvēlētā mezgla bērni līdz izvēlētajam vecākam.
+rendering.macro.tree.parameter.openTo.name=Atvērt līdz
+rendering.macro.tree.parameter.reference.description=Norāde uz resursu, sākot ar kuru tiks parādīts koks ar visiem tajā esošajiem bērniem. Resursu var norādīt dinamiski atverot koku, piemēram ar labo peles klikšķi konteksta izvēlnē. Statiskiem kokiem jums būtu jāizmanto makrosa saturs. Norāde var būt dokumenta nosaukums vai URL/ceļš.
+rendering.macro.tree.parameter.reference.name=Norāde
+rendering.macro.tree.parameter.root.description=Saknes mezgla identifikators. Tas noder, ja vēlaties parādīt koku, sākot ar norādīto sakni. Koks tiek parādīts, sākot ar norādītās saknes bērniem, tātad pati sakne patiesībā nav redzama. Ja sakne nav norādīta, tiek parādīts viss koks.
+rendering.macro.tree.parameter.root.name=Sakne
+</content>
+</xwikidoc>

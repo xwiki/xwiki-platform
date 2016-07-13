@@ -19,25 +19,15 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-
-import com.google.common.base.Predicates;
 
 /**
  * Default implementation for {@link SolrConfiguration} that uses the xwiki.properties file.
@@ -75,9 +65,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
-     * The package containing the solr configuration.
+     * The package containing the Solr core configuration files.
      */
-    public static final String HOME_DIRECTORY_CONF_PACKAGE = "solr.conf";
+    public static final String HOME_DIRECTORY_CORE_PACKAGE = "solr.xwiki";
 
     /**
      * The prefix of the solr resources.
@@ -115,6 +105,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 100000;
 
     /**
+     * The name of the configuration property indicating if a synchronization should be run at startup.
+     */
+    public static final String SOLR_SYNCHRONIZE_AT_STARTUP = "solr.synchronizeAtStartup";
+
+    /**
+     * Indicate if a synchronization should be run at startup by default.
+     */
+    public static final boolean SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT = true;
+
+    /**
      * The Solr configuration source.
      */
     @Inject
@@ -135,31 +135,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public Map<String, URL> getHomeDirectoryConfiguration()
+    public InputStream getHomeDirectoryConfiguration()
     {
-        // Build the result
-        Map<String, URL> result = new HashMap<String, URL>();
-
-        // Home directory.
-        for (String file : HOME_DIRECTORY_FILE_NAMES) {
-            result.put(file, this.getClass().getResource(String.format(CLASSPATH_LOCATION_PREFIX, file)));
-        }
-
-        // Conf directory
-        Set<URL> solrConfigurationResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CONF_PACKAGE);
-        Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(solrConfigurationResourcess)
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CONF_PACKAGE))));
-
-        for (String resource : reflections.getResources(Predicates.<String> alwaysTrue())) {
-            URL resourceURL = getClass().getResource("/" + resource);
-            if (resourceURL != null) {
-                result.put(resource.substring(HOME_DIRECTORY_PREFIX.length()), resourceURL);
-            }
-        }
-
-        return result;
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
     }
 
     @Override
@@ -180,5 +158,11 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     {
         return this.configuration
             .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    @Override
+    public boolean synchronizeAtStartup()
+    {
+        return this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP, SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT);
     }
 }

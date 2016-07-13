@@ -3,7 +3,7 @@
 ### and/or groups, filtered according to some parameters, in the JSON format.
 ###
 ###
-$response.setContentType("application/x-json")
+$response.setContentType("application/json")
 #set($offset = $mathtool.toInteger($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($off = $offset - 1)
@@ -29,7 +29,7 @@ $response.setContentType("application/x-json")
     #if($docProps.contains($key))
       ## Each filter is: key=>[propType, value], where propType is null for document properties
       #set($arr = [])
-      #set($discard = $arr.add(null))## null => document property
+      #set($discard = $arr.add($NULL))## null => document property
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
 ## Question: Why do we order using the filter fields?
@@ -88,53 +88,73 @@ $response.setContentType("application/x-json")
     #set($matchedCount = $rm.groupsApi.countAllMatchedGroups($filterMap))
   #end
 #end
+#set($rightsWithAllowPrecedence = [ 'admin', 'programming', 'register', 'createwiki' ])
 ### json starts
-{
-"totalrows": $matchedCount,
-"reqNo"    : $mathtool.toInteger($request.reqNo),
-"returnedrows": #if($matchedCount < $limit) $matchedCount #else $limit #end,
-"offset"   : $offset,
-"clsname"  : "$!{escapetool.javascript($clsname)}",
-"uorg"     : "$!{escapetool.javascript($uorg)}",
-"rows": [
+#set($userGroupsMap = {})
+#set($discard = $userGroupsMap.put("totalrows", $matchedCount))
+#set($discard = $userGroupsMap.put("reqNo"    , $mathtool.toInteger($request.reqNo)))
+#set($discard = $userGroupsMap.put("returnedrows", $mathtool.min($matchedCount, $limit)))
+#set($discard = $userGroupsMap.put("offset"   , $offset))
+#set($discard = $userGroupsMap.put("clsname"  , $clsname))
+#set($discard = $userGroupsMap.put("uorg"     , $uorg))
+#set($rows = [])
 #foreach($user in $users)
   #set($wikiname = $user.getWiki())
   #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
   #if($wikiname == "xwiki")
     #set($username = $user.getPrefixedFullName())
+    #set($usermatch = ${regextool.quote($username)})
   #else
     #set($username = $user.fullName)
+    ## in subwikis users may be referenced by wiki:Space.Username or Space.Username
+    ## try to match both with one regexp. See XWIKI-9730
+    #set($usermatch = "("+${regextool.quote($user.getWiki())}+":)?"+${regextool.quote($username)} )
   #end
   #set($allows = {})
   #set($denys = {})
-  #if($velocityCount > 1) , #end
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
     #set($pers = "$!obj.getProperty($uorg).getValue()")
-    #if(($pers != "") && ($pers.matches("^(.*,)?${regextool.quote($username)}(,.*)?$")) )  
+    #if(($pers != "") && (($pers.matches("^(.*,)?${usermatch}(,.*)?$")) ) )  
       #foreach($right in $!obj.getProperty('levels').getValue().split(","))
         #set($right = $right.trim())
         #if($right != "")
           #if($obj.getProperty('allow').getValue() == 1)
-            ## If the same right is specified both as allow and deny, deny is stronger.
-            #if(!$denys.containsKey($right)) #set($discard = $allows.put($right, "1")) #end
+            #if($rightsWithAllowPrecedence.contains($right))
+              ## If the same right is specified both as allow and deny, allow is stronger.
+              #set($discard = $allows.put($right, "1"))
+              #set($discard = $denys.remove($right))
+            #else
+              ## If the same right is specified both as allow and deny, deny is stronger.
+              #if(!$denys.containsKey($right)) #set($discard = $allows.put($right, "1")) #end
+            #end
           #else
-            #set($discard = $denys.put($right, "1"))
-            ## If the same right is specified both as allow and deny, deny is stronger.
-            #set($discard = "$!allows.remove($right)")
+            #if($rightsWithAllowPrecedence.contains($right))
+              ## If the same right is specified both as allow and deny, allow is stronger.
+              #if(!$allows.containsKey($right)) #set($discard = $deny.put($right, "1")) #end
+            #else
+              #set($discard = $denys.put($right, "1"))
+              ## If the same right is specified both as allow and deny, deny is stronger.
+              #set($discard = "$!allows.remove($right)")
+            #end
           #end
         #end
       #end
     #end
   #end ## foreach rights object
- {"username"   : "$!{escapetool.javascript($user.name)}",
-  "fullname"   : #if($wikiname=="xwiki") "$!{escapetool.javascript($user.getPrefixedFullName())}" #else "$!{escapetool.javascript($user.fullName)}" #end,
-  "wikiname"   : "$!{escapetool.javascript($wikiname)}",
-  "userurl"    : "$xwiki.getURL($user.fullName)",
-  "allows"     : "$allows.keySet()",
-  "denys"      : "$denys.keySet()",
-  "isuseringroup" : #if($uorg == "groups") $xwiki.getUser().isUserInGroup($user.fullName) #else false #end
- }
+  #set($row = {})
+  #set($discard = $row.put("username", $user.name))
+  #set($discard = $row.put("fullname", $username))
+  #set($discard = $row.put("wikiname", $wikiname))
+  #set($discard = $row.put("userurl" , $xwiki.getURL($user.fullName)))
+  #set($discard = $row.put("allows"  , $allows.keySet()))
+  #set($discard = $row.put("denys"   , $denys.keySet()))
+  #if ($uorg == "groups")
+    #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))
+  #else
+    #set($discard = $row.put("isuseringroup", false))
+  #end
+  #set($discard = $rows.add($row))
 #end ## foreach user in users
-]}
-### end of json
+#set($discard = $userGroupsMap.put("rows"     , $rows))
+$jsontool.serialize($userGroupsMap)

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,6 +42,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,11 +57,11 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Represents an XClass property and contains property definitions (eg "relational storage", "display type",
  * "separator", "multi select", etc). Each property definition is of type {@link BaseProperty}.
- * 
+ *
  * @version $Id$
  */
-public class PropertyClass extends BaseCollection<ClassPropertyReference> implements PropertyClassInterface,
-    Comparable<PropertyClass>
+public class PropertyClass extends BaseCollection<ClassPropertyReference>
+    implements PropertyClassInterface, Comparable<PropertyClass>
 {
     /**
      * Logging helper object.
@@ -196,7 +201,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
@@ -205,7 +211,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
@@ -264,7 +271,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
-        XWikiContext context) throws XWikiException
+        final XWikiContext context) throws XWikiException
     {
         String content = "";
         try {
@@ -293,16 +300,26 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
                 if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
-                    content = getCustomDisplay();
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
-                        .getSyntax().toIdString();
-                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                    final String rawContent = getCustomDisplay();
+                    XWikiDocument classDocument =
+                        context.getWiki().getDocument(getObject().getDocumentReference(), context);
+                    final String classSyntax = classDocument.getSyntax().toIdString();
+                    // Using author reference since the document content is not relevant in this case.
+                    DocumentReference authorReference = classDocument.getAuthorReference();
+
+                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
+                    // document author).
+                    content = renderContentInContext(rawContent, classSyntax, authorReference, context);
                 } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
                     XWikiDocument displayerDoc = context.getWiki().getDocument(
                         StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
-                    content = displayerDoc.getContent();
-                    String classSyntax = displayerDoc.getSyntax().toIdString();
-                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                    final String rawContent = displayerDoc.getContent();
+                    final String displayerDocSyntax = displayerDoc.getSyntax().toIdString();
+                    DocumentReference authorReference = displayerDoc.getContentAuthorReference();
+
+                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. displayer
+                    // document content author).
+                    content = renderContentInContext(rawContent, displayerDocSyntax, authorReference, context);
                 } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
                     content = context.getWiki().evaluateTemplate(
                         StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
@@ -315,6 +332,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
         }
         buffer.append(content);
+    }
+
+    /**
+     * Render content in the current document's context with the rights of the given user.
+     */
+    private String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
+        final XWikiContext context) throws Exception
+    {
+        return Utils.getComponent(SUExecutor.class)
+            .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference);
     }
 
     @Override
@@ -366,8 +393,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             return getPrettyName();
         }
 
-        String prettyName = context.getMessageTool().get(msgName);
-        if (prettyName.equals(msgName)) {
+        String prettyName = localizePlain(msgName);
+        if (prettyName == null) {
             return getPrettyName();
         }
         return prettyName;
@@ -410,18 +437,18 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     /**
      * Gets international tooltip
-     * 
+     *
      * @param context
      * @return
      */
     public String getTooltip(XWikiContext context)
     {
         String tooltipName = getFieldFullName() + "_tooltip";
-        String tooltip = context.getMessageTool().get(tooltipName);
-        if (tooltipName.equals(tooltip)) {
+        String tooltip = localizePlain(tooltipName);
+        if (tooltip == null) {
             tooltipName = getLargeStringValue("tooltip");
             if ((tooltipName != null) && (!tooltipName.trim().equals(""))) {
-                tooltip = context.getMessageTool().get(tooltipName);
+                tooltip = localizePlainOrKey(tooltipName, tooltipName);
             }
         }
         return tooltip;
@@ -451,7 +478,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
      * <p>
      * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
      * type. See {@link com.xpn.xwiki.internal.objects.classes.PropertyClassProvider} for instance.
-     * 
+     *
      * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
      */
     public String getClassType()
@@ -463,7 +490,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     /**
      * Sets the property class type.
-     * 
+     *
      * @param type the class type
      * @deprecated since 4.3M1, the property class type cannot be modified
      */
@@ -520,7 +547,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             Element ppcel = (Element) list.get(i);
             String name = ppcel.getName();
             if (bclass == null) {
-                Object[] args = {getClass().getName()};
+                Object[] args = { getClass().getName() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                     XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_IN_METACLASS,
                     "Cannot find property class {0} in MetaClass object", null, args);
@@ -561,7 +588,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     /**
      * See if this property is disabled or not. A disabled property should not be editable, but existing object values
      * are still kept in the database.
-     * 
+     *
      * @return {@code true} if this property is disabled and should not be used, {@code false} otherwise
      * @see #setDisabled(boolean)
      * @since 2.4M2
@@ -574,7 +601,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     /**
      * Disable or re-enable this property. A disabled property should not be editable, but existing object values are
      * still kept in the database.
-     * 
+     *
      * @param disabled whether the property is disabled or not
      * @see #isDisabled()
      * @since 2.4M2
@@ -664,7 +691,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     /**
      * Compares two property definitions based on their index number.
-     * 
+     *
      * @param other the other property definition to be compared with
      * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
      *         the specified object.
@@ -693,7 +720,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
      * Returns the current cached default custom displayer for the PropertyClass. The result will be cached and can be
      * flushed using {@link #flushCache()}. If it returns the empty string, then there is no default custom displayer
      * for this class.
-     * 
+     *
      * @param context the current request context
      * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
      *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
@@ -718,9 +745,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
     /**
      * Method to find the default custom displayer to use for a specific Property Class.
-     * 
+     *
      * @param propertyClassName the type of the property; this is defined in each subclass, such as {@code boolean},
-     *        {@code string} or {@code dblist}
+     *            {@code string} or {@code dblist}
      * @param context the current request context
      * @return An identifier for the location of a custom displayer. This can be {@code class} if there's custom display
      *         code specified in the class itself, {@code page:currentwiki:XWiki.BooleanDisplayer} if such a document
@@ -735,7 +762,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         try {
             // First look into the current wiki
             String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
-            DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
+            DocumentReference reference = new DocumentReference(context.getWikiId(), "XWiki", pageName);
             if (context.getWiki().exists(reference, context)) {
                 LOGGER.debug("Found default custom displayer for property class name in local wiki: [{}]", pageName);
                 return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;
@@ -751,15 +778,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             }
 
             // Look in templates
-            String template = "displayer_" + propertyClassName + ".vm";
-            String result = "";
-            try {
-                result = context.getWiki().evaluateTemplate(template, context);
-                if (StringUtils.isNotEmpty(result)) {
-                    LOGGER.debug("Found default custom displayer for property class name as template: [{}]", template);
-                    return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + template;
-                }
-            } catch (IOException e) {
+            String templateName = "displayer_" + propertyClassName + ".vm";
+            TemplateManager templateManager = Utils.getComponent(TemplateManager.class);
+            Template existingTemplate = templateManager.getTemplate(templateName);
+            if (existingTemplate != null) {
+                LOGGER.debug("Found default custom displayer for property class name as template: [{}]", templateName);
+                return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + templateName;
             }
         } catch (Throwable e) {
             // If we fail we consider there is no custom displayer
@@ -772,11 +796,31 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     /**
      * Get a short name identifying this type of property. This is derived from the java class name, lowercasing the
      * part before {@code Class}.
-     * 
+     *
      * @return a string, for example {@code string}, {@code dblist}, {@code number}
      */
     private String getTypeName()
     {
         return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), "Class").toLowerCase();
+    }
+
+    /**
+     * Apply a 3 ways merge on passed current, previous and new version of the same property. The passed current version
+     * is modified as result of the merge.
+     *
+     * @param currentProperty the current version of the element and the one to modify
+     * @param previousProperty the previous version of the element
+     * @param newProperty the new version of the property
+     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param context the XWiki context
+     * @param mergeResult the merge report
+     * @return the merged version
+     * @since 6.2M1
+     */
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        currentProperty.merge(previousProperty, newProperty, configuration, context, mergeResult);
     }
 }

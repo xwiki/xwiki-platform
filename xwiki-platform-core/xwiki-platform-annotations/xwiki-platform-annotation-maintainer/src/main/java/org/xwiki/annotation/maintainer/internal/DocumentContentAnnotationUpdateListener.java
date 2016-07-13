@@ -33,8 +33,6 @@ import org.xwiki.annotation.maintainer.MaintainerServiceException;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -106,14 +104,11 @@ public class DocumentContentAnnotationUpdateListener implements EventListener
             isUpdating = true;
             String content = currentDocument.getContent();
             String previousContent = previousDocument.getContent();
-            // create the document reference
-            EntityReference docReference =
-                new EntityReference(currentDocument.getPageName(), EntityType.DOCUMENT, new EntityReference(
-                    currentDocument.getSpaceName(), EntityType.SPACE, new EntityReference(
-                        currentDocument.getWikiName(), EntityType.WIKI)));
+
             // maintain the document annotations
             try {
-                maintainer.updateAnnotations(serializer.serialize(docReference), previousContent, content);
+                maintainer.updateAnnotations(this.serializer.serialize(currentDocument.getDocumentReference()),
+                    previousContent, content);
             } catch (MaintainerServiceException e) {
                 this.logger.warn(e.getMessage(), e);
                 // nothing else, just go further

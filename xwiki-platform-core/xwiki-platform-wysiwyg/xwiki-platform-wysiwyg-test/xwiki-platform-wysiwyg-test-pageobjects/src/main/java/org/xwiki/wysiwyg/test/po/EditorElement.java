@@ -138,7 +138,7 @@ public class EditorElement extends org.xwiki.test.ui.po.editor.wysiwyg.EditorEle
      */
     private void waitForSourceTextArea(final boolean enabled)
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
+        getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(WebDriver driver)

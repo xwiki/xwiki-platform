@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 /**
  * Contains all backward-compatibility code for deprecated methods and objects.
  * This is somehow similar to the server side compatibility aspects.
@@ -341,5 +360,40 @@ Object.extend(XWiki.constants, {
    */
   pageAttachmentSeparator: "@"
 });
+
+/**
+ * Add some deprecated <meta> tags in the header of the page so that old script can still work. It is added via the
+ * JavaScript since these <meta> tags are invalid with HTML5 and we want to have valid static HTML code.
+ *
+ * Note: we do not use require JS here because this script have to be executed very quickly, before the execution of the
+ * scripts that need these meta tags.
+ */
+(function(){
+  // Maybe the meta tags already exist
+  if ($$("meta[name='document']").length > 0) {
+    return;
+  }
+  
+  // Get the DOM elements we need
+  var html = $$('html')[0];
+  var head = $$('head')[0];
+  
+  // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
+  var addMetaTag = function(name, value) {
+    head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
+  }
+  
+  // Add the new meta tags
+  addMetaTag('document',   'document');
+  addMetaTag('wiki',       'wiki');
+  addMetaTag('space',      'space');
+  addMetaTag('page',       'page');
+  addMetaTag('version',    'version');
+  addMetaTag('restURL',    'rest-url');
+  addMetaTag('form_token', 'form-token');
+
+  // Add the language
+  head.insert(new Element('meta', {'name': 'language', 'content': html.readAttribute('lang')}));
+})();
 
 })();

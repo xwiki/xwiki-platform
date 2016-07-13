@@ -32,19 +32,24 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.junit.Assert;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,13 +62,15 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
@@ -75,6 +82,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiStore;
 
     private Mock mockXWikiVersioningStore;
+
+    private Mock mockWikiDescriptorManager;
 
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
@@ -89,7 +98,18 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
-        
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockWikiDescriptorManager.stubs().method("getCurrentWikiId").will(
+            new CustomStub("Implements WikiDescriptorManager.getCurrentWikiId")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return getContext().getWikiId();
+                }
+            });
+
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
             // Avoid all the error at XWiki initialization
@@ -108,7 +128,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
-        this.xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+        getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -238,6 +258,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         attachment.setDoc(skin);
         this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
+
         assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
         assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
         assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
@@ -380,17 +401,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         });
 
         // Set the wiki to multilingual mode.
-        XWikiDocument preferences = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences")) {
-            @Override
-            public BaseObject getXObject()
-            {
-                BaseObject preferencesObject = new BaseObject();
-                preferencesObject.setIntValue("multilingual", 1);
-
-                return preferencesObject;
-            }
-        };
-        this.xwiki.saveDocument(preferences, getContext());
+        getConfigurationSource().setProperty("multilingual", "1");
 
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }
@@ -425,7 +436,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Check that the user validation feature works when the validation key is stored both as plain text and as a hashed
      * field.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testValidationKeyStorage() throws Exception
@@ -474,7 +485,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     /**
      * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testGetPrefsClass() throws Exception
@@ -503,7 +514,68 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             });
         mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
 
-        xwiki.getPrefsClass(getContext());
-        xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
+    }
+
+    public void testGetDocumentWithEntityReference() throws Exception
+    {
+        Mock mockStore = registerMockComponent(XWikiStoreInterface.class);
+        this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
+
+        mockStore.expects(atLeastOnce()).method("loadXWikiDoc").with(NOT_NULL, same(getContext()))
+            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Main", "WebHome");
+
+        WikiDescriptor mockWikiDescriptor = new WikiDescriptor("wiki", "wiki");
+        mockWikiDescriptor.setMainPageReference(documentReference);
+
+        this.mockWikiDescriptorManager.stubs().method("getById").with(same("wiki"))
+            .will(returnValue(mockWikiDescriptor));
+
+        assertEquals(documentReference, this.xwiki.getDocument(new WikiReference("wiki"), getContext())
+            .getDocumentReference());
+
+        assertEquals(documentReference,
+            this.xwiki.getDocument(new ObjectReference("object", documentReference), getContext())
+                .getDocumentReference());
+    }
+
+    /**
+     * XWIKI-12398: No layout for login page in a closed wiki
+     */
+    public void testSkinResourcesAreAlwaysAllowed() throws XWikiException
+    {
+        // /skin/resources/icons/xwiki/noavatar.png
+        XWikiDocument doc1 =
+            new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("resources", "icons", "xwiki"),
+                "noavatar.png"));
+        // /skin/skins/flamingo/style.css
+        XWikiDocument doc2 =
+            new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("skins", "flamingo", "xwiki"), "style.css"));
+
+        // Register a mock authService just so that we limit the test to a minimum.
+        Mock mockAuthService = mock(XWikiAuthService.class);
+        mockAuthService.expects(exactly(2)).method("checkAuth").with(same(getContext())).will(returnValue(null));
+        this.xwiki.setAuthService((XWikiAuthService) mockAuthService.proxy());
+
+        // Register a mock rights service and make sure it is never called to validate the test's results.
+        Mock mockRightService = mock(XWikiRightService.class);
+        mockRightService.expects(
+            never("Skin action resources inside the 'skins' and 'resources' folders"
+                + " should never be checked for rights.")).method("checkAccess");
+        this.xwiki.setRightService((XWikiRightService) mockRightService.proxy());
+
+        // Verify the results.
+        Assert.assertTrue(this.xwiki.checkAccess("skin", doc1, getContext()));
+        Assert.assertTrue(this.xwiki.checkAccess("skin", doc2, getContext()));
     }
 }

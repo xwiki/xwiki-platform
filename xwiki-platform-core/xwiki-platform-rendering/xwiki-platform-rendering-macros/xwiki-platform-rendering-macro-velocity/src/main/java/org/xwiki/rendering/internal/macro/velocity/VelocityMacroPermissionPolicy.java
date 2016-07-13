@@ -26,11 +26,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
  * <ul>
- *   <li>if the macro transformation context is <strong>not</strong> restricted</li>
+ * <li>if the macro transformation context is <strong>not</strong> restricted</li>
+ * <li>if the current document has script rights</li>
  * </ul>
  *
  * @version $Id$
@@ -44,6 +46,6 @@ public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermission
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
-        return !context.getTransformationContext().isRestricted();
+        return !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
     }
 }

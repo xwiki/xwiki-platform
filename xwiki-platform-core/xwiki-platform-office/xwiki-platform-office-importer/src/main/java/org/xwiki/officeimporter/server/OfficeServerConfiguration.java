@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration properties for the {@link OfficeServer}. They are defined in XWiki's global configuration file using
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.0M2
  */
 @Role
-@Unstable
 public interface OfficeServerConfiguration
 {
     /**

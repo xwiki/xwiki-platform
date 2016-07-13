@@ -1,0 +1,23 @@
+## -------------------------------
+## Compute the content to display
+## -------------------------------
+## Honor the syntax if it's passed in the request.
+#try()
+  #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be
+    ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
+    ## panels on the side, header, etc).
+    ## That's unless the caller has explicitly asked to not escape the content (this is done for example when calling
+    ## get.vm in order to get proper XML).
+    #set($syntaxType = $outputSyntax.type.toIdString())
+    #if (($syntaxType == "xhtml") || ($syntaxType == "html") || !$escapeContent)
+      #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
+    #else
+      ## Make sure to print correctly the result when it's not HTML,
+      #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
+    #end
+  #else
+    #set ($renderedContent = $tdoc.getRenderedContent())
+  #end
+#end

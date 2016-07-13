@@ -19,24 +19,16 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -71,11 +63,8 @@ public class RemoteSolrInstance extends AbstractSolrInstance
      */
     public static final String CONFIGURATION_ZIP_FILE_NAME = "conf.zip";
 
-    /**
-     * Execution context needed for XWiki model operation.
-     */
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Solr's configuration.
@@ -86,18 +75,20 @@ public class RemoteSolrInstance extends AbstractSolrInstance
     @Override
     public void initialize() throws InitializationException
     {
-        String remoteURL = configuration.getInstanceConfiguration(TYPE, "url", DEFAULT_REMOTE_URL);
+        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "url", DEFAULT_REMOTE_URL);
 
-        try {
-            this.generateAndAttachConfigurationZipIfNotExist();
-        } catch (Exception e) {
-            // This is not a critical issue, since the remote server may already be configured.
-            // We still log it as an error though.
-            logger.error("Failed to generate the remote server's configuration.", e);
-        }
+        // Disabled since this component is initialized when XWiki starts, before any XWikiContext is available, so it
+        // will always fail
+        // try {
+        // this.generateAndAttachConfigurationZipIfNotExist();
+        // } catch (Exception e) {
+        // // This is not a critical issue, since the remote server may already be configured.
+        // // We still log it as an error though.
+        // this.logger.error("Failed to generate the remote server's configuration.", e);
+        // }
 
         // Initialize the remote Solr server.
-        this.server = new HttpSolrServer(remoteURL);
+        this.server = new HttpSolrClient(remoteURL);
     }
 
     /**
@@ -112,59 +103,21 @@ public class RemoteSolrInstance extends AbstractSolrInstance
      */
     public void generateAndAttachConfigurationZipIfNotExist() throws Exception
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
         // Get or Create the attachment and dump the content of the zip into the attachment.
         DocumentReference configDocumentReference =
-            new DocumentReference(getXWikiContext().getMainXWiki(), "XWiki", "SolrSearchAdmin");
+            new DocumentReference(context.getMainXWiki(), "XWiki", "SolrSearchAdmin");
         XWikiDocument configurationDocument = xwiki.getDocument(configDocumentReference, context);
         XWikiAttachment configurationZipAttachment = configurationDocument.getAttachment(CONFIGURATION_ZIP_FILE_NAME);
         if (configurationZipAttachment == null) {
             // Create the zip file to attach.
-            Map<String, URL> homeDirectoryFiles = this.configuration.getHomeDirectoryConfiguration();
-            InputStream zipFileInputStream = createZip(homeDirectoryFiles);
-
-            // Attach the file.
-            try {
-                configurationDocument.addAttachment(CONFIGURATION_ZIP_FILE_NAME, zipFileInputStream, context);
-            } finally {
-                zipFileInputStream.close();
+            try (InputStream inputStream = this.configuration.getHomeDirectoryConfiguration()) {
+                // Attach the file.
+                configurationDocument.addAttachment(CONFIGURATION_ZIP_FILE_NAME, inputStream, context);
+                xwiki.saveDocument(configurationDocument, "Attach default SOLR configuration", context);
             }
         }
-    }
-
-    /**
-     * @param files a map of (fileName, fileDataURL).
-     * @return a zip containing the files specified by the input map.
-     * @throws IOException if problems occur.
-     */
-    private static InputStream createZip(Map<String, URL> files) throws IOException
-    {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zipfile = new ZipOutputStream(baos);
-        for (Map.Entry<String, URL> file : files.entrySet()) {
-            // Create a new zip entry.
-            zipfile.putNextEntry(new ZipEntry(file.getKey()));
-
-            // Get the file data as a byte array.
-            URL fileURL = file.getValue();
-            byte[] fileData = IOUtils.toByteArray(fileURL.openStream());
-
-            // Compress the file data for the current zip entry.
-            zipfile.write(fileData);
-        }
-        zipfile.close();
-
-        // Return the zipped data as an input stream.
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
-
-    /**
-     * @return the XWiki context needed for XWiki model operations.
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 }

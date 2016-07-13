@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
  * Realization of {@link AttachmentRecycleBinStore} for Hibernate-based storage.
- * 
+ *
  * @version $Id$
  * @since 1.4M1
  */
@@ -63,7 +63,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
     /**
      * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
-     * 
+     *
      * @param context The current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.
      */
@@ -81,9 +81,11 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     }
 
     @Override
-    public void saveToRecycleBin(XWikiAttachment attachment, String deleter, Date date, XWikiContext context,
+    public void saveToRecycleBin(XWikiAttachment attachment, String deleter, Date date, XWikiContext inputxcontext,
         boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         final DeletedAttachment trashAtachment = new DeletedAttachment(attachment, deleter, date, context);
         executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
@@ -98,10 +100,12 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
     @Override
     public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment, final long index,
-        final XWikiContext context, boolean bTransaction) throws XWikiException
+        final XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
+        XWikiContext context = getXWikiContext(inputxcontext);
+
         return executeRead(context, bTransaction, new HibernateCallback<XWikiAttachment>()
-        {
+        {   
             @Override
             public XWikiAttachment doInHibernate(Session session) throws HibernateException, XWikiException
             {

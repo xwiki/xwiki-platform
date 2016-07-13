@@ -33,7 +33,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Store visit statistics into the database.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -51,7 +51,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
 
     /**
      * Create new instance of {@link VisitStatsStoreItem}.
-     * 
+     *
      * @param visitStats the {@link VisitStats} object to store.
      * @param context the XWiki context.
      */

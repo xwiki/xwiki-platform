@@ -61,7 +61,7 @@ public class PeriodFactory
 
     /**
      * Creates a new custom period. The start and end dates must have the following format: "yyyyMMdd" .
-     * 
+     *
      * @param start The start date
      * @param end The end date
      * @return A new Period instance
@@ -74,7 +74,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the day that includes the specified time stamp.
-     * 
+     *
      * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
      * @return A new Period instance
      */
@@ -86,7 +86,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the day that includes the specified date.
-     * 
+     *
      * @param date The string representation of a date uniquely identifying a day. Use the "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
@@ -98,7 +98,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the hour that includes the specified time stamp.
-     * 
+     *
      * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
      * @return A new Period instance
      */
@@ -110,7 +110,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the hour that includes the specified date.
-     * 
+     *
      * @param date The string representation of a date uniquely identifying a day. Use the "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
@@ -123,7 +123,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that matches all the instants between N hours before the instantiation and the
      * instantiation.
-     * 
+     *
      * @param numberOfHours number of hours to substract from current date
      * @return The corresponding period object
      */
@@ -136,7 +136,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that matches all the instants between N days before the instantiation and the
      * instantiation.
-     * 
+     *
      * @param numberOfDays number of days to substract from current date
      * @return The corresponding period object
      */
@@ -149,7 +149,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that matches all the instants between N weeks before the instantiation and the
      * instantiation.
-     * 
+     *
      * @param numberOfWeeks number of weeks to substract from current date
      * @return The corresponding period object
      */
@@ -162,7 +162,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that matches all the instants between N months before the instantiation and the
      * instantiation.
-     * 
+     *
      * @param numberOfMonths number of months to substract from current date
      * @return The corresponding period object
      */
@@ -175,7 +175,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that matches all the instants between N years before the instantiation and the
      * instantiation.
-     * 
+     *
      * @param numberOfYears number of years to substract from current date
      * @return The corresponding period object
      */
@@ -195,7 +195,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the week that includes the specified time stamp.
-     * 
+     *
      * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
      * @return A new Period instance
      */
@@ -207,7 +207,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the week that includes the specified date.
-     * 
+     *
      * @param date The string representation of a date uniquely identifying a week. Use the "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
@@ -227,7 +227,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the month that includes the specified time stamp.
-     * 
+     *
      * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
      * @return A new Period instance
      */
@@ -239,7 +239,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the month that includes the specified date.
-     * 
+     *
      * @param date The string representation of a date uniquely identifying a month. Use the "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
@@ -259,7 +259,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the year that includes the specified time stamp.
-     * 
+     *
      * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
      * @return A new Period instance
      */
@@ -271,7 +271,7 @@ public class PeriodFactory
 
     /**
      * Creates a new Period instance that matches exactly the year that includes the specified date.
-     * 
+     *
      * @param date The string representation of a date uniquely identifying a year. Use the "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
@@ -284,7 +284,7 @@ public class PeriodFactory
     /**
      * Creates a new Period instance that starts at the minimum value allowed by Date and ends at the maximum value
      * allowed by Date.
-     * 
+     *
      * @return The corresponding Period object
      */
     public static Period createMaximumPeriod()

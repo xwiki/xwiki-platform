@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * XWiki-specific exceptions thrown by plugins.
- * 
+ *
  * @version $Id$
  * @deprecated the plugin technology is deprecated, and XWikiException was a bad idea from the start
  */
@@ -40,7 +40,7 @@ public class PluginException extends XWikiException
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param pluginName the name of the plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
@@ -49,14 +49,14 @@ public class PluginException extends XWikiException
      */
     public PluginException(String pluginName, int code, String message, Throwable e, Object[] args)
     {
-        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] {pluginName, message}), e,
-            args);
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] { pluginName, message }),
+            e, args);
         this.pluginName = pluginName;
     }
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param pluginName the name of the plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
@@ -64,67 +64,68 @@ public class PluginException extends XWikiException
      */
     public PluginException(String pluginName, int code, String message, Throwable e)
     {
-        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] {pluginName, message}), e);
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] { pluginName, message }),
+            e);
         this.pluginName = pluginName;
     }
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param pluginName the name of the plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
      */
     public PluginException(String pluginName, int code, String message)
     {
-        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] {pluginName, message}));
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] { pluginName, message }));
         this.pluginName = pluginName;
     }
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param plugin the type of plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
      * @param e a nested exception that caused this exception in the first place
      * @param args extra information about the exception
      */
-    public PluginException(java.lang.Class< ? extends XWikiPluginInterface> plugin, int code, String message,
+    public PluginException(java.lang.Class<? extends XWikiPluginInterface> plugin, int code, String message,
         Throwable e, Object[] args)
     {
         super(XWikiException.MODULE_XWIKI_PLUGINS, code,
-            CUSTOM_MESSAGE.format(new Object[] {plugin.getName(), message}), e, args);
+            CUSTOM_MESSAGE.format(new Object[] { plugin.getName(), message }), e, args);
         this.pluginName = plugin.getName();
     }
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param plugin the type of plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
      * @param e a nested exception that caused this exception in the first place
      */
-    public PluginException(java.lang.Class< ? extends XWikiPluginInterface> plugin, int code, String message,
+    public PluginException(java.lang.Class<? extends XWikiPluginInterface> plugin, int code, String message,
         Throwable e)
     {
         super(XWikiException.MODULE_XWIKI_PLUGINS, code,
-            CUSTOM_MESSAGE.format(new Object[] {plugin.getName(), message}), e);
+            CUSTOM_MESSAGE.format(new Object[] { plugin.getName(), message }), e);
         this.pluginName = plugin.getName();
     }
 
     /**
      * Exception constructor.
-     * 
+     *
      * @param plugin the type of plugin that triggered the exception
      * @param code exception code
      * @param message the exception message
      */
-    public PluginException(java.lang.Class< ? extends XWikiPluginInterface> plugin, int code, String message)
+    public PluginException(java.lang.Class<? extends XWikiPluginInterface> plugin, int code, String message)
     {
         super(XWikiException.MODULE_XWIKI_PLUGINS, code,
-            CUSTOM_MESSAGE.format(new Object[] {plugin.getName(), message}));
+            CUSTOM_MESSAGE.format(new Object[] { plugin.getName(), message }));
         this.pluginName = plugin.getName();
     }
 
@@ -137,7 +138,7 @@ public class PluginException extends XWikiException
 
     /**
      * Get the name of the plugin that triggered the exception.
-     * 
+     *
      * @return the plugin name, see {@link XWikiPluginInterface#getName()}
      */
     public String getPluginName()

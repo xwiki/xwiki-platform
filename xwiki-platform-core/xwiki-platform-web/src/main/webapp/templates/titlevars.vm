@@ -22,7 +22,7 @@
 ## * if it comes from the document title/name then it was parsed as plain text
 ## * if it comes from a heading in the document content then special XML characters are already escaped.
 #set ($titleToDisplay = $tdoc.getRenderedTitle('xhtml/1.0'))
-#if ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode())
+#if ("$!renderedContent" != '' && ($tdoc.title.length() == 0 || $xwiki.isTitleInCompatibilityMode()))
   ## Look for first H1-H6 either in lowercase or uppercase
   #set ($regexResult = $regextool.find($renderedContent, "<([hH][1-6]).*?>(?:<span>)?(.*?)(?:</span>)?</[hH][1-6]>"))
   #if (!$regexResult.isEmpty() && $regexResult.get(2).group.equals($titleToDisplay))

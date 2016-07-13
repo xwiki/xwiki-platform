@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
@@ -35,7 +37,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectsForClassNameResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectsForClassNameResourceImpl")
 public class ObjectsForClassNameResourceImpl extends BaseObjectsResource implements ObjectsForClassNameResource
 {
     @Override
@@ -55,10 +58,13 @@ public class ObjectsForClassNameResourceImpl extends BaseObjectsResource impleme
                     new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
 
             for (com.xpn.xwiki.objects.BaseObject object : ri) {
-                objects.getObjectSummaries().add(DomainObjectFactory
-                        .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                                componentManager), doc, object, false, Utils.getXWikiApi(componentManager),
-                                withPrettyNames));
+                // By deleting objects, some of them might become null, so we must check for this
+                if (object != null) {
+                    objects.getObjectSummaries()
+                        .add(DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(),
+                            Utils.getXWikiContext(componentManager), doc, object, false,
+                            Utils.getXWikiApi(componentManager), withPrettyNames));
+                }
             }
 
             return objects;

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>pt_BR</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1307189790000</date>
+  <contentUpdateDate>1307189790000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+platform.wiki.browse._actions=Ações
+platform.wiki.browse._actions.requestJoin=Solicitar Entrada
+platform.wiki.browse.description=Descrição
+platform.wiki.browse.owner=Dono
+platform.wiki.browse.wikiprettyname=Nome
+platform.wiki.create.error=Criação da divisão "{0}" falhou\: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=Uma base de dados com esse identificador já existe
+platform.wiki.create.error.wikiname.empty=O identificador não pode ser vazio
+platform.wiki.create.error.wikiname.wikialreadyexists=Esse identificador já foi usado
+platform.wiki.create.members=MEMBROS
+platform.wiki.create.prettyname.empty=Nome de exibição não pode ser vazio
+platform.wiki.create.title=Criar uma nova divisão
+platform.wiki.create.wizard.step.nameAndType.shortname=Nome
+platform.wiki.dependencies.applicationmanager.missing=O plugin {0}Gerenciador de Aplicações{1} não está instalado. Por favor instale-o e tente novamente.
+platform.wiki.dependencies.wiki.missing=O componente java do Gerenciador de Divisões não está instalado. Esta página não funcionará corretamente. Verifique se o arquivo 'wiki30-components-workspace-manager-&lt;version&gt;.jar' está presente no diretório 'webapps/xwiki/WEB-INF/lib/'.
+platform.wiki.error.exceptionWithMessage=Exceção\: {0}
+platform.wiki.error.oneParameterNotSpecified=O parâmetro ''{0}'' não foi informado.
+platform.wiki.error.parameterAcceptsMultipleValues=Mais de um valor aceito.
+platform.wiki.error.wikidoesnotexist=Divisão [{0}] não existe
+platform.wiki.form.requiredField=Obrigatório
+platform.wiki.menu.deletewiki=Remover
+platform.wiki.menu.userwikis=Divisões
+platform.wiki.menu.wikiindex=Diretório de Divisões
+platform.wiki.prop.description=Descrição
+platform.wiki.prop.owner=Dono
+platform.wiki.sheet.prop.owner=Dono
+platform.wiki.sheet.title.createnewalias=Criar novo apelido
+platform.wiki.users.delete.empty=Remover Divisão
+platform.wiki.users.delete.title=Remover Divisão "{0}"
+platform.wiki.users.invitation.accept.label=Aceitar
+platform.wiki.users.invitation.message.label=Mensagem de convite
+platform.wiki.users.invitation.reject.label=Rejeitar
+platform.wiki.users.invitation.reply.hint=Uma resposta para enviar, visualizada pelo administrador da divisão, na qual você pode explicar sua decisão.
+platform.wiki.users.invitation.reply.title=Responder
+platform.wiki.users.invitation.title=Você foi convidado para entrar na Divisão {0}{1}{2}.
+platform.wiki.users.invitation.userAcceptedNotification=O usuário ''{0}'' ({1}) aceitou o convite para entrar na divisão ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=O usuário {0}{1}{2} aceitou o convite e entrou na divisão {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=O usuário {0}{1}{2} rejeitou o convite para entrar na Wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=Você tem certeza que deseja entrar nesta Wiki{0}{1}{2}?
+platform.wiki.users.join.error.needInvitation=Essa Wiki é só para usuários registrados. Para entrar você deve receber um convite de um de seus administradores.
+platform.wiki.users.join.no=Não
+platform.wiki.users.join.request.cancelConfirmation=Você tem certeza que deseja cancelar a solicitação para entrar na divisão {3}{4}{5}?
+platform.wiki.users.join.request.cancelNo=Não
+platform.wiki.users.join.request.cancelSuccess=O usuário {0}{1}{2} cancelou com sucesso a solicitação para entrar na Wiki {3}{4}{5}.
+platform.wiki.users.join.request.cancelYes=Sim
+platform.wiki.users.join.request.hint=Para entrar na divisão {0}{1}{2} você deve primeiro fazer uma solicitação. Então, um administrador da divisão vai revisar sua solicitação e aceitá-la ou rejeitá-la.
+platform.wiki.users.join.request.message.hint=Uma mensagem para o administrador da Wiki na qual você pode explicar porque deseja entrar. 
+platform.wiki.users.join.request.pendingRequestExists=O usuário {0}{1}{2} já tem uma solicitação pendente para entrar na divisão {3}{4}{5}. Por favor espere até que do admin possa revisá-la.
+platform.wiki.users.join.request.saveNotification=O usuário ''{0}'' ({1}) solicitou entrar na divisão ''{2}'' ({3}).
+platform.wiki.users.join.request.success=O usuário {0}{1}{2} enviou com sucesso a solicitação para entrar na Wiki {3}{4}{5}.
+platform.wiki.users.join.success=O usuário {0}{1}{2} entrou com sucesso na divisão {3}{4}{5}.
+platform.wiki.users.join.title=Entrar na Divisão
+platform.wiki.users.join.yes=Sim
+platform.wiki.users.leave.confirmation=Você tem certeza que deseja sair da divisão {0}{1}{2}?
+platform.wiki.users.leave.confirmation.no=Não
+platform.wiki.users.leave.confirmation.yes=Sim
+platform.wiki.users.leave.empty=Sair da Divisão
+platform.wiki.users.leave.error.userIsOwner=O usuário {0}{1}{2} é o dono da divisão {3}{4}{5}. O dono não pode sair até que a divisão seja removida ou o dono seja alterado.
+platform.wiki.users.leave.success=O usuário {0}{1}{2} saiu com sucesso da Wiki {3}{4}{5}.
+platform.wiki.users.leave.title=Sair da Divisão "{0}"
+platform.wiki.users.logInToContinue=Para continuar você precisa {0}entrar{1}.
+platform.wiki.users.userAlreadyMemberOfWiki=O usuário {0}{1}{2} já é membro da divisão {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=O usuário {0}{1}{2} não é membro da divisão {3}{4}{5}.
+</content>
+</xwikidoc>

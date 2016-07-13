@@ -37,7 +37,7 @@ public class CacheMacroParameters
     /**
      * @see #getTimeToLive()
      */
-    private int timeToLive = 300;
+    private int lifespan = 300;
 
     /**
      * @see #getMaxEntries()
@@ -69,16 +69,16 @@ public class CacheMacroParameters
      */
     public int getTimeToLive()
     {
-        return this.timeToLive;
+        return this.lifespan;
     }
 
     /**
-     * @param timeToLive refer to {@link #getTimeToLive()}
+     * @param lifespan refer to {@link #getTimeToLive()}
      */
     @PropertyDescription("the number of seconds to cache the content")
-    public void setTimeToLive(int timeToLive)
+    public void setTimeToLive(int lifespan)
     {
-        this.timeToLive = timeToLive;
+        this.lifespan = lifespan;
     }
 
     /**

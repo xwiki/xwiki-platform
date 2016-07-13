@@ -59,11 +59,7 @@ public class ReadOnlyPlugin extends AbstractPlugin implements CommandListener, P
      */
     private final ReadOnlyUtils readOnlyUtils = new ReadOnlyUtils();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#init(RichTextArea, Config)
-     */
+    @Override
     public void init(RichTextArea textArea, Config config)
     {
         super.init(textArea, config);
@@ -75,11 +71,6 @@ public class ReadOnlyPlugin extends AbstractPlugin implements CommandListener, P
         getTextArea().getCommandManager().addCommandListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractPlugin#destroy()
-     */
     @Override
     public void destroy()
     {
@@ -88,32 +79,20 @@ public class ReadOnlyPlugin extends AbstractPlugin implements CommandListener, P
         super.destroy();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
+    @Override
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
         return !ALLOWED_COMMANDS.contains(command)
             && readOnlyUtils.isSelectionBoundaryInsideReadOnlyElement(getTextArea().getDocument());
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
+    @Override
     public void onCommand(CommandManager sender, Command command, String param)
     {
         // Ignore.
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see PasteHandler#onPaste(PasteEvent)
-     */
+    @Override
     public void onPaste(PasteEvent event)
     {
         if (readOnlyUtils.isSelectionBoundaryInsideReadOnlyElement(getTextArea().getDocument())) {

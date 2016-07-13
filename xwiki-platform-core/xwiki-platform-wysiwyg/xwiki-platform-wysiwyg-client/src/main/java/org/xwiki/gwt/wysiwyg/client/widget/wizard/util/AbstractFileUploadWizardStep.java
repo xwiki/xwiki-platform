@@ -172,41 +172,31 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
         return "filepath";
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#init(Object, AsyncCallback)
-     */
+    @Override
     public void init(Object data, AsyncCallback< ? > cb)
     {
         hideError();
         cb.onSuccess(null);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onCancel()
-     */
+    @Override
     public void onCancel()
     {
         // ignore
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractInteractiveWizardStep#onSubmit(AsyncCallback)
-     */
+    @Override
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
         getUploadURL(new AsyncCallback<String>()
         {
+            @Override
             public void onFailure(Throwable caught)
             {
                 async.onFailure(caught);
             }
 
+            @Override
             public void onSuccess(String result)
             {
                 submitTo(result, async);

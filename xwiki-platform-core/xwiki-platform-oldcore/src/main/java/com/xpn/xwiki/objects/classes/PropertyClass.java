@@ -406,23 +406,31 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         setStringValue("prettyName", prettyName);
     }
 
-    public String getHint()
+    /**
+     * @param property name of the property
+     * @return the localized value of the property, with a fallback to the inner value
+     */
+    private String getLocalizedPropertyValue(String property)
     {
-        return getLargeStringValue("hint");
-    }
-
-    public String getTranslatedHint(XWikiContext context)
-    {
-        // If we have a translation key, following the translation key convention, we return it
-        if(context != null && context.getWiki() != null){
-            String translationKeyName = getFieldFullName() + ".hint";
-            String translatedHint = context.getMessageTool().get(translationKeyName);
-            if(!translatedHint.equals(translationKeyName)){
-                return translatedHint;
+        String propertyName = String.format("%s_%s", getFieldFullName(), property);
+        String propertyValue = localizePlain(propertyName);
+        if (propertyValue == null) {
+            propertyName = getLargeStringValue(property);
+            if (StringUtils.isNotBlank(propertyName)) {
+                propertyValue = localizePlainOrKey(propertyName, propertyName);
             }
         }
-        // If not, we display the raw hint
-        return getHint();
+        return propertyValue;
+    }
+
+    /**
+     * Get the localized hint. A hint is a text displayed in the object editor to help the user filling some content.
+     *
+     * @return the localized hint.
+     */
+    public String getHint()
+    {
+        return getLocalizedPropertyValue("hint");
     }
 
     public void setHint(String hint)
@@ -443,15 +451,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      */
     public String getTooltip(XWikiContext context)
     {
-        String tooltipName = getFieldFullName() + "_tooltip";
-        String tooltip = localizePlain(tooltipName);
-        if (tooltip == null) {
-            tooltipName = getLargeStringValue("tooltip");
-            if ((tooltipName != null) && (!tooltipName.trim().equals(""))) {
-                tooltip = localizePlainOrKey(tooltipName, tooltipName);
-            }
-        }
-        return tooltip;
+        return getLocalizedPropertyValue("tooltip");
     }
 
     public void setTooltip(String tooltip)

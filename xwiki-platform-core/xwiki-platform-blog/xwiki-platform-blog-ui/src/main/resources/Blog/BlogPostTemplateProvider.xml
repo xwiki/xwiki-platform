@@ -165,7 +165,7 @@
       <description>blog.templateProvider.blogpost.description</description>
     </property>
     <property>
-      <icon>file-text</icon>
+      <icon>rss</icon>
     </property>
     <property>
       <name>blog.templateProvider.blogpost.name</name>

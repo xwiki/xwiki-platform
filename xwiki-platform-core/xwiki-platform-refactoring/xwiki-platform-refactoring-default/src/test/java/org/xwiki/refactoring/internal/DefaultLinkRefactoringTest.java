@@ -153,7 +153,7 @@ public class DefaultLinkRefactoringTest
         // Space link block stays the same, since they were on the same wiki.
         assertEquals("Z", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
-        verify(xcontext.getWiki()).saveDocument(newDocument, "Updated the relative links.", true, this.xcontext);
+        verifyDocumentSave(newDocument, "Updated the relative links.", true);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class DefaultLinkRefactoringTest
         // Space link is also updated, since they were referring entities on a different wiki.
         assertEquals("wiki1:Z", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
-        verify(xcontext.getWiki()).saveDocument(newDocument, "Updated the relative links.", true, this.xcontext);
+        verifyDocumentSave(newDocument, "Updated the relative links.", true);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class DefaultLinkRefactoringTest
 
         assertEquals("X.Y", linkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+        verifyDocumentSave(document, "Renamed back-links.", false);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class DefaultLinkRefactoringTest
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         assertEquals("X", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+        verifyDocumentSave(document, "Renamed back-links.", false);
     }
 
     @Test
@@ -341,7 +341,7 @@ public class DefaultLinkRefactoringTest
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         assertEquals("X.Y", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, spaceLinkBlock.getReference().getType());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+        verifyDocumentSave(document, "Renamed back-links.", false);
     }
 
     @Test
@@ -388,7 +388,7 @@ public class DefaultLinkRefactoringTest
         assertEquals("X.Y", includeMacroBlock1.getParameter("reference"));
         assertEquals("X.Y", includeMacroBlock2.getParameter("document"));
         assertEquals("X.Y", displayMacroBlock.getParameter("reference"));
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+        verifyDocumentSave(document, "Renamed back-links.", false);
     }
 
     @Test
@@ -428,6 +428,13 @@ public class DefaultLinkRefactoringTest
         assertEquals("X.Y", includeMacroBlock.getParameter("reference"));
         assertEquals("X.Y", documentLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
-        verify(this.xcontext.getWiki()).saveDocument(document, "Renamed back-links.", this.xcontext);
+        verifyDocumentSave(document, "Renamed back-links.", false);
+    }
+
+    private void verifyDocumentSave(XWikiDocument document, String comment, boolean minorEdit) throws Exception
+    {
+        // Verify we preserve the content author.
+        verify(document).setContentDirty(false);
+        verify(this.xcontext.getWiki()).saveDocument(document, comment, minorEdit, this.xcontext);
     }
 }

@@ -65,7 +65,8 @@ public class DeleteJobTest extends AbstractEntityJobTest
         request.setUserReference(userReference);
         run(request);
 
-        verify(this.modelBridge).delete(documentReference, userReference);
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).delete(documentReference);
     }
 
     @Test
@@ -74,7 +75,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         run(createRequest(documentReference));
         verify(this.mocker.getMockedLogger()).warn("Skipping [{}] because it doesn't exist.", documentReference);
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
     @Test
@@ -92,7 +93,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
         run(request);
 
         verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
     @Test
@@ -128,7 +129,7 @@ public class DeleteJobTest extends AbstractEntityJobTest
     {
         run(createRequest(new WikiReference("foo")));
         verify(this.mocker.getMockedLogger()).error("Unsupported entity type [{}].", EntityType.WIKI);
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
     private EntityRequest createRequest(EntityReference... entityReference)

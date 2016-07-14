@@ -100,7 +100,7 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
             progressManager.startStep(this, "Remove lock from the main document");
 
             // Remove any existing lock of the user that started this job on the target document.
-            this.modelBridge.removeLock(documentReference, this.request.getUserReference());
+            this.modelBridge.removeLock(documentReference);
         } finally {
             // Done, go back to parent progress level
             this.progressManager.popLevelProgress(this);
@@ -148,14 +148,14 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
             this.logger.error("You are not allowed to create the document [{}].", newDocumentReference);
         } else if (templateDocumentReference == null) {
             // If no template is specified, then we are just creating an empty document.
-            this.modelBridge.create(newDocumentReference, this.request.getUserReference());
+            this.modelBridge.create(newDocumentReference);
         } else if (!hasAccess(Right.VIEW, templateDocumentReference)) {
             this.logger.error("You are not allowed to view the template document [{}].", templateDocumentReference);
         } else if (!this.modelBridge.exists(templateDocumentReference)) {
             // Should generally not happen, but you never know.
             this.logger.error("Template document [{}] does not exist.", templateDocumentReference);
         } else {
-            this.modelBridge.copy(templateDocumentReference, newDocumentReference, this.request.getUserReference());
+            this.modelBridge.copy(templateDocumentReference, newDocumentReference);
         }
     }
 }

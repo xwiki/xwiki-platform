@@ -42,15 +42,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultModelBridge}.
@@ -78,21 +72,14 @@ public class DefaultModelBridgeTest
     @Test
     public void create() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
-        DocumentReference creatorReference = new DocumentReference("wiki", "Users", "Alice");
-
-        DocumentReference currentUserReference = new DocumentReference("wiki", "Users", "Bob");
-        when(this.xcontext.getUserReference()).thenReturn(currentUserReference);
-
         XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
 
-        this.mocker.getComponentUnderTest().create(documentReference, creatorReference);
+        this.mocker.getComponentUnderTest().create(documentReference);
 
-        verify(this.xcontext).setUserReference(creatorReference);
         verify(this.xcontext.getWiki()).saveDocument(document, this.xcontext);
         verify(this.mocker.getMockedLogger()).info("Document [{}] has been created.", documentReference);
-        verify(this.xcontext).setUserReference(currentUserReference);
     }
 
     @Test
@@ -100,42 +87,28 @@ public class DefaultModelBridgeTest
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
-        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
 
-        DocumentReference currentUserReference = new DocumentReference("wiki", "Users", "Bob");
-        when(this.xcontext.getUserReference()).thenReturn(currentUserReference);
+        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, false,
+            this.xcontext)).thenReturn(true);
 
-        when(
-            this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, false,
-                this.xcontext)).thenReturn(true);
+        assertTrue(this.mocker.getComponentUnderTest().copy(sourceReference, copyReference));
 
-        this.mocker.getComponentUnderTest().copy(sourceReference, copyReference, authorReference);
-
-        verify(this.xcontext).setUserReference(authorReference);
         verify(this.mocker.getMockedLogger()).info("Document [{}] has been copied to [{}].", sourceReference,
             copyReference);
-        verify(this.xcontext).setUserReference(currentUserReference);
     }
 
     @Test
     public void deleteTranslation() throws Exception
     {
-        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
-        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Alice");
-
-        DocumentReference currentUserReference = new DocumentReference("wiki", "Users", "Bob");
-        when(this.xcontext.getUserReference()).thenReturn(currentUserReference);
-
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
+        DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(1);
 
-        this.mocker.getComponentUnderTest().delete(sourceReference, authorReference);
+        this.mocker.getComponentUnderTest().delete(sourceReference);
 
-        verify(this.xcontext).setUserReference(authorReference);
         verify(this.xcontext.getWiki()).deleteDocument(sourceDocument, this.xcontext);
         verify(this.mocker.getMockedLogger()).info("Document [{}] has been deleted.", sourceReference);
-        verify(this.xcontext).setUserReference(currentUserReference);
     }
 
     @Test
@@ -147,7 +120,7 @@ public class DefaultModelBridgeTest
         when(this.xcontext.getWiki().getDocument(sourceReference, this.xcontext)).thenReturn(sourceDocument);
         when(sourceDocument.getTranslation()).thenReturn(0);
 
-        this.mocker.getComponentUnderTest().delete(sourceReference, null);
+        this.mocker.getComponentUnderTest().delete(sourceReference);
 
         verify(this.xcontext.getWiki()).deleteAllDocuments(sourceDocument, this.xcontext);
         verify(this.mocker.getMockedLogger()).info("Document [{}] has been deleted with all its translations.",

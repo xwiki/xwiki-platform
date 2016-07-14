@@ -46,10 +46,9 @@ public class RenameJob extends MoveJob
     }
 
     @Override
-    protected void runInternal() throws Exception
+    protected void process(Collection<EntityReference> entityReferences)
     {
-        Collection<EntityReference> entityReferences = this.request.getEntityReferences();
-        if (entityReferences != null && entityReferences.size() == 1 && this.request.getDestination() != null) {
+        if (entityReferences.size() == 1) {
             process(entityReferences.iterator().next());
         }
     }

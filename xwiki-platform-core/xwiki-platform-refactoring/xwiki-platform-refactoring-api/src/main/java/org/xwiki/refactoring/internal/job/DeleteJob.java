@@ -97,7 +97,7 @@ public class DeleteJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);
         } else {
-            this.modelBridge.delete(documentReference, this.request.getUserReference());
+            this.modelBridge.delete(documentReference);
         }
     }
 }

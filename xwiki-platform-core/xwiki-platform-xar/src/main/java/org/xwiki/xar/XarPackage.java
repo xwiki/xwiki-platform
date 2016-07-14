@@ -42,6 +42,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -527,6 +528,10 @@ public class XarPackage
     private void readDescriptorInfos(Element infos)
     {
         this.packageExtensionId = getElementText(infos, XarModel.ELEMENT_INFOS_EXTENSIONID);
+        if (StringUtils.isEmpty(this.packageExtensionId)) {
+            this.packageExtensionId = null;
+        }
+
         this.packageVersion = getElementText(infos, XarModel.ELEMENT_INFOS_VERSION);
         this.packageName = getElementText(infos, XarModel.ELEMENT_INFOS_NAME);
         this.packageDescription = getElementText(infos, XarModel.ELEMENT_INFOS_DESCRIPTION);

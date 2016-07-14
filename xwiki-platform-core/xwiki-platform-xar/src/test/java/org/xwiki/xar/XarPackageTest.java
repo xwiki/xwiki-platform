@@ -87,6 +87,16 @@ public class XarPackageTest
         assertEqualsEntry(new XarEntry(SPACE_MERGEDTRANSLATIONS, XarModel.ACTION_MERGE), iterator.next());
         assertEqualsEntry(new XarEntry(SPACE_MERGEDTRANSLATIONS_FR, XarModel.ACTION_MERGE), iterator.next());
     }
+    
+    @Test
+    public void readDescriptorWithEmptyId() throws Exception
+    {
+        XarPackage xarPackage = new XarPackage();
+
+        xarPackage.readDescriptor(getClass().getResourceAsStream("/packagewithemptyid.xml"));
+
+        assertEquals(null, xarPackage.getPackageExtensionId());        
+    }
 
     private void assertEqualsEntry(XarEntry expected, XarEntry actual)
     {

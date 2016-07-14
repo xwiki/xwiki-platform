@@ -108,34 +108,26 @@ public class DefaultModelBridge implements ModelBridge
     private JobProgressManager progressManager;
 
     @Override
-    public boolean create(DocumentReference documentReference, DocumentReference userReference)
+    public boolean create(DocumentReference documentReference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        DocumentReference currentUserReference = xcontext.getUserReference();
         try {
-            xcontext.setUserReference(userReference);
-
             XWikiDocument newDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
             xcontext.getWiki().saveDocument(newDocument, xcontext);
             this.logger.info("Document [{}] has been created.", documentReference);
+            return true;
         } catch (Exception e) {
             this.logger.error("Failed to create document [{}].", documentReference, e);
             return false;
-        } finally {
-            xcontext.setUserReference(currentUserReference);
         }
-
-        return true;
     }
 
     @Override
-    public boolean copy(DocumentReference source, DocumentReference destination, DocumentReference userReference)
+    public boolean copy(DocumentReference source, DocumentReference destination)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference currentUserReference = xcontext.getUserReference();
         try {
-            xcontext.setUserReference(userReference);
             String language = source.getLocale() != null ? source.getLocale().toString() : null;
             boolean result =
                 xcontext.getWiki().copyDocument(source, destination, language, false, true, false, xcontext);
@@ -149,18 +141,14 @@ public class DefaultModelBridge implements ModelBridge
         } catch (Exception e) {
             this.logger.error("Failed to copy [{}] to [{}].", source, destination, e);
             return false;
-        } finally {
-            xcontext.setUserReference(currentUserReference);
         }
     }
 
     @Override
-    public boolean delete(DocumentReference reference, DocumentReference userReference)
+    public boolean delete(DocumentReference reference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference currentUserReference = xcontext.getUserReference();
         try {
-            xcontext.setUserReference(userReference);
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             if (document.getTranslation() == 1) {
                 xcontext.getWiki().deleteDocument(document, xcontext);
@@ -173,18 +161,14 @@ public class DefaultModelBridge implements ModelBridge
         } catch (Exception e) {
             this.logger.error("Failed to delete document [{}].", reference, e);
             return false;
-        } finally {
-            xcontext.setUserReference(currentUserReference);
         }
     }
 
     @Override
-    public boolean removeLock(DocumentReference reference, DocumentReference userReference)
+    public boolean removeLock(DocumentReference reference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference currentUserReference = xcontext.getUserReference();
         try {
-            xcontext.setUserReference(userReference);
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
             if (document.getLock(xcontext) != null) {
@@ -197,8 +181,6 @@ public class DefaultModelBridge implements ModelBridge
             // Just warn, since it's a recoverable situation.
             this.logger.warn("Failed to unlock document [{}].", reference, e);
             return false;
-        } finally {
-            xcontext.setUserReference(currentUserReference);
         }
     }
 
@@ -318,5 +300,14 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         return true;
+    }
+
+    @Override
+    public DocumentReference setContextUserReference(DocumentReference userReference)
+    {
+        XWikiContext context = xcontextProvider.get();
+        DocumentReference previousUserReference = context.getUserReference();
+        context.setUserReference(userReference);
+        return previousUserReference;
     }
 }

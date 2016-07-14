@@ -67,8 +67,9 @@ public class CreateJobTest extends AbstractEntityJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).copy(templateReference, documentReference, userReference);
-        verify(this.modelBridge).removeLock(documentReference, userReference);
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).copy(templateReference, documentReference);
+        verify(this.modelBridge).removeLock(documentReference);
     }
 
     @Test
@@ -92,8 +93,9 @@ public class CreateJobTest extends AbstractEntityJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference, userReference);
-        verify(this.modelBridge, never()).removeLock(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference);
+        verify(this.modelBridge, never()).removeLock(any(DocumentReference.class));
     }
 
     @Test
@@ -106,10 +108,9 @@ public class CreateJobTest extends AbstractEntityJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).create(documentReference, null);
-        verify(this.modelBridge).removeLock(documentReference, null);
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
+        verify(this.modelBridge).create(documentReference);
+        verify(this.modelBridge).removeLock(documentReference);
+        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
     }
 
     @Test
@@ -123,10 +124,9 @@ public class CreateJobTest extends AbstractEntityJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).create(spaceHomeReference, null);
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
-        verify(this.modelBridge, never()).removeLock(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge).create(spaceHomeReference);
+        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).removeLock(any(DocumentReference.class));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class CreateJobTest extends AbstractEntityJobTest
         request.setDeep(true);
         run(request);
 
-        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference, null);
+        verify(this.modelBridge).copy(templateDocumentReference, newDocumentReference);
     }
 
     @Test
@@ -247,8 +247,7 @@ public class CreateJobTest extends AbstractEntityJobTest
 
     private void verifyNoCreate()
     {
-        verify(this.modelBridge, never()).create(any(DocumentReference.class), any(DocumentReference.class));
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
+        verify(this.modelBridge, never()).create(any(DocumentReference.class));
+        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
     }
 }

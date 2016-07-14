@@ -158,8 +158,8 @@ public class MoveJobTest extends AbstractMoveJobTest
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
 
-        when(this.modelBridge.delete(newReference, userReference)).thenReturn(true);
-        when(this.modelBridge.copy(oldReference, newReference, userReference)).thenReturn(true);
+        when(this.modelBridge.delete(newReference)).thenReturn(true);
+        when(this.modelBridge.copy(oldReference, newReference)).thenReturn(true);
 
         MoveRequest request = createRequest(oldReference, newReference.getParent());
         request.setCheckRights(false);
@@ -171,7 +171,8 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(linkRefactoring).renameLinks(backLinkReference, oldReference, newReference);
         verify(linkRefactoring).updateRelativeLinks(oldReference, newReference);
 
-        verify(this.modelBridge).delete(oldReference, userReference);
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).delete(oldReference);
         verify(this.modelBridge).createRedirect(oldReference, newReference);
     }
 
@@ -186,7 +187,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).copy(source, new DocumentReference("wiki", "C", "B"), null);
+        verify(this.modelBridge).copy(source, new DocumentReference("wiki", "C", "B"));
     }
 
     @Test
@@ -205,7 +206,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setDeep(true);
         run(request);
 
-        verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"), null);
+        verify(this.modelBridge).copy(docFromSpace, new DocumentReference("tennis", "C", "X"));
     }
 
     @Test
@@ -222,7 +223,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckRights(false);
         run(request);
 
-        verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"), null);
+        verify(this.modelBridge).copy(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"));
     }
 
     @Test
@@ -235,7 +236,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         when(this.modelBridge.getBackLinkedReferences(sourceReference)).thenReturn(Arrays.asList(backLinkReference));
 
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
-        when(this.modelBridge.copy(sourceReference, copyReference, null)).thenReturn(true);
+        when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
 
         MoveRequest request = createRequest(sourceReference, copyReference.getParent());
         request.setCheckRights(false);
@@ -248,7 +249,7 @@ public class MoveJobTest extends AbstractMoveJobTest
             any(DocumentReference.class));
         verify(linkRefactoring).updateRelativeLinks(sourceReference, copyReference);
 
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
         verify(this.modelBridge, never()).createRedirect(any(DocumentReference.class), any(DocumentReference.class));
     }
 }

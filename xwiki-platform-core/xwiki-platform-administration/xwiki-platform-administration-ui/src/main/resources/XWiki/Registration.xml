@@ -483,7 +483,7 @@
         ##
         &lt;input class="button" type="submit" value="$services.localization.render('save')" onclick="window.lb.lbSaveForm();"/&gt;
         &lt;/span&gt;#* End ButtonWrapper then start another...*#&lt;span class="buttonwrapper"&gt;
-        &lt;input class="button secondary" type="submit" value="$services.localization.render("cancel")" onclick="window.lb.lbClose();"/&gt;
+        &lt;input class="button secondary" type="button" value="$services.localization.render("cancel")" onclick="window.lb.lbClose();"/&gt;
       #else
         ## Not using the LightBox
         &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;

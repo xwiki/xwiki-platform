@@ -324,6 +324,9 @@ viewers.Comments = Class.create({
               response.request.options.onFailure(response);
             },
             onComplete : function (response) {
+              // We enable the form even when it is going to be replaced because the browser caches the state of the form
+              // input fields and the user will get disabled fields when (soft) reloading the page.
+              form.enable();
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
                 document.fire("xwiki:docextra:loaded", {
@@ -331,8 +334,6 @@ viewers.Comments = Class.create({
                   "element": this.container
                 });
                 this.updateCount();
-              } else {
-                form.enable();
               }
             }.bind(this)
           });

@@ -126,10 +126,17 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     protected void runInternal() throws Exception
     {
         Collection<EntityReference> entityReferences = this.request.getEntityReferences();
-        if (entityReferences == null) {
-            return;
+        if (entityReferences != null) {
+            // Set the context user before executing the job. We don't have to restore the previous context user when
+            // the job is finished because jobs are normally executed in a separate thread, with a separate execution
+            // context.
+            this.modelBridge.setContextUserReference(this.request.getUserReference());
+            process(entityReferences);
         }
+    }
 
+    protected void process(Collection<EntityReference> entityReferences)
+    {
         this.progressManager.pushLevelProgress(entityReferences.size(), this);
 
         try {

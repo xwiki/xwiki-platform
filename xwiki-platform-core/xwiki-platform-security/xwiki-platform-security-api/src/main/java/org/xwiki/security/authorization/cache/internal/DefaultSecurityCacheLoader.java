@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -281,28 +282,23 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             if (globalGroups == null) {
                 // No luck, the cache has no information about the global groups, so we will load them too
                 globalGroups = new HashSet<>();
-                loadUserEntry(user, userWiki, null, globalGroups);
+                loadUserEntry(user, userWiki, null, globalGroups, new ArrayDeque<GroupSecurityReference>());
             }
             groups.addAll(globalGroups);
 
             // Now we load the rules concerning the shadows of the global groups in the subwiki
             for (GroupSecurityReference group : globalGroups) {
                 Collection<GroupSecurityReference> localGroups = new HashSet<>();
-                loadUserEntry(group, userWiki, entityWiki, localGroups);
+                loadUserEntry(group, userWiki, entityWiki, localGroups, new ArrayDeque<GroupSecurityReference>());
                 groups.addAll(localGroups);
             }
-            
-            // And finally we load the rules concerning the shadow of the user
-            Collection<GroupSecurityReference> localGroups = new HashSet<>();
-            loadUserEntry(user, userWiki, entityWiki, localGroups);
-            groups.addAll(localGroups);
-            
-        } else {
-            // We have to load the rules concerning the groups of the user inside the wiki of that user
-            Collection<GroupSecurityReference> localGroups = new HashSet<>();
-            loadUserEntry(user, userWiki, null, localGroups);
-            groups.addAll(localGroups);
         }
+
+        // We load the rules concerning the groups of the user inside the wiki of the entity, could be either
+        // the global group of a global user, local group for a global user, or local group for a local user
+        Collection<GroupSecurityReference> localGroups = new HashSet<>();
+        loadUserEntry(user, userWiki, entityWiki, localGroups, new ArrayDeque<GroupSecurityReference>());
+        groups.addAll(localGroups);
 
         // Returns all collected groups for access evaluation
         return groups;
@@ -316,13 +312,14 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param entityWiki Only for global user, the wiki to be evaluated, null otherwise to evaluate the user wiki.
      * @param allGroups For the initial call, this collection should normally be empty, and will receive all the
      *                  group associated with the given user (either directly or indirectly).
-     *                  (During recursive calls, it contains the result so far, and allow limiting the recursion.)
+     * @param branchGroups During recursive calls, it contains the result so far, and allow limiting the recursion.
      * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
      * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      * @throws org.xwiki.security.authorization.AuthorizationException on error.
      */
     private void loadUserEntry(UserSecurityReference user, SecurityReference userWiki,
-        SecurityReference entityWiki, Collection<GroupSecurityReference> allGroups)
+        SecurityReference entityWiki, Collection<GroupSecurityReference> allGroups,
+        Deque<GroupSecurityReference> branchGroups)
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
         // Retrieve the list of immediate group for the user/group in either the entity wiki or the user/group wiki
@@ -330,35 +327,55 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             ? userBridge.getAllGroupsFor(user, entityWiki.getOriginalWikiReference())
             : userBridge.getAllGroupsFor(user, userWiki.getOriginalWikiReference());
 
-        Collection<GroupSecurityReference> userGroups = new ArrayList<GroupSecurityReference>();
+        Collection<GroupSecurityReference> immediateGroup = new ArrayList<GroupSecurityReference>();
 
         // Loads all immediate groups recursively, collecting indirect groups along the way
         for (GroupSecurityReference group : groups) {
-            // Loads the group only if it has never been seen before, avoid infinite recursion
-            if (allGroups.add(group)) {
-                Collection<GroupSecurityReference> groupsOfGroup = securityCache.getGroupsFor(group, entityWiki);
-                // But we load the groups only if they are not in the cache
+            // Loads the group only if it has never been seen before in the current path to avoid infinite recursion
+            if (!branchGroups.contains(group)) {
+                // We check the cache for real nodes (not shadows) since group are coming from their own wiki
+                Collection<GroupSecurityReference> groupsOfGroup = securityCache.getGroupsFor(group, null);
+                // And we load the groups only if they are not in the cache
                 if (groupsOfGroup == null) {
-                    loadUserEntry(group, (entityWiki != null) ? entityWiki : userWiki, null, allGroups);
+                    // Add this group into the list of immediate groups for this entry
+                    immediateGroup.add(group);
+
+                    // Load dependencies recursively
+                    branchGroups.push(group);
+                    loadUserEntry(group, (entityWiki != null) ? entityWiki : userWiki, null, allGroups, branchGroups);
+                    branchGroups.pop();
                 } else {
-                    allGroups.addAll(groupsOfGroup);
+                    // Check for possible recursion in the cached groups and add this group only if it is safe
+                    boolean recursionFound = false;
+                    for (GroupSecurityReference existingGroups : groupsOfGroup) {
+                        if (branchGroups.contains(existingGroups)) {
+                            recursionFound = true;
+                            break;
+                        }
+                    }
+                    if (!recursionFound) {
+                        // Add this group into the list of immediate groups for this entry
+                        immediateGroup.add(group);
+                        // Add all group found in the cache for the final result
+                        allGroups.addAll(groupsOfGroup);
+                    }
                 }
-                
-                // Do not forget to add this group into the list of user's groups
-                userGroups.add(group);
             }
         }
+
+        // Collect groups of this entry for the final result
+        allGroups.addAll(immediateGroup);
 
         // Store the user/group in the cache
         if (entityWiki != null) {
             // Store a shadow entry for a global user/group involved in a local wiki
-            securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), userGroups);
+            securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), immediateGroup);
         } else {
             // Store or upgrade document entry into a user/group entry in the cache
             // While the document rules could be already loaded in the cache, even if these rules should stay the same,
             // we need to reload them as a user/group to have the security rules reference properly typed and
             // recognized by the cache as a user. (cfr. XWIKI-12016)
-            loadUserEntry(user, userGroups);
+            loadUserEntry(user, immediateGroup);
         }
     }
 

@@ -3,11 +3,27 @@
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="Main Wiki">
     <user name="userA" alt="a global user in local groupA and global groupA which is in local groupB and global groupB which is local group C" />
+    <user name="userB" alt="a global user global groupC member of global groupB" />
+    <user name="userC" alt="a global user in global groupD member of global groupB" />
+    <user name="userD" alt="a global user in global groupC and global groupD both members of global group B" />
     <group name="groupA">
       <user name="userA" />
     </group>
+    <group name="groupE">
+      <group name="userD" />
+    </group>
+    <group name="groupC">
+      <group name="groupE" />
+      <user name="userB" />
+    </group>
+    <group name="groupD">
+      <group name="groupE" />
+      <user name="userC" />
+    </group>
     <group name="groupB">
       <group name="groupA" />
+      <group name="groupC" />
+      <group name="groupD" />
     </group>
 
     <space name="any space">
@@ -15,7 +31,7 @@
       <document name="docAllowGroupA" alt="document with access for groupA">
         <allowGroup name="groupA" />
       </document>
-      <document name="docAllowGroupeB" alt="document with access for groupB">
+      <document name="docAllowGroupB" alt="document with access for groupB">
         <allowGroup name="groupB" />
       </document>
       <document name="docDenyGroupA" alt="document without access for groupA">

@@ -118,7 +118,6 @@
     #set ($targetwiki = "$!request.targetWikiName")
     #set ($targetspace = "$!request.targetSpaceName")
     #set ($targetpage = "$!request.targetPageName")
-    #set ($targetTitle = $request.targetPageTitle)
     ## Determine if the target document should be terminal.
     #isTargetDocumentTerminal($sourcepage)
     ##------------------------------------------------
@@ -167,9 +166,9 @@
           </div>
         </form>
       #else
-        ## TODO: We should set the title specified on the request.
         #set ($copyAsRequest = $services.refactoring.createCopyAsRequest($sourceDocReference, $targetDocReference))
         #set ($discard = $copyAsRequest.setDeep($deep))
+        #maybeUpdateTitleAfterCopy($copyAsRequest $sourceDocReference 'targetPageTitle')
         #set ($copyAsJob = $services.refactoring.copyAs($copyAsRequest))
         #if ($request.async != 'true')
           #try()

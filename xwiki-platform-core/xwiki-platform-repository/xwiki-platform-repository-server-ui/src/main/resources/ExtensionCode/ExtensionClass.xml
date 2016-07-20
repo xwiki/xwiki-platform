@@ -31,7 +31,7 @@
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1468937169000</date>
+  <date>1469007715000</date>
   <contentUpdateDate>1427461793000</contentUpdateDate>
   <version>1.1</version>
   <title/>
@@ -334,6 +334,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </scmdevconnection>
+    <showInstalledCount>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>showInstalledCount</name>
+      <number>24</number>
+      <prettyName>Show installed count</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </showInstalledCount>
     <source>
       <customDisplay/>
       <disabled>0</disabled>

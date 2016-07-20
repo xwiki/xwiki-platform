@@ -22,23 +22,20 @@ package org.xwiki.extension.xar.script;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
-import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
@@ -57,15 +54,6 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
      * The install request property that specifies which user triggered the XAR repair job.
      */
     private static final String PROPERTY_USER_REFERENCE = "user.reference";
-
-    /**
-     * Needed for checking programming rights.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    private JobExecutor jobExecutor;
 
     /**
      * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -90,7 +78,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         String namespace = getWikiNamespace(wiki);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        installRequest.setId(getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, id, namespace));
         DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
         if (currentUserReference != null) {
             installRequest.setProperty(PROPERTY_USER_REFERENCE, currentUserReference);
@@ -134,7 +122,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         if (StringUtils.isNotBlank(wiki)) {
             installRequest.addNamespace(getWikiNamespace(wiki));
         }
-        installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, feature,
+        installRequest.setId(getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, feature,
             installRequest.hasNamespaces() ? installRequest.getNamespaces().iterator().next() : null));
 
         try {
@@ -161,9 +149,9 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         List<String> jobId;
 
         if (namespace != null) {
-            jobId = Arrays.asList(ExtensionManagerScriptService.EXTENSION_JOBID_PREFIX, prefix, extensionId, namespace);
+            jobId = Arrays.asList(ExtensionRequest.JOBID_PREFIX, prefix, extensionId, namespace);
         } else {
-            jobId = Arrays.asList(ExtensionManagerScriptService.EXTENSION_JOBID_PREFIX, prefix, extensionId);
+            jobId = Arrays.asList(ExtensionRequest.JOBID_PREFIX, prefix, extensionId);
         }
 
         return jobId;

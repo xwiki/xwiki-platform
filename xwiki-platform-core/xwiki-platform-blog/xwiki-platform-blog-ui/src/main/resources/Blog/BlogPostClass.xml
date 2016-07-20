@@ -67,7 +67,7 @@
       <separators/>
       <size>1</size>
       <sort>value</sort>
-      <sql/>
+      <sql>select doc.name from XWikiDocument doc, BaseObject as obj where doc.fullName = obj.name and obj.className = 'Blog.CategoryClass' and  doc.fullName not in ('Blog.CategoryTemplate', 'Blog.Categories')</sql>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

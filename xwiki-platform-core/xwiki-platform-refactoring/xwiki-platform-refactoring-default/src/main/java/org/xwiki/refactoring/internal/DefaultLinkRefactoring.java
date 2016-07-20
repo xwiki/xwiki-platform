@@ -161,10 +161,8 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
 
         if (modified) {
-            XWikiContext xcontext = this.xcontextProvider.get();
             document.setContent(xdom);
-            document.setAuthorReference(xcontext.getUserReference());
-            xcontext.getWiki().saveDocument(document, "Renamed back-links.", xcontext);
+            saveDocumentPreservingContentAuthor(document, "Renamed back-links.", false);
             this.logger.info("The links from [{}] that were targeting [{}] have been updated to target [{}].",
                 document.getDocumentReferenceWithLocale(), oldTarget, newTarget);
         } else {
@@ -293,13 +291,31 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         }
 
         if (modified) {
-            XWikiContext xcontext = this.xcontextProvider.get();
             document.setContent(xdom);
-            document.setAuthorReference(xcontext.getUserReference());
-            xcontext.getWiki().saveDocument(document, "Updated the relative links.", true, xcontext);
+            saveDocumentPreservingContentAuthor(document, "Updated the relative links.", true);
             this.logger.info("Updated the relative links from [{}].", document.getDocumentReference());
         } else {
             this.logger.info("No relative links to update in [{}].", document.getDocumentReference());
         }
+    }
+
+    /**
+     * HACK: Save the given document without changing the content author because the document may loose or win
+     * programming and script rights as a consequence and this is not the intent of this operation. Even though the
+     * document content field was modified, the change is purely syntactic; the semantic is not affected so it's not
+     * clear whether the content author deserves to be updated or not (even without the side effects).
+     * 
+     * @param document the document to be saved
+     * @param comment the revision comment
+     * @param minorEdit whether it's a minor edit or not
+     * @throws XWikiException if saving the document fails
+     */
+    private void saveDocumentPreservingContentAuthor(XWikiDocument document, String comment, boolean minorEdit)
+        throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        document.setContentDirty(false);
+        document.setAuthorReference(xcontext.getUserReference());
+        xcontext.getWiki().saveDocument(document, comment, minorEdit, xcontext);
     }
 }

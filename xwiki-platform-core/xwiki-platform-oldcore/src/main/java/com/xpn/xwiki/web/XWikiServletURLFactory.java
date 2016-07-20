@@ -26,6 +26,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -37,13 +39,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
+import com.sun.star.uno.RuntimeException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
@@ -239,6 +241,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
+        // For how to encode the various parts of the URL, see http://stackoverflow.com/a/29948396/153102
         addAction(path, spaceReference, action, context);
         addSpaces(path, spaceReference, action, context);
         addName(path, name, action, context);
@@ -246,12 +249,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
             path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
-            // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
             path.append("#");
-            path.append(encode(anchor, context));
+            path.append(encodeWithinQuery(anchor, context));
         }
 
         URL result;
@@ -290,6 +292,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    /**
+     * Add the spaces to the path.
+     */
     private void addSpaces(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
         for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
@@ -299,15 +304,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference, XWikiContext context)
     {
-        path.append(encode(spaceReference.getName(), context)).append('/');
+        path.append(encodeWithinPath(spaceReference.getName(), context)).append('/');
     }
 
+    /**
+     * Add the page name to the path.
+     */
     private void addName(StringBuilder path, String name, String action, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
             || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
-            path.append(encode(name, context));
+            path.append(encodeWithinPath(name, context));
         }
     }
 
@@ -321,7 +329,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         path.append("/");
         if (encode) {
             // Encode the given file name as a single path segment.
-            path.append(encode(fileName, context).replace("+", "%20"));
+            path.append(encodeWithinPath(fileName, context).replace("+", "%20"));
         } else {
             try {
                 // The given file name is actually a file path and so we need to encode each path segment separately.
@@ -335,9 +343,26 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    private String encode(String name, XWikiContext context)
+    private String encodeWithinPath(String name, XWikiContext context)
     {
-        return Util.encodeURI(name, context);
+        String encodedName;
+        try {
+            encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
+        } catch (URIException e) {
+            throw new RuntimeException("Missing charset [UTF-8]", e);
+        }
+        return encodedName;
+    }
+
+    private String encodeWithinQuery(String name, XWikiContext context)
+    {
+        String encodedName;
+        try {
+            encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
+        } catch (URIException e) {
+            throw new RuntimeException("Missing charset [UTF-8]", e);
+        }
+        return encodedName;
     }
 
     @Override

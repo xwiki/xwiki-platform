@@ -42,6 +42,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -526,16 +527,16 @@ public class XarPackage
 
     private void readDescriptorInfos(Element infos)
     {
-        this.packageExtensionId = getElementText(infos, XarModel.ELEMENT_INFOS_EXTENSIONID);
-        this.packageVersion = getElementText(infos, XarModel.ELEMENT_INFOS_VERSION);
-        this.packageName = getElementText(infos, XarModel.ELEMENT_INFOS_NAME);
-        this.packageDescription = getElementText(infos, XarModel.ELEMENT_INFOS_DESCRIPTION);
-        this.packageLicense = getElementText(infos, XarModel.ELEMENT_INFOS_LICENSE);
-        this.packageAuthor = getElementText(infos, XarModel.ELEMENT_INFOS_AUTHOR);
+        this.packageExtensionId = getElementText(infos, XarModel.ELEMENT_INFOS_EXTENSIONID, true);
+        this.packageVersion = getElementText(infos, XarModel.ELEMENT_INFOS_VERSION, false);
+        this.packageName = getElementText(infos, XarModel.ELEMENT_INFOS_NAME, false);
+        this.packageDescription = getElementText(infos, XarModel.ELEMENT_INFOS_DESCRIPTION, false);
+        this.packageLicense = getElementText(infos, XarModel.ELEMENT_INFOS_LICENSE, false);
+        this.packageAuthor = getElementText(infos, XarModel.ELEMENT_INFOS_AUTHOR, false);
         this.packageBackupPack =
-            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISBACKUPPACK)).booleanValue();
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISBACKUPPACK, false)).booleanValue();
         this.packagePreserveVersion =
-            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION)).booleanValue();
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, false)).booleanValue();
     }
 
     private void readDescriptorFiles(Element files)
@@ -612,11 +613,17 @@ public class XarPackage
         }
     }
 
-    private String getElementText(Element element, String tagName)
+    private String getElementText(Element element, String tagName, boolean ignoreEmpty)
     {
         NodeList nList = element.getElementsByTagName(tagName);
 
-        return nList.getLength() > 0 ? nList.item(0).getTextContent() : null;
+        String value = nList.getLength() > 0 ? nList.item(0).getTextContent() : null;
+
+        if (value != null && ignoreEmpty && StringUtils.isEmpty(value)) {
+            value = null;
+        }
+
+        return value;
     }
 
     /**
@@ -686,14 +693,15 @@ public class XarPackage
         writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
 
         writer.writeStartElement(XarModel.ELEMENT_INFOS);
-        writeElement(writer, XarModel.ELEMENT_INFOS_NAME, getPackageName());
-        writeElement(writer, XarModel.ELEMENT_INFOS_DESCRIPTION, getPackageDescription());
-        writeElement(writer, XarModel.ELEMENT_INFOS_LICENSE, getPackageLicense());
-        writeElement(writer, XarModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
-        writeElement(writer, XarModel.ELEMENT_INFOS_VERSION, getPackageVersion());
-        writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, String.valueOf(isPackageBackupPack()));
-        writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, String.valueOf(isPackagePreserveVersion()));
-        writeElement(writer, XarModel.ELEMENT_INFOS_EXTENSIONID, getPackageExtensionId());
+        writeElement(writer, XarModel.ELEMENT_INFOS_NAME, getPackageName(), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_DESCRIPTION, getPackageDescription(), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_LICENSE, getPackageLicense(), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor(), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_VERSION, getPackageVersion(), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, String.valueOf(isPackageBackupPack()), true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, String.valueOf(isPackagePreserveVersion()),
+            true);
+        writeElement(writer, XarModel.ELEMENT_INFOS_EXTENSIONID, getPackageExtensionId(), false);
         writer.writeEndElement();
 
         writer.writeStartElement(XarModel.ELEMENT_FILES);
@@ -707,7 +715,8 @@ public class XarPackage
         writer.writeEndElement();
     }
 
-    private void writeElement(XMLStreamWriter streamWriter, String localName, String value) throws XMLStreamException
+    private void writeElement(XMLStreamWriter streamWriter, String localName, String value, boolean emptyIfNull)
+        throws XMLStreamException
     {
         if (value != null) {
             if (value.isEmpty()) {
@@ -717,7 +726,7 @@ public class XarPackage
                 streamWriter.writeCharacters(value);
                 streamWriter.writeEndElement();
             }
-        } else {
+        } else if (emptyIfNull) {
             streamWriter.writeEmptyElement(localName);
         }
     }

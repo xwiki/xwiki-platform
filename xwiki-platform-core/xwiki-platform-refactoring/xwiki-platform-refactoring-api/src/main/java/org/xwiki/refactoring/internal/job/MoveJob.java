@@ -184,14 +184,14 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
                     return;
-                } else if (!this.modelBridge.delete(newReference, this.request.getUserReference())) {
+                } else if (!this.modelBridge.delete(newReference)) {
                     return;
                 }
             }
 
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
-            if (!this.modelBridge.copy(oldReference, newReference, this.request.getUserReference())) {
+            if (!this.modelBridge.copy(oldReference, newReference)) {
                 return;
             }
 
@@ -201,7 +201,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
             // Step 5: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
-                this.modelBridge.delete(oldReference, this.request.getUserReference());
+                this.modelBridge.delete(oldReference);
             }
 
             // Step 6: Create an automatic redirect.

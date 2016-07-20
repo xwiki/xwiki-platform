@@ -87,10 +87,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 (((
 {{box title="**Contents**"}}{{toc /}}{{/box}}
 
-[[image:Templates.Article.Template.WebHome@image1.jpg||width="100%"]]
+[[image:Templates.Article.Template.WebHome@image1.jpg||style="width: 100%"]]
 //Figure 1: [[Sea&gt;&gt;https://commons.wikimedia.org/wiki/File:Isle_of_Icacos_II.jpg]]//
 
-[[image:Templates.Article.Template.WebHome@image2.jpg||width="100%"]]
+[[image:Templates.Article.Template.WebHome@image2.jpg||style="width: 100%"]]
 //Figure 2: [[Waves&gt;&gt;https://commons.wikimedia.org/wiki/File:Culebra_-_Playa_de_Flamenco.jpg]]//
 )))
 )))</content>

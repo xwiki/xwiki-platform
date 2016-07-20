@@ -91,7 +91,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 (% class="box" %)
 (((
 = Falabella =
-[[image:Templates.Encyclopedia.Template.WebHome@image.jpg||width="100%"]]
+[[image:Templates.Encyclopedia.Template.WebHome@image.jpg||style="width: 100%"]]
 |=Morphology|Miniature horse
 |=Region|[[Argentina&gt;&gt;Main.WebHome]]
 |=Price|1200 €

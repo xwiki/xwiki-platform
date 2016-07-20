@@ -46,8 +46,8 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/application-forum.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/application-forum.git</developerConnection>
+    <connection>scm:git:git://github.com/xwiki-contrib/application-templates.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki-contrib/application-templates.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-templates</url>
     <tag>HEAD</tag>
   </scm>

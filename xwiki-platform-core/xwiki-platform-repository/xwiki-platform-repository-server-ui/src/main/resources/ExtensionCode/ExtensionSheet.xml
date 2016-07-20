@@ -130,6 +130,10 @@
         #else
           $doc.authors
         #end
+      ##------- Active Installs --------
+      #if ($doc.getValue('id'))
+        |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
+      #end
       ##------- Rating --------
       |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference "")
       ##------- Website --------------

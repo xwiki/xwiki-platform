@@ -1,3 +1,5 @@
+##! Priviledged template in order to be able to execute SOLR queries which require PR.
+##!privileged=true
 ###
 ### Document does not exist message
 ###
@@ -16,10 +18,14 @@
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
     #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
+    ## Create link
     #if($hasEdit)
       #set($url = $doc.getURL("create", $editparams))
       $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
     #end
+    ## Suggestions, if any.
+    #showSuggestions
+    ## Recycle bin
     #template("recyclebinlist.vm")
     #xwikimessageboxend()
   #end
@@ -27,4 +33,72 @@
   </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
+#end
+##
+## Suggestions macro that displays similar pages based on the current document's reference, using Solr Search.
+##
+#macro (showSuggestions)
+  #set ($docName = $doc.name)
+  #if ($doc.name == 'WebHome')
+    ## Use the last space name as doc name for non-terminal documents.
+    #set ($docName = ${doc.documentReference.lastSpaceReference.name})
+  #end
+
+  ## Handle the case when there are spaces in the doc name
+  #set ($docNameSplit = "${stringtool.join($stringtool.split($docName, ' '), ',')}")
+  #set ($docNameSplitFuzzy = "$!{stringtool.join($stringtool.split($docName, ' '), '~,')}~")
+
+  ## Extract the space reference elements
+  #set ($spaceReferenceStrings = "")
+  #set ($spaceReferenceFuzzyStrings = "")
+  #set ($spaceReferences = $doc.documentReference.spaceReferences)
+  #foreach ($spaceReference in $spaceReferences)
+    #if ($foreach.count > 1)
+      #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
+      #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #end
+    ## Note: Also handling possible space characters in the space name.
+    #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), ',')}")
+    #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), '~,')}~")
+  #end
+
+  ## Build the query string, with various usecases supported.
+  ## TODO: Add better scoring boosts to properly favor one usecase over another or multiple usecases happening at the same time.
+
+  ## Non-terminal doc with the same name as the current doc
+  #set ($suggestionsQueryString = "(spaces:($docNameSplit, $docNameSplitFuzzy) AND name_exact:WebHome)")
+  ## Terminal doc with the same name as the current doc
+  #set ($suggestionsQueryString = "${suggestionsQueryString} OR name:($docNameSplit, $docNameSplitFuzzy)")
+  ## Document in a space named like the current terminal doc, if it is the case.
+  #if ($doc.name != 'WebHome')
+    #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($docNameSplit, $docNameSplitFuzzy)")
+  #end
+  ## Document in a space named like on of the spaces of the current doc.
+  #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings)")
+
+  ## Build and run the Solr query.
+  #set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))
+  #set ($filterQuery = ['type:"DOCUMENT"', "locale:(""$xcontext.locale"" OR """")"])
+  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+    #set ($discard = $filterQuery.add('hidden:false'))
+  #end
+  #set ($discard = $suggestionsQuery.bindValue('fq', $filterQuery))
+  #set ($discard = $suggestionsQuery.setLimit(10))
+
+  #set ($suggestionsResponse = $suggestionsQuery.execute()[0])
+  #set ($suggestionResults = $suggestionsResponse.results)
+
+  ## Display the suggestions, if any.
+  #if ($suggestionResults.size() > 0)
+    <div style="margin-top: 1em">
+      <p><b>Were you looking for one of the following pages instead?</b></p>
+      <ul>
+      #foreach ($suggestionResult in $suggestionResults)
+        #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))
+        #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
+        <li><a href="$escapetool.xml($suggestionDocument.getURL())">$escapetool.xml($suggestionDocument.plainTitle)</a></li>
+      #end
+      </ul>
+    </div>
+  #end
 #end

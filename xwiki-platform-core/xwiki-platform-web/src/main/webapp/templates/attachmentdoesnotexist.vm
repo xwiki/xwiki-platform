@@ -1,3 +1,5 @@
+##! Priviledged template in order to be able to execute SOLR queries which require PR.
+##!privileged=true
 $response.setStatus(404)
 #template("startpage.vm")
 <div class="main layoutsubsection">
@@ -7,9 +9,79 @@ $response.setStatus(404)
 #else
   #xwikimessageboxstart($services.localization.render('error') $services.localization.render('attachmentdoesnotexist'))
   $!exception
+  ## Suggestions, if any.
+  #showSuggestions()
   #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main
 #template("endpage.vm")
+##
+## Suggestions macro that displays similar attachments from the current document, using Solr Search.
+##
+#macro (showSuggestions)
+  ## Determine the filename from the last request URL path element.
+  #set ($filename = $stringtool.substringAfterLast($request.requestURL, '/'))
+  ## URL unescape any spaces.
+  #set ($filename = $stringtool.remove($filename, '%20'))
+
+  ## Handle the case when there are spaces in the file name
+  #set ($filenameSplit = "${stringtool.join($stringtool.split($filename, ' '), ',')}")
+  #set ($filenameSplitFuzzy = "$!{stringtool.join($stringtool.split($filename, ' '), '~,')}~")
+
+  ## Determine the document name.
+  #set ($docName = $doc.name)
+  #if ($doc.name == 'WebHome')
+    ## Use the last space name as doc name for non-terminal documents.
+    #set ($docName = ${doc.documentReference.lastSpaceReference.name})
+  #end
+
+  ## Handle the case when there are spaces in the doc name.
+  #set ($docNameSplit = "${stringtool.join($stringtool.split($docName, ' '), ',')}")
+  #set ($docNameSplitFuzzy = "$!{stringtool.join($stringtool.split($docName, ' '), '~,')}~")
+
+  ## Extract the space reference elements.
+  #set ($spaceReferenceStrings = "")
+  #set ($spaceReferenceFuzzyStrings = "")
+  #set ($spaceReferences = $doc.documentReference.spaceReferences)
+  #foreach ($spaceReference in $spaceReferences)
+    #if ($foreach.count > 1)
+      #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
+      #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #end
+    ## Note: Also handling possible space characters in the space name.
+    #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), ',')}")
+    #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), '~,')}~")
+  #end
+
+  ## Files in the same document
+  #set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy) OR (space_exact:""$doc.space"" AND name_exact:""$doc.name"")")
+  ## Files in a document with a similar name or space elements as the current doc.
+  #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings) OR name:($docNameSplit, $docNameSplitFuzzy)")
+
+  ## Build and run the Solr query.
+  #set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))
+  #set ($filterQuery = ['type:"ATTACHMENT"', "locale:(""$xcontext.locale"" OR """")"])
+  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+    #set ($discard = $filterQuery.add('hidden:false'))
+  #end
+  #set ($discard = $suggestionsQuery.bindValue('fq', $filterQuery))
+  #set ($discard = $suggestionsQuery.setLimit(10))
+
+  #set ($suggestionsResponse = $suggestionsQuery.execute()[0])
+  #set ($suggestionResults = $suggestionsResponse.results)
+
+  ## Display the suggestions, if any.
+  #if ($suggestionResults.size() > 0)
+    <div style="margin-top: 1em">
+      <p><b>Were you looking for one of the following files instead?</b></p>
+      <ul>
+      #foreach ($suggestionResult in $suggestionResults)
+        #set ($suggestionResultReference = $services.solr.resolve($suggestionResult, 'ATTACHMENT'))
+        <li><a href="$escapetool.xml($xwiki.getURL($suggestionResultReference))">$escapetool.xml($suggestionResultReference.name)</a></li>
+      #end
+      </ul>
+    </div>
+  #end
+#end

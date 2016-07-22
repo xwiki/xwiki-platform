@@ -56,7 +56,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
       &lt;dl&gt;
         &lt;dt&gt;
           &lt;label&gt;$services.localization.render('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;
-          #set ($hintKey = 'platform.core.profile.displayHiddenDocuments.hint')
+          #set ($hintKey = 'XWiki.XWikiUsers_displayHiddenDocuments.hint')
           #if ($services.localization.get($hintKey))
           &lt;span class='xHint'&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
           #end
@@ -64,7 +64,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
         &lt;dd&gt;$doc.display('displayHiddenDocuments')&lt;/dd&gt;
         &lt;dt&gt;
           &lt;label&gt;$services.localization.render('platform.core.profile.enableAccessibility')&lt;/label&gt;
-          #set ($hintKey = 'platform.core.profile.enableAccessibility.hint')
+          #set ($hintKey = 'XWiki.XWikiUsers_accessibility.hint')
           #if ($services.localization.get($hintKey))
           &lt;span class='xHint'&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
           #end
@@ -75,7 +75,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
       &lt;dl&gt;
         &lt;dt&gt;
           &lt;label&gt;$services.localization.render('platform.core.profile.timezone')&lt;/label&gt;
-          #set ($hintKey = 'platform.core.profile.timezone.hint')
+          #set ($hintKey = 'XWiki.XWikiUsers_timezone.hint')
           #if ($services.localization.get($hintKey))
           &lt;span class='xHint'&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
           #end
@@ -86,7 +86,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
       &lt;dl&gt;
         &lt;dt&gt;
           &lt;label&gt;$services.localization.render('platform.core.profile.editor')&lt;/label&gt;
-          #set ($hintKey = 'platform.core.profile.editor.hint')
+          #set ($hintKey = 'XWiki.XWikiUsers_editor.hint')
           #if ($services.localization.get($hintKey))
           &lt;span class='xHint'&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
           #end
@@ -94,7 +94,7 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
         &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
         &lt;dt&gt;
           &lt;label&gt;$services.localization.render('platform.core.profile.userType')&lt;/label&gt;
-          #set ($hintKey = 'platform.core.profile.userType.hint')
+          #set ($hintKey = 'XWiki.XWikiUsers_usertype.hint')
           #if ($services.localization.get($hintKey))
           &lt;span class='xHint'&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
           #end

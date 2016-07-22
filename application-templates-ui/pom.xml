@@ -36,15 +36,6 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Templates Application</xwiki.extension.name>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-      <type>zip</type>
-    </dependency>
-  </dependencies>
   <build>
     <!-- Needed to add support for the XAR packaging -->
     <extensions>

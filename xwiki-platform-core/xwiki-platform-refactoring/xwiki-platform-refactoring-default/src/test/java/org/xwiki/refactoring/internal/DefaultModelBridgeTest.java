@@ -228,4 +228,18 @@ public class DefaultModelBridgeTest
         verify(this.xcontext.getWiki(), never()).saveDocument(any(XWikiDocument.class), eq("Updated parent field."),
             eq(true), eq(this.xcontext));
     }
+
+    @Test
+    public void updateTitle() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(this.xcontext.getWiki().getDocument(documentReference, xcontext)).thenReturn(document);
+
+        this.mocker.getComponentUnderTest().update(documentReference, Collections.singletonMap("title", "foo"));
+
+        verify(document).setTitle("foo");
+        verify(this.xcontext.getWiki()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.mocker.getMockedLogger()).info("Document [{}] has been updated.", documentReference);
+    }
 }

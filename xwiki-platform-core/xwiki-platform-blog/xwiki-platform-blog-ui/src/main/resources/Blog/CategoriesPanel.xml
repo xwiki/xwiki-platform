@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Blog.CategoriesPanel" locale="">
   <web>Blog</web>
   <name>CategoriesPanel</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>Panels.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1229921032000</date>
-  <contentUpdateDate>1229921032000</contentUpdateDate>
+  <date>1467882976000</date>
+  <contentUpdateDate>1467273445000</contentUpdateDate>
   <version>1.1</version>
   <title>Blog Categories Panel</title>
   <comment/>
@@ -126,6 +126,11 @@
 
 {{velocity}}
 #panelheader($services.localization.render('xe.blog.categories.paneltitle'))
+{{html wiki="true"}}
+#getCallingDocument($callingDocument)
+* (% class="blog-category-level" %)((( [[#toolImage('bullet_feed', '[RSS]')&gt;&gt;Blog.BlogRss||queryString="xpage=plain" title="RSS"]] &lt;span class="wikilink"&gt;&lt;a href="$xwiki.getURL('Blog.WebHome')"&gt;$services.localization.render('blog.categories.all')&lt;/a&gt;&lt;/span&gt;)))
+{{/html}}
+
 #getCategoriesHierarchy('Blog' $tree)
 {{html wiki="true"}}
 #displayCategoriesHierarchy($tree 'simple')

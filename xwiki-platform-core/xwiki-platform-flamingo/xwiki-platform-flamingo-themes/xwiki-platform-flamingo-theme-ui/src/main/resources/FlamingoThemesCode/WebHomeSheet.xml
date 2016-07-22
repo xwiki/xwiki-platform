@@ -40,27 +40,71 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-####################################
-## GLOBALS &amp; STYLES
-####################################
-#set($discard = $xwiki.ssx.use('FlamingoThemesCode.WebHomeSheet'))
-#set($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
-#if("$!currentTheme" == '')
-  #set($currentTheme = 'FlamingoThemes.Charcoal')
-#end
-#set($currentThemeDoc = $xwiki.getDocument($currentTheme))
+################################
+## Globals
+################################
+#set ($discard = $xwiki.ssx.use('FlamingoThemesCode.WebHomeSheet'))
 ####################################
 ## CONTROLLER
 ####################################
 #if($request.action == 'setTheme')
   #setTheme()
 #elseif($request.action == 'setThemeSuccess')
+  #prepareView()
   #setThemeSuccess()
   #view()
 #elseif($request.action == 'create')
   #create()
 #else
+  #prepareView()
   #view()
+#end
+####################################
+## PREPARE VIEW
+####################################
+#macro(prepareView)
+  #set ($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
+  #if ("$!currentTheme" == '')
+    #set ($currentTheme = 'FlamingoThemes.Charcoal')
+  #end
+  #set ($currentThemeDoc = $xwiki.getDocument($currentTheme))
+  #set ($isSubWiki = $services.wiki.currentWikiId != $services.wiki.mainWikiId)
+  #set ($flamingoThemesFromThisWiki = [])
+  #getFlamingoThemes($services.wiki.currentWikiId, $flamingoThemesFromThisWiki)
+  #if ($isSubWiki)
+    #set ($flamingoThemesFromMainWiki = [])
+    #getFlamingoThemes($services.wiki.mainWikiId,  $flamingoThemesFromMainWiki)
+  #end
+  #set ($currentScope = 'local')
+  #if ("$!currentTheme" != '' &amp;&amp; $services.model.resolveDocument($currentTheme).wikiReference.name == $services.wiki.mainWikiId)
+    #set ($currentScope = 'global')
+  #end
+#end
+################################
+## Get Flamingo themes
+################################
+#macro(getFlamingoThemes $wiki $return)
+  #set ($results = [])
+  #set ($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")
+  #getThemesFromQuery ($xwql, $wiki, $results)
+  #set ($return = $NULL)
+  #setVariable ("$return", $results)
+#end
+################################
+## Get themes from a query
+################################
+#macro(getThemesFromQuery $xwql $wiki $return)
+  #set ($wikiReference = $services.model.createDocumentReference($wiki, 'A', 'B').wikiReference)
+  #set ($themes = $services.query.xwql($xwql).setWiki($wiki).execute())
+  #set ($themesRef = [])
+  #foreach ($theme in $themes)
+    #set ($themeRef = $services.model.resolveDocument($theme, 'default', $wikiReference))
+    #if ($services.security.authorization.hasAccess('view', $xcontext.userReference, $themeRef))
+      #set ($discard = $themesRef.add($themeRef))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $themesRef)
 #end
 ####################################
 ## VIEW
@@ -82,32 +126,59 @@
         $services.localization.render('platform.flamingo.themes.home.warningCurrentOldColorTheme')
       {{/warning}}
     #end
-    #displayTheme($currentTheme)
+    #displayTheme($currentTheme, $currentScope)
     
     ## Display the other themes
-    #set($query = "FROM doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; :currentTheme AND doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.title")
-    #set($themeList = $services.query.xwql($query).bindValue('currentTheme', $currentTheme).execute())
-    #if($themeList.size() &gt; 0)
-      == $services.localization.render('platform.flamingo.themes.home.otherthemes') ==
-    #end
     ## Creation form
     #creationForm()
-
-    #foreach($themeDocName in $themeList)
-      #displayTheme($themeDocName)
+    
+    == $services.localization.render('platform.flamingo.themes.home.otherthemes') ==
+    #if ($isSubWiki &amp;&amp; !$flamingoThemesFromMainWiki.isEmpty())
+      {{html}}
+      &lt;ul class="nav nav-tabs" role="tablist"&gt;
+        &lt;li role="presentation" class="active"&gt;&lt;a href="#local" role="tab" data-toggle="tab"&gt;$escapetool.xml($services.localization.render('platform.flamingo.themes.local'))&lt;/a&gt;&lt;/li&gt;
+        &lt;li role="presentation"&gt;&lt;a href="#global" role="tab" data-toggle="tab"&gt;$escapetool.xml($services.localization.render('platform.flamingo.themes.global'))&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      {{/html}}
+      
+      (% class="tab-content" %)
+      (((
+        (% class="tab-pane active" id="local" %)
+        (((
+          #foreach($themeRef in $flamingoThemesFromThisWiki)
+            #displayTheme($themeRef, 'local')
+          #end
+        )))
+        
+        (% class="tab-pane" id="global" %)
+        (((
+          #foreach($themeRef in $flamingoThemesFromMainWiki)
+            #displayTheme($themeRef, 'global')
+          #end
+        )))
+      )))
+    #else
+      #foreach($themeRef in $flamingoThemesFromThisWiki)
+        #displayTheme($themeRef, 'local')
+      #end
     #end
   )))
 #end
 ####################################
 ## DISPLAY THEME
 ####################################
-#macro(displayTheme $themeDocName)
-  #if($currentTheme == $themeDocName)
+#macro(displayTheme $themeReference $scope)
+  #if ($scope == 'local')
+    #set($fullName = $services.model.serialize($themeReference, 'local'))
+  #else
+    #set($fullName = $services.model.serialize($themeReference, 'default'))
+  #end
+  #if($currentTheme == $fullName)
     #set($isCurrentTheme = true)
   #else
     #set($isCurrentTheme = false)
   #end
-  #set($themeDoc = $xwiki.getDocument($themeDocName))
+  #set($themeDoc = $xwiki.getDocument($themeReference))
   #set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
   (% class="theme #if($isCurrentTheme) current-theme#end" %)
   (((
@@ -116,9 +187,9 @@
     ## Display the informations
     (% class="theme-info" %)
     (((
-      === [[$themeDoc.displayTitle&gt;&gt;$themeDocName]] ===
+      === [[$themeDoc.displayTitle&gt;&gt;$fullName]] #if ($isSubWiki &amp;&amp; $scope == 'local') ($services.wiki.currentWikiId)#end===
       #if($hasAdmin &amp;&amp; !$isCurrentTheme)
-        $services.icon.render('bullet_go') [[$services.localization.render('platform.flamingo.themes.home.useThisTheme')&gt;&gt;path:$doc.getURL('view', "action=setTheme&amp;theme=${themeDoc.fullName}&amp;form_token=$services.csrf.token")]]
+        $services.icon.render('bullet_go') [[$services.localization.render('platform.flamingo.themes.home.useThisTheme')&gt;&gt;path:$doc.getURL('view', "action=setTheme&amp;theme=${fullName}&amp;form_token=$services.csrf.token")]]
       #end
     )))
   )))
@@ -186,6 +257,8 @@
 ####################################
 #macro(creationForm)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, 'FlamingoThemes.AnyPage____________'))
+    (% class="clearfix" %)
+    (((
   
     {{html}}
       &lt;div class="theme-creation-form" &gt;
@@ -199,6 +272,7 @@
       &lt;/div&gt;
     {{/html}}
     
+    )))
   #end
 #end
 ####################################

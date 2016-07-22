@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -110,4 +111,12 @@ public interface ModelBridge
      * @return the previous user reference that was on the execution context
      */
     DocumentReference setContextUserReference(DocumentReference userReference);
+
+    /**
+     * Modify the specified document based on the given parameters (usually the fields to update).
+     * 
+     * @param documentReference specifies the document to update
+     * @param parameters specifies the updates to perform (e.g. which fields to update)
+     */
+    void update(DocumentReference documentReference, Map<String, String> parameters);
 }

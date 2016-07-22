@@ -39,11 +39,17 @@
           'label': 'core.rename.links.label',
           'hint': 'core.rename.links.hint'
         })
+        ##--------------------
+        ## Auto redirect field
+        ##--------------------
+        #set ($checked = !$request.autoRedirect || $request.autoRedirect == 'true')
         <dt>
           <label>
-            <input type="checkbox" name="autoRedirect" value="true" checked="checked" />
+            <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
             $services.localization.render('core.rename.autoRedirect.label')
           </label>
+          ## The value submitted when the checkbox is not checked, used to preserve the form state.
+          <input type="hidden" name="autoRedirect" value="false" />
         </dt>
         <dd>
           <span class="xHint">$services.localization.render('core.rename.autoRedirect.hint')</span>

@@ -51,7 +51,7 @@ Search Extension...
 {{velocity}}
 {{html}}
 &lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
-  &lt;input type="hidden" name="space" value="Extension" /&gt;
+  &lt;input type="hidden" name="f_space" value="Extension" /&gt;
   &lt;input type="text" name="text" value="extension name..." size="25" class="withTip" id="searchTextInput" /&gt;
   &lt;span class="buttonwrapper"&gt;
     &lt;input class="button" type="submit" value="Search"  id="searchSubmit"/&gt;

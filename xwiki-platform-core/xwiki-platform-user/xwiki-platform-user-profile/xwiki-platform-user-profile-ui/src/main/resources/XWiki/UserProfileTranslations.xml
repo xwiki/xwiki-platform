@@ -42,7 +42,7 @@
 XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
 XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
-XWiki.XWikiUsers_usertype.hint=When editing a page, a Simple user will use the default editor. An Advanced user will have access to the full editing menu, which includes all editors: Wiki, Inline, Objects, Class etc.</content>
+XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

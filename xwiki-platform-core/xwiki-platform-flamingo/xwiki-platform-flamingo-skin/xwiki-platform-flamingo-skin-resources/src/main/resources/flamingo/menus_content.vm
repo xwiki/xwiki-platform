@@ -199,13 +199,13 @@
   ## COPY
   ##
   #if ($canCopy)
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')", 'order': 30000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')", 'order': 20000, 'separator': true}))
   #end
   ##
   ## DELETE / RENAME
   ##
   #if ($canDelete)
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')", 'order': 20000, 'separator': true}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')", 'order': 30000}))
     #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')", 'order': 40000}))
   #end
   ##

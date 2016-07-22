@@ -242,7 +242,7 @@
     |Source|$doc.display('source')
     |Display Icon Location
 (Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
-    |Show installed count|#if($proxyExtensionObject)$doc.display('showInstalledCount', 'view')#else$doc.display('showInstalledCount')#end~
+    |Show installed count|$doc.display('showInstalledCount')
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)

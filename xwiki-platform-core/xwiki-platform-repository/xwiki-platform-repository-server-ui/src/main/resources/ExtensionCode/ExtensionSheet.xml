@@ -131,7 +131,7 @@
           $doc.authors
         #end
       ##------- Active Installs --------
-      #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount'))
+      #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)
         |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
       #end
       ##------- Rating --------

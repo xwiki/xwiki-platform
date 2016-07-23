@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1459332046000</date>
-  <contentUpdateDate>1459332046000</contentUpdateDate>
+  <date>1469290377000</date>
+  <contentUpdateDate>1469290377000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -42,7 +42,9 @@
   <content>help.tipsPanel.title=Tips
 help.tipsPanel.noTipMessage=No Tip available!
 help.tipsPanel.gettingStartedTip=If you're starting with XWiki, check out the [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].</content>
+help.tipsPanel.jumpToPageTip=Jump to any page in the wiki with Ctrl+G or Meta+G.\nSee [[more shortcuts&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 minutes to [[fill this survey&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] and help this open source project!
+help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages</content>
   <object>
     <name>Help.Translations</name>
     <number>0</number>

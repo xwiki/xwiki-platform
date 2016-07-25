@@ -124,24 +124,20 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     /*
      * Terminal checkbox value updating when switching between document types.
      */
-    // Only do the work if the checkbox is displayed (advanced user).
-    if (terminalCheckbox.length > 0) {
-      var updateTerminalCheckboxFromTemplateProviderInput = function(input) {
-        var pageShouldBeTerminalString = input.attr('data-terminal');
-        var pageShouldBeTerminal = false;
-        if (pageShouldBeTerminalString) {
-          pageShouldBeTerminal = $.parseJSON(input.attr('data-terminal'));
-        }
-        // Set the default value for the page type.
-        terminalCheckbox.prop('checked', pageShouldBeTerminal);
-      };
+    var updateTerminalCheckboxFromTemplateProviderInput = function(input) {
+      var pageShouldBeTerminalString = input.attr('data-terminal');
+      var pageShouldBeTerminal = false;
+      if (pageShouldBeTerminalString) {
+        pageShouldBeTerminal = $.parseJSON(input.attr('data-terminal'));
+      }
+      // Set the default value for the page type.
+      terminalCheckbox.prop('checked', pageShouldBeTerminal);
+    };
 
-      // Update the allowed spaces based on the selected template provider.
-      form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
-        var type = $('input[name="type"]:checked');
-        updateTerminalCheckboxFromTemplateProviderInput(type);
-      });
-    }
-
+    // Update the allowed spaces based on the selected template provider.
+    form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
+      var type = $('input[name="type"]:checked');
+      updateTerminalCheckboxFromTemplateProviderInput(type);
+    });
   });
 });

@@ -94,7 +94,7 @@
 ## Get themes from a query
 ################################
 #macro(getThemesFromQuery $xwql $wiki $return)
-  #set ($wikiReference = $services.model.createDocumentReference($wiki, 'A', 'B').wikiReference)
+  #set ($wikiReference = $services.model.createWikiReference($wiki))
   #set ($themes = $services.query.xwql($xwql).setWiki($wiki).execute())
   #set ($themesRef = [])
   #foreach ($theme in $themes)

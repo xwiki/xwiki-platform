@@ -91,12 +91,13 @@
   ## Display the suggestions, if any.
   #if ($suggestionResults.size() > 0)
     <div style="margin-top: 1em">
-      <p><b>Were you looking for one of the following pages instead?</b></p>
+      <p><b>$services.localization.render('core.viewers.content.doesnotexists.suggestions')</b></p>
       <ul>
+      #template("hierarchy_macros.vm")
       #foreach ($suggestionResult in $suggestionResults)
         #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))
         #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
-        <li><a href="$escapetool.xml($suggestionDocument.getURL())">$escapetool.xml($suggestionDocument.plainTitle)</a></li>
+        <li><a href="$escapetool.xml($suggestionDocument.getURL())">#hierarchy($suggestionResultsDocReference, {'plain' : true, 'local' : true})</a></li>
       #end
       </ul>
     </div>

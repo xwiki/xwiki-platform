@@ -75,11 +75,12 @@ $response.setStatus(404)
   ## Display the suggestions, if any.
   #if ($suggestionResults.size() > 0)
     <div style="margin-top: 1em">
-      <p><b>Were you looking for one of the following files instead?</b></p>
+      <p><b>$services.localization.render('core.viewers.attachments.doesnotexists.suggestions')</b></p>
       <ul>
+      #template("hierarchy_macros.vm")
       #foreach ($suggestionResult in $suggestionResults)
         #set ($suggestionResultReference = $services.solr.resolve($suggestionResult, 'ATTACHMENT'))
-        <li><a href="$escapetool.xml($xwiki.getURL($suggestionResultReference))">$escapetool.xml($suggestionResultReference.name)</a></li>
+        <li><a href="$escapetool.xml($xwiki.getURL($suggestionResultReference))">#hierarchy($suggestionResultReference, {'plain' : true, 'local' : true})</a></li>
       #end
       </ul>
     </div>

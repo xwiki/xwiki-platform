@@ -435,6 +435,8 @@ public class DefaultLinkRefactoringTest
     {
         // Verify we preserve the content author.
         verify(document).setContentDirty(false);
+        // Verify the version is going to be incremented.
+        verify(document).setMetaDataDirty(true);
         verify(this.xcontext.getWiki()).saveDocument(document, comment, minorEdit, this.xcontext);
     }
 }

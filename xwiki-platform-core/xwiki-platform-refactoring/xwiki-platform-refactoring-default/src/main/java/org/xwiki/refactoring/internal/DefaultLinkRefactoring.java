@@ -314,7 +314,10 @@ public class DefaultLinkRefactoring implements LinkRefactoring
         throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        // Preserve the content author.
         document.setContentDirty(false);
+        // Make sure the version is incremented.
+        document.setMetaDataDirty(true);
         document.setAuthorReference(xcontext.getUserReference());
         xcontext.getWiki().saveDocument(document, comment, minorEdit, xcontext);
     }

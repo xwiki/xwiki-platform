@@ -110,9 +110,13 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
       /**
        * Change the tree behaviour
        */
-      var tree = $.jstree.reference($('#exportModal .xtree'));
-      tree.settings.checkbox.cascade = 'down';
-      tree.settings.checkbox.three_state = false;
+      var tree          = $('#exportModal .xtree');
+      var treeReference = $.jstree.reference(tree);
+      treeReference.settings.checkbox.cascade     = 'down';
+      treeReference.settings.checkbox.three_state = false ;
+      tree.on('loaded.jstree', function () {
+        treeReference.check_all();
+      });
         
       /**
        * Store the decoded URL in the export buttons

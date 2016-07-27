@@ -263,7 +263,8 @@ public class CreatePagePage extends ViewPage
      */
     public boolean isTerminalOptionDisplayed()
     {
-        return getDriver().hasElementWithoutWaiting(By.id("terminal"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("terminal"));
+        return elements.size() > 0 && elements.get(0).isDisplayed();
     }
 
     /**

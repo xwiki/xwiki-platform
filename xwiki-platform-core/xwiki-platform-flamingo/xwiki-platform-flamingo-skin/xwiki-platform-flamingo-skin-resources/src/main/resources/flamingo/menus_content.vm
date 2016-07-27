@@ -324,6 +324,20 @@
           <h4 class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</h4>
         </div>
         <div class="modal-body">
+          #if ($doc.name == 'WebHome')
+            #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
+            <div class="panel panel-default">
+              <div style="max-height: 400px; overflow: auto;" class="panel-body">
+                #documentTree({
+                  'checkboxes' : true,
+                  'root': "document:$doc.documentReference",
+                  'showRoot': true,
+                  'showAttachments': false,
+                  'showTranslations': false
+                })
+              </div>
+            </div>
+          #end
           <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.pdf')</a>
           #if("$!{services.officemanager.serverState}" == "Connected")
             <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.odt')</a>

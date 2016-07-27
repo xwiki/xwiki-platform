@@ -134,6 +134,17 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
           var page = checkedPages[i].substring('document:'.length);
           url.params.pages.push(page);
         }
+        // Add WebPreferences pages to the XAR export
+        if (url.params.format == 'xar') {
+          for (var i = 0; i < url.params.pages.length; ++i) {
+            var pageReference = XWiki.Model.resolve(url.params.pages[i], XWiki.EntityType.DOCUMENT);
+            // It only concerns non-terminal pages
+            if (pageReference.getName() == 'WebHome') {
+              pageReference.name = 'WebPreferences';
+              url.params.pages.push(XWiki.Model.serialize(pageReference));
+            }
+          }
+        }
         button.attr('href', url.serialize());
       });
     });

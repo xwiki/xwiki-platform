@@ -1085,6 +1085,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 </xsl:when>
                 <xsl:when test="$name = 'list-style'">
                 </xsl:when>
+                <!-- Not supported in FOP yet and needs to be ignored as otherwise they cause the export to fail with
+                     an exception raised -->
+                <xsl:when test="$name = 'border-image'"/>
                 <!-- These are not valid in XSL, so we ignore them -->
                 <xsl:when test="$name = 'cursor'"/>
                 <xsl:when test="$name = 'quotes'"/>

@@ -119,7 +119,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
       });
         
       /**
-       * Store the decoded URL in the export buttons
+       * Update the URL of the export buttons according to the tree
        */
        $('#exportModal a.btn').click(function() {
         var button = $(this);
@@ -127,7 +127,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
         var url = button.data('url').clone();
         var checkedPages = tree.get_checked();
         if (url.params === undefined) {
-          url.params = {'pages': []};
+          url.params = {};
         }
         url.params.pages = [];
         for (var i = 0; i < checkedPages.length; ++i) {

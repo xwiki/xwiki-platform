@@ -297,7 +297,7 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>confirmation_email_content</name>
         <number>16</number>
         <picker>0</picker>
@@ -503,7 +503,7 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>invitation_email_content</name>
         <number>34</number>
         <picker>0</picker>
@@ -519,7 +519,7 @@
       <javamail_extra_props>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>javamail_extra_props</name>
         <number>58</number>
         <picker>0</picker>
@@ -640,7 +640,7 @@
       <ldap_group_mapping>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>ldap_group_mapping</name>
         <number>72</number>
         <picker>0</picker>
@@ -801,7 +801,7 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>meta</name>
         <number>9</number>
         <picker>0</picker>
@@ -1244,7 +1244,7 @@
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
         <disabled>0</disabled>
-        <editor>---</editor>
+        <editor>PureText</editor>
         <name>validation_email_content</name>
         <number>15</number>
         <picker>0</picker>

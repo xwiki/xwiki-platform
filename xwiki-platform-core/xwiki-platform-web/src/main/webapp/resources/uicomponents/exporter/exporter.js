@@ -168,7 +168,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
       });
         
       /**
-       * Store the decoded URL in the export buttons
+       * Update the URL of the export buttons according to the tree 
        */
        $('#exportModal #exportModelOtherCollapse a.btn').click(function(event) {
         var button = $(this);

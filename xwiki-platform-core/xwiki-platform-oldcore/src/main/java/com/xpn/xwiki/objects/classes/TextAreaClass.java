@@ -42,6 +42,40 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    /**
+     * Possible values for the editor meta property.
+     */
+    public static enum EditorType
+    {
+        /**
+         * No wiki syntax.
+         */
+        PURE_TEXT("PureText"),
+
+        /**
+         * Edit wiki syntax using a plain text editor.
+         */
+        TEXT("Text"),
+
+        /**
+         * Edit wiki syntax using a visual editor.
+         */
+        WYSIWYG("Wysiwyg");
+
+        private final String value;
+
+        private EditorType(String value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.value;
+        }
+    }
+
     private static final String XCLASSNAME = "textarea";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
@@ -83,6 +117,12 @@ public class TextAreaClass extends StringClass
         return getStringValue("editor").toLowerCase();
     }
 
+    /**
+     * Sets the editor meta property.
+     * 
+     * @param editor the editor type
+     * @since 8.2RC1
+     */
     public void setEditor(String editor)
     {
         setStringValue("editor", editor);

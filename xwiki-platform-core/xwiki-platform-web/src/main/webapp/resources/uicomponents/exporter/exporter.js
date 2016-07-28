@@ -1,5 +1,5 @@
 // TODO: consider putting it in a webjar instead
-require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)'], function ($) {
+require(['jquery', '$xwiki.getSkinFile("uicomponents/widgets/tree.min.js", true)'], function ($) {
   'use strict';
   
   /**
@@ -130,7 +130,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
         var items = {};
         
         items.select_children = {
-          label: '$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))',
+          label: "$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))",
           action: function () {
             for (var i = 0; i < node.children.length; ++i) {
               var child = node.children[i];
@@ -140,7 +140,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
           _disabled: !node.state.opened
         };
         items.unselect_children = {
-          label: '$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))',
+          label: "$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))",
           action: function () {
             for (var i = 0; i < node.children.length; ++i) {
               var child = node.children[i];

@@ -3,11 +3,14 @@
 set -e
 #set -x
 
-if [ "$1" = "purge"  ]; then
-	rm -rf /var/lib/xwiki
+case "$1" in
+    purge)
+        # Purge XWiki configuration
+        rm -f /etc/xwiki/xwiki.cfg /etc/xwiki/xwiki.properties /etc/xwiki/web.xml
+        ucf --purge /etc/xwiki/xwiki.cfg || true
+        ucf --purge /etc/xwiki/xwiki.properties || true
+        ucf --purge /etc/xwiki/web.xml || true
+        ;;
+esac
 
-	if [ -e /usr/share/debconf/confmodule ]; then
-		. /usr/share/debconf/confmodule
-		db_purge
-	fi
-fi
+exit 0

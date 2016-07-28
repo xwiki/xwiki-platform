@@ -108,12 +108,23 @@
             <data>
               <src>${war.path}/WEB-INF</src>
               <type>directory</type>
-              <excludes>**/lib,**/lib/*,**/hibernate.cfg.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
+              <excludes>**/lib,**/lib/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
               <mapper>
                 <type>perm</type>
                 <prefix>/etc/xwiki</prefix>
               </mapper>
               <conffile>true</conffile>
+            </data>
+
+            <!-- Configuration files managed by UCF -->
+            <data>
+              <src>${war.path}/WEB-INF</src>
+              <type>directory</type>
+              <includes>web.xml</includes>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/share/xwiki/default</prefix>
+              </mapper>
             </data>
             <data>
               <src>${project.build.directory}/maven-shared-archive-resources</src>
@@ -121,9 +132,8 @@
               <includes>xwiki.cfg,xwiki.properties</includes>
               <mapper>
                 <type>perm</type>
-                <prefix>/etc/xwiki</prefix>
+                <prefix>/usr/share/xwiki/default</prefix>
               </mapper>
-              <conffile>true</conffile>
             </data>
 
             <!-- Links to /usr/lib/xwiki/WEB-INF files/folders -->

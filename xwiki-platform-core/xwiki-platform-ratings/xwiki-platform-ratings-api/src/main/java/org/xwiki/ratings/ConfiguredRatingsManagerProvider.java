@@ -56,6 +56,9 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
+    
     /**
      * Retrieve the XWiki context from the current execution context.
      * 
@@ -94,20 +97,11 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
                 defaultHint);
 
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, ratingDocument.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            XWikiDocument configDoc =
-                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
-                    : spaceConfigDoc;
-
-            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            XWikiDocument configurationDocument = ratingsConfiguration.getConfigurationDocument(documentRef);
+            if (!configurationDocument.isNew()
+                && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                    (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 ratingsHint = (hint == null) ? ratingsHint : hint;

@@ -51,7 +51,7 @@
     <validationScript/>
     <annotation>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>Text</editor>
       <name>annotation</name>
       <number>1</number>
       <picker>0</picker>
@@ -99,7 +99,7 @@
     </date>
     <originalSelection>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <name>originalSelection</name>
       <number>5</number>
       <picker>0</picker>
@@ -113,7 +113,7 @@
     </originalSelection>
     <selection>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <name>selection</name>
       <number>2</number>
       <picker>0</picker>
@@ -127,7 +127,7 @@
     </selection>
     <selectionLeftContext>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <name>selectionLeftContext</name>
       <number>3</number>
       <picker>0</picker>
@@ -141,7 +141,7 @@
     </selectionLeftContext>
     <selectionRightContext>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <name>selectionRightContext</name>
       <number>4</number>
       <picker>0</picker>

@@ -19,68 +19,114 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Action used to edit+save an existing comment in a page, saves the comment
  * object in the document, requires comment right but not edit right.
- * 
+ *
  * @version $Id$
+ * @since 8.3M1
  */
 public class CommentSaveAction extends XWikiAction
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(CommentSaveAction.class);
+    private static final String COMMENT_FIELD_NAME = "comment";
 
-    /** The name of the XWikiComments property identifying the author. */
-    private static final String AUTHOR_PROPERTY_NAME = "author";
+    /**
+     * Entity reference resolver.
+     */
+    private DocumentReferenceResolver<String> documentReferenceResolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
 
-    /** The name of the space where user profiles are kept. */
-    private static final String USER_SPACE_PREFIX = "XWiki.";
+    /**
+     * Authorization manager.
+     */
+    private AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
 
+    /**
+     * Pattern to get the comment's number.
+     */
+    private final Pattern pattern = Pattern.compile("XWiki.XWikiComments_(\\d+)_comment");
+
+    private int getCommentIdFromRequest(XWikiRequest request) throws XWikiException
+    {
+        // Get the comment object
+        Enumeration parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String parameterName = (String) parameterNames.nextElement();
+            // Matcher
+            Matcher m = pattern.matcher(parameterName);
+            if (m.find()) {
+                String number = m.group(1);
+                return Integer.parseInt(number);
+            }
+        }
+        throw new XWikiException("Failed to find the comment to save.", null);
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
+        // Get the XWiki utilities
+        XWiki xwiki = context.getWiki();
+        XWikiResponse response = context.getResponse();
+        XWikiRequest request = context.getRequest();
+        XWikiDocument doc = context.getDoc();
 
-        LOGGER.info("Action! " + context.getAction());
-        // dit wil je:
-        // doc.readObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
-
-        // CSRF prevention
-        if (!csrfTokenCheck(context)) {
+        if (!csrfTokenCheck(context) || doc.isNew()) {
             return false;
         }
 
-        XWiki xwiki = context.getWiki();
-        XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
-        EditForm eform = (EditForm) context.getForm();
+        // Comment class reference
+        DocumentReference commentClass = new DocumentReference(context.getWikiId(), "XWiki", "XWikiComments");
 
-        // Make sure this class exists
-        BaseClass baseclass = xwiki.getCommentsClass(context);
-        if (doc.isNew()) {
-            return true;
-        } else {
-            doc.readObjectsFromForm(eform, context);
+        // Edit comment
+        try {
+            int commentId = getCommentIdFromRequest(request);
+            BaseObject commentObj = doc.getXObject(commentClass, commentId);
+
+            // Check if the author is the current user or if the current user has the ADMIN right
+            String commentAuthor = commentObj.getStringValue("author");
+            DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
+            if (!authorReference.equals(context.getUserReference())
+                    || !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
+                            context.getDoc().getDocumentReference())) {
+                return false;
+            }
+
+            // Edit the comment
+            commentObj.set(COMMENT_FIELD_NAME, request.getParameter(
+                String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
+
+            // Save it
             xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
+
+            // If xpage is specified then allow the specified template to be parsed.
+            if (context.getRequest().get("xpage") != null) {
+                return true;
+            }
+
+            // forward to edit
+            String redirect = Utils.getRedirect("edit", context);
+            sendRedirect(response, redirect);
+            return false;
+
+        } catch (NullPointerException e) {
+            return false;
         }
-        // If xpage is specified then allow the specified template to be parsed.
-        if (context.getRequest().get("xpage") != null) {
-            return true;
-        }
-        // forward to edit
-        String redirect = Utils.getRedirect("edit", context);
-        sendRedirect(response, redirect);
-        return false;
     }
 
     @Override

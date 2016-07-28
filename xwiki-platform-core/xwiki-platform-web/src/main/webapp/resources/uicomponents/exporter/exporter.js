@@ -1,101 +1,100 @@
 // TODO: consider putting it in a webjar instead
 require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)'], function ($) {
   'use strict';
-
-  require(['tree'], function () {
+  
+  /**
+   * Class that represent a decoded URL.
+   * TODO: make it more generic and put it in some library.
+   */
+  var DecodedURL = function (path, params) {
+    
     /**
-     * Class that represent a decoded URL.
+     * Fields
      */
-    var DecodedURL = function (path, params) {
-      
-      /**
-       * Fields
-       */
-      var self    = this;
-      self.path   = path;
-      self.params = params;
-      
-      /**
-       * Return a serialized version of the url
-       */
-      self.serialize = function () {
-        var url = self.path;
-        var separator = '?';
-        for (var param in self.params) {
-          var value = self.params[param];
-          if (param != '' && value !== undefined) {
-            if (Array.isArray(value)) {
-              for (var i = 0; i < value.length; ++i) {
-                url += separator + encodeURIComponent(param) + '=' + encodeURIComponent(value[i]);
-                separator = '&';
-              }
-            } else if (typeof value === 'string') {
-              url += separator + encodeURIComponent(param) + '=' + encodeURIComponent(value);
-              separator = '&';
-            }
-          }
-        }
-        return url;
-      };
-
-      /**
-       * Return a clone of the object
-       */
-      self.clone = function () {
-        var clone = new DecodedURL();
-        clone.path = self.path;
-        clone.params = [];
-        for (var param in self.params) {
-          if (Array.isArray(self.params[param])) {
-            clone.params[param] = [];
-            for (var i = 0; i < self.params[param].length; ++i) {
-              clone.params[param].push(self.params[param][i]);
-            }
-          } else if (typeof self.params[param] === 'string') {
-            clone.params[param] = self.params[param];
-          }
-        }
-        return clone;
-      }
-    };
+    var self    = this;
+    self.path   = path;
+    self.params = params;
     
     /**
      * Parse an URL and returns an object containing the path and the parameters decoded from the query string.
      * Hashes (#) are not supported.
-     * TODO: make it more generic and put it in some library.
      */
-    var parseURL = function (url) {
-      var result = new DecodedURL();
+    self.initFromURL = function (url) {
+      self.params = {};
       var queryStringLocator = url.indexOf('?');
       if (queryStringLocator == -1) {
-        result.path = url;
+        self.path = url;
       } else {
-        result.path = url.substring(0, queryStringLocator);
-        result.queryString = url.substring(queryStringLocator + 1);
-        result.params = {};
+        self.path = url.substring(0, queryStringLocator);
+        var queryString = url.substring(queryStringLocator + 1);
         // Parse the query string
-        var parts = result.queryString.split('&');
+        var parts = queryString.split('&');
         for (var i = 0; i < parts.length; ++i) {
           var temp  = parts[i].split('=');
           var name  = decodeURIComponent(temp[0]);
           var value = decodeURIComponent(temp[1]);
-          if (result.params[name] !== undefined) {
-            if (Array.isArray(result.params[name])) {
-              result.params[name].push(value);
+          if (self.params[name] !== undefined) {
+            if (Array.isArray(self.params[name])) {
+              self.params[name].push(value);
             } else {
-              var oldValue = result.params[name];
-              result.params[name] = [oldValue, value];
+              var oldValue = self.params[name];
+              self.params[name] = [oldValue, value];
             }
           } else {
-            result.params[name] = value;
+            self.params[name] = value;
           }
         }
       } 
-      
-      return result;
     };
     
-    
+    /**
+     * Return a serialized version of the url
+     */
+    self.serialize = function () {
+      var url = self.path;
+      var separator = '?';
+      for (var param in self.params) {
+        var value = self.params[param];
+        if (param != '' && value !== undefined) {
+          if (Array.isArray(value)) {
+            for (var i = 0; i < value.length; ++i) {
+              url += separator + encodeURIComponent(param) + '=' + encodeURIComponent(value[i]);
+              separator = '&';
+            }
+          } else if (typeof value === 'string') {
+            url += separator + encodeURIComponent(param) + '=' + encodeURIComponent(value);
+            separator = '&';
+          }
+        }
+      }
+      return url;
+    };
+
+    /**
+     * Return a clone of the object
+     */
+    self.clone = function () {
+      var clone = new DecodedURL();
+      clone.path = self.path;
+      clone.params = [];
+      for (var param in self.params) {
+        if (Array.isArray(self.params[param])) {
+          clone.params[param] = [];
+          for (var i = 0; i < self.params[param].length; ++i) {
+            clone.params[param].push(self.params[param][i]);
+          }
+        } else if (typeof self.params[param] === 'string') {
+          clone.params[param] = self.params[param];
+        }
+      }
+      return clone;
+    }
+  };
+
+  /**
+   * Work with the Export Tree
+   */
+  require(['tree'], function () {
     $(document).ready(function () {
       
       /**
@@ -103,7 +102,8 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
        */
       $('#exportModal a.btn').each(function() {
         var button = $(this);
-        var url = parseURL(button.attr('href'));
+        var url = new DecodedURL();
+        url.initFromURL(button.attr('href'));
         button.data('url', url);
       });
       
@@ -114,34 +114,89 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
       var treeReference = $.jstree.reference(tree);
       treeReference.settings.checkbox.cascade     = 'down';
       treeReference.settings.checkbox.three_state = false ;
+      treeReference.settings.contextmenu.select_node = false;
+      
+      /**
+       * Check all on loading
+       */
       tree.on('loaded.jstree', function () {
         treeReference.check_all();
       });
+      
+      /**
+       * Modifying the context menu
+       */
+      treeReference.settings.contextmenu.items = function (node) {
+        var items = {};
+        if (node.state.selected && node.state.opened) {
+          items.select_children = {
+            label: 'Select all children',
+            action: function () {
+              for (var i = 0; i < node.children.length; ++i) {
+                var child = node.children[i];
+                treeReference.check_node(child);
+              }
+            }
+          };
+          items.unselect_children = {
+            label: 'Unselect all children',
+            action: function () {
+              for (var i = 0; i < node.children.length; ++i) {
+                var child = node.children[i];
+                treeReference.uncheck_node(child);
+              }
+            }
+          };
+        }
+        return items;
+      };
+      
+      /**
+       * Handle 'select all' button
+       */
+      $('#exportModal .tree_select_all').click(function() {
+        treeReference.check_all();
+        return false;
+      });
+      
+      /**
+       * Handle 'select none' button
+       */
+      $('#exportModal .tree_select_none').click(function() {
+        treeReference.uncheck_all();
+        return false;
+      });
         
       /**
-       * Update the URL of the export buttons according to the tree
+       * Store the decoded URL in the export buttons
        */
-       $('#exportModal a.btn').click(function() {
+       $('#exportModal #exportModelOtherCollapse a.btn').click(function(event) {
         var button = $(this);
-        var tree = $.jstree.reference($('#exportModal .xtree'));
         var url = button.data('url').clone();
-        var checkedPages = tree.get_checked();
+        var checkedNodes = treeReference.get_checked(true);
         if (url.params === undefined) {
-          url.params = {};
+          url.params = {'pages': []};
         }
+        
         url.params.pages = [];
-        for (var i = 0; i < checkedPages.length; ++i) {
-          var page = checkedPages[i].substring('document:'.length);
-          url.params.pages.push(page);
-        }
-        // Add WebPreferences pages to the XAR export
-        if (url.params.format == 'xar') {
-          for (var i = 0; i < url.params.pages.length; ++i) {
-            var pageReference = XWiki.Model.resolve(url.params.pages[i], XWiki.EntityType.DOCUMENT);
-            // It only concerns non-terminal pages
-            if (pageReference.getName() == 'WebHome') {
-              pageReference.name = 'WebPreferences';
-              url.params.pages.push(XWiki.Model.serialize(pageReference));
+        for (var i = 0; i < checkedNodes.length; ++i) {
+          var node = checkedNodes[i];
+          var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+          url.params.pages.push(XWiki.Model.serialize(pageReference));
+          // In case the page coudl have children
+          if (pageReference.getName() == 'WebHome') {
+            // The node could be checked but not loaded
+            if (node.state.loaded == false) {
+              // In that case, we need to add all children using a wildcard.
+              var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent);
+              url.params.pages.push(XWiki.Model.serialize(spaceReference));
+            }
+            // Special behaviour for the XAR export
+            if (url.params.format == 'xar') {
+              // Also add the WebPreferences
+              var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, 
+                pageReference.parent);
+              url.params.pages.push(XWiki.Model.serialize(webPreferencesReference));
             }
           }
         }

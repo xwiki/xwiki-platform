@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.UpdateRatingEvent;
@@ -72,6 +73,9 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     @Named("compactwiki")
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
+
     /**
      * SeparatePageRatingsManager constructor.
      */
@@ -91,8 +95,8 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         String ratingsSpaceName = getXWiki().Param("xwiki.ratings.separatepagemanager.spacename", "");
         ratingsSpaceName =
             getXWiki().getXWikiPreference("ratings_separatepagemanager_spacename", ratingsSpaceName, getXWikiContext());
-        return getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE,
-            ratingsSpaceName);
+        return ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE, ratingsSpaceName);
     }
 
     /**
@@ -107,8 +111,8 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         result =
             getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
                 getXWikiContext());
-        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES,
-            result) == "1");
+        return (ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result) == "1");
     }
 
     /**

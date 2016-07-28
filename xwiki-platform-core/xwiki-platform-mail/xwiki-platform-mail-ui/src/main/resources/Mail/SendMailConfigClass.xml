@@ -133,7 +133,7 @@
     <properties>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <name>properties</name>
       <number>7</number>
       <picker>0</picker>

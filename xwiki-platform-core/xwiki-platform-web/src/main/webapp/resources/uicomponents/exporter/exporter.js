@@ -128,26 +128,28 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
        */
       treeReference.settings.contextmenu.items = function (node) {
         var items = {};
-        if (node.state.selected && node.state.opened) {
-          items.select_children = {
-            label: '$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))',
-            action: function () {
-              for (var i = 0; i < node.children.length; ++i) {
-                var child = node.children[i];
-                treeReference.check_node(child);
-              }
+        
+        items.select_children = {
+          label: '$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))',
+          action: function () {
+            for (var i = 0; i < node.children.length; ++i) {
+              var child = node.children[i];
+              treeReference.check_node(child);
             }
-          };
-          items.unselect_children = {
-            label: '$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))',
-            action: function () {
-              for (var i = 0; i < node.children.length; ++i) {
-                var child = node.children[i];
-                treeReference.uncheck_node(child);
-              }
+          },
+          _disabled: !node.state.opened
+        };
+        items.unselect_children = {
+          label: '$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))',
+          action: function () {
+            for (var i = 0; i < node.children.length; ++i) {
+              var child = node.children[i];
+              treeReference.uncheck_node(child);
             }
-          };
-        }
+          },
+          _disabled: !node.state.opened
+        };
+        
         return items;
       };
       

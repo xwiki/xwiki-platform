@@ -130,7 +130,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
         var items = {};
         if (node.state.selected && node.state.opened) {
           items.select_children = {
-            label: 'Select all children',
+            label: '$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))',
             action: function () {
               for (var i = 0; i < node.children.length; ++i) {
                 var child = node.children[i];
@@ -139,7 +139,7 @@ require(['jquery', '$xwiki.getSkinFile('uicomponents/widgets/tree.min.js', true)
             }
           };
           items.unselect_children = {
-            label: 'Unselect all children',
+            label: '$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))',
             action: function () {
               for (var i = 0; i < node.children.length; ++i) {
                 var child = node.children[i];

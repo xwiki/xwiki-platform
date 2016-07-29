@@ -480,11 +480,6 @@
                   }
                 },
                 "ignore": [
-                  {
-                    "code": "java.class.removed",
-                    "old": "class org.xwiki.rendering.parser.ContentParser",
-                    "justification": "No actual breakage. Class was moved to another module"
-                  }
                 ]
               }
             }

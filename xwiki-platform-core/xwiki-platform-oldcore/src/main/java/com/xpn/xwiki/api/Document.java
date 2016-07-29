@@ -47,7 +47,6 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -70,7 +69,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -2061,22 +2059,9 @@ public class Document extends Api
     public java.lang.Object getValue(String fieldName, Object object)
     {
         if (object != null) {
-            try {
-                PropertyClass p = (PropertyClass) object.getBaseObject().getXClass(getXWikiContext()).get(fieldName);
-                // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
-                // API level, so that java code using core classes will still have access, regardless or rights.
-                if ("Password".equals(p.getClassType())) {
-                    if (!this.getAuthorizationManager().hasAccess(Right.PROGRAM)) {
-                        return null;
-                    }
-                }
-                BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
-
-                return bp.getValue();
-            } catch (NullPointerException e) {
-                return null;
-            }
+            return object.getValue(fieldName);
         }
+
         return null;
     }
 

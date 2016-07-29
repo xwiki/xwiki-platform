@@ -22,6 +22,7 @@ package org.xwiki.refactoring.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -309,5 +310,29 @@ public class DefaultModelBridge implements ModelBridge
         DocumentReference previousUserReference = context.getUserReference();
         context.setUserReference(userReference);
         return previousUserReference;
+    }
+
+    @Override
+    public void update(DocumentReference documentReference, Map<String, String> parameters)
+    {
+        try {
+            XWikiContext context = xcontextProvider.get();
+            XWiki wiki = context.getWiki();
+            XWikiDocument document = wiki.getDocument(documentReference, context);
+            boolean save = false;
+
+            String title = parameters.get("title");
+            if (title != null && !title.equals(document.getTitle())) {
+                document.setTitle(title);
+                save = true;
+            }
+
+            if (save) {
+                wiki.saveDocument(document, "Update document after refactoring.", true, context);
+                this.logger.info("Document [{}] has been updated.", documentReference);
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to update the document [{}] after refactoring.", documentReference, e);
+        }
     }
 }

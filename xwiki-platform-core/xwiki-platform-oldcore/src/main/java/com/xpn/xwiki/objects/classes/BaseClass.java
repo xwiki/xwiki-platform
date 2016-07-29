@@ -58,6 +58,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
@@ -837,12 +838,18 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTemplateField(String fieldName, String fieldPrettyName)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, 80, 15, "PureText");
+        return addTextAreaField(fieldName, fieldPrettyName, 80, 15, EditorType.PURE_TEXT);
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, null);
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, (String) null);
+    }
+
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, EditorType editorType)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows,
+            editorType != null ? editorType.toString() : (String) null);
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor)

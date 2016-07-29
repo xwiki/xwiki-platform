@@ -3,8 +3,6 @@
 set -e
 #set -x
 
-rm -rf /etc/xwiki/lib
-
 #########################
 # var
 #########################
@@ -15,3 +13,8 @@ fi
 if [ ! -d /var/lib/xwiki/data ]; then
   mkdir /var/lib/xwiki/data
 fi
+
+# Update configuration files
+ucf --three-way --debconf-ok /usr/share/xwiki/default/xwiki.cfg /etc/xwiki/xwiki.conf
+ucf --three-way --debconf-ok /usr/share/xwiki/default/xwiki.properties /etc/xwiki/xwiki.properties
+ucf --three-way --debconf-ok /usr/share/xwiki/default/web.xml /etc/xwiki/web.xml

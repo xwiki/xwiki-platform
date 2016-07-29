@@ -20,6 +20,8 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -242,7 +244,11 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckRights(false);
         request.setInteractive(false);
         request.setDeleteSource(false);
+        Map<String, String> parameters = Collections.singletonMap("foo", "bar");
+        request.setEntityParameters(sourceReference, parameters);
         run(request);
+
+        verify(this.modelBridge).update(copyReference, parameters);
 
         LinkRefactoring linkRefactoring = getMocker().getInstance(LinkRefactoring.class);
         verify(linkRefactoring, never()).renameLinks(any(DocumentReference.class), any(DocumentReference.class),

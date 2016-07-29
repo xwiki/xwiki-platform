@@ -129,15 +129,20 @@
         #else
           #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
         #end
+        ##
         ## Determine if it's a terminal page template
+        ##
         #set ($isTerminalProvider = $tpobj.getValue('terminal'))
-        #if ("$!isTerminalProvider" == '')
-          ## Fall-back on the 'type' property, if available.
-          #set ($type = $tpobj.getValue('type'))
+        ## Check if this is an old template provider that has not been migrated (the 'type' property has not been
+        ## replaced by the 'terminal' property).
+        #set ($type = $tpobj.getValue('type'))
+        #if ("$!isTerminalProvider" == '' && ("$!type" != '' || $type == ''))
+          ## This must be an old template provider because the 'terminal' property is not set (or it was set to '---'
+          ## from the UI) and the 'type' property is still present.
           #if ($type == 'space')
             #set ($isTerminalProvider = false)
           #else
-            ## 'page' or NULL both resolve to true, for backwards compatibility reasons.
+            ## 'page' or '' both resolve to true, for backwards compatibility reasons.
             #set ($isTerminalProvider = true)
           #end
         #else
@@ -268,21 +273,20 @@
         ## ---------------------------------------------------------------------------------------------------------
         ## Terminal page - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
+        #set ($hidden = '')
         #set ($deprecatedSpaceCreate = "$!request.tocreate" == 'space')
-        #if (($isAdvancedUser || $isSuperAdmin) && !$deprecatedSpaceCreate)
-          <dt>
-            <input type="checkbox" id="terminal" name="tocreate" value="terminal" #if(!$isSpace)checked="checked"#end/>
-            <label for="terminal">$services.localization.render('core.create.terminal.label')</label>
-            ## Hidden input used to ensure that an unchecked terminal checkbox means non-terminal and that the default is not used by mistake.
-            <input type="hidden" name="tocreate" value="nonterminal" />
-          </dt>
-          <dd>
-            <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
-          </dd>
-        #else
-          ## Pass along the "tocreate" parameter, as it was determined by the create action based on the first request.
-          <dd><input type="hidden" name="tocreate" value="#if($isSpace)nonterminal#{else}terminal#end"/></dd>
+        #if (!($isAdvancedUser || $isSuperAdmin) || $deprecatedSpaceCreate)
+          #set ($hidden = 'hidden')
         #end
+        <dt class="$hidden">
+          <input type="checkbox" id="terminal" name="tocreate" value="terminal" #if(!$isSpace)checked="checked"#end/>
+          <label for="terminal">$services.localization.render('core.create.terminal.label')</label>
+          ## Hidden input used to ensure that an unchecked terminal checkbox means non-terminal and that the default is not used by mistake.
+          <input type="hidden" name="tocreate" value="nonterminal" />
+        </dt>
+        <dd class="$hidden">
+          <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
+        </dd>
       </dl>
     </div>
   </div>

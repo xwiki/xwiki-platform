@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.ReputationException;
@@ -55,6 +56,9 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
 
     @Override
     public String getRatingsClassName()
@@ -94,44 +98,6 @@ public abstract class AbstractRatingsManager implements RatingsManager
     }
 
     /**
-     * Retrieves configuration parameter from the current space's WebPreferences and fallback to XWiki.RatingsConfig if
-     * it does not exist.
-     * 
-     * @param documentRef the document being rated or for which the existing ratings are fetched
-     * @param parameterName the parameter for which to retrieve the value
-     * @param defaultValue the default value for the parameter
-     * @return the value of the given parameter name from the current configuration context
-     */
-    protected String getConfigParameter(DocumentReference documentRef, String parameterName, String defaultValue)
-    {
-        try {
-            XWikiDocument sourceDoc = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, sourceDoc.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            XWikiDocument configDoc =
-                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
-                    : spaceConfigDoc;
-
-            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
-                BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE)
-                        .get(parameterName);
-                String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
-
-                return (propValue.equals("") ? defaultValue : propValue);
-            }
-        } catch (Exception e) {
-            logger.error("Cannot read ratings config", e);
-        }
-
-        return defaultValue;
-    }
-
-    /**
      * Checks if ratings are active.
      * 
      * @return answer to: are ratings active?
@@ -147,8 +113,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         String result = getXWiki().Param("xwiki.ratings.averagerating.stored", "1");
         result = getXWiki().getXWikiPreference("ratings_averagerating_stored", result, getXWikiContext());
-        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING,
-            result).equals("1"));
+        return (ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING, result).equals("1"));
     }
 
     @Override
@@ -156,8 +122,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         String result = getXWiki().Param("xwiki.ratings.reputation.stored", "0");
         result = getXWiki().getXWikiPreference("ratings_reputation_stored", result, getXWikiContext());
-        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED, result)
-            .equals("1"));
+        return (ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED, result).equals("1"));
     }
 
     @Override
@@ -165,8 +131,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         String result = getXWiki().Param("xwiki.ratings.reputation", "0");
         result = getXWiki().getXWikiPreference("ratings_reputation", result, getXWikiContext());
-        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION, result)
-            .equals("1"));
+        return (ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION, result).equals("1"));
     }
 
     @Override
@@ -174,8 +140,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         String method = getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
         method = getXWiki().getXWikiPreference("ratings_reputation_defaultmethod", method, getXWikiContext());
-        method =
-            getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
+        method = ratingsConfiguration.getConfigurationParameter(documentRef,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
         return method.split(",");
     }
 

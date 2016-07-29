@@ -65,8 +65,10 @@ public class UIExtensionClassDocumentInitializer extends AbstractMandatoryDocume
 
         needsUpdate |= bclass.addTextField(EXTENSION_POINT_ID_PROPERTY, "Extension Point ID", 30);
         needsUpdate |= bclass.addTextField(ID_PROPERTY, "Extension ID", 30);
-        needsUpdate |= bclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10);
-        needsUpdate |= bclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10);
+        // The content property supports wiki syntax, but it uses script macros most of the time.
+        needsUpdate |= bclass.addTextAreaField(CONTENT_PROPERTY, "Extension Content", 40, 10, "Text");
+        // The parameters property doesn't support wiki syntax.
+        needsUpdate |= bclass.addTextAreaField(PARAMETERS_PROPERTY, "Extension Parameters", 40, 10, "PureText");
         needsUpdate |= bclass.addStaticListField(SCOPE_PROPERTY, "Extension Scope", 1, false,
             "wiki=Current Wiki|user=Current User|global=Global", "select");
 

@@ -40,6 +40,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * @version $Id$
@@ -346,5 +348,25 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         if (ownerDocument != null && this.isValueDirty) {
             ownerDocument.setMetaDataDirty(true);
         }
+    }
+
+    /**
+     * @param xcontext the XWiki Context
+     * @return the definition of the property
+     * @since 8.3M1
+     */
+    public PropertyClass getPropertyClass(XWikiContext xcontext)
+    {
+        XWikiDocument document = getOwnerDocument();
+        if (document != null) {
+            BaseObject xobject = document.getXObject(getReference().getParent());
+            if (xobject != null) {
+                BaseClass xclass = xobject.getXClass(xcontext);
+
+                return (PropertyClass) xclass.get(getName());
+            }
+        }
+
+        return null;
     }
 }

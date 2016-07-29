@@ -61,16 +61,39 @@ public class Property extends Element
     }
 
     /**
+     * @return the definition of the property
+     * @since 8.3M1
+     */
+    public PropertyClass getPropertyClass()
+    {
+        BaseProperty baseProperty = getBaseProperty();
+
+        com.xpn.xwiki.objects.classes.PropertyClass propertyClass = baseProperty.getPropertyClass(getXWikiContext());
+
+        if (propertyClass != null) {
+            return new PropertyClass(propertyClass, getXWikiContext());
+        }
+
+        return null;
+    }
+
+    /**
      * @return the actual value of the property, as a String, Number or List.
      */
     public java.lang.Object getValue()
     {
-        // This is evil, any property which happens to be called 'password' will be masked. TODO fix.
-        if (this.element.getName().equals("password")
-            && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(
-                getXWikiContext())) {
-            return null;
+        BaseProperty baseProperty = getBaseProperty();
+
+        com.xpn.xwiki.objects.classes.PropertyClass propertyClass = baseProperty.getPropertyClass(getXWikiContext());
+
+        // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
+        // API level, so that java code using core classes will still have access, regardless or rights.
+        if (propertyClass != null && "Password".equals(propertyClass.getClassType())) {
+            if (!getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
+                return null;
+            }
         }
-        return ((BaseProperty) this.element).getValue();
+
+        return getBaseProperty().getValue();
     }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Main.SolrTranslations" locale="pt_BR">
   <web>Main</web>
   <name>SolrTranslations</name>
   <language>pt_BR</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

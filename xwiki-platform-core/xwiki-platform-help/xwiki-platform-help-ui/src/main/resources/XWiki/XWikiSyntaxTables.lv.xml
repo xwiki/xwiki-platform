@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="XWiki.XWikiSyntaxTables" locale="lv">
   <web>XWiki</web>
   <name>XWikiSyntaxTables</name>
   <language>lv</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1301497989000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxTables</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

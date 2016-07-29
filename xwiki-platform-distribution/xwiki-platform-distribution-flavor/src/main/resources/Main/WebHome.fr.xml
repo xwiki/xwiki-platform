@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Main.WebHome" locale="fr">
   <web>Main</web>
   <name>WebHome</name>
   <language>fr</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1321284472000</contentUpdateDate>
   <version>1.1</version>
   <title>Home</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

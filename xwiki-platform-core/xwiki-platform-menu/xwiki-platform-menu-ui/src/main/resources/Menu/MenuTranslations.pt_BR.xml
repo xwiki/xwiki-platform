@@ -20,13 +20,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Menu.MenuTranslations" locale="pt_BR">
   <web>Menu</web>
   <name>MenuTranslations</name>
   <language>pt_BR</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>L10NCode.MenuClass</parent>
+  <parent>MenuClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1372229927000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

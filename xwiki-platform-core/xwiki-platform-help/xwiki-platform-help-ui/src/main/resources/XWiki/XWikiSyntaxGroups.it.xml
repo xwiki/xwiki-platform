@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="XWiki.XWikiSyntaxGroups" locale="it">
   <web>XWiki</web>
   <name>XWikiSyntaxGroups</name>
   <language>it</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1301497834000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxGroups</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

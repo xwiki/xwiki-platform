@@ -402,19 +402,14 @@ position: relative;
         {{/velocity}}
         {{velocity}}
         #if($canView)
-          #set($configClass     = 'XWiki.RatingsConfigClass')
-          #set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
-          #set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))
+          #set($configurationClass = 'XWiki.RatingsConfigClass')
+          #set($configurationDoc = $services.ratings.getConfigurationDocument($doc.documentReference))
+          #set($configurationObj = $configurationDoc.getObject($configurationClass))
           ##
-          #if($xwiki.exists($webPrefDoc) &amp;&amp; $webPrefDoc.getObjectNumbers($configClass) &gt; 0)
-            #set($configObj = $webPrefDoc.getObject($configClass))
-          #else
-            #set($configObj = $globalConfigDoc.getObject($configClass))
-          #end
-          ##
-          #set($displayRatings = $configObj.getProperty('displayRatings').value == 1)
-          #set($excludedPages  = $stringtool.split($configObj.getProperty('excludedPages').value, ','))
+          #set($displayRatings = $configurationObj.getProperty('displayRatings').value == 1)
+          #set($excludedPages  = $stringtool.split($configurationObj.getProperty('excludedPages').value, ','))
           #set($excludedPages  = $stringtool.stripAll($excludedPages))
+          ##
           ##
           #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
             #displayFullRating($doc.getDocumentReference() "")

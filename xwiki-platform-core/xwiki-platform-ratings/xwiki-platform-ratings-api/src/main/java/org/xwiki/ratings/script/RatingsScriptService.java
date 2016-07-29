@@ -34,8 +34,10 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.AverageRatingApi;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -68,6 +70,9 @@ public class RatingsScriptService implements ScriptService
     @Inject
     @Named("user/current")
     private DocumentReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
 
     /**
      * Retrieve the XWiki context from the current execution context.
@@ -396,5 +401,18 @@ public class RatingsScriptService implements ScriptService
             setError(e);
             return null;
         }
+    }
+    
+    /**
+     * Get configuration document.
+      *
+      * @param documentReference the documentReference for which to return the configuration document
+      * @return the configuration document
+      * @since 8.2.1
+      */
+    @Unstable
+    public Document getConfigurationDocument(DocumentReference documentReference)
+    {
+        return ratingsConfiguration.getConfigurationDocument(documentReference).newDocument(getXWikiContext());
     }
 }

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.render;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +75,7 @@ import com.xpn.xwiki.internal.template.SUExecutor;
  */
 @Component
 @Singleton
+// TODO: refactor to move it in xwiki-commons, the dependencies on the model are actually quite minor
 public class DefaultVelocityManager implements VelocityManager, Initializable
 {
     /**
@@ -176,10 +179,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     @Override
     public VelocityContext getVelocityContext()
     {
-        // The Velocity Context is set in VelocityExecutionContextInitializer, when the XWiki Request is initialized
-        // so we are guaranteed it is defined when this method is called.
-        VelocityContext vcontext = (VelocityContext) this.execution.getContext()
-            .getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+        VelocityContext vcontext = getCurrentVelocityContext();
 
         // Copy current JSR223 ScriptContext binding.
         ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
@@ -191,11 +191,16 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         // Add the "context" binding which is deprecated since 1.9.1.
         vcontext.put("context", new DeprecatedContext(xcontext));
 
-        // Make sure the execution context and the XWiki context point to the same Velocity context instance. There is
-        // old code that accesses the Velocity context from the XWiki context.
-        xcontext.put("vcontext", vcontext);
-
         return vcontext;
+    }
+
+    @Override
+    public VelocityContext getCurrentVelocityContext()
+    {
+        // The Velocity Context is set in VelocityExecutionContextInitializer, when the XWiki Request is initialized
+        // so we are guaranteed it is defined when this method is called.
+        return (VelocityContext) this.execution.getContext()
+            .getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
     }
 
     /**
@@ -315,5 +320,29 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         }
 
         return velocityEngine;
+    }
+
+    @Override
+    public boolean evaluate(Writer out, String templateName, Reader source) throws XWikiVelocityException
+    {
+        // Get up to date Velocity context
+        VelocityContext velocityContext = getVelocityContext();
+
+        // Execute Velocity context
+        boolean result = getVelocityEngine().evaluate(velocityContext, out, templateName, source);
+
+        // Update current script context with potentially modified Velocity context
+        ScriptContext scontext = this.scriptContextManager.getCurrentScriptContext();
+        for (Object vkey : velocityContext.getKeys()) {
+            if (vkey instanceof String) {
+                String svkey = (String) vkey;
+                // context is a reserved binding in JSR223 specification
+                if (!"context".equals(svkey)) {
+                    scontext.setAttribute(svkey, velocityContext.get(svkey), ScriptContext.ENGINE_SCOPE);
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
+import javax.script.ScriptContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.CaptchaVerifier;
@@ -74,8 +75,7 @@ public class RegisterAction extends XWikiAction
             } else {
                 result = xwiki.createUser(context);
             }
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put("reg", Integer.valueOf(result));
+            getCurrentScriptContext().setAttribute("reg", Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
 
             // Redirect if a redirection parameter is passed.
             String redirect = Utils.getRedirect(request, null);

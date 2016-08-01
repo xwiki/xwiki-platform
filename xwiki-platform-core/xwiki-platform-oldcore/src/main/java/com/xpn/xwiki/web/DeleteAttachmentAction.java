@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -108,11 +108,16 @@ public class DeleteAttachmentAction extends XWikiAction
         // No such attachment
         if (attachment == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext != null) {
-                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
-                vcontext.put("details", localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"));
+
+            ScriptContext scriptContext = getCurrentScriptContext();
+            if (scriptContext != null) {
+                scriptContext.setAttribute("message",
+                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                scriptContext.setAttribute("details",
+                    localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"),
+                    ScriptContext.ENGINE_SCOPE);
             }
+
             return true;
         }
 
@@ -131,11 +136,15 @@ public class DeleteAttachmentAction extends XWikiAction
             xwiki.saveDocument(newdoc, comment, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext != null) {
-                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
-                vcontext.put("details", ExceptionUtils.getRootCauseMessage(ex));
+
+            ScriptContext scriptContext = getCurrentScriptContext();
+            if (scriptContext != null) {
+                scriptContext.setAttribute("message",
+                    localizePlainOrKey("core.action.deleteAttachment.failed", filename), ScriptContext.ENGINE_SCOPE);
+                scriptContext.setAttribute("details", ExceptionUtils.getRootCauseMessage(ex),
+                    ScriptContext.ENGINE_SCOPE);
             }
+
             return true;
         }
 

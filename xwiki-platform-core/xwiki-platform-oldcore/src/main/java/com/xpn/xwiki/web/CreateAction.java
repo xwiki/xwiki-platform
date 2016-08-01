@@ -20,9 +20,9 @@
 package com.xpn.xwiki.web;
 
 import javax.inject.Provider;
+import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -108,12 +108,13 @@ public class CreateAction extends XWikiAction
         handler.processRequest();
 
         // Save the determined values so we have them available in the action template.
-        VelocityContext velocityContext = handler.getVelocityContext();
-        velocityContext.put(SPACE_REFERENCE, handler.getSpaceReference());
-        velocityContext.put(NAME, handler.getName());
-        velocityContext.put(IS_SPACE, handler.isSpace());
+        ScriptContext scontext = getCurrentScriptContext();
+        scontext.setAttribute(SPACE_REFERENCE, handler.getSpaceReference(), ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute(NAME, handler.getName(), ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute(IS_SPACE, handler.isSpace(), ScriptContext.ENGINE_SCOPE);
         // put the available templates on the context, for the .vm to not compute them again
-        velocityContext.put("availableTemplateProviders", handler.getAvailableTemplateProviders());
+        scontext.setAttribute("availableTemplateProviders", handler.getAvailableTemplateProviders(),
+            ScriptContext.ENGINE_SCOPE);
 
         DocumentReference newDocumentReference = handler.getNewDocumentReference();
         if (newDocumentReference == null) {
@@ -138,7 +139,7 @@ public class CreateAction extends XWikiAction
         if (handler.isDocumentAlreadyExisting(newDocument)) {
             return CREATE_TEMPLATE;
         }
-        
+
         // Verify if the "type" of document to create has been set, even if we currently do not use it in the action.
         // The goal is let the user be able to chose it, which have some consequences in the UI (thanks to javascript).
         // See: http://jira.xwiki.org/browse/XWIKI-12580
@@ -164,7 +165,7 @@ public class CreateAction extends XWikiAction
     {
         ContextualAuthorizationManager authManager = Utils.getComponent(ContextualAuthorizationManager.class);
         if (!authManager.hasAccess(Right.EDIT, spaceReference)) {
-            Object[] args = {spaceReference.toString(), context.getUser()};
+            Object[] args = { spaceReference.toString(), context.getUser() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "The creation of a document into the space {0} has been denied to user {1}", null, args);
         }

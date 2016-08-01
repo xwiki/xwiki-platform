@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -166,6 +170,8 @@ public class CreateActionRequestHandler
      */
     private static final String WEBHOME = "WebHome";
 
+    private ScriptContextManager scriptContextManager;
+
     private SpaceReference spaceReference;
 
     private String name;
@@ -209,9 +215,8 @@ public class CreateActionRequestHandler
 
         // Get the available templates, in the current space, to check if all conditions to create a new document are
         // met
-        availableTemplateProviders =
-            loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
-                templateProviderClassReference, context);
+        availableTemplateProviders = loadAvailableTemplateProviders(
+            document.getDocumentReference().getLastSpaceReference(), templateProviderClassReference, context);
 
         // Get the type of document to create
         type = request.get(TYPE);
@@ -409,10 +414,10 @@ public class CreateActionRequestHandler
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
 
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
-            Query query =
-                queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
-                    + "where doc.fullName not like 'XWiki.TemplateProviderTemplate' "
-                    + "order by template.name", Query.XWQL);
+            Query query = queryManager.createQuery(
+                "from doc.object(XWiki.TemplateProviderClass) as template "
+                    + "where doc.fullName not like 'XWiki.TemplateProviderTemplate' " + "order by template.name",
+                Query.XWQL);
 
             // TODO: Extend the above query to include a filter on the type and allowed spaces properties so we can
             // remove the java code below, thus improving performance by not loading all the documents, but only the
@@ -536,14 +541,16 @@ public class CreateActionRequestHandler
         if (templateProvider != null) {
             if (!isTemplateProviderAllowedInSpace(templateProvider, spaceReference)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
-                XWikiException exception =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
-                VelocityContext vcontext = getVelocityContext();
-                vcontext.put(EXCEPTION, exception);
-                vcontext.put("createAllowedSpaces", templateProvider.getListValue(SPACES_PROPERTY));
+                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, name };
+                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                    "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+
+                ScriptContext scontext = getCurrentScriptContext();
+                scontext.setAttribute(EXCEPTION, exception, ScriptContext.ENGINE_SCOPE);
+                scontext.setAttribute("createAllowedSpaces", templateProvider.getListValue(SPACES_PROPERTY),
+                    ScriptContext.ENGINE_SCOPE);
+
                 return false;
             }
         }
@@ -562,17 +569,19 @@ public class CreateActionRequestHandler
         // if the document exists don't create it, put the exception on the context so that the template gets it and
         // re-requests the page and space, else create the document and redirect to edit
         if (!isEmptyDocument(newDocument)) {
+            ScriptContext scontext = getCurrentScriptContext();
+
             // Expose to the template reference of the document that already exist so that it can propose to view or
             // edit it.
-            getVelocityContext().put("existingDocumentReference", newDocument.getDocumentReference());
+            scontext.setAttribute("existingDocumentReference", newDocument.getDocumentReference(),
+                ScriptContext.ENGINE_SCOPE);
 
             // Throw an exception.
-            Object[] args = {newDocument.getDocumentReference()};
+            Object[] args = { newDocument.getDocumentReference() };
             XWikiException documentAlreadyExists =
-                new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot create document {0} because it already has content", null, args);
-            getVelocityContext().put(EXCEPTION, documentAlreadyExists);
+            scontext.setAttribute(EXCEPTION, documentAlreadyExists, ScriptContext.ENGINE_SCOPE);
 
             return true;
         }
@@ -620,11 +629,25 @@ public class CreateActionRequestHandler
 
     /**
      * @return the {@link VelocityContext} for the context we are handling
+     * @deprecated since 8.3M1, use {@link #getScriptContext()} instead
      */
+    @Deprecated
     public VelocityContext getVelocityContext()
     {
-        VelocityContext result = (VelocityContext) context.get("vcontext");
-        return result;
+        return Utils.getComponent(VelocityManager.class).getVelocityContext();
+    }
+
+    /**
+     * @return the current script context
+     * @since 8.3M1
+     */
+    protected ScriptContext getCurrentScriptContext()
+    {
+        if (this.scriptContextManager == null) {
+            this.scriptContextManager = Utils.getComponent(ScriptContextManager.class);
+        }
+
+        return this.scriptContextManager.getCurrentScriptContext();
     }
 
     /**

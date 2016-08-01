@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.velocity.VelocityContext;
+import javax.script.ScriptContext;
+
+import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiValidationStatus
 {
@@ -75,12 +78,15 @@ public class XWikiValidationStatus
         if ((validationMessage != null) && (!validationMessage.trim().equals(""))) {
             getErrors().add(validationMessage);
         } else {
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext == null) {
+            ScriptContextManager scriptManager = Utils.getComponent(ScriptContextManager.class);
+            ScriptContext scontext = scriptManager.getCurrentScriptContext();
+
+            if (scontext == null) {
                 getErrors().add("Validation error for property " + propPrettyName + " in class " + className);
             } else {
-                vcontext.put("className", className);
-                vcontext.put("propName", propPrettyName);
+                scontext.setAttribute("className", className, ScriptContext.ENGINE_SCOPE);
+                scontext.setAttribute("propName", propPrettyName, ScriptContext.ENGINE_SCOPE);
+
                 String message = context.getMessageTool().get("validationerror", Collections.singletonList(propName));
                 getErrors().add(message);
             }

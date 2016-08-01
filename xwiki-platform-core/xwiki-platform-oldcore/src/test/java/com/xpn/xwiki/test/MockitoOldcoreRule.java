@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
+import javax.script.ScriptContext;
+import javax.script.SimpleScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +59,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
@@ -145,6 +149,8 @@ public class MockitoOldcoreRule implements MethodRule
     private MemoryConfigurationSource wikiConfigurationSource;
 
     private MemoryConfigurationSource spaceConfigurationSource;
+
+    private ScriptContext scriptContext;
 
     public MockitoOldcoreRule()
     {
@@ -279,10 +285,10 @@ public class MockitoOldcoreRule implements MethodRule
         // Make sure a "space" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, "space")) {
             this.spaceConfigurationSource = new MockConfigurationSource();
-            getMocker().registerComponent(MockConfigurationSource.getDescriptor("space"), this.spaceConfigurationSource);
+            getMocker().registerComponent(MockConfigurationSource.getDescriptor("space"),
+                this.spaceConfigurationSource);
         }
 
-        
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)
@@ -322,7 +328,21 @@ public class MockitoOldcoreRule implements MethodRule
         } else {
             econtext = execution.getContext();
         }
+
+        // Set a few standard things in the ExecutionContext
         econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
+        this.scriptContext = (ScriptContext) econtext.getProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
+        if (this.scriptContext == null) {
+            this.scriptContext = new SimpleScriptContext();
+            econtext.setProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID, this.scriptContext);
+        }
+
+        if (!this.componentManager.hasComponent(ScriptContextManager.class)) {
+            ScriptContextManager scriptContextManager =
+                this.componentManager.registerMockComponent(ScriptContextManager.class);
+            when(scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
+            when(scriptContextManager.getScriptContext()).thenReturn(this.scriptContext);
+        }
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
@@ -363,7 +383,8 @@ public class MockitoOldcoreRule implements MethodRule
                 this.componentManager.registerMockComponent(CoreConfiguration.class);
             when(coreConfigurationMock.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_1_0);
         } else {
-            CoreConfiguration coreConfiguration = this.componentManager.registerMockComponent(CoreConfiguration.class, false);
+            CoreConfiguration coreConfiguration =
+                this.componentManager.registerMockComponent(CoreConfiguration.class, false);
             if (mockUtil.isMock(coreConfiguration)) {
                 when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.XWIKI_1_0);
             }
@@ -804,6 +825,14 @@ public class MockitoOldcoreRule implements MethodRule
     public ExecutionContext getExecutionContext() throws ComponentLookupException
     {
         return this.componentManager.<Execution>getInstance(Execution.class).getContext();
+    }
+
+    /**
+     * @since 8.3M1
+     */
+    public ScriptContext getScriptContext()
+    {
+        return this.scriptContext;
     }
 
     /**

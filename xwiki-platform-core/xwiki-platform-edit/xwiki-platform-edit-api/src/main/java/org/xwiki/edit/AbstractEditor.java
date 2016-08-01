@@ -49,12 +49,15 @@ public abstract class AbstractEditor<D> implements Editor<D>
     @Override
     public String render(D data, Map<String, Object> parameters) throws EditException
     {
-        ScriptContext scriptContext = this.scripts.getScriptContext();
-        scriptContext.setAttribute(EDIT_CONTEXT_KEY, getEditContext(data, parameters), ScriptContext.ENGINE_SCOPE);
+        ScriptContext scriptContext = this.scripts.getCurrentScriptContext();
+
+        Object currentEdit = scriptContext.getAttribute(EDIT_CONTEXT_KEY, ScriptContext.ENGINE_SCOPE);
         try {
+            scriptContext.setAttribute(EDIT_CONTEXT_KEY, getEditContext(data, parameters), ScriptContext.ENGINE_SCOPE);
+
             return render();
         } finally {
-            scriptContext.removeAttribute(EDIT_CONTEXT_KEY, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute(EDIT_CONTEXT_KEY, currentEdit, ScriptContext.ENGINE_SCOPE);
         }
     }
 

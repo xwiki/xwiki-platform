@@ -21,13 +21,12 @@ package com.xpn.xwiki.render;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
 
@@ -37,8 +36,6 @@ import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Inject in the {@link ScriptContext} the XWiki context and the {@link XWiki} instance for backward compatibility.
@@ -56,12 +53,15 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     private Logger logger;
 
     @Inject
-    private Execution execution;
+    private SyntaxFactory syntaxFactory;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public void initialize(ScriptContext scriptContext)
     {
-        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         if (scriptContext.getAttribute("util") == null) {
             // Put the Util API in the Script context.
@@ -83,32 +83,35 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             // Make the Syntax Factory component available from Script.
             // TODO: We need to decide how we want to expose components in general and how to protect users from
             // "dangerous" apis.
-            scriptContext.setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.class),
-                ScriptContext.ENGINE_SCOPE);
-
-            // Make deprecated XWiki message tool available from scripts
-            scriptContext.setAttribute("msg",
-                new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class)),
-                ScriptContext.ENGINE_SCOPE);
+            // TODO: Actually this should probably be moved to legacy, we have a rendering ScriptService now
+            scriptContext.setAttribute("syntaxFactory", this.syntaxFactory, ScriptContext.ENGINE_SCOPE);
         }
 
         // Current document
         XWikiDocument doc = xcontext.getDoc();
         if (doc != null) {
-            Document previousDoc = (Document) scriptContext.getAttribute("doc");
-            if (previousDoc == null || !previousDoc.getDocumentReference().equals(doc.getDocumentReference())) {
-                Document apiDocument = doc.newDocument(xcontext);
-                Document translatedDocument = apiDocument;
+            setDocument(scriptContext, "doc", doc, xcontext);
+
+            XWikiDocument tdoc = (XWikiDocument) xcontext.get("tdoc");
+            if (tdoc == null) {
                 try {
-                    translatedDocument = apiDocument.getTranslatedDocument();
+                    tdoc = doc.getTranslatedDocument(xcontext);
                 } catch (XWikiException e) {
                     this.logger.warn("Failed to retrieve the translated document for [{}]. "
-                        + "Continue using the default translation.", apiDocument.getFullName(), e);
+                        + "Continue using the default translation.", doc.getDocumentReference(), e);
+                    tdoc = doc;
                 }
-                scriptContext.setAttribute("doc", apiDocument, ScriptContext.ENGINE_SCOPE);
-                scriptContext.setAttribute("cdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
-                scriptContext.setAttribute("tdoc", translatedDocument, ScriptContext.ENGINE_SCOPE);
             }
+            setDocument(scriptContext, "tdoc", tdoc, xcontext);
+
+            XWikiDocument cdoc = (XWikiDocument) xcontext.get("cdoc");
+            if (cdoc == null) {
+                cdoc = tdoc;
+                if (cdoc == null) {
+                    cdoc = doc;
+                }
+            }
+            setDocument(scriptContext, "cdoc", cdoc, xcontext);
         }
 
         // Current secure document
@@ -118,6 +121,18 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             if (previousSDoc == null || !previousSDoc.getDocumentReference().equals(sdoc.getDocumentReference())) {
                 scriptContext.setAttribute("sdoc", sdoc.newDocument(xcontext), ScriptContext.ENGINE_SCOPE);
             }
+        }
+
+        // Miscellaneous
+        scriptContext.setAttribute("locale", xcontext.getLocale(), ScriptContext.ENGINE_SCOPE);
+    }
+
+    private void setDocument(ScriptContext scriptContext, String key, XWikiDocument document, XWikiContext xcontext)
+    {
+        Document previousDoc = (Document) scriptContext.getAttribute(key);
+        if (previousDoc == null || !previousDoc.getDocumentReference().equals(document.getDocumentReference())) {
+            Document apiDocument = document.newDocument(xcontext);
+            scriptContext.setAttribute(key, apiDocument, ScriptContext.ENGINE_SCOPE);
         }
     }
 }

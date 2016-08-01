@@ -22,9 +22,10 @@ package com.xpn.xwiki.objects.classes;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
-import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
@@ -33,14 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -275,26 +274,24 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         String content = "";
         try {
-            VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
-            vcontext.put("name", fieldName);
-            vcontext.put("prefix", prefix);
+            ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
+            scontext.setAttribute("name", fieldName, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
             // The PropertyClass instance can be used to access meta properties in the custom displayer (e.g.
             // dateFormat, multiSelect). It can be obtained from the XClass of the given object but only if the property
             // has been added to the XClass. We need to have it in the Velocity context for the use case when an XClass
             // property needs to be previewed before being added to the XClass.
-            vcontext.put("field", new com.xpn.xwiki.api.PropertyClass(this, context));
-            vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
-            vcontext.put("type", type);
-            vcontext.put("context", new DeprecatedContext(context));
-            vcontext.put("xcontext", new Context(context));
+            scontext.setAttribute("field", new com.xpn.xwiki.api.PropertyClass(this, context), ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
-                vcontext.put("value", prop.getValue());
+                scontext.setAttribute("value", prop.getValue(), ScriptContext.ENGINE_SCOPE);
             } else {
                 // The $value property can exist in the velocity context, we overwrite it to make sure we don't get a
                 // wrong value in the displayer when the property does not exist yet.
-                vcontext.put("value", null);
+                scontext.setAttribute("value", null, ScriptContext.ENGINE_SCOPE);
             }
 
             String customDisplayer = getCachedDefaultCustomDisplayer(context);

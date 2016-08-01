@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,7 +64,7 @@ public class CommentAddAction extends XWikiAction
         if (doc.isNew()) {
             return true;
         } else if (context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME) && !checkCaptcha(context)) {
-            ((VelocityContext) context.get("vcontext")).put("captchaAnswerWrong", Boolean.TRUE);
+            getCurrentScriptContext().setAttribute("captchaAnswerWrong", Boolean.TRUE, ScriptContext.ENGINE_SCOPE);
         } else {
             // className = XWiki.XWikiComments
             String className = baseclass.getName();

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -26,6 +28,8 @@ import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
 import org.junit.Test;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -307,7 +311,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
         Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
-        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
+        mockVelocityManager.stubs().method("getCurrentVelocityContext").will(returnValue(vcontext));
 
         VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
         VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
@@ -318,6 +322,15 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertTrue(cachedMacroNamespaceSize > 0);
 
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
+        mockVelocityManager.stubs().method("evaluate").will(new CustomStub("evaluate")
+        {
+            @Override
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return vengine.evaluate(vcontext, (Writer) invocation.parameterValues.get(0),
+                    (String) invocation.parameterValues.get(1), (Reader) invocation.parameterValues.get(2));
+            }
+        });
 
         // $doc.display will ask for the syntax of the current document so we need to mock it.
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").with(eq("xwiki/2.0"), ANYTHING)

@@ -43,6 +43,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -60,9 +62,9 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Represents the execution environment for all the wiki pages. An instance of the <code>Context</code> class is
- * available as a predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code> in Velocity
- * scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means of getting
- * contextual information about the current request or configuring XWiki on the fly.
+ * available as a predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code>
+ * in Velocity scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means
+ * of getting contextual information about the current request or configuring XWiki on the fly.
  *
  * @version $Id$
  */
@@ -73,8 +75,8 @@ public class XWikiContext extends Hashtable<Object, Object>
      *
      * @since 5.0M1
      */
-    public static final ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
-        XWikiContext.class);
+    public static final ParameterizedType TYPE_PROVIDER =
+        new DefaultParameterizedType(null, Provider.class, XWikiContext.class);
 
     public static final int MODE_SERVLET = 0;
 
@@ -91,6 +93,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public static final int MODE_GWT_DEBUG = 6;
 
     public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
+
+    /**
+     * @deprecated use {@link VelocityManager#getVelocityContext()} instead
+     */
+    public static final String KEY_LEGACY_VELOCITYCONTEXT = "vcontext";
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiContext.class);
@@ -208,6 +215,15 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
 
         return this.execution;
+    }
+
+    private ExecutionContext getExecutionContext()
+    {
+        if (getExecution() != null) {
+            return getExecution().getContext();
+        }
+
+        return null;
     }
 
     public XWiki getWiki()
@@ -337,6 +353,27 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
+    @Override
+    public synchronized Object get(Object key)
+    {
+        Object value;
+
+        if (WIKI_KEY.equals(key)) {
+            value = getWikiId();
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                value = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+            } else {
+                value = null;
+            }
+        } else {
+            value = super.get(key);
+        }
+
+        return value;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -353,6 +390,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
             setWikiId((String) value);
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                previous = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+                executionContext.setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID, value);
+            } else {
+                previous = null;
+            }
         } else {
             if (value != null) {
                 previous = super.put(key, value);
@@ -380,6 +425,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
             setWikiId(null);
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                previous = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+                executionContext.removeProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+            } else {
+                previous = null;
+            }
         } else {
             previous = super.remove(key);
         }

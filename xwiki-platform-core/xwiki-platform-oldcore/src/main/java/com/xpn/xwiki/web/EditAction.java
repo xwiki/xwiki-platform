@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -132,7 +133,6 @@ public class EditAction extends XWikiAction
         // only for the duration of the current request.
         doc = doc.clone();
         context.put("doc", doc);
-        ((VelocityContext) context.get("vcontext")).put("doc", doc.newDocument(context));
 
         EditForm editForm = (EditForm) context.getForm();
         doc.readDocMetaFromForm(editForm, context);
@@ -204,7 +204,7 @@ public class EditAction extends XWikiAction
         // Check if section editing is enabled and if a section is specified.
         boolean sectionEditingEnabled = context.getWiki().hasSectionEdit(context);
         int sectionNumber = sectionEditingEnabled ? NumberUtils.toInt(context.getRequest().getParameter("section")) : 0;
-        ((VelocityContext) context.get("vcontext")).put("sectionNumber", sectionNumber);
+        getCurrentScriptContext().setAttribute("sectionNumber", sectionNumber, ScriptContext.ENGINE_SCOPE);
 
         // Update the edited content.
         EditForm editForm = (EditForm) context.getForm();
@@ -237,14 +237,10 @@ public class EditAction extends XWikiAction
      */
     private void putDocumentOnContext(XWikiDocument document, XWikiContext context)
     {
-        // Put the document on the XWiki context and the Velocity context.
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         context.put("tdoc", document);
-        vcontext.put("tdoc", document.newDocument(context));
         // Old XWiki applications that are still using the inline action might expect the cdoc (content document) to be
         // properly set on the context. Let's expose the given document also as cdoc for backward compatibility.
         context.put("cdoc", context.get("tdoc"));
-        vcontext.put("cdoc", vcontext.get("tdoc"));
     }
 
     /**

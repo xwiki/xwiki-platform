@@ -23,10 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -39,7 +39,6 @@ import org.xwiki.script.service.ScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
@@ -61,8 +60,8 @@ public class SaveAction extends PreviewAction
      * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
      * redirecting the user to a different page (e.g. when a page has been moved).
      */
-    private static final EntityReference REDIRECT_CLASS = new EntityReference("RedirectClass", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+    private static final EntityReference REDIRECT_CLASS =
+        new EntityReference("RedirectClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     public SaveAction()
     {
@@ -124,8 +123,8 @@ public class SaveAction extends PreviewAction
         if (doc.isNew()) {
             doc.setLocale(Locale.ROOT);
             if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(LocaleUtils
-                    .toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+                doc.setDefaultLocale(
+                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
             }
         }
 
@@ -173,13 +172,9 @@ public class SaveAction extends PreviewAction
                 context.put("doc", doc);
                 context.put("cdoc", tdoc);
                 context.put("tdoc", tdoc);
-                Document vdoc = tdoc.newDocument(context);
-                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-                vcontext.put("doc", doc.newDocument(context));
-                vcontext.put("cdoc", vdoc);
-                vcontext.put("tdoc", vdoc);
                 // Force the "Inline form" edit mode.
-                vcontext.put("editor", "inline");
+                getCurrentScriptContext().setAttribute("editor", "inline", ScriptContext.ENGINE_SCOPE);
+
                 return true;
             }
         }
@@ -199,8 +194,8 @@ public class SaveAction extends PreviewAction
             if (isAsync(request)) {
                 if (Utils.isAjaxRequest(context)) {
                     // Redirect to the job status URL of the job we have just launched.
-                    sendRedirect(context.getResponse(), String.format("%s/rest/jobstatus/%s?media=json", context
-                        .getRequest().getContextPath(), serializeJobId(createJob.getRequest().getId())));
+                    sendRedirect(context.getResponse(), String.format("%s/rest/jobstatus/%s?media=json",
+                        context.getRequest().getContextPath(), serializeJobId(createJob.getRequest().getId())));
                 }
 
                 // else redirect normally and the operation will eventually finish in the background.

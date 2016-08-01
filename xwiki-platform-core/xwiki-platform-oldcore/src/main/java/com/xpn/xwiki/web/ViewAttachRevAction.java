@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
+import javax.script.ScriptContext;
+
 import org.xwiki.model.EntityType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -60,9 +61,8 @@ public class ViewAttachRevAction extends XWikiAction
         if (context.getWiki().hasAttachmentRecycleBin(context) && request.getParameter("rid") != null) {
             int recycleId = Integer.parseInt(request.getParameter("rid"));
             attachment = new XWikiAttachment(doc, filename);
-            attachment =
-                context.getWiki().getAttachmentRecycleBinStore()
-                    .restoreFromRecycleBin(attachment, recycleId, context, true);
+            attachment = context.getWiki().getAttachmentRecycleBinStore().restoreFromRecycleBin(attachment, recycleId,
+                context, true);
         } else if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = doc.getAttachmentList().get(id);
@@ -73,8 +73,11 @@ public class ViewAttachRevAction extends XWikiAction
                 return "exception";
             }
         }
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        vcontext.put("attachment", new Attachment((Document) vcontext.get("doc"), attachment, context));
+
+        ScriptContext scriptContext = getCurrentScriptContext();
+        scriptContext.setAttribute("attachment",
+            new Attachment((Document) scriptContext.getAttribute("doc"), attachment, context),
+            ScriptContext.ENGINE_SCOPE);
 
         return "viewattachrev";
     }

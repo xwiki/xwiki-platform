@@ -308,7 +308,8 @@ public class XWiki extends Api
     {
         String author = this.getEffectiveScriptAuthorName();
         XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(), getXWikiContext()) == false) {
+        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
+            getXWikiContext()) == false) {
             return null;
         }
 
@@ -346,7 +347,8 @@ public class XWiki extends Api
         if (!NumberUtils.isDigits(index)) {
             return null;
         }
-        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
+        XWikiDeletedDocument dd =
+            this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
         if (dd == null) {
             return null;
         }
@@ -661,8 +663,7 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale, int nb, int start)
         throws XWikiException
     {
-        return convert(this.xwiki.getStore()
-            .searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
+        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
     }
 
     /**
@@ -756,9 +757,8 @@ public class XWiki extends Api
     public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return this.xwiki.getStore().search(
-            "select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause, nb, start, parameterValues,
-            this.context);
+        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause,
+            nb, start, parameterValues, this.context);
     }
 
     /**
@@ -778,8 +778,8 @@ public class XWiki extends Api
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues,
-            this.context));
+        return convertAttachments(
+            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**
@@ -948,8 +948,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale
@@ -960,8 +960,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
@@ -973,9 +973,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale If no preference is found it will look in the
-     * XWiki Preferences
+     * API to access an Space Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale If no preference is found it will look in the XWiki
+     * Preferences
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale
@@ -986,9 +986,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale If no preference is found it will look in the
-     * XWiki Preferences
+     * API to access an Space Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale If no preference is found it will look in the XWiki
+     * Preferences
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
@@ -1163,9 +1163,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a space Preference as a int number There can be one preference object per locale This function
-     * will find the right preference object associated to the current active locale If no preference is found it will
-     * look for the XWiki Preference
+     * API to access a space Preference as a int number There can be one preference object per locale This function will
+     * find the right preference object associated to the current active locale If no preference is found it will look
+     * for the XWiki Preference
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
@@ -1177,9 +1177,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a Space Preference as a int number There can be one preference object per locale This function
-     * will find the right preference object associated to the current active locale If no preference is found it will
-     * look for the XWiki Preference
+     * API to access a Space Preference as a int number There can be one preference object per locale This function will
+     * find the right preference object associated to the current active locale If no preference is found it will look
+     * for the XWiki Preference
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale in int format
@@ -1226,17 +1226,17 @@ public class XWiki extends Api
 
     /**
      * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get
-     * the locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists
-     * then use the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP
-     * request. If none is defined use the default locale.
+     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
+     * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
+     * the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP request. If none
+     * is defined use the default locale.
      *
      * @return the locale to use
      * @since 8.0M1
      */
     public Locale getLocalePreference()
     {
-        return this.xwiki.getLocalePreference(getXWikiContext());        
+        return this.xwiki.getLocalePreference(getXWikiContext());
     }
 
     /**
@@ -1253,8 +1253,8 @@ public class XWiki extends Api
 
     /**
      * API to access the interface locale preference for the request Order of evaluation is: locale of the wiki in
-     * mono-lingual mode locale request parameter locale in context locale user preference locale in cookie
-     * locale accepted by the navigator
+     * mono-lingual mode locale request parameter locale in context locale user preference locale in cookie locale
+     * accepted by the navigator
      *
      * @return the document locale preference for the request
      */
@@ -1380,9 +1380,8 @@ public class XWiki extends Api
             if (hasProgrammingRights()) {
                 registerRight = true;
             } else {
-                registerRight =
-                    this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                        "XWiki.XWikiPreferences", getXWikiContext());
+                registerRight = this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                    "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1539,16 +1538,14 @@ public class XWiki extends Api
     {
         DocumentReference sourceDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference =
-                sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(), new WikiReference(
-                    sourceWiki));
+            sourceDocumentReference = sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(),
+                new WikiReference(sourceWiki));
         }
 
         DocumentReference targetDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference =
-                targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(), new WikiReference(
-                    targetWiki));
+            targetDocumentReference = targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(),
+                new WikiReference(targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force);
@@ -2430,9 +2427,8 @@ public class XWiki extends Api
     public boolean renamePage(Document doc, String newFullName)
     {
         try {
-            if (this.xwiki.exists(newFullName, getXWikiContext())
-                && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                    getXWikiContext())) {
+            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
+                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),

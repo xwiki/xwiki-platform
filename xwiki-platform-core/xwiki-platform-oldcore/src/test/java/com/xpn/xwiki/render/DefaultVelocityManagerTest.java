@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.render;
 
-import javax.script.SimpleScriptContext;
-
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,7 +28,6 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.internal.DefaultScriptContextManager;
-import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityManager;
@@ -65,8 +62,6 @@ public class DefaultVelocityManagerTest
         this.mocker.registerMockComponent(SyntaxFactory.class);
         this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
-        this.oldcore.getExecutionContext().setProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID,
-            new SimpleScriptContext());
         this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
             new VelocityContext());
     }

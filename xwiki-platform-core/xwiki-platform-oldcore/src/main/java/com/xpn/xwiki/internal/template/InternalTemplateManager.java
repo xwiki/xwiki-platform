@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.template;
 
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
@@ -39,7 +40,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -689,8 +689,6 @@ public class InternalTemplateManager
 
     private void evaluateContent(Template template, DefaultTemplateContent content, Writer writer) throws Exception
     {
-        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
-
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
         String namespace = this.renderingContext.getTransformationId();
@@ -710,7 +708,7 @@ public class InternalTemplateManager
         }
 
         try {
-            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, namespace, content.content);
+            this.velocityManager.evaluate(writer, namespace, new StringReader(content.content));
         } finally {
             // Get rid of temporary rendering context
             if (renderingContextPushed) {

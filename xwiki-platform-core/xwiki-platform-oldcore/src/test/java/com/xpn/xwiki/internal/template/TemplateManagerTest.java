@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.context.Context;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,13 +42,12 @@ import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.test.mockito.StringReaderMatcher;
 import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
 /**
@@ -68,15 +66,10 @@ public class TemplateManagerTest
 
     private VelocityManager velocityManagerMock;
 
-    private VelocityEngine velocityEngineMock;
-
     @Before
     public void before() throws Exception
     {
-        this.velocityEngineMock = mock(VelocityEngine.class);
-
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
-        when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
 
         MemoryConfigurationSource configuration = this.mocker.registerMemoryConfigurationSource();
         this.mocker.registerComponent(MockConfigurationSource.getDescriptor("all"), configuration);
@@ -95,8 +88,8 @@ public class TemplateManagerTest
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException
     {
-        when(this.environmentMock.getResourceAsStream("/templates/template")).thenReturn(
-            new ByteArrayInputStream(content.getBytes("UTF8")));
+        when(this.environmentMock.getResourceAsStream("/templates/template"))
+            .thenReturn(new ByteArrayInputStream(content.getBytes("UTF8")));
         when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
     }
 
@@ -105,20 +98,19 @@ public class TemplateManagerTest
     @Test
     public void testRenderVelocity() throws Exception
     {
-        when(
-            this.velocityEngineMock.evaluate(Matchers.<Context>any(), Matchers.<Writer>any(), anyString(),
-                eq("<html>$toto</html>"))).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
+        when(this.velocityManagerMock.evaluate(Matchers.<Writer>any(), anyString(),
+            argThat(new StringReaderMatcher("<html>$toto</html>")))).then(new Answer<Boolean>()
             {
-                Writer writer = (Writer) invocation.getArguments()[1];
+                @Override
+                public Boolean answer(InvocationOnMock invocation) throws Throwable
+                {
+                    Writer writer = (Writer) invocation.getArguments()[0];
 
-                writer.write("<html>value</html>");
+                    writer.write("<html>value</html>");
 
-                return Boolean.TRUE;
-            }
-        });
+                    return Boolean.TRUE;
+                }
+            });
 
         setTemplateContent("<html>$toto</html>");
 

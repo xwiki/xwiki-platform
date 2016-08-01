@@ -1,3 +1,0 @@
-org.xwiki.cache.internal.DefaultCacheFactory
-org.xwiki.cache.internal.DefaultCacheManager
-org.xwiki.cache.internal.DefaultCacheManagerConfiguration

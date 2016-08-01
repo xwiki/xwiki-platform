@@ -180,7 +180,7 @@ public class EntityRequest extends AbstractRequest
         Map<String, String> entityParameters =
             getProperty(PROPERTY_ENTITY_PARAMETERS, Collections.<EntityReference, Map<String, String>>emptyMap()).get(
                 entityReference);
-        return entityParameters == null ? Collections.emptyMap() : entityParameters;
+        return entityParameters == null ? Collections.<String, String>emptyMap() : entityParameters;
     }
 
     /**

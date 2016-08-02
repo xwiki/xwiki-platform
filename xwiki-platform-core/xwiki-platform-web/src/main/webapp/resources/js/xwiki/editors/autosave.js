@@ -49,7 +49,7 @@ editors.AutoSave = Class.create({
   initialize : function(options) {
     this.options = Object.extend(Object.clone(this.options), options || { });
     this.form = $(this.options.form) || ($("xwikieditcontent") && $("xwikieditcontent").up('form'));
-    if (!this.form) {
+    if (!this.form || this.form.down('#autosaveControl')) {
       return;
     }
     this.initVersionMetadataElements();

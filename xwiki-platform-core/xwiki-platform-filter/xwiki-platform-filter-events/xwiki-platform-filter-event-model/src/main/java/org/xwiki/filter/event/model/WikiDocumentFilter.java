@@ -26,7 +26,6 @@ import org.slf4j.MarkerFactory;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Document related events.
@@ -191,8 +190,7 @@ public interface WikiDocumentFilter
      * @param parameters the properties of the document
      * @throws FilterException when failing to send event
      */
-    void beginWikiDocument(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void beginWikiDocument(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -200,8 +198,7 @@ public interface WikiDocumentFilter
      * @param parameters the properties of the document
      * @throws FilterException when failing to send event
      */
-    void endWikiDocument(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void endWikiDocument(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -209,34 +206,30 @@ public interface WikiDocumentFilter
      * @param parameters the properties of the document locale
      * @throws FilterException when failing to send event
      */
-    void beginWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void beginWikiDocumentLocale(@Default("") Locale locale,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param locale the locale of the document
      * @param parameters the properties of the document
      * @throws FilterException when failing to send event
      */
-    void endWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void endWikiDocumentLocale(@Default("") Locale locale,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param revision the revision of the document
      * @param parameters the properties of the document revision
      * @throws FilterException when failing to send event
      */
-    void beginWikiDocumentRevision(@Name("revision") String revision,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void beginWikiDocumentRevision(String revision,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param revision the revision of the document
      * @param parameters the properties of the document revision
      * @throws FilterException when failing to send event
      */
-    void endWikiDocumentRevision(@Name("revision") String revision,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void endWikiDocumentRevision(String revision,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 }

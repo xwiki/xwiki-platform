@@ -22,7 +22,6 @@ package org.xwiki.filter.event.model;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Wiki related events.
@@ -37,8 +36,7 @@ public interface WikiFilter
      * @param parameters the properties of the wiki
      * @throws FilterException when failing to send event
      */
-    void beginWiki(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void beginWiki(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -46,7 +44,6 @@ public interface WikiFilter
      * @param parameters the properties of the wiki
      * @throws FilterException when failing to send event
      */
-    void endWiki(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void endWiki(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

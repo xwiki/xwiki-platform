@@ -22,7 +22,6 @@ package org.xwiki.filter.event.user;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Group related events.
@@ -51,8 +50,7 @@ public interface GroupFilter
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
      */
-    void beginGroup(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void beginGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -60,8 +58,7 @@ public interface GroupFilter
      * @param parameters the parameters of the user
      * @throws FilterException when failing to send event
      */
-    void onGroupMemberUser(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void onGroupMemberUser(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -69,8 +66,7 @@ public interface GroupFilter
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
      */
-    void onGroupMemberGroup(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void onGroupMemberGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -78,7 +74,6 @@ public interface GroupFilter
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
      */
-    void endGroup(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void endGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

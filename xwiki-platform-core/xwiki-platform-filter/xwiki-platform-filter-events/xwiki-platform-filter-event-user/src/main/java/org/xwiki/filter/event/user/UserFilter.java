@@ -22,7 +22,6 @@ package org.xwiki.filter.event.user;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * User related events.
@@ -71,8 +70,7 @@ public interface UserFilter
      * @param parameters the parameters of the user
      * @throws FilterException when failing to send event
      */
-    void beginUser(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void beginUser(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -80,7 +78,6 @@ public interface UserFilter
      * @param parameters the parameters of the user
      * @throws FilterException when failing to send event
      */
-    void endUser(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void endUser(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

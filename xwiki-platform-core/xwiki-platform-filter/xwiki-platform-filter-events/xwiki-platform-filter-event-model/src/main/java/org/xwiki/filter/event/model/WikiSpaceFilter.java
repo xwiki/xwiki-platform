@@ -22,7 +22,6 @@ package org.xwiki.filter.event.model;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Space related events.
@@ -37,8 +36,7 @@ public interface WikiSpaceFilter
      * @param parameters the properties of the space
      * @throws FilterException when failing to send event
      */
-    void beginWikiSpace(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void beginWikiSpace(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
     /**
@@ -46,7 +44,6 @@ public interface WikiSpaceFilter
      * @param parameters the properties of the space
      * @throws FilterException when failing to send event
      */
-    void endWikiSpace(@Name("name") String name,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void endWikiSpace(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

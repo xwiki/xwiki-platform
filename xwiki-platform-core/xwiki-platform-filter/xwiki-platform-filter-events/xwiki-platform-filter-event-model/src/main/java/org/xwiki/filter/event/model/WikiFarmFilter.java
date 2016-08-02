@@ -22,7 +22,6 @@ package org.xwiki.filter.event.model;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Wiki farm related events.
@@ -36,15 +35,11 @@ public interface WikiFarmFilter
      * @param parameters the farm parameters
      * @throws FilterException when failing to send event
      */
-    void beginWikiFarm(
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void beginWikiFarm(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param parameters the farm parameters
      * @throws FilterException when failing to send event
      */
-    void endWikiFarm(
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void endWikiFarm(@Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 }

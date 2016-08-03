@@ -972,12 +972,6 @@
         </dependency>
         <dependency>
           <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-legacy-ldap-authenticator</artifactId>
-          <version>${project.version}</version>
-          <scope>runtime</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-legacy-watchlist-api</artifactId>
           <version>${project.version}</version>
           <scope>runtime</scope>

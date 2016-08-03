@@ -533,7 +533,6 @@
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
-    <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>

@@ -807,7 +807,7 @@ var XWiki = (function(XWiki){
     // If the source declares that results are matching, we highlight them in the value
     var output = value,
         // Separate words (called fragments hereafter) in user input
-        fragments = input.split(' ').uniq().compact(),
+        fragments = input.split(/\s+/).uniq().compact(),
         offset = 0,
         matches = {};
 

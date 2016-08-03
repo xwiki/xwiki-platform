@@ -23,9 +23,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,6 +38,8 @@ import javax.script.ScriptContext;
 import org.apache.commons.io.output.NullWriter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.RuntimeSingleton;
+import org.apache.velocity.runtime.directive.Scope;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -137,6 +141,11 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     @Inject
     private Logger logger;
 
+    /**
+     * Binding that should stay on Velocity side only.
+     */
+    private final Set<String> reservedBindings = new HashSet<>();
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -164,6 +173,27 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 return EVENTS;
             }
         });
+
+        // Set reserved bindings
+
+        // "context" is a reserved binding in JSR223 world
+        this.reservedBindings.add("context");
+
+        // Macros directive
+        this.reservedBindings.add("macro");
+        // Foreach directive
+        this.reservedBindings.add("foreach");
+        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.COUNTER_NAME,
+            RuntimeSingleton.getString(RuntimeConstants.COUNTER_NAME)));
+        this.reservedBindings.add(this.velocityConfiguration.getProperties().getProperty(RuntimeConstants.HAS_NEXT_NAME,
+            RuntimeSingleton.getString(RuntimeConstants.HAS_NEXT_NAME)));
+        // Evaluate directive
+        this.reservedBindings.add("evaluate");
+        // TryCatch directive
+        this.reservedBindings.add("exception");
+        this.reservedBindings.add("try");
+        // Default directive
+        this.reservedBindings.add("define");
     }
 
     private void copyScriptContext(VelocityContext vcontext, ScriptContext scriptContext, int scope)
@@ -171,7 +201,13 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         Bindings bindings = scriptContext.getBindings(scope);
         if (bindings != null) {
             for (Map.Entry<String, Object> entry : bindings.entrySet()) {
-                vcontext.put(entry.getKey(), entry.getValue());
+                if (!this.reservedBindings.contains(entry.getKey())) {
+                    Object currentValue = vcontext.get(entry.getKey());
+                    // Don't replace internal Velocity bindings
+                    if (!(currentValue instanceof Scope)) {
+                        vcontext.put(entry.getKey(), entry.getValue());
+                    }
+                }
             }
         }
     }
@@ -336,8 +372,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         for (Object vkey : velocityContext.getKeys()) {
             if (vkey instanceof String) {
                 String svkey = (String) vkey;
-                // context is a reserved binding in JSR223 specification
-                if (!"context".equals(svkey)) {
+                if (!this.reservedBindings.contains(svkey)) {
                     scontext.setAttribute(svkey, velocityContext.get(svkey), ScriptContext.ENGINE_SCOPE);
                 }
             }

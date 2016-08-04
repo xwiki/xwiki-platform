@@ -285,9 +285,9 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     }
 
     @Override
-    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    public void beginWikiDocumentRevision(String revision, FilterEventParameters parameters) throws FilterException
     {
-        this.currentDocumentVersion = version;
+        this.currentDocumentVersion = revision;
 
         try {
             if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_PARENT)) {
@@ -358,7 +358,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     }
 
     @Override
-    public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
+    public void endWikiDocumentRevision(String revision, FilterEventParameters parameters) throws FilterException
     {
         this.currentDocumentVersion = null;
     }

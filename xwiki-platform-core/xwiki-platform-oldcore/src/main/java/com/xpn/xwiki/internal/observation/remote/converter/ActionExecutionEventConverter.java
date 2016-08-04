@@ -25,7 +25,9 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.event.AbstractActionExecutionEvent;
 import org.xwiki.bridge.event.ActionExecutedEvent;
+import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
@@ -62,8 +64,9 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof ActionExecutedEvent) {
-            ActionExecutedEvent event = (ActionExecutedEvent) localEvent.getEvent();
+        if (localEvent.getEvent() instanceof ActionExecutedEvent
+            || localEvent.getEvent() instanceof ActionExecutingEvent) {
+            AbstractActionExecutionEvent event = (AbstractActionExecutionEvent) localEvent.getEvent();
 
             if (this.actions.contains(event.getActionName())) {
                 // fill the remote event
@@ -81,7 +84,8 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof ActionExecutedEvent) {
+        if (remoteEvent.getEvent() instanceof ActionExecutedEvent
+            || remoteEvent.getEvent() instanceof ActionExecutingEvent) {
             // fill the local event
             XWikiContext xcontext = unserializeXWikiContext(remoteEvent.getData());
 

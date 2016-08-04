@@ -278,7 +278,9 @@ public class XWikiServletRequest implements XWikiRequest
     @Override
     public String getParameter(String s)
     {
-        return this.request.getParameter(s);
+        // Workaround Application server ot properly handling null parameter (by returning null like they are supposed
+        // to)
+        return s != null ? this.request.getParameter(s) : null;
     }
 
     @Override
@@ -290,7 +292,9 @@ public class XWikiServletRequest implements XWikiRequest
     @Override
     public String[] getParameterValues(String s)
     {
-        return this.request.getParameterValues(s);
+        // Workaround Application server ot properly handling null parameter (by returning null like they are supposed
+        // to)
+        return s != null ? this.request.getParameterValues(s) : null;
     }
 
     @Override

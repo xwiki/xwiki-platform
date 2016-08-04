@@ -514,6 +514,16 @@
 
 .toc ul {
   margin-top: 0;
+}
+
+/*Rating*/
+.extensionInfo .rating-wrapper {
+  float: left;
+}
+
+.extensionInfo .rating-container &gt; div {
+  float: left;
+  margin-right: 10px
 }</code>
     </property>
     <property>

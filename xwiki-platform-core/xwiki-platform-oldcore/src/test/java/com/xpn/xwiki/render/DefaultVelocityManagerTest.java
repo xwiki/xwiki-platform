@@ -31,6 +31,7 @@ import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.api.Document;
@@ -47,7 +48,8 @@ import static org.junit.Assert.assertSame;
  * 
  * @version $Id$
  */
-@ComponentList(value = { DefaultScriptContextManager.class, XWikiScriptContextInitializer.class })
+@ComponentList(value = { DefaultScriptContextManager.class, XWikiScriptContextInitializer.class,
+DefaultVelocityConfiguration.class })
 public class DefaultVelocityManagerTest
 {
     public MockitoComponentMockingRule<VelocityManager> mocker =

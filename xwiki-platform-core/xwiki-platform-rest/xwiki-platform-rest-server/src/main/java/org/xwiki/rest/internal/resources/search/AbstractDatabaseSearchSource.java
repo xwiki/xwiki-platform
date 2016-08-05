@@ -116,7 +116,7 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
             Object[] fields = (Object[]) object;
 
             String fullName = (String) fields[0];
-            String language = (String) fields[1];
+            String language = (String) fields[3];
 
             DocumentReference documentReference = this.resolver.resolve(fullName, wikiReference);
 

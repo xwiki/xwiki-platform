@@ -49,7 +49,7 @@ public class HQLSearchSource extends AbstractDatabaseSearchSource
             builder.append("distinct ");
         }
 
-        builder.append("doc.fullName, doc.language from XWikiDocument as doc ");
+        builder.append("doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc ");
 
         builder.append(query);
 

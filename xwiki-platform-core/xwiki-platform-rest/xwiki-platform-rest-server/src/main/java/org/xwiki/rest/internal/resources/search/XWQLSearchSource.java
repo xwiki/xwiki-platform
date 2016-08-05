@@ -49,7 +49,7 @@ public class XWQLSearchSource extends AbstractDatabaseSearchSource
             builder.append("distinct ");
         }
 
-        builder.append("doc.fullName, doc.language from Document as doc ");
+        builder.append("doc.fullName, doc.space, doc.name, doc.language from Document as doc ");
 
         builder.append(query);
 

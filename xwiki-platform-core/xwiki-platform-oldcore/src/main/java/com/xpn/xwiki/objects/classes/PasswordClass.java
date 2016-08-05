@@ -234,9 +234,9 @@ public class PasswordClass extends StringClass
 
     /**
      * @param password the password to hash.
-     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;algorithmName> is
-     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), &lt;salt> is a random 64 character
-     *         salt and &lt;hexStrignHash> is the salted hash of the given password, using the given hashing algorithm.
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>} is
+     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
+     *         salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
      */
     public String getPasswordHash(String password)
     {
@@ -246,8 +246,8 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;salt> is a random
-     *         64 character salt and &lt;hexStrignHash> is the salted hash of the given password, using the given
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt> is a random
+     *         64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
      *         hashing algorithm.
      */
     public String getPasswordHash(String password, String algorithmName)
@@ -260,7 +260,7 @@ public class PasswordClass extends StringClass
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
      * @param salt the string to pad the password with before hashing. If {@code null}, a random 64 character salt will
      *            be used. To disable salting, use an empty ({@code ""}) salt string.
-     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;hexStrignHash> is
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>} is
      *         the salted hash of the given password, using the given hashing algorithm.
      * @since 6.3M2
      */

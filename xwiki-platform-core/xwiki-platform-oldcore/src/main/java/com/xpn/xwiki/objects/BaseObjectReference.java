@@ -32,7 +32,8 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Object reference implementation for object names generated in {@code className[objectNumber]} format. It provides
- * helper functions to extract the class name as specified by the caller, and object number. <br />
+ * helper functions to extract the class name as specified by the caller, and object number.
+ * <p>
  * Accepted formats for the object name are:
  * <dl>
  * <dt>className[objectNumber]

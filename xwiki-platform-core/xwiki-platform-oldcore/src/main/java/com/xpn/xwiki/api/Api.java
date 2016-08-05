@@ -43,8 +43,6 @@ public class Api
      * The current context, needed by the underlying protected object.
      *
      * @see #getXWikiContext()
-     * @todo make this variable private after we agree on it on the mailing list. It'll break non-core plugins but
-     *       better do it now rather than after the 1.0 release...
      */
     protected XWikiContext context;
 
@@ -62,7 +60,7 @@ public class Api
     /**
      * Note 1: This method is protected so that users of this API do not get to see the XWikiContext object which should
      * not be exposed.
-     * <p/>
+     * <p>
      * Note 2: This is not longer the canonical way of retrieving the XWiki Context. The new way is to get it from the
      * {@link org.xwiki.context.ExecutionContext}.
      *

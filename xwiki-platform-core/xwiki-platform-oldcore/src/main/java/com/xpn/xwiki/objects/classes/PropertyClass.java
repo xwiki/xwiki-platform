@@ -787,7 +787,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
      * @param mergeResult the merge report
-     * @return the merged version
      * @since 6.2M1
      */
     public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,

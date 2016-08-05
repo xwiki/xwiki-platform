@@ -495,11 +495,11 @@ public abstract class ListClass extends PropertyClass
     /**
      * Search for an internationalizable display text for the current value. The search process is:
      * <ol>
-     * <li>let V = the internal value of the option, used as the "value" attribute of the <option> element, and D = the
-     * displayed value</li>
-     * <li>if a message with the key <fieldFullName>_<V> exists, return it as D</li>
-     * <li>else, if a message with the key option_<fieldName>_<V> exists, return it as D</li>
-     * <li>else, if a message with the key option_<V> exists, return it as D</li>
+     * <li>let V = the internal value of the option, used as the "value" attribute of the {@code <option>} element, and
+     * D = the displayed value</li>
+     * <li>if a message with the key {@code <fieldFullName>_<V>} exists, return it as D</li>
+     * <li>else, if a message with the key {@code option_<fieldName>_<V>} exists, return it as D</li>
+     * <li>else, if a message with the key {@code option_<V>} exists, return it as D</li>
      * <li>else, D can be specified in the values parameter of the property by using V=D</li>
      * <li>else return V</li>
      * </ol>

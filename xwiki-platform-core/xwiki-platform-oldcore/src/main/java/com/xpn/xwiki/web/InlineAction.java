@@ -44,6 +44,9 @@ public class InlineAction extends XWikiAction
             XWikiForm form = context.getForm();
 
             XWikiDocument cdoc = (XWikiDocument) context.get("cdoc");
+            if (cdoc == null) {
+                cdoc = doc;
+            }
 
             EditForm peform = (EditForm) form;
 

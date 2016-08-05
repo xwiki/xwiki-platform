@@ -4815,6 +4815,7 @@ public class XWiki implements EventListener
         }
 
         context.put("doc", doc);
+        context.put("cdoc", doc);
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));
         XWikiDocument tdoc = doc.getTranslatedDocument(context);

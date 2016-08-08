@@ -825,12 +825,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getKey()
     {
         if (this.keyCache == null) {
-            final String localUid = getUidStringEntityReferenceSerializer().serialize(getDocumentReference());
+            final String uid = getUidStringEntityReferenceSerializer().serialize(getDocumentReference());
 
             if (StringUtils.isEmpty(getLanguage())) {
-                this.keyCache = localUid;
+                this.keyCache = uid;
             } else {
-                this.keyCache = appendLocale(new StringBuilder(64).append(localUid)).toString();
+                this.keyCache = appendLocale(new StringBuilder(64).append(uid)).toString();
             }
         }
 

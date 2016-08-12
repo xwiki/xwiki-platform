@@ -173,6 +173,9 @@ solr.field.attauthor_display=Uploaded By
 solr.field.attdate=Upload Date
 solr.field.attsize=File Size
 
+solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
+solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 

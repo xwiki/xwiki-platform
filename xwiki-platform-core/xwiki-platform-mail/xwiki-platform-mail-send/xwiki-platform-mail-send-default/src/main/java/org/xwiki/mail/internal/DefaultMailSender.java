@@ -22,28 +22,17 @@ package org.xwiki.mail.internal;
 import java.util.UUID;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.internal.thread.MailQueueManager;
-import org.xwiki.mail.internal.thread.MailRunnable;
 import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
 import org.xwiki.mail.internal.thread.context.Copier;
 
@@ -58,54 +47,18 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class DefaultMailSender implements MailSender, Initializable, Disposable
+public class DefaultMailSender implements MailSender
 {
-    /**
-     * Logger to use to log shutdown information (opposite of initialization).
-     */
-    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
-
     private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
 
     @Inject
-    private ComponentManager componentManager;
-
-    @Inject
     private Execution execution;
-
-    @Inject
-    @Named("prepare")
-    private MailRunnable prepareMailRunnable;
-
-    @Inject
-    @Named("send")
-    private MailRunnable sendMailRunnable;
 
     @Inject
     private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
 
     @Inject
     private Copier<ExecutionContext> executionContextCloner;
-
-    private Thread prepareMailThread;
-
-    private Thread sendMailThread;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        // Step 1: Start the Mail Prepare Thread
-        this.prepareMailThread = new Thread(this.prepareMailRunnable);
-        this.prepareMailThread.setName("Mail Prepare Thread");
-        this.prepareMailThread.setDaemon(true);
-        this.prepareMailThread.start();
-
-        // Step 2: Start the Mail Sender Thread
-        this.sendMailThread = new Thread(this.sendMailRunnable);
-        this.sendMailThread.setName("Mail Sender Thread");
-        this.sendMailThread.setDaemon(true);
-        this.sendMailThread.start();
-    }
 
     @Override
     public MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session,
@@ -136,52 +89,5 @@ public class DefaultMailSender implements MailSender, Initializable, Disposable
             clonedExecutionContext));
 
         return new DefaultMailResult(batchId);
-    }
-
-    /**
-     * Stops the Mail Prepare and Sender threads. Should be called when the application is stopped for a clean shutdown.
-     *
-     * @throws InterruptedException if a thread fails to be stopped
-     */
-    public void stopMailThreads() throws InterruptedException
-    {
-        // Step 1: Stop the Mail Sender Thread
-
-        this.sendMailRunnable.stopProcessing();
-        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
-        this.sendMailThread.interrupt();
-        // Wait till the thread goes away
-        this.sendMailThread.join();
-        SHUTDOWN_LOGGER.debug(String.format("Mail Prepare Thread has been stopped"));
-
-        // Step 2: Stop the Mail Prepare Thread
-
-        this.prepareMailRunnable.stopProcessing();
-        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
-        this.prepareMailThread.interrupt();
-        // Wait till the thread goes away
-        this.prepareMailThread.join();
-        SHUTDOWN_LOGGER.debug(String.format("Mail Sender Thread has been stopped"));
-    }
-
-    private MailListener getListener(String hint) throws MessagingException
-    {
-        MailListener listener;
-        try {
-            listener = this.componentManager.getInstance(MailListener.class, hint);
-        } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to locate Mail listener [%s].", hint), e);
-        }
-        return listener;
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        try {
-            stopMailThreads();
-        } catch (InterruptedException e) {
-            SHUTDOWN_LOGGER.debug("Mail threads shutdown has been interruped", e);
-        }
     }
 }

@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -60,13 +61,14 @@ public class SendMailRunnable extends AbstractMailRunnable
     @Inject
     private ExecutionContextManager executionContextManager;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     private Transport currentTransport;
 
     private Session currentSession;
 
     private int count;
-
-    private ExecutionContext executionContext;
 
     @Override
     public void run()
@@ -89,18 +91,13 @@ public class SendMailRunnable extends AbstractMailRunnable
         // Create a single execution context and use it for the send mail thread.
         ExecutionContext ec = new ExecutionContext();
         this.executionContextManager.initialize(ec);
-        this.executionContext = ec;
     }
 
     private void prepareContextForQueueItem(SendMailQueueItem mailItem)
     {
         // Set the current wiki in the context. This is needed for example to be able to locate the configuration
         // properties when processing the mail queue items (in waitSendWaitTime()).
-        XWikiContext xcontext = (XWikiContext) this.executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        if (xcontext == null) {
-            xcontext = new XWikiContext();
-            this.executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        }
+        XWikiContext xcontext = this.contextProvider.get();
         xcontext.setWikiId(mailItem.getWikiId());
     }
 

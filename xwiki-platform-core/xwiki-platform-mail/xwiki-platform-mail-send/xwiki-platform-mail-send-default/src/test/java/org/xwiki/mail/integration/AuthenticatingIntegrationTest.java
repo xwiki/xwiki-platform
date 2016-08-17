@@ -38,6 +38,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -54,6 +56,7 @@ import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
+import org.xwiki.mail.internal.thread.MailSenderInitializerListener;
 import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
@@ -61,6 +64,7 @@ import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -82,6 +86,7 @@ import static org.mockito.Mockito.when;
  */
 // @formatter:off
 @ComponentList({
+    MailSenderInitializerListener.class,
     TextMimeBodyPartFactory.class,
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
@@ -155,6 +160,11 @@ public class AuthenticatingIntegrationTest
             this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
                 String.class));
         this.sender = this.componentManager.getInstance(MailSender.class);
+
+        // Simulate receiving the Application Ready Event to start the mail threads
+        MailSenderInitializerListener listener =
+            this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
+        listener.onEvent(new ApplicationReadyEvent(), null, null);
     }
 
     @After
@@ -162,7 +172,9 @@ public class AuthenticatingIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.sender).stopMailThreads();
+        Disposable listener =
+            this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
+        listener.dispose();
     }
 
     @Test

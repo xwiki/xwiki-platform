@@ -5,7 +5,6 @@ com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultMandatoryDocumentInitializerManager
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
-com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
 com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider
 com.xpn.xwiki.internal.XWikiCfgConfigurationSource
 com.xpn.xwiki.internal.XWikiContextProvider
@@ -86,7 +85,6 @@ com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.pdf.impl.PDFResourceResolver
 com.xpn.xwiki.render.DefaultVelocityManager
-com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor

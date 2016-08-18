@@ -32,14 +32,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 
 import org.apache.commons.io.output.NullWriter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeSingleton;
-import org.apache.velocity.runtime.directive.Scope;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -198,38 +196,31 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         this.reservedBindings.add("template");
     }
 
-    private void copyScriptContext(VelocityContext vcontext, ScriptContext scriptContext, int scope)
-    {
-        Bindings bindings = scriptContext.getBindings(scope);
-        if (bindings != null) {
-            for (Map.Entry<String, Object> entry : bindings.entrySet()) {
-                if (!this.reservedBindings.contains(entry.getKey())) {
-                    Object currentValue = vcontext.get(entry.getKey());
-                    // Don't replace internal Velocity bindings
-                    if (!(currentValue instanceof Scope)) {
-                        vcontext.put(entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public VelocityContext getVelocityContext()
     {
-        VelocityContext vcontext = getCurrentVelocityContext();
+        ScriptVelocityContext velocityContext;
 
-        // Copy current JSR223 ScriptContext binding.
+        // Make sure the velocity context support ScriptContext synchronization
+        VelocityContext currentVelocityContext = getCurrentVelocityContext();
+        if (currentVelocityContext instanceof ScriptVelocityContext) {
+            velocityContext = (ScriptVelocityContext) currentVelocityContext;
+        } else {
+            velocityContext = new ScriptVelocityContext(currentVelocityContext, this.reservedBindings);
+            this.execution.getContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
+                velocityContext);
+        }
+
+        // Synchronize with ScriptContext
         ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
-        copyScriptContext(vcontext, scriptContext, ScriptContext.GLOBAL_SCOPE);
-        copyScriptContext(vcontext, scriptContext, ScriptContext.ENGINE_SCOPE);
+        velocityContext.setScriptContext(scriptContext);
 
+        // Velocity specific bindings
         XWikiContext xcontext = this.xcontextProvider.get();
-
         // Add the "context" binding which is deprecated since 1.9.1.
-        vcontext.put("context", new DeprecatedContext(xcontext));
+        velocityContext.put("context", new DeprecatedContext(xcontext));
 
-        return vcontext;
+        return velocityContext;
     }
 
     @Override
@@ -367,19 +358,6 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         VelocityContext velocityContext = getVelocityContext();
 
         // Execute Velocity context
-        boolean result = getVelocityEngine().evaluate(velocityContext, out, templateName, source);
-
-        // Update current script context with potentially modified Velocity context
-        ScriptContext scontext = this.scriptContextManager.getCurrentScriptContext();
-        for (Object vkey : velocityContext.getKeys()) {
-            if (vkey instanceof String) {
-                String svkey = (String) vkey;
-                if (!this.reservedBindings.contains(svkey)) {
-                    scontext.setAttribute(svkey, velocityContext.get(svkey), ScriptContext.ENGINE_SCOPE);
-                }
-            }
-        }
-
-        return result;
+        return getVelocityEngine().evaluate(velocityContext, out, templateName, source);
     }
 }

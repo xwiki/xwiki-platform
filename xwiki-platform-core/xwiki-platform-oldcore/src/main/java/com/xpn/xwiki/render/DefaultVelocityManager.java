@@ -194,6 +194,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         this.reservedBindings.add("try");
         // Default directive
         this.reservedBindings.add("define");
+        // The name of the context variable used for the template-level scope
+        this.reservedBindings.add("template");
     }
 
     private void copyScriptContext(VelocityContext vcontext, ScriptContext scriptContext, int scope)

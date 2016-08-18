@@ -76,6 +76,16 @@ public abstract class AbstractRatingsManager implements RatingsManager
     }
 
     /**
+     * Gets the ratings configuration component.
+     *
+     * @return the ratingsConfiguration representing the RatingsConfiguration component.
+     */
+    protected RatingsConfiguration getRatingsConfiguration()
+    {
+        return ratingsConfiguration;
+    }
+
+    /**
      * Retrieves the XWiki context from the current execution context.
      * 
      * @return the XWiki context

@@ -265,7 +265,8 @@
   #end
 #end
 
-#if (!$xwiki.hasAccessLevel("edit"))
+#template('xwikivars.vm')
+#if (!$xwiki.hasAccessLevel('view') || !$hasCreatePage)
   #template('accessdenied.vm')
 #elseif ($xcontext.action == 'get' && "$!request.copyId" != '')
   ## AJAX request for copy status update.

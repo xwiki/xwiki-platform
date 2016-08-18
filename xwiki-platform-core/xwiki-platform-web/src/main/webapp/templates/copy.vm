@@ -1,7 +1,8 @@
 ###
 ### Copy document template
 ###
-#if(!$xwiki.hasAccessLevel("edit"))
+#template('xwikivars.vm')
+#if (!$xwiki.hasAccessLevel('view') || !$hasCreatePage)
   #template("accessdenied.vm")
 #elseif($doc.isNew())
   $response.setStatus(404)

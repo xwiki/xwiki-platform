@@ -541,7 +541,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
             // Log this since it's probably a mistake so that we find who is doing bad things
             if (this.userReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                     new Exception("See stack trace"));
             }
         }

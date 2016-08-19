@@ -1631,7 +1631,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                 new Exception("See stack trace"));
         }
     }
@@ -1681,7 +1681,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.contentAuthorReference != null
             && this.contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                 new Exception("See stack trace"));
         }
     }
@@ -1729,7 +1729,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.creatorReference != null && this.creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                 new Exception("See stack trace"));
         }
     }

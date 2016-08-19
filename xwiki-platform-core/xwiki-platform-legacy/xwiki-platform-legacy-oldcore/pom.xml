@@ -32,6 +32,10 @@
   <packaging>jar</packaging>
   <description>xwiki-platform-oldcore repackaging including legacy aspects</description>
   <properties>
+    <!-- TODO: Remove as soon as https://github.com/revapi/revapi/issues/39 has been fixed. Right now this means we're
+         at risk of introducing unknown backward compatibliity changes. We absolutely need to have revapi back before
+         the final 8.3 release -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-oldcore,

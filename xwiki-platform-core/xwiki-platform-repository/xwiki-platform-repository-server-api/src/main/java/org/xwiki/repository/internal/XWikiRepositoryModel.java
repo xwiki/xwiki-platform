@@ -248,9 +248,9 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
-        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE,
-            new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
-        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_ALLOWEDNAMESPACE));
+        SOLR_FIELDS.put(Extension.FIELD_NAMESPACES, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
         SOLR_FIELDS.put(Extension.FIELD_PROPERTIES, new ExtensionSolrField(PROP_EXTENSION_PROPERTIES, null));
 

@@ -60,7 +60,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocument
 
         needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
-        needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
+        needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5, "PureText");
         needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
         needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
         needsUpdate |=
@@ -71,8 +71,8 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocument
                 "Optional|Mandatory|No content", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
         needsUpdate |=
             bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
-                "Content description (Not applicable for \"No content\" type)", 40, 5);
-        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
+                "Content description (Not applicable for \"No content\" type)", 40, 5, "PureText");
+        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20, "PureText");
 
         needsUpdate |= setClassDocumentFields(document, "XWiki Wiki Macro Class");
 

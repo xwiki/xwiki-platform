@@ -231,8 +231,7 @@ public class Document extends Api
      */
     public DocumentReference getDocumentReference()
     {
-        // Clone the document reference since it can be modified
-        return new DocumentReference(this.doc.getDocumentReference());
+        return this.doc.getDocumentReference();
     }
 
     /**
@@ -395,14 +394,7 @@ public class Document extends Api
      */
     public String getAuthor()
     {
-        String author = "";
-        DocumentReference authorReference = this.doc.getAuthorReference();
-        if (authorReference != null) {
-            author =
-                getCompactWikiEntityReferenceSerializer().serialize(authorReference, this.doc.getDocumentReference());
-        }
-
-        return author;
+        return this.doc.getAuthor();
     }
 
     /**
@@ -422,15 +414,7 @@ public class Document extends Api
      */
     public String getContentAuthor()
     {
-        String contentAuthor = "";
-        DocumentReference contentAuthorReference = this.doc.getContentAuthorReference();
-        if (contentAuthorReference != null) {
-            contentAuthor =
-                getCompactWikiEntityReferenceSerializer().serialize(contentAuthorReference,
-                    this.doc.getDocumentReference());
-        }
-
-        return contentAuthor;
+        return this.doc.getContentAuthor();
     }
 
     /**
@@ -495,13 +479,7 @@ public class Document extends Api
      */
     public String getCreator()
     {
-        String creator = "";
-        DocumentReference creatorReference = this.doc.getCreatorReference();
-        if (creatorReference != null) {
-            creator = getCompactWikiEntityReferenceSerializer().serialize(creatorReference, getDocumentReference());
-        }
-
-        return creator;
+        return this.doc.getCreator();
     }
 
     /**

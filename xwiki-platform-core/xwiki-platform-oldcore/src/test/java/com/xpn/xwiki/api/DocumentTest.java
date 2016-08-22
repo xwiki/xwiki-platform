@@ -175,8 +175,8 @@ public class DocumentTest extends AbstractBridgedXWikiComponentTestCase
         XWikiDocument xdoc = new XWikiDocument(new DocumentReference("Wiki", "Space", "Page"));
         Document document = new Document(xdoc, getContext());
         
-        assertEquals("", document.getCreator());
-        assertEquals("", document.getAuthor());
-        assertEquals("", document.getContentAuthor());
+        assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getCreator());
+        assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getAuthor());
+        assertEquals(XWikiRightService.GUEST_USER_FULLNAME, document.getContentAuthor());
     }
 }

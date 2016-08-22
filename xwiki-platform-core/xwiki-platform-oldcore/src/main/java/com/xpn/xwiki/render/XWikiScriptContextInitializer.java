@@ -117,10 +117,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         // Current secure document
         XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
         if (sdoc != null) {
-            Document previousSDoc = (Document) scriptContext.getAttribute("sdoc");
-            if (previousSDoc == null || !previousSDoc.getDocumentReference().equals(sdoc.getDocumentReference())) {
-                scriptContext.setAttribute("sdoc", sdoc.newDocument(xcontext), ScriptContext.ENGINE_SCOPE);
-            }
+            setDocument(scriptContext, "sdoc", sdoc, xcontext);
         }
 
         // Miscellaneous
@@ -129,8 +126,10 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
 
     private void setDocument(ScriptContext scriptContext, String key, XWikiDocument document, XWikiContext xcontext)
     {
+        // Change the Document instance only of it's not already wrapping the same XWikiDocument (otherwise we might
+        // loose modifications made in a previous script and not yet saved)
         Document previousDoc = (Document) scriptContext.getAttribute(key);
-        if (previousDoc == null || !previousDoc.getDocumentReference().equals(document.getDocumentReference())) {
+        if (previousDoc == null || !previousDoc.same(document)) {
             Document apiDocument = document.newDocument(xcontext);
             scriptContext.setAttribute(key, apiDocument, ScriptContext.ENGINE_SCOPE);
         }

@@ -93,12 +93,12 @@ public class Document extends Api
     /**
      * The XWikiDocument object wrapped by this API.
      */
-    protected XWikiDocument doc;
+    protected XWikiDocument initialDoc;
 
     /**
-     * Indicates if this API wraps a cloned XWikiDocument.
+     * The XWikiDocument object wrapped by this API.
      */
-    protected boolean cloned = false;
+    protected XWikiDocument doc;
 
     /**
      * Convenience object used by object related methods.
@@ -179,7 +179,9 @@ public class Document extends Api
     public Document(XWikiDocument doc, XWikiContext context)
     {
         super(context);
-        this.doc = doc;
+
+        this.initialDoc = doc;
+        this.doc = this.initialDoc;
     }
 
     /**
@@ -204,9 +206,8 @@ public class Document extends Api
      */
     protected XWikiDocument getDoc()
     {
-        if (!this.cloned) {
-            this.doc = this.doc.clone();
-            this.cloned = true;
+        if (this.initialDoc == this.doc) {
+            this.doc = this.initialDoc.clone();
         }
 
         return this.doc;
@@ -2117,6 +2118,18 @@ public class Document extends Api
         return d.getXWikiContext().equals(getXWikiContext()) && this.doc.equals(d.doc);
     }
 
+    /**
+     * Check if the passed one is the one wrapped by this {@link Document}.
+     * 
+     * @param document the document to compare
+     * @return true if passed document is the wrapped one
+     * @since 8.3M1
+     */
+    public boolean same(XWikiDocument document)
+    {
+        return document == this.doc || document == this.initialDoc;
+    }
+
     public List<String> getBacklinks() throws XWikiException
     {
         return this.doc.getBackLinkedPages(getXWikiContext());
@@ -2425,7 +2438,7 @@ public class Document extends Api
             doc.setCreatorReference(currentUserReference);
         }
         getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
-        this.cloned = false;
+        this.initialDoc = this.doc;
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
@@ -2532,7 +2545,7 @@ public class Document extends Api
     protected void deleteDocument() throws XWikiException
     {
         getXWikiContext().getWiki().deleteDocument(this.doc, getXWikiContext());
-        this.cloned = false;
+        this.initialDoc = this.doc;
     }
 
     public void delete() throws XWikiException
@@ -2640,7 +2653,7 @@ public class Document extends Api
         }
         if (nb > 0) {
             getXWikiContext().getWiki().saveDocument(getDoc(), getXWikiContext());
-            this.cloned = false;
+            this.initialDoc = this.doc;
         }
         return nb;
     }

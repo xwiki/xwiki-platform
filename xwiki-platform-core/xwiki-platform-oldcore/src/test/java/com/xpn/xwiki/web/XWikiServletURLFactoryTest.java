@@ -577,11 +577,9 @@ public class XWikiServletURLFactoryTest
     {
         // Note: The query string is not encoded, and used as is. It's the responsibility of the caller to
         // url-encode it.
-        // See see http://stackoverflow.com/a/29948396/153102 for a good explanation of URL encoding:
-        // - space in path part must be encoded with %20 (and not "+"). "+" character should be left as is.
-        // - space in query string part and fragment part can be encoded with "+" or "%20". "+" character should be
-        //   encoded with "%2B"
+        // See XWikiServletURLFactory#encodeWithinPath() and XWikiServletURLFactory#encodeWithinQuery() for explanations
         URL url = this.urlFactory.createURL("a b.c+d", "e f", "view", "g=h+i", "j k+l", this.oldcore.getXWikiContext());
-        assertEquals("http://127.0.0.1/xwiki/bin/view/a%20b/c+d/e%20f?g=h+i#j%20k%2Bl", url.toString());
+
+        assertEquals("http://127.0.0.1/xwiki/bin/view/a%20b/c%2Bd/e%20f?g=h+i#j+k%2Bl", url.toString());
     }
 }

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -343,23 +344,74 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    /**
+     * Encode a URL path following the URL specification so that space is encoded as {@code %20} in the path
+     * (and not as {@code +} wnich is not correct). Note that for all other characters we encode them even though some
+     * don't need to be encoded. For example we encode the single quote even though it's not necessary
+     * (see <a href="http://tinyurl.com/j6bjgaq">this explanation</a>). The reason is that otherwise it becomes
+     * dangerous to use a returned URL in the HREF attribute in HTML. Imagine the following {@code <a href='$url'...}
+     * and {@code #set ($url = $doc.getURL(...))}. Now let's assume that {@code $url}'s value is
+     * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
+     * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
+     * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
+     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
+     * specially and encode the rest.
+     *
+     * @param name the path to encode
+     * @param context see {@link XWikiContext}
+     * @return the URL-encoded path segment
+     */
     private String encodeWithinPath(String name, XWikiContext context)
     {
+        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
+        // mentioned in the javadoc of this method
+        //   String encodedName;
+        //   try {
+        //     encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
+        //   } catch (URIException e) {
+        //     throw new RuntimeException("Missing charset [UTF-8]", e);
+        //   }
+        //   return encodedName;
+
         String encodedName;
         try {
-            encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
-        } catch (URIException e) {
+            encodedName = URLEncoder.encode(name, "UTF-8");
+        } catch (Exception e) {
+            // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
         }
+
+        // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
+        encodedName = encodedName.replaceAll("\\+", "%20");
+
         return encodedName;
     }
 
+    /**
+     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)} but this time space is encoded as {@code +}.
+     *
+     * @param name the query string part to encode
+     * @param context see {@link XWikiContext}
+     * @return the URL-encoded query string part
+     */
     private String encodeWithinQuery(String name, XWikiContext context)
     {
+        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
+        // mentioned in the javadoc of this method
+        //   String encodedName;
+        //   try {
+        //     encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
+        //   } catch (URIException e) {
+        //     throw new RuntimeException("Missing charset [UTF-8]", e);
+        //   }
+        //   return encodedName;
+
         String encodedName;
         try {
-            encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        } catch (URIException e) {
+            encodedName = URLEncoder.encode(name, "UTF-8");
+        } catch (Exception e) {
+            // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
         }
         return encodedName;

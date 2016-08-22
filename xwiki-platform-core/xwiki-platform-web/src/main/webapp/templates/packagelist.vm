@@ -8,7 +8,7 @@
     <li class="xitem xhighlight">
       <div class="xitemcontainer package $!extra">
         <div class="name">
-          <a href="$!escapetool.xml($url)" class="package" title="$services.localization.render('core.importer.selectThisPackage')">
+          <a href="$!url" class="package" title="$services.localization.render('core.importer.selectThisPackage')">
             #set($maxnamelength = 40)
             #packName($attach.filename)
           </a>
@@ -16,7 +16,7 @@
           <span class="xwikibuttonlinks">
             #set($redirect = $doc.getURL('import', 'section=Import'))
             #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
-            <a class="deletelink" href="$!escapetool.xml($attachurl)"
+            <a class="deletelink" href="${attachurl}"
                title="$services.localization.render('core.viewers.attachments.delete.title')"></a>
           </span>
         </div>

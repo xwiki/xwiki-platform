@@ -126,7 +126,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
 
     private void setDocument(ScriptContext scriptContext, String key, XWikiDocument document, XWikiContext xcontext)
     {
-        // Change the Document instance only of it's not already wrapping the same XWikiDocument (otherwise we might
+        // Change the Document instance only if it's not already wrapping the same XWikiDocument (otherwise we might
         // loose modifications made in a previous script and not yet saved)
         Document previousDoc = (Document) scriptContext.getAttribute(key);
         if (previousDoc == null || !previousDoc.same(document)) {

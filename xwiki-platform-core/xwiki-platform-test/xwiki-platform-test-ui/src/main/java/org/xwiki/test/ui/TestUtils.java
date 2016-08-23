@@ -1554,20 +1554,28 @@ public class TestUtils
     // HTTP
 
     /**
-     * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
-     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
-     * to hexadecimal, and spaces are substituted by '+'.
+     * Encodes a given string so that it may be used as a URL component. Compatible with javascript decodeURIComponent,
+     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are encoded.
+     * Uses the same algorithm than the one used to generate URLs as otherwise tests won't find the proper matches...
+     * See XWikiServletURLFactory#encodeWithinPath() and #encodeWithinQuery().
      *
-     * @param s
+     * @param url the url to encode
      */
-    public String escapeURL(String s)
+    public String escapeURL(String url)
     {
+        String encodedURL;
         try {
-            return URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // should not happen
-            throw new RuntimeException(e);
+            encodedURL = URLEncoder.encode(url, "UTF-8");
+        } catch (Exception e) {
+            // Should not happen (UTF-8 is always available)
+            throw new RuntimeException("Missing charset [UTF-8]", e);
         }
+
+        // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
+        // It's ok since %20 is allowed in both the URL path and the query string (and anchor).
+        encodedURL = encodedURL.replaceAll("\\+", "%20");
+
+        return encodedURL;
     }
 
     public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception

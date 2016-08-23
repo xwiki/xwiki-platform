@@ -389,7 +389,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)} but this time space is encoded as {@code +}.
+     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
+     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
+     * implementation for both URL paths and query string).
      *
      * @param name the query string part to encode
      * @param context see {@link XWikiContext}
@@ -407,14 +409,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         //   }
         //   return encodedName;
 
-        String encodedName;
-        try {
-            encodedName = URLEncoder.encode(name, "UTF-8");
-        } catch (Exception e) {
-            // Should not happen (UTF-8 is always available)
-            throw new RuntimeException("Missing charset [UTF-8]", e);
-        }
-        return encodedName;
+        return encodeWithinPath(name, context);
     }
 
     @Override

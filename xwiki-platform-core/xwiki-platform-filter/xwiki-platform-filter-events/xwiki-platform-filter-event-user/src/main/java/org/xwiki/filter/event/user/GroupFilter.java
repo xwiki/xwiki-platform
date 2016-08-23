@@ -53,6 +53,7 @@ public interface GroupFilter
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
      */
+    @Name("groupContainer")
     void beginGroup(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws FilterException;
@@ -80,6 +81,7 @@ public interface GroupFilter
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
      */
+    @Name("groupContainer")
     void endGroup(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws FilterException;

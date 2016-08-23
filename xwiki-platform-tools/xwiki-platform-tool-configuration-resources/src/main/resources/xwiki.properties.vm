@@ -394,6 +394,7 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 2.5]
 #-# Repositories to use when searching and downloading extensions.
+#-# Repositories will be checked in the same order they have in this configuration file.
 #-# 
 #-# The format is <id>:<type>:<url> where
 #-# * id can be anything as long as there is only one
@@ -419,9 +420,9 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
-#-# When not set the following is taken:
-# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+#-# When not set the following is taken (in this order):
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 #-# 
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=

@@ -758,8 +758,8 @@
       <number>6</number>
       <picker>0</picker>
       <prettyName>HTTP Meta Info</prettyName>
-      <rows>5</rows>
-      <size>40</size>
+      <rows>8</rows>
+      <size>60</size>
       <tooltip/>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

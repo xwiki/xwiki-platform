@@ -130,10 +130,10 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     }
 
     @Override
-    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
+    public void onVerbatim(String content, boolean inline, Map<String, String> parameters)
     {
-        super.onVerbatim(protectedString, isInline, parameters);
-        handleRawText(protectedString);
+        super.onVerbatim(content, inline, parameters);
+        handleRawText(content);
     }
 
     /**
@@ -171,9 +171,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * @since 3.0M2
      */
     @Override
-    public void endDocument(MetaData metaData)
+    public void endDocument(MetaData metadata)
     {
-        super.endDocument(metaData);
+        super.endDocument(metadata);
 
         // create the bookmarks
         mapAnnotations();

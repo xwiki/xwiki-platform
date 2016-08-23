@@ -80,18 +80,18 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
     }
 
     @Override
-    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
+    public void onVerbatim(String content, boolean inline, Map<String, String> parameters)
     {
-        if (!isInline || Character.isWhitespace(protectedString.charAt(0))) {
+        if (!inline || Character.isWhitespace(content.charAt(0))) {
             // if there is a space right at the beginning of the verbatim string, or the verbatim string is block, we
             // need to print a space
             printSpace();
         }
 
-        AlteredContent cleanedContent = textCleaner.alter(protectedString);
+        AlteredContent cleanedContent = textCleaner.alter(content);
         printText(cleanedContent.getContent().toString());
 
-        if (!isInline || Character.isWhitespace(protectedString.charAt(protectedString.length() - 1))) {
+        if (!inline || Character.isWhitespace(content.charAt(content.length() - 1))) {
             // print a space after
             printSpace();
         }
@@ -232,13 +232,13 @@ public class PlainTextNormalizingChainingRenderer extends AbstractChainingPrintR
     }
 
     @Override
-    public void beginList(ListType listType, Map<String, String> parameters)
+    public void beginList(ListType type, Map<String, String> parameters)
     {
         printSpace();
     }
 
     @Override
-    public void endList(ListType listType, Map<String, String> parameters)
+    public void endList(ListType type, Map<String, String> parameters)
     {
         printSpace();
     }

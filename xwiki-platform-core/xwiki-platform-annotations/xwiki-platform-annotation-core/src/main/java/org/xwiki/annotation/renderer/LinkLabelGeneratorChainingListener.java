@@ -86,7 +86,7 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
      * @since 2.5RC1
      */
     @Override
-    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean freestanding, Map<String, String> parameters)
     {
         // if the link has no label, generate one for it and send the generated link as events to this listener default
         // behaviour
@@ -122,6 +122,6 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
         }
 
         // end the link
-        super.endLink(reference, isFreeStandingURI, parameters);
+        super.endLink(reference, freestanding, parameters);
     }
 }

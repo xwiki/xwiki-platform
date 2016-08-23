@@ -49,7 +49,7 @@
   /* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. */
   #set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columns - 1)) / $columns))
   #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
-  .container-columns-$column .column{
+  .container-columns-$columns .column{
     width: $computedColumnWidth%;
     padding-right: $columnPadding%;
     padding-left: $columnPadding%;

@@ -1183,7 +1183,8 @@ public class XWiki implements EventListener
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
                 if (initializer.updateDocument(document)) {
-                    saveDocument(document, context);
+                    saveDocument(document,
+                        localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
                 }
             }
         } catch (XWikiException e) {
@@ -3105,7 +3106,8 @@ public class XWiki implements EventListener
                 Utils.getComponent(MandatoryDocumentInitializer.class, document.getFullName());
 
             if (initializer.updateDocument(document)) {
-                saveDocument(document, context);
+                saveDocument(document, localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"),
+                    context);
             }
         }
 

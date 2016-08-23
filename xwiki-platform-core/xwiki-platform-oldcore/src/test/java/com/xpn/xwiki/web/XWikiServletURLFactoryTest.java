@@ -578,8 +578,10 @@ public class XWikiServletURLFactoryTest
         // Note: The query string is not encoded, and used as is. It's the responsibility of the caller to
         // url-encode it.
         // See XWikiServletURLFactory#encodeWithinPath() and XWikiServletURLFactory#encodeWithinQuery() for explanations
-        URL url = this.urlFactory.createURL("a b.c+d", "e f", "view", "g=h+i", "j k+l", this.oldcore.getXWikiContext());
+        // Note: We also verify that the single quote is encoded since otherwise that could cause problems in HTML when
+        // the returned URL is used in the HREF attribute of a A tag (when using single quote delimiters).
+        URL url = this.urlFactory.createURL("a b.c+d'", "e f", "view", "g=h+i", "j k+l", this.oldcore.getXWikiContext());
 
-        assertEquals("http://127.0.0.1/xwiki/bin/view/a%20b/c%2Bd/e%20f?g=h+i#j+k%2Bl", url.toString());
+        assertEquals("http://127.0.0.1/xwiki/bin/view/a%20b/c%2Bd%27/e%20f?g=h+i#j+k%2Bl", url.toString());
     }
 }

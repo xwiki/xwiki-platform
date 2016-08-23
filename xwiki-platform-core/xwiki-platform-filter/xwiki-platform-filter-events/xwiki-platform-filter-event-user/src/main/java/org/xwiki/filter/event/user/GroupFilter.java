@@ -22,6 +22,7 @@ package org.xwiki.filter.event.user;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
+import org.xwiki.filter.annotation.Name;
 
 /**
  * Group related events.
@@ -49,9 +50,25 @@ public interface GroupFilter
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
+     * @since 8.3M1, 8.2.2, 7.4.5
      */
-    void beginGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
-        throws FilterException;
+    default void beginGroupContainer(String name,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+        beginGroup(name, parameters);
+    }
+
+    /**
+     * @param name the name of the group
+     * @param parameters the parameters of the group
+     * @throws FilterException when failing to send event
+     * @since 8.3M1, 8.2.2, 7.4.5
+     */
+    default void endGroupContainer(String name,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
+    {
+        endGroup(name, parameters);
+    }
 
     /**
      * @param name the name of the user
@@ -69,11 +86,29 @@ public interface GroupFilter
     void onGroupMemberGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
+    // Deprecated
+
     /**
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
+     * @deprecated since 7.4.5, 8.2.2, 8.3M1 because it's conflicting with Rendering Listener events, use
+     *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
      */
+    @Name("groupContainer")
+    @Deprecated
+    void beginGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
+        throws FilterException;
+
+    /**
+     * @param name the name of the group
+     * @param parameters the parameters of the group
+     * @throws FilterException when failing to send event
+     * @deprecated since 7.4.5, 8.2.2, 8.3M1 because it's conflicting with Rendering Listener events, use
+     *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
+     */
+    @Name("groupContainer")
+    @Deprecated
     void endGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

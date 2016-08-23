@@ -61,12 +61,12 @@
       </parameters>
     </p>
   </user>
-  <group name="group1">
+  <groupContainer name="group1">
     <groupMemberUser name="user1" />
     <groupMemberUser name="user2" />
-  </group>
-  <group name="group2">
+  </groupContainer>
+  <groupContainer name="group2">
     <groupMemberGroup name="group1" />
-  </group>
-  <group name="emptygroup" />
+  </groupContainer>
+  <groupContainer name="emptygroup" />
 </wiki>

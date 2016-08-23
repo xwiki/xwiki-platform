@@ -61,7 +61,7 @@
     </parameters>
   </p>
 </user>
-<group name="administrators">
+<groupContainer name="administrators">
   <p>
     <parameters>
       <entry>
@@ -75,8 +75,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
-</group>
-<group name="atlassian-addons">
+</groupContainer>
+<groupContainer name="atlassian-addons">
   <p>
     <parameters>
       <entry>
@@ -89,8 +89,8 @@
       </entry>
     </parameters>
   </p>
-</group>
-<group name="balsamiq-mockups-editors">
+</groupContainer>
+<groupContainer name="balsamiq-mockups-editors">
   <p>
     <parameters>
       <entry>
@@ -104,8 +104,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
-</group>
-<group name="_licensed-confluence">
+</groupContainer>
+<groupContainer name="_licensed-confluence">
   <p>
     <parameters>
       <entry>
@@ -120,8 +120,8 @@
   </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
   <groupMemberGroup name="sysadmin"></groupMemberGroup>
-</group>
-<group name="system-administrators">
+</groupContainer>
+<groupContainer name="system-administrators">
   <p>
     <parameters>
       <entry>
@@ -135,8 +135,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="sysadmin"></groupMemberGroup>
-</group>
-<group name="XWikiAdminGroup">
+</groupContainer>
+<groupContainer name="XWikiAdminGroup">
   <p>
     <parameters>
       <entry>
@@ -150,8 +150,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="sysadmin"></groupMemberGroup>
-</group>
-<group name="site-admins">
+</groupContainer>
+<groupContainer name="site-admins">
   <p>
     <parameters>
       <entry>
@@ -165,8 +165,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
-</group>
-<group name="XWikiAllGroup">
+</groupContainer>
+<groupContainer name="XWikiAllGroup">
   <p>
     <parameters>
       <entry>
@@ -179,7 +179,7 @@
       </entry>
     </parameters>
   </p>
-</group>
+</groupContainer>
 <wikiSpace name="Demonstration Space">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
@@ -2676,7 +2676,7 @@ TlB7jki6RKzYkfxTv9YGl0YBAH//2Q==</content>
               </header>
               <list type="NUMBERED">
                 <listItem>
-                  <group name="{}">
+                  <group>
                     <section>
                       <section>
                         <section>
@@ -2806,7 +2806,7 @@ TlB7jki6RKzYkfxTv9YGl0YBAH//2Q==</content>
                   </group>
                 </listItem>
                 <listItem>
-                  <group name="{}">
+                  <group>
                     <section>
                       <section>
                         <section>
@@ -2887,7 +2887,7 @@ TlB7jki6RKzYkfxTv9YGl0YBAH//2Q==</content>
                   </group>
                 </listItem>
                 <listItem>
-                  <group name="{}">
+                  <group>
                     <section>
                       <section>
                         <section>

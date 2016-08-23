@@ -108,103 +108,104 @@ require(['jquery', '$xwiki.getSkinFile("uicomponents/widgets/tree.min.js", true)
       });
       
       /**
-       * Change the tree behaviour
+       * Initialize the tree.
+       * Note: we need to wait the 'loaded.jstree' event otherwise we have synchronization issues.
        */
-      var tree          = $('#exportModal .xtree');
-      var treeReference = $.jstree.reference(tree);
-      treeReference.settings.checkbox.cascade     = 'down';
-      treeReference.settings.checkbox.three_state = false ;
-      treeReference.settings.contextmenu.select_node = false;
-      
-      /**
-       * Check all on loading
-       */
+      var tree = $('#exportModal .xtree');
       tree.on('loaded.jstree', function () {
+        
+        // Change the tree behaviour
+        var treeReference = $.jstree.reference(tree);
+        treeReference.settings.checkbox.cascade        = 'down';
+        treeReference.settings.checkbox.three_state    = false ;
+        treeReference.settings.contextmenu.select_node = false ;
+        
+        // Check all by default
         treeReference.check_all();
-      });
       
-      /**
-       * Modifying the context menu
-       */
-      treeReference.settings.contextmenu.items = function (node) {
-        var items = {};
-        
-        items.select_children = {
-          label: "$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))",
-          action: function () {
-            for (var i = 0; i < node.children.length; ++i) {
-              var child = node.children[i];
-              treeReference.check_node(child);
-            }
-          },
-          _disabled: !node.state.opened
+        /**
+         * Modifying the context menu
+         */
+        treeReference.settings.contextmenu.items = function (node) {
+          var items = {};
+          
+          items.select_children = {
+            label: "$escapetool.javascript($services.localization.render('core.exporter.selectChildren'))",
+            action: function () {
+              for (var i = 0; i < node.children.length; ++i) {
+                var child = node.children[i];
+                treeReference.check_node(child);
+              }
+            },
+            _disabled: !node.state.opened
+          };
+          items.unselect_children = {
+            label: "$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))",
+            action: function () {
+              for (var i = 0; i < node.children.length; ++i) {
+                var child = node.children[i];
+                treeReference.uncheck_node(child);
+              }
+            },
+            _disabled: !node.state.opened
+          };
+          
+          return items;
         };
-        items.unselect_children = {
-          label: "$escapetool.javascript($services.localization.render('core.exporter.unselectChildren'))",
-          action: function () {
-            for (var i = 0; i < node.children.length; ++i) {
-              var child = node.children[i];
-              treeReference.uncheck_node(child);
-            }
-          },
-          _disabled: !node.state.opened
-        };
+
+        /**
+         * Handle 'select all' button
+         */
+        $('#exportModal .tree_select_all').click(function() {
+          treeReference.check_all();
+          return false;
+        });
         
-        return items;
-      };
-      
-      /**
-       * Handle 'select all' button
-       */
-      $('#exportModal .tree_select_all').click(function() {
-        treeReference.check_all();
-        return false;
-      });
-      
-      /**
-       * Handle 'select none' button
-       */
-      $('#exportModal .tree_select_none').click(function() {
-        treeReference.uncheck_all();
-        return false;
-      });
-        
-      /**
-       * Update the URL of the export buttons according to the tree 
-       */
-       $('#exportModal #exportModelOtherCollapse a.btn').click(function(event) {
-        var button = $(this);
-        var url = button.data('url').clone();
-        var checkedNodes = treeReference.get_checked(true);
-        if (url.params === undefined) {
-          url.params = {'pages': []};
-        }
-        
-        url.params.pages = [];
-        for (var i = 0; i < checkedNodes.length; ++i) {
-          var node = checkedNodes[i];
-          var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-          url.params.pages.push(XWiki.Model.serialize(pageReference));
-          // In case the page coudl have children
-          if (pageReference.getName() == 'WebHome') {
-            // The node could be checked but not loaded
-            if (node.state.loaded == false) {
-              // In that case, we need to add all children using a wildcard.
-              var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent);
-              url.params.pages.push(XWiki.Model.serialize(spaceReference));
-            }
-            // Special behaviour for the XAR export
-            if (url.params.format == 'xar') {
-              // Also add the WebPreferences
-              var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, 
-                pageReference.parent);
-              url.params.pages.push(XWiki.Model.serialize(webPreferencesReference));
+        /**
+         * Handle 'select none' button
+         */
+        $('#exportModal .tree_select_none').click(function() {
+          treeReference.uncheck_all();
+          return false;
+        });
+          
+        /**
+         * Update the URL of the export buttons according to the tree 
+         */
+         $('#exportModal #exportModelOtherCollapse a.btn').click(function(event) {
+          var button = $(this);
+          var url = button.data('url').clone();
+          var checkedNodes = treeReference.get_checked(true);
+          if (url.params === undefined) {
+            url.params = {'pages': []};
+          }
+          
+          url.params.pages = [];
+          for (var i = 0; i < checkedNodes.length; ++i) {
+            var node = checkedNodes[i];
+            var pageReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+            url.params.pages.push(XWiki.Model.serialize(pageReference));
+            // In case the page coudl have children
+            if (pageReference.getName() == 'WebHome') {
+              // The node could be checked but not loaded
+              if (node.state.loaded == false) {
+                // In that case, we need to add all children using a wildcard.
+                var spaceReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent);
+                url.params.pages.push(XWiki.Model.serialize(spaceReference));
+              }
+              // Special behaviour for the XAR export
+              if (url.params.format == 'xar') {
+                // Also add the WebPreferences
+                var webPreferencesReference = new XWiki.EntityReference('WebPreferences', XWiki.EntityType.DOCUMENT, 
+                  pageReference.parent);
+                url.params.pages.push(XWiki.Model.serialize(webPreferencesReference));
+              }
             }
           }
-        }
-        button.attr('href', url.serialize());
+          button.attr('href', url.serialize());
+        });
       });
     });
-    
+
   });
 });

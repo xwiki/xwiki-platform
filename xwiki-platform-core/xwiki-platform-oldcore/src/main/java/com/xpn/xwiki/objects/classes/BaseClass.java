@@ -854,20 +854,44 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor)
     {
-        if (get(fieldName) == null) {
-            TextAreaClass template_class = new TextAreaClass();
-            template_class.setName(fieldName);
-            template_class.setPrettyName(fieldPrettyName);
-            template_class.setEditor(editor);
-            template_class.setSize(cols);
-            template_class.setRows(rows);
-            template_class.setObject(this);
-            put(fieldName, template_class);
+        boolean result = false;
 
-            return true;
+        TextAreaClass textAreaClass = (TextAreaClass) get(fieldName);
+        if (textAreaClass == null) {
+            textAreaClass = new TextAreaClass();
+            textAreaClass.setName(fieldName);
+            textAreaClass.setObject(this);
+            put(fieldName, textAreaClass);
+            result = true;
         }
 
-        return false;
+        // If one of the other parameter values have changed, return true so that we update it.
+
+        if (!textAreaClass.getPrettyName().equals(fieldPrettyName)) {
+            textAreaClass.setPrettyName(fieldPrettyName);
+            result = true;
+        }
+
+        // Note: TextAreaClass.getEditor() transforms the editor string into lowercase so we need to do the same when
+        // comparing here. In addition when the editor is not, an empty string is returned from getEditor()...
+        if ((editor == null && !textAreaClass.getEditor().isEmpty())
+            || (editor != null && !textAreaClass.getEditor().equals(editor.toLowerCase())))
+        {
+            textAreaClass.setEditor(editor);
+            result = true;
+        }
+
+        if (textAreaClass.getSize() != cols) {
+            textAreaClass.setSize(cols);
+            result = true;
+        }
+
+        if (textAreaClass.getRows() != rows) {
+            textAreaClass.setRows(rows);
+            result = true;
+        }
+
+        return result;
     }
 
     public boolean addStaticListField(String fieldName, String fieldPrettyName, String values)

@@ -104,14 +104,8 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
         needsUpdate |= baseClass.addTextField(FIELD_JOBCLASS, "Job Class", 60);
         needsUpdate |= baseClass.addTextField(FIELD_STATUS, "Status", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CRON, "Cron Expression", 30);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10);
-        // make sure that the script field is of type pure text so that wysiwyg editor is never used for it
-        TextAreaClass scriptField = (TextAreaClass) baseClass.getField(FIELD_SCRIPT);
-        // Note: getEditor() returns lowercase but the values are actually camelcase...
-        if (!scriptField.getEditor().equals("puretext")) {
-            scriptField.setStringValue("editor", "PureText");
-            needsUpdate = true;
-        }
+        needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10,
+            TextAreaClass.EditorType.PURE_TEXT);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTLANG, "Job execution context lang", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTDATABASE, "Job execution context database", 30);

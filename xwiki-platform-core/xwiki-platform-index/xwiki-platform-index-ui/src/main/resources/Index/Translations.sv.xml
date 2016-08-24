@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Index.Translations" locale="sv">
   <web>Index</web>
   <name>Translations</name>
   <language>sv</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1425564037000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

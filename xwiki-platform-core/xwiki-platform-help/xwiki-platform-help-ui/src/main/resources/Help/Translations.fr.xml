@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Help.Translations" locale="fr">
   <web>Help</web>
   <name>Translations</name>
   <language>fr</language>
@@ -32,11 +32,10 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1459330108000</creationDate>
-  <date>1459332046000</date>
-  <contentUpdateDate>1459332046000</contentUpdateDate>
+  <date>1469290377000</date>
+  <contentUpdateDate>1469290377000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -44,8 +43,10 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+help.tipsPanel.breadcrumbsTip=Cliquez sur les flèches à côté des éléments du fil d'ariane pour naviguer vers les pages soeurs et filles de la page courante
 help.tipsPanel.gettingStartedTip=Si vous débutez avec XWiki, consultez le [[Guide de démarrage&gt;&gt; http\://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Aller directement vers une page quelconque du wiki avec Ctrl+G ou Meta+G.\nVoir d'autres [[raccourcis clavier&gt;&gt; http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Savez-vous que vous pouvez améliorer XWiki ? Prenez 5 minutes pour [[remplir ce questionnaire&gt;&gt;http\://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] et aider ce projet open source \!
+help.tipsPanel.jumpToPageTip=Naviguez directement vers une page du wiki avec Ctrl+G ou Meta+G.\nVoir d'autres [[raccourcis clavier&gt;&gt;http\://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
 help.tipsPanel.noTipMessage=Aucun conseil disponible\!
 help.tipsPanel.title=Conseils
 </content>

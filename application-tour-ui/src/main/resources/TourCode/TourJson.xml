@@ -104,7 +104,13 @@
           ## -----------------------------
           ## Create the step map (that will be serialized to JSON afterwards)
           ## -----------------------------
-          #set ($step = { 'element'  : $tourDoc.getValue('element', $stepObj),
+          #set ($element = "$!tourDoc.getValue('element', $stepObj)")
+          ## For retro-compatibility and because of a bug (https://github.com/sorich87/bootstrap-tour/issues/557)
+          ## we need to replace the element when it targets the document body by an empty string.
+          #if ($element == 'body')
+            #set ($element = '')
+          #end
+          #set ($step = { 'element'  : $element,
                           'title'    : $services.localization.render($tourDoc.getValue('title', $stepObj)),
                           'content'  : $content,
                           'placement': $tourDoc.getValue('placement', $stepObj),

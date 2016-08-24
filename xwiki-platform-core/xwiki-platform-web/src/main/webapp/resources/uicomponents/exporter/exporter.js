@@ -1,5 +1,8 @@
 // TODO: consider putting it in a webjar instead
-require(['jquery', '$xwiki.getSkinFile("uicomponents/widgets/tree.min.js", true)'], function ($) {
+require([
+  'jquery',
+  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+], function ($) {
   'use strict';
   
   /**

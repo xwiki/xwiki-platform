@@ -2584,7 +2584,10 @@ $services.localization.render($title)##
 #elseif (!$sheetTitle_displayingDocumentTitle)##
 ## Display the document title without going through the sheet and preventing recursion.
 #set ($sheetTitle_displayingDocumentTitle = true)
-$services.display.title($doc, {'displayerHint': 'default'})##
+$services.display.title($doc, {
+  'displayerHint': 'default',
+  'outputSyntaxId': 'plain/1.0'
+})##
 #set ($sheetTitle_displayingDocumentTitle = false)
 ##
 #else##

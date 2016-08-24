@@ -100,7 +100,7 @@ public class TourApplicationTest extends AbstractTest
         tourHomePage = TourHomePage.gotoPage();
         assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.WebHome", true, "-")));
 
-        PageWithTour homePage = PageWithTour.gotoPage("Tour", "WebHome");
+        PageWithTour homePage = new PageWithTour();
         assertTrue(homePage.isTourDisplayed());
 
         // Step 1

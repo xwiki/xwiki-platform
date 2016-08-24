@@ -87,11 +87,12 @@
         ## -------------------------
         #foreach($stepObj in $tourDoc.getObjects('TourCode.StepClass'))
           #set ($backdrop = $tourDoc.getValue('backdrop', $stepObj) == 1)
-          ## If the targetPage value of a step is empty, the path is inherited from the previous step
-          ## for the first step, the path is inherited from the tour configuration
-          ## this way the tour stays in the same wiki page
-          #if ("$tourDoc.getValue('targetPage', $stepObj)" != '')
-            #set ($path = $xwiki.getURL($tourDoc.getValue('targetPage', $stepObj)))
+          ## If the 'targetPage' value of a step is empty, the path is inherited from the previous step.
+          ## For the first step, the path is inherited from the tour configuration.
+          ## This way the tour stays in the same wiki page.
+          #set ($targetPage = "$!tourDoc.getValue('targetPage', $stepObj)")
+          #if ($targetPage != '')
+            #set ($path = $xwiki.getURL($targetPage))
           #end
           ## ------------------------------
           ## Render the content of the step

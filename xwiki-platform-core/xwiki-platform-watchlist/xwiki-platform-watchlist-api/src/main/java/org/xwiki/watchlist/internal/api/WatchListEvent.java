@@ -26,7 +26,9 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.watchlist.internal.WatchListEventHTMLDiffExtractor;
@@ -107,6 +109,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
     private EntityReferenceSerializer<String> localSerializer;
 
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
     /**
      * Constructor.
      *
@@ -173,6 +177,22 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         SpaceReference spaceReference = getDocumentReference().getLastSpaceReference();
         return getLocalSerializer().serialize(spaceReference);
+    }
+
+    /**
+     * @return the serialized space for display, taking into account Nested Pages, i.e. not displaying WebHome for a
+     *         nicer user experience
+     * @since 8.3M2
+     */
+    public String getDisplaySpace()
+    {
+        if (getDefaultEntityReferenceProvider().getDefaultReference(EntityType.DOCUMENT).getName().equals(
+            getDocumentReference().getName()) && getDocumentReference().getLastSpaceReference().getParent() != null)
+        {
+            return getLocalSerializer().serialize(getDocumentReference().getLastSpaceReference().getParent());
+        } else {
+            return getSpace();
+        }
     }
 
     /**
@@ -475,6 +495,15 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         }
 
         return this.localSerializer;
+    }
+
+    private EntityReferenceProvider getDefaultEntityReferenceProvider()
+    {
+        if (this.defaultEntityReferenceProvider == null) {
+            this.defaultEntityReferenceProvider = Utils.getComponent(EntityReferenceProvider.class);
+        }
+
+        return this.defaultEntityReferenceProvider;
     }
 
     private XWikiContext getXWikiContext()

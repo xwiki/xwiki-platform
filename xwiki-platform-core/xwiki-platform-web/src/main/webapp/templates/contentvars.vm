@@ -2,7 +2,7 @@
 ## Compute the content to display
 ## -------------------------------
 ## Honor the syntax if it's passed in the request.
-#try()
+#try("contentvmexception")
   #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
   #if ($outputSyntax)
     ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be

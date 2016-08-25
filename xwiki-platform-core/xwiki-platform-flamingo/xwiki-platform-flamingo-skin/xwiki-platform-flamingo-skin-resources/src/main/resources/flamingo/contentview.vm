@@ -33,8 +33,8 @@ $services.progress.startStep('Display the title and content')
   ## ----------------------------
   <div class="row">
     <div id="xwikicontent" class="col-xs-12">
-      #if ("$!exception" != '')
-        #displayUnhandledException($exception)
+      #if ("$!contentvmexception" != '')
+        #displayUnhandledException($contentvmexception)
       #else
         $renderedContent
       #end

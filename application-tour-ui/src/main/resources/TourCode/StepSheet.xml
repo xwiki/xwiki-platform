@@ -541,12 +541,15 @@ if(typeof(XWiki) == 'undefined' || typeof(XWiki.widgets) == 'undefined' || typeo
   width: 800px;
 }
 
+.actionBtn, #addStep {
+  font-size: .8em;
+  text-transform: uppercase;
+}
+
 .actionBtn {
    background: none no-repeat scroll 0 center transparent;
    display: block;
-   font-size: .8em;
    padding: .3em .3em .3em 20px;
-   text-transform: uppercase;
    float:right;
 }</code>
     </property>

@@ -58,10 +58,10 @@
 #set($discard = $xwiki.jsx.use('TourCode.StepSheet'))
 &lt;div id="stepsBlk"&gt;
    #if ($xcontext.action == 'edit')
-      &lt;a class="actionBtn" id="addStep" href="#" &gt;
+      &lt;p class="text-right"&gt;&lt;a class="" id="addStep" href="#" &gt;
          $services.icon.renderHTML("add")
          $services.localization.render("tour.steps.new_step")
-      &lt;/a&gt;
+      &lt;/a&gt;&lt;/p&gt;
    #end
    &lt;div id="stepsContainer"&gt;
       &lt;table class="table-striped"&gt;

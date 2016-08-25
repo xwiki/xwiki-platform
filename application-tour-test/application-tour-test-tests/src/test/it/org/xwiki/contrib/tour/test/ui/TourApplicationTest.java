@@ -22,14 +22,13 @@ package org.xwiki.contrib.tour.test.ui;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.contrib.tour.test.po.PageWithTour;
-import org.xwiki.contrib.tour.test.po.TourFromLivetable;
+import org.xwiki.contrib.tour.test.po.StepEditModal;
 import org.xwiki.contrib.tour.test.po.TourEditPage;
+import org.xwiki.contrib.tour.test.po.TourFromLivetable;
 import org.xwiki.contrib.tour.test.po.TourHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,19 +51,20 @@ public class TourApplicationTest extends AbstractTest
         tourEditPage.setIsActive(isActive);
         tourEditPage.setTargetPage(targetPage);
         tourEditPage.setTargetClass(targetClass);
-        tourEditPage.clickSaveAndView();
     }
 
-    private void setUpStep(ObjectEditPane obj, String element, String title, String content, String order,
-        Boolean backdrop, String targetPage)
+    private void setUpStep(TourEditPage tourEditPage, String element, String title, String content,
+            boolean backdrop, String targetPage)
     {
-        obj.setFieldValue(obj.byPropertyName("element"), element);
-        obj.setFieldValue(obj.byPropertyName("title"), title);
-        obj.setFieldValue(obj.byPropertyName("content"), content);
-        obj.setFieldValue(obj.byPropertyName("order"), order);
-        obj.setCheckBox(obj.byPropertyName("backdrop"), backdrop);
-        obj.setFieldValue(obj.byPropertyName("targetPage"), targetPage);
+        StepEditModal stepEditModal = tourEditPage.newStep();
+        stepEditModal.setElement(element);
+        stepEditModal.setTitle(title);
+        stepEditModal.setContent(content);
+        stepEditModal.setBackdrop(backdrop);
+        stepEditModal.setTargetPage(targetPage);
+        stepEditModal.save();
     }
+
 
     private void cleanUp(String page) throws Exception
     {
@@ -81,22 +81,45 @@ public class TourApplicationTest extends AbstractTest
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
         setUpTour(tourEditPage, "My nice description", true, "Tour.WebHome", "");
 
-        // Todo: replace by a nice UI
-        ObjectEditPage objectEditPage = tourEditPage.editObjects();
-        ObjectEditPane obj1 = objectEditPage.addObject("TourCode.StepClass");
         // Test to put a translation key, use the translation macro
-        setUpStep(obj1, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}", "1", true,
-            "");
+        setUpStep(tourEditPage, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}",
+                true, "");
         // I voluntary create the object 3 before the 2 to test the 'order' field
-        ObjectEditPane obj3 = objectEditPage.addObject("TourCode.StepClass");
-        setUpStep(obj3, "body", "Title 3", "Step 3", "3", true, "");
-        ObjectEditPane obj2 = objectEditPage.addObject("TourCode.StepClass");
-        setUpStep(obj2, "body", "Title 2", "Step 2", "2", true, "");
+        setUpStep(tourEditPage, "body", "Title 3", "Step 3", true, "");
+        setUpStep(tourEditPage, "body", "Title 2", "Step 2", true, "");
+        // Add a step that will be removed
+        setUpStep(tourEditPage, "body", "to remove", "to remove", false, "");
         // Object 4 used to test the Multipage feature ('targetPage' field)
-        ObjectEditPane obj4 = objectEditPage.addObject("TourCode.StepClass");
-        setUpStep(obj4, "body", "Title 4", "Step 4", "4", true, "TourCode.TourClass");
-        objectEditPage.clickSaveAndView();
+        setUpStep(tourEditPage, "body", "Title 4", "Step 4", true, "TourCode.TourClass");
 
+
+        // Test that we can change the order of a step
+        StepEditModal stepEditModal = tourEditPage.editStep(2);
+        assertEquals("body", stepEditModal.getElement());
+        assertEquals("Title 3", stepEditModal.getTitle());
+        assertEquals("Step 3", stepEditModal.getContent());
+        assertEquals(2, stepEditModal.getOrder());
+        assertTrue(stepEditModal.isBackdropEnabled());
+        assertEquals("", stepEditModal.getTargetPage());
+        stepEditModal.setOrder(3);
+        stepEditModal.save();
+        stepEditModal = tourEditPage.editStep(2);
+        assertEquals("Step 2", stepEditModal.getContent());
+        stepEditModal.close();
+
+        // Test that we can remove a step
+        stepEditModal = tourEditPage.editStep(4);
+        assertEquals("to remove", stepEditModal.getContent());
+        stepEditModal.close();
+        tourEditPage.deleteStep(4, true);
+        stepEditModal = tourEditPage.editStep(4);
+        assertEquals("Step 4", stepEditModal.getContent());
+        stepEditModal.close();
+
+        // Save the tour...
+        tourEditPage.clickSaveAndView();
+
+        // And let's try it!
         tourHomePage = TourHomePage.gotoPage();
         assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("Test", "Tour.WebHome", true, "-")));
 
@@ -216,12 +239,8 @@ public class TourApplicationTest extends AbstractTest
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("NewTest");
         setUpTour(tourEditPage, "Description", true, "", "TourCode.TourClass");
-
-        // Todo: replace by a nice UI
-        ObjectEditPage objectEditPage = tourEditPage.editObjects();
-        ObjectEditPane obj1 = objectEditPage.addObject("TourCode.StepClass");
-        setUpStep(obj1, "body", "Tour Title", "Tour Content", "1", true, "");
-        objectEditPage.clickSaveAndView();
+        setUpStep(tourEditPage, "body", "Tour Title", "Tour Content", true, "");
+        tourEditPage.clickSaveAndView();
 
         tourHomePage = TourHomePage.gotoPage();
         assertTrue(tourHomePage.getTours().contains(new TourFromLivetable("NewTest", "-", true, "TourCode.TourClass")));

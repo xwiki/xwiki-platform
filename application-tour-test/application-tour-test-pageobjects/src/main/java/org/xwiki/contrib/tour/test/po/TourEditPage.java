@@ -19,6 +19,7 @@
  */
 package org.xwiki.contrib.tour.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -40,6 +41,12 @@ public class TourEditPage extends EditPage
     
     @FindBy(id = "TourCode.TourClass_0_targetClass")
     private WebElement targetClass;
+
+    @FindBy(xpath = "//div[@id='stepsBlk']//a[@id='addStep']")
+    private WebElement addStepButton;
+
+    @FindBy(id = "stepsContainer")
+    private WebElement stepsContainer;
     
     public void setDescription(String description) 
     {
@@ -64,5 +71,38 @@ public class TourEditPage extends EditPage
     {
         this.targetClass.clear();
         this.targetClass.sendKeys(targetClass);
+    }
+
+    public StepEditModal newStep()
+    {
+        addStepButton.click();
+        waitUntilElementIsVisible(By.id("stepForm"));
+        return new StepEditModal();
+    }
+
+    public StepEditModal editStep(int number)
+    {
+        WebElement stepEditLink =
+                stepsContainer.findElement(By.xpath(String.format("(//a[contains(@class, 'editStep')])[%d]", number)));
+        stepEditLink.click();
+        waitUntilElementIsVisible(By.id("stepForm"));
+        return new StepEditModal();
+    }
+
+    public void deleteStep(int number, boolean confirm)
+    {
+        WebElement deleteLink =
+                stepsContainer.findElement(By.xpath(String.format("(//a[contains(@class, 'deleteStep')])[%d]", number)));
+        deleteLink.click();
+        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        WebElement confirmBox = getDriver().findElement(By.className("xdialog-content"));
+        if (confirm) {
+            confirmBox.findElement(By.xpath("//input[@value = 'Yes']")).click();
+        } else {
+            confirmBox.findElement(By.xpath("//input[@value = 'No']")).click();
+        }
+        waitUntilElementDisappears(By.className("xdialog-box-confirmation"));
+        waitForNotificationSuccessMessage("Delete step done!");
+
     }
 }

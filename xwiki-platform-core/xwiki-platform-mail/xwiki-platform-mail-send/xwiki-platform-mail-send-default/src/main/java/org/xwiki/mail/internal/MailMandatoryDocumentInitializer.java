@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Create or update a {@code XWiki.Mail} class and document at startup. This class is used as a Mail Template.
@@ -60,8 +61,8 @@ public class MailMandatoryDocumentInitializer extends AbstractMandatoryDocumentI
 
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);
-        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15);
-        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15);
+        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "Mail Class");
 

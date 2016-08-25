@@ -48,6 +48,10 @@
       <id>gdelhumeau</id>
       <name>Guillaume Delhumeau</name>
     </developer>
+    <developer>
+      <id>acotiuga</id>
+      <name>Alexandru Cotiuga</name>
+    </developer>
   </developers>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>

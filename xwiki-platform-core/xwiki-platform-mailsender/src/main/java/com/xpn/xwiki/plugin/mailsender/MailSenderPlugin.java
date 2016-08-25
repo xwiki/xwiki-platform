@@ -72,6 +72,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.util.Util;
@@ -231,8 +232,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         bclass.setName(EMAIL_XWIKI_CLASS_NAME);
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);
-        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15);
-        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15);
+        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
 
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;

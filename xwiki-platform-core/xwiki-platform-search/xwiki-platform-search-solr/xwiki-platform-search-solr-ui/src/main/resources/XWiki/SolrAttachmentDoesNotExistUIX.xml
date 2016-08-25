@@ -233,8 +233,10 @@
 #set ($filename = $stringtool.remove($filename, '%20'))
 ##
 ## Handle the case when there are spaces in the file name
-#set ($filenameSplit = "${stringtool.join($stringtool.split($filename, ' '), ',')}")
-#set ($filenameSplitFuzzy = "$!{stringtool.join($stringtool.split($filename, ' '), '~,')}~")
+#set ($filenameWords = $stringtool.split($filename, ' '))
+#set ($filenameSplit = "${stringtool.join($filenameWords, ',')}")
+#set ($filenameSplitFuzzy = "$!{stringtool.join($filenameWords, '~,')}~")
+#set ($filenameSplitWildcard = "*$!{stringtool.join($filenameWords, '*,*')}*")
 ##
 ## Determine the document name.
 #set ($docName = $doc.name)
@@ -244,27 +246,33 @@
 #end
 ##
 ## Handle the case when there are spaces in the doc name.
-#set ($docNameSplit = "${stringtool.join($stringtool.split($docName, ' '), ',')}")
-#set ($docNameSplitFuzzy = "$!{stringtool.join($stringtool.split($docName, ' '), '~,')}~")
+#set ($docNameWords = $stringtool.split($docName, ' '))
+#set ($docNameSplit = "${stringtool.join($docNameWords, ',')}")
+#set ($docNameSplitFuzzy = "$!{stringtool.join($docNameWords, '~,')}~")
+#set ($docNameSplitWildcard = "*$!{stringtool.join($docNameWords, '*,*')}*")
 ##
 ## Extract the space reference elements.
 #set ($spaceReferenceStrings = "")
 #set ($spaceReferenceFuzzyStrings = "")
+#set ($spaceReferenceWildcardStrings = "")
 #set ($spaceReferences = $doc.documentReference.spaceReferences)
 #foreach ($spaceReference in $spaceReferences)
   #if ($foreach.count &gt; 1)
     #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
     #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}, ")
   #end
   ## Note: Also handling possible space characters in the space name.
-  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), ',')}")
-  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), '~,')}~")
+  #set ($spaceNameWords = $stringtool.split(${spaceReference.name}, ' '))
+  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($spaceNameWords, ',')}")
+  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($spaceNameWords, '~,')}~")
+  #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}*${stringtool.join($spaceNameWords, '*,*')}*")
 #end
 ##
 ## Files in the same document
-#set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy) OR (space_exact:""$doc.space"" AND name_exact:""$doc.name"")")
+#set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy, $filenameSplitWildcard) OR (space_exact:""$doc.space"" AND name_exact:""$doc.name"")")
 ## Files in a document with a similar name or space elements as the current doc.
-#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings) OR name:($docNameSplit, $docNameSplitFuzzy)")
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings, $spaceReferenceWildcardStrings) OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 ##
 ## Build and run the Solr query.
 #set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))

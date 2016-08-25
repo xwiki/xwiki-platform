@@ -234,36 +234,42 @@
 #end
 ##
 ## Handle the case when there are spaces in the doc name
-#set ($docNameSplit = "${stringtool.join($stringtool.split($docName, ' '), ',')}")
-#set ($docNameSplitFuzzy = "$!{stringtool.join($stringtool.split($docName, ' '), '~,')}~")
+#set ($docNameWords = $stringtool.split($docName, ' '))
+#set ($docNameSplit = "${stringtool.join($docNameWords, ',')}")
+#set ($docNameSplitFuzzy = "$!{stringtool.join($docNameWords, '~,')}~")
+#set ($docNameSplitWildcard = "*$!{stringtool.join($docNameWords, '*,*')}*")
 ##
 ## Extract the space reference elements
 #set ($spaceReferenceStrings = "")
 #set ($spaceReferenceFuzzyStrings = "")
+#set ($spaceReferenceWildcardStrings = "")
 #set ($spaceReferences = $doc.documentReference.spaceReferences)
 #foreach ($spaceReference in $spaceReferences)
   #if ($foreach.count &gt; 1)
     #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
     #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}, ")
   #end
   ## Note: Also handling possible space characters in the space name.
-  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), ',')}")
-  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($stringtool.split(${spaceReference.name}, ' '), '~,')}~")
+  #set ($spaceNameWords = $stringtool.split(${spaceReference.name}, ' '))
+  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($spaceNameWords, ',')}")
+  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($spaceNameWords, '~,')}~")
+  #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}*${stringtool.join($spaceNameWords, '*,*')}*")
 #end
 ##
 ## Build the query string, with various usecases supported.
 ## TODO: Add better scoring boosts to properly favor one usecase over another or multiple usecases happening at the same time.
 ##
 ## Non-terminal doc with the same name as the current doc
-#set ($suggestionsQueryString = "(spaces:($docNameSplit, $docNameSplitFuzzy) AND name_exact:WebHome)")
+#set ($suggestionsQueryString = "(spaces:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard) AND name_exact:WebHome)")
 ## Terminal doc with the same name as the current doc
-#set ($suggestionsQueryString = "${suggestionsQueryString} OR name:($docNameSplit, $docNameSplitFuzzy)")
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 ## Document in a space named like the current terminal doc, if it is the case.
 #if ($doc.name != 'WebHome')
-  #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($docNameSplit, $docNameSplitFuzzy)")
+  #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
 #end
 ## Document in a space named like on of the spaces of the current doc.
-#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings)")
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings, $spaceReferenceWildcardStrings)")
 ##
 ## Build and run the Solr query.
 #set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))

@@ -920,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Simplex 3.3.5
+      <lessCode>// Simplex 3.3.7
 // Variables
 // --------------------------------------------------
 
@@ -1033,7 +1033,7 @@
 //** Global background color for active items (e.g., navs or dropdowns).
 @component-active-bg:       @brand-primary;
 
-//** Width of the `border` for generating carets that indicator dropdowns.
+//** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
 //** Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
@@ -1785,14 +1785,21 @@
 @page-header-border-color:    @gray-lighter;
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
+//** Point at which .dl-horizontal becomes horizontal
+@dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Simplex 3.3.5
+// Simplex 3.3.7
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,700");
+@web-font-path: "https://fonts.googleapis.com/css?family=Open+Sans:400,700";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
 
 .btn-shadow(@color) {
   #gradient &gt; .vertical-three-colors(lighten(@color, 3%), @color, 6%, darken(@color, 3%));

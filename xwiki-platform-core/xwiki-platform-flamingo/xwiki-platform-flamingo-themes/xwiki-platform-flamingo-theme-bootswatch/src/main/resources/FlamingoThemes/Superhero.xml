@@ -929,7 +929,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Superhero 3.3.5
+      <lessCode>// Superhero 3.3.7
 // Variables
 // --------------------------------------------------
 
@@ -1044,7 +1044,7 @@
 //** Global background color for active items (e.g., navs or dropdowns).
 @component-active-bg:       @brand-primary;
 
-//** Width of the `border` for generating carets that indicator dropdowns.
+//** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
 //** Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
@@ -1796,21 +1796,28 @@
 @page-header-border-color:    @gray-lighter;
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
+//** Point at which .dl-horizontal becomes horizontal
+@dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
 @hr-border:                   lighten(@gray-light, 5%);
 
-// Superhero 3.3.5
+// Superhero 3.3.7
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("https://fonts.googleapis.com/css?family=Lato:300,400,700");
+@web-font-path: "https://fonts.googleapis.com/css?family=Lato:300,400,700";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
 
 // Navbar =====================================================================
 
 .navbar {
   .box-shadow(none);
   border: none;
-  font-size: 12px;
+  font-size: @font-size-small;
 
   &amp;-default {
 
@@ -1841,7 +1848,7 @@
 
   &amp;-sm,
   &amp;-xs {
-    font-size: 12px;
+    font-size: @font-size-small;
   }
 }
 
@@ -1883,7 +1890,7 @@
   .box-shadow(none);
 
   &gt; li &gt; a {
-    font-size: 12px;
+    font-size: @font-size-small;
   }
 }
 
@@ -1892,14 +1899,14 @@
 }
 
 .dropdown-header {
-  font-size: 12px;
+  font-size: @font-size-small;
 }
 
 // Tables =====================================================================
 
 table,
 .table {
-  font-size: 12px;
+  font-size: @font-size-small;
 
   a:not(.btn) {
     color: #fff;
@@ -1935,7 +1942,7 @@ label,
 .radio label,
 .checkbox label,
 .help-block {
-  font-size: 12px;
+  font-size: @font-size-small;
 }
 
 .input-addon,
@@ -1958,6 +1965,11 @@ label,
     color: @brand-warning;
   }
 
+  .form-control,
+  .form-control:focus {
+    border: 4px solid @brand-warning;
+  }
+
   .input-group-addon {
     border: none;
   }
@@ -1978,6 +1990,11 @@ label,
     color: @brand-danger;
   }
 
+  .form-control,
+  .form-control:focus {
+    border: 4px solid @brand-danger;
+  }
+
   .input-group-addon {
     border: none;
   }
@@ -1996,6 +2013,11 @@ label,
   &amp;.checkbox-inline label,
   .form-control-feedback {
     color: @brand-success;
+  }
+
+  .form-control,
+  .form-control:focus {
+    border: 4px solid @brand-success;
   }
 
   .input-group-addon {

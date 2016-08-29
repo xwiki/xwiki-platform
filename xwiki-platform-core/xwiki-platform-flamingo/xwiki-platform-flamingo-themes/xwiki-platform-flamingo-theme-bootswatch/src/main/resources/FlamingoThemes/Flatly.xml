@@ -930,7 +930,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Flatly 3.3.5
+      <lessCode>// Flatly 3.3.7
 // Variables
 // --------------------------------------------------
 
@@ -1045,7 +1045,7 @@
 //** Global background color for active items (e.g., navs or dropdowns).
 @component-active-bg:       @brand-primary;
 
-//** Width of the `border` for generating carets that indicator dropdowns.
+//** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
 //** Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
@@ -1298,7 +1298,7 @@
 @navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);
 @navbar-collapse-max-height:       340px;
 
-@navbar-default-color:             #777;
+@navbar-default-color:             #fff;
 @navbar-default-bg:                @brand-primary;
 @navbar-default-border:            transparent;
 
@@ -1797,14 +1797,21 @@
 @page-header-border-color:    transparent;
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
+//** Point at which .dl-horizontal becomes horizontal
+@dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Flatly 3.3.5
+// Flatly 3.3.7
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("https://fonts.googleapis.com/css?family=Lato:400,700,400italic");
+@web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
 
 // Navbar =====================================================================
 
@@ -1921,7 +1928,7 @@ table,
 // Forms ======================================================================
 
 .form-control,
-input, {
+input {
   border-width: 2px;
   .box-shadow(none);
 

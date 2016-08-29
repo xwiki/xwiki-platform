@@ -929,7 +929,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// United 3.3.5
+      <lessCode>// United 3.3.7
 // Variables
 // --------------------------------------------------
 
@@ -945,7 +945,7 @@
 @gray-light:             #AEA79F;   // #999
 @gray-lighter:           lighten(@gray-base, 93.5%); // #eee
 
-@brand-primary:         #DD4814;
+@brand-primary:         #E95420;
 @brand-success:         #38B44A;
 @brand-info:            #772953;
 @brand-warning:         #EFB73E;
@@ -1044,7 +1044,7 @@
 //** Global background color for active items (e.g., navs or dropdowns).
 @component-active-bg:       @brand-primary;
 
-//** Width of the `border` for generating carets that indicator dropdowns.
+//** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
 //** Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
@@ -1796,14 +1796,21 @@
 @page-header-border-color:    @gray-lighter;
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
+//** Point at which .dl-horizontal becomes horizontal
+@dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// United 3.3.5
+// United 3.3.7
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("https://fonts.googleapis.com/css?family=Ubuntu");
+@web-font-path: "https://fonts.googleapis.com/css?family=Ubuntu:400,700";
+
+.web-font(@path) {
+  @import url("@{path}");
+}
+.web-font(@web-font-path);
 
 // Navbar =====================================================================
 

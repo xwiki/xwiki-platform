@@ -929,7 +929,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Slate 3.3.5
+      <lessCode>// Slate 3.3.7
 // Variables
 // --------------------------------------------------
 
@@ -1044,7 +1044,7 @@
 //** Global background color for active items (e.g., navs or dropdowns).
 @component-active-bg:       transparent;
 
-//** Width of the `border` for generating carets that indicator dropdowns.
+//** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
 //** Carets increase slightly in size for larger components.
 @caret-width-large:         5px;
@@ -1121,7 +1121,7 @@
 //** Text color for `&lt;input&gt;`s
 @input-color:                    @gray-darker;
 //** `&lt;input&gt;` border color
-@input-border:                   #ccc;
+@input-border:                   #000;
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
@@ -1154,7 +1154,7 @@
 //** Background color for textual input addons
 @input-group-addon-bg:           @gray-lighter;
 //** Border color for textual input addons
-@input-group-addon-border-color: @input-border;
+@input-group-addon-border-color: rgba(0, 0, 0, 0.6);
 
 //** Disabled cursor for form controls and buttons.
 @cursor-disabled:                not-allowed;
@@ -1796,10 +1796,12 @@
 @page-header-border-color:    darken(@gray-darker, 5%);
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
+//** Point at which .dl-horizontal becomes horizontal
+@dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
 @hr-border:                   darken(@gray-darker, 5%);
 
-// Slate 3.3.5
+// Slate 3.3.7
 // Bootswatch
 // -----------------------------------------------------
 
@@ -1809,7 +1811,7 @@
 }
 
 .btn-shadow-inverse(@color) {
-  #gradient &gt; .vertical-three-colors(darken(@color, 24%), darken(@color, 18%), 40%, darken(@color, 14%));
+  #gradient &gt; .vertical-three-colors(darken(@color, 24%), darken(@color, 18%), 40%, darken(@color, 16%));
   filter: none;
 }
 
@@ -1821,21 +1823,28 @@
   border: 1px solid rgba(0, 0, 0, 0.6);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 
-  &amp;-inverse {
-    .btn-shadow(@navbar-inverse-bg);
-
-    .badge {
-      background-color: @navbar-inverse-link-active-bg;
-    }
-  }
-
-  &amp;-nav &gt; li &gt; a {
+  .navbar-nav &gt; li &gt; a {
     border-right: 1px solid rgba(0, 0, 0, 0.2);
     border-left: 1px solid rgba(255, 255, 255, 0.1);
 
     &amp;:hover {
       .btn-shadow-inverse(@navbar-default-bg);
       border-left-color: transparent;
+    }
+  }
+
+  &amp;-inverse {
+    .btn-shadow(@navbar-inverse-bg);
+
+    .badge {
+      background-color: @navbar-inverse-link-active-bg;
+    }
+
+    .navbar-nav &gt; li &gt; a {
+
+      &amp;:hover {
+        .btn-shadow-inverse(@navbar-inverse-bg);
+      }
     }
   }
 
@@ -2002,8 +2011,8 @@ textarea {
   }
 
   .input-group-addon {
-    background-color: @body-bg;
-    border: none;
+    background-color: @gray-dark;
+    border-color: @input-group-addon-border-color;
   }
 }
 
@@ -2028,8 +2037,8 @@ textarea {
   }
 
   .input-group-addon {
-    background-color: @body-bg;
-    border: none;
+    background-color: @gray-dark;
+    border-color: @input-group-addon-border-color;
   }
 }
 
@@ -2054,8 +2063,8 @@ textarea {
   }
 
   .input-group-addon {
-    background-color: @body-bg;
-    border: none;
+    background-color: @gray-dark;
+    border-color: @input-group-addon-border-color;
   }
 }
 
@@ -2064,9 +2073,9 @@ legend {
 }
 
 .input-group-addon {
-  border-color: rgba(0, 0, 0, 0.6);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+  background-color: @gray-dark;
   .btn-shadow(@btn-default-bg);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
   color: @btn-default-color;
 }
 

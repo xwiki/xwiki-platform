@@ -278,6 +278,14 @@ Object.extend(XWiki, {
                       break;
                   }
               }
+              // If the link is opened in a new window, we are vulnerable to a phishing attack
+              // see https://mathiasbynens.github.io/rel-noopener/ or https://dev.to/phishing
+              // To avoid that, we just need to add "noopener" and "noreferer" in the "rel" attribute of the link.
+              if (anchor.target == "blank" || anchor.target == "_blank") {
+                  values.push("noopener");
+                  values.push("noreferer");
+                  anchor.setAttribute("rel", values.join(" "));
+              }
           }
       }
   },

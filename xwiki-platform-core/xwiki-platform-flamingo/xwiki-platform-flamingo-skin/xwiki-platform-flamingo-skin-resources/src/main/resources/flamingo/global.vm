@@ -12,7 +12,7 @@
   <div id="globallinks">
   </div> ## globallinks
   <div class="clearfloats"></div>
-  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.header.after'))
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.header.after', {'sortByParameter': 'order'}))
     $services.rendering.render($uix.execute(), 'xhtml/1.0')
   #end
 </div> ## headerglobal

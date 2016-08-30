@@ -72,7 +72,7 @@
     <content>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>PureText</editor>
+      <editor>Text</editor>
       <name>content</name>
       <number>3</number>
       <picker>0</picker>

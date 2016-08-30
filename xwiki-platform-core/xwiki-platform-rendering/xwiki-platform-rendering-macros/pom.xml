@@ -105,7 +105,6 @@ Thus it is forbidden to depend on the HTML Macro.
     <module>xwiki-platform-rendering-macro-code</module>
     <module>xwiki-platform-rendering-macro-rss</module>
     <module>xwiki-platform-rendering-macro-useravatar</module>
-    <module>xwiki-platform-rendering-macro-ruby</module>
     <module>xwiki-platform-rendering-macro-python</module>
     <module>xwiki-platform-rendering-macro-php</module>
     <module>xwiki-platform-rendering-macro-container</module>

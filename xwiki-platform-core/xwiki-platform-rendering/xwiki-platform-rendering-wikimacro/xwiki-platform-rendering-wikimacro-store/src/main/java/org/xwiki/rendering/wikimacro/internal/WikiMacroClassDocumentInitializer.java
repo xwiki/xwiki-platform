@@ -61,6 +61,7 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocument
 
         needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
+        // The Macro description is using plain text (same as for Java Macros).
         needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5,
             TextAreaClass.EditorType.PURE_TEXT);
         needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
@@ -69,11 +70,13 @@ public class WikiMacroClassDocumentInitializer extends AbstractMandatoryDocument
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
         needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
             "Optional|Mandatory|No content", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
+        // The Macro content description is using plain text (same as for Java Macros).
         needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
             "Content description (Not applicable for \"No content\" type)", 40, 5,
             TextAreaClass.EditorType.PURE_TEXT);
+        // The code property contains wiki markup
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20,
-            TextAreaClass.EditorType.PURE_TEXT);
+            TextAreaClass.EditorType.TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "XWiki Wiki Macro Class");
 

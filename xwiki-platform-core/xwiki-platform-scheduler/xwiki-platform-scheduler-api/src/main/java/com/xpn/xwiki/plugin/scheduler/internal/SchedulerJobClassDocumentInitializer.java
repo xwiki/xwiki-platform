@@ -104,6 +104,10 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
         needsUpdate |= baseClass.addTextField(FIELD_JOBCLASS, "Job Class", 60);
         needsUpdate |= baseClass.addTextField(FIELD_STATUS, "Status", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CRON, "Cron Expression", 30);
+
+        // This field contains groovy script and is thus of tpye PureText.
+        // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
+        // and not only Groovy. When this is done, convert this field to "Text".
         needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10,
             TextAreaClass.EditorType.PURE_TEXT);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);

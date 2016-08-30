@@ -37,6 +37,7 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
+import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanTree;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.Job;
@@ -114,7 +115,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
      */
     private Extension tryInstallExtension(ExtensionId extensionId, String namespace)
     {
-        ModifableExtensionPlanTree currentTree = new ModifableExtensionPlanTree();
+        DefaultExtensionPlanTree currentTree = new DefaultExtensionPlanTree();
 
         try {
             installExtension(extensionId, namespace, currentTree);

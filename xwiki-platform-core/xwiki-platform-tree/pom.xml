@@ -32,6 +32,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Tree - Parent POM</description>
   <modules>
+    <module>xwiki-platform-tree-api</module>
     <module>xwiki-platform-tree-macro</module>
     <module>xwiki-platform-tree-test-pageobjects</module>
     <module>xwiki-platform-tree-war</module>

@@ -52,7 +52,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>16.3.3</version>
+      <version>16.6.29</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>

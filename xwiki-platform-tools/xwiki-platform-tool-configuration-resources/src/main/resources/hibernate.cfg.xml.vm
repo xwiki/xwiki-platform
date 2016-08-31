@@ -125,6 +125,7 @@
     <property name="hibernate.connection.characterEncoding">utf8</property>
 
     <mapping resource="$xwikiDbHbmXwiki"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -150,6 +151,7 @@
     <property name="dbcp.poolPreparedStatements">true</property>
     <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -173,6 +175,7 @@
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
     <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
     <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -202,6 +205,7 @@
     <property name="jdbc.use_streams_for_binary">false</property>
     <property name="xwiki.virtual_mode">schema</property>
     <mapping resource="xwiki.postgresql.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -234,6 +238,7 @@
     <property name="dbcp.poolPreparedStatements">true</property>
     <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -257,6 +262,7 @@
     <property name="dbcp.poolPreparedStatements">true</property>
     <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.derby.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
@@ -280,6 +286,7 @@
     <property name="connection.driver_class">org.h2.Driver</property>
     <property name="dialect">org.hibernate.dialect.H2Dialect</property>
     <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="hierarchy.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))

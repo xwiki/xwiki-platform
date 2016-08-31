@@ -418,11 +418,15 @@ xwiki.defaultbaseskin=$!xwikiCfgDefaultBaseSkin
 # xwiki.title.mandatory=0
 
 #---------------------------------------
-# Extensions
+# Plugin Mechanism
 #
 
 #-# List of active plugins.
 xwiki.plugins=$!xwikiCfgPlugins
+
+#---------------------------------------
+# Monitor Plugin
+#
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of
@@ -431,6 +435,96 @@ xwiki.plugins=$!xwikiCfgPlugins
 
 #-# Maximum number of last requests to remember.
 # xwiki.monitor.lastlistsize=20
+
+#---------------------------------------
+# GraphViz Plugin
+#
+
+#-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
+#-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins
+#-# in the xwiki.plugins property.
+#-# Uncomment and set the locations of the Dot and Neato executables
+# xwiki.plugin.graphviz.dotpath=c:/Program Files/ATT/GraphViz/bin/dot.exe
+# xwiki.plugin.graphviz.neatopath=c:/Program Files/ATT/GraphViz/bin/neato.exe
+
+#---------------------------------------
+# Image Plugin
+#
+
+xwiki.plugin.image.cache.capacity=30
+
+#---------------------------------------
+# Calendar Plugin
+#
+
+#-# Calendar Prev/Next Month bounds.
+#-# The calendar generates links to the previous/next months for a limited range, by default 6 months back and 12 months
+#-# after. A value of 0 means that there is no limit in that direction.
+# xwiki.calendar.bound.prev=6
+# xwiki.calendar.bound.next=12
+
+#---------------------------------------
+# Lucene Plugin
+#
+
+#-# Lucene search engine
+#-# Location where to place the lucene index files. The default is the "lucene" subdirectory in XWiki's permanent data
+#-# directory. Change it if you want to store indexes in another place.
+# xwiki.plugins.lucene.indexdir=/usr/local/xwiki/lucene
+#-# The text analyzer to use for indexing.
+# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
+#-# The number of seconds to wait between reindexes. A smaller value ensures that new documents will be indexed faster,
+#-# but with a minor performance reduction. Adjust according to your wiki load.
+# xwiki.plugins.lucene.indexinterval=20
+#-# The maximum size of the indexing queue. After this limit is reached, the reindex thread will have to wait until the
+#-# queue is consumed. Note that this does not affect documents submitted through the notification mechanism, only the
+#-# full reindex option.
+# xwiki.plugins.lucene.maxQueueSize=1000
+
+#---------------------------------------
+# Activity Stream Plugin
+#
+
+#-# [Since 2.0RC1]
+#-# Activity Stream plugin. 
+#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
+#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
+#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
+#-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
+#-#
+#-# Default: 1 
+# xwiki.plugin.activitystream.uselocalstore=1
+#-#
+#-# Default: 1
+# xwiki.plugin.activitystream.usemainstore=1
+#-#
+#-# Number of days the events should be kept (0 or any negative value: infinite duration)
+#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
+#-# delete events older than the configured value.
+#-# Default: 0
+# xwiki.plugin.activitystream.daystokeepevents=0
+
+#---------------------------------------
+# Watchlist Plugin
+#
+
+#-# [Since 3.1M1]
+#-# Indicate which mode to use for automatic document watching.
+#-# The possibles modes are the following:
+#-# * none: never automatically add document in watchlist
+#-# * all: add to watchlist any modified document
+#-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
+#-# * new: add to watchlist only newly created documents
+# xwiki.plugin.watchlist.automaticwatch=major
+
+#---------------------------------------
+# Statistics Plugin
+#
+
+#-# Note that this plugin is in charge of storing stats in the database, and offering some API to query them.
+#-# It doesn't provide any UI. If you wish to install a UI, please check the Statistics Application at
+#-# http://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
+#-# (this application is no longer bundled in XWiki starting with 8.0)
 
 #-# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...).
 #-# Enabled by default.
@@ -463,62 +557,9 @@ xwiki.stats.default=0
 #-# It is also possible to choose a different stats service to record statistics separately from XWiki.
 # xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
 
-#-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
-#-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins
-#-# in the xwiki.plugins property.
-#-# Uncomment and set the locations of the Dot and Neato executables
-# xwiki.plugin.graphviz.dotpath=c:/Program Files/ATT/GraphViz/bin/dot.exe
-# xwiki.plugin.graphviz.neatopath=c:/Program Files/ATT/GraphViz/bin/neato.exe
-
-xwiki.plugin.image.cache.capacity=30
-
-#-# Calendar Prev/Next Month bounds.
-#-# The calendar generates links to the previous/next months for a limited range, by default 6 months back and 12 months
-#-# after. A value of 0 means that there is no limit in that direction.
-# xwiki.calendar.bound.prev=6
-# xwiki.calendar.bound.next=12
-
-#-# Lucene search engine
-#-# Location where to place the lucene index files. The default is the "lucene" subdirectory in XWiki's permanent data
-#-# directory. Change it if you want to store indexes in another place.
-# xwiki.plugins.lucene.indexdir=/usr/local/xwiki/lucene
-#-# The text analyzer to use for indexing.
-# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
-#-# The number of seconds to wait between reindexes. A smaller value ensures that new documents will be indexed faster,
-#-# but with a minor performance reduction. Adjust according to your wiki load.
-# xwiki.plugins.lucene.indexinterval=20
-#-# The maximum size of the indexing queue. After this limit is reached, the reindex thread will have to wait until the
-#-# queue is consumed. Note that this does not affect documents submitted through the notification mechanism, only the
-#-# full reindex option.
-# xwiki.plugins.lucene.maxQueueSize=1000
-
-#-# [Since 2.0RC1]
-#-# Activity Stream plugin. 
-#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
-#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
-#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
-#-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
-#-#
-#-# Default: 1 
-# xwiki.plugin.activitystream.uselocalstore=1
-#-#
-#-# Default: 1
-# xwiki.plugin.activitystream.usemainstore=1
-#-#
-#-# Number of days the events should be kept (0 or any negative value: infinite duration)
-#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
-#-# delete events older than the configured value.
-#-# Default: 0
-# xwiki.plugin.activitystream.daystokeepevents=0
-
-#-# [Since 3.1M1]
-#-# Indicate which mode to use for automatic document watching.
-#-# The possibles modes are the following:
-#-# * none: never automatically add document in watchlist
-#-# * all: add to watchlist any modified document
-#-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
-#-# * new: add to watchlist only newly created documents
-# xwiki.plugin.watchlist.automaticwatch=major
+#---------------------------------------
+# Import/Export
+#
 
 #-# [Since 5.2RC1]
 #-# Indicate if WikiStream should be used when exporting a XAR in the export action.

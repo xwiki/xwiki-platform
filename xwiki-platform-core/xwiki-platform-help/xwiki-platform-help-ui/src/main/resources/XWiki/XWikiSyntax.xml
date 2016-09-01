@@ -349,11 +349,11 @@ $xwiki.get('ssx').use($doc.getFullName())##
 ##-----------------------------------------
 ## syntax-page display
 ##-----------------------------------------
+  #set ($subHeading = '===')
   (% id="syntax-page-content" %)(((
   #if(!$crtSection &amp;&amp; !$crtCategory)
     #syntax_displayCategories($syntaxMenu 'syntax.')
   #elseif (!$crtSection)
-    #set ($subHeading = '===')
     #syntax_displayCategory($crtCategory.children 'syntax.' '==')
   #else
       #syntax_displaySection($crtSection 'syntax.' false)      

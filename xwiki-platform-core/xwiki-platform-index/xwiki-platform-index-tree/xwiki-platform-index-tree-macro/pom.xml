@@ -38,6 +38,12 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tree-macro</artifactId>
       <version>${project.version}</version>
       <type>xar</type>

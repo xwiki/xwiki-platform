@@ -29,6 +29,8 @@ import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.XHTML10ComponentList;
+import org.xwiki.test.page.XWikiSyntax20ComponentList;
 
 import com.xpn.xwiki.plugin.feed.FeedPlugin;
 import com.xpn.xwiki.plugin.feed.FeedPluginApi;
@@ -42,6 +44,8 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 7.3M1
  */
+@XWikiSyntax20ComponentList
+@XHTML10ComponentList
 public class WebRssTest extends PageTest
 {
     private ScriptQuery query;

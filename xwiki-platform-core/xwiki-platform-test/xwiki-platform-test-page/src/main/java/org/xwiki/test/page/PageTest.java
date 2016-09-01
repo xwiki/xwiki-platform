@@ -21,9 +21,7 @@ package org.xwiki.test.page;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
@@ -58,6 +56,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
+import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -67,7 +66,6 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -90,11 +88,6 @@ public class PageTest
      */
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    /**
-     * The documents that have been loaded with {@link #loadPage(DocumentReference)}.
-     */
-    protected Map<DocumentReference, XWikiDocument> documents = new HashMap<>();
 
     /**
      * The stubbed request used to simulate a real Servlet Request.
@@ -169,7 +162,7 @@ public class PageTest
         path.add(documentReference.getName() + ".xml");
         XWikiDocument document = new XWikiDocument(documentReference);
         document.fromXML(getClass().getClassLoader().getResourceAsStream(StringUtils.join(path, '/')));
-        this.documents.put(documentReference, document);
+        this.xwiki.saveDocument(document, "registering document", true, this.context);
         return document;
     }
 
@@ -251,27 +244,11 @@ public class PageTest
             }
         );
 
-        // Make XWiki#getDocument() return the documents that have been loaded.
-        doAnswer(new Answer<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-            {
-                DocumentReference documentReference = invocation.getArgumentAt(0, DocumentReference.class);
-                XWikiDocument document = documents.get(documentReference);
-                if (document == null) {
-                    // Try to get the default document translation.
-                    document = documents.get(new DocumentReference(documentReference, null));
-                    if (document == null) {
-                        // Return a new document.
-                        document = new XWikiDocument(documentReference);
-                        // Avoid "Failed to find parser for the default syntax [XWiki 1.0]".
-                        document.setSyntax(Syntax.XWIKI_2_1);
-                    }
-                }
-                return document;
-            }
-        }).when(oldcore.getSpyXWiki()).getDocument(any(DocumentReference.class), any(XWikiContext.class));
+        // If the page uses the SSX/JSX plugins then provide a noop implementation (if the test needs to do something
+        // specific they'll need to override the mock).
+        SkinExtensionPluginApi voidPluginApi = mock(SkinExtensionPluginApi.class);
+        doReturn(voidPluginApi).when(xwiki).getPluginApi("jsx", context);
+        doReturn(voidPluginApi).when(xwiki).getPluginApi("ssx", context);
     }
 
     /**

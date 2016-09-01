@@ -32,14 +32,10 @@ import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
-import org.xwiki.rendering.internal.macro.include.IncludeMacro;
-import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
-import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
-import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.XWikiSyntax20ComponentList;
 import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.velocity.tools.RegexTool;
 
@@ -55,11 +51,7 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
-@ComponentList(value = {
-    IncludeMacro.class,
-    CurrentMacroDocumentReferenceResolver.class,
-    CurrentMacroEntityReferenceResolver.class
-})
+@XWikiSyntax20ComponentList
 public class LiveTableResultsTest extends PageTest
 {
     private QueryManagerScriptService queryService;

@@ -1,16 +1,14 @@
-/* Get the number of columns from the request parameter. */
-#set ($columns = "$!request.columns")
-#set ($columnsNumber = $mathtool.toInteger($columns))
-#if (!$columnsNumber || $columnsNumber <= 0)
-  #set ($columnsNumber = 1)
+#set ($maxColumns = "$!request.maxColumns")
+#set ($maxColumnsNumber = $mathtool.toInteger($maxColumns))
+#if (!$maxColumnsNumber || $maxColumnsNumber <= 0)
+  #set ($maxColumnsNumber = 50)
 #end
 /* Don't fill 100% because IE doesn't fit things properly in. */
 #set($columnsTotalWidth = 99)
 /* 1.5% padding right to all the columns except last one. */
 #set($columnPadding = 0.75)
-/* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. */
-#set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columnsNumber - 1)) / $columnsNumber))
-#set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
+
+/* Render generic css first */
 
 /* FIXME: this style should not be here, it's style for the container overall, not for the columns layout. For the moment
    it's here to minimize the number of requested css, since there are no other container rules at the moment (like
@@ -21,9 +19,6 @@
 
 .container-columns .column {
   float: left;
-  width: $computedColumnWidth%;
-  padding-right: $columnPadding%;
-  padding-left: $columnPadding%;
 }
 
 /* Responsiveness, upon the same limit than Twitter Bootstrap (768px) */
@@ -47,3 +42,16 @@
 .container-columns .last-column {
   padding-right: 0;
 }
+
+
+/* Generate column-specific css classes */
+#foreach($columns in [1..$maxColumnsNumber])
+  /* Compute the percent of the screen width of a column. Round so that the java upper rounding doesn't screw IE, and because 2 decimals should be enough for everyone. */
+  #set($rawComputedColumnWidth = (($columnsTotalWidth - $columnPadding * 2 * ($columns - 1)) / $columns))
+  #set($computedColumnWidth = $mathtool.roundTo(2, $rawComputedColumnWidth))
+  .container-columns-$columns .column{
+    width: $computedColumnWidth%;
+    padding-right: $columnPadding%;
+    padding-left: $columnPadding%;
+  }
+#end

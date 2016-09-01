@@ -75,7 +75,7 @@ public class ColumnsLayoutManager implements LayoutManager
 
         Map<String, Object> skinxParams = new HashMap<String, Object>();
         skinxParams.put("forceSkinAction", true);
-        skinxParams.put("columns", count);
+
         ssfx.use("uicomponents/container/columns.css", skinxParams);
 
         // add styles to all columns inside
@@ -100,7 +100,7 @@ public class ColumnsLayoutManager implements LayoutManager
         Map<String, String> clearFloatsParams = new HashMap<String, String>();
         clearFloatsParams.put(CLASS_ATTRIBUTE, "clearfloats");
         String oldClass = container.getParameter(CLASS_ATTRIBUTE);
-        String newClass = "container-columns";
+        String newClass = "container-columns container-columns-" + count;
         container.setParameter(CLASS_ATTRIBUTE, StringUtils.isEmpty(oldClass) ? newClass : oldClass + " " + newClass);
         container.addChild(new GroupBlock(clearFloatsParams));
     }

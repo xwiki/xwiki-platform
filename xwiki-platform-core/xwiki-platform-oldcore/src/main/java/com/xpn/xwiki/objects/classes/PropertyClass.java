@@ -333,8 +333,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     /**
      * Render content in the current document's context with the rights of the given user.
+     * 
+     * @since 8.3M2
      */
-    private String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
+    protected String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
         final XWikiContext context) throws Exception
     {
         return Utils.getComponent(SUExecutor.class)

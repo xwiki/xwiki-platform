@@ -24,6 +24,7 @@ import javax.script.ScriptContext;
 import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -108,7 +109,7 @@ public class ComputedFieldClass extends PropertyClass
         XWikiContext context)
     {
         String script = getScript();
-        String content = "";
+
         try {
             ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
             scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
@@ -116,13 +117,16 @@ public class ComputedFieldClass extends PropertyClass
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
                 ScriptContext.ENGINE_SCOPE);
 
-            String classSyntax =
-                context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
-            content = context.getDoc().getRenderedContent(script, classSyntax, context);
+            XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+
+            String result = renderContentInContext(script, classDocument.getSyntax().toIdString(),
+                classDocument.getAuthorReference(), context);
+
+            buffer.append(result);
         } catch (Exception e) {
+            // TODO: append a rendering style complete error instead
             buffer.append(e.getMessage());
         }
-        buffer.append(content);
     }
 
     @Override

@@ -245,9 +245,8 @@ public class Document extends Api
     }
 
     /**
-     * Return the full local space reference of the Document.
-     * For example a document located in sub-space <code>space11</code> of space <code>space1</code> will return
-     * <code>space1.space11</code>.
+     * Return the full local space reference of the Document. For example a document located in sub-space
+     * <code>space11</code> of space <code>space1</code> will return <code>space1.space11</code>.
      *
      * @return the name of the spaces of the document
      */
@@ -364,8 +363,8 @@ public class Document extends Api
     public String getRenderedTitle(String syntaxId) throws XWikiException
     {
         try {
-            return this.doc.getRenderedTitle(
-                Utils.getComponent(SyntaxFactory.class).createSyntaxFromIdString(syntaxId), getXWikiContext());
+            return this.doc.getRenderedTitle(Utils.getComponent(SyntaxFactory.class).createSyntaxFromIdString(syntaxId),
+                getXWikiContext());
         } catch (ParseException e) {
             LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
 
@@ -652,8 +651,8 @@ public class Document extends Api
 
     /**
      * @return the translated document's content if the wiki is multilingual, the locale is first checked in the URL,
-     *         the cookie, the user profile and finally the wiki configuration if not, the locale is the one on the
-     *         wiki configuration.
+     *         the cookie, the user profile and finally the wiki configuration if not, the locale is the one on the wiki
+     *         configuration.
      */
     public String getTranslatedContent() throws XWikiException
     {
@@ -973,7 +972,11 @@ public class Document extends Api
      */
     public int createNewObject(String classname) throws XWikiException
     {
-        return getDoc().createNewObject(classname, getXWikiContext());
+        int index = getDoc().createNewObject(classname, getXWikiContext());
+
+        updateAuthor();
+
+        return index;
     }
 
     /**
@@ -1214,8 +1217,7 @@ public class Document extends Api
     public String getXMLContent() throws XWikiException
     {
         String xml = this.doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil().substitute(
-            "s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
+        return getXWikiContext().getUtil().substitute("s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
             getXWikiContext().getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
                 xml));
     }
@@ -1672,8 +1674,8 @@ public class Document extends Api
         }
     }
 
-    public List<Delta> getContentDiff(Document origdoc, Document newdoc) throws XWikiException,
-        DifferentiationFailedException
+    public List<Delta> getContentDiff(Document origdoc, Document newdoc)
+        throws XWikiException, DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1701,8 +1703,8 @@ public class Document extends Api
         }
     }
 
-    public List<Delta> getXMLDiff(Document origdoc, Document newdoc) throws XWikiException,
-        DifferentiationFailedException
+    public List<Delta> getXMLDiff(Document origdoc, Document newdoc)
+        throws XWikiException, DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1730,8 +1732,8 @@ public class Document extends Api
         }
     }
 
-    public List<Delta> getRenderedContentDiff(Document origdoc, Document newdoc) throws XWikiException,
-        DifferentiationFailedException
+    public List<Delta> getRenderedContentDiff(Document origdoc, Document newdoc)
+        throws XWikiException, DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1860,9 +1862,8 @@ public class Document extends Api
 
             return wrapAttachmentDiff(this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext()));
         } catch (Exception e) {
-            java.lang.Object[] args =
-                { (origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
-                (newdoc != null) ? newdoc.getVersion() : null };
+            java.lang.Object[] args = { (origdoc != null) ? origdoc.getFullName() : null,
+            (origdoc != null) ? origdoc.getVersion() : null, (newdoc != null) ? newdoc.getVersion() : null };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
@@ -1952,8 +1953,8 @@ public class Document extends Api
     public boolean hasAccessLevel(String level)
     {
         try {
-            return getXWikiContext().getWiki().getRightService()
-                .hasAccessLevel(level, getXWikiContext().getUser(), this.getPrefixedFullName(), getXWikiContext());
+            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, getXWikiContext().getUser(),
+                this.getPrefixedFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1963,8 +1964,8 @@ public class Document extends Api
     public boolean hasAccessLevel(String level, String user)
     {
         try {
-            return getXWikiContext().getWiki().getRightService()
-                .hasAccessLevel(level, user, this.getPrefixedFullName(), getXWikiContext());
+            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, user, this.getPrefixedFullName(),
+                getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -2083,6 +2084,9 @@ public class Document extends Api
     {
         if (hasAccessLevel("edit")) {
             getDoc().insertText(text, marker, getXWikiContext());
+
+            updateAuthor();
+            updateContentAuthor();
         }
     }
 
@@ -2222,21 +2226,45 @@ public class Document extends Api
     public void setTitle(String title)
     {
         getDoc().setTitle(title);
+
+        updateAuthor();
+        updateContentAuthor();
     }
 
     public void setCustomClass(String customClass)
     {
         getDoc().setCustomClass(customClass);
+
+        updateAuthor();
     }
 
     public void setParent(String parent)
     {
         getDoc().setParent(parent);
+
+        updateAuthor();
+    }
+
+    private void updateContentAuthor()
+    {
+        // Temporary set as content author of the document the current script author (until the document is saved)
+        XWikiContext xcontext = getXWikiContext();
+        getDoc().setContentAuthorReference(xcontext.getAuthorReference());
+    }
+
+    private void updateAuthor()
+    {
+        // Temporary set as author of the document the current script author (until the document is saved)
+        XWikiContext xcontext = getXWikiContext();
+        getDoc().setAuthorReference(xcontext.getAuthorReference());
     }
 
     public void setContent(String content)
     {
         getDoc().setContent(content);
+
+        updateAuthor();
+        updateContentAuthor();
     }
 
     /**
@@ -2247,6 +2275,9 @@ public class Document extends Api
     public void setContent(XDOM content) throws XWikiException
     {
         getDoc().setContent(content);
+
+        updateAuthor();
+        updateContentAuthor();
     }
 
     /**
@@ -2256,6 +2287,9 @@ public class Document extends Api
     public void setSyntax(Syntax syntax)
     {
         getDoc().setSyntax(syntax);
+
+        updateAuthor();
+        updateContentAuthor();
     }
 
     /**
@@ -2266,11 +2300,16 @@ public class Document extends Api
     public void setSyntaxId(String syntaxId)
     {
         getDoc().setSyntaxId(syntaxId);
+
+        updateAuthor();
+        updateContentAuthor();
     }
 
     public void setDefaultTemplate(String dtemplate)
     {
         getDoc().setDefaultTemplate(dtemplate);
+
+        updateAuthor();
     }
 
     public void setComment(String comment)
@@ -2329,7 +2368,7 @@ public class Document extends Api
                     saveDocument(comment, minorEdit);
                 } else {
                     java.lang.Object[] args =
-                        {getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki()};
+                        { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki() };
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                         "Access denied in edit mode on document [{0}]. The wiki [{1}] is in read only mode.", null,
@@ -2422,13 +2461,22 @@ public class Document extends Api
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
     {
         // Call to getDoc() ensures that we are working on a clone()
-        return new com.xpn.xwiki.api.Object(getDoc().addXObjectFromRequest(getXWikiContext()), getXWikiContext());
+        com.xpn.xwiki.api.Object obj =
+            new com.xpn.xwiki.api.Object(getDoc().addXObjectFromRequest(getXWikiContext()), getXWikiContext());
+
+        updateAuthor();
+
+        return obj;
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className) throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, getXWikiContext()),
-            getXWikiContext());
+        com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(
+            getDoc().addObjectFromRequest(className, getXWikiContext()), getXWikiContext());
+
+        updateAuthor();
+
+        return obj;
     }
 
     public List<Object> addObjectsFromRequest(String className) throws XWikiException
@@ -2438,8 +2486,12 @@ public class Document extends Api
 
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className, String prefix) throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, prefix, getXWikiContext()),
-            getXWikiContext());
+        com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(
+            getDoc().addObjectFromRequest(className, prefix, getXWikiContext()), getXWikiContext());
+
+        updateAuthor();
+
+        return obj;
     }
 
     public List<Object> addObjectsFromRequest(String className, String prefix) throws XWikiException
@@ -2449,13 +2501,20 @@ public class Document extends Api
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
+
+        updateAuthor();
+
         return wrapped;
     }
 
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, getXWikiContext()),
-            getXWikiContext());
+        com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(
+            getDoc().updateObjectFromRequest(className, getXWikiContext()), getXWikiContext());
+
+        updateAuthor();
+
+        return obj;
     }
 
     public List<Object> updateObjectsFromRequest(String className) throws XWikiException
@@ -2465,8 +2524,12 @@ public class Document extends Api
 
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className, String prefix) throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, prefix, getXWikiContext()),
-            getXWikiContext());
+        com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(
+            getDoc().updateObjectFromRequest(className, prefix, getXWikiContext()), getXWikiContext());
+
+        updateAuthor();
+
+        return obj;
     }
 
     public List<Object> updateObjectsFromRequest(String className, String prefix) throws XWikiException
@@ -2476,6 +2539,9 @@ public class Document extends Api
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
+
+        updateAuthor();
+
         return wrapped;
     }
 
@@ -2558,7 +2624,8 @@ public class Document extends Api
         } else {
             java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null, args);
+                "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null,
+                args);
         }
     }
 
@@ -2629,10 +2696,12 @@ public class Document extends Api
                 nb++;
             }
         }
+
         if (nb > 0) {
             getXWikiContext().getWiki().saveDocument(getDoc(), getXWikiContext());
             this.initialDoc = this.doc;
         }
+
         return nb;
     }
 
@@ -2645,7 +2714,10 @@ public class Document extends Api
             // TODO Log the error and let the user know about it
         } catch (IOException e) {
             // TODO Log the error and let the user know about it
+        } finally {
+            updateAuthor();
         }
+
         return null;
     }
 
@@ -2656,7 +2728,10 @@ public class Document extends Api
                 getXWikiContext());
         } catch (XWikiException e) {
             // TODO Log the error and let the user know about it
+        } finally {
+            updateAuthor();
         }
+
         return null;
     }
 
@@ -2692,6 +2767,8 @@ public class Document extends Api
     public void setValidationScript(String validationScript)
     {
         getDoc().setValidationScript(validationScript);
+
+        updateAuthor();
     }
 
     /**
@@ -2718,9 +2795,8 @@ public class Document extends Api
      */
     public void rename(DocumentReference newReference) throws XWikiException
     {
-        if (hasAccessLevel("delete")
-            && this.context.getWiki().checkAccess("edit",
-                this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
+            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
             this.getDoc().rename(newReference, getXWikiContext());
         }
     }
@@ -2747,9 +2823,8 @@ public class Document extends Api
      */
     public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete")
-            && this.context.getWiki().checkAccess("edit",
-                this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
+            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
             this.getDoc().rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
         }
     }
@@ -2796,9 +2871,8 @@ public class Document extends Api
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete")
-            && this.context.getWiki().checkAccess("edit",
-                this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
+            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
@@ -2809,10 +2883,9 @@ public class Document extends Api
             while (counter > 0) {
                 counter--;
                 if (!actuallyChildren.contains(childDocumentNames.get(counter))
-                    && !this.context.getWiki()
-                        .checkAccess("edit",
-                            this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context),
-                            this.context)) {
+                    && !this.context.getWiki().checkAccess("edit",
+                        this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context),
+                        this.context)) {
                     return;
                 }
             }
@@ -2875,10 +2948,13 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
-            LOGGER.error("Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId
-                + "]", ex);
+            LOGGER.error(
+                "Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]", ex);
 
             return false;
+        } finally {
+            updateAuthor();
+            updateContentAuthor();
         }
 
         return true;

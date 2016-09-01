@@ -995,4 +995,19 @@ public class XWikiContext extends Hashtable<Object, Object>
             executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this);
         }
     }
+
+    /**
+     * @return the reference of the user being used to check script and programming right (i.e. the author of the
+     *         current script)
+     * @since 8.3M2
+     */
+    public DocumentReference getAuthorReference()
+    {
+        XWikiDocument sdoc = (XWikiDocument) get("sdoc");
+        if (sdoc == null) {
+            sdoc = getDoc();
+        }
+
+        return sdoc != null ? sdoc.getContentAuthorReference() : getUserReference();
+    }
 }

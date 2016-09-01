@@ -1168,8 +1168,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getProgress().startStep(getDocumentReference(), "document.progress.render.cache",
                 "Try to get content from the cache");
 
-            String renderedContent =
-                getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, xcontext);
+            String renderedContent = getRenderingCache().getRenderedContent(tdoc.getDocumentReferenceWithLocale(),
+                translatedContent, xcontext);
 
             if (renderedContent == null) {
                 getProgress().startStep(getDocumentReference(), "document.progress.render.execute", "Execute content");
@@ -1212,7 +1212,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // rights
         Object currrentSdoc = context.get("sdoc");
         try {
-            context.put("sdoc", this);
+            // If we execute a translation use translated document as secure document
+            XWikiDocument tdoc = getTranslatedDocument(context);
+
+            context.put("sdoc", tdoc);
 
             return display(targetSyntax, false, isolateVelocityMacros, false, true);
         } finally {

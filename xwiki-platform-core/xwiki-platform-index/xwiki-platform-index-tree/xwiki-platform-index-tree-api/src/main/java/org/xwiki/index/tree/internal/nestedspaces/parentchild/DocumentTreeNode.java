@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -56,6 +57,9 @@ public class DocumentTreeNode extends org.xwiki.index.tree.internal.nestedpages.
     @Inject
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     protected List<DocumentReference> getChildDocuments(DocumentReference documentReference, int offset, int limit)

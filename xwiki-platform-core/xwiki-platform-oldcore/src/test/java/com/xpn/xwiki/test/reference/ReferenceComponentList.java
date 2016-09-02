@@ -44,8 +44,6 @@ import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
-import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
-import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
@@ -115,8 +113,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultReferenceEntityReferenceResolver.class,
     DefaultSymbolScheme.class,
     CurrentReferenceObjectReferenceResolver.class,
-    CurrentMacroDocumentReferenceResolver.class,
-    CurrentMacroEntityReferenceResolver.class,
 
     DefaultModelConfiguration.class
 })

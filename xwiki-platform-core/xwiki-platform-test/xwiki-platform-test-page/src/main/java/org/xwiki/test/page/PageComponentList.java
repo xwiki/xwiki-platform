@@ -60,6 +60,8 @@ import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
@@ -223,7 +225,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     TextAreaMetaClass.class,
     StringMetaClass.class,
     BooleanMetaClass.class,
-    NumberMetaClass.class
+    NumberMetaClass.class,
+
+    // Macro Resolver/Serializer
+    CurrentMacroDocumentReferenceResolver.class,
+    CurrentMacroEntityReferenceResolver.class,
 })
 @Inherited
 public @interface PageComponentList

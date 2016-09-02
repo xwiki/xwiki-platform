@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.page;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -37,7 +34,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -46,7 +42,6 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -56,17 +51,14 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
-import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,8 +73,6 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 public class PageTest
 {
-    private static final String XWIKI = "xwiki";
-
     /**
      * Page tests use the Oldcore rule to configure some base mocks (such as XWiki).
      */
@@ -224,31 +214,13 @@ public class PageTest
             eq(context))).thenReturn(true);
 
         // Set up URL Factory
-        doReturn(XWIKI).when(xwiki).getWebAppPath(context);
-        context.setURL(new URL("http://localhost:8080/xwiki/bin/Main/WebHome"));
-        doReturn(true).when(xwiki).showViewAction(context);
-        context.setURLFactory(new XWikiServletURLFactory(context));
-        doReturn("/bin/").when(xwiki).getServletPath(XWIKI, context);
+        URLFactorySetup.setUp(xwiki, context);
 
-        // All translation return their key as translation values
-        LocalizationScriptService lss = mock(LocalizationScriptService.class);
-        mocker.registerComponent(ScriptService.class, "localization", lss);
-        when(lss.render(anyString())).thenAnswer(
-            new Answer() {
-                @Override
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    // Return the translation key as the value
-                    return invocationOnMock.getArgumentAt(0, String.class);
-                }
-            }
-        );
+        // Set up Localization
+        LocalizationSetup.setUp(mocker);
 
-        // If the page uses the SSX/JSX plugins then provide a noop implementation (if the test needs to do something
-        // specific they'll need to override the mock).
-        SkinExtensionPluginApi voidPluginApi = mock(SkinExtensionPluginApi.class);
-        doReturn(voidPluginApi).when(xwiki).getPluginApi("jsx", context);
-        doReturn(voidPluginApi).when(xwiki).getPluginApi("ssx", context);
+        // Set up Skin Extensions
+        SkinExtensionSetup.setUp(xwiki, context);
     }
 
     /**

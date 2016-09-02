@@ -33,7 +33,7 @@ import org.suigeneris.jrcs.rcs.InvalidFileFormatException;
 import org.suigeneris.jrcs.util.ToString;
 
 /**
- * diff & patch utility.
+ * Diff and patch utility.
  *
  * @version $Id$
  * @since 1.2M1
@@ -68,7 +68,7 @@ public class XWikiPatchUtils
     }
 
     /**
-     * From {@link Node#patch(List, boolean)}.
+     * From {@link org.suigeneris.jrcs.rcs.impl.Node#patch(List, boolean)}.
      *
      * @param orig - text to patch, List&lt;String&gt; of lines.
      * @param diff - diff to patch, {@link Diff} format

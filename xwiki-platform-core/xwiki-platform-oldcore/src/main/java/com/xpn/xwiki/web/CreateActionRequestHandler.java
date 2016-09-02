@@ -629,7 +629,7 @@ public class CreateActionRequestHandler
 
     /**
      * @return the {@link VelocityContext} for the context we are handling
-     * @deprecated since 8.3M1, use {@link #getScriptContext()} instead
+     * @deprecated since 8.3M1, use {@link #getCurrentScriptContext()} instead
      */
     @Deprecated
     public VelocityContext getVelocityContext()

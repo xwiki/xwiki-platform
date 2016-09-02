@@ -82,8 +82,8 @@ public class PluginApi<T extends XWikiPluginInterface> extends Api
      * Set the inner plugin object.
      *
      * @param plugin The wrapped plugin object.
-     * @todo Is this really needed? The inner plugin should not be changed.
      */
+    // TODO: Is this really needed? The inner plugin should not be changed.
     public void setPlugin(T plugin)
     {
         this.plugin = plugin;

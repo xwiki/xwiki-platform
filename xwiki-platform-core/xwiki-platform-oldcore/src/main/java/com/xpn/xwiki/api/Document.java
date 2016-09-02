@@ -608,8 +608,8 @@ public class Document extends Api
     }
 
     /**
-     * @return the Locale of the default version of the document (usually {@value Locale#ROOT} or
-     *         {@value Locale#ENGLISH})
+     * @return the Locale of the default version of the document (usually {@link Locale#ROOT} or
+     *  {@link Locale#ENGLISH})
      * @since 8.0M1
      */
     public Locale getDefaultLocale()
@@ -881,7 +881,7 @@ public class Document extends Api
      * Get the URL to do a given action on this document.
      *
      * @param action what to do to the document for example "view", "edit" or "inline".
-     * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
+     * @param queryString parameters to pass in the request eg: {code paramA=value1&paramB=value2}
      * @return the URL of this document with the given action and queryString as parameters.
      * @see #getExternalURL(String, String) for an absolute URL which can used outside of the site.
      */
@@ -918,7 +918,7 @@ public class Document extends Api
      * Get the URL to do a given action on this document.
      *
      * @param action what to do to the document for example "view", "edit" or "inline".
-     * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
+     * @param queryString parameters to pass in the request eg: {code paramA=value1&paramB=value2}
      * @return the URL of this document with the given action and queryString as parameters.
      * @see #getURL() for a relative URL which can only be used inside of the site.
      */
@@ -1431,9 +1431,9 @@ public class Document extends Api
      * before or after the field
      *
      * @param fieldname fieldname to display the pretty name of
-     * @param object Object to find the class to display the pretty name of
      * @param showMandatory true to display a mandatory sign
      * @param before true if the mandatory sign should be before the field
+     * @param obj Object to find the class to display the pretty name of
      * @return the pretty name display of the field.
      */
     public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, Object obj)
@@ -1464,7 +1464,7 @@ public class Document extends Api
      * Displays the tooltip of the given field of the given object.
      *
      * @param fieldname fieldname to display the tooltip of
-     * @param object Object to find the class to display the tooltip of
+     * @param obj Object to find the class to display the tooltip of
      * @return the tooltip display of the field.
      */
     public String displayTooltip(String fieldname, Object obj)
@@ -1534,7 +1534,7 @@ public class Document extends Api
      * inline context will display in edit, view context in view) This function can return html inside and html macro
      *
      * @param fieldname fieldname to display
-     * @param object object from which to take the field
+     * @param obj object from which to take the field
      * @return the display of the field.
      */
     public String display(String fieldname, Object obj)
@@ -1571,7 +1571,7 @@ public class Document extends Api
      *
      * @param fieldname fieldname to display
      * @param mode display mode to use (view, edit, hidden, search)
-     * @param object the object containing the field to display
+     * @param obj the object containing the field to display
      * @return the display of the field.
      */
     public String display(String fieldname, String mode, Object obj)
@@ -1589,7 +1589,7 @@ public class Document extends Api
      * @param fieldname fieldname to display
      * @param mode display mode to use (view, edit, hidden, search)
      * @param prefix prefix to use for the form names
-     * @param object the object containing the field to display
+     * @param obj the object containing the field to display
      * @return the display of the field.
      */
     public String display(String fieldname, String mode, String prefix, Object obj)

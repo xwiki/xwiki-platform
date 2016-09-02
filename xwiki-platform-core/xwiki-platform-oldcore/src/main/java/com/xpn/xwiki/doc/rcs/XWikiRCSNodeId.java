@@ -26,7 +26,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
- * Composite ID component used in {@link XWikiRCSNodeInfo} & {@link XWikiRCSNodeContent}. Immutable.
+ * Composite ID component used in {@link XWikiRCSNodeInfo} and {@link XWikiRCSNodeContent}. Immutable.
  *
  * @version $Id$
  * @since 1.2M1

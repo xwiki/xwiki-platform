@@ -683,8 +683,8 @@ public class XWiki extends Api
      * &lt;/code&gt;
      * </pre>
      *
-     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parameterizedWhereClause the HQL where clause. For example
+     *      {code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -717,8 +717,8 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
      *
      * @param wikiName the name of the wiki where to search.
-     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parameterizedWhereClause the HQL where clause. For example
+     *      {code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -746,8 +746,8 @@ public class XWiki extends Api
      * Search spaces by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
-     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parametrizedSqlClause the HQL where clause. For example
+     *      {code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -766,8 +766,8 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
-     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param parametrizedSqlClause The HQL where clause. For example
+     *      {code where doc.fullName <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}</code>
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
@@ -1056,10 +1056,8 @@ public class XWiki extends Api
      * <p>
      * If the property is not set on any level then empty String is returned.
      * 
-     * @param preferenceKey the name of the preference key
+     * @param preference the name of the preference key
      * @param spaceReference the reference of the space
-     * @param defaultValue the value to return if the preference can't be found
-     * @param context the XWiki context
      * @return the value of the preference or empty String if it could not be found
      * @since 7.4M1
      */
@@ -1073,10 +1071,9 @@ public class XWiki extends Api
      * <p>
      * If the property is not set on any level then <code>defaultValue</code> is returned.
      * 
-     * @param preferenceKey the name of the preference key
+     * @param preference the name of the preference key
      * @param spaceReference the reference of the space
      * @param defaultValue the value to return if the preference can't be found
-     * @param context the XWiki context
      * @return the value of the preference or <code>defaultValue</code> if it could not be found
      * @since 7.4M1
      */
@@ -1354,9 +1351,9 @@ public class XWiki extends Api
 
     /**
      * Privileged API to create a new user from the request.
-     * <p/>
+     * <p>
      * This API is used by the RegisterNewUser wiki page.
-     * <p/>
+     * <p>
      * This version sends a validation email to the user. Configuration of validation email is in the XWiki Preferences.
      *
      * @param withValidation true to send the validation email
@@ -1402,7 +1399,7 @@ public class XWiki extends Api
      * validation information are taken from the request object
      *
      * @param withConfirmEmail true to send a account confirmation email/false to not send it
-     * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
+     * @return Success of Failure code (0 for success, -1 for missing programming rights, &gt; 0 for other errors
      * @throws XWikiException
      */
     public int validateUser(boolean withConfirmEmail) throws XWikiException
@@ -1810,7 +1807,8 @@ public class XWiki extends Api
      *
      * @param reference the reference to the entity for which to return the URL for
      * @param action the mode in which to access the entity (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the entity
      * @throws XWikiException if the URL could not be generated properly
      * @since 7.2M1
@@ -1861,7 +1859,8 @@ public class XWiki extends Api
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      */
@@ -1879,7 +1878,8 @@ public class XWiki extends Api
      *
      * @param reference the reference to the document for which to return the URL for
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      * @since 3.0M3
@@ -1898,7 +1898,8 @@ public class XWiki extends Api
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({code name1=value1&name2=value=2}) including
+     *            encoding
      * @param anchor the anchor that points at a location within the passed document name
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
@@ -1947,7 +1948,6 @@ public class XWiki extends Api
      * Generate and return an unescaped user display name.
      *
      * @param userReference the user reference
-     * @param context the XWiki context
      * @return the unescaped display user name
      * @since 6.4RC1
      */

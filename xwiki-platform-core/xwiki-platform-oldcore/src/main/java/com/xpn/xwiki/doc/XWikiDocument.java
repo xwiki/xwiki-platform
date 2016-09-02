@@ -1060,7 +1060,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
      * @param parent the reference of the parent relative to the document
-     * @deprecated since 2.2M1 used {@link #setParentReference(DocumentReference)} instead
+     * @deprecated since 2.2M1, use {@link #setParentReference(EntityReference)} instead
      */
     @Deprecated
     public void setParent(String parent)
@@ -3746,13 +3746,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Create and/or update objects in a document given a list of HTTP parameters of the form
-     * '<spacename>.<classname>_<number>_<propertyname>'. If the object already exists, the field is replace by the
-     * given value. If the object doesn't exist in the document, it is created then the property <propertyname> is
-     * initialized with the given value. An object is only created if the given '<number>' is 'one-more' than the
-     * existing number of objects. For example, if the document already has 2 objects of type 'Space.Class', then it
-     * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
-     * 'Space.Class_42_prop=foobar' for example, will be ignore.
+     * Create and/or update objects in a document given a list of HTTP parameters of the form {code
+     * <spacename>.<classname>_<number>_<propertyname>}. If the object already exists, the field is replace by the given
+     * value. If the object doesn't exist in the document, it is created then the property {code <propertyname>} is
+     * initialized with the given value. An object is only created if the given {code <number>} is 'one-more' than the
+     * existing number of objects. For example, if the document already has 2 objects of type {code Space.Class}, then
+     * it will create a new object only with {code Space.Class_2_prop=something}. Every other parameter like {code
+     * Space.Class_42_prop=foobar} for example, will be ignore.
      *
      * @param eform is form information that contains all the query parameters
      * @param context
@@ -5089,12 +5089,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Get a list of unique links from this document to others documents.
-     * <p>
      * <ul>
      * <li>xwiki/1.0 content: get the unique links associated to document from database. This is stored when the
      * document is saved. You can use "backlinks" in XWikiPreferences or "xwiki.backlinks" in xwiki.cfg file to enable
      * links storage in the database.</li>
-     * <li>Other content: call {@link #getUniqueLinkedPages(XWikiContext)} and generate the List</li>.
+     * <li>Other content: call {@link #getUniqueLinkedPages(XWikiContext)} and generate the List.</li>
      * </ul>
      *
      * @param context the XWiki context
@@ -7638,7 +7637,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * future objects will have new (different) numbers. However, on some storage engines the counter will be reset if
      * the document is removed from the cache and reloaded from the persistent storage.
      *
-     * @param classReference The XClass reference of the XObjects to be removed.
+     * @param reference The XClass reference of the XObjects to be removed.
      * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
      *         was in the current document.
      * @since 5.0M1

@@ -39,12 +39,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 
 /**
- * <p>
  * A filter that dispatches requests to the right action, depending on the button that was pressed in the editing form.
  * This is needed since the browser cannot send the form data to different URLs depending on the button pressed, and an
  * XHTML form has only one target URL. In previous versions of XWiki this was accomplished using javascript code, with a
  * fall-back on a pseudo-dispatcher inside the {@link PreviewAction}, which was on obvious case of bad code design.
- * </p>
  * <p>
  * The filter dispatches requests based on the presence of a request parameter starting with <tt>action_</tt> followed
  * by the name of the struts action that should actually process the request. For example, the button that does
@@ -56,7 +54,6 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  *
  * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
  * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
- * </p>
  *
  * @version $Id$
  * @since 1.8M1

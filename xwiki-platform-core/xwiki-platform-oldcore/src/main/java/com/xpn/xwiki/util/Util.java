@@ -826,7 +826,6 @@ public class Util
     /**
      * Normalize the given language code. Converts the given language code to lower case and checks its validity (i.e.
      * whether it is an ISO 639 language code or the string "default").
-     * <p>
      *
      * <pre>
      * Util.normalizeLanguage(null)      = null
@@ -838,8 +837,6 @@ public class Util
      * Util.normalizeLanguage("en")      = "en"
      * Util.normalizeLanguage("DE_at")   = "de_AT"
      * </pre>
-     *
-     * </p>
      *
      * @param languageCode the language code to normalize
      * @return normalized language code or the string "default" if the code is invalid

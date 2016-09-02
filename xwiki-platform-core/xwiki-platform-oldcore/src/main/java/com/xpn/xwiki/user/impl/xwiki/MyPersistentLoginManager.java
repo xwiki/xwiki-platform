@@ -430,8 +430,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      *
      * @param clearText The text to be encrypted.
      * @return clearText, encrypted.
-     * @todo Optimize this code by creating the Cipher only once.
      */
+    // TODO: Optimize this code by creating the Cipher only once.
     public String encryptText(String clearText)
     {
         try {
@@ -586,9 +586,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param request The servlet request.
      * @param response The servlet response.
      * @return The username value, or <tt>null</tt> if not found or the cookie isn't valid.
-     * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
     @Override
+    // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
     public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
@@ -610,9 +610,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param request The servlet request.
      * @param response The servlet response.
      * @return The password value, or <tt>null</tt> if not found or the cookie isn't valid.
-     * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
     @Override
+    // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);

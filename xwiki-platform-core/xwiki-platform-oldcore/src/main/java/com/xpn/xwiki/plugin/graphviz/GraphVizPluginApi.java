@@ -100,8 +100,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
     }
 
     /**
-     * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename
-     * which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename.
      *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -115,7 +114,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
-     * the filename which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
+     * the filename.
      *
      * @param content the dot source code
      * @param extension the output file extension

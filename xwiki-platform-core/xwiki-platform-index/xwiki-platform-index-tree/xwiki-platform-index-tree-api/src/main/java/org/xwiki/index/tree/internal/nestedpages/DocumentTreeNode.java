@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +32,13 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,9 +49,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.tree.TreeNode;
 
 /**
  * The document tree node.
@@ -59,7 +60,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("document")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentTreeNode extends AbstractEntityTreeNode
+public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initializable
 {
     @Inject
     @Named("count")
@@ -70,52 +71,54 @@ public class DocumentTreeNode extends AbstractEntityTreeNode
     protected QueryFilter hiddenDocumentQueryFilter;
 
     @Inject
-    protected Provider<XWikiContext> xcontextProvider;
-
-    @Inject
     private LocalizationContext localizationContext;
 
     @Inject
     private ContextualAuthorizationManager authorization;
 
-    @Override
-    public List<String> getChildren(String nodeId, int offset, int limit)
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
+    /**
+     * We use a {@link LinkedHashMap} because the order of the key is important.
+     */
+    private Map<String, TreeNode> nonLeafChildNodes = new LinkedHashMap<String, TreeNode>();
+
+    /**
+     * Default constructor.
+     */
+    public DocumentTreeNode()
     {
-        EntityReference documentReference = resolve(nodeId);
-        if (documentReference != null && documentReference.getType() == EntityType.DOCUMENT) {
-            try {
-                return getChildren(new DocumentReference(documentReference), offset, limit);
-            } catch (Exception e) {
-                this.logger.warn("Failed to retrieve the children of [{}]. Root cause [{}].", nodeId,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        return Collections.emptyList();
+        super("document");
     }
 
+    @Override
+    public void initialize() throws InitializationException
+    {
+        String[] nonLeafChildNodeTypes = new String[] {"translations", "attachments", "classProperties", "objects"};
+        ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
+        try {
+            for (String nonLeafChildNodeType : nonLeafChildNodeTypes) {
+                this.nonLeafChildNodes.put(nonLeafChildNodeType,
+                    contextComponentManager.getInstance(TreeNode.class, nonLeafChildNodeType));
+            }
+        } catch (ComponentLookupException e) {
+            throw new InitializationException("Failed to lookup the child components.", e);
+        }
+    }
+
+    @Override
     protected List<String> getChildren(DocumentReference documentReference, int offset, int limit) throws Exception
     {
         List<String> children = new ArrayList<String>();
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
         String serializedDocRef = this.defaultEntityReferenceSerializer.serialize(documentReference);
 
         if (offset == 0) {
-            if (hasTranslations(document, xcontext)) {
-                children.add("translations:" + serializedDocRef);
-            }
-
-            if (hasAttachments(document)) {
-                children.add("attachments:" + serializedDocRef);
-            }
-
-            if (hasClassProperties(document)) {
-                children.add("classProperties:" + serializedDocRef);
-            }
-
-            if (hasObjects(document)) {
-                children.add("objects:" + serializedDocRef);
+            for (Map.Entry<String, TreeNode> entry : this.nonLeafChildNodes.entrySet()) {
+                if (hasChild(entry.getKey(), entry.getValue(), documentReference)) {
+                    children.add(entry.getKey() + ':' + serializedDocRef);
+                }
             }
 
             if (showAddDocument(documentReference)) {
@@ -188,40 +191,13 @@ public class DocumentTreeNode extends AbstractEntityTreeNode
     }
 
     @Override
-    public int getChildCount(String nodeId)
-    {
-        EntityReference documentReference = resolve(nodeId);
-        if (documentReference != null && documentReference.getType() == EntityType.DOCUMENT) {
-            try {
-                return getChildCount(new DocumentReference(documentReference));
-            } catch (Exception e) {
-                this.logger.warn("Failed to count the children of [{}]. Root cause [{}].", nodeId,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        return 0;
-    }
-
     protected int getChildCount(DocumentReference documentReference) throws Exception
     {
         int count = 0;
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-
-        if (hasTranslations(document, xcontext)) {
-            count++;
-        }
-
-        if (hasAttachments(document)) {
-            count++;
-        }
-
-        if (hasClassProperties(document)) {
-            count++;
-        }
-
-        if (hasObjects(document)) {
-            count++;
+        for (Map.Entry<String, TreeNode> entry : this.nonLeafChildNodes.entrySet()) {
+            if (hasChild(entry.getKey(), entry.getValue(), documentReference)) {
+                count++;
+            }
         }
 
         if (showAddDocument(documentReference)) {
@@ -259,20 +235,6 @@ public class DocumentTreeNode extends AbstractEntityTreeNode
     }
 
     @Override
-    public String getParent(String nodeId)
-    {
-        EntityReference documentReference = resolve(nodeId);
-        if (documentReference != null && documentReference.getType() == EntityType.DOCUMENT) {
-            try {
-                return serialize(getParent(new DocumentReference(documentReference)));
-            } catch (Exception e) {
-                this.logger.warn("Failed to retrieve the parent of [{}]. Root cause [{}].", nodeId,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        return null;
-    }
-
     protected EntityReference getParent(DocumentReference documentReference) throws Exception
     {
         if (getDefaultDocumentName().equals(documentReference.getName())) {
@@ -287,33 +249,27 @@ public class DocumentTreeNode extends AbstractEntityTreeNode
         }
     }
 
-    private boolean hasTranslations(XWikiDocument document, XWikiContext xcontext) throws Exception
-    {
-        return Boolean.TRUE.equals(getProperties().get("showTranslations"))
-            && !document.getTranslationLocales(xcontext).isEmpty();
-    }
-
-    private boolean hasAttachments(XWikiDocument document)
-    {
-        return Boolean.TRUE.equals(getProperties().get("showAttachments")) && !document.getAttachmentList().isEmpty();
-    }
-
-    private boolean hasClassProperties(XWikiDocument document)
-    {
-        return Boolean.TRUE.equals(getProperties().get("showClassProperties"))
-            && !document.getXClass().getPropertyList().isEmpty();
-    }
-
-    private boolean hasObjects(XWikiDocument document)
-    {
-        return Boolean.TRUE.equals(getProperties().get("showObjects")) && !document.getXObjects().isEmpty();
-    }
-
     private boolean showAddDocument(DocumentReference documentReference)
     {
         return Boolean.TRUE.equals(getProperties().get("showAddDocument"))
             && "reference".equals(getProperties().get("hierarchyMode"))
             && getDefaultDocumentName().equals(documentReference.getName())
             && this.authorization.hasAccess(Right.EDIT, documentReference.getParent());
+    }
+
+    private boolean hasChild(String nodeType, TreeNode childNode, DocumentReference documentReference)
+    {
+        return hasChild(nodeType, childNode, this.defaultEntityReferenceSerializer.serialize(documentReference));
+    }
+
+    private boolean hasChild(String nodeType, TreeNode childNode, String serializedDocumentReference)
+    {
+        String showChild = "show" + StringUtils.capitalize(nodeType);
+        if (Boolean.TRUE.equals(getProperties().get(showChild))) {
+            String nodeId = nodeType + ':' + serializedDocumentReference;
+            childNode.getProperties().putAll(getProperties());
+            return childNode.getChildCount(nodeId) > 0;
+        }
+        return false;
     }
 }

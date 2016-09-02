@@ -23,15 +23,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,8 +45,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("classProperties")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ClassPropertiesTreeNode extends DocumentTreeNode
+public class ClassPropertiesTreeNode extends AbstractDocumentTreeNode
 {
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Default constructor.
+     */
+    public ClassPropertiesTreeNode()
+    {
+        super("classProperties");
+    }
+
     @Override
     protected List<String> getChildren(DocumentReference documentReference, int offset, int limit) throws Exception
     {
@@ -67,20 +78,5 @@ public class ClassPropertiesTreeNode extends DocumentTreeNode
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
         return document.getXClass().getPropertyList().size();
-    }
-
-    @Override
-    protected EntityReference getParent(DocumentReference documentReference) throws Exception
-    {
-        return documentReference;
-    }
-
-    @Override
-    protected EntityReference resolve(String nodeId)
-    {
-        if (StringUtils.startsWith(nodeId, "classProperties:")) {
-            return super.resolve("document:" + nodeId.substring(16));
-        }
-        return null;
     }
 }

@@ -24,13 +24,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -47,10 +46,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("attachments")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class AttachmentsTreeNode extends DocumentTreeNode
+public class AttachmentsTreeNode extends AbstractDocumentTreeNode
 {
     @Inject
     private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Default constructor.
+     */
+    public AttachmentsTreeNode()
+    {
+        super("attachments");
+    }
 
     @Override
     protected List<String> getChildren(DocumentReference documentReference, int offset, int limit) throws Exception
@@ -85,21 +95,6 @@ public class AttachmentsTreeNode extends DocumentTreeNode
         count += document.getAttachmentList().size();
 
         return count;
-    }
-
-    @Override
-    protected EntityReference getParent(DocumentReference documentReference) throws Exception
-    {
-        return documentReference;
-    }
-
-    @Override
-    protected EntityReference resolve(String nodeId)
-    {
-        if (StringUtils.startsWith(nodeId, "attachments:")) {
-            return super.resolve("document:" + nodeId.substring(12));
-        }
-        return null;
     }
 
     private boolean showAddAttachment(DocumentReference documentReference)

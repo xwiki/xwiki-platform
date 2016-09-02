@@ -881,7 +881,7 @@ public class Document extends Api
      * Get the URL to do a given action on this document.
      *
      * @param action what to do to the document for example "view", "edit" or "inline".
-     * @param queryString parameters to pass in the request eg: {code paramA=value1&paramB=value2}
+     * @param queryString parameters to pass in the request eg: {@code paramA=value1&paramB=value2}
      * @return the URL of this document with the given action and queryString as parameters.
      * @see #getExternalURL(String, String) for an absolute URL which can used outside of the site.
      */
@@ -918,7 +918,7 @@ public class Document extends Api
      * Get the URL to do a given action on this document.
      *
      * @param action what to do to the document for example "view", "edit" or "inline".
-     * @param queryString parameters to pass in the request eg: {code paramA=value1&paramB=value2}
+     * @param queryString parameters to pass in the request eg: {@code paramA=value1&paramB=value2}
      * @return the URL of this document with the given action and queryString as parameters.
      * @see #getURL() for a relative URL which can only be used inside of the site.
      */

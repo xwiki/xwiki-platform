@@ -696,6 +696,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param wait true if the method should way for {@link XWiki} instance to be initialized
      * @param context see {@link XWikiContext}
      */
     public static XWiki getMainXWiki(boolean wait, XWikiContext context) throws XWikiException
@@ -948,6 +949,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param content the content of the text area
      * @param context see {@link XWikiContext}
      */
     public static String getTextArea(String content, XWikiContext context)
@@ -979,15 +981,15 @@ public class XWiki implements EventListener
      * Initialize all xwiki subsystems.
      *
      * @param context see {@link XWikiContext}
-     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     * @param engineContext the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
      *            data that live on as long as the XWiki webapp is not stopped in the Servlet Container
      * @param noupdate true if the whole initialization should be done (create mandatory xlcasses, initialize stats
      *            service), i.e. if this is not an update, and false otherwise
      * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
      */
-    public XWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
+    public XWiki(XWikiContext context, XWikiEngineContext engineContext, boolean noupdate) throws XWikiException
     {
-        initXWiki(context, engine_context, noupdate);
+        initXWiki(context, engineContext, noupdate);
     }
 
     /**
@@ -1005,16 +1007,16 @@ public class XWiki implements EventListener
      * Initialize all xwiki subsystems.
      *
      * @param context see {@link XWikiContext}
-     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     * @param engineContext the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
      *            data that live on as long as the XWiki webapp is not stopped in the Servlet Container
      * @param noupdate true if the whole initialization should be done (create mandatory xlcasses, initialize stats
      *            service), i.e. if this is not an update, and false otherwise
      * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
      */
-    public void initXWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public void initXWiki(XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
-        initXWiki(null, context, engine_context, noupdate);
+        initXWiki(null, context, engineContext, noupdate);
     }
 
     /**
@@ -1022,7 +1024,7 @@ public class XWiki implements EventListener
      *
      * @param config the object holding the XWiki configuration read from {@code xwiki.cfg}
      * @param context see {@link XWikiContext}
-     * @param engine_context the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
+     * @param engineContext the XWiki object wrapping the {@link javax.servlet.ServletContext} and which allows to set
      *            data that live on as long as the XWiki webapp is not stopped in the Servlet Container
      * @param noupdate true if the whole initialization should be done (create mandatory xlcasses, initialize stats
      *            service), i.e. if this is not an update, and false otherwise
@@ -1030,7 +1032,7 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M2, use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
         getProgress().pushLevelProgress(4, this);
@@ -1040,7 +1042,7 @@ public class XWiki implements EventListener
 
             setDatabase(context.getMainXWiki());
 
-            setEngineContext(engine_context);
+            setEngineContext(engineContext);
             context.setWiki(this);
 
             // "Pre-initialize" XWikiStubContextProvider with a XWikiContext containing a XWiki instance as soon as
@@ -1219,26 +1221,31 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
      */
-    public void updateDatabase(String wikiName, XWikiContext context) throws HibernateException, XWikiException
+    public void updateDatabase(String wikiId, XWikiContext context) throws HibernateException, XWikiException
     {
-        updateDatabase(wikiName, false, context);
+        updateDatabase(wikiId, false, context);
     }
 
     /**
+     * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
      */
-    public void updateDatabase(String wikiName, boolean force, XWikiContext context)
+    public void updateDatabase(String wikiId, boolean force, XWikiContext context)
         throws HibernateException, XWikiException
     {
-        updateDatabase(wikiName, force, true, context);
+        updateDatabase(wikiId, force, true, context);
     }
 
     /**
+     * @param wikiId the id of the wiki
+     * @param force if the update of the databse should be forced
+     * @param initDocuments if mandatory document and plugin should be initialized for passed wiki
      * @param context see {@link XWikiContext}
      */
-    public void updateDatabase(String wikiName, boolean force, boolean initClasses, XWikiContext context)
+    public void updateDatabase(String wikiId, boolean force, boolean initDocuments, XWikiContext context)
         throws HibernateException, XWikiException
     {
         String database = context.getWikiId();
@@ -1247,17 +1254,17 @@ public class XWiki implements EventListener
 
             // Make sure the wiki is updated
             if (force) {
-                wikiList.remove(wikiName);
+                wikiList.remove(wikiId);
                 context.remove("initdone");
             }
 
-            context.setWikiId(wikiName);
-            synchronized (wikiName) {
-                if (!wikiList.contains(wikiName)) {
-                    wikiList.add(wikiName);
+            context.setWikiId(wikiId);
+            synchronized (wikiId) {
+                if (!wikiList.contains(wikiId)) {
+                    wikiList.add(wikiId);
 
                     // Make sure these classes exists
-                    if (initClasses) {
+                    if (initDocuments) {
                         initializeMandatoryDocuments(context);
                         getPluginManager().virtualInit(context);
                     }
@@ -1267,7 +1274,7 @@ public class XWiki implements EventListener
                     context.put("initdone", "1");
 
                     // Send event to notify listeners that the subwiki is ready
-                    getObservationManager().notify(new WikiReadyEvent(wikiName), wikiName, context);
+                    getObservationManager().notify(new WikiReadyEvent(wikiId), wikiId, context);
                 }
             }
         } finally {
@@ -1589,6 +1596,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param doc the document to save
      * @param context see {@link XWikiContext}
      */
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
@@ -1598,6 +1606,8 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param doc the document to save
+     * @param comment the comment to associated to the new version of the saved document
      * @param context see {@link XWikiContext}
      */
     public void saveDocument(XWikiDocument doc, String comment, XWikiContext context) throws XWikiException
@@ -1606,6 +1616,9 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param isMinorEdit true if the new version is a minor version
      * @param context see {@link XWikiContext}
      */
     public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, XWikiContext context)
@@ -1716,6 +1729,7 @@ public class XWiki implements EventListener
      * extracted from it. If it's a document parent it will be completed with the necessary default references (for
      * example if it's a space reference it will load the space home page).
      *
+     * @param reference the reference of teh document
      * @param context see {@link XWikiContext}
      * @since 5.0M1
      */
@@ -1725,6 +1739,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param doc the document
      * @param context see {@link XWikiContext}
      */
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
@@ -1740,6 +1755,8 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param doc the document
+     * @param revision the version of the document
      * @param context see {@link XWikiContext}
      */
     public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException
@@ -1773,6 +1790,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param reference the reference of the document
      * @param context see {@link XWikiContext}
      * @since 2.2M1
      */
@@ -1787,6 +1805,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
@@ -1799,6 +1818,8 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param spaces the reference of the space as String
+     * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
@@ -1898,6 +1919,7 @@ public class XWiki implements EventListener
      * Retrieve a specific attachment from the trash.
      *
      * @param id the unique identifier of the entry in the trash
+     * @param context the XWiki context
      * @return specified attachment from the trash, {@code null} if not found
      * @throws XWikiException if an error occurs while loading the attachments
      */
@@ -1933,6 +1955,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param sql the sql query to execute
      * @param context see {@link XWikiContext}
      */
     public <T> List<T> search(String sql, XWikiContext context) throws XWikiException
@@ -1941,6 +1964,9 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param sql the sql query to execute
+     * @param nb limit the number of results to return
+     * @param start the offset from which to start return results
      * @param context see {@link XWikiContext}
      */
     public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
@@ -1949,6 +1975,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param sql the sql query to execute
      * @param context see {@link XWikiContext}
      */
     public <T> List<T> search(String sql, Object[][] whereParams, XWikiContext context) throws XWikiException
@@ -1957,6 +1984,9 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param sql the sql query to execute
+     * @param nb limit the number of results to return
+     * @param start the offset from which to start return results
      * @param context see {@link XWikiContext}
      */
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
@@ -1966,6 +1996,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param content the content to parse
      * @param context see {@link XWikiContext}
      * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
      */
@@ -1976,6 +2007,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param template the name of the template
      * @param context see {@link XWikiContext}
      * @deprecated use {@link #evaluateTemplate(String, XWikiContext)} instead
      */
@@ -2021,6 +2053,8 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param template the name of the template
+     * @param skinId the id of the skin from which to load the template
      * @param context see {@link XWikiContext}
      * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin(String, Skin)} instead
      */
@@ -2051,6 +2085,8 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param template the name of the template
+     * @param skinId the id of the skin from which to load the template
      * @param context see {@link XWikiContext}
      */
     public String renderTemplate(String template, String skin, XWikiContext context)
@@ -2064,6 +2100,7 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @param template the name of the template
      * @param context see {@link XWikiContext}
      */
     public String renderTemplate(String template, XWikiContext context)
@@ -2079,8 +2116,6 @@ public class XWiki implements EventListener
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
      * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @author LBlaze
      */
     public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
     {
@@ -2215,7 +2250,7 @@ public class XWiki implements EventListener
         return getSkinPreference(prefname, "", context);
     }
 
-    public String getSkinPreference(String prefname, String default_value, XWikiContext context)
+    public String getSkinPreference(String prefname, String defaultValue, XWikiContext context)
     {
         for (Skin skin = getInternalSkinManager().getCurrentSkin(true); skin != null; skin = skin.getParent()) {
             if (skin instanceof WikiSkin) {
@@ -2228,7 +2263,7 @@ public class XWiki implements EventListener
             }
         }
 
-        return default_value;
+        return defaultValue;
     }
 
     /**
@@ -2300,17 +2335,17 @@ public class XWiki implements EventListener
      *
      * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
      *            document of the wiki.
-     * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
+     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
      *            no result
-     * @param default_value the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
+     * @param defaultValue the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
      *            xwiki.cfg parameter gave no result
      */
-    public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
+    public String getXWikiPreference(String prefname, String fallbackParam, String defaultValue, XWikiContext context)
     {
         String result = getWikiConfiguration().getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
-            result = getConfiguration().getProperty(fallback_param, default_value);
+            result = getConfiguration().getProperty(fallbackParam, defaultValue);
         }
 
         return result != null ? result : "";
@@ -2324,13 +2359,13 @@ public class XWiki implements EventListener
      * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
      *            document of the wiki.
      * @param wiki the wiki to get preference from
-     * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
+     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
      *            no result
-     * @param default_value the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
+     * @param defaultValue the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
      *            xwiki.cfg parameter gave no result
      * @since 7.4M1
      */
-    public String getXWikiPreference(String prefname, String wiki, String fallback_param, String default_value,
+    public String getXWikiPreference(String prefname, String wiki, String fallbackParam, String defaultValue,
         XWikiContext xcontext)
     {
         String currentWiki = xcontext.getWikiId();
@@ -2338,15 +2373,15 @@ public class XWiki implements EventListener
         try {
             xcontext.setWikiId(wiki);
 
-            return getXWikiPreference(prefname, fallback_param, default_value, xcontext);
+            return getXWikiPreference(prefname, fallbackParam, defaultValue, xcontext);
         } finally {
             xcontext.setWikiId(currentWiki);
         }
     }
 
-    public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
+    public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
     {
-        return getXWikiPreference(prefname, "", default_value, context);
+        return getXWikiPreference(prefname, "", defaultValue, context);
     }
 
     public String getSpacePreference(String preference, XWikiContext context)

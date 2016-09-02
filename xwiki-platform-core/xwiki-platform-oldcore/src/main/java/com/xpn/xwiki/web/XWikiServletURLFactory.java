@@ -742,7 +742,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used for
      * example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
      * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
-     * <p/>
+     * <p>
      * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
      * strip it since we don't want to have that in our URLs as it can cause issues with:
      * <ul>

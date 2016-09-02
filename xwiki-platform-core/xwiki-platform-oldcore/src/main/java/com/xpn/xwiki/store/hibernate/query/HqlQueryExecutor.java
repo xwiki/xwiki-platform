@@ -182,8 +182,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      * Append the required select clause to HQL short query statements. Short statements are the only way for users
      * without programming rights to perform queries. Such statements can be for example:
      * <ul>
-     * <li>{code , BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'}</li>
-     * <li>{code where doc.creationDate > '2008-01-01'}</li>
+     * <li>{@code , BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'}</li>
+     * <li>{@code where doc.creationDate > '2008-01-01'}</li>
      * </ul>
      *
      * @param statement the statement to complete if required.

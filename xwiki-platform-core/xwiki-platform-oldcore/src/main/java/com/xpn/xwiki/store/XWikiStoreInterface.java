@@ -431,7 +431,7 @@ public interface XWikiStoreInterface
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
      * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field
-     *            name, field value and compared symbol ("=", ">", etc.).
+     *            name, field value and compared symbol ({@code =}, {@code >}, etc.).
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
@@ -451,7 +451,7 @@ public interface XWikiStoreInterface
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
      * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field
-     *            name, field value and compared symbol ("=", ">", etc.).
+     *            name, field value and compared symbol ({@code =}, {@code >}, etc.).
      * @param parameterValues the where clause values that replace the question marks (?).
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.

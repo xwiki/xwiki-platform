@@ -43,7 +43,7 @@ public interface SymbolScheme
     /**
      * @return the map containing all the symbols to separate Entity Types. The map's key is an Entity Type and
      *         the value is another map who's key is the second Entity Type and its value is the character separating
-     *         the 2 Entity Types. For example you could have the {code .} character separating an
+     *         the 2 Entity Types. For example you could have the {@code .} character separating an
      *         {@link EntityType#DOCUMENT} and a {@link EntityType#SPACE}. Note that a given Entity Type can have
      *         several separator characters if it can have several different parent types (e.g. a Space reference can
      *         have either a Space Entity Type or a Wiki Entity Type)

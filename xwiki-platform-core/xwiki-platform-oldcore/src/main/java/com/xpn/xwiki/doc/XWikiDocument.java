@@ -3746,12 +3746,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Create and/or update objects in a document given a list of HTTP parameters of the form {code
+     * Create and/or update objects in a document given a list of HTTP parameters of the form {@code
      * <spacename>.<classname>_<number>_<propertyname>}. If the object already exists, the field is replace by the given
-     * value. If the object doesn't exist in the document, it is created then the property {code <propertyname>} is
-     * initialized with the given value. An object is only created if the given {code <number>} is 'one-more' than the
-     * existing number of objects. For example, if the document already has 2 objects of type {code Space.Class}, then
-     * it will create a new object only with {code Space.Class_2_prop=something}. Every other parameter like {code
+     * value. If the object doesn't exist in the document, it is created then the property {@code <propertyname>} is
+     * initialized with the given value. An object is only created if the given {@code <number>} is 'one-more' than the
+     * existing number of objects. For example, if the document already has 2 objects of type {@code Space.Class}, then
+     * it will create a new object only with {@code Space.Class_2_prop=something}. Every other parameter like {@code
      * Space.Class_42_prop=foobar} for example, will be ignore.
      *
      * @param eform is form information that contains all the query parameters

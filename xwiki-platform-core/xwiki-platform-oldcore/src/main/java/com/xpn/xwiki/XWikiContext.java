@@ -71,7 +71,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 public class XWikiContext extends Hashtable<Object, Object>
 {
     /**
-     * Type instance for Provider<XWikiContext>.
+     * Type instance for {@code Provider<XWikiContext>}.
      *
      * @since 5.0M1
      */
@@ -377,7 +377,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure to keep {@link #wikiId} fields and map synchronized.
+     * Make sure to keep wiki field and map synchronized.
      * </p>
      *
      * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
@@ -412,7 +412,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure to keep {@link #wikiId} field and map synchronized.
+     * Make sure to keep wiki field and map synchronized.
      * </p>
      *
      * @see java.util.Hashtable#remove(java.lang.Object)
@@ -478,7 +478,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Set the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
      *
-     * @return the wiki id originally requested by the user.
+     * @param wikiId the wiki id originally requested by the user
      * @since 6.1M1
      */
     public void setOriginalWikiId(String wikiId)

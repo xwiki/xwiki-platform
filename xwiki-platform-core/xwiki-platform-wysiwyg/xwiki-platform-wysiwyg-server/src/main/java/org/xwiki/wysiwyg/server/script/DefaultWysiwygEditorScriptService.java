@@ -91,7 +91,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     public boolean isSyntaxSupported(String syntaxId)
     {
         // Special handling for XHTML since right the XHTML renderer doesn't produce valid XHTML. Thus if, for example,
-        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {code <p>a</p><p>b</p>} which is invalid XHTML
+        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {@code <p>a</p><p>b</p>} which is invalid XHTML
         // and the page will fail to render.
         if (syntaxId.equals(Syntax.XHTML_1_0.toIdString())) {
             return false;

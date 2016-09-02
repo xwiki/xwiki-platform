@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -44,6 +46,9 @@ import org.xwiki.tree.Tree;
 public class TreeScriptService implements ScriptService
 {
     @Inject
+    private Logger logger;
+
+    @Inject
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
@@ -53,10 +58,15 @@ public class TreeScriptService implements ScriptService
      */
     public Tree get(String roleHint)
     {
-        try {
-            return this.contextComponentManagerProvider.get().getInstance(Tree.class, roleHint);
-        } catch (ComponentLookupException e) {
-            return null;
+        ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
+        if (contextComponentManager.hasComponent(Tree.class, roleHint)) {
+            try {
+                return contextComponentManager.getInstance(Tree.class, roleHint);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to load the specified tree component. Root cause is [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
         }
+        return null;
     }
 }

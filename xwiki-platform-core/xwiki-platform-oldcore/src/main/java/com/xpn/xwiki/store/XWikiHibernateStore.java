@@ -428,10 +428,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Verifies if a wiki document exists
-     *
-     * @param doc
-     * @param context
-     * @throws XWikiException
      */
     @Override
     public boolean exists(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException

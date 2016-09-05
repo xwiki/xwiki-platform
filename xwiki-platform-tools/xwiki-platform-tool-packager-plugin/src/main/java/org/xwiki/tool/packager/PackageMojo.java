@@ -160,7 +160,7 @@ public class PackageMojo extends AbstractMojo
     /**
      * The platform version to be used by the packager plugin.
      */
-    @Parameter(property = "platform.version", defaultValue = "${platform.version}")
+    @Parameter(defaultValue = "${platform.version}")
     private String platformVersion;
 
     /**

@@ -163,7 +163,12 @@ public class PageTest
      */
     protected String renderPage(DocumentReference reference) throws Exception
     {
-        return loadPage(reference).getRenderedContent(this.context);
+        XWikiDocument doc = loadPage(reference);
+
+        // Set up the current doc in the context so that $doc is bound in scripts
+        context.setDoc(doc);
+
+        return doc.getRenderedContent(this.context);
     }
 
     /**

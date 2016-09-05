@@ -37,7 +37,8 @@ import org.xwiki.rendering.block.Block;
 public interface LayoutManager
 {
     /**
-     * Performs the layout of {@code container}, modifying the blocks inside. <br />
+     * Performs the layout of {@code container}, modifying the blocks inside.
+     * <p>
      * TODO: might as well have been with a list of blocks as parameter, but I wanted to mimic the awt LayoutManager
      * interface, which lays out a container and not a list of contents. Reviewer, WDYT?
      * 

@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * XHTML Printer to handle printing annotations markers in the rendered XHTML. It is able to generate the annotation
  * start marker and end marker and to store information about the annotations state: which ones are being currently
- * rendered, which markers are opened, etc. To be used by the XHTML renderers to render annotations on the XHTML. <br />
+ * rendered, which markers are opened, etc. To be used by the XHTML renderers to render annotations on the XHTML. <br>
  * Note that, although this class could aggregate a XHTMLWikiPrinter, and be used to wrap the default XHTMLWikiPrinter
  * in a XHTML Renderer, it extends it so that it can replace. TODO: in a future improved implementation, this could
  * handle annotations rendering alone, just using state information from the renderer.
@@ -59,7 +59,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
     /**
      * The list of annotations being currently rendered, in the order in which they were opened (i.e. for which
      * beginAnnotation was signaled but not endAnnotation). Used for correctly nesting the annotations markers with
-     * other XHTML elements. <br />
+     * other XHTML elements. <br>
      */
     private List<Annotation> renderedAnnotations = new LinkedList<Annotation>();
 

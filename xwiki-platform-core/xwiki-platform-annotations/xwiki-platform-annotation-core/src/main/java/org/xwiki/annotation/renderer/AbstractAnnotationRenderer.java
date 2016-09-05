@@ -48,7 +48,7 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
     AnnotationPrintRenderer
 {
     /**
-     * Selection cleaner so that the selection can be mapped on the content. <br />
+     * Selection cleaner so that the selection can be mapped on the content. <br>
      * TODO: not really sure if this is the right place for this pull, but the annotations generator is not a component
      * so it cannot 'require' it.
      */
@@ -109,8 +109,8 @@ public abstract class AbstractAnnotationRenderer extends AbstractChainingPrintRe
     public abstract ChainingPrintRenderer getAnnotationPrintRenderer(ListenerChain chain);
 
     /**
-     * Getter for the link label generator to be used for generating link labels in this mapping & rendering process for
-     * links that don't have labels.
+     * Getter for the link label generator to be used for generating link labels in this mapping and rendering process
+     * for links that don't have labels.
      * 
      * @return the {@link LinkLabelGenerator} used to generate labels for links without labels by this renderer
      */

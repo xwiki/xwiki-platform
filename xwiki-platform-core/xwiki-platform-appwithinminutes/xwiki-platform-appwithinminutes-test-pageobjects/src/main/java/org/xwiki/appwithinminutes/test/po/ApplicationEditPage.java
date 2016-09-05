@@ -24,8 +24,8 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
 
 /**
- * Represents some custom actions available on application pages in inline edit mode, since the default save&view and
- * save&continue buttons are overridden in AWM.
+ * Represents some custom actions available on application pages in inline edit mode, since the default save and view and
+ * save and continue buttons are overridden in AWM.
  *
  * @version $Id$
  * @since 7.4M2

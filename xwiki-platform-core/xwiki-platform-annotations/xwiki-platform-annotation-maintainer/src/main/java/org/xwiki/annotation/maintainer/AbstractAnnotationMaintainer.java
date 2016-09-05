@@ -162,8 +162,8 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     /**
      * For each annotation, recompute its properties wrt the differences in the document. The annotation mapping will be
      * done using the spaceless version of the rendered previous content, in order to have synchronization with the
-     * rendering, whereas the annotation diff & update will be done wrt to the normalized spaces version, to produce
-     * human readable versions of the annotation selection & contexts.
+     * rendering, whereas the annotation diff and update will be done wrt to the normalized spaces version, to produce
+     * human readable versions of the annotation selection and contexts.
      * 
      * @param annotation the annotation to update properties for
      * @param differences the differences between {@code renderedPreviousContent} and {@code renderedCurrentContent}

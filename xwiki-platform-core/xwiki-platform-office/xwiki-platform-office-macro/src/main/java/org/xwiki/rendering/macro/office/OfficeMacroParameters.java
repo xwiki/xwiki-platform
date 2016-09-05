@@ -52,7 +52,7 @@ public class OfficeMacroParameters
 
     /**
      * @return a string reference to the office attachment to be viewed
-     * @deprecated since 5.4.6, use {@link #getSource()} instead
+     * @deprecated since 5.4.6, use {@link #getReference()} instead
      */
     @Deprecated
     public String getAttachment()

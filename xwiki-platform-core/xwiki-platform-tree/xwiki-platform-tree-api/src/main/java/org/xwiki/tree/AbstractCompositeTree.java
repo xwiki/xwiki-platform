@@ -60,7 +60,7 @@ public abstract class AbstractCompositeTree extends AbstractTree
     }
 
     /**
-     * @param nodeType the node type
+     * @param nodeId the node identifier
      * @return the {@link TreeNode} component that handles the specified node type
      */
     protected TreeNode getTreeNode(String nodeId)

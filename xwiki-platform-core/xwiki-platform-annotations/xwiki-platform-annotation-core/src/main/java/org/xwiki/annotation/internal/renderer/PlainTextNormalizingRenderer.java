@@ -61,7 +61,7 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
     protected StreamParser plainTextParser;
 
     /**
-     * Link label generator, used to generate labels for links with no label in this renderer. <br />
+     * Link label generator, used to generate labels for links with no label in this renderer. <br>
      * TODO: it would be nice if we could somehow get the very same link generator that the XHTML default renderer is
      * using, since we need the two to be fully synchronized and generate the same content.
      */

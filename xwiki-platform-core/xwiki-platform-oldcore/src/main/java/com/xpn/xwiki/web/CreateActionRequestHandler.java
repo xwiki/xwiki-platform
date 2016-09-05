@@ -72,7 +72,7 @@ public class CreateActionRequestHandler
     private static final String NAME = "name";
 
     /**
-     * The name of the deprecated space parameter. <br />
+     * The name of the deprecated space parameter. <br>
      * Note: if you change the value of this variable, change the value of {{@link #TOCREATE_SPACE} to the previous
      * value.
      *
@@ -90,7 +90,7 @@ public class CreateActionRequestHandler
     private static final String PAGE = "page";
 
     /**
-     * The value of the tocreate parameter when a space is to be created. <br />
+     * The value of the tocreate parameter when a space is to be created. <br>
      * TODO: find a way to give this constant the same value as the constant above without violating checkstyle.
      */
     private static final String TOCREATE_SPACE = SPACE;
@@ -590,7 +590,7 @@ public class CreateActionRequestHandler
     }
 
     /**
-     * Checks if a document is empty, that is, if a document with that name could be created from a template. <br />
+     * Checks if a document is empty, that is, if a document with that name could be created from a template. <br>
      * TODO: move this function to a more accessible place, to be used by the readFromTemplate method as well, so that
      * we have consistency.
      *

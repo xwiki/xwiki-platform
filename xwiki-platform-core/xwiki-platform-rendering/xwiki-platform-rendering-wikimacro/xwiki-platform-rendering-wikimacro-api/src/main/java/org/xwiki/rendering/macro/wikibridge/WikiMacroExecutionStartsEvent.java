@@ -26,7 +26,7 @@ package org.xwiki.rendering.macro.wikibridge;
  * </p>
  * <ul>
  * <li>source: the related {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance</li>
- * <li>data: a java.util.Map<String, Object> containing the macro bindings</li>
+ * <li>data: a {@code java.util.Map<String, Object>} containing the macro bindings</li>
  * </ul>
  * 
  * @version $Id$

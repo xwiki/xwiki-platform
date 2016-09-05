@@ -276,8 +276,7 @@ public class CreatePagePage extends ViewPage
      * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
      * iteration, we lookup the current breadcrumb element and not a cached one.
      * <p>
-     * TODO: Reuse {@link org.xwiki.index.test.po.DocumentPicker DocumentPicker} inside this PO instead of duplicating
-     * this method.
+     * TODO: Reuse {@link DocumentPicker} inside this PO instead of duplicating this method.
      *
      * @param expectedPathString the path string to wait for
      * @since 7.2RC1

@@ -69,7 +69,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultGadgetSource implements GadgetSource
 {
     /**
-     * The reference to the gadgets class, relative to the current wiki. <br />
+     * The reference to the gadgets class, relative to the current wiki. <br>
      * TODO: to make sure that this class exists before trying to read objects of this type.
      */
     private static final EntityReference GADGET_CLASS =

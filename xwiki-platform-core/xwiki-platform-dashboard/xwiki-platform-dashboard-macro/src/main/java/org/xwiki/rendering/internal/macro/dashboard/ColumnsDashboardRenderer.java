@@ -90,7 +90,7 @@ class ColumnGadget extends Gadget
     {
         super.setPosition(position);
 
-        // parse the position as a "container, index" pair and store the container number and index. <br />
+        // parse the position as a "container, index" pair and store the container number and index. <br>
         // TODO: move this code in an API class since the comma separated format is more generic than the columns layout
         // split by comma, first position is column, second position is index
         String[] split = position.split(",");

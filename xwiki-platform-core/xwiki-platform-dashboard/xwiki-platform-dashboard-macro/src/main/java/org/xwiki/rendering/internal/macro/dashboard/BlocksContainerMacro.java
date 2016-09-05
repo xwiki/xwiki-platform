@@ -33,7 +33,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * Version of the container macro that takes a list of blocks as content and renders them according to the parameters in
  * {@link ContainerMacroParameters}. Also, it can be instantiated and used as a POJO, not only injected by the component
  * manager, as long as an instance of the component manager is being passed with
- * {@link #setComponentManager(ComponentManager)}. <br />
+ * {@link #setComponentManager(ComponentManager)}. <br>
  * TODO: this macro should be defined in the container macro package, since it's generic enough. Unfortunately, this
  * macro cannot be made public, since ftm there is no mechanism to hide macros from user (in the wysiwyg list, for
  * example), which forces us to keep it here with package visibility, so it can be used in the gadgets implementation.
@@ -45,7 +45,7 @@ class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParamete
 {
     /**
      * The component manager, injected to this macro by the caller, since this macro cannot be exposed to the cm because
-     * we don't want it available in the macros list. <br />
+     * we don't want it available in the macros list. <br>
      * FIXME: when we will be able to hide macros from the user, this should be implemented properly as a component.
      */
     private ComponentManager componentManager;

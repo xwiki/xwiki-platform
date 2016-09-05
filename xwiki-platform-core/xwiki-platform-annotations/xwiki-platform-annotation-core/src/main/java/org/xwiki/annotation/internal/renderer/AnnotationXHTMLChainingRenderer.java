@@ -41,7 +41,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * Extends the default XHTML renderer to add handling of annotations.<br />
+ * Extends the default XHTML renderer to add handling of annotations.<br>
  * 
  * @version $Id$
  * @since 2.3M1

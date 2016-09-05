@@ -124,7 +124,7 @@ public class BasePage extends BaseElement
     /**
      * @param metaName the name of the XWiki document metadata
      * @return the value of the specified XWiki document metadata for the current XWiki document
-     * @see {@link #getHTMLMetaDataValue(String)} for HTML meta field values
+     * @see #getHTMLMetaDataValue(String)
      */
     public String getMetaDataValue(String metaName)
     {

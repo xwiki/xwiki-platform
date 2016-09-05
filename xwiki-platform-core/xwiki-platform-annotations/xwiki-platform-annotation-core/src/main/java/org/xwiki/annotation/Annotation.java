@@ -37,29 +37,29 @@ import org.xwiki.annotation.maintainer.AnnotationState;
 public class Annotation
 {
     /**
-     * The name of the field of this annotation selection. <br />
+     * The name of the field of this annotation selection. <br>
      * The text on which this annotation is added.
      */
     public static final String SELECTION_FIELD = "selection";
 
     /**
-     * The name of the field of this annotation selection context to the left of the annotation. <br />
+     * The name of the field of this annotation selection context to the left of the annotation. <br>
      * The context of the selection is used to uniquely localize an annotation on the content where is added. Or, if the
-     * context appears twice, semantically speaking it shouldn't make any difference if the annotation is displayed &
+     * context appears twice, semantically speaking it shouldn't make any difference if the annotation is displayed and
      * handled in one or other of the occurrences.
      */
     public static final String SELECTION_LEFT_CONTEXT_FIELD = "selectionLeftContext";
 
     /**
-     * The name of the field of this annotation selection context to the right of the annotation. <br />
+     * The name of the field of this annotation selection context to the right of the annotation. <br>
      * The context of the selection is used to uniquely localize an annotation on the content where is added. Or, if the
-     * context appears twice, semantically speaking it shouldn't make any difference if the annotation is displayed &
+     * context appears twice, semantically speaking it shouldn't make any difference if the annotation is displayed and
      * handled in one or other of the occurrences.
      */
     public static final String SELECTION_RIGHT_CONTEXT_FIELD = "selectionRightContext";
 
     /**
-     * The name of the field of this annotation state. <br />
+     * The name of the field of this annotation state. <br>
      * TODO: find out if it's the right place to put the state information, as it's a maintainer particular information.
      */
     public static final String STATE_FIELD = "state";

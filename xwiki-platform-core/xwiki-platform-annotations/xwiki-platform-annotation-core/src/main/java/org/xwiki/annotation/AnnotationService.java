@@ -26,10 +26,10 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Component responsible for providing annotations related services: the management of annotations (retrieving, adding,
- * removing, updating) and rendering them on their respective targets. <br />
+ * removing, updating) and rendering them on their respective targets. <br>
  * This service does not parse or interpret the references of targets its operating with, caller is responsible to be
  * consistent in calls and use references which are interpreted by the used implementations for
- * {@link org.xwiki.annotation.io.IOService and org.xwiki.annotation.io.IOTargetService}. <br />
+ * {@link org.xwiki.annotation.io.IOService and org.xwiki.annotation.io.IOTargetService}. <br>
  * 
  * @version $Id$
  * @see org.xwiki.annotation.io.IOTargetService

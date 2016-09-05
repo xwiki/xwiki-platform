@@ -47,7 +47,7 @@ public interface GadgetSource
 
     /**
      * Get the metadata about this dashboard source, such as source document fullname, gadget add url, gadget remove
-     * url, etc, to pass to the client. <br />
+     * url, etc, to pass to the client. <br>
      * TODO: find a better place for this code, ftm it's here because this is the only class that knows about XWiki data
      * model
      * 
@@ -60,7 +60,7 @@ public interface GadgetSource
 
     /**
      * @return {@code true} if the the current context is in edit mode (gadgets can be edited -- positions, parameters,
-     *         adding gadgets etc), {@code false} otherwise <br />
+     *         adding gadgets etc), {@code false} otherwise <br>
      *         TODO: find a better place to put this function, but for now this is the only interface towards XWiki data
      *         model, and since the mode is set on the current context, this function needs to be here
      */

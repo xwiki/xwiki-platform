@@ -1222,7 +1222,7 @@ public class TestUtils
     }
 
     /**
-     * @sice 3.2M1
+     * @since 3.2M1
      */
     public void addQueryStringEntry(StringBuilder builder, String key, Object value)
     {
@@ -1241,7 +1241,7 @@ public class TestUtils
     }
 
     /**
-     * @sice 3.2M1
+     * @since 3.2M1
      */
     public void addQueryStringEntry(StringBuilder builder, String key, String value)
     {

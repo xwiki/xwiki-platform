@@ -39,7 +39,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Event listener to listen to documents update events and update the annotations that are impacted by the document
- * <strong>content</strong> change, to update the selection and context to match the new document content. <br />
+ * <strong>content</strong> change, to update the selection and context to match the new document content. <br>
  * 
  * @version $Id$
  * @since 2.3M1

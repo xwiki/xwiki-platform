@@ -45,7 +45,7 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Script service exposing interaction with the {@link SolrIndex}. Queries on the index are performed using XWiki's <a
+ * Script service exposing interaction with the {@link SolrIndexer}. Queries on the index are performed using XWiki's <a
  * href="http://extensions.xwiki.org/xwiki/bin/view/Extension/Query+Module">Query Module API</a> with query type "solr".
  * 
  * @version $Id$

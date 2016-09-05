@@ -24,7 +24,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Typed flavour of the {@code EntityReferenceSerializer&lt;String&gt;}, which adds the type in front of it in the
- * string serialization (e.g. DOCUMENT://wiki:Space.Page). <br />
+ * string serialization (e.g. DOCUMENT://wiki:Space.Page). <br>
  * Note that, although it performs the roughly the same function as the entity reference serializer this is a different
  * hierarchy because it's a different strategy and to make it obvious that typed serializers and resolvers should be
  * used together.

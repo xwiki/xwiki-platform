@@ -60,7 +60,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 public abstract class AbstractAnnotationRESTResource extends XWikiResource
 {
     /**
-     * The default action to render the document for. <br />
+     * The default action to render the document for. <br>
      * TODO: action should be obtained from the calling client in the parameters
      */
     protected static final String DEFAULT_ACTION = "view";
@@ -150,7 +150,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     }
 
     /**
-     * Helper function to create an error response from a passed exception. <br />
+     * Helper function to create an error response from a passed exception. <br>
      * 
      * @param exception the exception that was encountered during regular execution of service
      * @return an error response
@@ -173,7 +173,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
 
     /**
      * Helper function to get the rendered content of the document with annotations. All setup of context for rendering
-     * content similar to the rendering on standard view will be done in this function. <br />
+     * content similar to the rendering on standard view will be done in this function. <br>
      * FIXME: find out if this whole context setup code has to be here or in the annotations service
      * 
      * @param docName the name of the document to render
@@ -220,7 +220,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     }
 
     /**
-     * Helper function to prepare the XWiki documents and translations on the context and velocity context. <br />
+     * Helper function to prepare the XWiki documents and translations on the context and velocity context. <br>
      * TODO: check how this code could be written only once (not duplicate the prepareDocuments function in XWiki)
      * 
      * @param docName the full name of the document to prepare context for

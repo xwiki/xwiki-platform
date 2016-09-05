@@ -36,7 +36,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     /**
      * {@inheritDoc}
      * <p>
-     * NOTE: Remove this method as soon as Issue 3156 is fixed. <br />
+     * NOTE: Remove this method as soon as Issue 3156 is fixed. <br>
      * We also need this method to be able to hook simplification of the DOM tree storing meta data in elements.
      * </p>
      * <p>

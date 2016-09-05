@@ -278,7 +278,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     /**
      * Instantiates the default strategy for converting articles in feed entries.
      * 
-     * @return a new {@link SyndEntrySourceApi} wrapping a {@link SyndEntryArticleSource} object
+     * @return a new {@link SyndEntrySourceApi}
      */
     public SyndEntrySourceApi getSyndEntryArticleSource()
     {
@@ -290,7 +290,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * Instantiates the default strategy for converting articles in feed entries, allowing you to customize it through
      * parameters.
      * 
-     * @return a new {@link SyndEntrySourceApi} wrapping a {@link SyndEntryArticleSource} object
+     * @return a new {@link SyndEntrySourceApi}
      */
     public SyndEntrySourceApi getSyndEntryArticleSource(Map<String, Object> params)
     {
@@ -395,10 +395,10 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * Creates a new feed from a list of documents, using the default strategy for converting documents in feed entries.
      * You can customize this strategy using strategy parameters.
      * 
-     * @param list a list of {@link Document} objects, {@link XWikiDocument} objects or document names
+     * @param list a list of {@link com.xpn.xwiki.api.Document} objects, {@link com.xpn.xwiki.doc.XWikiDocument} objects or document names
      * @param params strategy parameters
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(List, SyndEntrySourceApi, Map)
      * @see SyndEntryDocumentSource
      */
@@ -414,9 +414,9 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * 
      * @param list a list of articles
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(List, SyndEntrySourceApi, Map)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public SyndFeed getArticleFeed(List<Object> list)
     {
@@ -427,9 +427,9 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     /**
      * Instantiates the default document feed.
      * 
-     * @param list a list of {@link Document} objects, {@link XWikiDocument} objects or document names
+     * @param list a list of {@link com.xpn.xwiki.api.Document} objects, {@link com.xpn.xwiki.doc.XWikiDocument} objects or document names
      * @return a new feed
-     * @see #getDocumentFeed(List)
+     * @see #getDocumentFeed(List, Map)
      */
     public SyndFeed getWebFeed(List<Object> list)
     {
@@ -477,7 +477,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param start the start index
      * @param params strategy parameters
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map)
      * @see SyndEntryDocumentSource
      */
@@ -495,9 +495,9 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param count the maximum number of articles to retrieve
      * @param start the start index
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public SyndFeed getArticleFeed(String query, int count, int start)
     {
@@ -512,7 +512,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param count the maximum number of documents to retrieve
      * @param start the start index
      * @return a new feed
-     * @see #getDocumentFeed(String, int, int)
+     * @see #getDocumentFeed(String, int, int, Map)
      */
     public SyndFeed getWebFeed(String query, int count, int start)
     {
@@ -561,11 +561,11 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * Creates a new feed from a list of documents, using the default strategy for converting documents in feed entries,
      * filling in the feed meta data. You can customize the default strategy by using strategy parameters.
      * 
-     * @param list a list of {@link Document} objects, {@link XWikiDocument} objects or document names
+     * @param list a list of {@link com.xpn.xwiki.api.Document} objects, {@link com.xpn.xwiki.doc.XWikiDocument} objects or document names
      * @param params strategy parameters
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryDocumentSource
      */
@@ -582,9 +582,9 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param list a list of articles
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public SyndFeed getArticleFeed(List<Object> list, Map<String, Object> metadata)
     {
@@ -632,7 +632,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     /**
      * Instantiates the default document feed.
      * 
-     * @param list a list of {@link Document} objects, {@link XWikiDocument} objects or document names
+     * @param list a list of {@link com.xpn.xwiki.api.Document} objects, {@link com.xpn.xwiki.doc.XWikiDocument} objects or document names
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      * @see #getDocumentFeed(List, Map)
@@ -702,7 +702,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param params strategy parameters
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryDocumentSource
      */
@@ -722,9 +722,9 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      * @param start the start index
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
-     * @see Document
+     * @see com.xpn.xwiki.api.Document
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public SyndFeed getArticleFeed(String query, int count, int start, Map<String, Object> metadata)
     {
@@ -863,7 +863,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
 
     /**
      * @see #getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public String getArticleFeedOutput(List<Object> list, Map<String, Object> metadata, String type)
     {
@@ -918,7 +918,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
 
     /**
      * @see #getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
-     * @see SyndEntryArticleSource
+     * @see SyndEntrySourceApi
      */
     public String getArticleFeedOutput(String query, int count, int start, Map<String, Object> metadata, String type)
     {

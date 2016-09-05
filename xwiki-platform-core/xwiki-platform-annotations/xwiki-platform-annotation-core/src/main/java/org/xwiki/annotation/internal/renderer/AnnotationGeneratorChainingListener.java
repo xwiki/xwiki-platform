@@ -45,7 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Chaining listener that maps the annotations on the events that it receives, holds the state of annotations on these
  * events and exposes it to the subsequent listeners in the chain through {@link #getAnnotationEvents()}. It operates by
  * buffering all events, creating the plain text representation of the listened content, mapping the annotations on this
- * content and identifying the events in the stream that hold the start and end of the annotations. <br />
+ * content and identifying the events in the stream that hold the start and end of the annotations. <br>
  * FIXME: this should use the PlainTextNormalizingChaininngRenderer to generate the plain text version of the content,
  * and match with the space normalized selection.
  * 

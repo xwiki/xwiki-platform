@@ -47,7 +47,7 @@ import org.xwiki.security.authorization.Right;
 public class XWikiAnnotationRightService implements AnnotationRightService
 {
     /**
-     * Entity reference handler to resolve the reference target. <br />
+     * Entity reference handler to resolve the reference target. <br>
      * TODO: should be a current reference resolver, to be fully correct, but for the moment it will be a default one,
      * since current resolver does not exist in 2.1.1 and a current typed resolver would fail. Plus, all references
      * passed to this service should be absolute.

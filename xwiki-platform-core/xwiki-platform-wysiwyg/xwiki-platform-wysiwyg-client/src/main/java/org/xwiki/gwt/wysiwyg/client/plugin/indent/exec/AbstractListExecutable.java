@@ -127,7 +127,7 @@ public abstract class AbstractListExecutable extends AbstractSelectionExecutable
      * Executes this list operation on all items in the non-collapsed selection. The {@code perform} parameter specifies
      * if the operation is actually performed or just checked to be possible (while this kind of parameters are not good
      * practice, it's the best way right now to make sure we use the same detection algorithm in the
-     * {@link #execute(RichTextArea, String)} and {@link #isEnabled(RichTextArea)} functions).
+     * {@link #execute(String)} and {@link #isEnabled()} functions).
      * 
      * @param range the current range to execute the operation on
      * @param perform {@code true} if the operation is to be actually executed, {@code false} if it's only to be checked

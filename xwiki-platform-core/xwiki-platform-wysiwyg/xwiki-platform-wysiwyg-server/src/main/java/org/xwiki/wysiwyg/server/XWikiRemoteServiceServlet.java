@@ -32,9 +32,10 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Generic {@link RemoteServiceServlet} that dispatches the RPC calls to components registered through the component
  * manager.
+ * <p>
+ * See http://stuffthathappens.com/blog/2009/09/14/guice-with-gwt/.
  * 
  * @version $Id$
- * @see http://stuffthathappens.com/blog/2009/09/14/guice-with-gwt/
  */
 public class XWikiRemoteServiceServlet extends RemoteServiceServlet
 {

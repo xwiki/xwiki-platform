@@ -41,7 +41,8 @@ public class Element extends com.google.gwt.dom.client.Element
     public static final String INNER_HTML_PLACEHOLDER = "org.xwiki.gwt.dom.client.Element#placeholder";
 
     /**
-     * The name of the JavaScript property storing the reference to the meta data.<br/>
+     * The name of the JavaScript property storing the reference to the meta data.
+     * <p>
      * NOTE: We can't use the same name as for {@link #META_DATA_ATTR} because IE stores attribute values as JavaScript
      * properties of DOM element objects.
      */
@@ -49,7 +50,7 @@ public class Element extends com.google.gwt.dom.client.Element
 
     /**
      * The name of the DOM attribute storing the HTML of the meta data. This HTML is used to recreate the meta data when
-     * an element is cloned or copy&pasted.
+     * an element is cloned or copy and pasted.
      */
     public static final String META_DATA_ATTR = "metadata";
 
@@ -73,8 +74,9 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3054.
+     * 
      * @return The names of DOM attributes present on this element.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3054
      */
     public final JsArrayString getAttributeNames()
     {
@@ -84,7 +86,8 @@ public class Element extends com.google.gwt.dom.client.Element
     /**
      * Returns the value of the specified CSS property for this element as it is computed by the browser before the
      * element is displayed. The CSS property doesn't have to be applied explicitly or directly on this element. It can
-     * be inherited or assumed by default on this element.<br/>
+     * be inherited or assumed by default on this element.
+     * <p>
      * NOTE: You have to pass the JavaScript name of the property and not its CSS name. The JavaScript name has camel
      * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
      * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
@@ -99,10 +102,11 @@ public class Element extends com.google.gwt.dom.client.Element
 
     /**
      * Set inner HTML in cross browser manner and notify the owner document.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3146.
      * 
      * @param html the html to set.
-     * @see {@link DOMUtils#setInnerHTML(Element, String)}
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
+     * @see DOMUtils#setInnerHTML(Element, String)
      */
     public final void xSetInnerHTML(String html)
     {
@@ -203,7 +207,8 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
-     * Places all the children of this element in a document fragment and returns it.<br/>
+     * Places all the children of this element in a document fragment and returns it.
+     * <p>
      * NOTE: The element will remain empty after this method call.
      * 
      * @return A document fragment containing all the descendants of this element.
@@ -322,10 +327,11 @@ public class Element extends com.google.gwt.dom.client.Element
 
     /**
      * We need this method because {@link #getInnerText()} includes commented text in the output.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3275.
      * 
      * @return the text between the start and end tags of this element
      * @see #getInnerText()
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
      */
     public final String xGetInnerText()
     {
@@ -398,11 +404,12 @@ public class Element extends com.google.gwt.dom.client.Element
      * a consequence an attribute can be shared by multiple elements. When we {@link #removeAttribute(String)} the
      * {@code specified} flag is set to {@code false} and thus {@link #hasAttribute(String)}, which uses this flag in
      * its IE7 implementation, mistakenly reports the attribute as missing from the rest of the elements that share it.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=4690.
      * 
      * @param attributeName the name of an attribute
      * @return {@code true} if this element has the specified attribute, {@code false} otherwise
      * @see #hasAttribute(String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
      */
     public final boolean xHasAttribute(String attributeName)
     {

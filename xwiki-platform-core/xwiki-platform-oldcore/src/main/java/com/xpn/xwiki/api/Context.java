@@ -75,7 +75,7 @@ public class Context extends Api
     /**
      * Specifies the container or environment in which XWiki is currently running. See the following table for possible
      * values it can return:
-     * <table>
+     * <table summary="Return values">
      * <thead>
      * <tr>
      * <th>Return</th>

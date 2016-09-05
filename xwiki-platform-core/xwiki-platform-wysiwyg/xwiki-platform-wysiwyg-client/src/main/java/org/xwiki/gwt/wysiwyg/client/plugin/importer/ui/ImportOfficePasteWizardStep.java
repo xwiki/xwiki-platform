@@ -78,7 +78,7 @@ public class ImportOfficePasteWizardStep extends AbstractInteractiveWizardStep i
     /**
      * Creates an instance of {@link ImportOfficePasteWizardStep}.
      * 
-     * @param importService the component used to clean content copy&pasted from office documents
+     * @param importService the component used to clean content copy and pasted from office documents
      */
     public ImportOfficePasteWizardStep(ImportServiceAsync importService)
     {

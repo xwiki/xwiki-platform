@@ -63,7 +63,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
     }
 
     /**
-     * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
+     * See http://jira.xwiki.org/jira/browse/XWIKI-2730.
      */
     public void testInsertHeaderOnEmptyDocument()
     {

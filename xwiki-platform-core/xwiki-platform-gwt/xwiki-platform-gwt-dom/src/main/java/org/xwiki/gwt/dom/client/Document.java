@@ -25,9 +25,10 @@ import com.google.gwt.dom.client.Node;
 
 /**
  * Extends the document implementation provided by GWT to add support for selection and range.
+ * <p>
+ * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3006 and
+ * http://code.google.com/p/google-web-toolkit/issues/detail?id=3053.
  * 
- * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3006"
- * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3053"
  * @version $Id$
  */
 public class Document extends com.google.gwt.dom.client.Document
@@ -50,12 +51,15 @@ public class Document extends com.google.gwt.dom.client.Document
     }-*/;
 
     /**
-     * Creates an empty document fragment.<br/>
+     * Creates an empty document fragment.
+     * <p>
      * A DocumentFragment is a minimal document object that has no parent. It supports the following DOM 2 methods:
-     * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.<br/>
+     * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.
+     * <p>
      * It also supports the following DOM 2 properties: attributes, childNodes, firstChild, lastChild, localName,
      * namespaceURI, nextSibling, nodeName, nodeType, nodeValue, ownerDocument, parentNode, prefix, previousSibling,
-     * textContent.<br/>
+     * textContent.
+     * <p>
      * Various other methods can take a document fragment as an argument (e.g. Node interface methods such as
      * appendChild and insertBefore), in which case the children of the fragment are appended or inserted, not the
      * fragment itself.
@@ -82,9 +86,10 @@ public class Document extends com.google.gwt.dom.client.Document
     /**
      * We've added this method because at the time of writing {@link com.google.gwt.dom.client.Document} doesn't offer
      * support for creating a range.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3053.
      * 
      * @return A new range for this document.
-     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3053"
      */
     public final Range createRange()
     {
@@ -92,14 +97,16 @@ public class Document extends com.google.gwt.dom.client.Document
     }
 
     /**
-     * Creates a copy of a node from an external document that can be inserted into this document.<br/>
+     * Creates a copy of a node from an external document that can be inserted into this document.
+     * <p>
      * We've added this method because at time of writing
      * {@link com.google.gwt.dom.client.Document#importNode(Node, boolean)} is not well implemented.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3006.
      * 
      * @param externalNode The node from another document to be imported.
      * @param deep Indicates whether the children of the given node need to be imported.
      * @return a copy of the given node that can be inserted into this document.
-     * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=3006"
      */
     public final Node xImportNode(Node externalNode, boolean deep)
     {
@@ -108,11 +115,12 @@ public class Document extends com.google.gwt.dom.client.Document
 
     /**
      * Returns an iterator for the depth-first pre-order strategy, starting in <code>startNode</code>.
+     * <p>
+     * See http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document.
      * 
      * @param startNode node to start iteration from
      * @return the depth-first pre-order iterator
-     * @see {@link DepthFirstPreOrderIterator}
-     * @see "http://www.w3.org/TR/DOM-Level-2-Traversal-Range/traversal.html#Traversal-Document"
+     * @see DepthFirstPreOrderIterator
      */
     public final Iterator<Node> getIterator(Node startNode)
     {

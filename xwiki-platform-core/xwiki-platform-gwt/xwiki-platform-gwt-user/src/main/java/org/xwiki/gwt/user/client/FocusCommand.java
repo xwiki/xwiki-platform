@@ -23,7 +23,8 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Focusable;
 
 /**
- * Command that sets focus on the specified widget. <br />
+ * Command that sets focus on the specified widget.
+ * <p>
  * We need the deferred command focus setting in order to handle the issue described at
  * http://code.google.com/p/google-web-toolkit/issues/detail?id=1849 and the applied workarounds in existing code (e.g.
  * GlassPanel).

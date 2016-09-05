@@ -138,8 +138,8 @@ public interface Range
     /**
      * Sets the attributes describing the end of this range.
      * 
-     * @param refNode the {@link #endContainer} value. This parameter must be different from null.
-     * @param offset the {@link #endOffset} value
+     * @param refNode the {@link #getEndContainer()} value. This parameter must be different from null.
+     * @param offset the {@link #getEndOffset()} value
      */
     void setEnd(Node refNode, int offset);
 
@@ -160,8 +160,8 @@ public interface Range
     /**
      * Sets the attributes describing the start of this range.
      * 
-     * @param refNode the {@link #startContainer} value. This parameter must be different from null.
-     * @param offset the {@link #startOffset} value
+     * @param refNode the {@link #getStartContainer()} value. This parameter must be different from null.
+     * @param offset the {@link #getStartOffset()} value
      */
     void setStart(Node refNode, int offset);
 

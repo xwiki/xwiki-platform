@@ -48,7 +48,7 @@ public class RichTextAreaTest extends RichTextAreaTestCase
     /**
      * Unit test for {@link RichTextArea#setHTML(String)}. We test the workaround we use for Issue 3147.
      * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3147.
      */
     public void testSetHTML()
     {

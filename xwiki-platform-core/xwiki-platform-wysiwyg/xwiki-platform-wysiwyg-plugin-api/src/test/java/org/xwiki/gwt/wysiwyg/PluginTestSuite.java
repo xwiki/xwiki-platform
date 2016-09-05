@@ -36,9 +36,10 @@ import com.google.gwt.junit.tools.GWTTestSuite;
  * <p>
  * As described in GWT issue 2486, GWTTestSuite is not a translatable class and in order to prevent reports of harmless
  * errors we moved our test suite class out of module's source path.
+ * <p>
+ * See http://code.google.com/p/google-web-toolkit/issues/detail?id=2486.
  * 
  * @version $Id$
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2486
  */
 public class PluginTestSuite extends GWTTestSuite
 {

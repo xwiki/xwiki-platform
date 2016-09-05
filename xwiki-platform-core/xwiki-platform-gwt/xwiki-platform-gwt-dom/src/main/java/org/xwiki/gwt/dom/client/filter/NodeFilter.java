@@ -41,7 +41,7 @@ public interface NodeFilter
 
         /**
          * Reject the node. Tree iterators should reject the children of this node too. Node list iterators should
-         * consider this equivalent to {@link #FILTER_SKIP}.
+         * consider this equivalent to {@link #SKIP}.
          */
         REJECT,
 

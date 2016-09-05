@@ -83,7 +83,8 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     }
 
     /**
-     * Builds a {@link AbstractExplorerWizardStep} from the passed settings, with parameters for size. <br />
+     * Builds a {@link AbstractExplorerWizardStep} from the passed settings, with parameters for size.
+     * <p>
      * FIXME: remove the size parameters when the explorer will be correctly sizable from CSS.
      * 
      * @param treeURL the URL of the resource that represents the tree

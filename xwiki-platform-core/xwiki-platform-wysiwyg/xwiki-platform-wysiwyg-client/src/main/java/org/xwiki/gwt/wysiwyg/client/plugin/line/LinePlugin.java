@@ -436,10 +436,10 @@ public class LinePlugin extends AbstractPlugin implements CommandListener
      * <ul>
      * <li>Anchors don't start or end with a line break.</li>
      * </ul>
+     * See XWIKI-4193: When hitting Return at the end of the link the new line should not be a link.
      * 
      * @param container the block-level element containing the line break
      * @param br the line break
-     * @see XWIKI-4193: When hitting Return at the end of the link the new line should not be a link
      */
     protected void adjustLineBreak(Node container, Node br)
     {

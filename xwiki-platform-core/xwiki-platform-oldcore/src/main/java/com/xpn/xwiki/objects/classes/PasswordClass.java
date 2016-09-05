@@ -246,7 +246,7 @@ public class PasswordClass extends StringClass
     /**
      * @param password the password to hash.
      * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt> is a random
+     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a random
      *         64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
      *         hashing algorithm.
      */

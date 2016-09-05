@@ -32,10 +32,12 @@ import com.google.gwt.user.client.ui.Hidden;
 
 /**
  * A group of {@link Hidden} widgets that can be used to send data to the server when the HTML form is submitted. An
- * {@link Hidden} widget can serve two roles. It's either a flag or a parameter.<br/>
+ * {@link Hidden} widget can serve two roles. It's either a flag or a parameter.
+ * <p>
  * Flags are global with respect to the host page. Another {@link HiddenConfig} can have the same flag. As a consequence
  * the request will have a parameter with the name of the flag. The value of this request parameter will be the list of
- * {@link #nameSpace} of {@link HiddenConfig} that had the flag set when the form was submitted.<br/>
+ * {@link #nameSpace} of {@link HiddenConfig} that had the flag set when the form was submitted.
+ * <p>
  * Parameters are local with respect to a {@link HiddenConfig}. Their names are prefixed by the {@link #nameSpace}. For
  * each parameter set on a {@link HiddenConfig} there will be a request parameter with the same name and the same value.
  * 

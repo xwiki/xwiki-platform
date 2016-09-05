@@ -36,7 +36,8 @@ import com.google.gwt.dom.client.Node;
  * selection (thus on the current range). In some cases, a plugin needs to get user input before executing such a
  * command. It can gather the needed information by opening a dialog, for instance. In some browsers this may lead to
  * loosing the selection on the rich text area. In this case the plugin has to {@link #saveSelection()} before the
- * dialog is shown and {@link #restoreSelection()} after the dialog is closed.<br/>
+ * dialog is shown and {@link #restoreSelection()} after the dialog is closed.
+ * <p>
  * The selection preserver can be also used to restore the selection after executing commands like insert HTML. In this
  * particular case the restored selection will contain the HTML that replaced the previous selection.
  * 

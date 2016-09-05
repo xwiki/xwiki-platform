@@ -29,7 +29,7 @@ import com.google.gwt.dom.client.AnchorElement;
 
 /**
  * Executable for the unlink command, to remove a link in the wiki document. The command will be enabled whenever a 
- * link is selected, according to the algorithm described by {@link LinkExecutableUtils#getSelectedAnchor(RichTextArea).
+ * link is selected, according to the algorithm described by {@link LinkExecutableUtils#getSelectedAnchor(RichTextArea)}.
  * 
  * @version $Id$
  */

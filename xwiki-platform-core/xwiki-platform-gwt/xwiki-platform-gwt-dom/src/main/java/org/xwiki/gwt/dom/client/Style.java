@@ -45,8 +45,10 @@ public class Style extends com.google.gwt.dom.client.Style
 
     /**
      * Sets the stack order of an element. An element with greater stack order is always in front of another element
-     * with lower stack order.<br/>
-     * Elements can have negative stack orders.<br/>
+     * with lower stack order.
+     * <p>
+     * Elements can have negative stack orders.
+     * <p>
      * Z-index only works on elements that have been positioned (eg position:absolute;)!
      */
     public static final String Z_INDEX = "zIndex";
@@ -75,13 +77,15 @@ public class Style extends com.google.gwt.dom.client.Style
 
     /**
      * The font-family property is a prioritized list of font family names and/or generic family names for an element.
-     * The browser will use the first value it recognizes.<br/>
+     * The browser will use the first value it recognizes.
+     * <p>
      * There are two types of font-family values:
      * <ul>
      * <li>family-name: "times", "courier", "arial", etc.</li>
      * <li>generic-family: "serif", "sans-serif", "cursive", "fantasy", "monospace".</li>
      * </ul>
-     * Note: Separate each value with a comma, and always offer a generic-family name as the last alternative.<br/>
+     * Note: Separate each value with a comma, and always offer a generic-family name as the last alternative.
+     * <p>
      * Note: If a family-name contains white-space, it should be quoted. Single quotes must be used when using the
      * "style" attribute in HTML.
      */
@@ -305,7 +309,7 @@ public class Style extends com.google.gwt.dom.client.Style
     /**
      * The text-align property aligns the text in an element.
      * 
-     * @see http://www.w3.org/TR/css3-text/#justification
+     * See http://www.w3.org/TR/css3-text/#justification.
      */
     public static final class TextAlign
     {

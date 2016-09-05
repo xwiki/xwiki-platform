@@ -2086,7 +2086,7 @@ public class XWiki implements EventListener
 
     /**
      * @param template the name of the template
-     * @param skinId the id of the skin from which to load the template
+     * @param skin the id of the skin from which to load the template
      * @param context see {@link XWikiContext}
      */
     public String renderTemplate(String template, String skin, XWikiContext context)

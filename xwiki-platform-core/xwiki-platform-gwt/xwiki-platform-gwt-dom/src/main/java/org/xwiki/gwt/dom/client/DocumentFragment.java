@@ -22,11 +22,13 @@ package org.xwiki.gwt.dom.client;
 import com.google.gwt.dom.client.Node;
 
 /**
- * A fragment of a DOM document.<br/>
+ * A fragment of a DOM document.
+ * <p>
  * We've added this class because at the time of writing GWT doesn't offer a similar implementation.
+ * <p>
+ * See http://code.google.com/p/google-web-toolkit/issues/detail?id=2955.
  * 
  * @version $Id$
- * @see "http://code.google.com/p/google-web-toolkit/issues/detail?id=2955"
  */
 public final class DocumentFragment extends Node
 {

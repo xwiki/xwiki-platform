@@ -36,7 +36,7 @@ public interface WikiMacroManager
      * (Current User, Current Wiki, Global). For example Macros defined with a "Current User" visibility are
      * registered against the User Component Manager so that they are only visible from that Component Manager and not
      * from other Component Manager.
-     * <p/>
+     * <p>
      * Note that the Execution Context must be set properly (the current user or the current wiki must be set) prior
      * to calling this API.
      *

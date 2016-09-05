@@ -119,7 +119,7 @@ public class DocumentPicker extends BaseElement
 
     /**
      * Clicks the "pick document" button that triggers a modal pop-up to be displayed.
-     * <p/>
+     * <p>
      * The caller is responsible for handling the modal (or instantiating the right page object element), such we limit
      * the extra coupling that would be required from the test framework if it were to instantiate and return the page
      * object for the modal pop-up.
@@ -133,7 +133,7 @@ public class DocumentPicker extends BaseElement
      * Wait for the Breadcrumb to display the passed path string and throw an exception if the timeout is reached. Note
      * that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to
      * false positives.
-     * <p/>
+     * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
      * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
      * iteration, we lookup the current breadcrumb element and not a cached one.
@@ -175,7 +175,7 @@ public class DocumentPicker extends BaseElement
      * Wait for the Breadcrumb to display the passed path and throw an exception if the timeout is reached. Note that we
      * need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to false
      * positives.
-     * <p/>
+     * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
      * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
      * iteration, we lookup the current breadcrumb element and not a cached one.

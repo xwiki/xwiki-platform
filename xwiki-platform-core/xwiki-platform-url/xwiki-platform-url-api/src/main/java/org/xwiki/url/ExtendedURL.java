@@ -215,7 +215,7 @@ public class ExtendedURL implements Cloneable
      * Extract segments between "/" characters in the passed path. Also remove any path parameters (i.e. content
      * after ";" in a path segment; for ex ";jsessionid=...") since we don't want to have these params in the
      * segments we return and act on (otherwise we would get them in document names for example).
-     * <p/>
+     * <p>
      * Note that we only remove ";" characters when they are not URL-encoded. We want to allow the ";" character to be
      * in document names for example.
      *

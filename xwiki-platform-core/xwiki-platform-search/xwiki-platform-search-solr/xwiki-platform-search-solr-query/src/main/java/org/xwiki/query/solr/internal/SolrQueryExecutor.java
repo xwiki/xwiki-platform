@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Executes Solr queries.
- * <p/>
+ * <p>
  * For now, the result is the direct {@link QueryResponse}, in lack of a more expressive result type than the generic
  * List that the {@link #execute(Query)} method allows.
  * 

@@ -24,31 +24,33 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Maven 2 plugin to export a set of XWiki documents from an existing database to the file system.
  *
  * @version $Id$
- * @goal export
  */
+@Mojo(name = "export")
 public class ExportMojo extends AbstractMojo
 {
     /**
-     * @parameter default-value = "xwiki"
      * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="xwiki")
     private String databaseName;
 
     /**
-     * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
      * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="${basedir}/src/main/packager/hibernate.cfg.xml")
     private File hibernateConfig;
 
     /**
-     * @parameter default-value = "${project.build.directory}/export"
      * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="${project.build.directory}/export")
     private File exportDirectory;
 
     @Override

@@ -56,6 +56,11 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -81,113 +86,87 @@ import com.xpn.xwiki.tool.backup.Importer;
  *
  * @version $Id$
  * @since 3.4M1
- * @goal package
- * @phase package
- * @requiresProject
- * @requiresDependencyResolution runtime
- * @threadSafe
  */
+@Mojo(
+    name = "package",
+    defaultPhase = LifecyclePhase.PACKAGE,
+    requiresDependencyResolution = ResolutionScope.RUNTIME,
+    requiresProject = true,
+    threadSafe = true
+)
 public class PackageMojo extends AbstractMojo
 {
     /**
      * The directory where to create the packaging.
-     *
-     * @parameter default-value="${project.build.directory}/xartmp"
-     * @required
      */
-    private File tmpXarDirectory;
-
-    /**
-     * The directory where to create the packaging.
-     *
-     * @parameter default-value="${project.build.directory}/xwiki"
-     * @required
-     */
+    @Parameter(defaultValue="${project.build.directory}/xwiki", required = true)
     private File outputPackageDirectory;
 
     /**
      * The directory where classes are put.
-     *
-     * @parameter default-value="${project.build.outputDirectory}"
-     * @required
      */
+    @Parameter(defaultValue="${project.build.outputDirectory}", required = true)
     private File outputClassesDirectory;
 
     /**
      * The directory where the HSQLDB database is generated.
-     *
-     * @parameter default-value="${project.build.directory}/database"
-     * @required
      */
+    @Parameter(defaultValue="${project.build.directory}/database", required = true)
     private File databaseDirectory;
 
     /**
      * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(property = "project", required = true, readonly = true)
     protected MavenProject project;
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     *
-     * @component role="org.apache.maven.project.ProjectBuilder"
-     * @required
-     * @readonly
      */
+    @Component
     protected ProjectBuilder projectBuilder;
 
     /**
      * Used to look up Artifacts in the remote repository.
-     *
-     * @component
      */
+    @Component
     protected RepositorySystem repositorySystem;
 
     /**
      * The current Maven session being executed.
-     *
-     * @parameter default-value="${session}"
-     * @readonly
      */
+    @Parameter(property = "session", defaultValue = "${session}", readonly = true)
     private MavenSession session;
 
     /**
      * Local repository to be used by the plugin to resolve dependencies.
-     *
-     * @parameter expression="${localRepository}"
      */
+    @Parameter(property = "localRepository")
     protected ArtifactRepository localRepository;
 
     /**
      * List of remote repositories to be used by the plugin to resolve dependencies.
-     *
-     * @parameter expression="${project.remoteArtifactRepositories}"
      */
+    @Parameter(property = "project.remoteArtifactRepositories")
     protected List<ArtifactRepository> remoteRepositories;
 
     /**
      * The user under which the import should be done. If not user is specified then we import with backup pack. For
      * example {@code superadmin}.
-     *
-     * @parameter
      */
+    @Parameter
     private String importUser;
 
     /**
      * The platform version to be used by the packager plugin.
-     *
-     * @parameter expression="${platform.version}" default-value="${platform.version}"
      */
+    @Parameter(property = "platform.version", defaultValue = "${platform.version}")
     private String platformVersion;
 
     /**
      * List of skin artifacts to include in the packaging.
-     *
-     * @parameter
      */
+    @Parameter
     private List<SkinArtifactItem> skinArtifactItems;
 
     /**
@@ -195,9 +174,8 @@ public class PackageMojo extends AbstractMojo
      * artifact is extracted. WARs that share the same context path are merged. The order of the WAR artifacts in the
      * dependency list is important because the last one can overwrite files from the previous ones if they share the
      * same context path.
-     *
-     * @parameter
      */
+    @Parameter
     private Map<String, String> contextPathMapping;
 
     /**
@@ -207,6 +185,7 @@ public class PackageMojo extends AbstractMojo
      * @parameter default-value="true"
      * @since 6.0M2
      */
+    @Parameter(property = "true")
     private boolean test;
 
     @Override

@@ -35,7 +35,7 @@ import org.xwiki.properties.converter.ConversionException;
  * Converts from {@link String} to {@link java.nio.file.DirectoryStream.Filter} by looking at Component implementations
  * of the {@link java.nio.file.DirectoryStream.Filter} role with the passed string as the component hint. This makes it
  * easy to call the VFS module scripting API from Velocity for example.
- * <p/>
+ * <p>
  * For example the following would list all entries in the referenced zip which are of type File:
  * <code><pre>
  * #set ($ds = $services.vfs.getPaths("attach:Sandbox.WebHome@my.zip", "/", "File"))

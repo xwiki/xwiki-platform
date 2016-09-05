@@ -33,7 +33,7 @@ import java.util.Set;
  * {@link com.xpn.xwiki.gwt.api.client.widgets.WordListSuggestOracle#setWordOracle(com.google.gwt.user.client.ui.SuggestOracle)}
  * and the separators through {@link com.xpn.xwiki.gwt.api.client.widgets.WordListSuggestOracle#setSeparators(String)}.
  * Whether this oracle generates unique suggestions with respect to the already typed list, can 
- * be configured through {@link WordListSuggestOracle#isSuggestUnique()}.
+ * be configured through {@link WordListSuggestOracle#setSuggestUnique(boolean)}.
  */
 public class WordListSuggestOracle extends SuggestOracle {
     /**

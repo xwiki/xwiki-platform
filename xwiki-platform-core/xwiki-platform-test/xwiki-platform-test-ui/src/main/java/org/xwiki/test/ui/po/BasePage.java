@@ -101,7 +101,7 @@ public class BasePage extends BaseElement
     /**
      * Note: when reusing instances of BasePage, the constructor is not doing the work anymore and the
      * waitUntilPageJSIsLoaded() method needs to be executed manually, when needed.
-     * <p/>
+     * <p>
      * Note2: Never call the constructor before navigating to the page you need to test first.
      */
     public BasePage()
@@ -490,7 +490,7 @@ public class BasePage extends BaseElement
     /**
      * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
      * safely.
-     * <p/>
+     * <p>
      * Subclassed should override this method and add additional checks needed by their logic.
      * 
      * @since 6.2

@@ -45,7 +45,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * Data source that extracts values from a table (in any syntax that supports tables).  For example in xwiki/2.1 syntax:
  *
- * <p/>
+ * <p>
  * <code><pre>
  * |=           |= column label 1 |= column label 2  
  * | row label 1| 11              |  12

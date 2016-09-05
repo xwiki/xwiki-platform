@@ -63,7 +63,7 @@ public interface WatchListEventMatcher
 
     /**
      * Checks if an event should be skipped for various reasons (performance, security, etc.).
-     * <p/>
+     * <p>
      * Example: Watchlist job documents that are updated on each trigger should be skipped.
      * 
      * @param event the event to check

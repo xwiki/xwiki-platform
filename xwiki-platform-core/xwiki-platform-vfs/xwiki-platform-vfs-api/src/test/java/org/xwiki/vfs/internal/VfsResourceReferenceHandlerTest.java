@@ -65,7 +65,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link VfsResourceReferenceHandler}.
- * <p/>
+ * <p>
  * Note: We use a different URI for the various unit tests in this class since otherwise they're cached by
  * TrueVFS. TODO: Find a way to flush TrueVFS caches.
  *

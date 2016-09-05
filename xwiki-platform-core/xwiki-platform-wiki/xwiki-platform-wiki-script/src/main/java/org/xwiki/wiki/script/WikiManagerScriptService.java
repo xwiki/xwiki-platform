@@ -487,7 +487,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Tell if the path mode is used for subwikis.
-     * <p/>
+     * <p>
      * Example:
      * 
      * <pre>

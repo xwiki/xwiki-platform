@@ -38,7 +38,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Various APIs to make it easy to perform Git commands from within scripts.
- * <p/>
+ * <p>
  * Example usage from Velocity:
  * <code><pre>
  *   {{velocity}}

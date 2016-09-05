@@ -42,8 +42,8 @@ public class Exporter extends AbstractPackager
      * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
      *            password, etc)
      * @throws Exception if the export failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the exportation
      */
+    // TODO: Replace the Hibernate config file with a list of parameters required for the exportation
     public void exportDocuments(File exportDirectory, String databaseName, File hibernateConfig) throws Exception
     {
         XWikiContext xcontext = createXWikiContext(databaseName, hibernateConfig);

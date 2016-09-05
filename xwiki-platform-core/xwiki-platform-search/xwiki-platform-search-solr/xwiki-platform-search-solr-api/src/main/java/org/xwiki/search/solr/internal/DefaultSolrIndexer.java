@@ -61,7 +61,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
  * Default implementation of {@link SolrIndexer}.
- * <p/>
+ * <p>
  * This implementation does not directly process the given leaf-references, but adds them to a processing queue, in the
  * order they were received. The {@link Runnable} part of this implementation is the one that sequentially reads and
  * processes the queue.

@@ -116,7 +116,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     /**
      * Check if the migration can be executed by verifying if the current annotation class is the default one and that
      * the comments class does not have any custom mappings set up.
-     * <p/>
+     * <p>
      * Note: We can not do this in {@link #shouldExecute(XWikiDBVersion)} because we need to read the database and we
      * can not do that until the previous migrations are executed.
      * 

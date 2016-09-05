@@ -26,7 +26,7 @@ import com.xpn.xwiki.api.Attachment;
 
 /**
  * Get the user's avatar if it is set. If not, get the standard "noAvatar.png" image.
- * <p/>
+ * <p>
  * In both cases, the resulting image will be resized to a thumbnail version and it will have a fixed name. The
  * resulting {@link Attachment} object will be a fake as to not affect live documents.
  *

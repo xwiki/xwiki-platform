@@ -236,7 +236,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     /**
      * Wait until the element given by the locator is displayed. Give up after specified timeout (in seconds).
-     * <p/>
+     * <p>
      * Only use this API if you absolutely need a longer timeout than the default, otherwise use
      * {@link #waitUntilElementIsVisible(org.openqa.selenium.By)}.
      *
@@ -517,7 +517,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     /**
      * Waits until the provided javascript expression returns {@code true}.
-     * <p/>
+     * <p>
      * The wait is done while the expression returns {@code false}.
      *
      * @param booleanExpression the javascript expression to wait for to return {@code true}. The expression must have a
@@ -847,7 +847,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     /**
      * Adds a marker in the DOM of the browser that will only be available until we leave or reload the current page.
-     * <p/>
+     * <p>
      * To be used mainly before {@link #waitUntilPageIsReloaded()}.
      *
      * @since 7.4M2
@@ -869,7 +869,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      * Waits until the previously added marker is no longer found on the current page, signaling that the page has been
      * changed or reloaded. Useful when the page loading is done by jJavaScript and Selenium can not help in telling us
      * when we have left the old page.
-     * <p/>
+     * <p>
      * To be used always after {@link #addPageNotYetReloadedMarker()}.
      *
      * @since 7.4M2

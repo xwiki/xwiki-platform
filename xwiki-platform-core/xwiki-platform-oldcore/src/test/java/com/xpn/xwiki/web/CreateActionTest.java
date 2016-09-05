@@ -675,7 +675,7 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
@@ -686,7 +686,7 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
@@ -697,7 +697,7 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,

@@ -36,10 +36,10 @@ import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * A Scheduler plugin to plan execution of Jobs from XWiki with cron expressions. The plugin uses Quartz's scheduling
- * library. <p/> Jobs are represented by {@link com.xpn.xwiki.api.Object} XObjects, instances of the
+ * library. <p> Jobs are represented by {@link com.xpn.xwiki.api.Object} XObjects, instances of the
  * {@link SchedulerPlugin#XWIKI_JOB_CLASS} XClass. These XObjects do store a job name, the implementation class name of
  * the job to be executed, the cron expression to precise when the job should be fired, and possibly a groovy script
- * with the job's program. <p/> The plugin offers a {@link GroovyJob} Groovy Job wrapper to execute groovy scripts
+ * with the job's program. <p> The plugin offers a {@link GroovyJob} Groovy Job wrapper to execute groovy scripts
  * (typically for use inside the Wiki), but can also be used with any Java class implementing {@link org.quartz.Job}
  * 
  * @version $Id$

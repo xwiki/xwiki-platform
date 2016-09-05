@@ -132,7 +132,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Simply clicks on the Next Stept button, nothing more.
-     * <p/>
+     * <p>
      * You should generally use {@link #clickNextStep()} instead if you are not expecting an error or something outside
      * the normal flow.
      */

@@ -639,7 +639,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     /**
      * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating its name (it's
      * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document.
-     * <p/>
+     * <p>
      * The scheduler uses this unique object id to assure the unicity of jobs
      * 
      * @return a unique String that can identify the object

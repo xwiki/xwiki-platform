@@ -24,12 +24,12 @@ import java.util.Locale;
 /**
  * Contains constants naming the Solr/Lucene index fields used by this module for indexing entities. Also contains
  * additional constants used for composing field names on multilingual fields.
- * <p/>
+ * <p>
  * A multilingual and virtual/alias field, is not stored in the index with the specified name. It is only used at query
  * time and it is expanded automatically to the actual fields from the index.
- * <p/>
+ * <p>
  * Example: "title" becomes "title_ | title_en | title_ro | title_fr | etc..."
- * <p/>
+ * <p>
  * <b>Note</b>: When indexing a field, the actual field name must be used instead of the virtual field name.
  * 
  * @version $Id$
@@ -136,7 +136,7 @@ public final class FieldUtils
 
     /**
      * Title of the document.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String TITLE = "title";
@@ -153,7 +153,7 @@ public final class FieldUtils
 
     /**
      * For storing the comment associated to the version.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String COMMENT = "comment";
@@ -182,7 +182,7 @@ public final class FieldUtils
     /**
      * XWiki object content. Used by objects to index their properties and by documents to index all the properties of
      * the contained objects.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String OBJECT_CONTENT = "objcontent";
@@ -234,7 +234,7 @@ public final class FieldUtils
 
     /**
      * Fulltext plain rendered content.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String DOCUMENT_RENDERED_CONTENT = "doccontent";
@@ -246,7 +246,7 @@ public final class FieldUtils
 
     /**
      * Attachment content.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String ATTACHMENT_CONTENT = "attcontent";
@@ -313,7 +313,7 @@ public final class FieldUtils
 
     /**
      * For storing property value.
-     * <p/>
+     * <p>
      * Note: Multilingual and virtual field.
      */
     public static final String PROPERTY_VALUE = "propertyvalue";

@@ -83,7 +83,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     /**
      * Set the locale to all the translations that the owning document has. This ensures that this entity is found for
      * all the translations of a document, not just the original document.
-     * <p/>
+     * <p>
      * Also, index the content with each locale so that the right analyzer is used.
      * 
      * @param documentReference the original document's reference.

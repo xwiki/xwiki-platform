@@ -271,11 +271,11 @@ public class CreatePagePage extends ViewPage
      * Wait for the location preview to display the passed path string and throw an exception if the timeout is reached.
      * Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would
      * lead to false positives.
-     * <p/>
+     * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
      * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
      * iteration, we lookup the current breadcrumb element and not a cached one.
-     * <p/>
+     * <p>
      * TODO: Reuse {@link org.xwiki.index.test.po.DocumentPicker DocumentPicker} inside this PO instead of duplicating
      * this method.
      *

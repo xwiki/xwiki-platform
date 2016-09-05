@@ -93,10 +93,10 @@ public class RemoteSolrInstance extends AbstractSolrInstance
 
     /**
      * Generates the configuration files required to properly configure and initialize the remote Solr server.
-     * <p/>
+     * <p>
      * The files are available as a zip archive ("solr.zip") attached to the main wiki's XWiki.SolrSearchAdmin document
      * and exposed in the user interface of the main wiki.
-     * <p/>
+     * <p>
      * Note: If the attachment already exists, nothing will be done.
      * 
      * @throws Exception if problems occur.

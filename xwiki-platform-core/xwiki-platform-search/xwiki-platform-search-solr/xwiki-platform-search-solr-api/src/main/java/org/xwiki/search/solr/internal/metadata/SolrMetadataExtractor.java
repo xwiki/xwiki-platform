@@ -27,7 +27,7 @@ import org.xwiki.search.solr.internal.api.SolrIndexerException;
  * Internal component interface for handling the extraction of metadata into a {@link SolrInputDocument} from XWiki
  * entities reference. Each entity type is supported by a specific implementation so the correct implementation must be
  * used with the correct entity type.
- * <p/>
+ * <p>
  * The implementation use as hint the same value as returned by something like
  * {@code org.xwiki.model.EntityType.DOCUMENT.name().toLowerCase()} so they are easily retrievable, if they exist.
  * 

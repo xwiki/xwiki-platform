@@ -100,8 +100,8 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
         ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
         try {
             for (String nonLeafChildNodeType : nonLeafChildNodeTypes) {
-                this.nonLeafChildNodes.put(nonLeafChildNodeType,
-                    contextComponentManager.getInstance(TreeNode.class, nonLeafChildNodeType));
+                TreeNode treeNode = contextComponentManager.getInstance(TreeNode.class, nonLeafChildNodeType);
+                this.nonLeafChildNodes.put(nonLeafChildNodeType, treeNode);
             }
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to lookup the child components.", e);

@@ -64,8 +64,8 @@ public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.Wiki
     {
         // In Oracle the empty parent is actually null.
         Query query = this.documentQueryHelper.getQuery(
-            Arrays.asList("(doc.parent = '' or doc.parent is null)", "doc.translation = 0"), Collections.emptyMap(),
-            getProperties());
+            Arrays.asList("(doc.parent = '' or doc.parent is null)", "doc.translation = 0"),
+            Collections.<String, Object>emptyMap(), getProperties());
         query.setWiki(parentReference.getName());
         return query;
     }

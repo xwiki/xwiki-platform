@@ -592,10 +592,16 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       }
 
     //
+    // Un-wrap the links generated from wiki syntax so that they are taken into account by jsTree.
+    //
+
+    }).find('li > span[class^="wiki"] > a').unwrap().addBack()
+
+    //
     // Create the tree and extend its API.
     //
 
-    }).each(function() {
+    .each(function() {
       $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}));
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });

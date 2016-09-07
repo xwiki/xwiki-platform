@@ -75,12 +75,13 @@
       <groupId>org.artofsolving.jodconverter</groupId>
       <artifactId>jodconverter-core</artifactId>
       <!--
-        We use a custom build that includes:
-          * a fix for http://code.google.com/p/jodconverter/issues/detail?id=75
-          * a fix for http://jira.xwiki.org/jira/browse/XWIKI-5979
-          * a fix for http://jira.xwiki.org/jira/browse/XWIKI-6583
+        We have forked the JODConverter project because it is not maintained any more by its creator. This is a custom
+        release that includes fixes required by XWiki.
+
+        GitHub: https://github.com/xwiki/jodconverter
+        JIRA: http://jira.xwiki.org/browse/XJODC
       -->
-      <version>3.0-beta-4-xwiki-20110822</version>
+      <version>3.1-xwiki</version>
     </dependency>
     <dependency>
       <!--

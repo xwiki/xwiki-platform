@@ -38,14 +38,17 @@
   #if ($showChildDocuments == 'true')
     #set ($macro.options.hierarchyMode = 'parentchild')
   #end
-  #set ($resourceParams = {'outputSyntax': 'plain'})
+  #set ($resourceParams = {
+    'outputSyntax': 'plain',
+    'sheet': 'XWiki.DocumentTree'
+  })
   #foreach ($entry in $docTreeConfig.entrySet())
     #set ($value = $macro.options.get($entry.key))
     #if ("$!value" != '' && $value != "$!entry.value")
       #set ($discard = $resourceParams.put($entry.key, $value))
     #end
   #end
-  #set ($macro.options.reference = "path:$xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url($resourceParams))")
+  #set ($macro.options.reference = "path:$doc.getURL('get', $escapetool.url($resourceParams))")
   #set ($editable = $macro.options.remove('readOnly') != 'true')
   #set ($macro.options.dragAndDrop = $editable)
   #set ($macro.options.contextMenu = $editable)

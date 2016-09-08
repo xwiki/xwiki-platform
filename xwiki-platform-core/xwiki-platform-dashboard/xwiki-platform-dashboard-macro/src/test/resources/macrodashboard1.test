@@ -11,7 +11,7 @@
 beginDocument
 beginMacroMarkerStandalone [dashboard] []
 beginGroup [[class]=[dashboard]]
-beginGroup [[class]=[container-columns]]
+beginGroup [[class]=[container-columns container-columns-1]]
 beginGroup [[class]=[gadget-container column first-column last-column][id]=[gadgetcontainer_1]]
 beginGroup [[class]=[gadget][id]=[gadget_0]]
 beginHeader [1, null] [[class]=[gadget-title]]
@@ -29,7 +29,7 @@ endGroup [[class]=[gadget][id]=[gadget_0]]
 endGroup [[class]=[gadget-container column first-column last-column][id]=[gadgetcontainer_1]]
 beginGroup [[class]=[clearfloats]]
 endGroup [[class]=[clearfloats]]
-endGroup [[class]=[container-columns]]
+endGroup [[class]=[container-columns container-columns-1]]
 endGroup [[class]=[dashboard]]
 endMacroMarkerStandalone [dashboard] []
 endDocument

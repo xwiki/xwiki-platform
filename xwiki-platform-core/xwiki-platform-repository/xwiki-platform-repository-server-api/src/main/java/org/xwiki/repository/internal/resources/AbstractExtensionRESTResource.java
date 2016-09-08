@@ -372,7 +372,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
             ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
             extensionFeature.setId(extensionId.getId());
-            extensionFeature.setVersion(extensionId.getVersion().getValue());
+            if (extensionId.getVersion() != null) {
+                extensionFeature.setVersion(extensionId.getVersion().getValue());
+            }
             extension.getExtensionFeatures().add(extensionFeature);
         }
 
@@ -601,7 +603,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             org.xwiki.extension.ExtensionId extensionId = ExtensionIdConverter.toExtensionId(feature, null);
             ExtensionId extensionFeature = this.extensionObjectFactory.createExtensionId();
             extensionFeature.setId(extensionId.getId());
-            extensionFeature.setVersion(extensionId.getVersion().getValue());
+            if (extensionId.getVersion() != null) {
+                extensionFeature.setVersion(extensionId.getVersion().getValue());
+            }
             extension.getExtensionFeatures().add(extensionFeature);
         }
 

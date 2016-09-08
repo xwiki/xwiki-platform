@@ -57,6 +57,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWiki extends Api
 {
+    private static final int MAIL_SENDER_WRONGLY_CONFIGURED = -11;
+
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
@@ -1387,8 +1389,15 @@ public class XWiki extends Api
 
             return -1;
         } catch (Exception e) {
+            // NOTE: Since XWikiException is not properly typed (uses getModule() instead of a Java Class) it's easier
+            // to check the module here instead of risking to miss the other cases or duplicate code.
+            if ((e instanceof XWikiException)
+                && ((XWikiException) e).getModule() == XWikiException.MODULE_XWIKI_EMAIL) {
+                LOGGER.error("User created. Failed to send the email to the created user", e);
+                return MAIL_SENDER_WRONGLY_CONFIGURED;
+            }
+            // Generic error
             LOGGER.error("Failed to create user", e);
-
             return -10;
         }
 

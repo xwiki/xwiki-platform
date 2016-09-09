@@ -139,7 +139,7 @@ public interface TemplateManager
      * @param writer the writer containing the result of the execution and rendering
      * @throws Exception when failing to render the template
      */
-    void renderFromSkin(final String templateName, Skin skin, final Writer writer) throws Exception;
+    void renderFromSkin(String templateName, Skin skin, Writer writer) throws Exception;
 
     /**
      * Search the template with passed name in the passed skin.

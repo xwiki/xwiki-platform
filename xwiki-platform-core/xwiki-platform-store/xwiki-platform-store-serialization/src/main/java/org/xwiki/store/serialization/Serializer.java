@@ -46,7 +46,7 @@ public interface Serializer<R, P extends R>
      * handled by this serializer, the object was serialized with
      * a different Serializer, or something goes wrong along the way.
      */
-    P parse(final InputStream stream) throws IOException;
+    P parse(InputStream stream) throws IOException;
 
     /**
      * Serialize the given object and return an InputStream.

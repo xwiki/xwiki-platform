@@ -134,10 +134,73 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       terminalCheckbox.prop('checked', pageShouldBeTerminal);
     };
 
+    // Flag used to reset the parent reference to the current space reference when switching from a template provider
+    // that employs restrictions back to one that does not, so that the value restricted by the previous provider
+    // does not linger on to the ones without restrictions.
+    var shouldResetParentReference = false;
+
+    /*
+     * Parent Reference value updating when switching between document types.
+     */
+    var updateParentReferenceFromTemplateProviderInput = function(input) {
+      var currentParentReferenceValue = parentReferenceField.val();
+
+      // Get the list of allowed spaces.
+      var allowedSpacesData = input.attr('data-allowed-spaces');
+      var allowedSpaces = [];
+      if (allowedSpacesData) {
+        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+      }
+
+      var newParentReferenceValue = currentParentReferenceValue;
+      if (allowedSpaces.length > 0) {
+        // Utility method to determine if a value is in the list of restrictions or is a child of an existing restriction.
+        var isRestrictionOrChildOfRestriction = function(value) {
+          for (var i=0; i<allowedSpaces.length; i++) {
+            var allowedSpace = allowedSpaces[i];
+            var prefix = allowedSpace + ".";
+            if (value.indexOf(prefix) == 0 || value == allowedSpace) {
+              // When the current value is a child of an existing restriction or actually in the list, use it.
+              return true;
+            }
+          }
+
+          return false;
+        }
+
+        // Determine what new value we will set for the parent reference, which needs to respect the restrictions.
+        if (isRestrictionOrChildOfRestriction(currentParentReferenceValue)) {
+          newParentReferenceValue = currentParentReferenceValue;
+        } else if (isRestrictionOrChildOfRestriction(xm.space)) {
+          newParentReferenceValue = xm.space;
+          // Remember to reset when switching back to a provider with no restrictions.
+          shouldResetParentReference = true;
+        } else {
+          // The new value is "randomly" chosen as the first value in the list.
+          newParentReferenceValue = allowedSpaces[0];
+          // Remember to reset when switching back to a provider with no restrictions.
+          shouldResetParentReference = true;
+        }
+      } else if (shouldResetParentReference) {
+        // No restrictions, reset to the default (current space) parent reference.
+        newParentReferenceValue = xm.space;
+        // Clear the flag.
+        shouldResetParentReference = false;
+      }
+
+      // Set the new value, if different from what already exists.
+      if (currentParentReferenceValue != newParentReferenceValue) {
+        parentReferenceField.val(newParentReferenceValue);
+        // Trigger the input event so that validation can be performed.
+        parentReferenceField.trigger("input");
+      }
+    };
+
     // Update the allowed spaces based on the selected template provider.
     form.find('.xwiki-select').on('xwiki:select:updated', function (event) {
       var type = $('input[name="type"]:checked');
       updateTerminalCheckboxFromTemplateProviderInput(type);
+      updateParentReferenceFromTemplateProviderInput(type);
     });
   });
 });

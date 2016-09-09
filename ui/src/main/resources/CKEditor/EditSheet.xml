@@ -455,24 +455,31 @@ if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
 
 // Polyfill for xwiki-events-bridge module (available since 6.4).
 (function() {
-  var originalDocumentFire = document.fire;
-  if (typeof originalDocumentFire === 'function') {
-    require(['jquery', 'xwiki-events-bridge'], function($) {
-      if (document.fire === originalDocumentFire) {
-        // xwiki-events-bridge module is not available.
-        [
-          'xwiki:actions:cancel',
-          'xwiki:actions:preview',
-          'xwiki:actions:save',
-          'xwiki:document:saved'
-        ].forEach(function(eventType) {
-          // Catch the Prototype.js event.
-          document.observe(eventType, function(event) {
-            // Fire the jQuery event.
-            $(document).triggerHandler(eventType, event.memo);
-          });
+  if (typeof document.fire === 'function' &amp;&amp; require.toUrl('xwiki-events-bridge') === './xwiki-events-bridge') {
+    require(['jquery'], function($) {
+      // xwiki-events-bridge module is not available.
+      [
+        'xwiki:actions:cancel',
+        'xwiki:actions:preview',
+        'xwiki:actions:save',
+        'xwiki:document:saved'
+      ].forEach(function(eventType) {
+        // Catch the Prototype.js event.
+        var firing = false;
+        document.observe(eventType, function(event) {
+          // Fire the jQuery event.
+          if (firing) {
+            console.log("Attempted to fire an event inside of an event handler, stahp");
+          } else {
+            firing = true;
+            try {
+              $(document).triggerHandler(eventType, event.memo);
+            } finally {
+              firing = false;
+            }
+          }
         });
-      }
+      });
     });
   }
 })();

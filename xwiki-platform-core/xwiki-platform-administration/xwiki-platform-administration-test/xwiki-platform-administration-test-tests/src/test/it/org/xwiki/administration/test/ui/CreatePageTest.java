@@ -182,7 +182,8 @@ public class CreatePageTest extends AbstractTest
         TemplateProviderInlinePage templateProviderInline = new TemplateProviderInlinePage();
         List<String> allowedSpaces = new ArrayList<String>();
         allowedSpaces.add(getTestClassName());
-        templateProviderInline.setSpaces(allowedSpaces);
+        templateProviderInline.setVisibilityRestrictions(allowedSpaces);
+        templateProviderInline.setCreationRestrictions(allowedSpaces);
         templateProviderView = templateProviderInline.clickSaveAndView();
 
         // Verify we can still create a page from template in the test space

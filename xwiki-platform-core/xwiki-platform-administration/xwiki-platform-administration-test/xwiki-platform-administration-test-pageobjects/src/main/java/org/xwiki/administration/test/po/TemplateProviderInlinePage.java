@@ -20,8 +20,10 @@
 package org.xwiki.administration.test.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -61,6 +63,12 @@ public class TemplateProviderInlinePage extends InlinePage
 
     @FindBy(name = "XWiki.TemplateProviderClass_0_action")
     private WebElement templateActionSelect;
+
+    @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictions")
+    private WebElement creationRestrictionsInput;
+
+    @FindBy(name = "XWiki.TemplateProviderClass_0_creationRestrictionsAreSuggestions")
+    private WebElement creationRestrictionsAreSuggestionsCheckbox;
 
     private DocumentTreeElement spacesTree;
 
@@ -128,14 +136,18 @@ public class TemplateProviderInlinePage extends InlinePage
     {
         if (this.spacesTree == null) {
             this.spacesTree =
-                new DocumentTreeElement(this.getDriver().findElement(By.cssSelector("#enabled-spaces .xtree")))
+                new DocumentTreeElement(this.getDriver().findElement(By.cssSelector(".templateProviderSheet .xtree")))
                     .waitForIt();
         }
 
         return this.spacesTree;
     }
 
-    public List<String> getSpaces()
+    /**
+     * @return the list of spaces
+     * @since 8.2M3 (renamed from getSpaces)
+     */
+    public List<String> getVisibilityRestrictions()
     {
         List<String> spaces = new ArrayList<String>();
 
@@ -147,7 +159,11 @@ public class TemplateProviderInlinePage extends InlinePage
         return spaces;
     }
 
-    public void setSpaces(List<String> spaces)
+    /**
+     * @param spaces the list of spaces
+     * @since 8.2M3 (renamed from setSpaces)
+     */
+    public void setVisibilityRestrictions(List<String> spaces)
     {
         // Clean any existing selection.
         List<String> selectedNodeIDs = getSpacesTree().getSelectedNodeIDs();
@@ -167,12 +183,37 @@ public class TemplateProviderInlinePage extends InlinePage
                 @Override
                 public WebElement apply(WebDriver input)
                 {
-                    return getDriver().findElementWithoutWaiting(
-                        By.xpath("//input[@id='XWiki.TemplateProviderClass_0_spaces' and contains(@value, '" + space
-                            + "')]"));
+                    return getDriver()
+                        .findElementWithoutWaiting(
+                            By.xpath("//input[@id='XWiki.TemplateProviderClass_0_visibilityRestrictions' and contains(@value, '"
+                                + space + "')]"));
                 }
             });
         }
+    }
+
+    /**
+     * @param spaces the list of spaces to set
+     * @since 8.3M2
+     */
+    public void setCreationRestrictions(List<String> spaces)
+    {
+        String value = StringUtils.join(spaces.toArray());
+
+        this.creationRestrictionsInput.clear();
+        this.creationRestrictionsInput.sendKeys(value);
+    }
+
+    /**
+     * @return the list of spaces
+     * @since 8.2M2
+     */
+    public List<String> getCreationRestrictions()
+    {
+        String value = this.creationRestrictionsInput.getAttribute("value");
+        List<String> values = Arrays.asList(value.split(","));
+
+        return values;
     }
 
     /**
@@ -247,5 +288,25 @@ public class TemplateProviderInlinePage extends InlinePage
     public void setActionOnCreate(String actionName)
     {
         this.templateActionSelect.findElement(By.xpath("//option[@value='" + actionName + "']")).click();
+    }
+
+    /**
+     * @return true if the creationRestrictions are suggestions, false otherwise
+     * @since 8.3M2
+     */
+    public boolean isCreationRestrictionsSuggestions()
+    {
+        return this.creationRestrictionsAreSuggestionsCheckbox.isSelected();
+    }
+
+    /**
+     * @param selected true if the creationRestrictions should be suggestions, false otherwise
+     * @since 8.3M2
+     */
+    public void setCreationRestrictionsSuggestions(boolean selected)
+    {
+        if (this.creationRestrictionsAreSuggestionsCheckbox.isSelected() != selected) {
+            this.creationRestrictionsAreSuggestionsCheckbox.click();
+        }
     }
 }

@@ -20,30 +20,62 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="XWiki.Ratings" locale="">
   <web>XWiki</web>
   <name>Ratings</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1356994800000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1356994800000</date>
   <contentUpdateDate>1356994800000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="XWiki.RatingsMacros"/}}
+
+{{velocity}}
+#if("$!{request.xpage}" == "plain")
+  #if("$!{request.vote}" != "")
+    #set($requestDocRef = $services.model.resolveDocument($request.doc))
+    #set($userDocRef = $xcontext.getUserReference())
+    #set($vote = $mathtool.toInteger($request.vote))
+    #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
+      #set($ok = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
+      #if($ok) 
+        #if("$!{request.method}" != "")
+          #set($ar = $services.ratings.getAverageRating($requestDocRef, $request.method))
+        #else
+          #set($ar = $services.ratings.getAverageRating($requestDocRef))
+        #end
+        #set($avgvote = $ar.averageVote)
+        #set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef))
+        #set($nbVotes = $ar.nbVotes)
+       $response.setContentType('application/json')
+       {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }
+      #else 
+        {{translation key="rating.saveexception"/}}
+      #end
+    #elseif($vote == 0)
+      {{translation key="rating.votenotvalid"/}}
+    #else
+      {{translation key="rating.voteoutofbounds"/}}
+    #end
+  #end
+#end
+{{/velocity}}</content>
   <object>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>70a8d5ac-906d-4701-b7fd-8837d804740b</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -63,7 +95,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -71,6 +103,7 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -108,17 +141,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.Ratings</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>70a8d5ac-906d-4701-b7fd-8837d804740b</guid>
     <property>
       <cache>default</cache>
     </property>
@@ -218,6 +247,10 @@ document.observe("dom:loaded", function()
     </property>
   </object>
   <object>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>619a1d7d-5944-4a4a-97b0-e006452b0f44</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -233,11 +266,11 @@ document.observe("dom:loaded", function()
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>5</number>
+        <number>6</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -245,18 +278,35 @@ document.observe("dom:loaded", function()
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>2</number>
+        <number>3</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -267,7 +317,7 @@ document.observe("dom:loaded", function()
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -278,21 +328,17 @@ document.observe("dom:loaded", function()
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>3</number>
+        <number>4</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.Ratings</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>619a1d7d-5944-4a4a-97b0-e006452b0f44</guid>
     <property>
       <cache>default</cache>
     </property>
@@ -325,6 +371,10 @@ position: relative;
     </property>
   </object>
   <object>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -336,6 +386,7 @@ position: relative;
       <validationScript/>
       <content>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>content</name>
         <number>3</number>
         <prettyName>Extension Content</prettyName>
@@ -364,6 +415,7 @@ position: relative;
       </name>
       <parameters>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>parameters</name>
         <number>4</number>
         <prettyName>Extension Parameters</prettyName>
@@ -382,17 +434,13 @@ position: relative;
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>XWiki.Ratings</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
       <content>{{velocity}}
         #set($canView = $services.security.authorization.hasAccess("view", "XWiki.RatingsMacros"))
@@ -432,36 +480,4 @@ icon=icon:star</parameters>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{include reference="XWiki.RatingsMacros"/}}
-
-{{velocity}}
-#if("$!{request.xpage}" == "plain")
-  #if("$!{request.vote}" != "")
-    #set($requestDocRef = $services.model.resolveDocument($request.doc))
-    #set($userDocRef = $xcontext.getUserReference())
-    #set($vote = $mathtool.toInteger($request.vote))
-    #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
-      #set($ok = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
-      #if($ok) 
-        #if("$!{request.method}" != "")
-          #set($ar = $services.ratings.getAverageRating($requestDocRef, $request.method))
-        #else
-          #set($ar = $services.ratings.getAverageRating($requestDocRef))
-        #end
-        #set($avgvote = $ar.averageVote)
-        #set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef))
-        #set($nbVotes = $ar.nbVotes)
-       $response.setContentType('application/json')
-       {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }
-      #else 
-        {{translation key="rating.saveexception"/}}
-      #end
-    #elseif($vote == 0)
-      {{translation key="rating.votenotvalid"/}}
-    #else
-      {{translation key="rating.voteoutofbounds"/}}
-    #end
-  #end
-#end
-{{/velocity}}</content>
 </xwikidoc>

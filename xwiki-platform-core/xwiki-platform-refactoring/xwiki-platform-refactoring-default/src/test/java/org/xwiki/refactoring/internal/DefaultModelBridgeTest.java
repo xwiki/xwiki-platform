@@ -88,7 +88,7 @@ public class DefaultModelBridgeTest
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
 
-        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, false,
+        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true,
             this.xcontext)).thenReturn(true);
 
         assertTrue(this.mocker.getComponentUnderTest().copy(sourceReference, copyReference));

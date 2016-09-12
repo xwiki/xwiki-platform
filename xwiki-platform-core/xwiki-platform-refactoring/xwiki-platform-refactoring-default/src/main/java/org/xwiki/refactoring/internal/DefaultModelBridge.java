@@ -131,7 +131,7 @@ public class DefaultModelBridge implements ModelBridge
         try {
             String language = source.getLocale() != null ? source.getLocale().toString() : null;
             boolean result =
-                xcontext.getWiki().copyDocument(source, destination, language, false, true, false, xcontext);
+                xcontext.getWiki().copyDocument(source, destination, language, false, true, true, xcontext);
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {

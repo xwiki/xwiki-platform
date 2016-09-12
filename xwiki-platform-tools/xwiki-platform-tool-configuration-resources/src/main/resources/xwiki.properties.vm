@@ -456,6 +456,12 @@ extension.oldflavors=$oldFlavor.trim()
 # extension.oldflavors=
 #end
 
+#-# [Since 8.3]
+#-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
+#-# 
+#-# The default is:
+# extension.core.resolve=true
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

@@ -717,6 +717,9 @@ public class PackageMojo extends AbstractMojo
         // developer's life easy, we also include the filter module (used for XAR exports).
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-filter-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        // XAR module is trigged by xwiki-platform-oldcore but trigger it explicitly to not have surprises
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-filter-stream-xar", getXWikiPlatformVersion(), null, "jar"));
 
         // Also add the skins artifacts, that may have JAR dependencies
         mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());

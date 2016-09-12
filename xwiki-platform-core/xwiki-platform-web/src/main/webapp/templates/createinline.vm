@@ -122,6 +122,10 @@
           ## Backwards compatibility for Template Providers created before 8.3M2.
           #set($allowedSpaces = $tpobj.getValue('spaces'))
         #end
+        ## Reset to an empty list when no restrictions are set.
+        #if ("$!allowedSpaces" == '')
+          #set ($allowedSpaces = [])
+        #end
         #if($allowedSpaces.size() > 0)
           #set($jsAllowedSpacesArray = $jsontool.serialize($allowedSpaces))
         #end

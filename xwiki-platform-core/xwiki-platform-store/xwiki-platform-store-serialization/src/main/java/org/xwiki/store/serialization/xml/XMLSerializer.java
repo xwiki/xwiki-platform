@@ -55,5 +55,5 @@ public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
      * @param writeTo write output to this.
      * @throws IOException if something goes wrong.
      */
-    void serialize(R object, final XMLWriter writeTo) throws IOException;
+    void serialize(R object, XMLWriter writeTo) throws IOException;
 }

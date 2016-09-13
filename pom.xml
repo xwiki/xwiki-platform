@@ -110,7 +110,7 @@
             <tags>
               <!-- Tag to document a xwiki.cfg configuration file property behavior -->
               <tag>
-                <name>xwikicfg</name>
+                <name>xwiki.xwikicfg</name>
                 <placement>a</placement>
                 <head>xwiki.cfg configuration:</head>
               </tag>

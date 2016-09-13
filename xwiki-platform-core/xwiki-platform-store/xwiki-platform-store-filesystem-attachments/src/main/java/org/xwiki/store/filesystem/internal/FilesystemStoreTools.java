@@ -77,8 +77,7 @@ public interface FilesystemStoreTools
      * @param deleteDate the date the attachment was deleted.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment,
-        final Date deleteDate);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment, Date deleteDate);
 
     /**
      * Get a map of dates of deletion by the document where the attachment was attached.

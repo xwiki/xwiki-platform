@@ -40,6 +40,7 @@ import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.internal.maven.MavenUtils;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -337,6 +338,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             StringUtils.defaultIfEmpty((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
                 extensionDocument.getExternalURL("view", getXWikiContext())));
 
+        // Recommended
+        Integer recommended = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_RECOMMENDED, 0);
+        extension.setRecommended(recommended.intValue() == 1);
+
         // SCM
         ExtensionScm scm = new ExtensionScm();
         scm.setUrl((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMURL));
@@ -557,6 +562,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setSummary(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
 
+        // Recommended
+        Integer recommended = this.<Integer>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_RECOMMENDED);
+        extension.setRecommended(recommended != null && recommended.intValue() == 1);
+
         // SCM
         ExtensionScm scm = new ExtensionScm();
         scm.setUrl(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SCMURL));
@@ -648,6 +657,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
+
+        // Recommended
+        Integer recommended = this.<Integer>getSolrValue(document, RemoteExtension.FIELD_RECOMMENDED, false, 0);
+        extension.setRecommended(recommended.intValue() == 1);
 
         // SCM
         ExtensionScm scm = new ExtensionScm();

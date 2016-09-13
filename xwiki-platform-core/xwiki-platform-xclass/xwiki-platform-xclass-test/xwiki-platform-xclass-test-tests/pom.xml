@@ -34,15 +34,6 @@
   <packaging>jar</packaging>
   <description>Tests for the XClass Application</description>
   <properties>
-    <!-- Override in order to add the Packager Plugin -->
-    <xwikiCfgPlugins>\
-      com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.packaging.PackagePlugin
-    </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

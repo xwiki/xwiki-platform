@@ -714,7 +714,9 @@ public class PackageMojo extends AbstractMojo
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
 
         // When writing functional tests there's is often the need to export pages as XAR. Thus, in order to make
-        // developer's life easy, we also include the Filter modules required for it.
+        // developer's life easy, we also include the filter module (used for XAR exports).
+        // Note that we also need to bundle the Package plugin in getDefaultConfigurationProperties() because of
+        // http://jira.xwiki.org/browse/XWIKI-13695
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-filter-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
         // XAR module is triggered by org.xwiki.platform:xwiki-platform-oldcore but we still trigger it explicitly to
@@ -949,7 +951,8 @@ public class PackageMojo extends AbstractMojo
         props.setProperty("xwikiDbHbmFeeds", "feeds.hbm.xml");
 
         // Default configuration data for xwiki.cfg
-        props.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
+        props.setProperty("xwikiCfgPlugins", "com.xpn.xwiki.plugin.packaging.PackagePlugin,\\"
+            + "        com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
             + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"

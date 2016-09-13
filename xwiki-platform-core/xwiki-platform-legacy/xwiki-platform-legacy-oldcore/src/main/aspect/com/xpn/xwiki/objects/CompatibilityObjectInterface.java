@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public interface CompatibilityObjectInterface
 {
     /**
-     * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
+     * @deprecated since 2.2M1 use {@link com.xpn.xwiki.objects.BaseObject#getXClass(com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public BaseClass getxWikiClass(XWikiContext context) throws XWikiException;

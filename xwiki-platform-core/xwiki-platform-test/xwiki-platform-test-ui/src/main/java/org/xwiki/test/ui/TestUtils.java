@@ -1183,6 +1183,14 @@ public class TestUtils
 
     public void updateObject(String space, String page, String className, int objectNumber, Object... properties)
     {
+        updateObject(Collections.singletonList(space), page, className, objectNumber, properties);
+    }
+
+    /**
+     * @since 8.3RC1
+     */
+    public void updateObject(List<String> spaces, String page, String className, int objectNumber, Object... properties)
+    {
         // TODO: would be even quicker using REST
         Map<String, Object> queryParameters =
             (Map<String, Object>) toQueryParameters(className, objectNumber, properties);
@@ -1190,7 +1198,7 @@ public class TestUtils
         // Append the updateOrCreate objectPolicy since we always want this in our tests.
         queryParameters.put("objectPolicy", "updateOrCreate");
 
-        gotoPage(space, page, "save", queryParameters);
+        gotoPage(spaces, page, "save", queryParameters);
     }
 
     public void addClassProperty(String space, String page, String propertyName, String propertyType)

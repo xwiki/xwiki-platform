@@ -66,6 +66,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-sheet-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-ratings-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>

@@ -30,6 +30,9 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class ExtensionsPage extends ViewPage
 {
+    @FindBy(id = "browseSubmit")
+    private WebElement browseSubmit;
+
     @FindBy(id = "searchTextInput")
     private WebElement searchInput;
 
@@ -75,5 +78,15 @@ public class ExtensionsPage extends ViewPage
         this.contributeImportLink.click();
 
         return new ExtensionImportPage();
+    }
+
+    /**
+     * @since 8.3RC1
+     */
+    public ExtensionsPage clickBrowse()
+    {
+        this.browseSubmit.click();
+
+        return new ExtensionsPage();
     }
 }

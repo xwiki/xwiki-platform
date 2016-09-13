@@ -19,6 +19,8 @@
  */
 package org.xwiki.repository.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -38,15 +40,9 @@ public class ExtensionPage extends ViewPage
      */
     public boolean isValidExtension()
     {
-        for (WebElement message : getDriver().findElementsWithoutWaiting(
-            By.xpath("//div[@class='box successmessage']")))
-        {
-            if (message.getText().contains("Installable with the Extension Manager")) {
-                return true;
-            }
-        }
-
-        return false;
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(
+            By.xpath("//div[@class='box successmessage']/*[text() = 'Installable with the Extension Manager']"));
+        return !elements.isEmpty();
     }
 
     public ExtensionPage updateExtension()

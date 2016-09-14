@@ -777,11 +777,9 @@ public class InternalTemplateManager
 
         // Try from base skin if no skin is set
         if (skin == null) {
-            if (template == null) {
-                Skin baseSkin = this.skins.getCurrentParentSkin(false);
-                if (baseSkin != null) {
-                    template = getTemplate(templateName, baseSkin);
-                }
+            Skin baseSkin = this.skins.getCurrentParentSkin(false);
+            if (baseSkin != null) {
+                template = getTemplate(templateName, baseSkin);
             }
         }
 

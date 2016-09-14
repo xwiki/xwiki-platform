@@ -17,28 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package com.xpn.xwiki.internal.skin;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.xwiki.environment.Environment;
-
-import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.skin.ResourceRepository;
 
 /**
+ * @param <I> the type of the {@link InputSource}
  * @version $Id$
- * @since 6.4M1
+ * @since 8.3RC1
  */
-public class TemplateEnvironmentResource extends AbstractEnvironmentResource
+public abstract class AbstractInputSourceResource<I extends InputSource> extends AbstractResource<I>
 {
-    public TemplateEnvironmentResource(String path, String resourceName, Environment environment)
+    protected I source;
+
+    public AbstractInputSourceResource(String path, String resourceName, ResourceRepository repository, I source)
     {
-        super(path, resourceName, null, environment);
+        super(path, path, resourceName, repository);
+
+        this.source = source;
     }
 
     @Override
-    public String getURL(boolean forceSkinAction) throws Exception
+    public I getInputSource()
     {
-        // Does not make any sense in this case
-        throw new NotImplementedException();
+        return this.source;
     }
 }

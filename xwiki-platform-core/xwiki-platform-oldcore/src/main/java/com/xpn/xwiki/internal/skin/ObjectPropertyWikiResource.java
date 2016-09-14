@@ -61,9 +61,8 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
 
         XWikiURLFactory urlf = xcontext.getURLFactory();
 
-        URL url =
-            urlf.createSkinURL(this.reference.getName(), document.getSpace(), document.getName(),
-                document.getDatabase(), xcontext);
+        URL url = urlf.createSkinURL(this.reference.getName(), document.getSpace(), document.getName(),
+            document.getDatabase(), xcontext);
         return urlf.getURL(url, xcontext);
     }
 }

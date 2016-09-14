@@ -17,63 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.model;
+package org.xwiki.index.tree.internal.nestedspaces.query;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.observation.event.Event;
 
 /**
- * Represents an abstract page.
+ * Registers the named query mapping.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3RC1, 7.4.5
  */
-public abstract class AbstractXWikiPage
+@Component
+@Named("queryRegistrationHandler/nestedSpaces")
+@Singleton
+public class QueryRegistrationHandler extends org.xwiki.index.tree.internal.nestedpages.query.QueryRegistrationHandler
 {
-    private String reference;
-
-    private boolean terminal;
-
-    private String name;
-
-    private String parent;
-
-    private boolean hidden;
-
-    /**
-     * @return the page reference
-     */
-    public String getReference()
-    {
-        return reference;
-    }
-
-    /**
-     * @return whether the page is terminal or not
-     */
-    public boolean isTerminal()
-    {
-        return terminal;
-    }
-
-    /**
-     * @return the page name
-     */
+    @Override
     public String getName()
     {
-        return name;
+        return "queryRegistrationHandler/nestedSpaces";
     }
 
-    /**
-     * @return the page parent
-     */
-    public String getParent()
+    @Override
+    public void onEvent(Event event, Object source, Object data)
     {
-        return parent;
-    }
-
-    /**
-     * @return whether the page is hidden or not
-     */
-    public boolean isHidden()
-    {
-        return hidden;
+        loadMappingFile("org/xwiki/index/tree/internal/nestedspaces/query/queries.hbm.xml");
     }
 }

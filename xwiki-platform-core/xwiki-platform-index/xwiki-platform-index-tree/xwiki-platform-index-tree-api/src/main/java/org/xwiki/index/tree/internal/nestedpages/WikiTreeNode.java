@@ -19,17 +19,12 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -37,11 +32,11 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 
 /**
  * The wiki tree node.
@@ -56,6 +51,18 @@ public class WikiTreeNode extends AbstractEntityTreeNode
 {
     @Inject
     private LocalizationContext localizationContext;
+
+    @Inject
+    @Named("topLevelPage/nestedPages")
+    private QueryFilter topLevelPageFilter;
+
+    @Inject
+    @Named("hiddenPage/nestedPages")
+    private QueryFilter hiddenPageFilter;
+
+    @Inject
+    @Named("documentReferenceResolver/nestedPages")
+    private QueryFilter documentReferenceResolverFilter;
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -75,45 +82,27 @@ public class WikiTreeNode extends AbstractEntityTreeNode
     protected List<? extends EntityReference> getChildren(WikiReference wikiReference, int offset, int limit)
         throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        constraints.add("page.parent is null");
-        if (!areHiddenEntitiesShown()) {
-            constraints.add("page.hidden <> true");
-        }
-        String whereClause = whereClause(constraints);
-
-        Map<String, Object> parameters = new HashMap<String, Object>();
         String orderBy = getOrderBy();
-        String statement;
+        Query query;
         if ("title".equals(orderBy)) {
-            statement = StringUtils.join(Arrays.asList("select page.name from XWikiPage page",
-                "left join page.translations defaultTranslation with defaultTranslation.locale = ''",
-                "left join page.translations translation with translation.locale = :locale", whereClause,
-                "order by lower(coalesce(translation.title, defaultTranslation.title, page.name)), "
-                    + "coalesce(translation.title, defaultTranslation.title, page.name)"),
-                ' ');
-            parameters.put("locale", this.localizationContext.getCurrentLocale().toString());
+            query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle");
+            query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
         } else {
             // Query only the spaces table.
-            statement = StringUtils.join(
-                Arrays.asList("select name from XWikiSpace page", whereClause, "order by lower(name), name"), ' ');
+            query = this.queryManager.createQuery(
+                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
         }
-
-        Query query = this.queryManager.createQuery(statement, Query.HQL);
         query.setWiki(wikiReference.getName());
         query.setOffset(offset);
         query.setLimit(limit);
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            query.bindValue(entry.getKey(), entry.getValue());
+
+        query.addFilter(this.topLevelPageFilter);
+
+        if (!areHiddenEntitiesShown()) {
+            query.addFilter(this.hiddenPageFilter);
         }
 
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-        for (Object result : query.execute()) {
-            String name = (String) result;
-            documentReferences.add(new DocumentReference(wikiReference.getName(), name, getDefaultDocumentName()));
-        }
-
-        return documentReferences;
+        return query.addFilter(this.documentReferenceResolverFilter).execute();
     }
 
     @Override

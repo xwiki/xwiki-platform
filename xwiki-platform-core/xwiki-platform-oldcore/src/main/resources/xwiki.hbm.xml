@@ -44,7 +44,7 @@
         <property name="title" type="string" column="XWD_TITLE" length="255" index="DOC_TITLE" not-null="true" />
         <property name="language" type="string" column="XWD_LANGUAGE" index="DOC_LANGUAGE" length="5" />
         <property name="defaultLanguage" type="string" column="XWD_DEFAULT_LANGUAGE" index="DOC_DEFAULT_LANGUAGE" length="5" />
-        <property name="translation" type="integer" column="XWD_TRANSLATION" not-null="true" />
+        <property name="translation" type="integer" column="XWD_TRANSLATION" index="DOC_TRANSLATION" not-null="true" />
         <property name="date" type="timestamp" column="XWD_DATE" index="DOC_DATE" not-null="true" />
         <property name="contentUpdateDate" type="timestamp" column="XWD_CONTENT_UPDATE_DATE" index="DOC_CONTENT_UPDATE_DATE" not-null="true" />
         <property name="creationDate" type="timestamp" column="XWD_CREATION_DATE" index="DOC_CREATION_DATE" not-null="true" />

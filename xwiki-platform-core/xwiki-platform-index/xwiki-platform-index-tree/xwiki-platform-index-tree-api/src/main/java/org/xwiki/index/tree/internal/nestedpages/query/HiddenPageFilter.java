@@ -17,47 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.model;
+package org.xwiki.index.tree.internal.nestedpages.query;
 
-import java.util.Locale;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.localization.LocaleUtils;
+import org.xwiki.component.annotation.Component;
 
 /**
- * An abstract page translation.
+ * Filters hidden pages. This filter works with the named <strong>native SQL</strong> queries declared in the
+ * {@code queries.hbm.xml} mapping file.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3RC1, 7.4.5
  */
-public abstract class AbstractXWikiPageTranslation
+@Component
+@Named("hiddenPage/nestedPages")
+@Singleton
+public class HiddenPageFilter extends AbstractNestedPageFilter
 {
-    private String title;
-
-    private String locale;
-
-    private String defaultLocale;
-
-    /**
-     * @return the page title
-     */
-    public String getTitle()
+    @Override
+    protected String filterNestedPagesStatement(String statement)
     {
-        return title;
+        // The constraint is different depending on whether we filter a native SQL query or an HQL query.
+        String constraint = statement.indexOf("XWS_REFERENCE") < 0 ? "hidden <> true " : "XWS_HIDDEN <> 1 ";
+        return insertWhereConstraint(statement, constraint);
     }
 
-    /**
-     * @return the page locale
-     */
-    public Locale getLocale()
+    @Override
+    protected String filterTerminalPagesStatement(String statement)
     {
-        return LocaleUtils.toLocale(this.locale, Locale.ROOT);
-    }
-
-    /**
-     * @return the default page locale
-     */
-    public Locale getDefaultLocale()
-    {
-        return LocaleUtils.toLocale(this.defaultLocale, Locale.ROOT);
+        return statement + " and doc.XWD_HIDDEN <> 1 ";
     }
 }

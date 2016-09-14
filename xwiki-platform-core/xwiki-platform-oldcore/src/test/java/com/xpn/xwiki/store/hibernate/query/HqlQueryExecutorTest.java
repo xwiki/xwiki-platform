@@ -26,7 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.NamedSQLQueryDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +39,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -48,6 +52,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -256,6 +261,35 @@ public class HqlQueryExecutorTest
             // Verify nested exception!
             assertEquals("nestedmessage", expected.getCause().getMessage());
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createNamedNativeHibernateQuery() throws Exception
+    {
+        DefaultQuery query = new DefaultQuery("queryName", this.executor);
+        QueryFilter filter = mock(QueryFilter.class);
+        query.addFilter(filter);
+
+        Session session = mock(Session.class);
+        SQLQuery sqlQuery = mock(SQLQuery.class);
+        when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
+
+        when(sqlQuery.getQueryString()).thenReturn("foo");
+        when(filter.filterStatement("foo", "sql")).thenReturn("bar");
+
+        SQLQuery finalQuery = mock(SQLQuery.class);
+        when(session.createSQLQuery("bar")).thenReturn(finalQuery);
+
+        NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
+        when(definition.getResultSetRef()).thenReturn("someResultSet");
+
+        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
+        sessionFactory.getConfiguration().getNamedSQLQueries().put(query.getStatement(), definition);
+
+        assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
+
+        verify(finalQuery).setResultSetMapping(definition.getResultSetRef());
     }
 
     // Allowed

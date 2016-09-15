@@ -636,7 +636,7 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-gwt-api", getXWikiPlatformVersion(), null, "jar"));
 
         // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
-        // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
+        // issue with XE and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-uiextension-api", getXWikiPlatformVersion(), null, "jar"));
@@ -662,6 +662,8 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-resource-servlet", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-xar-script", getXWikiPlatformVersion(), null, "jar"));
 
         // Velocity Scripting for Model Modules is also core (it's used a bit everywhere in VMs, pages, etc).
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

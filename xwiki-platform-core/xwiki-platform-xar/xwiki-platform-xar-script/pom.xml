@@ -24,16 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-xar</artifactId>
     <version>8.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-xar</artifactId>
-  <name>XWiki Platform - XAR - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>API and UI to import and export XAR packages</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-xar-model</module>
-    <module>xwiki-platform-xar-script</module>
-  </modules>
+  <artifactId>xwiki-platform-xar-script</artifactId>
+  <name>XWiki Platform - XAR - Scripting API</name>
+  <packaging>jar</packaging>
+  <description>Scripting API for XAR import/export</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Scripting API for XAR import/export</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

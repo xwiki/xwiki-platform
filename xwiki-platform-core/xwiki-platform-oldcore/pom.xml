@@ -535,7 +535,7 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-xar</artifactId>
+      <artifactId>xwiki-platform-xar-script</artifactId>
       <version>${project.version}</version>
     </dependency>
 

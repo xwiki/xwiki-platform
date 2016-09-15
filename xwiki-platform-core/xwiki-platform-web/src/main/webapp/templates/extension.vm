@@ -917,6 +917,9 @@ $namespace##
       #if ("$!extension.summary" != '')
         <div class="extension-summary">$escapetool.xml($extension.summary)</div>
       #end
+      #if ($extension.isRecommended())
+        <div class="extension-recommended">$services.localization.render('extensions.info.recommended')</div>
+      #end
       #displayProgressBar($extension)
       <div class="clearfloats"></div>
     </div>

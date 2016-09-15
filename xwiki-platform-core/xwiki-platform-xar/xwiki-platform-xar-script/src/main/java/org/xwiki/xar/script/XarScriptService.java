@@ -25,12 +25,21 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.XarPackage;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Provide APIs to manipulate XAR files.
@@ -48,11 +57,21 @@ public class XarScriptService implements ScriptService
      */
     public static final String ERROR_KEY = "scriptservice.xar.error";
 
+    private static final String EXPORT_USEFILTER_KEY = "xwiki.action.export.xar.usefilter";
+
     /**
      * Provides access to the current context.
      */
     @Inject
     protected Execution execution;
+
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikiCfgConfigurationSource;
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
 
     // Error management
 
@@ -120,5 +139,36 @@ public class XarScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    /**
+     * @return true if the XAR export feature is available in the current XWiki instance, false otherwise
+     * @since 8.3RC1
+     */
+    @Unstable
+    public boolean isXARExportAvailable()
+    {
+        boolean available = false;
+
+        // Check the value of the xwiki.action.export.xar.usefilter config parameter in xwiki.cfg
+        int useFilter = this.xwikiCfgConfigurationSource.getProperty(EXPORT_USEFILTER_KEY, (Integer) 1);
+        if (useFilter == 1) {
+            // Are the following 2 components available?
+            ComponentManager cm = this.contextComponentManagerProvider.get();
+            if (cm.hasComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize())
+                && cm.hasComponent(OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize()))
+            {
+                available = true;
+            }
+        } else {
+            // We're using the old packager plugin, verify it's there
+            XWikiContext xcontext =
+                (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            if (xcontext != null && xcontext.getWiki().getPlugin("package", xcontext) != null) {
+                available = true;
+            }
+        }
+
+        return available;
     }
 }

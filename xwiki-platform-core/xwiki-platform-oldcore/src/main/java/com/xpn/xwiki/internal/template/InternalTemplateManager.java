@@ -807,7 +807,7 @@ public class InternalTemplateManager
 
         // Try from current Thread classloader
         if (template == null) {
-            template = getClassloaderTemplate("/templates/", templateName);
+            template = getClassloaderTemplate("templates/", templateName);
         }
 
         return template;

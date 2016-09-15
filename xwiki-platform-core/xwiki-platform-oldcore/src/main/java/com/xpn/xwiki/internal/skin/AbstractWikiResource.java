@@ -38,6 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public abstract class AbstractWikiResource<R extends EntityReference, I extends InputSource> extends
     AbstractResource<I> implements WikiResource<I>
 {
+    protected  final Provider<XWikiContext> xcontextProvider;
+
     protected final R reference;
 
     protected final DocumentReference authorReference;
@@ -45,10 +47,11 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
     public AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository,
         R reference, DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
     {
-        super(id, path, resourceName, repository, xcontextProvider);
+        super(id, path, resourceName, repository);
 
         this.reference = reference;
         this.authorReference = authorReference;
+        this.xcontextProvider = xcontextProvider;
     }
 
     @Override

@@ -19,20 +19,27 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.xwiki.environment.Environment;
+import java.net.URL;
 
-import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
+import org.apache.commons.lang.NotImplementedException;
+import org.xwiki.filter.input.DefaultURLInputSource;
+import org.xwiki.filter.input.URLInputSource;
+
+import com.xpn.xwiki.internal.skin.AbstractInputSourceResource;
 
 /**
  * @version $Id$
- * @since 6.4M1
+ * @since 8.3RC1
  */
-public class TemplateEnvironmentResource extends AbstractEnvironmentResource
+public class ClassloaderResource extends AbstractInputSourceResource<URLInputSource>
 {
-    public TemplateEnvironmentResource(String path, String resourceName, Environment environment)
+    /**
+     * @param url the URL of the resource
+     * @param resourceName the name of the resource
+     */
+    public ClassloaderResource(URL url, String resourceName)
     {
-        super(path, resourceName, null, environment);
+        super(url.toExternalForm(), resourceName, null, new DefaultURLInputSource(url));
     }
 
     @Override

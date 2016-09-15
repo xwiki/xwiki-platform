@@ -46,6 +46,11 @@ public interface Resource<I extends InputSource>
     String getPath();
 
     /**
+     * @return the name of the resource (usually a relative path)
+     */
+    String getResourceName();
+
+    /**
      * Provide an {@link InputSource} to read the resource.
      * 
      * @return an {@link InputSource} to read the resource

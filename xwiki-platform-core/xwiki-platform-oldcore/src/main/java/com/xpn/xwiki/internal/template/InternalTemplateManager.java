@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -732,6 +733,20 @@ public class InternalTemplateManager
             ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName, this.environment)) : null;
     }
 
+    private Template getClassloaderTemplate(String suffixPath, String templateName)
+    {
+        return getClassloaderTemplate(Thread.currentThread().getContextClassLoader(), suffixPath, templateName);
+    }
+
+    private Template getClassloaderTemplate(ClassLoader classloader, String suffixPath, String templateName)
+    {
+        String templatePath = suffixPath + templateName;
+
+        URL url = classloader.getResource(templatePath);
+
+        return url != null ? new DefaultTemplate(new ClassloaderResource(url, templateName)) : null;
+    }
+
     private Template createTemplate(Resource<?> resource)
     {
         Template template;
@@ -783,9 +798,16 @@ public class InternalTemplateManager
             }
         }
 
-        // Try from /template/ resources
+        // Try from /templates/ environment resources
         if (template == null) {
             template = getFileSystemTemplate("/templates/", templateName);
+        }
+
+        // TODO: Try from the caller class (i.e. give priority to the JAR of the caller)
+
+        // Try from current Thread classloader
+        if (template == null) {
+            template = getClassloaderTemplate("templates/", templateName);
         }
 
         return template;

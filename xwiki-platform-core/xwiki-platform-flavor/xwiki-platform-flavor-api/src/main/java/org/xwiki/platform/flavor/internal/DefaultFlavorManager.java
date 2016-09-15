@@ -77,13 +77,13 @@ public class DefaultFlavorManager implements FlavorManager
 
     @Override
     @Deprecated
-    public IterableResult<Extension> getFlavors(FlavorQuery query)
+    public IterableResult<Extension> getFlavors(FlavorQuery query) throws SearchException
     {
         return searchFlavors(query);
     }
 
     @Override
-    public IterableResult<Extension> searchFlavors(FlavorQuery query)
+    public IterableResult<Extension> searchFlavors(FlavorQuery query) throws SearchException
     {
         IterableResult<Extension> result = null;
 

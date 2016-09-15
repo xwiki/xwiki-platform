@@ -60,22 +60,22 @@
   <sql-query name="nestedSpacesOrderedByTitle" resultset-ref="XWikiPageOrSpaceReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
-    select xwikiPageOrSpace.reference as reference, xwikiPageOrSpace.terminal as terminal
+    select xwikiPageOrSpace.reference reference, xwikiPageOrSpace.terminal terminal
 
     from (
 
-        (select XWS_REFERENCE as reference,
-                0 as terminal,
-                XWS_NAME as title
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWS_NAME title
             from xwikispace)
 
         union all
 
-        (select doc.XWD_FULLNAME as reference,
-                1 as terminal,
-                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), doc.XWD_NAME) as title
-            from xwikidoc as doc
-            left outer join xwikidoc as tdoc on (
+        (select doc.XWD_FULLNAME reference,
+                1 terminal,
+                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), doc.XWD_NAME) title
+            from xwikidoc doc
+            left outer join xwikidoc tdoc on (
                 tdoc.XWD_FULLNAME = doc.XWD_FULLNAME and
                 tdoc.XWD_LANGUAGE = :locale)
             where doc.XWD_TRANSLATION = 0)
@@ -90,21 +90,21 @@
   <sql-query name="nestedSpacesOrderedByName" resultset-ref="XWikiPageOrSpaceReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
-    select xwikiPageOrSpace.reference as reference, xwikiPageOrSpace.terminal as terminal
+    select xwikiPageOrSpace.reference reference, xwikiPageOrSpace.terminal terminal
 
     from (
 
-        (select XWS_REFERENCE as reference,
-                0 as terminal,
-                XWS_NAME as pageOrSpaceName
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWS_NAME pageOrSpaceName
             from xwikispace)
 
         union all
 
-        (select XWD_FULLNAME as reference,
-                1 as terminal,
-                XWD_NAME as pageOrSpaceName
-            from xwikidoc as doc
+        (select XWD_FULLNAME reference,
+                1 terminal,
+                XWD_NAME pageOrSpaceName
+            from xwikidoc doc
             where XWD_TRANSLATION = 0)
 
     ) xwikiPageOrSpace

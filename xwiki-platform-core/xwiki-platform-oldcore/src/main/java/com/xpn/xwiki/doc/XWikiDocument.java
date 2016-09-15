@@ -795,29 +795,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Temporary helper to produce a local/uid serialization of this document reference, including the language. Only
-     * translated document will have language appended. FIXME: when reference contains locale, this is no more needed.
+     * Helper to produce and cache a local uid serialization of this document reference, including the language. Only
+     * translated document will have language appended.
      *
      * @return a unique name (in a wiki) (5:space4:name2:lg)
      */
     private String getLocalKey()
     {
         if (this.localKeyCache == null) {
-            final String localUid = LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getDocumentReference());
-
-            if (StringUtils.isEmpty(getLanguage())) {
-                this.localKeyCache = localUid;
-            } else {
-                this.localKeyCache = appendLocale(new StringBuilder(64).append(localUid)).toString();
-            }
+            this.localKeyCache =
+                LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getDocumentReferenceWithLocale());
         }
 
         return this.localKeyCache;
     }
 
     /**
-     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only translated
-     * document will have locale appended. FIXME: when reference contains locale, this is no more needed.
+     * Helper to produce and cache a uid serialization of this document reference, including the language. Only
+     * translated document will have language appended.
      *
      * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
      * @since 4.0M1
@@ -825,35 +820,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getKey()
     {
         if (this.keyCache == null) {
-            final String uid = getUidStringEntityReferenceSerializer().serialize(getDocumentReference());
-
-            if (StringUtils.isEmpty(getLanguage())) {
-                this.keyCache = uid;
-            } else {
-                this.keyCache = appendLocale(new StringBuilder(64).append(uid)).toString();
-            }
+            this.keyCache = getUidStringEntityReferenceSerializer().serialize(getDocumentReferenceWithLocale());
         }
 
         return this.keyCache;
-    }
-
-    /**
-     * Temporary helper that append the language of this document to the provide string buffer. FIXME: when reference
-     * contains locale, this is no more needed.
-     *
-     * @param sb a StringBuilder where to append the locale key
-     * @return the StringBuilder appended with the locale of this document formatted like 2:lg
-     * @see #getLocalKey()
-     */
-    private StringBuilder appendLocale(StringBuilder sb)
-    {
-        String localeString = getLanguage();
-
-        if (StringUtils.isEmpty(localeString)) {
-            return sb;
-        }
-
-        return sb.append(localeString.length()).append(':').append(localeString);
     }
 
     @Override
@@ -879,7 +849,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // that all things saved in a given wiki's database are always stored relative to that wiki so that
         // changing that wiki's name is simpler.
 
-        return (this.id = Util.getHash(getLocalKey()));
+        this.id = Util.getHash(getLocalKey());
+
+        return this.id;
     }
 
     /**

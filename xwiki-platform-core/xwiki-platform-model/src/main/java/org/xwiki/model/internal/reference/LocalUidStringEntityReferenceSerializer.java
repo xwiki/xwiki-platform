@@ -21,6 +21,7 @@
 package org.xwiki.model.internal.reference;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -109,5 +111,16 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
             }
         }
         representation.append(name.length()).append(':').append(name);
+
+        // Append Locale
+        if (currentReference instanceof DocumentReference) {
+            Locale locale = ((DocumentReference) currentReference).getLocale();
+            if (locale != null) {
+                String localeString = locale.toString();
+                if (!localeString.isEmpty()) {
+                    representation.append(localeString.length()).append(':').append(localeString);
+                }
+            }
+        }
     }
 }

@@ -78,8 +78,11 @@ public class XWikiCacheStoreTest
     @Test
     public void testLoadXWikiDoc() throws Exception
     {
+        // Set current wiki
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+
         // Save a document
-        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        DocumentReference reference = new DocumentReference("otherwiki", "space", "page");
         this.oldcore.getSpyXWiki().saveDocument(new XWikiDocument(reference), this.oldcore.getXWikiContext());
 
         XWikiCacheStore store = new XWikiCacheStore(this.oldcore.getMockStore(), this.oldcore.getXWikiContext());
@@ -88,8 +91,8 @@ public class XWikiCacheStoreTest
             store.loadXWikiDoc(new XWikiDocument(reference), this.oldcore.getXWikiContext());
 
         assertFalse(existingDocument.isNew());
-        verify(this.cache).set(eq(existingDocument.getKey()), any(XWikiDocument.class));
-        verify(this.existCache).set(existingDocument.getKey(), Boolean.TRUE);
+        verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
+        verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
         verify(this.cache).get(anyString());
         verify(this.existCache).get(anyString());
 
@@ -97,15 +100,15 @@ public class XWikiCacheStoreTest
         verifyNoMoreInteractions(this.existCache);
 
         XWikiDocument notExistingDocument =
-            store.loadXWikiDoc(new XWikiDocument(new DocumentReference("wiki", "space", "nopage")),
+            store.loadXWikiDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "nopage")),
                 this.oldcore.getXWikiContext());
 
         assertTrue(notExistingDocument.isNew());
 
         // Make sure only the existing document has been put in the cache
-        verify(this.cache).set(eq(existingDocument.getKey()), any(XWikiDocument.class));
-        verify(this.existCache).set(existingDocument.getKey(), Boolean.TRUE);
-        verify(this.existCache).set(notExistingDocument.getKey(), Boolean.FALSE);
+        verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
+        verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
+        verify(this.existCache).set("4:wiki5:space6:nopage", Boolean.FALSE);
         verify(this.cache, times(2)).get(anyString());
         verify(this.existCache, times(2)).get(anyString());
 

@@ -20,10 +20,13 @@
 
 package org.xwiki.model.internal.reference;
 
+import java.util.Locale;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -49,7 +52,19 @@ public class UidStringEntityReferenceSerializer extends AbstractStringEntityRefe
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
+        // Append name
         String name = currentReference.getName();
         representation.append(name.length()).append(':').append(name);
+
+        // Append Locale
+        if (currentReference instanceof DocumentReference) {
+            Locale locale = ((DocumentReference) currentReference).getLocale();
+            if (locale != null) {
+                String localeString = locale.toString();
+                if (!localeString.isEmpty()) {
+                    representation.append(localeString.length()).append(':').append(localeString);
+                }
+            }
+        }
     }
 }

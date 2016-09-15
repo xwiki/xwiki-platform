@@ -61,30 +61,30 @@
   <sql-query name="nestedPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
-    select xwikiPage.reference as reference, xwikiPage.terminal as terminal
+    select xwikiPage.reference reference, xwikiPage.terminal terminal
 
     from (
 
-        (select XWS_REFERENCE as reference,
-                0 as terminal,
-                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) as title
+        (select XWS_REFERENCE reference,
+                0  terminal,
+                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) title
             from xwikispace
-            left outer join xwikidoc as doc on (
+            left outer join xwikidoc doc on (
                 doc.XWD_WEB = XWS_REFERENCE and
                 doc.XWD_NAME = 'WebHome' and
                 doc.XWD_LANGUAGE = '')
-            left outer join xwikidoc as tdoc on (
+            left outer join xwikidoc tdoc on (
                 tdoc.XWD_WEB = XWS_REFERENCE and
                 tdoc.XWD_NAME = 'WebHome' and
                 tdoc.XWD_LANGUAGE = :locale))
 
         union all
 
-        (select doc.XWD_FULLNAME as reference,
-                1 as terminal,
-                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), doc.XWD_NAME) as title
-            from xwikidoc as doc
-            left outer join xwikidoc as tdoc on (
+        (select doc.XWD_FULLNAME reference,
+                1 terminal,
+                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), doc.XWD_NAME) title
+            from xwikidoc doc
+            left outer join xwikidoc tdoc on (
                 tdoc.XWD_FULLNAME = doc.XWD_FULLNAME and
                 tdoc.XWD_LANGUAGE = :locale)
             where doc.XWD_TRANSLATION = 0 and doc.XWD_NAME &lt;&gt; 'WebHome')
@@ -99,21 +99,21 @@
   <sql-query name="nestedPagesOrderedByName" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
-    select xwikiPage.reference as reference, xwikiPage.terminal as terminal
+    select xwikiPage.reference reference, xwikiPage.terminal terminal
 
     from (
 
-        (select XWS_REFERENCE as reference,
-                0 as terminal,
-                XWS_NAME as pageName
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWS_NAME pageName
             from xwikispace)
 
         union all
 
-        (select XWD_FULLNAME as reference,
-                1 as terminal,
-                XWD_NAME as pageName
-            from xwikidoc as doc
+        (select XWD_FULLNAME reference,
+                1 terminal,
+                XWD_NAME pageName
+            from xwikidoc doc
             where XWD_TRANSLATION = 0 and XWD_NAME &lt;&gt; 'WebHome')
 
     ) xwikiPage
@@ -128,15 +128,15 @@
   <sql-query name="nonTerminalPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
-    select XWS_REFERENCE as reference,
-           0 as terminal,
-           coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) as title
+    select XWS_REFERENCE reference,
+           0 terminal,
+           coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) title
         from xwikispace
-        left outer join xwikidoc as doc on (
+        left outer join xwikidoc doc on (
             doc.XWD_WEB = XWS_REFERENCE and
             doc.XWD_NAME = 'WebHome' and
             doc.XWD_LANGUAGE = '')
-        left outer join xwikidoc as tdoc on (
+        left outer join xwikidoc tdoc on (
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and
             tdoc.XWD_LANGUAGE = :locale)

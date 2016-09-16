@@ -347,7 +347,12 @@
   #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
   #if ($canViewDoc &amp;&amp; $docTreeConfig.showDocumentTitle)
     #set ($document = $xwiki.getDocument($documentReference))
-    #set ($plainTitle = $document.translatedDocument.plainTitle)
+    ## Make sure the displayed title is not affected by the sheet request parameter
+    ## (e.g. when $document is the current document).
+    #set ($plainTitle = $services.display.title($document.translatedDocument, {
+      'displayerHint': 'default',
+      'outputSyntaxId': 'plain/1.0'
+    }))
     #if (!$stringtool.isBlank($plainTitle))
       #set ($label = $plainTitle)
     #end

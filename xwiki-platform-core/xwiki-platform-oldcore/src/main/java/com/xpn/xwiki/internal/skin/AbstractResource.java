@@ -64,8 +64,15 @@ public abstract class AbstractResource<I extends InputSource> implements Resourc
         return this.path;
     }
 
+    @Override
     public String getResourceName()
     {
         return this.resourceName;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId();
     }
 }

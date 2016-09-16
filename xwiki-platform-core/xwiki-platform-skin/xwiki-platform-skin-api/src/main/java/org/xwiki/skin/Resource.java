@@ -49,10 +49,7 @@ public interface Resource<I extends InputSource>
      * @return the name of the resource (usually a relative path)
      * @since 8.3RC1
      */
-    default String getResourceName()
-    {
-        return getPath();
-    }
+    String getResourceName();
 
     /**
      * Provide an {@link InputSource} to read the resource.

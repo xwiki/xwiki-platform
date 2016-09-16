@@ -476,9 +476,16 @@
                 },
                 "ignore": [
                   {
-                    "code": "java.method.addedToInterface",
-                    "new": "method java.lang.String org.xwiki.skin.Resource<I extends org.xwiki.filter.input.InputSource>::getResourceName()",
-                    "justification": "Young API. Required in order to make the Template Manager fallback on an embedded template file"
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery)",
+                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
+                    "justification": "Align with ExtensionRepository API"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
+                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
+                    "justification": "Align with ExtensionRepository API"
                   }
                 ]
               }

@@ -273,23 +273,30 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             return groups;
         }
 
-        // If the user is global and we are looking for rules inside a subwiki
+        // If the user/group is global and we are looking for rules inside a subwiki, we need to ensure that the
+        // global user/group is loaded first, and we should also looks at global groups that it is a member of
         if (entityWiki != null) {
-            // Optim: We know we will have to load at least the rules concerning the local groups of the user, but we 
-            // can try to get the global groups of that user, meaning that we would not have to load the rules
-            // concerning them via the bridge.
+            // First we add the global groups containing that user/group
+            // Check availability of the information from the user/group entry in the cache
             Collection<GroupSecurityReference> globalGroups = securityCache.getGroupsFor(user, null);
             if (globalGroups == null) {
-                // No luck, the cache has no information about the global groups, so we will load them too
+                // No luck, the global user does not seems to be in the cache, so we need to load it
                 globalGroups = new HashSet<>();
                 loadUserEntry(user, userWiki, null, globalGroups, new ArrayDeque<GroupSecurityReference>());
             }
             groups.addAll(globalGroups);
 
-            // Now we load the rules concerning the shadows of the global groups in the subwiki
+            // Now we also need to consider the local groups that contains the global groups found, since the user/group
+            // should be considered indirectly a member of these groups as well
             for (GroupSecurityReference group : globalGroups) {
-                Collection<GroupSecurityReference> localGroups = new HashSet<>();
-                loadUserEntry(group, userWiki, entityWiki, localGroups, new ArrayDeque<GroupSecurityReference>());
+                // Check availability of the information from the shadow entry of the global group in the entity wiki
+                Collection<GroupSecurityReference> localGroups = securityCache.getGroupsFor(group, entityWiki);
+                if (localGroups == null) {
+                    // No luck, the shadow of the global group in the entity wiki does not seems to be in the cache,
+                    // so we need to load it
+                    localGroups = new HashSet<>();
+                    loadUserEntry(group, userWiki, entityWiki, localGroups, new ArrayDeque<GroupSecurityReference>());
+                }
                 groups.addAll(localGroups);
             }
         }
@@ -347,8 +354,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                 } else {
                     // Check for possible recursion in the cached groups and add this group only if it is safe
                     boolean recursionFound = false;
-                    for (GroupSecurityReference existingGroups : groupsOfGroup) {
-                        if (branchGroups.contains(existingGroups)) {
+                    for (GroupSecurityReference existingGroup : groupsOfGroup) {
+                        if (branchGroups.contains(existingGroup)) {
                             recursionFound = true;
                             break;
                         }

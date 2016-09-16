@@ -475,6 +475,11 @@
                   }
                 },
                 "ignore": [
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String org.xwiki.skin.Resource<I extends org.xwiki.filter.input.InputSource>::getResourceName()",
+                    "justification": "Required in order to make the Template Manager fallback on an embedded template file"
+                  }
                 ]
               }
             }

@@ -35,7 +35,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.internal.SessionFactory;
+import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;

@@ -33,7 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.internal.SessionFactory;
+import org.xwiki.mail.SessionFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**

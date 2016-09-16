@@ -17,22 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
 
 import java.util.Map;
 
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Create a Java Mail {@link javax.mail.Session} object, taking its properties from some configuration location but
  * allowing to pass additional properties (for example to reuse an existing Batch Id).
  *
  * @version $Id$
- * @since 6.4
+ * @since 8.3RC1
  */
 @Role
+@Unstable
 public interface SessionFactory
 {
     /**

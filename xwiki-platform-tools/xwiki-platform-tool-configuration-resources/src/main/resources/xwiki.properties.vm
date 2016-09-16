@@ -415,7 +415,7 @@ rendering.transformations = $xwikiRenderingTransformations
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
 ## Apache Commons Configuration syntax for specifying the user.home system property!
 #set ($userHome = '${sys:user.home}')
-# extension.repositories=local:maven:file://${userHome}/.m2/repository
+# extension.repositories=maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots

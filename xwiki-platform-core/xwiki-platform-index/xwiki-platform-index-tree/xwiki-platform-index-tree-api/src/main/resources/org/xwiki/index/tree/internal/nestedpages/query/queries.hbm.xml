@@ -121,16 +121,15 @@
     order by lower(xwikiPage.pageName), xwikiPage.pageName
   </sql-query>
 
-  <!-- We select the title only because we don't want to duplicate the expression in the order by clause. We don't plan
-    to read it from the results so we don't add the type information to the result set meta-data (we don't have to
-    anyway because the string type doesn't require any special handling). -->
+  <!-- We have to duplicate the title fall-back expression in the order by clause because PostgreSQL doesn't support the
+    usage of column aliases in order by expressions (e.g. for lower(columnAlias) it throws "column 'columnAlias' does
+    not exist"). See https://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-ORDERBY -->
   <!-- This query conforms to Core SQL-2003 ANSI standard. -->
   <sql-query name="nonTerminalPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
     select XWS_REFERENCE reference,
-           0 terminal,
-           coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) title
+           0 terminal
         from xwikispace
         left outer join xwikidoc doc on (
             doc.XWD_WEB = XWS_REFERENCE and
@@ -140,6 +139,7 @@
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and
             tdoc.XWD_LANGUAGE = :locale)
-        order by lower(title), title
+        order by lower(coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)),
+            coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)
   </sql-query>
 </hibernate-mapping>

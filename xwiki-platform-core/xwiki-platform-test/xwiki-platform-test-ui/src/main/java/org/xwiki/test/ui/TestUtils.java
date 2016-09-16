@@ -134,28 +134,34 @@ public class TestUtils
      * @since 7.3M1
      */
     public static final int[] STATUS_OK_NOT_FOUND =
-        new int[] {Status.OK.getStatusCode(), Status.NOT_FOUND.getStatusCode()};
+        new int[] { Status.OK.getStatusCode(), Status.NOT_FOUND.getStatusCode() };
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
+    public static final int[] STATUS_OK = new int[] { Status.OK.getStatusCode() };
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_NO_CONTENT = new int[] {Status.NO_CONTENT.getStatusCode()};
+    public static final int[] STATUS_NO_CONTENT = new int[] { Status.NO_CONTENT.getStatusCode() };
+
+    /**
+     * @since 8.3RC1
+     */
+    public static final int[] STATUS_NO_CONTENT_NOT_FOUND =
+        new int[] { Status.NO_CONTENT.getStatusCode(), Status.NOT_FOUND.getStatusCode() };
 
     /**
      * @since 7.3M1
      */
     public static final int[] STATUS_CREATED_ACCEPTED =
-        new int[] {Status.CREATED.getStatusCode(), Status.ACCEPTED.getStatusCode()};
+        new int[] { Status.CREATED.getStatusCode(), Status.ACCEPTED.getStatusCode() };
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
+    public static final int[] STATUS_CREATED = new int[] { Status.CREATED.getStatusCode() };
 
     private static PersistentTestContext context;
 
@@ -834,7 +840,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(action, new String[] {space, page}, queryString);
+        return getURL(action, new String[] { space, page }, queryString);
     }
 
     /**
@@ -966,7 +972,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(action, new String[] {space, page, attachment}, queryString);
+        return getURL(action, new String[] { space, page, attachment }, queryString);
     }
 
     /**
@@ -1173,7 +1179,7 @@ public class TestUtils
     {
         TestUtils.assertStatusCodes(
             rest().executeDelete(ObjectResource.class, getCurrentWiki(), space, page, className, objectNumber), true,
-            STATUS_NO_CONTENT);
+            STATUS_NO_CONTENT_NOT_FOUND);
     }
 
     public void updateObject(String space, String page, String className, int objectNumber, Map<String, ?> properties)
@@ -2082,7 +2088,8 @@ public class TestUtils
                 throw new Exception("Unsuported type [" + reference.getType() + "]");
             }
 
-            TestUtils.assertStatusCodes(executeDelete(resource, toElements(reference)), true, STATUS_NO_CONTENT);
+            TestUtils.assertStatusCodes(executeDelete(resource, toElements(reference)), true,
+                STATUS_NO_CONTENT_NOT_FOUND);
         }
 
         public void deletePage(String space, String page) throws Exception

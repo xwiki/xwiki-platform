@@ -48,6 +48,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -292,7 +293,7 @@ public class Utils
     {
         XWikiUser user = getXWikiContext(componentManager).getXWikiUser();
         if (user == null) {
-            return "XWiki.Guest";
+            return XWikiRightService.GUEST_USER_FULLNAME;
         }
 
         return user.getUser();

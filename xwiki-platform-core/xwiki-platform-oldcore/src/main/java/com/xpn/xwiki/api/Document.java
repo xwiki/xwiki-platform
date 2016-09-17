@@ -73,7 +73,6 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.stats.impl.RefererStats;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;

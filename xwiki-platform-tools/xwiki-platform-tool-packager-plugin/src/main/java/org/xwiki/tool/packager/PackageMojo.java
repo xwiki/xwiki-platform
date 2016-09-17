@@ -348,36 +348,27 @@ public class PackageMojo extends AbstractMojo
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
-        Artifact configurationResourcesArtifact =
-            this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-                getXWikiPlatformVersion(), "", "jar");
+        Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-tool-configuration-resources", getXWikiPlatformVersion(), "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
         configurationFileTargetDirectory.mkdirs();
 
-        try {
-            JarInputStream jarInputStream =
-                new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()));
-
-            try {
-                JarEntry entry;
-                while ((entry = jarInputStream.getNextJarEntry()) != null) {
-                    if (entry.getName().endsWith(".vm")) {
-
-                        String fileName = entry.getName().replace(".vm", "");
-                        File outputFile = new File(configurationFileTargetDirectory, fileName);
-                        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                        getLog().info("Writing config file: " + outputFile);
-                        // Note: Init is done once even if this method is called several times...
-                        Velocity.init();
-                        Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
-                        writer.close();
-                        jarInputStream.closeEntry();
-                    }
+        try (JarInputStream jarInputStream =
+            new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
+            JarEntry entry;
+            while ((entry = jarInputStream.getNextJarEntry()) != null) {
+                if (entry.getName().endsWith(".vm")) {
+                    String fileName = entry.getName().replace(".vm", "");
+                    File outputFile = new File(configurationFileTargetDirectory, fileName);
+                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
+                    getLog().info("Writing config file: " + outputFile);
+                    // Note: Init is done once even if this method is called several times...
+                    Velocity.init();
+                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
+                    writer.close();
+                    jarInputStream.closeEntry();
                 }
-            } finally {
-                // Flush and close all the streams
-                jarInputStream.close();
             }
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to extract configuration files", e);

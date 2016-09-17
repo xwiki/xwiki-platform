@@ -1734,6 +1734,7 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
+    // TODO: Refactor TestUtils to move RestTestUtils tools to xwiki-platform-test-integration
     public static class RestTestUtils
     {
         public static final Boolean ELEMENTS_ENCODED = new Boolean(true);
@@ -2175,12 +2176,16 @@ public class TestUtils
                 return null;
             }
 
-            try {
-                try (InputStream stream = getMethod.getResponseBodyAsStream()) {
-                    return toResource(stream);
+            if (reference.getType() == EntityType.ATTACHMENT) {
+                return (T) getMethod.getResponseBodyAsStream();
+            } else {
+                try {
+                    try (InputStream stream = getMethod.getResponseBodyAsStream()) {
+                        return toResource(stream);
+                    }
+                } finally {
+                    getMethod.releaseConnection();
                 }
-            } finally {
-                getMethod.releaseConnection();
             }
         }
 

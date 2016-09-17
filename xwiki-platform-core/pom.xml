@@ -516,6 +516,12 @@
                     "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
                     "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
                     "justification": "Align with ExtensionRepository API"
+                  },
+                  {
+                    "code": "java.field.typeChanged",
+                    "old": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
+                    "new": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
+                    "justification": "Was publicly exposing internal class"
                   }
                 ]
               }

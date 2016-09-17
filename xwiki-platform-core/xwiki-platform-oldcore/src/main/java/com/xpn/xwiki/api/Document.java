@@ -2380,12 +2380,7 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        // The existing convention is that when the current user reference is null, it's the guest user.
         DocumentReference currentUserReference = this.context.getUserReference();
-        if (currentUserReference == null) {
-            currentUserReference =
-                getCurrentMixedDocumentReferenceResolver().resolve(XWikiRightService.GUEST_USER_FULLNAME);
-        }
 
         doc.setAuthorReference(currentUserReference);
 

@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
@@ -104,7 +103,6 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
      * 
      * @param query query to execute
      * @return flavors matching the query
-     * @throws SearchException error when trying to search provided query
      * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
      */
     @Deprecated

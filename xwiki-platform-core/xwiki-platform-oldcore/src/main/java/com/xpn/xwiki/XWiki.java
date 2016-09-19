@@ -5127,7 +5127,7 @@ public class XWiki implements EventListener
             }
             return text;
         } catch (Exception e) {
-            LOGGER.warn("Failed to display the user name of [{}]. Root cause is [{}]. Falling back on the user alias.",
+            LOGGER.warn("Failed to display the user name of [{}]. Root cause is [{}]. Falling back on the user id.",
                 userReference, ExceptionUtils.getRootCauseMessage(e));
 
             return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();

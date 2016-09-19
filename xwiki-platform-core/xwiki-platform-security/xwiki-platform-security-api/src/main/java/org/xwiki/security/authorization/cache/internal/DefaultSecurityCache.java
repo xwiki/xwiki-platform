@@ -817,7 +817,29 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             }
         }
     }
-    
+
+    @Override
+    public Collection<GroupSecurityReference> getImmediateGroupsFor(UserSecurityReference user)
+    {
+        Collection<GroupSecurityReference> groups = new HashSet<>();
+
+        SecurityCacheEntry userEntry = getEntry(user);
+        // If the user is not in the cache, or if it is, but not as a user, but as a regular document
+        if (userEntry == null || !userEntry.isUser()) {
+            // In that case, the ancestors are not fully loaded
+            return null;
+        }
+
+        for (SecurityCacheEntry parent : userEntry.parents) {
+            // Add the parent group (if we have not already seen it)
+            SecurityReference parentRef = parent.getEntry().getReference();
+            if (parentRef instanceof GroupSecurityReference) {
+                groups.add((GroupSecurityReference) parentRef);
+            }
+        }
+        return groups;
+    }
+
     @Override
     public Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki)
     {

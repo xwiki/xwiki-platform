@@ -115,6 +115,16 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
+     * Get immediate groups where the user/group is a member (directly in its wiki).
+     *
+     * @param user reference to a user/group
+     * @return the list of immediate groups where the user is a member or null if the information is not in the cache
+     *
+     * @since 8.3rc1 - 8.2.2 - 7.4.5 - 7.1.5
+     */
+    Collection<GroupSecurityReference> getImmediateGroupsFor(UserSecurityReference user);
+
+    /**
      * Get all groups where the user/group is a member (directly, or indirectly including relation due to global groups
      * members of local ones).
      * 

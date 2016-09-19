@@ -1,1 +1,2 @@
 org.xwiki.instance.internal.DefaultInstanceIdManager
+org.xwiki.instance.script.InstanceScriptService

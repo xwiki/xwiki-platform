@@ -346,13 +346,13 @@
   #set ($canViewDoc = $services.security.authorization.hasAccess('view', $documentReference))
   #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
   #if ($canViewDoc &amp;&amp; $docTreeConfig.showDocumentTitle)
-    #set ($document = $xwiki.getDocument($documentReference))
-    ## Make sure the displayed title is not affected by the sheet request parameter
-    ## (e.g. when $document is the current document).
-    #set ($plainTitle = $services.display.title($document.translatedDocument, {
-      'displayerHint': 'default',
-      'outputSyntaxId': 'plain/1.0'
-    }))
+    ## Display the translated title.
+    #set ($translatedDocument = $xwiki.getDocument($documentReference).translatedDocument)
+    ## Make sure the displayed title is not affected by the sheet request parameter (e.g. when $translatedDocument is
+    ## the current document). By setting the title (even if we don't change it) the internal document instance is cloned
+    ## so it's going to be different than the current document instance (which is the target of the sheet parameter).
+    #set ($discard = $translatedDocument.setTitle($translatedDocument.title))
+    #set ($plainTitle = $translatedDocument.plainTitle)
     #if (!$stringtool.isBlank($plainTitle))
       #set ($label = $plainTitle)
     #end

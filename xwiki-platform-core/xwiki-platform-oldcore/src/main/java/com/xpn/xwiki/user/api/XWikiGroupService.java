@@ -50,8 +50,9 @@ public interface XWikiGroupService
     Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
     /**
-     * Adding the user to the group cache.
+     * @deprecated should never be used ! There is a listener taking care of that automatically.
      */
+    @Deprecated
     void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
 
     /**

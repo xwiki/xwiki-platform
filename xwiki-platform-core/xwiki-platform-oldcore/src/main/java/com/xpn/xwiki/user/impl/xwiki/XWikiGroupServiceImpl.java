@@ -43,7 +43,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -212,30 +211,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     @Override
+    @Deprecated
     public Collection<String> listGroupsForUser(String member, XWikiContext context) throws XWikiException
     {
         return getAllGroupsNamesForMember(member, -1, 0, context);
     }
 
     @Override
+    @Deprecated
     public void addUserToGroup(String username, String database, String group, XWikiContext context)
         throws XWikiException
     {
-        String shortname = Util.getName(username);
-        String key = database + "/" + database + ":" + shortname;
-
-        if (this.memberGroupsCache == null) {
-            initCache(context);
-        }
-
-        Collection<DocumentReference> list = this.memberGroupsCache.get(key);
-
-        if (list == null) {
-            list = new ArrayList<DocumentReference>();
-            this.memberGroupsCache.set(key, list);
-        }
-
-        list.add(this.currentMixedDocumentReferenceResolver.resolve(group, new WikiReference(database)));
+        // Don't do anything and let the listener do its job if there is a need
     }
 
     /**
@@ -344,6 +331,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     @Override
+    @Deprecated
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
         List<String> list = new ArrayList<String>();
@@ -381,6 +369,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     @Override
+    @Deprecated
     public List<String> listAllGroups(XWikiContext context) throws XWikiException
     {
         if (context.getWiki().getHibernateStore() != null) {

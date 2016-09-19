@@ -3484,13 +3484,6 @@ public class XWiki implements EventListener
         memberObject.setStringValue("member", userName);
 
         this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
-
-        try {
-            XWikiGroupService gservice = getGroupService(context);
-            gservice.addUserToGroup(userName, context.getWikiId(), groupName, context);
-        } catch (Exception e) {
-            LOGGER.error("Failed to update group service cache", e);
-        }
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)

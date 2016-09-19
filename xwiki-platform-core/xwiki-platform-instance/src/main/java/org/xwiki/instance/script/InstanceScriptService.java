@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
  * Provides instance-specific scripting APIs.
  * 
  * @version $Id$
- * @since 8.3-RC1
+ * @since 8.3RC1
  */
 @Component
 @Named("instance")
@@ -41,20 +41,11 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class InstanceScriptService implements ScriptService
 {
-    /**
-     * The key under which the last encountered error is stored in the current execution context.
-     */
-    public static final String INSTANCE_ERROR_KEY = "scriptservice.instance.error";
-
-    /**
-     * Used to access the instanceId manager.
-     */
     @Inject
     private InstanceIdManager instanceIdManager;
 
     /**
-     * @return the XWiki's instanceId
-     * @since 8.3-RC1
+     * @return the XWiki instance id or null if not set, see {@link InstanceIdManager#getInstanceId()}
      */
     public InstanceId getInstanceId()
     {

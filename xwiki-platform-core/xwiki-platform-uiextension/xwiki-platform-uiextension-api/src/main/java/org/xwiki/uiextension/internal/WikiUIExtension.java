@@ -31,9 +31,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.uiextension.UIExtension;
-
-import com.xpn.xwiki.internal.template.SUExecutor;
 
 /**
  * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we register
@@ -81,7 +80,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      */
     private final String roleHint;
 
-    private final SUExecutor suExecutor;
+    private final AuthorExecutor authorExecutor;
 
     /**
      * Parameter manager for this extension.
@@ -106,10 +105,10 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * @param extensionPointId ID of the extension point this extension is designed for
      * @param objectReference the reference of the object holding this extension
      * @param authorReference the reference of the author of the document holding this extension
-     * @param suExecutor the executor used to execute the extension with the proper user rights
+     * @param authorExecutor the executor used to execute the extension with the proper user rights
      */
     public WikiUIExtension(String roleHint, String id, String extensionPointId, ObjectReference objectReference,
-        DocumentReference authorReference, SUExecutor suExecutor)
+        DocumentReference authorReference, AuthorExecutor authorExecutor)
     {
         this.roleHint = roleHint;
         this.id = id;
@@ -117,7 +116,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         this.authorReference = authorReference;
         this.documentReference = (DocumentReference) objectReference.getParent();
 
-        this.suExecutor = suExecutor;
+        this.authorExecutor = authorExecutor;
     }
 
     /**
@@ -177,7 +176,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     {
         if (this.renderer != null) {
             try {
-                return this.suExecutor.call(this.renderer::execute, getAuthorReference());
+                return this.authorExecutor.call(this.renderer::execute, getAuthorReference());
             } catch (Exception e) {
                 LOGGER.error("Error while executing transformation for extension [{}]", documentReference.toString());
             }

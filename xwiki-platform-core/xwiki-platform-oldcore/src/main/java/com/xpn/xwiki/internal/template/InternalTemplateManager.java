@@ -75,6 +75,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
@@ -151,7 +152,7 @@ public class InternalTemplateManager
     private ConverterManager converter;
 
     @Inject
-    private SUExecutor suExecutor;
+    private AuthorExecutor authorExecutor;
 
     @Inject
     private InternalSkinManager skins;
@@ -633,7 +634,7 @@ public class InternalTemplateManager
                 final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
 
                 if (content.authorProvided) {
-                    this.suExecutor.call(() -> {
+                    this.authorExecutor.call(() -> {
                         render(template, content, writer);
 
                         return null;
@@ -730,7 +731,7 @@ public class InternalTemplateManager
             final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
 
             if (content.authorProvided) {
-                return this.suExecutor.call(() -> execute(template, content), content.getAuthorReference());
+                return this.authorExecutor.call(() -> execute(template, content), content.getAuthorReference());
             } else {
                 return execute(template, content);
             }
@@ -745,7 +746,7 @@ public class InternalTemplateManager
             final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
 
             if (content.authorProvided) {
-                return this.suExecutor.call(() -> execute(template, content), content.getAuthorReference());
+                return this.authorExecutor.call(() -> execute(template, content), content.getAuthorReference());
             } else {
                 return execute(template, content);
             }

@@ -48,6 +48,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
@@ -65,7 +66,6 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.internal.template.SUExecutor;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
@@ -134,7 +134,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private ObservationManager observation;
 
     @Inject
-    private SUExecutor suExecutor;
+    private AuthorExecutor authorExecutor;
 
     @Inject
     private Logger logger;
@@ -334,7 +334,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                         try {
                             final VelocityEngine finalVelocityEngine = velocityEngine;
 
-                            this.suExecutor.call(() -> {
+                            this.authorExecutor.call(() -> {
                                 finalVelocityEngine.evaluate(new VelocityContext(), NullWriter.NULL_WRITER, "",
                                     template.getContent().getContent());
 

@@ -23,7 +23,6 @@ import java.util.Stack;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -31,19 +30,18 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 /**
  * Allow executing some code with the right of a provided user.
  *
  * @version $Id$
  * @since 6.3M2
+ * @deprecated since 8.3RC1, use {@link AuthorExecutor} instead
  */
 @Component(roles = SUExecutor.class)
 @Singleton
+@Deprecated
 public class SUExecutor
 {
     /**
@@ -53,20 +51,16 @@ public class SUExecutor
      */
     public static final class SUExecutorContext
     {
-        private XWikiDocument currentSecureDocument;
+        private AutoCloseable context;
 
-        private Object xwikiContextDropPermissionHack;
-
-        private Object documentDropPermissionHack;
-
-        private SUExecutorContext()
+        private SUExecutorContext(AutoCloseable context)
         {
-            // Only SUExecutor can create SUExecutorContext
+            this.context = context;
         }
     }
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private AuthorExecutor executor;
 
     @Inject
     private Execution execution;
@@ -85,13 +79,7 @@ public class SUExecutor
      */
     public <V> V call(Callable<V> callable, DocumentReference author) throws Exception
     {
-        SUExecutorContext context = before(author);
-
-        try {
-            return callable.call();
-        } finally {
-            after(context);
-        }
+        return this.executor.call(callable, author);
     }
 
     /**
@@ -106,37 +94,7 @@ public class SUExecutor
      */
     public SUExecutorContext before(DocumentReference user)
     {
-        SUExecutorContext suContext;
-
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-
-        if (xwikiContext != null) {
-            suContext = new SUExecutorContext();
-
-            // Make sure to have the right secure document
-            suContext.currentSecureDocument = (XWikiDocument) xwikiContext.get(XWikiDocument.CKEY_SDOC);
-            XWikiDocument secureDocument =
-                new XWikiDocument(new DocumentReference(user != null ? user.getWikiReference().getName() : "xwiki",
-                    "SUSpace", "SUPage"));
-            secureDocument.setContentAuthorReference(user);
-            secureDocument.setAuthorReference(user);
-            secureDocument.setCreatorReference(user);
-            xwikiContext.put(XWikiDocument.CKEY_SDOC, secureDocument);
-
-            // Make sure to disable XWikiContext#dropPermission hack
-            suContext.xwikiContextDropPermissionHack = xwikiContext.remove(XWikiConstant.DROPPED_PERMISSIONS);
-
-            // Make sure to disable Document#dropPermission hack
-            ExecutionContext econtext = this.execution.getContext();
-            if (econtext != null) {
-                suContext.documentDropPermissionHack = econtext.getProperty(XWikiConstant.DROPPED_PERMISSIONS);
-                econtext.removeProperty(XWikiConstant.DROPPED_PERMISSIONS);
-            }
-        } else {
-            suContext = null;
-        }
-
-        return suContext;
+        return new SUExecutorContext(this.executor.before(user));
     }
 
     /**
@@ -147,23 +105,7 @@ public class SUExecutor
      */
     public void after(SUExecutorContext suContext)
     {
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-
-        if (xwikiContext != null) {
-            // Restore context document's content author
-            xwikiContext.put(XWikiDocument.CKEY_SDOC, suContext.currentSecureDocument);
-
-            // Restore XWikiContext#dropPermission hack
-            if (suContext.xwikiContextDropPermissionHack != null) {
-                xwikiContext.put(XWikiConstant.DROPPED_PERMISSIONS, suContext.xwikiContextDropPermissionHack);
-            }
-
-            // Restore Document#dropPermission hack
-            if (suContext.documentDropPermissionHack != null) {
-                ExecutionContext econtext = this.execution.getContext();
-                econtext.setProperty(XWikiConstant.DROPPED_PERMISSIONS, suContext.documentDropPermissionHack);
-            }
-        }
+        this.executor.after(suContext.context);
     }
 
     /**

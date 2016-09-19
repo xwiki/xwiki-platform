@@ -122,29 +122,34 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               <th scope="col" class="usersorgroupsnames">
                 ## ToDo: workspace is deprecated
                 #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
-                <label for="uorgg" class="hidden">$services.localization.render('rightsmanager.groups')</label>
-                <input type="radio" id="uorgg" name="uorg" value="groups"
-                  onclick="if(!$('unregistered').hasClassName('hidden'))
-                             $('unregistered').addClassName('hidden');
-                         #if ($isWorkspace)
-                           ## Unhide scope selection and automatically select the old index.
-                           if($('usersandgroupstable-filters-scope').hasClassName('hidden')) {
-                             $('usersandgroupstable-filters-scope').removeClassName('hidden');
-                             $('wiki').options[groupScopeIndex].selected=true;
-                           }
-                         #end" checked="checked" />$services.localization.render('rightsmanager.groups')&nbsp;&nbsp;
-                <label for="uorgu" class="hidden">$services.localization.render('rightsmanager.users')</label>
-                <input type="radio" id="uorgu" name="uorg" value="users" 
-                  onclick="if($('unregistered').hasClassName('hidden'))
-                             $('unregistered').removeClassName('hidden');
-                         #if ($isWorkspace)
-                           ## Hide scope selection and automatically select global scope.
-                           if(!$('usersandgroupstable-filters-scope').hasClassName('hidden')) {
-                             $('usersandgroupstable-filters-scope').addClassName('hidden');
-                             groupScopeIndex = $('wiki').selectedIndex;
-                             $('wiki').options[1].selected=true;
-                           }
-                         #end" />$services.localization.render('rightsmanager.users')
+                <label for="uorgg">
+                  <input type="radio" id="uorgg" name="uorg" value="groups" checked="checked"
+                    onclick="if(!$('unregistered').hasClassName('hidden'))
+                               $('unregistered').addClassName('hidden');
+                      #if ($isWorkspace)
+                        ## Unhide scope selection and automatically select the old index.
+                        if($('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                          $('usersandgroupstable-filters-scope').removeClassName('hidden');
+                          $('wiki').options[groupScopeIndex].selected=true;
+                        }
+                      #end" />
+                  $services.localization.render('rightsmanager.groups')
+                </label>
+                &nbsp;&nbsp;
+                <label for="uorgu">
+                  <input type="radio" id="uorgu" name="uorg" value="users"
+                    onclick="if($('unregistered').hasClassName('hidden'))
+                               $('unregistered').removeClassName('hidden');
+                      #if ($isWorkspace)
+                        ## Hide scope selection and automatically select global scope.
+                        if(!$('usersandgroupstable-filters-scope').hasClassName('hidden')) {
+                          $('usersandgroupstable-filters-scope').addClassName('hidden');
+                          groupScopeIndex = $('wiki').selectedIndex;
+                          $('wiki').options[1].selected=true;
+                        }
+                      #end" />
+                  $services.localization.render('rightsmanager.users')
+                </label>
               </th>
               ## Column headers for each configurable access right
               #foreach ($i in [0..$maxlevel])

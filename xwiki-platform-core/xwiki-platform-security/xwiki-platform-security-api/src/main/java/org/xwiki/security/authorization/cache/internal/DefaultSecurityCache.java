@@ -396,6 +396,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 children = null;
                 for (SecurityCacheEntry child : childrenToClean) {
                     if (child.dispose()) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
+                        }
                         DefaultSecurityCache.this.cache.remove(child.getKey());
                     }
                 }

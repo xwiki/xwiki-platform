@@ -79,15 +79,15 @@ public class DefaultAuthorExecutor implements AuthorExecutor
     private Execution execution;
 
     @Override
-    public <V> V call(Callable<V> callable, DocumentReference author) throws Exception
+    public <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception
     {
-        try (AutoCloseable context = before(author)) {
+        try (AutoCloseable context = before(authorReference)) {
             return callable.call();
         }
     }
 
     @Override
-    public AutoCloseable before(DocumentReference user)
+    public AutoCloseable before(DocumentReference authorReference)
     {
         DefaultAuthorExecutorContext suContext;
 
@@ -98,11 +98,11 @@ public class DefaultAuthorExecutor implements AuthorExecutor
 
             // Make sure to have the right secure document
             suContext.currentSecureDocument = (XWikiDocument) xwikiContext.get(XWikiDocument.CKEY_SDOC);
-            XWikiDocument secureDocument = new XWikiDocument(
-                new DocumentReference(user != null ? user.getWikiReference().getName() : "xwiki", "SUSpace", "SUPage"));
-            secureDocument.setContentAuthorReference(user);
-            secureDocument.setAuthorReference(user);
-            secureDocument.setCreatorReference(user);
+            XWikiDocument secureDocument = new XWikiDocument(new DocumentReference(
+                authorReference != null ? authorReference.getWikiReference().getName() : "xwiki", "SUSpace", "SUPage"));
+            secureDocument.setContentAuthorReference(authorReference);
+            secureDocument.setAuthorReference(authorReference);
+            secureDocument.setCreatorReference(authorReference);
             xwikiContext.put(XWikiDocument.CKEY_SDOC, secureDocument);
 
             // Make sure to disable XWikiContext#dropPermission hack

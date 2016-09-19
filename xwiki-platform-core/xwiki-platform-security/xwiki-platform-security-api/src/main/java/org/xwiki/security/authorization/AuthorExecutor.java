@@ -39,24 +39,30 @@ public interface AuthorExecutor
      * Execute the passed {@link Callable} with the rights of the passed user.
      *
      * @param callable the the task to execute
-     * @param author the user to check rights on
+     * @param authorReference the user to check rights on
      * @return computed result
      * @throws Exception if unable to compute a result
      * @param <V> the result type of method <tt>call</tt>
      */
-    <V> V call(Callable<V> callable, DocumentReference author) throws Exception;
+    <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception;
 
     /**
      * Setup the context so that following code is executed with provided user rights.
      * <p>
-     * The returned {@link SUExecutorContext} should be given to {@link #after(SUExecutorContext)} to restore the
-     * context to its previous state.
+     * 
+     * <pre>
+     * {@code
+     * try (AutoCloseable context = this.executor.before(author)) {
+     *   ...
+     * }
+     * }
+     * </pre>
      *
-     * @param user the user to check rights on
+     * @param authorReference the user to check rights on
      * @return the context to restore
      * @see #after(SUExecutorContext)
      */
-    AutoCloseable before(DocumentReference user);
+    AutoCloseable before(DocumentReference authorReference);
 
     /**
      * Restore the context to it's previous state as defined by the provided {@link SUExecutorContext}.

@@ -164,6 +164,12 @@ public class PackageMojo extends AbstractMojo
     private String platformVersion;
 
     /**
+     * The commons version to be used by the packager plugin.
+     */
+    @Parameter(defaultValue = "${commons.version}")
+    private String commonsVersion;
+
+    /**
      * List of skin artifacts to include in the packaging.
      */
     @Parameter
@@ -799,21 +805,26 @@ public class PackageMojo extends AbstractMojo
      */
     private String getXWikiCommonsVersion()
     {
-        return this.project.getProperties().getProperty("commons.version", this.project.getVersion());
+        return normalizeVersion(this.commonsVersion);
     }
 
     /**
-     * @return the version of the XWiki Platform project, either configured in the project using this plugin or taken
-     *         from the {@code platform.version} property if defined, defaulting to the current project version if not
-     *         defined
+     * @return the version of the XWiki Platform project, either configured in the project's pom using this plugin or
+     *         taken from the {@code platform.version} property if defined, defaulting to the current project version
+     *         if not defined
      */
     private String getXWikiPlatformVersion()
     {
-        String version = this.platformVersion;
-        if (version == null) {
-            version = this.project.getVersion();
+        return normalizeVersion(this.platformVersion);
+    }
+
+    private String normalizeVersion(String version)
+    {
+        String normalizedVersion = version;
+        if (normalizedVersion == null) {
+            normalizedVersion = this.project.getVersion();
         }
-        return version;
+        return normalizedVersion;
     }
 
     private String getDependencyManagementVersion(MavenProject project, String groupId, String artifactId)

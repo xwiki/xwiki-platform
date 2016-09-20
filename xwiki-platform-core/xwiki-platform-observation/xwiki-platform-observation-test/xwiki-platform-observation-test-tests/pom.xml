@@ -162,8 +162,7 @@
           <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <!-- FIXME: maven-hsqldb-plugin seems to an issue with 2.3.4 -->
-            <version>2.3.3</version>
+            <version>${hsqldb.version}</version>
           </dependency>
         </dependencies>
       </plugin>

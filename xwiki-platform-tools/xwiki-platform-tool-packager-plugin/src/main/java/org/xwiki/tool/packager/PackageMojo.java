@@ -462,6 +462,7 @@ public class PackageMojo extends AbstractMojo
     {
         Artifact hsqldbArtifact = null;
 
+        // Try to find an HSQLDB dependency in the project using the packager plugin
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
@@ -473,9 +474,17 @@ public class PackageMojo extends AbstractMojo
             }
         }
 
-        // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
+        // If the HSQLDB artifact wasn't defined in the project, resolve it using ${hsqldb.version} as its version to
+        // make sure we use the version defined in the top level POM. And if that property doesn't exist throw an
+        // error.
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.3.3", "", "jar");
+            String hsqldbVersion = this.project.getProperties().getProperty("hsqldb.version");
+            if (hsqldbVersion == null) {
+                throw new MojoExecutionException("The HSQLDB version couldn't be computed. Either define a dependency "
+                    + "on it in your project or set the \"hsqldb.version\" Maven property in the project POM or in "
+                    + "some of its parents.");
+            }
+            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", hsqldbVersion, "", "jar");
         }
 
         if (hsqldbArtifact != null) {
@@ -484,6 +493,8 @@ public class PackageMojo extends AbstractMojo
             throw new MojoExecutionException("Failed to locate the HSQLDB artifact in either the project "
                 + "dependency list or using the specific [hsqldb:hsqldb] artifact name");
         }
+
+        getLog().info("  ... Using artifact: " + hsqldbArtifact.getFile());
 
         return hsqldbArtifact;
     }

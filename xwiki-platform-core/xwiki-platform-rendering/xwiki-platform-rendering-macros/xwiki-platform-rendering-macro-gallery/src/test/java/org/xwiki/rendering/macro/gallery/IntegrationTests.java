@@ -51,7 +51,7 @@ public class IntegrationTests
         {
             {
                 allowing(jsfx).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
-                allowing(ssfx).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
+                allowing(ssfx).use(with(aNonNull(String.class)));
             }
         });
     }

@@ -158,7 +158,7 @@ public class ExtensionTest extends AbstractExtensionAdminAuthenticatedTest
 
         pagination = pagination.gotoPage(pagination.getPageCount());
         searchResults = new SearchResultsPane();
-        assertEquals((pagination.getResultsCount() - 1 % 20) + 1, searchResults.getDisplayedResultsCount());
+        assertEquals(((pagination.getResultsCount() - 1) % 20) + 1, searchResults.getDisplayedResultsCount());
         assertEquals(pagination.getPageCount(), pagination.getCurrentPageIndex());
         assertFalse(pagination.hasNextPage());
         assertTrue(pagination.hasPreviousPage());

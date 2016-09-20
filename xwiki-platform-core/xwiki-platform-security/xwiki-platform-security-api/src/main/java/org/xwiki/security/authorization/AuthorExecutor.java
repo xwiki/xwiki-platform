@@ -48,7 +48,6 @@ public interface AuthorExecutor
 
     /**
      * Setup the context so that following code is executed with provided user rights.
-     * <p>
      * 
      * <pre>
      * {@code
@@ -60,12 +59,12 @@ public interface AuthorExecutor
      *
      * @param authorReference the user to check rights on
      * @return the context to restore
-     * @see #after(SUExecutorContext)
+     * @see #after(AutoCloseable)
      */
     AutoCloseable before(DocumentReference authorReference);
 
     /**
-     * Restore the context to it's previous state as defined by the provided {@link SUExecutorContext}.
+     * Restore the context to it's previous state as defined by the provided {@link AutoCloseable}.
      *
      * @param context the context to restore
      * @see #before(DocumentReference)

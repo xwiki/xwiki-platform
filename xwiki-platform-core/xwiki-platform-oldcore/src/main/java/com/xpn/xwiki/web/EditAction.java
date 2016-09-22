@@ -223,8 +223,11 @@ public class EditAction extends XWikiAction
             // In both cases the document content is currently having one section, so we can take its title.
             String sectionTitle = document.getDocumentSection(1).getSectionTitle();
             if (StringUtils.isNotBlank(sectionTitle)) {
+                // We cannot edit the page title while editing a page section so this title is for display only.
+                String sectionPlainTitle = document.getRenderedContent(sectionTitle, document.getSyntax().toIdString(),
+                    Syntax.PLAIN_1_0.toIdString(), context);
                 document.setTitle(localizePlainOrKey("core.editors.content.titleField.sectionEditingFormat",
-                    document.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle));
+                    document.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionPlainTitle));
             }
         }
     }

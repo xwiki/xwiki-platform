@@ -25,9 +25,7 @@ XWiki.Gallery = Class.create({
 
     this.container = container.update(
       '<input type="text" tabindex="-1" class="focusCatcher"/>' +
-      '<div class="currentImageWrapper">' +
-        '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
-      '</div>' +
+      '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
       '<div class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</div>' +
       '<div class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</div>' +
       '<div class="index">0 / 0</div>' +
@@ -119,22 +117,6 @@ XWiki.Gallery = Class.create({
       "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
-    if (this.container.hasClassName('maximized')) {
-      this._updateSize();
-    } else {
-      this._resetSize();
-    }
-  },
-  _updateSize : function() {
-    var dimensions = document.viewport.getDimensions();
-    // Remove container padding;
-    var height = dimensions.height - 64;
-    // Center the image vertically.
-    this.currentImage.up().setStyle({lineHeight: height + 'px'});
-  },
-  _resetSize : function() {
-    this.currentImage.parentNode.style.cssText = '';
-    this.currentImage.parentNode.removeAttribute('style');
   },
   show : function(index) {
     if (index < 0 || index >= this.images.length || index == this.index) {

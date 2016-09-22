@@ -113,10 +113,10 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
             }
             if (!StringUtils.isEmpty(parameters.getHeight())) {
                 // Non-empty height value. The empty value means "no explicit height".
-                inlineStyle.append("line-height: ").append(parameters.getHeight()).append(';');
+                inlineStyle.append("height: ").append(parameters.getHeight()).append(';');
             } else if (parameters.getHeight() == null) {
-                // Default height when none is specified.
-                inlineStyle.append("line-height: 369px;");
+                // Default height when none is specified (16:9 aspect ratio).
+                inlineStyle.append("height: 349px;");
             }
 
             Map<String, String> groupParameters = new HashMap<>();

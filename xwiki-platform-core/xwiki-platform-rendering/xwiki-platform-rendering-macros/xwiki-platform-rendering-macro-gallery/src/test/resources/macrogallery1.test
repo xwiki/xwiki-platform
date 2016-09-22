@@ -12,13 +12,13 @@ image:second.png
 beginDocument
 beginMacroMarkerStandalone [gallery] [] [image:first.png
 image:second.png]
-beginGroup [[class]=[gallery][style]=[width: 620px;line-height: 369px;]]
+beginGroup [[class]=[gallery][style]=[width: 620px;height: 349px;]]
 beginParagraph
 onImage [Typed = [false] Type = [url] Reference = [first.png]] [true]
 onNewLine
 onImage [Typed = [false] Type = [url] Reference = [second.png]] [true]
 endParagraph
-endGroup [[class]=[gallery][style]=[width: 620px;line-height: 369px;]]
+endGroup [[class]=[gallery][style]=[width: 620px;height: 349px;]]
 endMacroMarkerStandalone [gallery] [] [image:first.png
 image:second.png]
 endDocument

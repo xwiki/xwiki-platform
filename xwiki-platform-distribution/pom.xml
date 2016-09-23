@@ -91,6 +91,7 @@
       org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator,
       com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator
     </xwiki.properties.extensions.oldflavors>
+    <xwiki.properties.defaultWysiwygEditor />
     <xwiki.properties.additionalproperties />
 
     <!-- Default location for XWiki's Data directory -->
@@ -188,6 +189,7 @@
                   <!-- Default configuration data for xwiki.properties -->
                   <xwikiPropertiesEnvironmentPermanentDirectory>${xwiki.properties.environment.permanentDirectory}</xwikiPropertiesEnvironmentPermanentDirectory>
                   <xwikiPropertiesExtensionOldFlavors>${xwiki.properties.extensions.oldflavors}</xwikiPropertiesExtensionOldFlavors>
+                  <xwikiPropertiesDefaultWysiwygEditor>${xwiki.properties.defaultWysiwygEditor}</xwikiPropertiesDefaultWysiwygEditor>
                   <xwikiPropertiesAdditionalProperties>${xwiki.properties.additionalproperties}</xwikiPropertiesAdditionalProperties>
                 </properties>
               </configuration>

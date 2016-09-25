@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -42,6 +43,8 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * Execute the macro's content in the context of another document's reference.
@@ -83,6 +86,9 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
     @Named("macro")
     private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
 
+    @Inject
+    private TransformationManager transformationManager;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -111,16 +117,16 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 + "set in the context as the current document.");
         }
 
-        DocumentReference docReference =
+        DocumentReference referencedDocReference =
             this.macroDocumentReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
 
         boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
 
         List<Block> result;
         try {
-            Map<String, Object> backupObjects = new HashMap<String, Object>();
+            Map<String, Object> backupObjects = new HashMap<>();
             try {
-                this.documentAccessBridge.pushDocumentInContext(backupObjects, docReference);
+                this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
 
                 // The current document is now the passed document. Check for programming rights for it. If it has
                 // programming rights then the initial current document also needs programming right, else throw an
@@ -134,7 +140,15 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
                 metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
                 metadata.addMetaData(MetaData.BASE, parameters.getDocument());
 
-                XDOM xdom = this.contentParser.parse(content, context, true, metadata, false);
+                XDOM xdom = this.contentParser.parse(content, context, false, metadata, false);
+
+                // Apply the transformations but with a Transformation Context having the XDOM of the passed document
+                // so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate the toc for
+                // the passed document instead of the current document).
+                DocumentModelBridge referencedDoc = this.documentAccessBridge.getDocument(referencedDocReference);
+                XDOM referencedXDOM = referencedDoc.getXDOM();
+                TransformationContext txContext = new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
+                this.transformationManager.performTransformations(xdom, txContext);
 
                 // Keep metadata so that the result stay associated to context properties when inserted in the parent
                 // XDOM
@@ -147,7 +161,8 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
             if (e instanceof MacroExecutionException) {
                 throw (MacroExecutionException) e;
             } else {
-                throw new MacroExecutionException("Failed to render page in the context of [" + docReference + "]", e);
+                throw new MacroExecutionException(
+                    String.format("Failed to render page in the context of [%s]", referencedDocReference), e);
             }
         }
 

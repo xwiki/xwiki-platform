@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blog</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-blog-test</artifactId>
   <name>XWiki Platform - Blog - Tests - Parent POM</name>

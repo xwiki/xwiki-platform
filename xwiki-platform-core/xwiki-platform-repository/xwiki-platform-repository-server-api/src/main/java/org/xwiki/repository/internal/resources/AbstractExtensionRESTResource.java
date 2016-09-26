@@ -370,8 +370,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         // Features
-        List<String> features =
-            (List<String>) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_FEATURES);
+        List<String> features;
+        if (extensionVersionObject != null) {
+            features = (List<String>) getValue(extensionVersionObject, XWikiRepositoryModel.PROP_VERSION_FEATURES);
+        } else {
+            features = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
+        }
         if (features != null && !features.isEmpty()) {
             extension.withFeatures(features);
             for (String feature : features) {

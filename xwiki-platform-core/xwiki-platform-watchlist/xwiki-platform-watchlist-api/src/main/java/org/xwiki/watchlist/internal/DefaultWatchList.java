@@ -63,6 +63,7 @@ public class DefaultWatchList implements WatchList
     /**
      * @return the store instance.
      */
+    @Override
     public WatchListStore getStore()
     {
         return this.store;
@@ -71,6 +72,7 @@ public class DefaultWatchList implements WatchList
     /**
      * @return the notifier instance.
      */
+    @Override
     public WatchListNotifier getNotifier()
     {
         return this.notifier;
@@ -79,6 +81,7 @@ public class DefaultWatchList implements WatchList
     /**
      * @return the feed manager instance.
      */
+    @Override
     public WatchListEventFeedManager getFeedManager()
     {
         return this.feedManager;

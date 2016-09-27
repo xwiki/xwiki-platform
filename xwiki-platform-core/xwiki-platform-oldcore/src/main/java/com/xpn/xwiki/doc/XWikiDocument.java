@@ -6468,7 +6468,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     }
                 } catch (XWikiException e) {
                     LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach.getReference(),
-                        newAttach.getReference());
+                        newAttach.getReference(), e);
                 }
             }
         }

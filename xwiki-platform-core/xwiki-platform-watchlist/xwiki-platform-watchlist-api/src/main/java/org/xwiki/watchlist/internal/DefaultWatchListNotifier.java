@@ -121,6 +121,7 @@ public class DefaultWatchListNotifier implements WatchListNotifier
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
     @Override
+    @Deprecated
     public void sendNotification(String subscriber, List<WatchListEvent> events, String templateDocument,
         Date previousFireTime) throws XWikiException
     {

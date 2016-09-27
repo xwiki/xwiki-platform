@@ -39,7 +39,8 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
  * API for managing users.
  *
  * @version $Id$
- * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+ * @since 1.1.2
+ * @since 1.2M2
  */
 public class RightsManagerUsersApi extends Api
 {

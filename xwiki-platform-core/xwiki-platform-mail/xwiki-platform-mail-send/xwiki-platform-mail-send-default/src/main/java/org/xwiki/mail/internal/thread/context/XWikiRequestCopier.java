@@ -32,7 +32,8 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * Copy a {@link XWikiRequest} instance.
  *
  * @version $Id$
- * @since 7.1M2, 6.4.5
+ * @since 7.1M2
+ * @since 6.4.5
  */
 @Component
 @Singleton

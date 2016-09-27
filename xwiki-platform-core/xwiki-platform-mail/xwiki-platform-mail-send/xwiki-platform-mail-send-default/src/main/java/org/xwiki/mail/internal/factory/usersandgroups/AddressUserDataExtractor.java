@@ -36,7 +36,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * Extracts email addresses from User profiles.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class AddressUserDataExtractor implements UserDataExtractor<Address>
 {

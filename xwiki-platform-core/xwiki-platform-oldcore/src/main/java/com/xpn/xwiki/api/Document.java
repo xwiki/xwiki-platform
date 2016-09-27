@@ -258,7 +258,8 @@ public class Document extends Api
      * Get the name wiki where the document is stored.
      *
      * @return The name of the wiki where this document is stored.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public String getWiki()
     {
@@ -282,7 +283,8 @@ public class Document extends Api
      * complete full name is "xwiki:MySpace.MyDoc".
      *
      * @return The complete fullName of the document.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public String getPrefixedFullName()
     {

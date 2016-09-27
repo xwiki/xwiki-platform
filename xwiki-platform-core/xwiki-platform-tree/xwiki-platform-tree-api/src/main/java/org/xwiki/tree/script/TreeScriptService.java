@@ -37,7 +37,8 @@ import org.xwiki.tree.Tree;
  * Exposes the tree API in server-side scripts.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("tree")

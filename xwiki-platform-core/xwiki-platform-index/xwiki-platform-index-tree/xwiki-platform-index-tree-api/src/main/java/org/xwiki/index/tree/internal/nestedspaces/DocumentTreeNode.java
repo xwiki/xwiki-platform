@@ -34,7 +34,8 @@ import org.xwiki.model.reference.EntityReference;
  * The document node in the nested spaces hierarchy.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("document/nestedSpaces")

@@ -32,7 +32,9 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the applications panel administration page (PanelsCode.ApplicationsPanelConfiguration).
  *
  * @version $Id$
- * @since 7.1M1, 7.0.1, 6.4.4
+ * @since 7.1M1
+ * @since 7.0.1
+ * @since 6.4.4
  */
 public class ApplicationsPanelAdministrationPage extends ViewPage
 {

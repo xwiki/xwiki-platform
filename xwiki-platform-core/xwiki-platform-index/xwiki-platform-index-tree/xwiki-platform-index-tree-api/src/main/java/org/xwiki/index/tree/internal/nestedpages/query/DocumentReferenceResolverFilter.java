@@ -39,7 +39,8 @@ import org.xwiki.query.QueryFilter;
  * Transforms the results of a nested page query into a list of {@link DocumentReference}s.
  * 
  * @version $Id$
- * @since 8.3RC1, 7.4.5
+ * @since 8.3RC1
+ * @since 7.4.5
  */
 @Component
 @Named("documentReferenceResolver/nestedPages")

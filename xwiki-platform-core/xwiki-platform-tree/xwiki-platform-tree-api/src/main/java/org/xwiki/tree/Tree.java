@@ -28,7 +28,8 @@ import org.xwiki.stability.Unstable;
  * The interface used to represent a tree structure.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Role
 @Unstable

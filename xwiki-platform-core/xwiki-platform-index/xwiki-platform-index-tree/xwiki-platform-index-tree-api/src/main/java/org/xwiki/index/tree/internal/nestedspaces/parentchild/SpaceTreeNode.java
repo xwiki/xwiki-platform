@@ -42,7 +42,8 @@ import org.xwiki.query.QueryFilter;
  * The space node in the parent-child over nested spaces hierarchy.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("space/parentChildOnNestedSpaces")

@@ -38,7 +38,8 @@ import com.xpn.xwiki.util.Util;
  * Registers the named query mapping.
  * 
  * @version $Id$
- * @since 8.3RC1, 7.4.5
+ * @since 8.3RC1
+ * @since 7.4.5
  */
 @Component
 @Named("queryRegistrationHandler/nestedPages")

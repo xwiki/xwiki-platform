@@ -229,7 +229,8 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
 
     /**
      * @param stoppedWhenSaveFail Indicate if an exception should be thrown if a document save fail.
-     * @since 6.2.6, 6.4.2
+     * @since 6.2.6
+     * @since 6.4.2
      */
     public void setStoppedWhenSaveFail(boolean stoppedWhenSaveFail)
     {

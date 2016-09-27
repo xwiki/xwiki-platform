@@ -2363,7 +2363,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     * @since 7.3M1
+     * @since 7.2.1
+     * @since 7.1.3
+     * @since 6.4.6
      */
     public int getXObjectSize(EntityReference classReference)
     {
@@ -2556,7 +2559,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param xcontext the XWiki context
      * @return a {@link BaseObject} stored at passed location
      * @throws XWikiException when failing to create new xobject instance
-     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     * @since 7.3M1
+     * @since 7.2.1
+     * @since 7.1.3
+     * @since 6.4.6
      */
     public BaseObject getXObject(EntityReference classReference, int number, boolean create, XWikiContext xcontext)
         throws XWikiException

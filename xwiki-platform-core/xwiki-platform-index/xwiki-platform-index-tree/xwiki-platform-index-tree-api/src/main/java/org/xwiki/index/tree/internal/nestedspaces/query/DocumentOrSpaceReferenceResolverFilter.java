@@ -34,7 +34,8 @@ import org.xwiki.model.reference.EntityReference;
  * references).
  * 
  * @version $Id$
- * @since 8.3RC1, 7.4.5
+ * @since 8.3RC1
+ * @since 7.4.5
  */
 @Component
 @Named("documentOrSpaceReferenceResolver/nestedSpaces")

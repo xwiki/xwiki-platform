@@ -41,7 +41,9 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Unit tests for {@link MergeUtils}.
  *
- * @since 4.5.4, 5.0.2, 5.1M1
+ * @since 4.5.4
+ * @since 5.0.2
+ * @since 5.1M1
  */
 @ComponentList({
     DefaultDiffManager.class

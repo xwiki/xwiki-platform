@@ -398,7 +398,8 @@ public class InternalTemplateManager
         /**
          * Made public to be seen as bean property.
          *
-         * @since 6.3.1, 6.4M1
+         * @since 6.3.1
+         * @since 6.4M1
          */
         @SuppressWarnings("unused")
         public boolean isPrivileged()
@@ -409,7 +410,8 @@ public class InternalTemplateManager
         /**
          * Made public to be seen as bean property.
          *
-         * @since 6.3.1, 6.4M1
+         * @since 6.3.1
+         * @since 6.4M1
          */
         @SuppressWarnings("unused")
         public void setPrivileged(boolean privileged)

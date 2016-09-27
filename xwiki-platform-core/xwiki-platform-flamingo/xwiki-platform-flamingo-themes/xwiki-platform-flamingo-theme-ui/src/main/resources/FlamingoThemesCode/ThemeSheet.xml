@@ -264,34 +264,6 @@
   <object>
     <name>FlamingoThemesCode.ThemeSheet</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>27bbf39f-be74-4cb2-99fc-b62027a9f33c</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
-  <object>
-    <name>FlamingoThemesCode.ThemeSheet</name>
-    <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>55955fbc-78ed-4062-94b3-19da854f013a</guid>
     <class>

@@ -39,7 +39,8 @@ import org.xwiki.query.QueryException;
  * The wiki node in the nested spaces tree.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("wiki/nestedSpaces")

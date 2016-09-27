@@ -174,7 +174,8 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
      *
      * @param type the type for which to get the setup
      * @return the reference setup map for the requested type, consisting of &lt;parent separator, parent type&gt; pairs
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     protected Map<Character, EntityType> getTypeSetup(EntityType type)
     {

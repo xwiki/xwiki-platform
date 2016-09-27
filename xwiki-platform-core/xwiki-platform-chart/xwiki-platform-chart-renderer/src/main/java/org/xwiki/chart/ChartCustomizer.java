@@ -29,7 +29,8 @@ import org.xwiki.stability.Unstable;
  * Allows implementing JFreeChart customizations (colors, fonts, etc) for the drawn graphs.
  *
  * @version $Id$
- * @since 7.4.3, 8.0RC1
+ * @since 7.4.3
+ * @since 8.0RC1
  */
 @Role
 @Unstable

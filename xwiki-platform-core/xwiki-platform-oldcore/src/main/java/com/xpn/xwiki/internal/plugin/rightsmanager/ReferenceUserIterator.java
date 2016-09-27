@@ -32,7 +32,8 @@ import com.xpn.xwiki.XWikiContext;
  * return {@link DocumentReference} for each found user.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class ReferenceUserIterator extends UserIterator<DocumentReference>
 {

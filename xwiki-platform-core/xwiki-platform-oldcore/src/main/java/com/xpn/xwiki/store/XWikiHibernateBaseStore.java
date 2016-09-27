@@ -394,7 +394,8 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param databaseProduct the database engine type.
      * @param inputxcontext the XWiki context.
      * @return the database/schema name.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext inputxcontext)
     {
@@ -446,7 +447,8 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param wikiName the wiki name to convert.
      * @param inputxcontext the XWiki context.
      * @return the database/schema name.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     protected String getSchemaFromWikiName(String wikiName, XWikiContext inputxcontext)
     {
@@ -468,7 +470,8 @@ public class XWikiHibernateBaseStore implements Initializable
      *
      * @param context the XWiki context.
      * @return the database/schema name.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {

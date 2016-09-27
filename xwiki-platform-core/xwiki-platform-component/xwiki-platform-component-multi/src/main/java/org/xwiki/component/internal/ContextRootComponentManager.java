@@ -37,7 +37,8 @@ import org.xwiki.component.phase.InitializationException;
  * purpose.
  * 
  * @version $Id$
- * @since 6.4.1, 6.2.6
+ * @since 6.4.1
+ * @since 6.2.6
  */
 @Component
 @Named("context/root")

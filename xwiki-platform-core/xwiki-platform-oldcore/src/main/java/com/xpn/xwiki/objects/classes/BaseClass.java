@@ -760,7 +760,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addUsersField(String fieldName, String fieldPrettyName, boolean multiSelect)
     {
@@ -773,7 +774,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
     {
@@ -912,7 +914,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values, String displayType, String separators)

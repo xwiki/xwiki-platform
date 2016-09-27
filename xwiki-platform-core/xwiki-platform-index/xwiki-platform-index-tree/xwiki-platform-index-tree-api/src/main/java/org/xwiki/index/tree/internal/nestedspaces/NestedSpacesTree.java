@@ -34,7 +34,8 @@ import org.xwiki.tree.TreeNode;
  * The tree of nested spaces.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component(roles = {Tree.class})
 @Named("nestedSpaces")

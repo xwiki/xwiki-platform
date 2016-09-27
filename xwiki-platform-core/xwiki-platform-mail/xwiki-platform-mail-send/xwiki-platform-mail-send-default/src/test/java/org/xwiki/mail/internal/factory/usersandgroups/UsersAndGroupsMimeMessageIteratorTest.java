@@ -53,7 +53,8 @@ import static org.mockito.Mockito.*;
  * Unit tests for {@link UsersAndGroupsMimeMessageIterator}.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class UsersAndGroupsMimeMessageIteratorTest
 {

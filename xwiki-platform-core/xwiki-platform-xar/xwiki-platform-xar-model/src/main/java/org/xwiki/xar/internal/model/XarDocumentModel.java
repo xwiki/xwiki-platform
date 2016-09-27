@@ -64,7 +64,7 @@ public class XarDocumentModel
     public static final String ATTRIBUTE_DOCUMENT_LOCALE = "locale";
 
     /**
-     * @since 7.2M1, use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
+     * @deprecated starting with 7.2M1, use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
      */
     @Deprecated
     public static final String ATTRIBUTE_STREAMVERSION = ATTRIBUTE_DOCUMENT_SPECVERSION;

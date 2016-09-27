@@ -63,7 +63,8 @@ public interface XWikiGroupService
      * @param userOrGroupName the name of the member.
      * @param context the XWiki context.
      * @throws XWikiException error when browsing groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         XWikiContext context) throws XWikiException;
@@ -102,7 +103,8 @@ public interface XWikiGroupService
      * @param context the {@link XWikiContext}.
      * @return the list of users.
      * @throws XWikiException error when getting users.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     List<?> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
@@ -130,7 +132,8 @@ public interface XWikiGroupService
      * @param context the {@link XWikiContext}.
      * @return the list of groups.
      * @throws XWikiException error when getting groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     List<?> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
@@ -148,7 +151,8 @@ public interface XWikiGroupService
      * @param context the {@link XWikiContext}.
      * @return the of found users.
      * @throws XWikiException error when getting number of users.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     int countAllMatchedUsers(Object[][] matchFields, XWikiContext context) throws XWikiException;
 
@@ -165,7 +169,8 @@ public interface XWikiGroupService
      * @param context the {@link XWikiContext}.
      * @return the of found groups.
      * @throws XWikiException error when getting number of groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     int countAllMatchedGroups(Object[][] matchFields, XWikiContext context) throws XWikiException;
 
@@ -178,7 +183,8 @@ public interface XWikiGroupService
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException;
@@ -206,7 +212,8 @@ public interface XWikiGroupService
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing member name.
      * @throws XWikiException error when browsing groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException;
@@ -234,7 +241,8 @@ public interface XWikiGroupService
      * @param context the XWiki context.
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException;
 
@@ -245,7 +253,8 @@ public interface XWikiGroupService
      * @param context the XWiki context.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException;
 }

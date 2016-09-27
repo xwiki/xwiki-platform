@@ -34,7 +34,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * given XDOM and to generically read and write the resources from and to these blocks.
  *
  * @version $Id$
- * @since 7.4.1, 8.0M1
+ * @since 7.4.1
+ * @since 8.0M1
  */
 @Role
 public interface LinkedResourceHelper

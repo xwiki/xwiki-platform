@@ -78,7 +78,8 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     /**
      * The logger to be used to output log messages.
      * 
-     * @since 7.4.5, 8.3C1
+     * @since 7.4.5
+     * @since 8.3C1
      */
     @Inject
     protected Logger slf4Jlogger;

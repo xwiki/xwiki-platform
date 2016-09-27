@@ -100,7 +100,8 @@ public interface ModelBridge
      * @param oldParentReference the old document reference for which to update its children's parent fields
      * @param newParentReference the new value to set in the chidlren's parent field
      * @return {@code true} if the parent fields were successfully updated, {@code false} if the update failed
-     * @since 8.0M2, 7.4.2
+     * @since 8.0M2
+     * @since 7.4.2
      */
     boolean updateParentField(DocumentReference oldParentReference, DocumentReference newParentReference);
 

@@ -698,7 +698,8 @@ public abstract class XWikiAction extends Action
      * @param context the XWiki context
      * @return either or not a redirection have been sent
      * @throws XWikiException if error occurs
-     * @since 8.0RC1, 7.4.2
+     * @since 8.0RC1
+     * @since 7.4.2
      */
     protected boolean handleRedirectObject(XWikiContext context) throws XWikiException
     {

@@ -29,7 +29,8 @@ import org.xwiki.mail.MimeMessageFactory;
  * @param <T> the return type of what gets created (usually a {@link javax.mail.internet.MimeMessage} or an
  *        {@link java.util.Iterator} of {@link javax.mail.internet.MimeMessage})
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public abstract class AbstractMimeMessageFactory<T> implements MimeMessageFactory<T>
 {

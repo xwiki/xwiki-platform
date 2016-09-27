@@ -141,34 +141,6 @@
   <object>
     <name>AnnotationCode.AnnotationConfigSheet</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>7d030ed4-622c-4843-981e-5b82a077fd53</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
-  <object>
-    <name>AnnotationCode.AnnotationConfigSheet</name>
-    <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>0f21197d-d521-40ee-9181-942a8f3577b2</guid>
     <class>

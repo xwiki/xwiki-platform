@@ -43,10 +43,10 @@
   <object>
     <name>WikiManager.Dashboard</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>22045e2a-e5ac-4b9e-9ff7-10ee2b62624c</guid>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>c704341f-6895-4084-bd38-aac4acc6b16e</guid>
     <class>
-      <name>XWiki.EditModeClass</name>
+      <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -54,18 +54,22 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <defaultEditMode>
+      <sheet>
+        <customDisplay/>
         <disabled>0</disabled>
-        <name>defaultEditMode</name>
+        <name>sheet</name>
         <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
+      </sheet>
     </class>
     <property>
-      <defaultEditMode>inline</defaultEditMode>
+      <sheet/>
     </property>
   </object>
   <object>

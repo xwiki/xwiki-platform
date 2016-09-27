@@ -63,32 +63,4 @@
   #displayPanelProperty($obj 'content')
 #end
 {{/velocity}}</content>
-  <object>
-    <name>Panels.PanelSheet</name>
-    <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>72b48dfa-090a-4b17-8859-73de9e1e050c</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
 </xwikidoc>

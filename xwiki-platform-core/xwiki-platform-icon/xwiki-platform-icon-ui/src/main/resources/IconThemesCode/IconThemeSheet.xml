@@ -56,10 +56,10 @@ Sheet of [[IconThemesCode.IconThemeClass]]
   <object>
     <name>IconThemesCode.IconThemeSheet</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>f4a5a0f7-15f2-45a1-ad9e-2676bbca098a</guid>
+    <className>XWiki.SheetDescriptorClass</className>
+    <guid>654a75c9-88ad-4574-a242-6674ae911967</guid>
     <class>
-      <name>XWiki.EditModeClass</name>
+      <name>XWiki.SheetDescriptorClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -67,18 +67,22 @@ Sheet of [[IconThemesCode.IconThemeClass]]
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <defaultEditMode>
+      <action>
+        <customDisplay/>
         <disabled>0</disabled>
-        <name>defaultEditMode</name>
+        <name>action</name>
         <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
+        <picker>0</picker>
+        <prettyName>Action</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
+      </action>
     </class>
     <property>
-      <defaultEditMode>wiki</defaultEditMode>
+      <action>view</action>
     </property>
   </object>
 </xwikidoc>

@@ -32,6 +32,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.classes.TimezoneClass;
 
 /**
@@ -114,7 +115,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
         needsUpdate |= bclass.addTextField("title", "Title", 30);
         needsUpdate |= bclass.addTextField("version", "Version", 30);
-        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8, "PureText");
+        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8, ContentType.PURE_TEXT);
         needsUpdate |= bclass.addTextField("dateformat", "Date Format", 30);
 
         // mail
@@ -124,14 +125,14 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("smtp_port", "SMTP Port", 5);
         needsUpdate |= bclass.addTextField("smtp_server_username", "Server username (optional)", 30);
         needsUpdate |= bclass.addTextField("smtp_server_password", "Server password (optional)", 30);
-        needsUpdate |=
-            bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6, "PureText");
-        needsUpdate |=
-            bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10, "PureText");
-        needsUpdate |=
-            bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10, "PureText");
-        needsUpdate |=
-            bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10, "PureText");
+        needsUpdate |= bclass.addTextAreaField("javamail_extra_props", "Additional JavaMail properties", 60, 6,
+            ContentType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10,
+            ContentType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10,
+            ContentType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10,
+            ContentType.PURE_TEXT);
         needsUpdate |= bclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
@@ -195,7 +196,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addBooleanField("ldap_update_photo", "Update user photo from LDAP", "yesno");
         needsUpdate |= bclass.addTextField("ldap_photo_attachment_name", "Attachment name to save LDAP photo", 30);
         needsUpdate |= bclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
-        needsUpdate |= bclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, "PureText");
+        needsUpdate |=
+            bclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, ContentType.PURE_TEXT);
         needsUpdate |= bclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
         needsUpdate |= bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "|always|create");
         needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");

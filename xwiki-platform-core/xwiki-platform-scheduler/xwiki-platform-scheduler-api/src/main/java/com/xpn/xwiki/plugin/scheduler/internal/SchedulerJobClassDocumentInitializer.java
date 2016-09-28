@@ -109,7 +109,7 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
         // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
         // and not only Groovy. When this is done, convert this field to "Text".
         needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10,
-            TextAreaClass.EditorType.PURE_TEXT);
+            TextAreaClass.ContentType.PURE_TEXT);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTLANG, "Job execution context lang", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTDATABASE, "Job execution context database", 30);

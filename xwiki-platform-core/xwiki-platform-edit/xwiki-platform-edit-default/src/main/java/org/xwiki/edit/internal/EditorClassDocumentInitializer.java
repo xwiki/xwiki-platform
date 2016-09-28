@@ -29,6 +29,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Update the {@code XWiki.EditorClass} document with all the required information.
@@ -64,7 +65,7 @@ public class EditorClassDocumentInitializer extends AbstractMandatoryDocumentIni
 
         needsUpdate |= bclass.addTextField("dataType", "Data Type", 30);
         needsUpdate |= bclass.addTextField("roleHint", "Role Hint", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 40, 20, "Text");
+        needsUpdate |= bclass.addTextAreaField("code", "Code", 40, 20, EditorType.TEXT);
         needsUpdate |= bclass.addTextField("icon", "Icon", 30);
         needsUpdate |= bclass.addTextField("category", "Category", 30);
         needsUpdate |= bclass.addStaticListField("scope", "Scope", "wiki=Current Wiki|user=Current User|global=Global");

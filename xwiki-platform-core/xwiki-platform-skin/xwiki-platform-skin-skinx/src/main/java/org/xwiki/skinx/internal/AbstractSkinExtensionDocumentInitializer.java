@@ -24,6 +24,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
 /**
  * Base class to initialize skin extensions classes.
@@ -50,7 +51,7 @@ public abstract class AbstractSkinExtensionDocumentInitializer extends AbstractM
         BaseClass bclass = document.getXClass();
 
         needsUpdate |= bclass.addTextField("name", "Name", 30);
-        needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20, "PureText");
+        needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20, ContentType.PURE_TEXT);
         needsUpdate |= bclass.addStaticListField("use", "Use this extension", "currentPage|onDemand|always");
         needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
         needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");

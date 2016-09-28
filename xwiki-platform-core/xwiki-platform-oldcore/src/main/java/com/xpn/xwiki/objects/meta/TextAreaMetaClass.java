@@ -28,6 +28,8 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Defines the meta properties of a text area XClass property.
@@ -39,6 +41,11 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 @Singleton
 public class TextAreaMetaClass extends StringMetaClass
 {
+    /**
+     * Unknown value.
+     */
+    private static final String UNKNWON = "---";
+
     /**
      * Default constructor. Initializes the default meta properties of a Text Area XClass property.
      */
@@ -57,7 +64,7 @@ public class TextAreaMetaClass extends StringMetaClass
         StaticListClass editorClass = new StaticListClass(this);
         editorClass.setName("editor");
         editorClass.setPrettyName("Editor");
-        editorClass.setValues("---|Text|PureText|Wysiwyg");
+        editorClass.setValues(UNKNWON + '|' + EditorType.TEXT + '|' + EditorType.PURE_TEXT + '|' + EditorType.WYSIWYG);
         editorClass.setRelationalStorage(false);
         editorClass.setDisplayType("select");
         editorClass.setMultiSelect(false);
@@ -67,7 +74,8 @@ public class TextAreaMetaClass extends StringMetaClass
         StaticListClass contentTypeClass = new StaticListClass(this);
         contentTypeClass.setName("contenttype");
         contentTypeClass.setPrettyName("Content");
-        contentTypeClass.setValues("FullyRenderedText|VelocityCode|PureText");
+        contentTypeClass.setValues(
+            UNKNWON + '|' + ContentType.WIKI_TEXT + '|' + ContentType.VELOCITY_CODE + '|' + ContentType.PURE_TEXT);
         contentTypeClass.setRelationalStorage(false);
         contentTypeClass.setDisplayType(editorClass.getDisplayType());
         contentTypeClass.setMultiSelect(false);

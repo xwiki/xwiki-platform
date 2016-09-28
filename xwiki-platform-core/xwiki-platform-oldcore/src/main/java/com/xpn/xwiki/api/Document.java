@@ -39,6 +39,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -607,8 +608,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the Locale of the default version of the document (usually {@link Locale#ROOT} or
-     *  {@link Locale#ENGLISH})
+     * @return the Locale of the default version of the document (usually {@link Locale#ROOT} or {@link Locale#ENGLISH})
      * @since 8.0M1
      */
     public Locale getDefaultLocale()
@@ -700,7 +700,7 @@ public class Document extends Api
     @Deprecated
     public String getRenderedContent(String text) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, Syntax.XWIKI_1_0.toIdString(), getXWikiContext());
+        return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString());
     }
 
     /**
@@ -711,7 +711,7 @@ public class Document extends Api
      */
     public String getRenderedContent(String text, String syntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, syntaxId, getXWikiContext());
+        return getRenderedContent(text, syntaxId, false);
     }
 
     /**
@@ -724,7 +724,21 @@ public class Document extends Api
      */
     public String getRenderedContentRestricted(String text, String syntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, syntaxId, true, getXWikiContext());
+        return getRenderedContent(text, syntaxId, true);
+    }
+
+    /**
+     * Render a text in a restricted mode, where script macros are completely disabled.
+     *
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return the given text rendered in the context of this document using the passed Syntax
+     */
+    private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException
+    {
+        // Make sure we keep using current author as passed content author
+        return this.doc.getRenderedContent(text, syntaxId, restricted, null, getXWikiContext());
     }
 
     /**
@@ -736,7 +750,8 @@ public class Document extends Api
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, getXWikiContext());
+        // Make sure we keep using current author as passed content author
+        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, null, getXWikiContext());
     }
 
     /**

@@ -44,14 +44,14 @@ import org.mockito.MockitoAnnotations;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.container.servlet.ServletResponse;
-import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for the {@link BatikSVGRasterizer} component.
@@ -77,7 +77,7 @@ public class BatikSVGRasterizerTest
 
     private DocumentReference dref = new DocumentReference("wiki", "Space", "Document");
 
-    private Environment environment;
+    private TemporaryResourceStore temporaryResourceStore;
 
     private DocumentReferenceResolver<String> resolver;
 
@@ -103,8 +103,28 @@ public class BatikSVGRasterizerTest
         this.temporaryFile = new File(this.baseDirectory.getRoot() + "/temp/svg/" + RASTER_FILE_NAME);
         this.temporaryFilePath = this.temporaryFile.getAbsolutePath();
 
-        this.environment = this.mocker.getInstance(Environment.class);
-        when(this.environment.getTemporaryDirectory()).thenReturn(this.baseDirectory.getRoot());
+        this.temporaryResourceStore = this.mocker.getInstance(TemporaryResourceStore.class);
+
+        TemporaryResourceReference rasterFileReferece = new TemporaryResourceReference("svg", RASTER_FILE_NAME, dref);
+        when(this.temporaryResourceStore.getTemporaryFile(rasterFileReferece)).thenReturn(rasterFile);
+
+        TemporaryResourceReference temporaryFileReferece =
+            new TemporaryResourceReference("svg", RASTER_FILE_NAME, null);
+        when(this.temporaryResourceStore.getTemporaryFile(temporaryFileReferece)).thenReturn(temporaryFile);
+
+        String invalidRasterFileName = Math.abs(INVALID_SVG.hashCode()) + ".png";
+        File invalidRasterFile =
+            new File(this.baseDirectory.getRoot() + "/temp/svg/wiki/Space/Document/" + invalidRasterFileName);
+        File invalidTemporaryFile = new File(this.baseDirectory.getRoot() + "/temp/svg/" + invalidRasterFileName);
+
+        TemporaryResourceReference invalidRasterFileReferece =
+            new TemporaryResourceReference("svg", invalidRasterFileName, dref);
+        when(this.temporaryResourceStore.getTemporaryFile(invalidRasterFileReferece)).thenReturn(invalidRasterFile);
+
+        TemporaryResourceReference invalidTemporaryFileReferece =
+            new TemporaryResourceReference("svg", invalidRasterFileName, null);
+        when(this.temporaryResourceStore.getTemporaryFile(invalidTemporaryFileReferece))
+            .thenReturn(invalidTemporaryFile);
 
         this.resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         when(this.resolver.resolve("")).thenReturn(this.dref);
@@ -117,8 +137,7 @@ public class BatikSVGRasterizerTest
     @Test
     public void rasterizeToTemporaryFileCreatesTemporaryFile() throws Exception
     {
-        File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        File tfile = this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
         Assert.assertEquals(this.temporaryFilePath, tfile.getAbsolutePath());
         Assert.assertTrue(tfile.exists());
         Assert.assertTrue(isPNG(tfile));
@@ -128,8 +147,7 @@ public class BatikSVGRasterizerTest
     public void rasterizeToTemporaryFileReusesFile() throws Exception
     {
         writeTestFile(this.temporaryFile);
-        File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        File tfile = this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
         Assert.assertEquals(this.temporaryFilePath, tfile.getAbsolutePath());
         Assert.assertTrue(tfile.exists());
         Assert.assertTrue(isTestFile(tfile));
@@ -138,19 +156,29 @@ public class BatikSVGRasterizerTest
     @Test
     public void rasterizeToTemporaryFileReturnsNullOnExceptions() throws Exception
     {
-        File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(INVALID_SVG, 0, 0);
+        File tfile = this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(INVALID_SVG, 0, 0);
         Assert.assertNull(tfile);
     }
 
     @Test
-    public void rasterizeToTemporaryFileReturnsNullWhenFileCannotBeCreated() throws Exception
+    public void rasterizeToTemporaryFileReturnsNullWhenParentFolderCannotBeCreated() throws Exception
     {
         this.baseDirectory.getRoot().mkdirs();
         writeTestFile(new File(this.baseDirectory.getRoot(), "temp"));
-        File tfile =
-            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+        File tfile = this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
         Assert.assertNull(tfile);
+    }
+
+    @Test
+    public void rasterizeToTemporaryFileThrowsExceptionWhenFileCannotBeCreated() throws Exception
+    {
+        this.temporaryFile.mkdirs();
+        try {
+            this.mocker.getComponentUnderTest().rasterizeToTemporaryFile(VALID_SVG, 100, 200);
+            Assert.fail();
+        } catch (IOException e) {
+            // Cannot write temporary file because it's a directory.
+        }
     }
 
     @Test
@@ -265,7 +293,7 @@ public class BatikSVGRasterizerTest
     {
         FileUtils.forceMkdir(file.getParentFile());
         try (OutputStream out = new FileOutputStream(file)) {
-            IOUtils.write("test", out);
+            IOUtils.write("test".getBytes(), out);
             return true;
         } catch (Exception ex) {
             return false;

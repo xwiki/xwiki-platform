@@ -24,25 +24,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>8.2.2-SNAPSHOT</version>
+    <artifactId>xwiki-platform-resource</artifactId>
+    <version>8.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-url-scheme-standard</artifactId>
-  <name>XWiki Platform - URL - Scheme - Standard Implementation</name>
+  <artifactId>xwiki-platform-resource-temporary</artifactId>
+  <name>XWiki Platform - Resource - Temporary</name>
   <packaging>jar</packaging>
-  <description>Standard format of supported URLs</description>
+  <description>Adds support for temporary resources</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Standard URL Scheme</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-url-standard</xwiki.extension.features>
+    <xwiki.extension.name>Temporary Resource Implementation</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-servlet</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -51,31 +54,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <artifactId>xwiki-platform-security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-container</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

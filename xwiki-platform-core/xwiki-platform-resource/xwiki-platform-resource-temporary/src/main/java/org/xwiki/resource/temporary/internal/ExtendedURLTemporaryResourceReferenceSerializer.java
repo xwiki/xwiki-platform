@@ -17,18 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard.temporary;
+package org.xwiki.resource.temporary.internal;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
@@ -37,19 +39,8 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 
 /**
- * Resolver that generates {@link ExtendedURL} out of {@link org.xwiki.resource.temporary.TemporaryResourceReference}.
- *
- * The generated format corresponds to {@code http://(server)/xwiki/temp/(space)/(page)/(module name)/(resource name)},
- * where:
- * <ul>
- *     <li>(space): the space owning the temporary resource (used to check permissions when accessing the resource
- *     later on)</li>
- *     <li>(page): the page owning the temporary resource  (used to check permissions when accessing the resource
- *     later on)</li>
- *     <li>(module name): a free name (used as a namespace) allowing several components to generate temporary
- *     resources for the same page</li>
- *     <li>(resource name): the name of the resource (usually the filename on disk, for example {@code image1.png})</li>
- * </ul>
+ * Serializes a {@link TemporaryResourceReference} as an {@link ExtendedURL}. The following URL format is used
+ * {@code http://<server>/<context>/tmp/<module id>/<owning entity reference>/<module-dependent resource path>}.
  *
  * @version $Id$
  * @since 6.1M2
@@ -61,22 +52,31 @@ public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
 {
     @Inject
-    @Named("contextpath+actionservletpath")
+    @Named("contextpath")
     private URLNormalizer<ExtendedURL> extendedURLNormalizer;
 
+    @Inject
+    @Named("url")
+    private EntityReferenceSerializer<String> urlEntityReferenceSerializer;
+
     @Override
-    public ExtendedURL serialize(TemporaryResourceReference resource)
+    public ExtendedURL serialize(TemporaryResourceReference reference)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        DocumentReference owningReference = (DocumentReference) resource.getOwningEntityReference();
-        List<String> segments = new LinkedList<>();
-        segments.add("temp");
-        segments.add(owningReference.getLastSpaceReference().getName());
-        segments.add(owningReference.getName());
-        segments.add(resource.getModuleId());
-        segments.add(resource.getResourceName());
-        // A modifiable map is used here instead of Collections.emptyMap so parameters can be added to the URL later
-        ExtendedURL result = new ExtendedURL(segments, new HashMap<String, List<String>>());
+        List<String> segments = new LinkedList<String>();
+        segments.add("tmp");
+        segments.add(reference.getModuleId());
+        segments.add(serialize(reference.getOwningEntityReference()));
+        segments.addAll(reference.getResourcePath());
+        // A modifiable map is used here so parameters can be added to the URL later.
+        Map<String, List<String>> parameters = new HashMap<String, List<String>>(reference.getParameters());
+        ExtendedURL result = new ExtendedURL(segments, parameters);
         return this.extendedURLNormalizer.normalize(result);
+    }
+
+    private String serialize(EntityReference reference)
+    {
+        return reference.getType().toString().toLowerCase() + ':'
+            + this.urlEntityReferenceSerializer.serialize(reference);
     }
 }

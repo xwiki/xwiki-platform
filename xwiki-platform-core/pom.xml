@@ -480,6 +480,11 @@
                   }
                 },
                 "ignore": [
+                  {
+                    "code": "java.class.removed",
+                    "old": "class org.xwiki.resource.temporary.TemporaryResourceReference",
+                    "justification": "Not an actual breakage. The class has been moved from xwiki-platform-resource-default to xwiki-platform-resource-temporary module, under the same package."
+                  }
                 ]
               }
             }

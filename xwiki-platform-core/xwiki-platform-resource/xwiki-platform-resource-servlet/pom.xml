@@ -47,6 +47,11 @@
       <artifactId>xwiki-platform-container-servlet</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to determine the Content Type of the requested resource. -->
+    <dependency>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

@@ -6,7 +6,5 @@ org.xwiki.url.internal.standard.StandardStringResourceTypeResolver
 org.xwiki.url.internal.standard.DefaultStandardURLConfiguration
 org.xwiki.url.internal.standard.DomainWikiReferenceExtractor
 org.xwiki.url.internal.standard.PathWikiReferenceExtractor
-org.xwiki.url.internal.standard.temporary.ExtendedURLTemporaryResourceReferenceSerializer
-org.xwiki.url.internal.standard.temporary.URLTemporaryResourceReferenceResolver
 org.xwiki.url.internal.standard.resources.ResourcesResourceReferenceResolver
 org.xwiki.url.internal.standard.skins.SkinsResourceReferenceResolver

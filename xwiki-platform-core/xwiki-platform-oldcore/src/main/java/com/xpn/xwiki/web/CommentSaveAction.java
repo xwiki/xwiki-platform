@@ -23,7 +23,6 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -42,7 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 8.3M1
  */
-public class CommentSaveAction extends CommentAddAction
+public class CommentSaveAction extends XWikiAction
 {
     private static final String COMMENT_FIELD_NAME = "comment";
 
@@ -50,17 +49,12 @@ public class CommentSaveAction extends CommentAddAction
      * Entity reference resolver.
      */
     private DocumentReferenceResolver<String> documentReferenceResolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
 
     /**
      * Authorization manager.
      */
     private AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
-
-    /**
-     *  Localization manager.
-     */
-    private ContextualLocalizationManager localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
 
     /**
      * Pattern to get the comment's number.
@@ -97,8 +91,7 @@ public class CommentSaveAction extends CommentAddAction
         }
 
         // Comment class reference
-        DocumentReference commentClass = new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE,
-                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+        DocumentReference commentClass = new DocumentReference(context.getWikiId(), "XWiki", "XWikiComments");
 
         // Edit comment
         try {
@@ -109,7 +102,7 @@ public class CommentSaveAction extends CommentAddAction
             String commentAuthor = commentObj.getStringValue("author");
             DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
             if (!authorReference.equals(context.getUserReference())
-                    && !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
+                    || !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
                             context.getDoc().getDocumentReference())) {
                 return false;
             }
@@ -119,8 +112,7 @@ public class CommentSaveAction extends CommentAddAction
                 String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
 
             // Save it
-            xwiki.saveDocument(doc, localizationManager.getTranslationPlain("core.comment.editComment"),
-                    true, context);
+            xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
 
             // If xpage is specified then allow the specified template to be parsed.
             if (context.getRequest().get("xpage") != null) {
@@ -136,4 +128,15 @@ public class CommentSaveAction extends CommentAddAction
             return false;
         }
     }
+
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        if (context.getDoc().isNew()) {
+            context.put("message", "nocommentwithnewdoc");
+            return "exception";
+        }
+        return "";
+    }
+
 }

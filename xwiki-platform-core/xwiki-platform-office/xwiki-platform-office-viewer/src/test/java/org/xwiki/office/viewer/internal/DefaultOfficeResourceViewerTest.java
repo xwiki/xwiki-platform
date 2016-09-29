@@ -19,14 +19,10 @@
  */
 package org.xwiki.office.viewer.internal;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,22 +39,39 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.environment.Environment;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ExpandedMacroBlock;
+import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.url.ExtendedURL;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Test case for {@link DefaultOfficeResourceViewer}.
@@ -147,8 +161,8 @@ public class DefaultOfficeResourceViewerTest
     public void configure() throws Exception
     {
         final CacheManager cacheManager = mocker.getInstance(CacheManager.class);
-        attachmentCache = mock(Cache.class);
-        externalCache = mock(Cache.class);
+        attachmentCache = mock(Cache.class, "attachment");
+        externalCache = mock(Cache.class, "external");
         when(cacheManager.<OfficeDocumentView>createNewCache(notNull(CacheConfiguration.class))).thenReturn(
             attachmentCache, externalCache);
 
@@ -173,6 +187,11 @@ public class DefaultOfficeResourceViewerTest
 
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         officeDocumentBuilder = mocker.getInstance(XDOMOfficeDocumentBuilder.class);
+
+        OfficeServer officeServer = mocker.getInstance(OfficeServer.class);
+        OfficeConverter officeConverter = mock(OfficeConverter.class);
+        when(officeServer.getConverter()).thenReturn(officeConverter);
+        when(officeConverter.getFormatRegistry()).thenReturn(new DefaultDocumentFormatRegistry());
     }
 
     /**
@@ -299,40 +318,62 @@ public class DefaultOfficeResourceViewerTest
         verify(attachmentCache).set(eq(CACHE_KEY), notNull(AttachmentOfficeDocumentView.class));
     }
 
-    /**
-     * A test case for testing the {@link AbstractOfficeViewer#getTemporaryFile(AttachmentReference, String)} method.
-     * 
-     * @throws Exception if an error occurs.
-     */
     @Test
-    public void testGetTemporaryFile() throws Exception
+    public void testViewPresentation() throws Exception
     {
-        Environment environment = mocker.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(System.getProperty("java.io.tmpdir")));
+        AttachmentResourceReference attachResourceRef =
+            new AttachmentResourceReference("xwiki:Some.Page@presentation.odp");
+        DocumentReference documentReference = new DocumentReference("wiki", "Some", "Page");
+        AttachmentReference attachmentReference = new AttachmentReference("presentation.odp", documentReference);
 
-        DefaultOfficeResourceViewer implementation = (DefaultOfficeResourceViewer) mocker.getComponentUnderTest();
-        File tempFile =
-            implementation.getTemporaryFile(ATTACHMENT_REFERENCE.getDocumentReference(),
-                "Test+file.doc/0/some+image.png");
-        Assert.assertTrue(tempFile.getAbsolutePath().endsWith(
-            "/temp/officeviewer/xwiki/Main/Test/Test+file.doc/0/some+image.png"));
-    }
+        AttachmentReferenceResolver<String> attachmentReferenceResolver =
+            mocker.getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
+        when(attachmentReferenceResolver.resolve(attachResourceRef.getReference())).thenReturn(attachmentReference);
 
-    /**
-     * A test case for testing the {@link DefaultOfficeResourceViewer#getFilePath(String, String, Map)} method.
-     * 
-     * @throws Exception if an error occurs
-     */
-    @Test
-    public void testGetFilePath() throws Exception
-    {
-        when(documentAccessBridge.getDocumentURL(ATTACHMENT_REFERENCE.getDocumentReference(), "temp", null, null, true))
-            .thenReturn("/xwiki/bin/temp/Main/Test");
+        when(documentAccessBridge.getAttachmentReferences(attachmentReference.getDocumentReference())).thenReturn(
+            Arrays.asList(attachmentReference));
+        when(documentAccessBridge.getAttachmentVersion(attachmentReference)).thenReturn("3.2");
 
-        DefaultOfficeResourceViewer implementation = (DefaultOfficeResourceViewer) mocker.getComponentUnderTest();
-        String filePath =
-            implementation.getFilePath(ATTACHMENT_REFERENCE.getName(), "some temporary artifact.gif",
-                Collections.<String, Object>emptyMap());
-        Assert.assertEquals("VGVzdCBmaWxlLmRvYw/0/some+temporary+artifact.gif", filePath);
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(documentAccessBridge.getAttachmentContent(attachmentReference)).thenReturn(attachmentContent);
+
+        ResourceReference imageReference = new ResourceReference("slide0.png", ResourceType.URL);
+        ExpandedMacroBlock galleryMacro =
+            new ExpandedMacroBlock("gallery", Collections.singletonMap("width", "300px"), null, false);
+        galleryMacro.addChild(new ImageBlock(imageReference, true));
+        XDOM xdom = new XDOM(Collections.<Block>singletonList(galleryMacro));
+
+        Map<String, byte[]> artifacts = Collections.singletonMap("slide0.png", new byte[8]);
+        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, artifacts, mocker);
+
+        PresentationBuilder presentationBuilder = mocker.getInstance(PresentationBuilder.class);
+        when(presentationBuilder.build(attachmentContent, attachmentReference.getName(), documentReference))
+            .thenReturn(xdomOfficeDocument);
+
+        Map<String, ?> viewParameters = Collections.singletonMap("ownerDocument", documentReference);
+        TemporaryResourceReference temporaryResourceReference = new TemporaryResourceReference("officeviewer",
+            Arrays.asList(String.valueOf(viewParameters.hashCode()), "slide0.png"), documentReference);
+
+        Type type = new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+            TemporaryResourceReference.class, ExtendedURL.class);
+        ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTemporaryResourceReferenceSerializer =
+            mocker.getInstance(type, "standard/tmp");
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", "slide0.png"));
+        when(urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
+
+        XDOM output = this.mocker.getComponentUnderTest().createView(attachResourceRef, viewParameters);
+
+        ImageBlock imageBlock =
+            (ImageBlock) output.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT).get(0);
+        assertEquals("/url/to/slide0.png", imageBlock.getReference().getReference());
+
+        galleryMacro = (ExpandedMacroBlock) output
+            .getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.DESCENDANT).get(0);
+        assertFalse(galleryMacro.getParent() instanceof XDOM);
+        assertEquals(Syntax.XWIKI_2_1,
+            ((MetaDataBlock) galleryMacro.getParent()).getMetaData().getMetaData(MetaData.SYNTAX));
+
+        TemporaryResourceStore store = mocker.getInstance(TemporaryResourceStore.class);
+        verify(store).createTemporaryFile(eq(temporaryResourceReference), any(InputStream.class));
     }
 }

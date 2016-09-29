@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,10 +65,11 @@ import org.xwiki.xml.html.HTMLUtils;
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
     /**
-     * Component manager used by {@link XDOMOfficeDocument}.
+     * Provides the component manager used by {@link XDOMOfficeDocument}.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
 
     /**
      * Used to obtain document converter.
@@ -117,7 +119,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         // Create the XDOM.
         XDOM xdom = buildPresentationXDOM(html, documentReference);
 
-        return new XDOMOfficeDocument(xdom, artifacts, this.componentManager);
+        return new XDOMOfficeDocument(xdom, artifacts, this.contextComponentManagerProvider.get());
     }
 
     /**
@@ -226,11 +228,13 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         throws OfficeImporterException
     {
         try {
+            ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
             String syntaxId = this.documentAccessBridge.getDocument(targetDocumentReference).getSyntax().toIdString();
-            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, syntaxId);
+            BlockRenderer renderer = contextComponentManager.getInstance(BlockRenderer.class, syntaxId);
 
             Map<String, String> galleryParameters = Collections.emptyMap();
-            ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", galleryParameters, renderer, false);
+            ExpandedMacroBlock gallery =
+                new ExpandedMacroBlock("gallery", galleryParameters, renderer, false, contextComponentManager);
             gallery.addChild(this.xhtmlParser.parse(new StringReader(html)));
 
             XDOM xdom = new XDOM(Collections.singletonList((Block) gallery));

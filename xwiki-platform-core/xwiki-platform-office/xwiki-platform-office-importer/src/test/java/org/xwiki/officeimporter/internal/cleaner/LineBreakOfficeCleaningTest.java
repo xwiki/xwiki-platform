@@ -22,11 +22,13 @@ package org.xwiki.officeimporter.internal.cleaner;
 import java.io.StringReader;
 import java.util.Collections;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
  * Test case for cleaning html {@code<br/>} elements in {@link OfficeHTMLCleaner}.
@@ -119,6 +121,14 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      */
     private void checkLineBreakReplacements(String html, int expectedBrCount, int expectedDivCount)
     {
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentReferenceResolver).resolve("Import.Test");
+                will(returnValue(new DocumentReference("wiki", "Import", "Test")));
+            }
+        });
+
         HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
         Document doc = officeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);

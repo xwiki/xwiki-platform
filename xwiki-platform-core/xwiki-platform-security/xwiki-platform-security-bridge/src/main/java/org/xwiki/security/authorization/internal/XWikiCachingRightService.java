@@ -95,7 +95,6 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("undelete", Right.EDIT)
             .putAction("reset", Right.DELETE)
             .putAction("commentadd", Right.COMMENT)
-            .putAction("commentsave", Right.COMMENT)
             .putAction("redirect", Right.VIEW)
             .putAction("export", Right.VIEW)
             .putAction("import", Right.ADMIN)

@@ -58,7 +58,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @since 2.4M1
+ * @deprecated Use the "tmp" resource reference handler instead since 8.3
  */
+@Deprecated
 public class TempResourceAction extends XWikiAction
 {
     /**

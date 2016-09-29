@@ -43,7 +43,7 @@ public abstract class AbstractResourceReference implements ResourceReference
     /**
      * @see #getParameters()
      */
-    private Map<String, List<String>> parameters = new LinkedHashMap<>();
+    private final Map<String, List<String>> parameters = new LinkedHashMap<>();
 
     /**
      * @see #getType()

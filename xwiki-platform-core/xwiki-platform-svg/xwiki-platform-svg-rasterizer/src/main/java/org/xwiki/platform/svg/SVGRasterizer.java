@@ -51,8 +51,8 @@ public interface SVGRasterizer
     File rasterizeToTemporaryFile(String content, int width, int height) throws IOException;
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the current document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG into a temporary resource belonging to the current document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @param width the desired width of the raster image, in pixels; if 0 or a negative number, the image's native size
@@ -65,8 +65,8 @@ public interface SVGRasterizer
     TemporaryResourceReference rasterizeToTemporaryResource(String content, int width, int height) throws IOException;
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the specified document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG into a temporary resource belonging to the specified document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @param width the desired width of the raster image, in pixels; if 0 or a negative number, the image's native size

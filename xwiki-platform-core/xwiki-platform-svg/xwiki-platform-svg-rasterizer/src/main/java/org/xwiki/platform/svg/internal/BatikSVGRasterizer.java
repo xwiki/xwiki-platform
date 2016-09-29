@@ -41,12 +41,11 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletResponse;
-import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.svg.SVGRasterizer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
 
 /**
  * The straight-forward implementation of the {@link SVGRasterizer} role using Batik.
@@ -65,11 +64,8 @@ public class BatikSVGRasterizer implements SVGRasterizer
     @Inject
     private Logger logger;
 
-    /**
-     * Used to get the temporary directory.
-     */
     @Inject
-    private Environment environment;
+    private TemporaryResourceStore temporaryResourceStore;
 
     @Inject
     @Named("current")
@@ -81,8 +77,10 @@ public class BatikSVGRasterizer implements SVGRasterizer
     @Override
     public File rasterizeToTemporaryFile(String content, int width, int height) throws IOException
     {
-        File out = getTempFile(content.hashCode());
-        if (out != null && rasterizeToFile(content, out, width, height)) {
+        String fileName = getTemporaryFileName(content, width, height);
+        TemporaryResourceReference reference = new TemporaryResourceReference(TEMP_DIR_NAME, fileName, null);
+        File out = this.temporaryResourceStore.getTemporaryFile(reference);
+        if (rasterizeToFile(content, out, width, height)) {
             return out;
         }
         return null;
@@ -99,9 +97,11 @@ public class BatikSVGRasterizer implements SVGRasterizer
     public TemporaryResourceReference rasterizeToTemporaryResource(String content, int width, int height,
         DocumentReference targetContext) throws IOException
     {
-        File out = getContextTempFile(content.hashCode(), targetContext);
-        if (out != null && rasterizeToFile(content, out, width, height)) {
-            return new TemporaryResourceReference(TEMP_DIR_NAME, out.getName(), targetContext);
+        String fileName = getTemporaryFileName(content, width, height);
+        TemporaryResourceReference reference = new TemporaryResourceReference(TEMP_DIR_NAME, fileName, targetContext);
+        File out = this.temporaryResourceStore.getTemporaryFile(reference);
+        if (rasterizeToFile(content, out, width, height)) {
+            return reference;
         }
         return null;
     }
@@ -126,21 +126,24 @@ public class BatikSVGRasterizer implements SVGRasterizer
 
     private boolean rasterizeToFile(String content, File out, int width, int height) throws IOException
     {
-        boolean result = true;
-        if (out.exists()) {
+        if (!out.getParentFile().exists() && !out.getParentFile().mkdirs()) {
+            this.logger.debug("Failed to create temporary folder [{}].", out.getParentFile().getAbsolutePath());
+            return false;
+        } else if (out.exists() && out.isFile()) {
             this.logger.debug("Reusing existing temporary raster image: {}", out.getAbsolutePath());
-            return result;
+            return true;
+        } else {
+            try (OutputStream fout = new FileOutputStream(out)) {
+                this.logger.debug("Rasterizing to temp file: {}", out.getAbsolutePath());
+                TranscoderInput input = new TranscoderInput(new StringReader(content));
+                TranscoderOutput output = new TranscoderOutput(fout);
+                boolean success = rasterize(input, output, width, height);
+                if (!success) {
+                    out.delete();
+                }
+                return success;
+            }
         }
-        try (OutputStream fout = new FileOutputStream(out)) {
-            this.logger.debug("Rasterizing to temp file: {}", out.getAbsolutePath());
-            TranscoderInput input = new TranscoderInput(new StringReader(content));
-            TranscoderOutput output = new TranscoderOutput(fout);
-            result = rasterize(input, output, width, height);
-        }
-        if (!result) {
-            out.delete();
-        }
-        return result;
     }
 
     private boolean rasterize(TranscoderInput input, TranscoderOutput output, int width, int height)
@@ -167,53 +170,9 @@ public class BatikSVGRasterizer implements SVGRasterizer
         return false;
     }
 
-    private File getTempFile(int hashcode)
+    private String getTemporaryFileName(String content, int width, int height)
     {
-        File parent = getBaseTempDir();
-        if (parent == null) {
-            return null;
-        }
-        return new File(parent, Math.abs(hashcode) + RASTER_FILE_EXTENSION);
-    }
-
-    private File getContextTempFile(int hashcode, DocumentReference targetContext)
-    {
-        File parent = getTempDir(targetContext);
-        if (parent == null) {
-            return null;
-        }
-        return new File(parent, Math.abs(hashcode) + RASTER_FILE_EXTENSION);
-    }
-
-    private File getTempDir(DocumentReference targetContext)
-    {
-        File tempDir = getBaseTempDir();
-        if (tempDir == null) {
-            return null;
-        }
-        for (EntityReference ref : targetContext.getReversedReferenceChain()) {
-            tempDir = new File(tempDir, ref.getName());
-        }
-
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
-            this.logger.error("Cannot create temporary directory [{}] for context document [{}]", tempDir,
-                targetContext);
-            return null;
-        }
-
-        return tempDir;
-    }
-
-    private File getBaseTempDir()
-    {
-        File tempDir = new File(new File(this.environment.getTemporaryDirectory(), "temp"), TEMP_DIR_NAME);
-
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
-            this.logger.error("Cannot create temporary directory [{}]", tempDir);
-            return null;
-        }
-
-        return tempDir;
+        return Math.abs(content.hashCode()) + RASTER_FILE_EXTENSION;
     }
 
     private DocumentReference getCurrentDocument()

@@ -19,8 +19,6 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -36,6 +34,8 @@ import org.xwiki.officeimporter.document.OfficeDocument;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.rendering.listener.MetaData;
+
+import static org.junit.Assert.*;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
@@ -93,6 +93,9 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
 
                 allowing(mockDocumentConverter).convert(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
                 will(returnValue(mockOutput));
+
+                allowing(mockDocumentReferenceResolver).resolve("xwiki:Main.Test");
+                will(returnValue(documentReference));
 
                 allowing(mockDefaultStringEntityReferenceSerializer).serialize(documentReference);
                 will(returnValue("xwiki:Main.Test"));

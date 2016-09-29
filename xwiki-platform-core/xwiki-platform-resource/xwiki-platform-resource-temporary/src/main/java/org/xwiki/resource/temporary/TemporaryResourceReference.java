@@ -19,6 +19,12 @@
  */
 package org.xwiki.resource.temporary;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
@@ -37,11 +43,26 @@ public class TemporaryResourceReference extends AbstractResourceReference
      */
     public static final ResourceType TYPE = new ResourceType("tmp");
 
-    private EntityReference owningEntityReference;
+    private final EntityReference owningEntityReference;
 
-    private String resourceName;
+    private final List<String> resourcePath;
 
-    private String moduleId;
+    private final String moduleId;
+
+    /**
+     * Create a new temporary resource reference.
+     * 
+     * @param moduleId see {@link #getModuleId()}
+     * @param resourcePath see {@link #getResourcePath()}
+     * @param owningEntityReference see {@link #getOwningEntityReference()}
+     */
+    public TemporaryResourceReference(String moduleId, List<String> resourcePath, EntityReference owningEntityReference)
+    {
+        setType(TYPE);
+        this.moduleId = moduleId;
+        this.resourcePath = Collections.unmodifiableList(new ArrayList<String>(resourcePath));
+        this.owningEntityReference = owningEntityReference;
+    }
 
     /**
      * @param moduleId see {@link #getModuleId()}
@@ -50,10 +71,7 @@ public class TemporaryResourceReference extends AbstractResourceReference
      */
     public TemporaryResourceReference(String moduleId, String resourceName, EntityReference owningEntityReference)
     {
-        setType(TYPE);
-        this.moduleId = moduleId;
-        this.resourceName = resourceName;
-        this.owningEntityReference = owningEntityReference;
+        this(moduleId, Collections.singletonList(resourceName), owningEntityReference);
     }
 
     /**
@@ -66,7 +84,7 @@ public class TemporaryResourceReference extends AbstractResourceReference
     }
 
     /**
-     * @return the reference to tne entity owning the current temporary resource. This can be used for example to verify
+     * @return the reference to the entity owning the current temporary resource. This can be used for example to verify
      *         that the user asking for the temporary resource has the permission to view the owning entity before
      *         letting him access the temporary resource.
      */
@@ -76,19 +94,47 @@ public class TemporaryResourceReference extends AbstractResourceReference
     }
 
     /**
-     * @return the name of the temporary resource (eg the temporary file name of a generated image)
+     * @return the name of the temporary resource (e.g. the temporary file name of a generated image)
      */
     public String getResourceName()
     {
-        return this.resourceName;
+        return this.resourcePath.get(this.resourcePath.size() - 1);
+    }
+
+    /**
+     * @return the path to the temporary resource (within the namespace defined by the module id)
+     */
+    public List<String> getResourcePath()
+    {
+        return this.resourcePath;
     }
 
     /**
      * @return the module id, a free name (used as a namespace) allowing several components to generate temporary
-     *         resources for the same Entity
+     *         resources for the same entity
      */
     public String getModuleId()
     {
         return this.moduleId;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(super.hashCode(), 5).append(getModuleId()).append(getOwningEntityReference())
+            .append(getResourcePath()).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (!super.equals(object)) {
+            return false;
+        }
+
+        TemporaryResourceReference reference = (TemporaryResourceReference) object;
+        return new EqualsBuilder().append(getModuleId(), reference.getModuleId())
+            .append(getOwningEntityReference(), reference.getOwningEntityReference())
+            .append(getResourcePath(), reference.getResourcePath()).isEquals();
     }
 }

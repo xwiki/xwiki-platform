@@ -57,8 +57,8 @@ public class SVGScriptService implements ScriptService
     private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> serializer;
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the current document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG into a temporary resource belonging to the current document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @return URL pointing to the temporary resource where the PNG is stored
@@ -69,8 +69,8 @@ public class SVGScriptService implements ScriptService
     }
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the current document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG into a temporary resource belonging to the current document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @param width the desired width of the raster image, in pixels; if 0 or a negative number, the image's native size
@@ -91,8 +91,8 @@ public class SVGScriptService implements ScriptService
     }
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the current document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG into a temporary resource belonging to the current document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @param targetContext the document which will "own" the new temporary resource
@@ -104,8 +104,8 @@ public class SVGScriptService implements ScriptService
     }
 
     /**
-     * Rasterize an image as PNG as a temporary resource belonging to the current document, which can be accessed with
-     * the /temp/ action.
+     * Rasterize an image as PNG as into temporary resource belonging to the current document, accessible through the
+     * "tmp" resource URL handler.
      *
      * @param content the SVG image
      * @param width the desired width of the raster image, in pixels; if 0 or a negative number, the image's native size

@@ -503,6 +503,11 @@
               <field>COLORS_PARAM</field>
               <justification>Removed constant that shouldn't have been there</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/resource/temporary/TemporaryResourceReference</className>
+              <justification>Not an actual breakage. The class has been moved from xwiki-platform-resource-default to xwiki-platform-resource-temporary module, under the same package.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

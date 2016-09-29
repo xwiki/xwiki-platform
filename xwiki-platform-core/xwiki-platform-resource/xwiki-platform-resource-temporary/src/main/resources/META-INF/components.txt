@@ -1,0 +1,4 @@
+org.xwiki.resource.temporary.internal.DefaultTemporaryResourceStore
+org.xwiki.resource.temporary.internal.ExtendedURLTemporaryResourceReferenceResolver
+org.xwiki.resource.temporary.internal.ExtendedURLTemporaryResourceReferenceSerializer
+org.xwiki.resource.temporary.internal.TemporaryResourceReferenceHandler

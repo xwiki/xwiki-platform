@@ -36,6 +36,7 @@
     <module>xwiki-platform-resource-api</module>
     <module>xwiki-platform-resource-default</module>
     <module>xwiki-platform-resource-servlet</module>
+    <module>xwiki-platform-resource-temporary</module>
   </modules>
   <profiles>
     <profile>

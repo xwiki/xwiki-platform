@@ -100,6 +100,9 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         // Prepare the parameters for HTML cleaning.
         Map<String, String> params = new HashMap<String, String>();
         params.put("targetDocument", this.entityReferenceSerializer.serialize(reference));
+        // Extract the images that are embedded through the Data URI scheme and add them to the other artifacts so that
+        // they end up as attachments.
+        params.put("attachEmbeddedImages", "true");
         if (filterStyles) {
             params.put("filterStyles", "strict");
         }
@@ -109,6 +112,12 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
         configuration.setParameters(params);
         Reader html = getReader(artifacts.remove(outputFileName));
         Document xhtmlDoc = this.officeHtmlCleaner.clean(html, configuration);
+
+        @SuppressWarnings("unchecked")
+        Map<String, byte[]> embeddedImages = (Map<String, byte[]>) xhtmlDoc.getUserData("embeddedImages");
+        if (embeddedImages != null) {
+            artifacts.putAll(embeddedImages);
+        }
 
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);

@@ -105,6 +105,12 @@
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
     </dependency>
+    <!-- Used to parse the images embedded through the Data URI scheme. -->
+    <dependency>
+      <groupId>com.github.ooxi</groupId>
+      <artifactId>jdatauri</artifactId>
+      <version>1.0</version>
+    </dependency>
     <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
     <dependency>
       <groupId>org.gagravarr</groupId>

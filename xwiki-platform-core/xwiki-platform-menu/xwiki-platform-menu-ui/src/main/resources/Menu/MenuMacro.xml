@@ -748,7 +748,7 @@ $xwiki.getDocument('MenuTemplate').content
             &amp;:after {
               position: absolute;
               margin-top: @line-height-computed / 2;
-              right: 1em;
+              right: 8px;
             }
           }
           /* Separator horizontal inside menu */

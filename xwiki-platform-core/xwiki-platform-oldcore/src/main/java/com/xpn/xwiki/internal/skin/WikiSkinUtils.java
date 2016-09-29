@@ -149,7 +149,10 @@ public class WikiSkinUtils
             }
 
             // Try parsing a document attachment
-            XWikiAttachment attachment = skinDocument.getAttachment(resource);
+            // Convert "/" into "." in order to support wiki skin attachments to override some resources located in
+            // subdirectories.
+            String normalizedResourceName = StringUtils.replaceChars(resource, '/', '.');
+            XWikiAttachment attachment = skinDocument.getAttachment(normalizedResourceName);
             if (attachment != null) {
                 AttachmentReference reference = attachment.getReference();
                 return new AttachmentWikiResource(getPath(reference), skin, reference, attachment.getAuthorReference(),

@@ -40,7 +40,10 @@ import com.xpn.xwiki.objects.BaseObject;
  * object in the document, requires comment right but not edit right.
  *
  * @version $Id$
- * @since 8.3M1
+ * @since 8.4RC1
+ * @since 8.3
+ * @since 8.2.2
+ * @since 7.4.6
  */
 public class CommentSaveAction extends CommentAddAction
 {
@@ -101,39 +104,37 @@ public class CommentSaveAction extends CommentAddAction
                 XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
 
         // Edit comment
-        try {
-            int commentId = getCommentIdFromRequest(request);
-            BaseObject commentObj = doc.getXObject(commentClass, commentId);
-
-            // Check if the author is the current user or if the current user has the ADMIN right
-            String commentAuthor = commentObj.getStringValue("author");
-            DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
-            if (!authorReference.equals(context.getUserReference())
-                    && !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
-                            context.getDoc().getDocumentReference())) {
-                return false;
-            }
-
-            // Edit the comment
-            commentObj.set(COMMENT_FIELD_NAME, request.getParameter(
-                String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
-
-            // Save it
-            xwiki.saveDocument(doc, localizationManager.getTranslationPlain("core.comment.editComment"),
-                    true, context);
-
-            // If xpage is specified then allow the specified template to be parsed.
-            if (context.getRequest().get("xpage") != null) {
-                return true;
-            }
-
-            // forward to edit
-            String redirect = Utils.getRedirect("edit", context);
-            sendRedirect(response, redirect);
-            return false;
-
-        } catch (NullPointerException e) {
+        int commentId = getCommentIdFromRequest(request);
+        BaseObject commentObj = doc.getXObject(commentClass, commentId);
+        if (commentObj == null) {
             return false;
         }
+
+        // Check if the author is the current user or if the current user has the ADMIN right
+        String commentAuthor = commentObj.getStringValue("author");
+        DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
+        if (!authorReference.equals(context.getUserReference())
+                && !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
+                        context.getDoc().getDocumentReference())) {
+            return false;
+        }
+
+        // Edit the comment
+        commentObj.set(COMMENT_FIELD_NAME, request.getParameter(
+            String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
+
+        // Save it
+        xwiki.saveDocument(doc, localizationManager.getTranslationPlain("core.comment.editComment"),
+                true, context);
+
+        // If xpage is specified then allow the specified template to be parsed.
+        if (context.getRequest().get("xpage") != null) {
+            return true;
+        }
+
+        // forward to edit
+        String redirect = Utils.getRedirect("edit", context);
+        sendRedirect(response, redirect);
+        return false;
     }
 }

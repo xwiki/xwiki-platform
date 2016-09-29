@@ -446,20 +446,22 @@ position: relative;
     </class>
     <property>
       <content>{{velocity}}
-#set($canView = $services.security.authorization.hasAccess("view", "XWiki.RatingsMacros"))
+#set($canView = $services.security.authorization.hasAccess('view', 'XWiki.RatingsMacros'))
 #if($canView)
   {{include reference='XWiki.RatingsMacros'/}}
-  #set($configurationClass = 'XWiki.RatingsConfigClass')
+#end
+{{/velocity}}
+{{velocity}}
+#if($canView)
   #set($configurationDoc = $services.ratings.getConfigurationDocument($doc.documentReference))
-  #set($configurationObj = $configurationDoc.getObject($configurationClass))
+  #set($configurationObj = $configurationDoc.getObject('XWiki.RatingsConfigClass'))
   ##
   #set($displayRatings = $configurationObj.getProperty('displayRatings').value == 1)
   #set($excludedPages  = $stringtool.split($configurationObj.getProperty('excludedPages').value, ','))
   #set($excludedPages  = $stringtool.stripAll($excludedPages))
   ##
-  ##
   #if($displayRatings &amp;&amp; !$excludedPages.contains($doc.name))
-    #displayFullRating($doc.getDocumentReference() "")
+    #displayFullRating($doc.getDocumentReference() '')
   #end
 #end
 {{/velocity}}</content>

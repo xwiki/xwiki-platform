@@ -41,9 +41,6 @@ import com.xpn.xwiki.objects.BaseObject;
  *
  * @version $Id$
  * @since 8.4RC1
- * @since 8.3
- * @since 8.2.2
- * @since 7.4.6
  */
 public class CommentSaveAction extends CommentAddAction
 {

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheEntry;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 
@@ -102,7 +103,13 @@ public class TestCache<T> implements Cache<T>
         if (listener != null && old == null) {
             listener.cacheEntryAdded(getEvent(key, value));
         } else {
-            listener.cacheEntryModified(getEvent(key, value));
+            if (old != value) {
+                disposeCacheValue(old);
+            }
+
+            if (listener != null) {
+                listener.cacheEntryModified(getEvent(key, value));
+            }
         }
         lastInsertedKey = key;
     }
@@ -120,6 +127,7 @@ public class TestCache<T> implements Cache<T>
         if (listener != null) {
             listener.cacheEntryRemoved(getEvent(key, value));
         }
+        disposeCacheValue(value);
     }
 
     @Override
@@ -144,6 +152,18 @@ public class TestCache<T> implements Cache<T>
     @Override
     public void dispose()
     {
+        listener = null;
+    }
+
+    private void disposeCacheValue(T value)
+    {
+        if (value instanceof DisposableCacheValue) {
+            try {
+                ((DisposableCacheValue) value).dispose();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public String getLastInsertedKey()

@@ -41,6 +41,7 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
+import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -142,22 +143,32 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
 
                 XDOM xdom = this.contentParser.parse(content, context, false, metadata, false);
 
-                // Apply the transformations but with a Transformation Context having the XDOM of the passed document
-                // so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate the toc for
-                // the passed document instead of the current document).
+                // Configure the  Transformation Context depending on the mode asked.
+                if (parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
+                    || parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS)
+                {
+                    // Apply the transformations but with a Transformation Context having the XDOM of the passed
+                    // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
+                    // the toc for the passed document instead of the current document).
+                    DocumentModelBridge referencedDoc = this.documentAccessBridge.getDocument(referencedDocReference);
+                    XDOM referencedXDOM = referencedDoc.getXDOM();
 
-                // Get the XDOM from the referenced doc but with Transformations applied so that all macro are executed
-                // and contribute XDOM elements.
-                DocumentModelBridge referencedDoc = this.documentAccessBridge.getDocument(referencedDocReference);
-                XDOM referencedXDOM = referencedDoc.getXDOM();
-                TransformationContext referencedTxContext =
-                    new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
-                this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
+                    if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
+                        // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
+                        // executed and contribute XDOM elements.
+                        // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
+                        // defined in the referenced document. To be used with caution.
+                        TransformationContext referencedTxContext =
+                            new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
+                        this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
+                    }
 
-                // Now execute transformation on the context macro content but with the referenced XDOM in the
-                // Transformation context!
-                TransformationContext txContext = new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
-                this.transformationManager.performTransformations(xdom, txContext);
+                    // Now execute transformation on the context macro content but with the referenced XDOM in the
+                    // Transformation context!
+                    TransformationContext txContext =
+                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
+                    this.transformationManager.performTransformations(xdom, txContext);
+                }
 
                 // Keep metadata so that the result stay associated to context properties when inserted in the parent
                 // XDOM

@@ -2,14 +2,14 @@
 .#-----------------------------------------------------
 .input|xwiki/2.1
 .#-----------------------------------------------------
-{{context document="Space.Page"}}
+{{context document="Space.Page" transformationContext="transformations"}}
 {{toc/}}
 {{/context}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [context] [document=Space.Page] [{{toc/}}]
+beginMacroMarkerStandalone [context] [document=Space.Page|transformationContext=transformations] [{{toc/}}]
 beginMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
 beginMacroMarkerStandalone [toc] []
 beginList [BULLETED]
@@ -28,5 +28,5 @@ endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [toc] []
 endMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
-endMacroMarkerStandalone [context] [document=Space.Page] [{{toc/}}]
+endMacroMarkerStandalone [context] [document=Space.Page|transformationContext=transformations] [{{toc/}}]
 endDocument

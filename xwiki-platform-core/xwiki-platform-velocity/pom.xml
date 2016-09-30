@@ -25,14 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-velocity</artifactId>
   <name>XWiki Platform - Velocity - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Velocity - Parent POM</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-velocity-webapp</module>
+    <module>xwiki-platform-velocity-xwiki</module>
   </modules>
   <dependencies>
     <dependency>

@@ -39,7 +39,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * no way to clear the session/transaction only in the copied context. So the session/transaction is cleared in the
  * original context before cloning, causing a side effect on the original context. You should never copy a context
  * while a create/update transaction is in progress, since some changes would get rollbacked.
- * <p/>
+ * <p>
  * Note: The clone is still rather shallow, since many fields will still be shared with the original
  * {@link XWikiContext}.
  *

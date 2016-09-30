@@ -267,11 +267,12 @@
         ##         Careful not to remove html macros from the content because they are not escaped!
         #set ($out = $out.substring($out.indexOf('&lt;'), $mathtool.add(1, $out.lastIndexOf('&gt;'))))
         ## Step 3: Prepend app name to all ID and FOR attributes to prevent id collision with multiple apps on one page.
-        #set ($out = $out.replaceAll(
-            " id='$objClass.getName()_$obj.getNumber()_$propName", " id='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName").replaceAll(
-            " for='$objClass.getName()_$obj.getNumber()_$propName", " for='${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName"))
+        #set ($oldId = "$objClass.getName()_$obj.getNumber()_$propName")
+        #set ($newId = "${escapedAppName}_$oldId")
+        #set ($out = $out.replaceAll(" (id|for)=('|"")$regextool.quote($oldId)",
+          " ${escapetool.d}1=${escapetool.d}2$regextool.quoteReplacement($newId)"))
         ## App Name is prepended to for= to make label work with id which is modified to prevent collisions.
-        &lt;dt&gt;&lt;label for="${escapedAppName}_$objClass.getName()_$obj.getNumber()_$propName"&gt;
+        &lt;dt&gt;&lt;label for="$newId"&gt;
         #if ($out.indexOf('type=''checkbox''') != -1)
           $out
         #end

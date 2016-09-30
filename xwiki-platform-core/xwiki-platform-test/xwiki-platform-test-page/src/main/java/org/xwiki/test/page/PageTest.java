@@ -19,18 +19,13 @@
  */
 package org.xwiki.test.page;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -39,7 +34,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -48,7 +42,6 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -62,13 +55,10 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,18 +73,11 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 public class PageTest
 {
-    private static final String XWIKI = "xwiki";
-
     /**
      * Page tests use the Oldcore rule to configure some base mocks (such as XWiki).
      */
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    /**
-     * The documents that have been loaded with {@link #loadPage(DocumentReference)}.
-     */
-    protected Map<DocumentReference, XWikiDocument> documents = new HashMap<>();
 
     /**
      * The stubbed request used to simulate a real Servlet Request.
@@ -169,7 +152,7 @@ public class PageTest
         path.add(documentReference.getName() + ".xml");
         XWikiDocument document = new XWikiDocument(documentReference);
         document.fromXML(getClass().getClassLoader().getResourceAsStream(StringUtils.join(path, '/')));
-        this.documents.put(documentReference, document);
+        this.xwiki.saveDocument(document, "registering document", true, this.context);
         return document;
     }
 
@@ -180,7 +163,12 @@ public class PageTest
      */
     protected String renderPage(DocumentReference reference) throws Exception
     {
-        return loadPage(reference).getRenderedContent(this.context);
+        XWikiDocument doc = loadPage(reference);
+
+        // Set up the current doc in the context so that $doc is bound in scripts
+        context.setDoc(doc);
+
+        return doc.getRenderedContent(this.context);
     }
 
     /**
@@ -231,47 +219,13 @@ public class PageTest
             eq(context))).thenReturn(true);
 
         // Set up URL Factory
-        doReturn(XWIKI).when(xwiki).getWebAppPath(context);
-        context.setURL(new URL("http://localhost:8080/xwiki/bin/Main/WebHome"));
-        doReturn(true).when(xwiki).showViewAction(context);
-        context.setURLFactory(new XWikiServletURLFactory(context));
-        doReturn("/bin/").when(xwiki).getServletPath(XWIKI, context);
+        URLFactorySetup.setUp(xwiki, context);
 
-        // All translation return their key as translation values
-        LocalizationScriptService lss = mock(LocalizationScriptService.class);
-        mocker.registerComponent(ScriptService.class, "localization", lss);
-        when(lss.render(anyString())).thenAnswer(
-            new Answer() {
-                @Override
-                public Object answer(InvocationOnMock invocationOnMock) throws Throwable
-                {
-                    // Return the translation key as the value
-                    return invocationOnMock.getArgumentAt(0, String.class);
-                }
-            }
-        );
+        // Set up Localization
+        LocalizationSetup.setUp(mocker);
 
-        // Make XWiki#getDocument() return the documents that have been loaded.
-        doAnswer(new Answer<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-            {
-                DocumentReference documentReference = invocation.getArgumentAt(0, DocumentReference.class);
-                XWikiDocument document = documents.get(documentReference);
-                if (document == null) {
-                    // Try to get the default document translation.
-                    document = documents.get(new DocumentReference(documentReference, null));
-                    if (document == null) {
-                        // Return a new document.
-                        document = new XWikiDocument(documentReference);
-                        // Avoid "Failed to find parser for the default syntax [XWiki 1.0]".
-                        document.setSyntax(Syntax.XWIKI_2_1);
-                    }
-                }
-                return document;
-            }
-        }).when(oldcore.getSpyXWiki()).getDocument(any(DocumentReference.class), any(XWikiContext.class));
+        // Set up Skin Extensions
+        SkinExtensionSetup.setUp(xwiki, context);
     }
 
     /**

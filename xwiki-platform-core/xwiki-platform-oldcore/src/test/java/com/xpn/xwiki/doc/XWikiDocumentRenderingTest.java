@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -26,6 +28,8 @@ import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
 import org.junit.Test;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -307,7 +311,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
         Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
-        mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(vcontext));
+        mockVelocityManager.stubs().method("getCurrentVelocityContext").will(returnValue(vcontext));
 
         VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
         VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
@@ -318,6 +322,15 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertTrue(cachedMacroNamespaceSize > 0);
 
         mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
+        mockVelocityManager.stubs().method("evaluate").will(new CustomStub("evaluate")
+        {
+            @Override
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return vengine.evaluate(vcontext, (Writer) invocation.parameterValues.get(0),
+                    (String) invocation.parameterValues.get(1), (Reader) invocation.parameterValues.get(2));
+            }
+        });
 
         // $doc.display will ask for the syntax of the current document so we need to mock it.
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").with(eq("xwiki/2.0"), ANYTHING)
@@ -395,22 +408,30 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     public void testGetRenderedContentTextRights()
     {
-        this.document.setContentAuthorReference(new DocumentReference("authorwiki", "XWiki", "authorpage"));
+        getContext().setDoc(null);
 
-        assertEquals("<p>$xcontext.sdoc.contentAuthor Space.Page authorwiki:XWiki.authorpage</p>",
-            this.document.getRenderedContent(
-                "{{velocity}}$xcontext.sdoc.contentAuthor $xcontext.doc $xcontext.doc.contentAuthor{{/velocity}}",
-                Syntax.XWIKI_2_1.toIdString(), getContext()));
+        String content =
+            "{{velocity}}" + "$xcontext.sdoc.contentAuthorReference $xcontext.doc $xcontext.doc.contentAuthorReference"
+                + "{{/velocity}}";
+
+        this.document.setContentAuthorReference(new DocumentReference("authorwiki", "XWiki", "contentauthor"));
+
+        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+
+        assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
 
         XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
-        otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "otherauthorpage"));
+        otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));
 
         getContext().setDoc(otherDocument);
 
-        assertEquals("<p>XWiki.otherauthorpage Space.Page authorwiki:XWiki.authorpage</p>",
-            this.document.getRenderedContent(
-                "{{velocity}}$xcontext.sdoc.contentAuthor $xcontext.doc $xcontext.doc.contentAuthor{{/velocity}}",
-                Syntax.XWIKI_2_1.toIdString(), getContext()));
+        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+
+        assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
 
         XWikiDocument sdoc = new XWikiDocument(new DocumentReference("callerwiki", "callerspace", "callerpage"));
         sdoc.setContentAuthorReference(new DocumentReference("callerwiki", "XWiki", "calleruser"));
@@ -418,16 +439,18 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         getContext().setDoc(this.document);
 
-        assertEquals("<p>XWiki.calleruser Space.Page authorwiki:XWiki.authorpage</p>",
-            this.document.getRenderedContent(
-                "{{velocity}}$xcontext.sdoc.contentAuthor $xcontext.doc $xcontext.doc.contentAuthor{{/velocity}}",
-                Syntax.XWIKI_2_1.toIdString(), getContext()));
+        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
 
         getContext().setDoc(otherDocument);
 
-        assertEquals("<p>XWiki.calleruser Space.Page authorwiki:XWiki.authorpage</p>",
-            this.document.getRenderedContent(
-                "{{velocity}}$xcontext.sdoc.contentAuthor $xcontext.doc $xcontext.doc.contentAuthor{{/velocity}}",
-                Syntax.XWIKI_2_1.toIdString(), getContext()));
+        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
     }
 }

@@ -33,16 +33,21 @@ public class SendMailQueueItem extends AbstractMailQueueItem
 {
     private String uniqueMessageId;
 
+    private String wikiId;
+
     /**
      * @param uniqueMessageId see {@link #getUniqueMessageId()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
+     * @param wikiId see {@link #getWikiId()}
      */
-    public SendMailQueueItem(String uniqueMessageId, Session session, MailListener listener, String batchId)
+    public SendMailQueueItem(String uniqueMessageId, Session session, MailListener listener, String batchId,
+        String wikiId)
     {
         super(session, listener, batchId);
         this.uniqueMessageId = uniqueMessageId;
+        this.wikiId = wikiId;
     }
 
     /**
@@ -53,9 +58,20 @@ public class SendMailQueueItem extends AbstractMailQueueItem
         return this.uniqueMessageId;
     }
 
+    /**
+     * @return the id of the wiki in which the mail sending was done
+     */
+    public String getWikiId()
+    {
+        return this.wikiId;
+    }
+
     @Override
     public String toString()
     {
-        return prepareToString().append("messageId", getUniqueMessageId()).toString();
+        return prepareToString()
+            .append("messageId", getUniqueMessageId())
+            .append("wikiId", getWikiId())
+            .toString();
     }
 }

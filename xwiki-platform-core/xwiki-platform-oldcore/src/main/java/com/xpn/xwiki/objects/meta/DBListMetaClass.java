@@ -50,6 +50,7 @@ public class DBListMetaClass extends ListMetaClass
         TextAreaClass sqlClass = new TextAreaClass(this);
         sqlClass.setName("sql");
         sqlClass.setPrettyName("Hibernate Query");
+        sqlClass.setEditor("PureText");
         sqlClass.setSize(80);
         sqlClass.setRows(5);
         safeput(sqlClass.getName(), sqlClass);

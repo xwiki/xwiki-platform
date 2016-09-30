@@ -26,15 +26,15 @@ import java.util.ListIterator;
 /**
  * A construct for altering storage in a safe way.
  * TransactionRunnable represents a storage transaction or a unit of work which may be done inside
- * of a transaction. It provides hooks to aquire locks, do work, commit and or roll the work back,
+ * of a transaction. It provides hooks to acquire locks, do work, commit and or roll the work back,
  * and release locks and cleanup temporary storage. Unless a TransactionRunnable extends
  * StartableTransactionRunnable, it must be run inside of another transaction and it may by the generic
- * <T> specify that it can only be run inside of a certian type of TransactionRunnable.
+ * {@code <T>} specify that it can only be run inside of a certain type of TransactionRunnable.
  *
  * @param <T> The type of TransactionRunnable which this TransactionRunnable must be run inside of.
  * A TransactionRunnable which alters a database through Hibernate would fail if it was
  * started outside of a TransactionRunnable which began and committed a transaction around
- * it. A class which extends TransactionRunnable<DatabaseTransactionRunnable> can only be
+ * it. A class which extends {@code TransactionRunnable<DatabaseTransactionRunnable>} can only be
  * run inside of a DatabaseTransactionRunnable or a subclass of it. Breaking that rule will
  * be a compile time error.
  * @version $Id$
@@ -74,11 +74,11 @@ public class TransactionRunnable<T>
      *
      * By using the return value of this function, it is possible to sandwich a TransactionRunnable which
      * with few requirements between 2 runnables with many requirements. Normally you cannot run a
-     * TransactionRunnable<DatabaseTransaction> of a TransactionRunnable which does not offer database
+     * {@code TransactionRunnable<DatabaseTransaction>} of a TransactionRunnable which does not offer database
      * access. However, when you add a runnable which does not need or offer database access to one which
      * does, this function returns that runnable casted to a type which does offer database access
      * (since it is running in one which does).
-     * <code>
+     * {@code
      * StartableTransactionRunnable<DbTransaction> transaction = new DbTransactionRunnable();
      * StartableTransactionRunnable<Standalone> standalone = new StandaloneTransactionRunnable();
      * TransactionRunnable<DbTransaction> runnableRequiringDb = new DbRequiringTransactionRunnable();
@@ -93,7 +93,7 @@ public class TransactionRunnable<T>
      * TransactionRunnable<DbTransaction> castedStandalone = standalone.runIn(transaction);
      * runnableRequiringDb.runIn(castedStandalone);
      * transaction.start();
-     * </code>
+     * }
      *
      * @param <U> The type of capabilities provided by the parent runnable.
      * This defines the state which the state which the storage engine is guaranteed to be in

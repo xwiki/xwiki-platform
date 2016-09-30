@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import javax.script.ScriptContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,6 +73,7 @@ import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -126,8 +128,8 @@ public abstract class XWikiAction extends Action
      * Actions that need to be resolved on the main wiki instead of the current non-existing wiki. This is used to be
      * able to render the skin even on a wiki that doesn't exist.
      */
-    private static final List<String> ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST = Arrays.asList("skin", "ssx", "jsx",
-        "download");
+    private static final List<String> ACTIONS_IGNORED_WHEN_WIKI_DOES_NOT_EXIST =
+        Arrays.asList("skin", "ssx", "jsx", "download");
 
     /**
      * Indicate if the action is blocked until XWiki is initialized.
@@ -142,6 +144,8 @@ public abstract class XWikiAction extends Action
     private ContextualLocalizationManager localization;
 
     private JobProgressManager progress;
+
+    private ScriptContextManager scriptContextManager;
 
     protected ContextualLocalizationManager getLocalization()
     {
@@ -160,10 +164,23 @@ public abstract class XWikiAction extends Action
     protected JobProgressManager getProgress()
     {
         if (this.progress == null) {
-            this.progress = Utils.getComponent(JobProgressManager.class);            
+            this.progress = Utils.getComponent(JobProgressManager.class);
         }
 
         return this.progress;
+    }
+
+    /**
+     * @return the current unmodified {@link ScriptContext} instance
+     * @since 8.3M1
+     */
+    protected ScriptContext getCurrentScriptContext()
+    {
+        if (this.scriptContextManager == null) {
+            this.scriptContextManager = Utils.getComponent(ScriptContextManager.class);
+        }
+
+        return this.scriptContextManager.getCurrentScriptContext();
     }
 
     /**
@@ -278,10 +295,9 @@ public abstract class XWikiAction extends Action
                             // since we cannot set the non existing one as it would generate errors obviously...
                             EntityReferenceValueProvider valueProvider =
                                 Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(
-                                new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI), valueProvider
-                                    .getDefaultValue(EntityType.SPACE), valueProvider
-                                    .getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            xwiki.setPhonyDocument(new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI),
+                                valueProvider.getDefaultValue(EntityType.SPACE),
+                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -396,14 +412,13 @@ public abstract class XWikiAction extends Action
                 getProgress().startStep(this, "Search and execute entity resource handler");
 
                 // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler =
-                    Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceHandler.class,
-                        ResourceType.class), "bin");
+                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
+                    new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
                 ResourceReference resourceReference =
                     Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
-                    entityResourceReferenceHandler.handle(resourceReference, new DefaultResourceReferenceHandlerChain(
-                        Collections.<ResourceReferenceHandler>emptyList()));
+                    entityResourceReferenceHandler.handle(resourceReference,
+                        new DefaultResourceReferenceHandlerChain(Collections.<ResourceReferenceHandler>emptyList()));
                     // Don't let the old actions kick in!
                     return null;
                 } catch (NotFoundResourceHandlerException e) {
@@ -436,8 +451,7 @@ public abstract class XWikiAction extends Action
                     if (doc.isNew() && "view".equals(context.getAction())
                         && !"recyclebin".equals(context.getRequest().get("viewer"))
                         && !"children".equals(context.getRequest().get("viewer"))
-                        && !"siblings".equals(context.getRequest().get("viewer")))
-                    {
+                        && !"siblings".equals(context.getRequest().get("viewer"))) {
                         String page = Utils.getPage(context.getRequest(), "docdoesnotexist");
 
                         getProgress().startStep(this, "Execute template [" + page + "]");
@@ -452,16 +466,13 @@ public abstract class XWikiAction extends Action
                 return null;
             } catch (Throwable e) {
                 if (e instanceof IOException) {
-                    e =
-                        new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
-                            e);
+                    e = new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
                 }
 
                 if (!(e instanceof XWikiException)) {
-                    e =
-                        new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                            "Uncaught exception", e);
+                    e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                        "Uncaught exception", e);
                 }
 
                 try {
@@ -687,8 +698,8 @@ public abstract class XWikiAction extends Action
      * @param context the XWiki context
      * @return either or not a redirection have been sent
      * @throws XWikiException if error occurs
-     *
-     * @since 8.0RC1, 7.4.2
+     * @since 8.0RC1
+     * @since 7.4.2
      */
     protected boolean handleRedirectObject(XWikiContext context) throws XWikiException
     {
@@ -696,8 +707,8 @@ public abstract class XWikiAction extends Action
 
         // Look if the document has a redirect object
         XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj = doc.getXObject(
-                new DocumentReference("RedirectClass", new SpaceReference("XWiki", wikiReference)));
+        BaseObject redirectObj =
+            doc.getXObject(new DocumentReference("RedirectClass", new SpaceReference("XWiki", wikiReference)));
         if (redirectObj == null) {
             return false;
         }
@@ -727,7 +738,7 @@ public abstract class XWikiAction extends Action
         // Note: the anchor part is lost in the process, because it is not sent to the server
         // (see: http://stackoverflow.com/a/4276491)
         String url = context.getWiki().getURL(locationReference, context.getAction(),
-                    context.getRequest().getQueryString(), null, context);
+            context.getRequest().getQueryString(), null, context);
 
         // Send the redirection
         try {
@@ -746,19 +757,13 @@ public abstract class XWikiAction extends Action
             context.put("rev", rev);
             XWikiDocument doc = (XWikiDocument) context.get("doc");
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-            XWikiDocument rdoc =
-                (!doc.getLanguage().equals(tdoc.getLanguage())) ? doc : context.getWiki()
-                    .getDocument(doc, rev, context);
-            XWikiDocument rtdoc =
-                (doc.getLanguage().equals(tdoc.getLanguage())) ? rdoc : context.getWiki().getDocument(tdoc, rev,
-                    context);
+            XWikiDocument rdoc = (!doc.getLanguage().equals(tdoc.getLanguage())) ? doc
+                : context.getWiki().getDocument(doc, rev, context);
+            XWikiDocument rtdoc = (doc.getLanguage().equals(tdoc.getLanguage())) ? rdoc
+                : context.getWiki().getDocument(tdoc, rev, context);
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put("doc", rdoc.newDocument(context));
-            vcontext.put("cdoc", vcontext.get("doc"));
-            vcontext.put("tdoc", rtdoc.newDocument(context));
         }
     }
 
@@ -804,10 +809,9 @@ public abstract class XWikiAction extends Action
                 response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
-            Object[] args = {url};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
-                args);
+            Object[] args = { url };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION,
+                "Exception while sending redirect to page {0}", e, args);
         }
     }
 
@@ -867,13 +871,13 @@ public abstract class XWikiAction extends Action
     }
 
     /**
-     * In order to let users enter URLs to Spaces we do the following when receiving {@code /A/B}
-     * (where A and B are spaces):
+     * In order to let users enter URLs to Spaces we do the following when receiving {@code /A/B} (where A and B are
+     * spaces):
      * <ul>
-     *   <li>check that the action is "view" (we only support this for the view action since otherwise this
-     *       would break apps written before this concept was introduced in XWiki 7.2M1)</li>
-     *   <li>if A.B exists then continue</li>
-     *   <li> if A.B doesn't exist then forward to A.B.WebHome</li>
+     * <li>check that the action is "view" (we only support this for the view action since otherwise this would break
+     * apps written before this concept was introduced in XWiki 7.2M1)</li>
+     * <li>if A.B exists then continue</li>
+     * <li>if A.B doesn't exist then forward to A.B.WebHome</li>
      * </ul>
      * In order to disable this redirect you should provide the {@code spaceRedirect=false} Query String parameter and
      * value.
@@ -886,8 +890,8 @@ public abstract class XWikiAction extends Action
         if ("view".equals(action) && !"false".equalsIgnoreCase(context.getRequest().getParameter("spaceRedirect"))) {
             DocumentReference reference = xwiki.getDocumentReference(context.getRequest(), context);
             if (!xwiki.exists(reference, context)) {
-                String defaultDocumentName = Utils.getComponent(EntityReferenceProvider.class).getDefaultReference(
-                    EntityType.DOCUMENT).getName();
+                String defaultDocumentName = Utils.getComponent(EntityReferenceProvider.class)
+                    .getDefaultReference(EntityType.DOCUMENT).getName();
                 // Avoid an infinite loop by ensuring we're not on a WebHome already
                 if (!reference.getName().equals(defaultDocumentName)) {
                     // Consider the reference as a Space Reference and Construct a new reference to the home of that
@@ -905,8 +909,8 @@ public abstract class XWikiAction extends Action
                     String webappContext = xwiki.getWebAppPath(context);
                     String relativeURL = urlf.getURL(forwardURL, context);
                     relativeURL = '/' + StringUtils.substringAfter(relativeURL, webappContext);
-                    context.getRequest().getRequestDispatcher(relativeURL).forward(
-                        context.getRequest(), context.getResponse());
+                    context.getRequest().getRequestDispatcher(relativeURL).forward(context.getRequest(),
+                        context.getResponse());
                     return true;
                 }
             }

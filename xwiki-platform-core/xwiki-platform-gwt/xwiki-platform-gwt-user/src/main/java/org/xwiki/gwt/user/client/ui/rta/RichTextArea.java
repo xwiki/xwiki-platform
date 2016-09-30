@@ -119,12 +119,13 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
 
     /**
      * NOTE: If the current browser doesn't support rich text editing this method returns <code>null</code>. You should
-     * test the returned value and fail save to an appropriate behavior!<br/>
-     * The appropriate test would be: <code><pre>
+     * test the returned value and fail save to an appropriate behavior!
+     * <p>
+     * The appropriate test would be: {@code
      * if (rta.isAttached() && rta.getDocument() == null) {
      *   // The current browser doesn't support rich text editing.
      * }
-     * </pre></code>
+     * }
      * 
      * @return The DOM document being edited with this rich text area.
      */
@@ -188,7 +189,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public void onBrowserEvent(com.google.gwt.user.client.Event event)
     {
         // We need to preview the event due to a GWT bug.
-        // @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=729.
         // Note that this makes the RichTextArea unusable on a modal dialog box because the test that checks if the
         // event target is a child of the panel fails for all the events triggered inside the in-line frame due to the
         // fact that they come from a different document than the one holding the panel. As a result all the
@@ -205,10 +206,11 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * We need to call DOM.previewEvent because there is a bug in GWT that prevents PopupPanel from previewing events
      * generated in in-line frames like the one in behind of this rich text area.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=729.
      * 
      * @param event a handle to the event being previewed.
      * @return <code>false</code> to cancel the event.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=729
      */
     private native boolean previewEvent(com.google.gwt.user.client.Event event)
     /*-{

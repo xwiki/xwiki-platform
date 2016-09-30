@@ -31,7 +31,6 @@ import java.util.logging.Level;
 
 import javax.inject.Inject;
 
-import org.apache.velocity.VelocityContext;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
@@ -42,12 +41,9 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationStub;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
 import org.xwiki.annotation.rights.AnnotationRightService;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -64,7 +60,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 public abstract class AbstractAnnotationRESTResource extends XWikiResource
 {
     /**
-     * The default action to render the document for. <br />
+     * The default action to render the document for. <br>
      * TODO: action should be obtained from the calling client in the parameters
      */
     protected static final String DEFAULT_ACTION = "view";
@@ -154,7 +150,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     }
 
     /**
-     * Helper function to create an error response from a passed exception. <br />
+     * Helper function to create an error response from a passed exception. <br>
      * 
      * @param exception the exception that was encountered during regular execution of service
      * @return an error response
@@ -177,7 +173,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
 
     /**
      * Helper function to get the rendered content of the document with annotations. All setup of context for rendering
-     * content similar to the rendering on standard view will be done in this function. <br />
+     * content similar to the rendering on standard view will be done in this function. <br>
      * FIXME: find out if this whole context setup code has to be here or in the annotations service
      * 
      * @param docName the name of the document to render
@@ -192,7 +188,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         Collection<Annotation> annotations) throws XWikiException, AnnotationServiceException
     {
         String isInRenderingEngineKey = "isInRenderingEngine";
-        XWikiContext context = getXWikiContext(componentManager);
+        XWikiContext context = this.xcontextProvider.get();
         Object isInRenderingEngine = context.get(isInRenderingEngineKey);
         // set the context url factory to the servlet url factory so that all links get correctly generated as if we
         // were view-ing the page
@@ -224,7 +220,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     }
 
     /**
-     * Helper function to prepare the XWiki documents and translations on the context and velocity context. <br />
+     * Helper function to prepare the XWiki documents and translations on the context and velocity context. <br>
      * TODO: check how this code could be written only once (not duplicate the prepareDocuments function in XWiki)
      * 
      * @param docName the full name of the document to prepare context for
@@ -233,33 +229,21 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     private void setUpDocuments(String docName, String language) throws XWikiException
     {
-        try {
-            VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+        XWikiContext context = xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
 
-            XWikiContext context = getXWikiContext(componentManager);
-            XWiki xwiki = context.getWiki();
+        // prepare the messaging tools and set them on context
+        xwiki.prepareResources(context);
 
-            // prepare the messaging tools and set them on context
-            xwiki.prepareResources(context);
+        XWikiDocument doc = xwiki.getDocument(docName, context);
+        // setup the xwiki context
+        context.put("doc", doc);
+        context.put("cdoc", doc);
 
-            XWikiDocument doc = xwiki.getDocument(docName, context);
-            // setup the xwiki context and the velocity context
-            String docKey = "doc";
-            context.put(docKey, doc);
-            vcontext.put(docKey, doc.newDocument(context));
-            vcontext.put("cdoc", vcontext.get(docKey));
-            XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
-            String translatedDocKey = "tdoc";
-            context.put(translatedDocKey, tdoc);
-            vcontext.put(translatedDocKey, tdoc.newDocument(context));
-            // and render the xwikivars to have all the variables set ($has*, $blacklistedSpaces, etc)
-            context.getWiki().renderTemplate("xwikivars.vm", context);
-        } catch (ComponentLookupException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
-                "Couldn't lookup velocity context to setup rendering context.");
-        }
+        XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+        context.put("tdoc", tdoc);
+        // and render the xwikivars to have all the variables set ($has*, $blacklistedSpaces, etc)
+        context.getWiki().renderTemplate("xwikivars.vm", context);
     }
 
     /**
@@ -316,7 +300,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     protected String getXWikiUser()
     {
-        return ((XWikiContext) execution.getContext().getProperty("xwikicontext")).getUser();
+        return this.xcontextProvider.get().getUser();
     }
 
     /**
@@ -342,28 +326,6 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
             // Just log it.
             logger.log(Level.SEVERE,
                 String.format("Failed to update the context for page [%s].", documentReference), e);
-        }
-    }
-    
-    /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
-     * 
-     * @param componentManager The component manager to be used to retrieve the execution context.
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
-     */
-    public XWikiContext getXWikiContext(ComponentManager componentManager)
-    {
-        Execution execution;
-        XWikiContext xwikiContext;
-        try {
-            execution = componentManager.getInstance(Execution.class);
-            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-            return xwikiContext;
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to get XWiki context", e);
         }
     }
 }

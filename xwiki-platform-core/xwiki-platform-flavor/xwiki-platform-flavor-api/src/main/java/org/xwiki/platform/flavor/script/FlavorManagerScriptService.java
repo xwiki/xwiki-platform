@@ -108,7 +108,15 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
     @Deprecated
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
-        return this.flavorManager.getFlavors(query);
+        setError(null);
+
+        try {
+            return this.flavorManager.getFlavors(query);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     /**
@@ -120,7 +128,15 @@ public class FlavorManagerScriptService extends AbstractExtensionScriptService
      */
     public IterableResult<Extension> searchFlavors(FlavorQuery query)
     {
-        return this.flavorManager.searchFlavors(query);
+        setError(null);
+
+        try {
+            return this.flavorManager.searchFlavors(query);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 
     /**

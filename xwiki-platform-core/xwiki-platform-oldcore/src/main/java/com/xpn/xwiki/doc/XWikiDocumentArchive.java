@@ -164,7 +164,7 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * @return collection of XWikiRCSNodeInfo where vfrom>=version>=vto order by version desc
+     * @return collection of XWikiRCSNodeInfo where vfrom &gt;= version &gt;= vto order by version desc
      * @param vfrom - start version
      * @param vto - end version
      */

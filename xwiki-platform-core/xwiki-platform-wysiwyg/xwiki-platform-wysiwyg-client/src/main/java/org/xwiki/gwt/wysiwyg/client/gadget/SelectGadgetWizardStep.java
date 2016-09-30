@@ -26,7 +26,8 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
 
 /**
- * The wizard step to select a gadget, extending the macro selecting step. <br />
+ * The wizard step to select a gadget, extending the macro selecting step.
+ * <p>
  * FIXME: remove some macros from the list, the ones that don't make sense as gadgets such as "dashboard", or that are
  * not part of the gadgets category. Add multiple categories to macros.
  * 

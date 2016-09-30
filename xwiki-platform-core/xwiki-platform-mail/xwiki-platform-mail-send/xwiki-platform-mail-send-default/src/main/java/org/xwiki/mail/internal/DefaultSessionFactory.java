@@ -28,6 +28,7 @@ import javax.mail.Session;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.SessionFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 
 /**

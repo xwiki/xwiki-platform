@@ -55,7 +55,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     private PushButton imageButton;
 
     /**
-     * The toolbar extension used to add the link buttons to the toolbar. <br />
+     * The toolbar extension used to add the link buttons to the toolbar. <br>
      * TODO: move this in its own extension, just like {@link ImageMenuExtension}
      */
     private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");

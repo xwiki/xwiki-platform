@@ -38,6 +38,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
@@ -144,6 +145,9 @@ public class DocumentLocaleReader extends AbstractReader
         this.currentDocumentRevision = null;
 
         this.currentDocumentParameters = new FilterEventParameters();
+        // Defaults
+        this.currentDocumentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, Locale.ROOT);
+
         this.currentDocumentLocaleParameters = new FilterEventParameters();
         this.currentDocumentRevisionParameters = new FilterEventParameters();
 

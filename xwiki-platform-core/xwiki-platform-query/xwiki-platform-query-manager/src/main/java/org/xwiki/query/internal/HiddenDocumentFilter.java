@@ -24,9 +24,9 @@ import org.xwiki.component.annotation.Component;
 /**
  * Query filter excluding 'hidden' documents from a {@link org.xwiki.query.Query}. Hidden documents should not be
  * returned in public search results or appear in the User Interface in general.
- * <p/>
+ * <p>
  * The filter assume the <code>XWikiDocument</code> table has a <code>space</code> alias.
- * <p/>
+ * <p>
  * Starting with 7.2M2, the 'hidden' hint is deprecated in favor of the 'hidden/document' one.
  *
  * @version $Id$

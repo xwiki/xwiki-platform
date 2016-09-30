@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.dashboard;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -41,6 +43,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -65,10 +68,10 @@ public class IntegrationTest
         // than have to provide mocks for them.
         componentManager.unregisterComponent(ComponentManager.class, "context");
 
-        final SkinExtension mockSsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx",
-            "ssfxMock");
-        final SkinExtension mockJsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx",
-            "jsfxMock");
+        final SkinExtension mockSsfx =
+            componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx", "ssfxMock");
+        final SkinExtension mockJsfx =
+            componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx", "jsfxMock");
         mockery.checking(new Expectations()
         {
             {
@@ -88,20 +91,25 @@ public class IntegrationTest
                 // Mock gadget for macrodashboard_nested_velocity.test
                 allowing(mockGadgetSource).getGadgets(with("nested_velocity"),
                     with(any(MacroTransformationContext.class)));
-                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
-                    .<Block> asList(new MacroBlock("velocity", Collections.<String, String> emptyMap(),
-                        "someVelocityCodeHere", true)), "1,1"))));
+                will(
+                    returnValue(
+                        Arrays
+                            .asList(
+                                new Gadget("0", Arrays.<Block>asList(new WordBlock("title")),
+                                    Arrays.<Block>asList(new MacroBlock("velocity",
+                                        Collections.<String, String>emptyMap(), "someVelocityCodeHere", true)),
+                                    "1,1"))));
 
                 // Mock gadget for macrodashboard1.test
                 allowing(mockGadgetSource).getGadgets(with(aNull(String.class)),
                     with(any(MacroTransformationContext.class)));
-                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block> asList(new WordBlock("title")), Arrays
-                    .<Block> asList(new WordBlock("content")), "1,1"))));
+                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block>asList(new WordBlock("title")),
+                    Arrays.<Block>asList(new WordBlock("content")), "1,1"))));
 
                 allowing(mockGadgetSource).getDashboardSourceMetadata(
                     with(AnyOf.anyOf(aNull(String.class), any(String.class))),
                     with(any(MacroTransformationContext.class)));
-                will(returnValue(Collections.<Block> emptyList()));
+                will(returnValue(Collections.<Block>emptyList()));
 
                 allowing(mockGadgetSource).isEditing();
                 // return true on is editing, to take as many paths possible
@@ -118,19 +126,35 @@ public class IntegrationTest
             {
                 allowing(mockVelocityManager).getVelocityContext();
                 will(returnValue(new VelocityContext()));
+                allowing(mockVelocityManager).getCurrentVelocityContext();
+                will(returnValue(new VelocityContext()));
                 allowing(mockVelocityManager).getVelocityEngine();
                 will(doAll(new CustomAction("mockGetVelocityEngine")
                 {
                     @Override
                     public Object invoke(Invocation invocation) throws Throwable
                     {
-                        org.xwiki.velocity.VelocityEngine velocityEngine =
-                            componentManager.getInstance(org.xwiki.velocity.VelocityEngine.class);
+                        VelocityEngine velocityEngine = componentManager.getInstance(VelocityEngine.class);
                         Properties properties = new Properties();
                         properties.setProperty("resource.loader", "file");
                         velocityEngine.initialize(properties);
 
                         return velocityEngine;
+                    }
+
+                }));
+                allowing(mockVelocityManager).evaluate(with(any(Writer.class)), with(any(String.class)),
+                    with(any(Reader.class)));
+                will(doAll(new CustomAction("mockEvaluate")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        VelocityEngine velocityEngine = mockVelocityManager.getVelocityEngine();
+
+                        return velocityEngine.evaluate(mockVelocityManager.getVelocityContext(),
+                            (Writer) invocation.getParameter(0), (String) invocation.getParameter(1),
+                            (Reader) invocation.getParameter(2));
                     }
 
                 }));

@@ -25,7 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 
 /**
- * Wrapper around a {@link Rating}, typically returned by the {@link RatingsPluginApi} and manipulated using a scripting
+ * Wrapper around a {@link Rating}, typically returned by the {@link RatingsScriptService} and manipulated using a scripting
  * language in the wiki.
  *
  * @version $Id$

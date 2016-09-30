@@ -303,7 +303,7 @@ public class XWikiAttachment implements Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                 new Exception("See stack trace"));
         }
     }

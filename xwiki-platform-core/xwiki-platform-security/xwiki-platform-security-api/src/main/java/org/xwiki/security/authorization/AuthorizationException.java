@@ -41,7 +41,6 @@ public class AuthorizationException extends Exception
 
     /**
      * @param message Message.
-     * @see java.lang.Exception
      */
     public AuthorizationException(String message)
     {
@@ -51,7 +50,6 @@ public class AuthorizationException extends Exception
     /**
      * @param message Message.
      * @param cause Original cause.
-     * @see java.lang.Exception
      */
     public AuthorizationException(String message, Throwable cause)
     {
@@ -61,7 +59,6 @@ public class AuthorizationException extends Exception
     /**
      * @param userReference The user, for which the query was attempted.
      * @param entityReference The entity, on which the query was attempted.
-     * @see java.lang.Exception
      */
     public AuthorizationException(DocumentReference userReference, EntityReference entityReference)
     {
@@ -72,7 +69,6 @@ public class AuthorizationException extends Exception
      * @param userReference The user, for which the query was attempted.
      * @param entityReference The entity, on which the query was attempted.
      * @param message Message.
-     * @see java.lang.Exception
      */
     public AuthorizationException(DocumentReference userReference, EntityReference entityReference, String message)
     {
@@ -84,7 +80,6 @@ public class AuthorizationException extends Exception
      * @param userReference The user, for which the query was attempted.
      * @param entityReference The entity, on which the query was attempted.
      * @param message Message.
-     * @see java.lang.Exception
      */
     public AuthorizationException(Right right, DocumentReference userReference, EntityReference entityReference,
         String message)
@@ -97,7 +92,6 @@ public class AuthorizationException extends Exception
      * @param entityReference The entity, on which the query was attempted.
      * @param message Message.
      * @param cause Original cause.
-     * @see java.lang.Exception
      */
     public AuthorizationException(DocumentReference userReference, EntityReference entityReference, String message,
         Throwable cause)
@@ -111,7 +105,6 @@ public class AuthorizationException extends Exception
      * @param entityReference The entity, on which the query was attempted.
      * @param message Message.
      * @param cause Original cause.
-     * @see java.lang.Exception
      */
     public AuthorizationException(Right right,
                                   DocumentReference userReference,
@@ -130,7 +123,6 @@ public class AuthorizationException extends Exception
      * @param entityReference The entity, on which the query was attempted.
      * @param message Message.
      * @param cause Original cause.
-     * @see java.lang.Exception
      */
     public AuthorizationException(EntityReference entityReference,
                                   String message,
@@ -145,7 +137,6 @@ public class AuthorizationException extends Exception
      * @param userReference The user, for which the query was attempted.
      * @param entityReference The entity, on which the query was attempted.
      * @param cause Original cause.
-     * @see java.lang.Exception
      */
     public AuthorizationException(DocumentReference userReference, EntityReference entityReference, Throwable cause)
     {

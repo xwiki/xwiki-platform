@@ -129,9 +129,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
-        this.mockXWikiMessageTool =
-            mock(XWikiMessageTool.class, new Class[] { ResourceBundle.class, XWikiContext.class }, new Object[] { null,
-            getContext() });
+        this.mockXWikiMessageTool = mock(XWikiMessageTool.class,
+            new Class[] { ResourceBundle.class, XWikiContext.class }, new Object[] { null, getContext() });
         this.mockXWikiMessageTool.stubs().method("get").will(returnValue("message"));
 
         this.mockXWikiRightService = mock(XWikiRightService.class);
@@ -221,8 +220,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")), new HashSet<String>(
-            linkedPages));
+        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")),
+            new HashSet<String>(linkedPages));
     }
 
     public void testGetUniqueLinkedPages()
@@ -238,15 +237,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(
-            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
-                "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
+        assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome",
+            "TargetSpace.TargetPage.WebHome", "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "1 header 1\nheader 1 content\n" + "1.1 header 2\nheader 2 content");
 
         List<DocumentSection> headers = this.document.getSections();
 
@@ -267,8 +265,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetSections() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         List<DocumentSection> headers = this.document.getSections();
@@ -290,8 +288,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetDocumentSection10() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "1 header 1\nheader 1 content\n" + "1.1 header 2\nheader 2 content");
 
         DocumentSection header1 = this.document.getDocumentSection(1);
         DocumentSection header2 = this.document.getDocumentSection(2);
@@ -308,8 +306,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetDocumentSection() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         DocumentSection header1 = this.document.getDocumentSection(1);
@@ -333,9 +331,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testGetDocumentSectionWhenSectionInGroups() throws XWikiException
     {
-        this.document.setContent("= Heading1 =\n" + "para1\n" + "== Heading2 ==\n" + "para2\n" + "(((\n"
-            + "== Heading3 ==\n" + "para3\n" + "(((\n" + "== Heading4 ==\n" + "para4\n" + ")))\n" + ")))\n"
-            + "== Heading5 ==\n" + "para5\n");
+        this.document.setContent(
+            "= Heading1 =\n" + "para1\n" + "== Heading2 ==\n" + "para2\n" + "(((\n" + "== Heading3 ==\n" + "para3\n"
+                + "(((\n" + "== Heading4 ==\n" + "para4\n" + ")))\n" + ")))\n" + "== Heading5 ==\n" + "para5\n");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         DocumentSection section = this.document.getDocumentSection(3);
@@ -344,8 +342,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetContentOfSection10() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "1 header 1\nheader 1 content\n" + "1.1 header 2\nheader 2 content");
 
         String content1 = this.document.getContentOfSection(1);
         String content2 = this.document.getContentOfSection(2);
@@ -356,9 +354,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetContentOfSection() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content\n" + "=== header 3===\nheader 3 content\n"
-            + "== header 4==\nheader 4 content");
+        this.document.setContent(
+            "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content\n"
+                + "=== header 3===\nheader 3 content\n" + "== header 4==\nheader 4 content");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         String content1 = this.document.getContentOfSection(1);
@@ -389,8 +387,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n", this.document.getContentOfSection(1));
+        assertEquals(
+            "1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n" + "Content of second section\n",
+            this.document.getContentOfSection(1));
         assertEquals("1.1", sections.get(1).getSectionLevel());
         assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
         assertEquals(3, sections.get(2).getSectionNumber());
@@ -445,8 +444,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
-        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
-            + "Content of second section\n", this.document.getContentOfSection(1));
+        assertEquals(
+            "1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n" + "Content of second section\n",
+            this.document.getContentOfSection(1));
         assertEquals("1.1", sections.get(1).getSectionLevel());
         assertEquals("1.1 Subsection 2\nContent of second section\n", this.document.getContentOfSection(2));
         assertEquals(3, sections.get(2).getSectionNumber());
@@ -456,8 +456,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testUpdateDocumentSection() throws XWikiException
     {
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent(
+            "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         // Modify section content
@@ -467,9 +467,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             "content not in section\n\n= header 1 =\n\nheader 1 content\n\n== header 2 ==\n\nmodified header 2 content",
             content1);
 
-        String content2 =
-            this.document.updateDocumentSection(1,
-                "= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content");
+        String content2 = this.document.updateDocumentSection(1,
+            "= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content");
 
         assertEquals(
             "content not in section\n\n= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content",
@@ -533,15 +532,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testConvertSyntax() throws XWikiException
     {
         this.document.setSyntax(Syntax.HTML_4_01);
-        this.document.setContent("<p>content not in section</p>"
-            + "<h1>header 1</h1><p>header 1 content</p>"
+        this.document.setContent("<p>content not in section</p>" + "<h1>header 1</h1><p>header 1 content</p>"
             + "<h2>header 2</h2><p>header 2 content</p>");
-        this.baseObject.setLargeStringValue("area", "<p>object content not in section</p>"
-            + "<h1>object header 1</h1><p>object header 1 content</p>"
-            + "<h2>object header 2</h2><p>object header 2 content</p>");
-        this.baseObject.setLargeStringValue("puretextarea", "<p>object content not in section</p>"
-            + "<h1>object header 1</h1><p>object header 1 content</p>"
-            + "<h2>object header 2</h2><p>object header 2 content</p>");
+        this.baseObject.setLargeStringValue("area",
+            "<p>object content not in section</p>" + "<h1>object header 1</h1><p>object header 1 content</p>"
+                + "<h2>object header 2</h2><p>object header 2 content</p>");
+        this.baseObject.setLargeStringValue("puretextarea",
+            "<p>object content not in section</p>" + "<h1>object header 1</h1><p>object header 1 content</p>"
+                + "<h2>object header 2</h2><p>object header 2 content</p>");
 
         this.document.convertSyntax("xwiki/2.0", getContext());
 
@@ -549,9 +547,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             + "== header 2 ==\n\nheader 2 content", this.document.getContent());
         assertEquals("object content not in section\n\n" + "= object header 1 =\n\nobject header 1 content\n\n"
             + "== object header 2 ==\n\nobject header 2 content", this.baseObject.getStringValue("area"));
-        assertEquals("<p>object content not in section</p>"
-            + "<h1>object header 1</h1><p>object header 1 content</p>"
-            + "<h2>object header 2</h2><p>object header 2 content</p>", this.baseObject.getStringValue("puretextarea"));
+        assertEquals(
+            "<p>object content not in section</p>" + "<h1>object header 1</h1><p>object header 1 content</p>"
+                + "<h2>object header 2</h2><p>object header 2 content</p>",
+            this.baseObject.getStringValue("puretextarea"));
         assertEquals("xwiki/2.0", this.document.getSyntaxId());
     }
 
@@ -568,12 +567,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.translatedDocument.setNew(false);
 
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
-        this.mockXWiki
-            .stubs()
-            .method("getDocument")
-            .with(
-                eq(new DocumentReference(this.translatedDocument.getDocumentReference(),
-                    this.translatedDocument.getLocale())), ANYTHING).will(returnValue(this.translatedDocument));
+        this.mockXWiki.stubs().method("getDocument").with(eq(
+            new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())),
+            ANYTHING).will(returnValue(this.translatedDocument));
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }
@@ -722,11 +718,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    VelocityContext velocityContext =
-                        (VelocityContext) execution.getContext().getProperty("velocityContext");
-                    // See DefaultVelocityManagerTest#testGetVelocityContextUpdatesXContext()
-                    getContext().put("vcontext", velocityContext);
-                    return velocityContext;
+                    return (VelocityContext) execution.getContext().getProperty("velocityContext");
                 }
             });
 

@@ -99,7 +99,14 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
     }
 
     @Test
-    public void testAddExtension() throws Exception
+    public void validateAllFeatures() throws Exception
+    {
+        addExtension();
+        importExtension();
+        validateRecommendations();
+    }
+
+    private void addExtension() throws Exception
     {
         // Set id prefix
 
@@ -354,12 +361,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         return extension;
     }
 
-    @Test
-    public void testImportExtension() throws Exception
+    private void importExtension() throws Exception
     {
-        getUtil().createUser(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null, "first_name",
-            "User", "last_name", "Name");
-
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
         ExtensionImportPage importPage = extensionsPage.clickImport();
@@ -438,5 +441,51 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         extensionPage = extensionPage.updateExtension();
 
         Assert.assertEquals("1.1", extensionPage.getMetaDataValue("version"));
+    }
+
+    private void validateRecommendations() throws Exception
+    {
+        // At this stage we assume that we have 2 Extensions in the Repository app and we'll make one of them
+        // Recommended.
+        // Then we'll turn on Recommendations and verify that the home page lists only the Recommended one.
+        // Then we'll click on the Browse button to list all extensions and verify we have 2 in the list.
+        // Then we'll click again on the Browse button to list only Recommended extensions and verify we have 1
+        // in the list.
+        // Last we'll navigate to an extension and verify that when clicking the breadcrumb we're still on the
+        // Recommended list.
+
+        // Note: We don't yet offer a UI for changing the Recommended flag for an Extension.
+        getUtil().updateObject(Arrays.asList("Extension", "Macro JAR extension"), "WebHome",
+            "ExtensionCode.ExtensionClass", 0, "recommended", 1);
+
+        // Turn on Recommendation. There's also no Admin UI yet for this.
+        getUtil().updateObject("ExtensionCode", "RepositoryConfig", "ExtensionCode.RepositoryConfigClass", 0,
+            "useRecommendations", 1);
+
+        // Verify that the home page now lists only the Recommended extension.
+        ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
+        ExtensionsLiveTableElement livetable = extensionsPage.getLiveTable();
+        Assert.assertEquals(1, livetable.getRowCount());
+
+        // Click on Browse button to list All Extensions
+        extensionsPage = extensionsPage.clickBrowse();
+
+        // Verify that the home page now lists all extensions.
+        livetable = extensionsPage.getLiveTable();
+        Assert.assertEquals(2, livetable.getRowCount());
+
+        // Click on Browse button to list Recommended Extensions
+        extensionsPage = extensionsPage.clickBrowse();
+
+        // Verify that the home page now lists only Recommended extensions.
+        livetable = extensionsPage.getLiveTable();
+        Assert.assertEquals(1, livetable.getRowCount());
+
+        // Navigate to the extension and click the breadcrumb and verify that we're listing only Recommended extensions
+        ExtensionPage extensionPage = livetable.clickExtensionName("Macro JAR extension");
+        extensionPage.clickBreadcrumbLink("Extensions");
+        extensionsPage = new ExtensionsPage();
+        livetable = extensionsPage.getLiveTable();
+        Assert.assertEquals(1, livetable.getRowCount());
     }
 }

@@ -173,7 +173,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void move(DocumentReference oldReference, DocumentReference newReference)
     {
-        this.progressManager.pushLevelProgress(6, this);
+        this.progressManager.pushLevelProgress(7, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -184,27 +184,31 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
                         "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
                         oldReference, newReference);
                     return;
-                } else if (!this.modelBridge.delete(newReference, this.request.getUserReference())) {
+                } else if (!this.modelBridge.delete(newReference)) {
                     return;
                 }
             }
 
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
-            if (!this.modelBridge.copy(oldReference, newReference, this.request.getUserReference())) {
+            if (!this.modelBridge.copy(oldReference, newReference)) {
                 return;
             }
 
-            // Step 3 + 4: Update other documents that might be affected by this move.
+            // Step 3: Update the destination document based on the source document parameters.
+            this.progressManager.startStep(this);
+            this.modelBridge.update(newReference, this.request.getEntityParameters(oldReference));
+
+            // Step 4 + 5: Update other documents that might be affected by this move.
             updateDocuments(oldReference, newReference);
 
-            // Step 5: Delete the source document.
+            // Step 6: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
-                this.modelBridge.delete(oldReference, this.request.getUserReference());
+                this.modelBridge.delete(oldReference);
             }
 
-            // Step 6: Create an automatic redirect.
+            // Step 7: Create an automatic redirect.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource() && this.request.isAutoRedirect()) {
                 this.modelBridge.createRedirect(oldReference, newReference);

@@ -28,7 +28,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * Simply return the {@link DocumentReference} for the users.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class ReferenceUserDataExtractor implements UserDataExtractor<DocumentReference>
 {

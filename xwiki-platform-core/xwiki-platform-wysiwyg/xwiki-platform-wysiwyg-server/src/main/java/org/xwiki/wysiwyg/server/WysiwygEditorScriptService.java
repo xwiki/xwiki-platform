@@ -63,7 +63,8 @@ public interface WysiwygEditorScriptService extends ScriptService
      * 
      * @param templateReference specifies the document that serves as the template for the editor content
      * @return the result of rendering the specified content template
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     @Unstable
     String render(DocumentReference templateReference);

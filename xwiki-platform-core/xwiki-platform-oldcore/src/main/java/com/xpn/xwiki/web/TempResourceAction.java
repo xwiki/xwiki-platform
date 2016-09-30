@@ -53,13 +53,14 @@ import com.xpn.xwiki.XWikiException;
  *   <li>(page): it's the 2nd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
  *   <li>(file): it's the 4th path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
  * </ul>
- * <p/>
  * For example if the URL is {@code http://localhost:8080/xwiki/bin/temp/Main/WebHome/test/test.png} then the resource
  * will be fetched from {@code TMPDIR/temp/test/xwiki/Main/WebHome/test.png}.
  *
  * @version $Id$
  * @since 2.4M1
+ * @deprecated Use the "tmp" resource reference handler instead since 8.3
  */
+@Deprecated
 public class TempResourceAction extends XWikiAction
 {
     /**

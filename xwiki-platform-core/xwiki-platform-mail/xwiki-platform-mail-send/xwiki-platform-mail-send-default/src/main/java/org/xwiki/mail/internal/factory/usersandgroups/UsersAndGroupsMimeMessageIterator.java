@@ -37,7 +37,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
  * duplicates so that an email address is sent the message only once.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class UsersAndGroupsMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {

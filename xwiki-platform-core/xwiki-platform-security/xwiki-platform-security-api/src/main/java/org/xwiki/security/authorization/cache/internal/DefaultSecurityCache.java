@@ -35,9 +35,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -92,6 +91,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
+
+    /** The new entry being added */
+    private SecurityCacheEntry newEntry;
    
     /**
      * @return a new configured security cache
@@ -117,13 +119,12 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     public void initialize() throws InitializationException
     {
         cache = newCache();
-        cache.addCacheEntryListener(new Listener());
     }
 
     /**
      * Cache entry.
      */
-    private class SecurityCacheEntry
+    private class SecurityCacheEntry implements DisposableCacheValue
     {
         /**
          * The cached security entry.
@@ -378,30 +379,49 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * Dispose this entry from the cache, removing all children relation in its parents, and removing
          * all its children recursively. This method is not thread safe in regards to the cache, proper
          * locking should be done externally.
-         * @return false if the entry was already disposed, true in all other cases.
          */
-        boolean dispose()
+        @Override
+        public void dispose()
         {
-            if (disposed) {
-                return false;
+            if (!disposed) {
+                disposed = true;
+                disconnectFromParents();
+                disposeChildren();
             }
+        }
+
+        protected void disconnectFromParents()
+        {
             if (parents != null) {
                 for (SecurityCacheEntry parent : parents) {
-                    parent.removeChild(this);
-                }
-                parents = null;
-            }
-            if (children != null) {
-                Collection<SecurityCacheEntry> childrenToClean = children;
-                children = null;
-                for (SecurityCacheEntry child : childrenToClean) {
-                    if (child.dispose()) {
-                        DefaultSecurityCache.this.cache.remove(child.getKey());
+                    if (!parent.disposed) {
+                        parent.removeChild(this);
                     }
                 }
             }
-            disposed = true;
-            return true;
+        }
+
+        private void disposeChildren()
+        {
+            if (children != null) {
+                for (SecurityCacheEntry child : children) {
+                    if (!child.disposed) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
+                        }
+                        // XWIKI-13746: Prevent an addition in progress to bite his own entry in a bad way.
+                        if (child == newEntry) {
+                            child.dispose();
+                        } else {
+                            try {
+                                DefaultSecurityCache.this.cache.remove(child.getKey());
+                            } catch (Throwable e) {
+                                logger.error("Security cache failure during eviction of entry [{}]", child.getKey(), e);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /**
@@ -435,7 +455,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         public boolean isUser()
         {
-            return entry.getReference() instanceof UserSecurityReference;
+            return entry.getReference() instanceof UserSecurityReference && !(entry instanceof SecurityAccessEntry);
         }
     }
 
@@ -596,6 +616,30 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         return false;
     }
 
+    /**
+     * Add a new entry in the cache and prevent cache container deadlock (in cooperation with the entry
+     * dispose method) in case adding the entry cause this same entry to be evicted.
+     * @param key the key of the entry to be added.
+     * @param entry the entry to add.
+     * @throws ConflictingInsertionException when the entry have been disposed while being added, the full load should
+     *                                       be retried.
+     */
+    private void addEntry(String key, SecurityCacheEntry entry) throws ConflictingInsertionException
+    {
+        try {
+            newEntry = entry;
+            cache.set(key, newEntry);
+            if (entry.disposed) {
+                // XWIKI-13746: The added entry have been disposed while being added, meaning that the eviction
+                // triggered by adding the entry has hit the entry itself, so remove it and fail.
+                cache.remove(key);
+                throw new ConflictingInsertionException();
+            }
+        } finally {
+            newEntry = null;
+        }
+    }
+
     @Override
     public void add(SecurityRuleEntry entry)
         throws ParentEntryEvictedException, ConflictingInsertionException
@@ -638,7 +682,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (isAlreadyInserted(key, entry, groups)) {
                 return;
             }
-            cache.set(key, newSecurityCacheEntry(entry, groups));
+            addEntry(key, newSecurityCacheEntry(entry, groups));
 
             logger.debug("Added rule/shadow entry [{}] into the cache.", key);
         } finally {
@@ -707,10 +751,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (isAlreadyInserted(key, entry)) {
                 return;
             }
-            cache.set(key, new SecurityCacheEntry(entry, wiki));
+            addEntry(key, new SecurityCacheEntry(entry, wiki));
 
             logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
+            newEntry = null;
             writeLock.unlock();
         }
     }
@@ -767,9 +812,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 if (logger.isDebugEnabled()) {
                     logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
                 }
-                if (entry.dispose()) {
-                    this.cache.remove(entry.getKey());
-                }
+                this.cache.remove(entry.getKey());
             }
         } finally {
             writeLock.unlock();
@@ -786,35 +829,35 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 if (logger.isDebugEnabled()) {
                     logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
                 }
-                if (entry.dispose()) {
-                    this.cache.remove(entry.getKey());
-                }
+                this.cache.remove(entry.getKey());
             }
         } finally {
             writeLock.unlock();
         }
     }
 
-    /**
-     * Listener for cache events, to properly dispose entries removed.
-     */
-    private class Listener extends AbstractCacheEntryListener<SecurityCacheEntry>
+    @Override
+    public Collection<GroupSecurityReference> getImmediateGroupsFor(UserSecurityReference user)
     {
-        @Override
-        public void cacheEntryRemoved(CacheEntryEvent<SecurityCacheEntry> event)
-        {
-            if (event.getEntry().getValue().dispose()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Evicting entry [{}].", event.getEntry().getKey());
-                }
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Removed entry [{}].", event.getEntry().getKey());
-                }
+        Collection<GroupSecurityReference> groups = new HashSet<>();
+
+        SecurityCacheEntry userEntry = getEntry(user);
+        // If the user is not in the cache, or if it is, but not as a user, but as a regular document
+        if (userEntry == null || !userEntry.isUser()) {
+            // In that case, the ancestors are not fully loaded
+            return null;
+        }
+
+        for (SecurityCacheEntry parent : userEntry.parents) {
+            // Add the parent group (if we have not already seen it)
+            SecurityReference parentRef = parent.getEntry().getReference();
+            if (parentRef instanceof GroupSecurityReference) {
+                groups.add((GroupSecurityReference) parentRef);
             }
         }
+        return groups;
     }
-    
+
     @Override
     public Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki)
     {

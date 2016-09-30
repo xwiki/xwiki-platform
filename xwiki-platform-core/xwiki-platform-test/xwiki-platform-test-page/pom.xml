@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-page</artifactId>
   <name>XWiki Platform - Test - Page Tests Framework</name>
@@ -49,6 +49,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
       <version>${rendering.version}</version>
     </dependency>
@@ -64,6 +69,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -74,9 +84,19 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-skinx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-transformation-macro</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

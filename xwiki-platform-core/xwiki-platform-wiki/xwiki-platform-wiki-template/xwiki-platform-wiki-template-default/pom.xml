@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-template</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-template-default</artifactId>
   <name>XWiki Platform - Wiki - Template - Default</name>
@@ -48,11 +48,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-application-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

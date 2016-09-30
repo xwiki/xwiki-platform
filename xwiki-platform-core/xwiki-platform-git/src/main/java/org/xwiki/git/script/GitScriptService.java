@@ -38,9 +38,9 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Various APIs to make it easy to perform Git commands from within scripts.
- * <p/>
+ * <p>
  * Example usage from Velocity:
- * <code><pre>
+ * <pre><code>
  *   {{velocity}}
  *   #set ($calendar = $datetool.calendar)
  *   #set ($now = $datetool.date)
@@ -52,7 +52,7 @@ import org.xwiki.script.service.ScriptService;
  *     * $authorCommits.email = $authorCommits.count
  *   #end
  *   {{/velocity}}
- * </pre></code>
+ * </code></pre>
  *
  * @version $Id$
  * @since 4.2M1

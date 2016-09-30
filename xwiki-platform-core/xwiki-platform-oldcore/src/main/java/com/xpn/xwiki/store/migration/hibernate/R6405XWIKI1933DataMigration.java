@@ -31,7 +31,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Migration for XWIKI1933: Editing users fails.
  *
  * Note: This data migration should only be executed if the R4340XWIKI833 one has already been executed
- * during a previous migration (i.e. if the database is in version >= 4340). This is because it
+ * during a previous migration (i.e. if the database is in version &gt;= 4340). This is because it
  * fixes a bug that cause the previous data migration to have only been executed in the main wiki, and
  * there was some code that inserted wrong data after the migration.
  *

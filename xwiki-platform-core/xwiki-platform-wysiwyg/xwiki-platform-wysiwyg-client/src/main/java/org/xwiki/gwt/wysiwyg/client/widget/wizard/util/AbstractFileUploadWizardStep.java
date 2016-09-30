@@ -165,7 +165,7 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
 
     /**
      * @return the {@code name} attribute of the {@link #fileUploadInput}, to be returned by subclasses implementing
-     *         {@link #getUploadURL()} to set the file upload form data
+     *         {@link #getUploadURL(AsyncCallback)} to set the file upload form data
      */
     protected String getFileUploadInputName()
     {
@@ -246,7 +246,7 @@ public abstract class AbstractFileUploadWizardStep extends AbstractInteractiveWi
      * 
      * @param event the original {@link SubmitCompleteEvent}
      * @param async the callback used to send back the response of form event processing
-     * @see {@link #onSubmit}
+     * @see #onSubmit
      */
     protected void onSubmitComplete(SubmitCompleteEvent event, final AsyncCallback<Boolean> async)
     {

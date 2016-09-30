@@ -32,13 +32,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
@@ -379,7 +379,7 @@ public class SkinAction extends XWikiAction
         String result = content;
 
         try {
-            result = Utils.getComponent(SUExecutor.class)
+            result = Utils.getComponent(AuthorExecutor.class)
                 .call(() -> context.getWiki().evaluateVelocity(content, namespace), author);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.

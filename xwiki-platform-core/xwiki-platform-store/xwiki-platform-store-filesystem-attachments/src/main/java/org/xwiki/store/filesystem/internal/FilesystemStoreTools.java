@@ -47,7 +47,7 @@ public interface FilesystemStoreTools
      * @param storageFile the file to get a backup file for.
      * @return a backup file with a name based on the name of the given file.
      */
-    File getBackupFile(final File storageFile);
+    File getBackupFile(File storageFile);
 
     /**
      * Get a temporary file which for a given storage file.
@@ -56,7 +56,7 @@ public interface FilesystemStoreTools
      * @param storageFile the file to get a temporary file for.
      * @return a temporary file with a name based on the name of the given file.
      */
-    File getTempFile(final File storageFile);
+    File getTempFile(File storageFile);
 
     /**
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment
@@ -66,7 +66,7 @@ public interface FilesystemStoreTools
      * @param attachment the attachment to get a tools for.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      */
-    AttachmentFileProvider getAttachmentFileProvider(final XWikiAttachment attachment);
+    AttachmentFileProvider getAttachmentFileProvider(XWikiAttachment attachment);
 
     /**
      * Get an instance of AttachmentFileProvider which will save everything to do with an attachment
@@ -77,8 +77,7 @@ public interface FilesystemStoreTools
      * @param deleteDate the date the attachment was deleted.
      * @return a provider which will provide files with collision free path and repeatable with same inputs.
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final XWikiAttachment attachment,
-        final Date deleteDate);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(XWikiAttachment attachment, Date deleteDate);
 
     /**
      * Get a map of dates of deletion by the document where the attachment was attached.
@@ -86,7 +85,7 @@ public interface FilesystemStoreTools
      * @param docRef a reference to the document to get deleted attachments for.
      * @return a map of maps which provide FileProviders by deletion dates and filenames.
      */
-    Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(final DocumentReference docRef);
+    Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(DocumentReference docRef);
 
     /**
      * @return the absolute path to the directory where the files are stored.
@@ -99,7 +98,7 @@ public interface FilesystemStoreTools
      * @param name a unique identifier for the file.
      * @return a file unique to the given name.
      */
-    File getGlobalFile(final String name);
+    File getGlobalFile(String name);
 
     /**
      * Get a deleted attachment file provider from a path to the deleted attachment directory.
@@ -107,7 +106,7 @@ public interface FilesystemStoreTools
      * @param pathToDirectory a relitive path to the directory where the deleted attachment is.
      * @return a DeletedAttachmentFileProvider which will provide files for that deleted attachment.
      */
-    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(final String pathToDirectory);
+    DeletedAttachmentFileProvider getDeletedAttachmentFileProvider(String pathToDirectory);
 
     /**
      * Get a {@link java.util.concurrent.locks.ReadWriteLock} which is unique to the given file.
@@ -117,5 +116,5 @@ public interface FilesystemStoreTools
      * @param toLock the file to get a lock for.
      * @return a lock for the given file.
      */
-    ReadWriteLock getLockForFile(final File toLock);
+    ReadWriteLock getLockForFile(File toLock);
 }

@@ -20,25 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.2" reference="ExtensionCode.RepositoryCode" locale="">
   <web>ExtensionCode</web>
   <name>RepositoryCode</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1320329126000</creationDate>
-  <date>1343909393000</date>
-  <contentUpdateDate>1343909393000</contentUpdateDate>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1473764440000</date>
+  <contentUpdateDate>1473764440000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -75,6 +71,35 @@
   #if ($throwable.cause)
     Caused by: #printThrowable($throwable.cause)
   #end
+#end
+
+## Find out if the Recommended feature is on
+#set ($configDoc = $xwiki.getDocument('ExtensionCode.RepositoryConfig'))
+#set ($useRecommendations = false)
+#if ("$!configDoc.getValue('useRecommendations')" == '1')
+  #set ($useRecommendations = true)
+
+  ## Find out which LiveTable the user was using (Recommended one or the All one)
+  ## First check for a request parameter
+  #set ($isRecommendedViewString = $request.isRecommendedView)
+  #if ("$!isRecommendedViewString" == '')
+    ## Otherwise check in the session
+    #set ($isRecommendedView = $request.getSession().getAttribute("isRecommendedView"))
+  #else
+    #if ($isRecommendedViewString == 'true')
+      #set ($isRecommendedView = true)
+    #else
+      #set ($isRecommendedView = false)
+    #end
+  #end
+
+  ## Default to Recommended view when not defined
+  #if ("$!isRecommendedView" == '') 
+    #set ($isRecommendedView = true)
+  #end
+
+  ## Save the current view in the session
+  #set ($discard = $request.getSession().setAttribute("isRecommendedView", $isRecommendedView))
 #end
 {{/velocity}}</content>
 </xwikidoc>

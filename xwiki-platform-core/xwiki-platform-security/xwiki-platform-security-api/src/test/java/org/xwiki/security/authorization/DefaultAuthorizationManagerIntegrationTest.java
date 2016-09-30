@@ -601,7 +601,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
 
         assertAccess(DEFAULT_DOCUMENT_RIGHTS,       getXUser("userA"), getXDoc("any document", "any space"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getXDoc("docAllowGroupA", "any space"));
-        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getXDoc("docAllowGroupeB", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getXDoc("docAllowGroupB", "any space"));
         assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupA", "any space"));
         assertAccess(new RightSet(LOGIN, REGISTER), getXUser("userA"), getXDoc("docDenyGroupB", "any space"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getXDoc("docDenyGroupAAllowUserA", "any space"));
@@ -619,6 +619,11 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getDoc("docAllowGroupA", "any space", "subwiki"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getDoc("docAllowGroupB", "any space", "subwiki"));
         assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userA"), getDoc("docAllowGroupC", "any space", "subwiki"));
+
+        /** Test XWIKI-13574 **/
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userD"), getXDoc("docAllowGroupB", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userC"), getXDoc("docAllowGroupB", "any space"));
+        assertAccess(ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI,       getXUser("userB"), getXDoc("docAllowGroupB", "any space"));
     }
 
     @Test

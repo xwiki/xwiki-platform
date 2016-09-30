@@ -31,8 +31,8 @@
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1343909563000</date>
-  <contentUpdateDate>1343909563000</contentUpdateDate>
+  <date>1473758373000</date>
+  <contentUpdateDate>1473756898000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -72,6 +72,7 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -171,6 +172,7 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>3</number>
         <prettyName>Code</prettyName>
@@ -243,6 +245,10 @@
   min-height: 115px;
   min-width: 310px;
   vertical-align: top;
+}
+
+.extension-link.box {
+    min-height: 135px;
 }
 
 .extension-link form {

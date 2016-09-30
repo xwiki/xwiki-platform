@@ -435,7 +435,7 @@ public class XWikiDavContext
     }
 
     /**
-     * A shortcut to {@linkXWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}, returns all the
+     * A shortcut to {@link com.xpn.xwiki.store.XWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}, returns all the
      * results found.
      * 
      * @param sql the HQL query string.
@@ -452,7 +452,7 @@ public class XWikiDavContext
     }
 
     /**
-     * A shortcut to {@linkXWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}.
+     * A shortcut to {@link com.xpn.xwiki.store.XWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}.
      * 
      * @param sql the HQL where clause.
      * @param nb number of results expected.

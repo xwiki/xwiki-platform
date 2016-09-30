@@ -44,7 +44,7 @@ import com.xpn.xwiki.plugin.diff.DiffPluginApi;
 
 /**
  * Default implementation for {@link WatchListEventHTMLDiffExtractor}.
- * <p/>
+ * <p>
  * TODO: Use the new diff module instead of the old diff plugin.
  * 
  * @version $Id$

@@ -91,7 +91,7 @@
  * @param $docWiki the wiki of the annotated document
  * @param $docSpace the space of the annotated document
  * @param $docPage the page of the annotated document
- * @since 7.2M3, use #displayEditBoxFromReference instead
+ * @deprecated, starting with 7.2M3, use #displayEditBoxFromReference instead
  *#
 #macro(displayEditBox $id $docWiki $docSpace $docPage)
   #displayEditBoxFromReference($id, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))

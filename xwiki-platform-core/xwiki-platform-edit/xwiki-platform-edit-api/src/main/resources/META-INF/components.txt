@@ -1,0 +1,12 @@
+org.xwiki.edit.internal.DefaultEditConfiguration
+org.xwiki.edit.internal.DefaultEditorManager
+org.xwiki.edit.internal.PureTextSyntaxContentEditor
+org.xwiki.edit.internal.PureTextXDOMEditor
+org.xwiki.edit.internal.SyntaxContentEditorConfiguration
+org.xwiki.edit.internal.TextSyntaxContentEditor
+org.xwiki.edit.internal.TextXDOMEditor
+org.xwiki.edit.internal.XDOMEditorConfiguration
+org.xwiki.edit.script.EditScriptService
+org.xwiki.edit.script.SyntaxContentEditScriptService
+org.xwiki.edit.script.XDOMEditScriptService
+org.xwiki.edit.EditorDescriptorBuilder

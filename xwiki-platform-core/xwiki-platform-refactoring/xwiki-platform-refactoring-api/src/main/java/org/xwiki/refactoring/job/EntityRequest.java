@@ -20,6 +20,9 @@
 package org.xwiki.refactoring.job;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.model.reference.DocumentReference;
@@ -59,6 +62,11 @@ public class EntityRequest extends AbstractRequest
      * @see #getEntityReferences()
      */
     private static final String PROPERTY_ENTITY_REFERENCES = "entityReferences";
+
+    /**
+     * @see #getEntityParameters(EntityReference)
+     */
+    private static final String PROPERTY_ENTITY_PARAMETERS = "entityParameters";
 
     /**
      * @see #isDeep()
@@ -161,5 +169,33 @@ public class EntityRequest extends AbstractRequest
     public void setDeep(boolean deep)
     {
         setProperty(PROPERTY_DEEP, deep);
+    }
+
+    /**
+     * @param entityReference one of the entity references that are the target of this request
+     * @return the custom parameters associated to the specified target entity
+     */
+    public Map<String, String> getEntityParameters(EntityReference entityReference)
+    {
+        Map<String, String> entityParameters =
+            getProperty(PROPERTY_ENTITY_PARAMETERS, Collections.<EntityReference, Map<String, String>>emptyMap()).get(
+                entityReference);
+        return entityParameters == null ? Collections.emptyMap() : entityParameters;
+    }
+
+    /**
+     * Associates custom parameters to a target entity.
+     * 
+     * @param entityReference one of the target entities
+     * @param entityParameters the custom parameters to associate to the specified target entity
+     */
+    public void setEntityParameters(EntityReference entityReference, Map<String, String> entityParameters)
+    {
+        Map<EntityReference, Map<String, String>> paramsPerEntity = getProperty(PROPERTY_ENTITY_PARAMETERS);
+        if (paramsPerEntity == null) {
+            paramsPerEntity = new HashMap<>();
+            setProperty(PROPERTY_ENTITY_PARAMETERS, paramsPerEntity);
+        }
+        paramsPerEntity.put(entityReference, entityParameters);
     }
 }

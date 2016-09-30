@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.SolrAttachmentDoesNotExistUIX" locale="">
+  <web>XWiki</web>
+  <name>SolrAttachmentDoesNotExistUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1470996853000</creationDate>
+  <parent>XWiki.SearchCode</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1471007197000</date>
+  <contentUpdateDate>1471005680000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>UI Extension, implemented with Solr, used to displays similar attachments based on the current attachment's reference, when the current attachment does not exist.</content>
+  <object>
+    <name>XWiki.SolrAttachmentDoesNotExistUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>fcaf6126-05e5-4780-8261-a7cbe6448c94</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.attachmentdoesnotexist-solr-container {
+  margin-top: 1em;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Style</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.SolrAttachmentDoesNotExistUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>5dca7b80-e4a1-4c0e-8c02-87a11607056c</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor/>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <editor/>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content>{{velocity}}
+## Determine the filename from the last request URL path element.
+#set ($filename = $stringtool.substringAfterLast($request.requestURL, '/'))
+## URL unescape any spaces.
+#set ($filename = $stringtool.remove($filename, '%20'))
+##
+## Handle the case when there are spaces in the file name
+#set ($filenameWords = $stringtool.split($filename, ' '))
+#set ($filenameSplit = "${stringtool.join($filenameWords, ',')}")
+#set ($filenameSplitFuzzy = "$!{stringtool.join($filenameWords, '~,')}~")
+#set ($filenameSplitWildcard = "*$!{stringtool.join($filenameWords, '*,*')}*")
+##
+## Determine the document name.
+#set ($docName = $doc.name)
+#if ($doc.name == 'WebHome')
+  ## Use the last space name as doc name for non-terminal documents.
+  #set ($docName = ${doc.documentReference.lastSpaceReference.name})
+#end
+##
+## Handle the case when there are spaces in the doc name.
+#set ($docNameWords = $stringtool.split($docName, ' '))
+#set ($docNameSplit = "${stringtool.join($docNameWords, ',')}")
+#set ($docNameSplitFuzzy = "$!{stringtool.join($docNameWords, '~,')}~")
+#set ($docNameSplitWildcard = "*$!{stringtool.join($docNameWords, '*,*')}*")
+##
+## Extract the space reference elements.
+#set ($spaceReferenceStrings = "")
+#set ($spaceReferenceFuzzyStrings = "")
+#set ($spaceReferenceWildcardStrings = "")
+#set ($spaceReferences = $doc.documentReference.spaceReferences)
+#foreach ($spaceReference in $spaceReferences)
+  #if ($foreach.count &gt; 1)
+    #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
+    #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}, ")
+  #end
+  ## Note: Also handling possible space characters in the space name.
+  #set ($spaceNameWords = $stringtool.split(${spaceReference.name}, ' '))
+  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($spaceNameWords, ',')}")
+  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($spaceNameWords, '~,')}~")
+  #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}*${stringtool.join($spaceNameWords, '*,*')}*")
+#end
+##
+## Files in the same document
+#set ($suggestionsQueryString = "filename:($filenameSplit, $filenameSplitFuzzy, $filenameSplitWildcard) OR (space_exact:""$doc.space"" AND name_exact:""$doc.name"")")
+## Files in a document with a similar name or space elements as the current doc.
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings, $spaceReferenceWildcardStrings) OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
+##
+## Build and run the Solr query.
+#set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))
+#set ($filterQuery = ['type:"ATTACHMENT"', "locale:(""$xcontext.locale"" OR """")"])
+#if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+  #set ($discard = $filterQuery.add('hidden:false'))
+#end
+#set ($discard = $suggestionsQuery.bindValue('fq', $filterQuery))
+#set ($discard = $suggestionsQuery.setLimit(10))
+##
+#set ($suggestionsResponse = $suggestionsQuery.execute()[0])
+#set ($suggestionResults = $suggestionsResponse.results)
+##
+## Display the suggestions, if any.
+#if ($suggestionResults.size() &gt; 0)
+  #set ($discard = $xwiki.ssx.use('XWiki.SolrAttachmentDoesNotExistUIX'))
+
+  {{html}}
+  &lt;div class='attachmentdoesnotexist-solr-container'&gt;
+    &lt;p&gt;&lt;b&gt;$services.localization.render('solr.uix.attachmentdoesnotexist.title')&lt;/b&gt;&lt;/p&gt;
+    &lt;ul&gt;
+    #template('hierarchy_macros.vm')
+    #foreach ($suggestionResult in $suggestionResults)
+      #set ($suggestionResultReference = $services.solr.resolve($suggestionResult, 'ATTACHMENT'))
+      &lt;li&gt;&lt;a href="$escapetool.xml($xwiki.getURL($suggestionResultReference))"&gt;#hierarchy($suggestionResultReference, {'plain' : true, 'local' : true})&lt;/a&gt;&lt;/li&gt;
+    #end
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  {{/html}}
+
+#end
+{{/velocity}}
+</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.search.ui.attachmentdoesnotexist</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.search.solr.ui.attachmentdoesnotexist</name>
+    </property>
+    <property>
+      <parameters>order=10000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

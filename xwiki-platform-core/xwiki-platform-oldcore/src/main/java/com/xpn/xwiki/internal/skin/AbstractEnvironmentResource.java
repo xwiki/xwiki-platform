@@ -21,14 +21,10 @@ package com.xpn.xwiki.internal.skin;
 
 import java.io.InputStream;
 
-import javax.inject.Provider;
-
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.skin.ResourceRepository;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -39,9 +35,9 @@ public abstract class AbstractEnvironmentResource extends AbstractResource<Input
     protected Environment environment;
 
     public AbstractEnvironmentResource(String path, String resourceName, ResourceRepository repository,
-        Environment environment, Provider<XWikiContext> xcontextProvider)
+        Environment environment)
     {
-        super(path, path, resourceName, repository, xcontextProvider);
+        super(path, path, resourceName, repository);
 
         this.environment = environment;
     }

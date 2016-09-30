@@ -19,22 +19,23 @@
  */
 package org.xwiki.test.rendering.velocity;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.XWikiVelocityException;
-import org.xwiki.velocity.VelocityManager;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
-
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
+
+import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency on the
@@ -47,9 +48,6 @@ import javax.script.ScriptContext;
 @Singleton
 public class StubVelocityManager implements VelocityManager, Initializable
 {
-    @Inject
-    private ComponentManager componentManager;
-
     /**
      * Note that we use a single Velocity Engine instance in this Mock.
      */
@@ -96,8 +94,38 @@ public class StubVelocityManager implements VelocityManager, Initializable
     }
 
     @Override
+    public VelocityContext getCurrentVelocityContext()
+    {
+        return this.velocityContext;
+    }
+
+    @Override
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
         return this.velocityEngine;
+    }
+
+    @Override
+    public boolean evaluate(Writer out, String templateName, Reader source) throws XWikiVelocityException
+    {
+        // Get up to date Velocity context
+        VelocityContext velocityContext = getVelocityContext();
+
+        // Execute Velocity context
+        boolean result = getVelocityEngine().evaluate(velocityContext, out, templateName, source);
+
+        // Update current script context with potentially modified Velocity context
+        ScriptContext scontext = this.scriptContextManager.getCurrentScriptContext();
+        for (Object vkey : velocityContext.getKeys()) {
+            if (vkey instanceof String) {
+                String svkey = (String) vkey;
+                // context is a reserved binding in JSR223 specification
+                if (!"context".equals(svkey)) {
+                    scontext.setAttribute(svkey, velocityContext.get(svkey), ScriptContext.ENGINE_SCOPE);
+                }
+            }
+        }
+
+        return result;
     }
 }

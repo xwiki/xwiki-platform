@@ -278,7 +278,8 @@ public class XWikiServletRequest implements XWikiRequest
     @Override
     public String getParameter(String s)
     {
-        return this.request.getParameter(s);
+        // Some servlet containers don't support passing null so we need to handle it.
+        return s != null ? this.request.getParameter(s) : null;
     }
 
     @Override
@@ -290,7 +291,8 @@ public class XWikiServletRequest implements XWikiRequest
     @Override
     public String[] getParameterValues(String s)
     {
-        return this.request.getParameterValues(s);
+        // Some servlet containers don't support passing null so we need to handle it.
+        return s != null ? this.request.getParameterValues(s) : null;
     }
 
     @Override

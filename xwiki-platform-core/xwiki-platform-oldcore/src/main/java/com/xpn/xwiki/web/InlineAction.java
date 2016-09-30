@@ -19,13 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
@@ -44,15 +42,16 @@ public class InlineAction extends XWikiAction
 
         synchronized (doc) {
             XWikiForm form = context.getForm();
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            Document vdoc = (Document) vcontext.get("doc");
-            Document vcdoc = (Document) vcontext.get("cdoc");
+
+            XWikiDocument cdoc = (XWikiDocument) context.get("cdoc");
+            if (cdoc == null) {
+                cdoc = doc;
+            }
+
             EditForm peform = (EditForm) form;
 
             XWikiDocument doc2 = doc.clone();
-            Document vdoc2 = doc2.newDocument(context);
             context.put("doc", doc2);
-            vcontext.put("doc", vdoc2);
 
             String parent = peform.getParent();
             if (parent != null) {
@@ -77,16 +76,25 @@ public class InlineAction extends XWikiAction
                 }
             }
 
-            if (vdoc == vcdoc) {
-                vcontext.put("cdoc", vdoc2);
+            if (doc == cdoc) {
+                context.put("cdoc", doc2);
             } else {
-                XWikiDocument cdoc = vcdoc.getDocument();
                 XWikiDocument cdoc2 = cdoc.clone();
-                vcontext.put("cdoc", cdoc2.newDocument(context));
                 cdoc2.readFromTemplate(peform, context);
+                context.put("cdoc", cdoc2);
             }
 
             doc2.readFromForm((EditForm) form, context);
+
+            // Set the current user as creator, author and contentAuthor when the edited document is newly created
+            // to avoid using XWikiGuest instead (because those fields were not previously initialized).
+            // This is needed for the script right, as guest doesn't have it and this would block the execution of
+            // scripts in newly created documents even if the user creating the document has the right.
+            if (doc2.isNew()) {
+                doc2.setCreatorReference(context.getUserReference());
+                doc2.setAuthorReference(context.getUserReference());
+                doc2.setContentAuthorReference(context.getUserReference());
+            }
 
             /* Setup a lock */
             try {
@@ -95,7 +103,6 @@ public class InlineAction extends XWikiAction
                     doc.setLock(context.getUser(), context);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
                 LOGGER.error("Exception while setting up lock", e);
@@ -105,6 +112,7 @@ public class InlineAction extends XWikiAction
         // Make sure object property fields are displayed in edit mode.
         // See XWikiDocument#display(String, BaseObject, XWikiContext)
         context.put("display", "edit");
+
         return "inline";
     }
 }

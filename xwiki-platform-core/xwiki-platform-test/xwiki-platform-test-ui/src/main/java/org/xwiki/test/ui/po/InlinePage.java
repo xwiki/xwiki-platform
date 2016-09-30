@@ -62,7 +62,7 @@ public class InlinePage extends ViewPage
     }
 
     /**
-     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
+     * Clicks on the Save and Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
      * for a different message (e.g. an error message).
      *
      * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
@@ -96,7 +96,7 @@ public class InlinePage extends ViewPage
     }
 
     /**
-     * Useful when the save&view operation could fail on the client side and a reload (the view part) might thus not
+     * Useful when the save and view operation could fail on the client side and a reload (the view part) might thus not
      * take place.
      *
      * @param wait {@code true} to wait for the page to be saved and reloaded, {@code false} otherwise

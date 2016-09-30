@@ -29,9 +29,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
 /**
- * <p>
  * A recorded event that occurred at some point in the wiki.
- * </p>
  * <p>
  * Events are identified by:
  * <ul>
@@ -40,16 +38,12 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDate() exact date and time} when the event occurred</li>
  * <li>an {@link #getImportance() importance} which allows to order events in the same group, or in the same stream</li>
  * </ul>
- * </p>
- * <p>
  * Events contain:
  * <ul>
  * <li>a {@link #getTitle() title}</li>
  * <li>a {@link #getBody() body}</li>
  * <li>and a map of {@link #getParameters() parameters}</li>
  * </ul>
- * </p>
- * <p>
  * Events are categorized into:
  * <ol>
  * <li>the {@link #getApplication() the application} that created them, like blog, user statuses, or the general wiki</li>
@@ -58,8 +52,6 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getType() particular type} of event, like adding a comment, updating an attachment, setting a new
  * user status</li>
  * </ol>
- * </p>
- * <p>
  * Events target:
  * <ol>
  * <li>the {@link #getWiki() wiki},</li>
@@ -68,8 +60,6 @@ import org.xwiki.model.reference.WikiReference;
  * <li>and an eventual {@link #getRelatedEntity() entity} inside the document, for example an individual attachment for
  * attachment events, or an individual object for comment events.</li>
  * </ol>
- * </p>
- * <p>
  * Events can store some more information about the context in which they occur:
  * <ul>
  * <li>the {@link #getUser() user} that caused the event</li>
@@ -77,7 +67,6 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDocumentTitle() display title} of the target document at the time that the event occurred</li>
  * <li>the {@link #getUrl() requested URL} that caused the event</li>
  * </ul>
- * </p>
  * 
  * @version $Id$
  * @since 3.0M2

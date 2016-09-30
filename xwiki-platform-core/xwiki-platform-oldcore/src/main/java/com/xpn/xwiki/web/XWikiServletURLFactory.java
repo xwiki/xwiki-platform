@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +44,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
@@ -239,6 +239,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Parse the spaces list into Space References
         EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
 
+        // For how to encode the various parts of the URL, see http://stackoverflow.com/a/29948396/153102
         addAction(path, spaceReference, action, context);
         addSpaces(path, spaceReference, action, context);
         addName(path, name, action, context);
@@ -246,12 +247,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
             path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
-            // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
             path.append("#");
-            path.append(encode(anchor, context));
+            path.append(encodeWithinQuery(anchor, context));
         }
 
         URL result;
@@ -290,6 +290,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    /**
+     * Add the spaces to the path.
+     */
     private void addSpaces(StringBuilder path, EntityReference spaceReference, String action, XWikiContext context)
     {
         for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
@@ -299,15 +302,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private void appendSpacePathSegment(StringBuilder path, EntityReference spaceReference, XWikiContext context)
     {
-        path.append(encode(spaceReference.getName(), context)).append('/');
+        path.append(encodeWithinPath(spaceReference.getName(), context)).append('/');
     }
 
+    /**
+     * Add the page name to the path.
+     */
     private void addName(StringBuilder path, String name, String action, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
             || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
-            path.append(encode(name, context));
+            path.append(encodeWithinPath(name, context));
         }
     }
 
@@ -321,7 +327,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         path.append("/");
         if (encode) {
             // Encode the given file name as a single path segment.
-            path.append(encode(fileName, context).replace("+", "%20"));
+            path.append(encodeWithinPath(fileName, context).replace("+", "%20"));
         } else {
             try {
                 // The given file name is actually a file path and so we need to encode each path segment separately.
@@ -335,9 +341,72 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    private String encode(String name, XWikiContext context)
+    /**
+     * Encode a URL path following the URL specification so that space is encoded as {@code %20} in the path
+     * (and not as {@code +} wnich is not correct). Note that for all other characters we encode them even though some
+     * don't need to be encoded. For example we encode the single quote even though it's not necessary
+     * (see <a href="http://tinyurl.com/j6bjgaq">this explanation</a>). The reason is that otherwise it becomes
+     * dangerous to use a returned URL in the HREF attribute in HTML. Imagine the following {@code <a href='$url'...}
+     * and {@code #set ($url = $doc.getURL(...))}. Now let's assume that {@code $url}'s value is
+     * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
+     * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
+     * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
+     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
+     * specially and encode the rest.
+     *
+     * @param name the path to encode
+     * @param context see {@link XWikiContext}
+     * @return the URL-encoded path segment
+     */
+    private String encodeWithinPath(String name, XWikiContext context)
     {
-        return Util.encodeURI(name, context);
+        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
+        // mentioned in the javadoc of this method
+        //   String encodedName;
+        //   try {
+        //     encodedName = URIUtil.encodeWithinPath(name, "UTF-8");
+        //   } catch (URIException e) {
+        //     throw new RuntimeException("Missing charset [UTF-8]", e);
+        //   }
+        //   return encodedName;
+
+        String encodedName;
+        try {
+            encodedName = URLEncoder.encode(name, "UTF-8");
+        } catch (Exception e) {
+            // Should not happen (UTF-8 is always available)
+            throw new RuntimeException("Missing charset [UTF-8]", e);
+        }
+
+        // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
+        encodedName = encodedName.replaceAll("\\+", "%20");
+
+        return encodedName;
+    }
+
+    /**
+     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
+     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
+     * implementation for both URL paths and query string).
+     *
+     * @param name the query string part to encode
+     * @param context see {@link XWikiContext}
+     * @return the URL-encoded query string part
+     */
+    private String encodeWithinQuery(String name, XWikiContext context)
+    {
+        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
+        // mentioned in the javadoc of this method
+        //   String encodedName;
+        //   try {
+        //     encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
+        //   } catch (URIException e) {
+        //     throw new RuntimeException("Missing charset [UTF-8]", e);
+        //   }
+        //   return encodedName;
+
+        return encodeWithinPath(name, context);
     }
 
     @Override
@@ -646,7 +715,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used for
      * example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
      * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
-     * <p/>
+     * <p>
      * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
      * strip it since we don't want to have that in our URLs as it can cause issues with:
      * <ul>
@@ -673,7 +742,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used for
      * example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
      * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
-     * <p/>
+     * <p>
      * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
      * strip it since we don't want to have that in our URLs as it can cause issues with:
      * <ul>

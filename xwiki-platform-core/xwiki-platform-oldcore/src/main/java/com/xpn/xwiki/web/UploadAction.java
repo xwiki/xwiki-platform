@@ -28,11 +28,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
@@ -72,8 +72,10 @@ public class UploadAction extends XWikiAction
                 XWikiException exp = (XWikiException) exception;
                 if (exp.getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE) {
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-                    ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure.maxSize");
+                    getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.maxSize",
+                        ScriptContext.ENGINE_SCOPE);
                     context.put("message", "fileuploadislarge");
+
                     return true;
                 }
             }
@@ -93,15 +95,17 @@ public class UploadAction extends XWikiAction
         if (doc.isNew()) {
             doc.setLocale(Locale.ROOT);
             if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(LocaleUtils
-                    .toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
+                doc.setDefaultLocale(
+                    LocaleUtils.toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
             }
         }
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         if (fileupload == null) {
-            ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure.noFiles");
+            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.noFiles",
+                ScriptContext.ENGINE_SCOPE);
+
             return true;
         }
         Map<String, String> fileNames = new LinkedHashMap<String, String>();
@@ -141,10 +145,11 @@ public class UploadAction extends XWikiAction
             return false;
         }
         // Forward to the attachment page
-        if (failedFiles.size() > 0 || wrongFileNames.size() > 0) {
-            ((VelocityContext) context.get("vcontext")).put("message", "core.action.upload.failure");
-            ((VelocityContext) context.get("vcontext")).put("failedFiles", failedFiles);
-            ((VelocityContext) context.get("vcontext")).put("wrongFileNames", wrongFileNames);
+        if (failedFiles.size() > 0 || !wrongFileNames.isEmpty()) {
+            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure", ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("failedFiles", failedFiles, ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("wrongFileNames", wrongFileNames, ScriptContext.ENGINE_SCOPE);
+
             return true;
         }
         String redirect = fileupload.getFileItemAsString("xredirect", context);
@@ -178,7 +183,8 @@ public class UploadAction extends XWikiAction
             attachment = doc.addAttachment(filename, contentInputStream, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
+                e);
         }
 
         // Set the document author
@@ -278,7 +284,9 @@ public class UploadAction extends XWikiAction
             }
             return null;
         }
-        ((VelocityContext) context.get("vcontext")).put("viewer", "uploadfailure");
+
+        getCurrentScriptContext().setAttribute("viewer", "uploadfailure", ScriptContext.ENGINE_SCOPE);
+
         return "view";
     }
 }

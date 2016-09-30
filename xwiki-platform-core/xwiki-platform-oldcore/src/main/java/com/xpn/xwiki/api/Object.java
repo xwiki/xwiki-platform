@@ -103,7 +103,12 @@ public class Object extends Collection
 
     public void set(String fieldname, java.lang.Object value)
     {
-        getBaseObject().set(fieldname, value, getXWikiContext());
+        XWikiContext xcontext = getXWikiContext();
+
+        getBaseObject().set(fieldname, value, xcontext);
+
+        // Temporary set as author of the document the current script author (until the document is saved)
+        getBaseObject().getOwnerDocument().setAuthorReference(xcontext.getAuthorReference());
     }
 
     @Override

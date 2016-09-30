@@ -48,5 +48,5 @@ public interface AttachmentFileProvider
      * @param versionName the name of the version of the attachment eg: "1.1" or "1.2"
      * @return the File for storing the content of a particular version of the attachment.
      */
-    File getAttachmentVersionContentFile(final String versionName);
+    File getAttachmentVersionContentFile(String versionName);
 }

@@ -49,7 +49,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 
 /**
- * Wizard step to explore and select images from all the pages in the wiki. <br />
+ * Wizard step to explore and select images from all the pages in the wiki.
  * 
  * @version $Id$
  */

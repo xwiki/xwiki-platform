@@ -32,7 +32,8 @@ import org.xwiki.component.annotation.Component;
  * Customize visiblity of items on the chart.
  *
  * @version $Id$
- * @since 7.4.3, 8.0RC1
+ * @since 7.4.3
+ * @since 8.0RC1
  */
 @Component
 @Named("visibility")

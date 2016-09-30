@@ -31,9 +31,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.NamedQueryDefinition;
+import org.hibernate.engine.NamedSQLQueryDefinition;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -182,8 +185,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      * Append the required select clause to HQL short query statements. Short statements are the only way for users
      * without programming rights to perform queries. Such statements can be for example:
      * <ul>
-     * <li><code>, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'</code></li>
-     * <li><code>where doc.creationDate > '2008-01-01'</code></li>
+     * <li>{@code , BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.MyClass'}</li>
+     * <li>{@code where doc.creationDate > '2008-01-01'}</li>
      * </ul>
      *
      * @param statement the statement to complete if required.
@@ -208,11 +211,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected org.hibernate.Query createHibernateQuery(Session session, Query query)
     {
         org.hibernate.Query hquery;
-        String statement = query.getStatement();
 
         if (!query.isNamed()) {
             // handle short queries
-            statement = completeShortFormStatement(statement);
+            String statement = completeShortFormStatement(query.getStatement());
 
             // Handle query filters
             if (query.getFilters() != null) {
@@ -222,21 +224,39 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             }
             hquery = session.createQuery(statement);
         } else {
-            hquery = session.getNamedQuery(query.getStatement());
-            if (query.getFilters() != null && !query.getFilters().isEmpty()) {
-                // Since we can't modify the hibernate query statement at this point we need to create a new one to
-                // apply the query filter. This comes with a performance cost, we could fix it by handling named queries
-                // ourselves and not delegate them to hibernate. This way we would always get a statement that we can
-                // transform before the execution.
-                statement = hquery.getQueryString();
-                for (QueryFilter filter : query.getFilters()) {
-                    statement = filter.filterStatement(statement, Query.HQL);
-                }
-                hquery = session.createQuery(statement);
-            }
+            hquery = createNamedHibernateQuery(session, query);
         }
 
         return hquery;
+    }
+
+    private org.hibernate.Query createNamedHibernateQuery(Session session, Query query)
+    {
+        org.hibernate.Query hQuery = session.getNamedQuery(query.getStatement());
+        if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+            // Since we can't modify the Hibernate query statement at this point we need to create a new one to apply
+            // the query filter. This comes with a performance cost, we could fix it by handling named queries ourselves
+            // and not delegate them to Hibernate. This way we would always get a statement that we can transform before
+            // the execution.
+            boolean isNative = hQuery instanceof SQLQuery;
+            String language = isNative ? "sql" : Query.HQL;
+            String statement = hQuery.getQueryString();
+            for (QueryFilter filter : query.getFilters()) {
+                statement = filter.filterStatement(statement, language);
+            }
+            if (isNative) {
+                hQuery = session.createSQLQuery(statement);
+                // Copy the information about the return column types, if possible.
+                NamedSQLQueryDefinition definition = (NamedSQLQueryDefinition) this.sessionFactory.getConfiguration()
+                    .getNamedSQLQueries().get(query.getStatement());
+                if (!StringUtils.isEmpty(definition.getResultSetRef())) {
+                    ((SQLQuery) hQuery).setResultSetMapping(definition.getResultSetRef());
+                }
+            } else {
+                hQuery = session.createQuery(statement);
+            }
+        }
+        return hQuery;
     }
 
     /**

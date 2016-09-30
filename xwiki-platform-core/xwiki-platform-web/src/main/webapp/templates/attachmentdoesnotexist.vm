@@ -1,3 +1,5 @@
+##! Priviledged template in order to be able to execute SOLR queries which require PR.
+##!privileged=true
 $response.setStatus(404)
 #template("startpage.vm")
 <div class="main layoutsubsection">
@@ -7,9 +9,19 @@ $response.setStatus(404)
 #else
   #xwikimessageboxstart($services.localization.render('error') $services.localization.render('attachmentdoesnotexist'))
   $!exception
+  ## UI Extensions, if any.
+  #showExtensions()
   #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>
 </div>## mainContentArea
 </div>## main
 #template("endpage.vm")
+##
+## Display any existing UI Extensions, sorted by order.
+##
+#macro (showExtensions)
+  #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.attachmentdoesnotexist', {'sortByParameter' : 'order'}))
+    $services.rendering.render($extension.execute(), 'html/5.0')
+  #end
+#end

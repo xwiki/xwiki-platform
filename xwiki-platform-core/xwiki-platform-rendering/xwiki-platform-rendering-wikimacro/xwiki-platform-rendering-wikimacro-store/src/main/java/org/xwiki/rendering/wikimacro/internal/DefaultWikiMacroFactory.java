@@ -138,12 +138,14 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Extract macro definition.
         String macroId = macroDefinition.getStringValue(MACRO_ID_PROPERTY);
         String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
+        // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
         String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = (macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) == 0) ? false : true;
         String macroContentType = macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY);
+        // The macro content description as plain text
         String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
         String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
 

@@ -122,7 +122,7 @@ public interface RatingsManager
     /**
      * Gets a rating based on its id.
      * 
-     * @param id the id of a certain rating
+     * @param ratingId the id of a certain rating
      * @return a Rating object containing all the rating information
      * @throws RatingsException when an error occurs while fetching the rating
      */
@@ -193,7 +193,6 @@ public interface RatingsManager
      * Gets or calculates the user reputation.
      *
      * @param username person to calculate the reputation for
-     * @param context context of the request
      * @return AverageRating of the voter
      */
     AverageRating getUserReputation(DocumentReference username) throws ReputationException;
@@ -202,7 +201,7 @@ public interface RatingsManager
      * Updates user reputation.
      * 
      * @param author the user for which to update the reputation
-     * @param voterRatign the users current reputation
+     * @param voterRating the users current reputation
      */
     void updateUserReputation(DocumentReference author, AverageRating voterRating) throws RatingsException;
 

@@ -138,7 +138,7 @@ public class ChartMacroParameters
     }
 
     /**
-     * @param source - refer to {@link #getSource()
+     * @param source - refer to {@link #getSource()}
      */
     @PropertyDescription("The string describing the type of input data source (Ex. xdom or inline)")
     public void setSource(String source)

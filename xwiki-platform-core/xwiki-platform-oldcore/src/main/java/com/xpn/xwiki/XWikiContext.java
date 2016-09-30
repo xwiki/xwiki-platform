@@ -43,6 +43,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -58,15 +60,23 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+/**
+ * Represents the execution environment for all the wiki pages. An instance of the <code>Context</code> class is
+ * available as a predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code>
+ * in Velocity scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means
+ * of getting contextual information about the current request or configuring XWiki on the fly.
+ *
+ * @version $Id$
+ */
 public class XWikiContext extends Hashtable<Object, Object>
 {
     /**
-     * Type instance for Provider<XWikiContext>.
+     * Type instance for {@code Provider<XWikiContext>}.
      *
      * @since 5.0M1
      */
-    public static final ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
-        XWikiContext.class);
+    public static final ParameterizedType TYPE_PROVIDER =
+        new DefaultParameterizedType(null, Provider.class, XWikiContext.class);
 
     public static final int MODE_SERVLET = 0;
 
@@ -83,6 +93,11 @@ public class XWikiContext extends Hashtable<Object, Object>
     public static final int MODE_GWT_DEBUG = 6;
 
     public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
+
+    /**
+     * @deprecated use {@link VelocityManager#getVelocityContext()} instead
+     */
+    public static final String KEY_LEGACY_VELOCITYCONTEXT = "vcontext";
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiContext.class);
@@ -200,6 +215,15 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
 
         return this.execution;
+    }
+
+    private ExecutionContext getExecutionContext()
+    {
+        if (getExecution() != null) {
+            return getExecution().getContext();
+        }
+
+        return null;
     }
 
     public XWiki getWiki()
@@ -329,10 +353,31 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
+    @Override
+    public synchronized Object get(Object key)
+    {
+        Object value;
+
+        if (WIKI_KEY.equals(key)) {
+            value = getWikiId();
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                value = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+            } else {
+                value = null;
+            }
+        } else {
+            value = super.get(key);
+        }
+
+        return value;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure to keep {@link #wikiId} fields and map synchronized.
+     * Make sure to keep wiki field and map synchronized.
      * </p>
      *
      * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
@@ -345,6 +390,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
             setWikiId((String) value);
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                previous = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+                executionContext.setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID, value);
+            } else {
+                previous = null;
+            }
         } else {
             if (value != null) {
                 previous = super.put(key, value);
@@ -359,7 +412,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure to keep {@link #wikiId} field and map synchronized.
+     * Make sure to keep wiki field and map synchronized.
      * </p>
      *
      * @see java.util.Hashtable#remove(java.lang.Object)
@@ -372,6 +425,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (WIKI_KEY.equals(key)) {
             previous = get(WIKI_KEY);
             setWikiId(null);
+        } else if (KEY_LEGACY_VELOCITYCONTEXT.equals(key)) {
+            ExecutionContext executionContext = getExecutionContext();
+            if (executionContext != null) {
+                previous = executionContext.getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+                executionContext.removeProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+            } else {
+                previous = null;
+            }
         } else {
             previous = super.remove(key);
         }
@@ -417,7 +478,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Set the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
      *
-     * @return the wiki id originally requested by the user.
+     * @param wikiId the wiki id originally requested by the user
      * @since 6.1M1
      */
     public void setOriginalWikiId(String wikiId)
@@ -480,7 +541,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
             // Log this since it's probably a mistake so that we find who is doing bad things
             if (this.userReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
                     new Exception("See stack trace"));
             }
         }
@@ -841,6 +902,15 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.displayedFields;
     }
 
+    /**
+     * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
+     * TextArea properties.
+     *
+     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
+     *         enabled
+     */
+    @Deprecated
     public String getEditorWysiwyg()
     {
         return (String) get("editor_wysiwyg");
@@ -924,5 +994,20 @@ public class XWikiContext extends Hashtable<Object, Object>
         } else {
             executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this);
         }
+    }
+
+    /**
+     * @return the reference of the user being used to check script and programming right (i.e. the author of the
+     *         current script)
+     * @since 8.3M2
+     */
+    public DocumentReference getAuthorReference()
+    {
+        XWikiDocument sdoc = (XWikiDocument) get("sdoc");
+        if (sdoc == null) {
+            sdoc = getDoc();
+        }
+
+        return sdoc != null ? sdoc.getContentAuthorReference() : getUserReference();
     }
 }

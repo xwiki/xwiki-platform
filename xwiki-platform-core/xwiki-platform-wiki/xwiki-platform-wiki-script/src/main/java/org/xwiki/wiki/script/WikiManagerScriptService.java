@@ -434,43 +434,41 @@ public class WikiManagerScriptService implements ScriptService
     {
         XWikiContext context = xcontextProvider.get();
 
-        boolean result = false;
+        boolean isAllowed;
 
         try {
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
             WikiReference wikiReference = descriptor.getReference();
             if (oldDescriptor != null) {
-                if (!result) {
-                    // Users that can edit the wiki's descriptor document are allowed to use this API as well. This
-                    // includes global admins.
-                    DocumentReference descriptorDocument =
-                        wikiDescriptorDocumentHelper.getDocumentReferenceFromId(oldDescriptor.getId());
-                    result = authorizationManager.hasAccess(Right.EDIT, context.getUserReference(), descriptorDocument);
-                }
+                // Users that can edit the wiki's descriptor document are allowed to use this API as well. This
+                // includes global admins.
+                DocumentReference descriptorDocument =
+                    wikiDescriptorDocumentHelper.getDocumentReferenceFromId(oldDescriptor.getId());
+                isAllowed = authorizationManager.hasAccess(Right.EDIT, context.getUserReference(), descriptorDocument);
 
                 String currentOwner = oldDescriptor.getOwnerId();
-                if (!result) {
+                if (!isAllowed) {
                     // The current owner can edit anything.
-                    result = entityReferenceSerializer.serialize(context.getUserReference()).equals(currentOwner);
+                    isAllowed = entityReferenceSerializer.serialize(context.getUserReference()).equals(currentOwner);
                 }
 
-                if (!result) {
+                if (!isAllowed) {
                     // Local admins can edit the descriptor, except for the "ownerId" field, which should be
                     // editable only by the current owner or main wiki admins.
                     String newOwner = descriptor.getOwnerId();
-                    result =
+                    isAllowed =
                         authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), wikiReference)
                             && StringUtils.equals(newOwner, currentOwner);
                 }
             } else {
                 // Saving a descriptor that did not already exist should be reserved to global admins
-                result =
+                isAllowed =
                     authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), new WikiReference(
                         wikiDescriptorManager.getMainWikiId()));
             }
 
-            if (!result) {
+            if (!isAllowed) {
                 // Exhausted all options. Deny access for the current user to edit the descriptor.
                 throw new AccessDeniedException(context.getUserReference(), wikiReference);
             } else {
@@ -478,7 +476,7 @@ public class WikiManagerScriptService implements ScriptService
                 wikiDescriptorManager.saveDescriptor(descriptor);
             }
 
-            return result;
+            return true;
         } catch (Exception e) {
             error(e);
             return false;
@@ -487,7 +485,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Tell if the path mode is used for subwikis.
-     * <p/>
+     * <p>
      * Example:
      * 
      * <pre>

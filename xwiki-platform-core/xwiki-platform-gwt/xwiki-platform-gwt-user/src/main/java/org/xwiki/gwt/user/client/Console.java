@@ -93,19 +93,20 @@ public class Console
 
     /**
      * Writes a message to the console. You may pass as many arguments as you'd like, and they will be joined together
-     * in a space-delimited line.<br/>
-     * The first argument to log may be a string containing printf-like string substitution patterns. For example:<br/>
-     * <code>console.log("The %s jumped over %d tall buildings", animal, count);</code><br/>
-     * The example above can be re-written without string substitution to achieve the same result:<br/>
-     * <code>console.log("The", animal, "jumped over", count, "tall buildings");</code><br/>
+     * in a space-delimited line.
+     * <p>
+     * The first argument to log may be a string containing printf-like string substitution patterns. For example:<br>
+     * <code>console.log("The %s jumped over %d tall buildings", animal, count);</code><br>
+     * The example above can be re-written without string substitution to achieve the same result:<br>
+     * <code>console.log("The", animal, "jumped over", count, "tall buildings");</code><br>
      * These two techniques can be combined. If you use string substitution but provide more arguments than there are
-     * substitution patterns, the remaining arguments will be appended in a space-delimited line, like so:<br/>
-     * <code>console.log("I am %s and I have:", myName, thing1, thing2, thing3);</code><br/>
+     * substitution patterns, the remaining arguments will be appended in a space-delimited line, like so:<br>
+     * <code>console.log("I am %s and I have:", myName, thing1, thing2, thing3);</code><br>
      * If objects are logged, they will be written not as static text, but as interactive hyperlinks that can be clicked
      * to inspect the object in Firebug's HTML, CSS, Script, or DOM tabs. You may also use the %o pattern to substitute
-     * a hyperlink in a string.<br/>
-     * Here is the complete set of patterns that you may use for string substitution:<br/>
-     * <table>
+     * a hyperlink in a string.<br>
+     * Here is the complete set of patterns that you may use for string substitution:<br>
+     * <table summary="Substitution Patterns">
      * <thead>
      * <tr>
      * <td>String</td>
@@ -215,7 +216,8 @@ public class Console
     }
 
     /**
-     * Prints an interactive stack trace of JavaScript execution at the point where it is called.<br/>
+     * Prints an interactive stack trace of JavaScript execution at the point where it is called.
+     * <p>
      * The stack trace details the functions on the stack, as well as the values that were passed as arguments to each
      * function. You can click each function to take you to its source, and click each argument value to inspect it.
      */

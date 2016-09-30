@@ -96,3 +96,7 @@
 tr.userorgroups-header {
   background-color: $theme.backgroundSecondaryColor;
 }
+
+tr.userorgroups-header label {
+  font-weight: 700;
+}

@@ -47,8 +47,6 @@ public interface SxSource
         /**
          * Cache for the proxy/browser's default time, It will be held in the server cache an amount of time specified
          * in AbstractSxAction.
-         * 
-         * @see AbstractSxAction#DEFAULT_CACHE_DURATION
          */
         DEFAULT,
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -40,7 +40,7 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <!-- The bootstrap version is used is several places -->
-    <bootstrap.version>3.3.6</bootstrap.version>
+    <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.8</batik.version>
   </properties>
   <dependencyManagement>
@@ -57,7 +57,7 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.6.9.Final</version>
+        <version>3.6.11.Final</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
@@ -196,11 +196,6 @@
         </exclusions>
       </dependency>
       <!-- Drawn by several transitive dependencies -->
-      <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>jta</artifactId>
-        <version>1.1</version>
-      </dependency>
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
@@ -481,9 +476,57 @@
                 },
                 "ignore": [
                   {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String org.xwiki.skin.Resource<I extends org.xwiki.filter.input.InputSource>::getResourceName()",
+                    "justification": "Young API. Remember the external name of the resource"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::execute(org.xwiki.template.Template) throws java.lang.Exception",
+                    "justification": "Young API. Add helpers"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::executeNoException(org.xwiki.template.Template)",
+                    "justification": "Young API. Add helpers"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::getXDOM(org.xwiki.template.Template) throws java.lang.Exception",
+                    "justification": "Young API. Add helpers"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::getXDOMNoException(org.xwiki.template.Template)",
+                    "justification": "Young API. Add helpers"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.template.TemplateManager::renderNoException(org.xwiki.template.Template, java.io.Writer)",
+                    "justification": "Young API. Add helpers"
+                 },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery)",
+                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
+                    "justification": "Align with ExtensionRepository API"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
+                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
+                    "justification": "Align with ExtensionRepository API"
+                  },
+                  {
+                    "code": "java.field.typeChanged",
+                    "old": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
+                    "new": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
+                    "justification": "Was publicly exposing internal class"
+                  },
+                  {
                     "code": "java.class.removed",
-                    "old": "class org.xwiki.rendering.parser.ContentParser",
-                    "justification": "No actual breakage. Class was moved to another module"
+                    "old": "class org.xwiki.resource.temporary.TemporaryResourceReference",
+                    "justification": "Not an actual breakage. The class has been moved from xwiki-platform-resource-default to xwiki-platform-resource-temporary module, under the same package."
                   }
                 ]
               }
@@ -508,13 +551,11 @@
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-annotations</module>
     <module>xwiki-platform-application</module>
-    <module>xwiki-platform-application-manager</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
     <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-blog</module>
     <module>xwiki-platform-bridge</module>
-    <module>xwiki-platform-cache</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
@@ -526,6 +567,7 @@
     <module>xwiki-platform-dashboard</module>
     <module>xwiki-platform-diffplugin</module>
     <module>xwiki-platform-display</module>
+    <module>xwiki-platform-edit</module>
     <module>xwiki-platform-eventstream</module>
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-feed</module>
@@ -543,7 +585,6 @@
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
-    <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>

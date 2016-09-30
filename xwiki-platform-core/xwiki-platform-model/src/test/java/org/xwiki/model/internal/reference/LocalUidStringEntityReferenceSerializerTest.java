@@ -20,11 +20,15 @@
 
 package org.xwiki.model.internal.reference;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -36,9 +40,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  *
  * @version $Id$
  */
-@ComponentList({
-    DefaultSymbolScheme.class
-})
+@ComponentList({ DefaultSymbolScheme.class })
 public class LocalUidStringEntityReferenceSerializerTest
 {
     @Rule
@@ -71,6 +73,16 @@ public class LocalUidStringEntityReferenceSerializerTest
 
         // Verify that passing null doesn't throw a NPE
         Assert.assertNull(serializer.serialize(null));
+    }
+
+    @Test
+    public void serializeDocumentReferenceWithLocale() throws Exception
+    {
+        EntityReference reference = new DocumentReference("wiki", "space", "page", Locale.US);
+        Assert.assertEquals("5:space4:page5:en_US", serializer.serialize(reference));
+
+        reference = new DocumentReference("wiki1.wiki2:wiki3", Arrays.asList("some", "space"), "page", Locale.US);
+        Assert.assertEquals("4:some5:space4:page5:en_US", serializer.serialize(reference));
     }
 
     @Test
@@ -122,7 +134,8 @@ public class LocalUidStringEntityReferenceSerializerTest
     @Test
     public void serializeObjectPropertyReference()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
+        EntityReference reference =
+            resolver.resolve("wiki:space.page^wiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
         Assert.assertEquals("5:space4:page14:space.class[0]4:prop", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.page^xwiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);

@@ -43,5 +43,5 @@ public interface LockProvider
      * @param toLockOn the object to get a lock for.
      * @return a lock for this object and any which are equal.
      */
-    ReadWriteLock getLock(final Object toLockOn);
+    ReadWriteLock getLock(Object toLockOn);
 }

@@ -36,6 +36,7 @@ import com.xpn.xwiki.XWikiContext;
  * {@link XWikiContext} like the current user).
  *
  * @version $Id$
+ * @see XWikiContextProvider
  * @since 7.2M1
  */
 @Component

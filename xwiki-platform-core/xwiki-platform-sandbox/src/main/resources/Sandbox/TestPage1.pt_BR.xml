@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="Sandbox.TestPage1" locale="pt_BR">
   <web>Sandbox</web>
   <name>TestPage1</name>
   <language>pt_BR</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1252454400000</contentUpdateDate>
   <version>1.1</version>
   <title>Sandbox Test Page 1</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

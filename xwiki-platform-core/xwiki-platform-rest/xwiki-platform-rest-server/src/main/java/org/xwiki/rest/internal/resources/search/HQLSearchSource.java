@@ -37,4 +37,22 @@ public class HQLSearchSource extends AbstractDatabaseSearchSource
     {
         super("hql");
     }
+
+    @Override
+    protected String resolveQuery(boolean distinct, String query)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("select ");
+
+        if (distinct) {
+            builder.append("distinct ");
+        }
+
+        builder.append("doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc ");
+
+        builder.append(query);
+
+        return builder.toString();
+    }
 }

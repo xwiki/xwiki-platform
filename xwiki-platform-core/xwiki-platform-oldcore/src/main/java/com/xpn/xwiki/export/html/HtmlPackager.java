@@ -35,7 +35,6 @@ import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
@@ -47,7 +46,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.url.URLContextManager;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -179,11 +177,10 @@ public class HtmlPackager
      *            render.
      * @param zos the ZIP output stream.
      * @param context the XWiki context.
-     * @param vcontext the Velocity context.
      * @throws XWikiException error when rendering document.
      * @throws IOException error when rendering document.
      */
-    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
+    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context)
         throws XWikiException, IOException
     {
         DocumentReferenceResolver<String> resolver =
@@ -215,12 +212,9 @@ public class HtmlPackager
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
             context.setDoc(doc);
-            vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
-            vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
 
             XWikiDocument tdoc = doc.getTranslatedDocument(context);
             context.put(CONTEXT_TDOC, tdoc);
-            vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
 
             String content = evaluateDocumentContent(context);
 
@@ -262,8 +256,6 @@ public class HtmlPackager
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         Execution execution = Utils.getComponent(Execution.class);
 
-        VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
-
         try {
             XWikiContext renderContext = context.clone();
             renderContext.put("action", "view");
@@ -280,18 +272,13 @@ public class HtmlPackager
             execution.pushContext(executionContext);
 
             try {
-                VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-
-                // At this stage we have a clean Velocity Context
-                VelocityContext vcontext = velocityManager.getVelocityContext();
-
                 // Set the URL Factories/Serializer to use
                 urlf.init(this.pages, tempdir, renderContext);
                 renderContext.setURLFactory(urlf);
                 Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
                 for (String pageName : this.pages) {
-                    renderDocument(pageName, zos, renderContext, vcontext);
+                    renderDocument(pageName, zos, renderContext);
                 }
             } finally {
                 execution.popContext();
@@ -299,10 +286,6 @@ public class HtmlPackager
         } catch (ExecutionContextException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
                 "Failed to initialize Execution Context", e);
-        } finally {
-            // We must ensure that the new request we've used is removed so that the current
-            // thread can continue to use its original Execution Context.
-            context.put("vcontext", oldVelocityContext);
         }
     }
 
@@ -395,8 +378,7 @@ public class HtmlPackager
         File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
 
         // Don't include vm and LESS files by default
-        FileFilter filter = new NotFileFilter(new SuffixFileFilter(
-            new String[] { ".vm", ".less", "skin.properties" }));
+        FileFilter filter = new NotFileFilter(new SuffixFileFilter(new String[] { ".vm", ".less", "skin.properties" }));
 
         addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
     }

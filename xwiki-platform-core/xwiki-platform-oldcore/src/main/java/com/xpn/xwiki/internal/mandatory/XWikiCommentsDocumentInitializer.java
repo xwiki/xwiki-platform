@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 
 /**
  * Update XWiki.XWikiComments document with all required informations.
@@ -58,7 +59,9 @@ public class XWikiCommentsDocumentInitializer extends AbstractMandatoryDocumentI
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
         needsUpdate |= bclass.addDateField("date", "Date");
-        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
+        // Use the Text editor for backwards compatibility (e.g. the annotation module which uses the comment class
+        // doesn't expect the WYSIWYG editor).
+        needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5, EditorType.TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "XWiki Comment Class");
 

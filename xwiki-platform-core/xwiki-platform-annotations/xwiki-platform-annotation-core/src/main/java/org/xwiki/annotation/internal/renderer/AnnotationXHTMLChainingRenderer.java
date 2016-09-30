@@ -41,7 +41,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * Extends the default XHTML renderer to add handling of annotations.<br />
+ * Extends the default XHTML renderer to add handling of annotations.<br>
  * 
  * @version $Id$
  * @since 2.3M1
@@ -133,18 +133,18 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     }
 
     @Override
-    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
+    public void onVerbatim(String content, boolean inline, Map<String, String> parameters)
     {
         SortedMap<Integer, List<AnnotationEvent>> annEvts = getAnnotationGenerator().getAnnotationEvents();
-        if (isInline) {
+        if (inline) {
             String ttEltName = "tt";
             getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
             getXHTMLWikiPrinter().printXMLStartElement(ttEltName, new String[][] {{"class", "wikimodel-verbatim"}});
             getAnnotationsMarkerPrinter().openAllAnnotationMarkers();
             if (annEvts != null && annEvts.size() > 0) {
-                getAnnotationsMarkerPrinter().printXMLWithAnnotations(protectedString, annEvts);
+                getAnnotationsMarkerPrinter().printXMLWithAnnotations(content, annEvts);
             } else {
-                getXHTMLWikiPrinter().printXML(protectedString);
+                getXHTMLWikiPrinter().printXML(content);
             }
             getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
             getXHTMLWikiPrinter().printXMLEndElement(ttEltName);
@@ -154,9 +154,9 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
             getXHTMLWikiPrinter().printXMLStartElement(preEltName, parameters);
             getAnnotationsMarkerPrinter().openAllAnnotationMarkers();
             if (annEvts != null && annEvts.size() > 0) {
-                getAnnotationsMarkerPrinter().printXMLWithAnnotations(protectedString, annEvts);
+                getAnnotationsMarkerPrinter().printXMLWithAnnotations(content, annEvts);
             } else {
-                getXHTMLWikiPrinter().printXML(protectedString);
+                getXHTMLWikiPrinter().printXML(content);
             }
             getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
             getXHTMLWikiPrinter().printXMLEndElement(preEltName);
@@ -205,10 +205,10 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
      * @since 2.5RC1
      */
     @Override
-    public void endLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(ResourceReference reference, boolean freestanding, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.endLink(reference, isFreeStandingURI, parameters);
+        super.endLink(reference, freestanding, parameters);
     }
 
     @Override
@@ -238,10 +238,10 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
      * @since 3.0M2
      */
     @Override
-    public void endDocument(MetaData metaData)
+    public void endDocument(MetaData metadata)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.endDocument(metaData);
+        super.endDocument(metadata);
     }
 
     @Override
@@ -266,10 +266,10 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
     }
 
     @Override
-    public void endList(ListType listType, Map<String, String> parameters)
+    public void endList(ListType type, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.endList(listType, parameters);
+        super.endList(type, parameters);
     }
 
     @Override
@@ -383,17 +383,17 @@ public class AnnotationXHTMLChainingRenderer extends XHTMLChainingRenderer imple
      * @since 2.5RC1
      */
     @Override
-    public void beginLink(ResourceReference reference, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void beginLink(ResourceReference reference, boolean freestanding, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.beginLink(reference, isFreeStandingURI, parameters);
+        super.beginLink(reference, freestanding, parameters);
     }
 
     @Override
-    public void beginList(ListType listType, Map<String, String> parameters)
+    public void beginList(ListType type, Map<String, String> parameters)
     {
         getAnnotationsMarkerPrinter().closeAllAnnotationMarkers();
-        super.beginList(listType, parameters);
+        super.beginList(type, parameters);
     }
 
     @Override

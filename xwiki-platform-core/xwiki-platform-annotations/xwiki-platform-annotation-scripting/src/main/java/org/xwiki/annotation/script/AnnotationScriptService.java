@@ -230,7 +230,7 @@ public class AnnotationScriptService implements ScriptService
      * @param target the string serialized reference to the content for which to get the annotations
      * @return all annotations which are valid on the specified content, or {@code null} if an exception occurs and the
      *         exception is saved on the xwiki context
-     * @see {@link org.xwiki.annotation.maintainer.AnnotationState}
+     * @see org.xwiki.annotation.maintainer.AnnotationState
      * @see AnnotationService#getValidAnnotations(String)
      */
     public Collection<Annotation> getValidAnnotations(String target)
@@ -299,7 +299,7 @@ public class AnnotationScriptService implements ScriptService
     /**
      * Checks if the current user can edit an annotation on the document given by wiki, space and page. This function is
      * a helper function, using wiki, space and page instead of the target to avoid target generation in velocity
-     * scripting.<br />
+     * scripting.<br>
      * TODO: annotations should only operate on targets, and velocity context should only operate with targets so that
      * they can pass a target to this function. This also assumes refactoring of the REST service to always get target
      * references instead of wiki, space and pages in the path.
@@ -337,7 +337,7 @@ public class AnnotationScriptService implements ScriptService
     /**
      * Checks if the current user can add an annotation on the document given by the wiki, space and page. This function
      * is a helper function, using wiki, space and page instead of the target to avoid target generation in velocity
-     * scripting.<br />
+     * scripting.<br>
      * 
      * @param wiki the wiki of the document where the annotation is added
      * @param space the space of the document where the annotation is added

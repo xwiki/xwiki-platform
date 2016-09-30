@@ -33,6 +33,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.ExtensionRepositoryDescriptor;
@@ -97,6 +98,11 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_FEATURES = "features";
 
     public static final String PROP_EXTENSION_CATEGORY = "category";
+
+    /**
+     * @since 8.3RC1
+     */
+    public static final String PROP_EXTENSION_RECOMMENDED = "recommended";
 
     public static final String PROP_EXTENSION_ALLOWEDNAMESPACES = "allowednamespaces";
 
@@ -176,6 +182,8 @@ public class XWikiRepositoryModel
 
     public static final String SOLR_INTEGER = "int";
 
+    public static final String SOLR_BOOLEAN = "boolean";
+
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
     public static class ExtensionSolrField extends SolrField
@@ -248,9 +256,9 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
-        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE,
-            new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
-        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_ALLOWEDNAMESPACE));
+        SOLR_FIELDS.put(Extension.FIELD_NAMESPACES, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
+        SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));
         SOLR_FIELDS.put(Extension.FIELD_PROPERTIES, new ExtensionSolrField(PROP_EXTENSION_PROPERTIES, null));
 
@@ -260,6 +268,10 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(RatingExtension.FIELD_AVERAGE_VOTE,
             new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
+
+        // Recommended
+        SOLR_FIELDS.put(RemoteExtension.FIELD_RECOMMENDED,
+            new ExtensionSolrField(PROP_EXTENSION_RECOMMENDED, SOLR_BOOLEAN, null));
 
         // Fields not stored
         // Extension.FIELD_REPOSITORY

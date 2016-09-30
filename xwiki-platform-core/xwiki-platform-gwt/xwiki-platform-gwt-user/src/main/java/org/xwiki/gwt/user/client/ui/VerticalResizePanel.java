@@ -26,7 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Panel that allows one of the contained widgets to be resized so that it vertically fills all the space left in this
  * container after its siblings are drawn. The desired container size will be considered to be its current size so it
- * needs to be correctly sized from CSS or otherwise before any refresh is triggered.<br />
+ * needs to be correctly sized from CSS or otherwise before any refresh is triggered.
+ * <p>
  * The layout is always automatically done on attaching this container, and it can also be requested manually by calling
  * {@link #refreshHeights()}. {@link #refreshHeights()} must <em>always</em> be called when the children of this
  * container are modified (their content, their size, or visibility), children are added or removed or when the size of

@@ -91,7 +91,7 @@
     </parameters>
   </p>
 </user>
-<group name="XWikiAdminGroup">
+<groupContainer name="XWikiAdminGroup">
   <p>
     <parameters>
       <entry>
@@ -105,8 +105,8 @@
     </parameters>
   </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
-</group>
-<group name="XWikiAllGroup">
+</groupContainer>
+<groupContainer name="XWikiAllGroup">
   <p>
     <parameters>
       <entry>
@@ -122,8 +122,8 @@
   <groupMemberGroup name="user2"></groupMemberGroup>
   <groupMemberGroup name="Admin"></groupMemberGroup>
   <groupMemberGroup name="user1"></groupMemberGroup>
-</group>
-<group name="twistedgroup">
+</groupContainer>
+<groupContainer name="twistedgroup">
   <p>
     <parameters>
       <entry>
@@ -136,7 +136,7 @@
       </entry>
     </parameters>
   </p>
-</group>
+</groupContainer>
 <wikiSpace name="privatespace">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
@@ -332,8 +332,28 @@
               </metadata>
             </metadata>
           </p>
-          <group name="{class=contentLayout, data-atlassian-layout={&quot;name&quot;:&quot;pagelayout-two-right&quot;,&quot;columns&quot;:[&quot;large&quot;,&quot;aside&quot;],&quot;header&quot;:true,&quot;footer&quot;:true}}">
-            <group name="{class=header}">
+          <group>
+            <p>
+              <parameters>
+                <entry>
+                  <string>class</string>
+                  <string>contentLayout</string>
+                </entry>
+                <entry>
+                  <string>data-atlassian-layout</string>
+                  <string>{"name":"pagelayout-two-right","columns":["large","aside"],"header":true,"footer":true}</string>
+                </entry>
+              </parameters>
+            </p>
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>header</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <word>This</word>
                 <space></space>
@@ -440,15 +460,55 @@
                 <specialSymbol>.</specialSymbol>
               </paragraph>
             </group>
-            <group name="{class=columnLayout twoColumns}">
-              <group name="{class=cell large}">
-                <group name="{class=innerCell}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>columnLayout twoColumns</string>
+                  </entry>
+                </parameters>
+              </p>
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell large</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <paragraph></paragraph>
                   <macro id="recently-updated"></macro>
                 </group>
               </group>
-              <group name="{class=cell aside}">
-                <group name="{class=innerCell}">
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell aside</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <section>
                     <section>
                       <section>
@@ -473,7 +533,15 @@
                 </group>
               </group>
             </group>
-            <group name="{class=footer}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>footer</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <space></space>
               </paragraph>
@@ -782,8 +850,28 @@
               </metadata>
             </metadata>
           </p>
-          <group name="{class=contentLayout, data-atlassian-layout={&quot;name&quot;:&quot;pagelayout-two-right&quot;,&quot;columns&quot;:[&quot;large&quot;,&quot;aside&quot;],&quot;header&quot;:true,&quot;footer&quot;:true}}">
-            <group name="{class=header}">
+          <group>
+            <p>
+              <parameters>
+                <entry>
+                  <string>class</string>
+                  <string>contentLayout</string>
+                </entry>
+                <entry>
+                  <string>data-atlassian-layout</string>
+                  <string>{"name":"pagelayout-two-right","columns":["large","aside"],"header":true,"footer":true}</string>
+                </entry>
+              </parameters>
+            </p>
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>header</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <word>This</word>
                 <space></space>
@@ -890,15 +978,55 @@
                 <specialSymbol>.</specialSymbol>
               </paragraph>
             </group>
-            <group name="{class=columnLayout twoColumns}">
-              <group name="{class=cell large}">
-                <group name="{class=innerCell}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>columnLayout twoColumns</string>
+                  </entry>
+                </parameters>
+              </p>
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell large</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <paragraph></paragraph>
                   <macro id="recently-updated"></macro>
                 </group>
               </group>
-              <group name="{class=cell aside}">
-                <group name="{class=innerCell}">
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell aside</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <section>
                     <section>
                       <section>
@@ -923,7 +1051,15 @@
                 </group>
               </group>
             </group>
-            <group name="{class=footer}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>footer</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <space></space>
               </paragraph>
@@ -19683,7 +19819,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -20249,7 +20385,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -21214,7 +21350,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -22179,7 +22315,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -23115,7 +23251,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -24066,7 +24202,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -25024,7 +25160,7 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <group name="{}">
+                      <group>
                         <paragraph>
                           <word>6</word>
                         </paragraph>
@@ -29932,8 +30068,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               </metadata>
             </metadata>
           </p>
-          <group name="{class=contentLayout, data-atlassian-layout={&quot;name&quot;:&quot;pagelayout-two-right&quot;,&quot;columns&quot;:[&quot;large&quot;,&quot;aside&quot;],&quot;header&quot;:true,&quot;footer&quot;:true}}">
-            <group name="{class=header}">
+          <group>
+            <p>
+              <parameters>
+                <entry>
+                  <string>class</string>
+                  <string>contentLayout</string>
+                </entry>
+                <entry>
+                  <string>data-atlassian-layout</string>
+                  <string>{"name":"pagelayout-two-right","columns":["large","aside"],"header":true,"footer":true}</string>
+                </entry>
+              </parameters>
+            </p>
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>header</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <word>This</word>
                 <space></space>
@@ -30040,15 +30196,55 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
             </group>
-            <group name="{class=columnLayout twoColumns}">
-              <group name="{class=cell large}">
-                <group name="{class=innerCell}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>columnLayout twoColumns</string>
+                  </entry>
+                </parameters>
+              </p>
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell large</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <paragraph></paragraph>
                   <macro id="recently-updated"></macro>
                 </group>
               </group>
-              <group name="{class=cell aside}">
-                <group name="{class=innerCell}">
+              <group>
+                <p>
+                  <parameters>
+                    <entry>
+                      <string>class</string>
+                      <string>cell aside</string>
+                    </entry>
+                  </parameters>
+                </p>
+                <group>
+                  <p>
+                    <parameters>
+                      <entry>
+                        <string>class</string>
+                        <string>innerCell</string>
+                      </entry>
+                    </parameters>
+                  </p>
                   <section>
                     <section>
                       <section>
@@ -30073,7 +30269,15 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 </group>
               </group>
             </group>
-            <group name="{class=footer}">
+            <group>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>class</string>
+                    <string>footer</string>
+                  </entry>
+                </parameters>
+              </p>
               <paragraph>
                 <space></space>
               </paragraph>

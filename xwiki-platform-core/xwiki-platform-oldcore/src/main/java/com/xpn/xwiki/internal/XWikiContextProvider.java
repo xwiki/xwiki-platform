@@ -35,6 +35,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * yet.
  *
  * @version $Id$
+ * @see ReadOnlyXWikiContextProvider
  */
 @Component
 @Singleton

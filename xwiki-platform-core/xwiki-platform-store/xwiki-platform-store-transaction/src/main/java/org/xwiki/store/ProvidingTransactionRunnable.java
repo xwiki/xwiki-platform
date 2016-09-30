@@ -42,20 +42,20 @@ package org.xwiki.store;
  * <i>provides</i> an interface called DBTransaction so TR1, TR2, and TR3 will all <i>require</i>
  * DBTransaction.
  *
- * <code>
+ * <pre><code>
  * // MyInterfaceWithDataA1 must extend DBTransaction because all
  * // ProvidingTransactionRunnables must provide more than they require.
  * public interface MyInterfaceWithDataA1 extends DBTransaction { Data getA1(); }
  *
  * public class ImplementationWithDataA1 implements MyInterfaceWithDataA1 { ... }
  *
- * public class TR1 extends ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1>
+ * public class TR1 extends ProvidingTransactionRunnable&lt;DBTransaction, MyInterfaceWithDataA1&gt;
  * {
  *     private Data dataA1;
  *
  *     protected void onRun() { this.dataA1 = ..... }
  *
- *     @Override
+ *     {@literal @}Override
  *     protected MyInterfaceWithDataA1 getProvidedContext()
  *     {
  *         // this.getContext() will return a DBTransaction which our implementation can wrap.
@@ -63,9 +63,9 @@ package org.xwiki.store;
  *     }
  * }
  *
- * public class TR2 extends TransactionRunnable<DBTransaction> { ... }
+ * public class TR2 extends TransactionRunnable&lt;DBTransaction&gt; { ... }
  *
- * public class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
+ * public class TR3 extends TransactionRunnable&lt;MyInterfaceWithDataA1&gt;
  * {
  *     protected void onRun()
  *     {
@@ -77,26 +77,25 @@ package org.xwiki.store;
  * To use these classes:
  *
  * DBStartableTransactionRunnable run = new DBStartableTransactionRunnable(dataSourceName);
- * TransactionRunnable<MyInterfaceWithDataA1> tr1 = new TR1();
+ * TransactionRunnable&lt;MyInterfaceWithDataA1&gt; tr1 = new TR1();
  * tr1.runIn(run);
- * TransactionRunnable<DBTransaction> tr2 = new TR2();
- * TransactionRunnable<MyInterfaceWithDataA1> tr2WithNewCapabilities = tr2.runIn(tr1.asProvider());
+ * TransactionRunnable&lt;DBTransaction&gt; tr2 = new TR2();
+ * TransactionRunnable&lt;MyInterfaceWithDataA1&gt; tr2WithNewCapabilities = tr2.runIn(tr1.asProvider());
  * new TR3().runIn(tr2WithNewCapabilities);
  * // This would fail at compile time: new TR3().runIn(tr2);
  * run.start();
- *
- * </code>
+ * </code></pre>
  *
  * @param <R> The type of transaction or transaction state which this runnable requires.
  *            A TransactionRunnable which alters a database through Hibernate would fail if it was
  *            started outside of a TransactionRunnable which began and committed a transaction around
- *            it. A class which extends TransactionRunnable<DatabaseTransaction> can only be
- *            run inside of another TransactionRunnable<DatabaseTransaction> or inside of a
- *            ProvidingTransactionRunnable<?, DatabaseTransaction>
+ *            it. A class which extends {@code TransactionRunnable<DatabaseTransaction>} can only be
+ *            run inside of another {@code TransactionRunnable<DatabaseTransaction>} or inside of a
+ *            {@code ProvidingTransactionRunnable<?, DatabaseTransaction>}
  *            Breaking that rule will be a compile time error.
  *
  * @param <P> the transaction state which this TransactionRunnable provides. Any
- *            TransactionRunnable<P> may be {@link TransactionRunnable#runIn(TransactionRunnable)}
+ *            {@code TransactionRunnable<P>} may be {@link TransactionRunnable#runIn(TransactionRunnable)}
  *            This runnable.
  *
  * @version $Id$

@@ -1604,9 +1604,9 @@ function (row, i, table) {
         var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
         ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
-          link.href = (row["${jscolname}_url"]=="") ? row["doc_url"] : row["${jscolname}_url"];
+          link.href = row["${jscolname}_url"] || row["doc_url"];
         #elseif($colprop.link=="field")
-          if (row["${jscolname}_url"] != "") {
+          if (row["${jscolname}_url"]) {
             link.href = row["${jscolname}_url"];
           }
         ## Property editor
@@ -2584,7 +2584,10 @@ $services.localization.render($title)##
 #elseif (!$sheetTitle_displayingDocumentTitle)##
 ## Display the document title without going through the sheet and preventing recursion.
 #set ($sheetTitle_displayingDocumentTitle = true)
-$services.display.title($doc, {'displayerHint': 'default'})##
+$services.display.title($doc, {
+  'displayerHint': 'default',
+  'outputSyntaxId': 'plain/1.0'
+})##
 #set ($sheetTitle_displayingDocumentTitle = false)
 ##
 #else##

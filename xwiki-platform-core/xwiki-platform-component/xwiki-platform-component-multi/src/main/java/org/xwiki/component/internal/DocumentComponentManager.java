@@ -49,6 +49,13 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
      */
     public static final String ID = "document";
 
+    /**
+     * The prefix of document namespace.
+     * 
+     * @since 8.4RC1
+     */
+    public static final String NAMESPACE_PREFIX = ID + ':';
+
     @Inject
     @Named("current")
     private Provider<DocumentReference> referenceProvider;

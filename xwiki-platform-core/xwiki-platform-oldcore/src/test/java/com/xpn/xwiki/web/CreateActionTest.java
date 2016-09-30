@@ -28,27 +28,24 @@ import java.util.Locale;
 
 import javax.inject.Provider;
 
-import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -66,12 +63,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.2M1
  */
+@ComponentList
+@ReferenceComponentList
 public class CreateActionTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    VelocityContext velocityContext;
 
     XWikiURLFactory mockURLFactory;
 
@@ -85,32 +82,12 @@ public class CreateActionTest
 
     Query mockTemplateProvidersQuery;
 
-    DocumentReferenceResolver<EntityReference> mockCurrentReferenceDocumentReferenceResolver;
-
-    DocumentReferenceResolver<String> mockCurrentMixedStringDocumentReferenceResolver;
-
-    EntityReferenceSerializer<String> mockLocalStringReferenceSerializer;
-
-    EntityReferenceResolver<String> mockCurrentStringReferenceResolver;
-
     @Before
     public void setUp() throws Exception
     {
         context = oldcore.getXWikiContext();
 
         Utils.setComponentManager(oldcore.getMocker());
-
-        mockCurrentReferenceDocumentReferenceResolver =
-            oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-
-        mockCurrentMixedStringDocumentReferenceResolver =
-            oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-
-        mockLocalStringReferenceSerializer =
-            oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-
-        mockCurrentStringReferenceResolver =
-            oldcore.getMocker().registerMockComponent(EntityReferenceResolver.TYPE_STRING, "current");
 
         QueryManager mockSecureQueryManager =
             oldcore.getMocker().registerMockComponent((Type) QueryManager.class, "secure");
@@ -124,8 +101,8 @@ public class CreateActionTest
 
         Provider<DocumentReference> mockDocumentReferenceProvider =
             oldcore.getMocker().registerMockComponent(DocumentReference.TYPE_PROVIDER);
-        when(mockDocumentReferenceProvider.get()).thenReturn(
-            new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome"));
+        when(mockDocumentReferenceProvider.get())
+            .thenReturn(new DocumentReference("xwiki", Arrays.asList("Main"), "WebHome"));
 
         mockURLFactory = mock(XWikiURLFactory.class);
         context.setURLFactory(mockURLFactory);
@@ -137,9 +114,6 @@ public class CreateActionTest
 
         mockResponse = mock(XWikiResponse.class);
         context.setResponse(mockResponse);
-
-        velocityContext = new VelocityContext();
-        context.put("vcontext", velocityContext);
 
         when(mockRequest.get("type")).thenReturn("plain");
     }
@@ -163,7 +137,8 @@ public class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+            context);
     }
 
     @Test
@@ -188,7 +163,8 @@ public class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+            "xwiki", context);
     }
 
     @Test
@@ -234,7 +210,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: The title is not "WebHome", but "X" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+            context);
     }
 
     @Test
@@ -258,7 +235,8 @@ public class CreateActionTest
 
         // Note1: The bebavior is the same for both a top level space and a child space WebHome.
         // Note2: The title is not "WebHome", but "Y" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+            "xwiki", context);
     }
 
     @Test
@@ -284,7 +262,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+            context);
     }
 
     @Test
@@ -356,10 +335,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
         when(mockRequest.getParameter("name")).thenReturn("Y");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Run the action
         String result = action.render(context);
 
@@ -369,7 +344,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+            "xwiki", context);
     }
 
     @Test
@@ -386,10 +362,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("spaceReference")).thenReturn("X.Y");
         when(mockRequest.getParameter("name")).thenReturn("Z");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X.Y", EntityType.SPACE)).thenReturn(
-            new SpaceReference("Y", new SpaceReference("X", new WikiReference("xwiki"))));
-
         // Run the action
         String result = action.render(context);
 
@@ -399,7 +371,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit", "template=&title=Z", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit", "template=&parent=Main.WebHome&title=Z", null,
+            "xwiki", context);
     }
 
     @Test
@@ -417,10 +390,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Run the action
         String result = action.render(context);
 
@@ -430,7 +399,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+            context);
     }
 
     @Test
@@ -448,10 +418,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Z");
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X.Y", EntityType.SPACE)).thenReturn(
-            new SpaceReference("Y", new SpaceReference("X", new WikiReference("xwiki"))));
-
         // Run the action
         String result = action.render(context);
 
@@ -461,7 +427,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z instead of X.Y.Z.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X.Y", "Z", "edit", "template=&title=Z", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+            context);
     }
 
     @Test
@@ -484,10 +451,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("WebHome");
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("Main", EntityType.SPACE)).thenReturn(
-            new SpaceReference("Main", new WikiReference("xwiki")));
-
         // Run the action
         String result = action.render(context);
 
@@ -497,7 +460,7 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // Check that the exception is properly set in the context for the UI to display.
-        XWikiException exception = (XWikiException) velocityContext.get("createException");
+        XWikiException exception = (XWikiException) this.oldcore.getScriptContext().getAttribute("createException");
         assertNotNull(exception);
         assertEquals(XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY, exception.getCode());
 
@@ -528,7 +491,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+            context);
     }
 
     /*
@@ -558,7 +522,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+            context);
     }
 
     @Test
@@ -585,7 +550,8 @@ public class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.Z since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit", "template=&title=Z", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+            context);
     }
 
     @Test
@@ -611,7 +577,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+            context);
     }
 
     @Test
@@ -639,7 +606,8 @@ public class CreateActionTest
 
         // Note: We are creating X.WebHome instead of X.Y because the tocreate parameter says "space" and the page
         // parameter is ignored.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+            context);
     }
 
     @Test
@@ -666,7 +634,8 @@ public class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit", "template=&title=X.Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=X.Y", null,
+            "xwiki", context);
     }
 
     /*
@@ -687,13 +656,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("spaceReference")).thenReturn("X");
         when(mockRequest.getParameter("name")).thenReturn("Y");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock 1 existing template provider
-        mockExistingTemplateProviders("XWiki.MyTemplateProvider", new DocumentReference("xwiki",
-            Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST);
+        mockExistingTemplateProviders("XWiki.MyTemplateProvider",
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST);
 
         // Run the action
         String result = action.render(context);
@@ -710,7 +675,7 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
@@ -721,7 +686,7 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
@@ -732,27 +697,18 @@ public class CreateActionTest
 
     /**
      * Mocks 1 existing template provider.
-     * <p/>
+     * <p>
      * Note: Calling it multiple times does not add multiple providers.
      */
     private void mockExistingTemplateProviders(String fullName, DocumentReference resolvedDocumentReference,
         List<String> allowedSpaces, Boolean terminal, String type) throws Exception
     {
-        // Mock resolving the templateProviderClass
-        EntityReference templateProviderClassRelativeReference =
-            new EntityReference("TemplateProviderClass", EntityType.DOCUMENT, new EntityReference("XWiki",
-                EntityType.SPACE));
         DocumentReference templateProviderClassReference =
             new DocumentReference("xwiki", Arrays.asList("XWiki"), "TemplateProviderClass");
-        when(mockCurrentReferenceDocumentReferenceResolver.resolve(templateProviderClassRelativeReference)).thenReturn(
-            templateProviderClassReference);
 
         // Mock to return at least 1 existing template provider
         when(mockTemplateProvidersQuery.execute()).thenReturn(new ArrayList<Object>(Arrays.asList(fullName)));
 
-        // Mock resolving the existing template provider
-        when(mockCurrentMixedStringDocumentReferenceResolver.resolve("XWiki.MyTemplateProvider")).thenReturn(
-            resolvedDocumentReference);
         // Mock the template document as existing.
         XWikiDocument templateProviderDocument = mock(XWikiDocument.class);
         when(templateProviderDocument.getDocumentReference()).thenReturn(resolvedDocumentReference);
@@ -760,7 +716,7 @@ public class CreateActionTest
             templateProviderDocument);
         // Mock the provider object (template + spaces properties)
         BaseObject templateProviderObject = mock(BaseObject.class);
-        when(templateProviderObject.getListValue("spaces")).thenReturn(allowedSpaces);
+        when(templateProviderObject.getListValue("creationRestrictions")).thenReturn(allowedSpaces);
         String templateDocumentFullName = fullName.substring(0, fullName.indexOf("Provider"));
         when(templateProviderObject.getStringValue("template")).thenReturn(templateDocumentFullName);
         if (terminal != null) {
@@ -789,8 +745,6 @@ public class CreateActionTest
     private void mockTemplateDocumentExisting(String templateDocumentFullName,
         DocumentReference templateDocumentReference) throws XWikiException
     {
-        when(mockCurrentMixedStringDocumentReferenceResolver.resolve(templateDocumentFullName)).thenReturn(
-            templateDocumentReference);
         XWikiDocument templateDocument = mock(XWikiDocument.class);
         when(templateDocument.getDocumentReference()).thenReturn(templateDocumentReference);
         when(templateDocument.getDefaultEditMode(context)).thenReturn("edit");
@@ -813,13 +767,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST);
 
         // Run the action
         String result = action.render(context);
@@ -830,8 +780,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y and using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -851,17 +801,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference(spaceReferenceString, new WikiReference("xwiki"));
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that allows usage in target space.
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Arrays.asList("X"));
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Arrays.asList("X"));
 
         // Run the action
         String result = action.render(context);
@@ -873,8 +815,8 @@ public class CreateActionTest
 
         // Note1: We are allowed to create anything under space X, be it a terminal or a non-terminal document.
         // Note2: We are creating X.Y and using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -894,18 +836,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("W");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference("xwiki", "X", "Y", "Z");
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that allows usage in one of the target space's parents (top level in this
         // case).
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Arrays.asList("X"));
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Arrays.asList("X"));
 
         // Run the action
         String result = action.render(context);
@@ -918,9 +852,8 @@ public class CreateActionTest
         // Note1: We are allowed to create anything under space X or its children, be it a terminal or a non-terminal
         // document
         // Note2: We are creating X.Y.Z.W and using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X.Y.Z.W", "WebHome", "edit", "template=XWiki.MyTemplate&title=W", null,
-            "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y.Z.W", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=W", null, "xwiki", context);
     }
 
     @Test
@@ -939,13 +872,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Arrays.asList("AnythingButX"));
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"),
+            Arrays.asList("AnythingButX"));
 
         // Run the action
         String result = action.render(context);
@@ -956,7 +886,7 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // Check that the exception is properly set in the context for the UI to display.
-        XWikiException exception = (XWikiException) velocityContext.get("createException");
+        XWikiException exception = (XWikiException) this.oldcore.getScriptContext().getAttribute("createException");
         assertNotNull(exception);
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
@@ -982,8 +912,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Arrays.asList("AnythingButX"));
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"),
+            Arrays.asList("AnythingButX"));
 
         // Run the action
         String result = action.render(context);
@@ -994,7 +925,7 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // Check that the exception is properly set in the context for the UI to display.
-        XWikiException exception = (XWikiException) velocityContext.get("createException");
+        XWikiException exception = (XWikiException) this.oldcore.getScriptContext().getAttribute("createException");
         assertNotNull(exception);
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
@@ -1019,8 +950,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Arrays.asList("AnythingButX"));
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"),
+            Arrays.asList("AnythingButX"));
 
         // Run the action
         String result = action.render(context);
@@ -1031,7 +963,7 @@ public class CreateActionTest
         assertEquals("create", result);
 
         // Check that the exception is properly set in the context for the UI to display.
-        XWikiException exception = (XWikiException) velocityContext.get("createException");
+        XWikiException exception = (XWikiException) this.oldcore.getScriptContext().getAttribute("createException");
         assertNotNull(exception);
         assertEquals(XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE, exception.getCode());
 
@@ -1056,8 +988,8 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
 
         // Run the action
         String result = action.render(context);
@@ -1069,7 +1001,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 
     @Test
@@ -1090,8 +1023,8 @@ public class CreateActionTest
         when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, true);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
 
         // Run the action
         String result = action.render(context);
@@ -1103,8 +1036,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y.WebHome as non-terminal even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1123,8 +1056,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, false);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            false);
 
         // Run the action
         String result = action.render(context);
@@ -1136,8 +1070,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1157,8 +1091,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, false);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            false);
 
         // Run the action
         String result = action.render(context);
@@ -1170,7 +1105,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 
     @Test
@@ -1192,10 +1128,6 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("template")).thenReturn("XWiki.MyTemplate");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock the passed template document as existing.
         mockTemplateDocumentExisting(templateDocumentFullName, templateDocumentReference);
 
@@ -1208,8 +1140,8 @@ public class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome and using the template specified in the request.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1229,17 +1161,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference(spaceReferenceString, new WikiReference("xwiki"));
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that creates terminal documents.
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, true);
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
 
         // Run the action
         String result = action.render(context);
@@ -1251,7 +1175,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 
     @Test
@@ -1272,17 +1197,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
         when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference(spaceReferenceString, new WikiReference("xwiki"));
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that creates terminal documents.
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, true);
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, true);
 
         // Run the action
         String result = action.render(context);
@@ -1294,8 +1211,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y.WebHome as non-terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1315,17 +1232,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference(spaceReferenceString, new WikiReference("xwiki"));
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that creates terminal documents.
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, false);
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            false);
 
         // Run the action
         String result = action.render(context);
@@ -1337,8 +1247,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y.WebHome as non-terminal and using a template, as specified in the
         // template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1359,17 +1269,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
-        // Mock the resolving of the passed space reference.
-        SpaceReference resolvedSpaceReference = new SpaceReference(spaceReferenceString, new WikiReference("xwiki"));
-        when(mockCurrentStringReferenceResolver.resolve(spaceReferenceString, EntityType.SPACE)).thenReturn(
-            resolvedSpaceReference);
-
         // Mock 1 existing template provider that creates terminal documents.
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, false);
-
-        // Mock the serialization of the passed space reference.
-        when(mockLocalStringReferenceSerializer.serialize(resolvedSpaceReference)).thenReturn(spaceReferenceString);
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST,
+            false);
 
         // Run the action
         String result = action.render(context);
@@ -1381,7 +1284,8 @@ public class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 
     @Test
@@ -1400,8 +1304,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "page");
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            "page");
 
         // Run the action
         String result = action.render(context);
@@ -1414,7 +1319,8 @@ public class CreateActionTest
         // Note: We are creating the document X.Y as terminal, since the template provider did not specify a "terminal"
         // property and it used the old "page" type instead. Also using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 
     @Test
@@ -1435,8 +1341,9 @@ public class CreateActionTest
         when(mockRequest.getParameter("tocreate")).thenReturn("nonterminal");
 
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "page");
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            "page");
 
         // Run the action
         String result = action.render(context);
@@ -1449,8 +1356,8 @@ public class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal, since even if the template provider did not
         // specify a "terminal" property and it used the old "page" type, the UI explicitly asked for a non-terminal
         // document. Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1469,13 +1376,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("name")).thenReturn("Y");
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "space");
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            "space");
 
         // Run the action
         String result = action.render(context);
@@ -1488,8 +1392,8 @@ public class CreateActionTest
         // Note: We are creating X.Y.WebHome as non-terminal, since the template provider does not specify a "terminal"
         // property and we fallback on the "type" property's value. Also using the template extracted from the template
         // provider.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki",
-            context);
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
     }
 
     @Test
@@ -1510,13 +1414,10 @@ public class CreateActionTest
         when(mockRequest.getParameter("templateprovider")).thenReturn(templateProviderFullName);
         when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
 
-        // Mock the resolving of the passed space reference.
-        when(mockCurrentStringReferenceResolver.resolve("X", EntityType.SPACE)).thenReturn(
-            new SpaceReference("X", new WikiReference("xwiki")));
-
         // Mock 1 existing template provider
-        mockExistingTemplateProviders(templateProviderFullName, new DocumentReference("xwiki", Arrays.asList("XWiki"),
-            "MyTemplateProvider"), Collections.EMPTY_LIST, null, "space");
+        mockExistingTemplateProviders(templateProviderFullName,
+            new DocumentReference("xwiki", Arrays.asList("XWiki"), "MyTemplateProvider"), Collections.EMPTY_LIST, null,
+            "space");
 
         // Run the action
         String result = action.render(context);
@@ -1528,6 +1429,7 @@ public class CreateActionTest
 
         // Note: We are creating X.Y as terminal, since it is overriden from the UI, regardless of any backwards
         // compatibility resolutions. Also using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&title=Y", null, "xwiki", context);
+        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+            null, "xwiki", context);
     }
 }

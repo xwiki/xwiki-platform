@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 /**
  * Generic component in charge of copying a given object of a given type. The main purpose of this is to add
  * {@link java.lang.Cloneable}-like behavior on objects that don't implement it.
- * <p/>
+ * <p>
  * Depending on the implementation, this can be different from {@link Object#clone()} as the result might need to be
  * modified to make sense on its own (e.g.: cloning a {@link javax.servlet.http.HttpServletRequest HttpServletRequest}).
  *

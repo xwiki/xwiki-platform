@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ public class AdminAction extends XWikiAction
         String content = request.getParameter("content");
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
@@ -94,7 +92,6 @@ public class AdminAction extends XWikiAction
                 // In this case the created document is going to be the default document
                 tdoc = doc;
                 context.put("tdoc", doc);
-                vcontext.put("tdoc", vcontext.get("doc"));
                 if (doc.isNew()) {
                     doc.setDefaultLanguage(language);
                     doc.setLanguage("");
@@ -110,16 +107,14 @@ public class AdminAction extends XWikiAction
                     tdoc.setAuthor(context.getUser());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
-                    vcontext.put("tdoc", tdoc.newDocument(context));
                 }
             }
 
             XWikiDocument tdoc2 = tdoc.clone();
-            if (content != null && !content.equals("")) {
+            if (content != null && !content.isEmpty()) {
                 tdoc2.setContent(content);
             }
             context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", tdoc2.newDocument(context));
             try {
                 tdoc2.readFromTemplate(peform, context);
             } catch (XWikiException e) {
@@ -136,7 +131,6 @@ public class AdminAction extends XWikiAction
                     tdoc.setLock(context.getUser(), context);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 // Lock should never make XWiki fail
                 // But we should log any related information
                 LOGGER.error("Exception while setting up lock", e);

@@ -36,7 +36,8 @@ import com.xpn.xwiki.internal.plugin.rightsmanager.UserIterator;
  * of email addresses to iterate over. Handles email duplication and an email exclusion list can be passed.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class AddressUserIterator extends UserIterator<Address>
 {

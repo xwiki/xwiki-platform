@@ -25,17 +25,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -52,12 +49,10 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -74,7 +69,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -188,54 +182,6 @@ public class XWikiDocumentMockitoTest
         Assert.assertEquals(2, childrenReferences.size());
         Assert.assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));
         Assert.assertEquals(new DocumentReference("wiki", "A", "b"), childrenReferences.get(1));
-    }
-
-    /**
-     * @see "XWIKI-8024: XWikiDocument#setAsContextDoc doesn't set the 'cdoc' in the Velocity context"
-     */
-    @Test
-    public void setAsContextDoc() throws Exception
-    {
-        VelocityManager velocityManager = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
-        VelocityContext velocityContext = mock(VelocityContext.class);
-        when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
-
-        this.document.setAsContextDoc(this.oldcore.getXWikiContext());
-
-        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
-
-        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
-        verify(velocityContext).put(eq("doc"), argument.capture());
-        assertSame(this.document, argument.getValue().getDocument());
-        verify(velocityContext).put(eq("tdoc"), argument.capture());
-        assertSame(this.document, argument.getValue().getDocument());
-        verify(velocityContext).put(eq("cdoc"), argument.capture());
-        assertSame(this.document, argument.getValue().getDocument());
-    }
-
-    @Test
-    public void setTranslationAsContextDoc() throws Exception
-    {
-        VelocityManager velocityManager = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
-        VelocityContext velocityContext = mock(VelocityContext.class);
-        when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
-
-        this.document.setLocale(Locale.US);
-        XWikiDocument defaultTranslation = new XWikiDocument(this.document.getDocumentReference());
-        doReturn(defaultTranslation).when(this.oldcore.getSpyXWiki()).getDocument(this.document.getDocumentReference(),
-            this.oldcore.getXWikiContext());
-
-        this.document.setAsContextDoc(this.oldcore.getXWikiContext());
-
-        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
-
-        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
-        verify(velocityContext).put(eq("doc"), argument.capture());
-        assertSame(defaultTranslation, argument.getValue().getDocument());
-        verify(velocityContext).put(eq("tdoc"), argument.capture());
-        assertSame(this.document, argument.getValue().getDocument());
-        verify(velocityContext).put(eq("cdoc"), argument.capture());
-        assertSame(this.document, argument.getValue().getDocument());
     }
 
     /**

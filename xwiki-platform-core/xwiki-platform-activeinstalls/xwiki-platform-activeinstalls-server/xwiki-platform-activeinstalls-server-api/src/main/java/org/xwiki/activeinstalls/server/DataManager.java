@@ -41,15 +41,15 @@ public interface DataManager
      *        thus another data format). We use the index type to match a given data model. The Active Installs Client
      *        module should be checked to understand the data model used.
      * @param fullQuery the full Elastic Search query used to search for installs. For example:
-     *        <p><pre><code>
+     *        <pre>{@code
      *            {
      *              "query" : {
      *                "term": { "distributionVersion" : "5.2" }
      *              }
      *            }
-     *        </code></pre></p>
+     *        }</pre>
      * @return the parsed JSON result coming from Elastic Search, for example:
-     *        <p><pre><code>
+     *         <pre>{@code
      *            {
      *              "took": 97,
      *              "timed_out": false,
@@ -85,7 +85,7 @@ public interface DataManager
      *                ]
      *              }
      *            }
-     *        </code></pre></p>
+     *         }</pre>
      * @param parameters the ElasticSearch search parameters to use (see for example
      *        <a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-uri-request.html">
      *        Search URI parameters</a>)

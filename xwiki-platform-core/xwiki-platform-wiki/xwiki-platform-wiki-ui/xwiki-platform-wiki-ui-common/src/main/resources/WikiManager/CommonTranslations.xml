@@ -44,7 +44,7 @@ admin.wikis.descriptor=Descriptor
 admin.wiki.description=Describe your wiki (pretty name and description) and set its owner and homepage.
 platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
 platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.
-platform.wiki.admin.wiki.requiredFieldsError=Owner and Homepage are required fields.
+platform.wiki.admin.wiki.requiredFieldsError=The 'Homepage' field cannot be empty.
 platform.wiki.admin.wiki.ownerWarning=Warning: Once you change this, the previous owner will lose his owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.
 
 ###############################################################################

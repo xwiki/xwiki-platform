@@ -45,7 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Chaining listener that maps the annotations on the events that it receives, holds the state of annotations on these
  * events and exposes it to the subsequent listeners in the chain through {@link #getAnnotationEvents()}. It operates by
  * buffering all events, creating the plain text representation of the listened content, mapping the annotations on this
- * content and identifying the events in the stream that hold the start and end of the annotations. <br />
+ * content and identifying the events in the stream that hold the start and end of the annotations. <br>
  * FIXME: this should use the PlainTextNormalizingChaininngRenderer to generate the plain text version of the content,
  * and match with the space normalized selection.
  * 
@@ -130,10 +130,10 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     }
 
     @Override
-    public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
+    public void onVerbatim(String content, boolean inline, Map<String, String> parameters)
     {
-        super.onVerbatim(protectedString, isInline, parameters);
-        handleRawText(protectedString);
+        super.onVerbatim(content, inline, parameters);
+        handleRawText(content);
     }
 
     /**
@@ -171,9 +171,9 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
      * @since 3.0M2
      */
     @Override
-    public void endDocument(MetaData metaData)
+    public void endDocument(MetaData metadata)
     {
-        super.endDocument(metaData);
+        super.endDocument(metadata);
 
         // create the bookmarks
         mapAnnotations();

@@ -50,7 +50,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  *
  * @param <T> the type of data returned by the iterator when {@link #next()} is called
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class UserIterator<T> implements Iterator<T>
 {

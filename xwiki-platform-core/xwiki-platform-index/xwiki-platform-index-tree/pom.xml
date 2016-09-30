@@ -25,17 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-tree</artifactId>
   <name>XWiki Platform - Index - Tree - Parent POM</name>
   <description>XWiki Platform - Index - Tree - Parent POM</description>
   <packaging>pom</packaging>
-    <properties>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
   <modules>
+    <module>xwiki-platform-index-tree-api</module>
     <module>xwiki-platform-index-tree-macro</module>
     <module>xwiki-platform-index-tree-war</module>
   </modules>

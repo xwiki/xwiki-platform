@@ -539,7 +539,7 @@ public final class StatsUtil
 
     /**
      * Compute the unique id for stat visits.
-     * <p/>
+     * <p>
      * TODO: In the future, replace this with a unique random number since this algorithm is not good enough; for
      * example users in the same company behind a company firewall may get the same IP and same user agent...
      *

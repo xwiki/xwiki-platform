@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -36,7 +36,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -163,7 +163,7 @@
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
       <artifactId>jsqlparser</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.6</version>
     </dependency>
 
     <!-- UnexpectedException -->
@@ -408,14 +408,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-cache-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-cache-api</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-cache-infinispan</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-cache-infinispan</artifactId>
+      <version>${commons.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
@@ -477,6 +477,11 @@
       <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -530,7 +535,7 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-xar</artifactId>
+      <artifactId>xwiki-platform-xar-model</artifactId>
       <version>${project.version}</version>
     </dependency>
 

@@ -61,10 +61,11 @@ public interface UIExtension
     /**
      * Tells if the given feature is enabled in the current context. A feature can be temporarily disabled if it can
      * generate invalid mark-up.
+     * <p>
+     * See org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator.
      * 
      * @param feature The feature whose enabled state is queried.
      * @return <code>true</code> if the specified feature is enabled.
-     * @see org.xwiki.gwt.wysiwyg.client.syntax.SyntaxValidator
      */
     boolean isEnabled(String feature);
 }

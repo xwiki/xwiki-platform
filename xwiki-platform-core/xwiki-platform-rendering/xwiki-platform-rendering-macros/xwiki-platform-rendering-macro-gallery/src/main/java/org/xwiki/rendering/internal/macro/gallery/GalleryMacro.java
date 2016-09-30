@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.gallery;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -34,6 +36,7 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.gallery.GalleryMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
@@ -46,7 +49,7 @@ import org.xwiki.skinx.SkinExtension;
 @Component
 @Named("gallery")
 @Singleton
-public class GalleryMacro extends AbstractMacro<Object>
+public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
 {
     /**
      * The description of the macro.
@@ -87,20 +90,42 @@ public class GalleryMacro extends AbstractMacro<Object>
      */
     public GalleryMacro()
     {
-        super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+        super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), GalleryMacroParameters.class);
         setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
     }
 
     @Override
-    public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
+    public List<Block> execute(GalleryMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         if (context != null) {
             Map<String, Object> skinExtensionParameters = Collections.singletonMap("forceSkinAction", (Object) true);
             this.jsfx.use("uicomponents/widgets/gallery/gallery.js", skinExtensionParameters);
-            this.ssfx.use("uicomponents/widgets/gallery/gallery.css", skinExtensionParameters);
+            this.ssfx.use("uicomponents/widgets/gallery/gallery.css");
 
-            Block galleryBlock = new GroupBlock(Collections.singletonMap("class", "gallery"));
+            StringBuilder inlineStyle = new StringBuilder();
+            if (!StringUtils.isEmpty(parameters.getWidth())) {
+                // Non-empty width value. The empty value means "no explicit width".
+                inlineStyle.append("width: ").append(parameters.getWidth()).append(';');
+            } else if (parameters.getWidth() == null) {
+                // Default width when none is specified.
+                inlineStyle.append("width: 620px;");
+            }
+            if (!StringUtils.isEmpty(parameters.getHeight())) {
+                // Non-empty height value. The empty value means "no explicit height".
+                inlineStyle.append("height: ").append(parameters.getHeight()).append(';');
+            } else if (parameters.getHeight() == null) {
+                // Default height when none is specified (16:9 aspect ratio).
+                inlineStyle.append("height: 349px;");
+            }
+
+            Map<String, String> groupParameters = new HashMap<>();
+            groupParameters.put("class", ("gallery " + StringUtils.defaultString(parameters.getClassNames())).trim());
+            if (inlineStyle.length() > 0) {
+                groupParameters.put("style", inlineStyle.toString());
+            }
+
+            Block galleryBlock = new GroupBlock(groupParameters);
             // Don't execute transformations explicitly. They'll be executed on the generated content later on.
             galleryBlock.addChildren(this.contentParser.parse(content, context, false, false).getChildren());
             return Collections.singletonList(galleryBlock);

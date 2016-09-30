@@ -30,7 +30,7 @@ public interface DataMigrationStatus
 {
     /**
      * @return current DB version or null for a new database
-     * @xwikicfg xwiki.store.migration.version - override data version
+     * @xwiki.xwikicfg xwiki.store.migration.version - override data version
      * @throws DataMigrationException if any error
      */
     XWikiDBVersion getDBVersion() throws DataMigrationException;

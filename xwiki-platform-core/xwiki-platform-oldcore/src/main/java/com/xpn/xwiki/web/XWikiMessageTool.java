@@ -237,7 +237,7 @@ public class XWikiMessageTool
     }
 
     /**
-     * @return the internationalization document bundles (a list of {@XWikiDocument})
+     * @return the internationalization document bundles (a list of {@link XWikiDocument})
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the document bundles
      */
     public List<XWikiDocument> getDocumentBundles()

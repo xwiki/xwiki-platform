@@ -57,6 +57,9 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
+    @Inject
+    private RatingsConfiguration ratingsConfiguration;
+
     /**
      * Retrieve the XWiki context from the current execution context.
      * 
@@ -94,26 +97,16 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                     + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, defaultAlgorithmHint);
 
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, ratingDocument.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
-            XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
-            XWikiDocument configDoc =
-                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
-                    : spaceConfigDoc;
-
-            if (configDoc != null && !configDoc.isNew()
-                && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
+            XWikiDocument configurationDocument = ratingsConfiguration.getConfigurationDocument(documentRef);
+            if (configurationDocument != null && !configurationDocument.isNew()
+                && configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                    (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 if (hint == "custom") {
                     prop =
-                        (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
+                        (BaseProperty) configurationDocument.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                             RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
                     hint = (prop == null) ? null : (String) prop.getValue();
                 }

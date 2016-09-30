@@ -40,8 +40,8 @@ import org.xwiki.mail.MailSenderConfiguration;
  * Gets the Mail Sending configuration. The configuration is checked in the following order:
  * <ul>
  *   <li>Look in Mail.MailConfig in the current wiki</li>
- *   <li>Look in (current space).XWikiPreferences in the current wiki</li>
- *   <li>Look in XWiki.XWikiPreferences in the current wiki</li>
+ *   <li>[Backward compatibility] Look in (current space).XWikiPreferences in the current wiki</li>
+ *   <li>[Backward compatibility] Look in XWiki.XWikiPreferences in the current wiki</li>
  *   <li>Look in the xwiki properties file</li>
  * </ul>
  *

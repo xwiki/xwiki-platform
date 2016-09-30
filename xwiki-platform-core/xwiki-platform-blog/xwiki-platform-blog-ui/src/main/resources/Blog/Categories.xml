@@ -119,7 +119,7 @@ $xwiki.jsx.use('Blog.ManageCategories')##
       <description/>
     </property>
     <property>
-      <name>xe.blog.code.blogcategories</name>
+      <name>Blog categories</name>
     </property>
   </object>
   <object>

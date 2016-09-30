@@ -31,7 +31,7 @@ import org.xwiki.vfs.VfsResourceReference;
 
 /**
  * Converts {@link String} into {@link VfsResourceReference} objects.
- * <p/>
+ * <p>
  * Example:
  * <ul>
  *   <li>Input: {@code attach:Sandbox.WebHome@my.zip/some/path}</li>

@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.velocity.VelocityManager;
+import javax.script.ScriptContext;
+
+import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.DeprecatedContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -105,37 +105,40 @@ public class ComputedFieldClass extends PropertyClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         String script = getScript();
-        String content = "";
+
         try {
-            VelocityContext vcontext = Utils.getComponent(VelocityManager.class).getVelocityContext();
-            vcontext.put("name", name);
-            vcontext.put("prefix", prefix);
-            vcontext.put("object", new com.xpn.xwiki.api.Object((BaseObject) object, context));
-            vcontext.put("context", new DeprecatedContext(context));
-            vcontext.put("xcontext", new Context(context));
-            String classSyntax =
-                context.getWiki().getDocument(getObject().getDocumentReference(), context).getSyntax().toIdString();
-            content = context.getDoc().getRenderedContent(script, classSyntax, context);
+            ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
+            scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
+                ScriptContext.ENGINE_SCOPE);
+
+            XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+
+            String result = renderContentInContext(script, classDocument.getSyntax().toIdString(),
+                classDocument.getAuthorReference(), context);
+
+            buffer.append(result);
         } catch (Exception e) {
+            // TODO: append a rendering style complete error instead
             buffer.append(e.getMessage());
         }
-        buffer.append(content);
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         displayView(buffer, name, prefix, object, context);
     }
 
     @Override
-    public void displayHidden(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
     }
 }

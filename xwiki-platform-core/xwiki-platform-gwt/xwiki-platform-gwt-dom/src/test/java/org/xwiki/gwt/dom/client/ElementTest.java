@@ -98,7 +98,7 @@ public class ElementTest extends DOMTestCase
     /**
      * Unit test for {@link Element#xGetInnerText()} when the element contains comment nodes.
      * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3275.
      */
     public void testXGetInnerTextWithCommentedText()
     {

@@ -57,7 +57,6 @@ import org.xwiki.url.ExtendedURL;
  *   <li>If not, then continue executing the rest of the {@code web.xml} file, thus bridging to the old system,
  *       including the existing Struts Action Servlet.</li>
  * </ul>
- * <p/>
  * As time progresses it is expected that more and more Resource Types will have registered
  * {@link org.xwiki.resource.ResourceReferenceHandler}.
  *

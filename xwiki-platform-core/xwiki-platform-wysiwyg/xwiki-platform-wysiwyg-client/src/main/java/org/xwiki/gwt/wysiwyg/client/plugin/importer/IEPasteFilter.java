@@ -39,9 +39,10 @@ import com.google.gwt.dom.client.NodeList;
  * </pre>
  * 
  * which is not understood by the server side parser.
+ * <p>
+ * See XWIKI-4161: XML tags are displayed after copy&amp;paste word-doc in office importer.
  * 
  * @version $Id$
- * @see XWIKI-4161: XML tags are displayed after copy&paste word-doc in office importer
  */
 public class IEPasteFilter extends PasteFilter
 {

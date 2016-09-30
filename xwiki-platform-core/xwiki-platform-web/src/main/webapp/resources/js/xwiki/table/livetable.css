@@ -191,7 +191,7 @@ tbody.xwiki-livetable-display-body td {
   padding: 3px 2px 3px 4px;
   background-image: none;
 }
-tbody.xwiki-livetable-display-body a, tbody.xwiki-livetable-display-body a:hover {
+tbody.xwiki-livetable-display-body a:link, tbody.xwiki-livetable-display-body a:link:hover {
   color: $theme.linkColor;
 }
 tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-body td.editableCellHover.linkeditor a {

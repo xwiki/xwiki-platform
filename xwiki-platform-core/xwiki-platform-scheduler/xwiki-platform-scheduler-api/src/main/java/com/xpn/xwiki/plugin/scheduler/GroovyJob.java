@@ -33,7 +33,6 @@ import groovy.lang.GroovyShell;
 /**
  * The task that will get executed by the Scheduler when the Job is triggered. This task in turn calls a Groovy script
  * to perform the execution.
- * <p/>
  * <p>
  * <b>Important:</b>: Note that the script will execute in the XWiki Context that was set at the time the Job was
  * scheduled for execution. For example calling <code>context.getDoc()</code> will return the current document that was

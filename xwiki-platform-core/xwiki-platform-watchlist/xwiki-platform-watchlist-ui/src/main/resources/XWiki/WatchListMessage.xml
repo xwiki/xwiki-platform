@@ -348,7 +348,7 @@
   #if ($newSpace)
     #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/ul&gt;&lt;/li&gt; #end
     #set($previousEvent = "")
-    &lt;li&gt;&lt;a href="#${event.getPrefixedSpace()}" style="$rightColumnAStyle"&gt;$event.getSpace()&lt;/a&gt;
+    &lt;li&gt;&lt;a href="#${event.getPrefixedSpace()}" style="$rightColumnAStyle"&gt;$event.getDisplaySpace()&lt;/a&gt;
     &lt;ul style="$rightColumnUlStyle"&gt;
   #end
   #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
@@ -392,7 +392,7 @@ $services.localization.render('watchlist.notification.email.multipleUpdates.intr
     #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/div&gt;&lt;/div&gt; #end
     #set($previousEvent = "")
     &lt;div class="space" style="$spaceDivStyle"&gt;
-    &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="${event.getPrefixedSpace()}"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getSpace()&lt;/h2&gt;
+    &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="${event.getPrefixedSpace()}"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getDisplaySpace()&lt;/h2&gt;
   #end
   #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
   #if($newDocument)
@@ -500,7 +500,7 @@ $services.localization.render('watchlist.notification.email.multipleUpdates.intr
 #if (!$firstEntry &amp;&amp; !$newWiki)
 |
 #end
-| + $event.getSpace()
+| + $event.getDisplaySpace()
 | |
 #end
 #if($newDocument)

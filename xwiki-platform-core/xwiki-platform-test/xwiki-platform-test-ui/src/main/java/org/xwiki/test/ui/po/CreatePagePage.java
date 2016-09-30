@@ -263,20 +263,20 @@ public class CreatePagePage extends ViewPage
      */
     public boolean isTerminalOptionDisplayed()
     {
-        return getDriver().hasElementWithoutWaiting(By.id("terminal"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("terminal"));
+        return elements.size() > 0 && elements.get(0).isDisplayed();
     }
 
     /**
      * Wait for the location preview to display the passed path string and throw an exception if the timeout is reached.
      * Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would
      * lead to false positives.
-     * <p/>
+     * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
      * completely the {@link BreadcrumbElement}'s container and thus it becomes stale. To avoid that, at each wait
      * iteration, we lookup the current breadcrumb element and not a cached one.
-     * <p/>
-     * TODO: Reuse {@link org.xwiki.index.test.po.DocumentPicker DocumentPicker} inside this PO instead of duplicating
-     * this method.
+     * <p>
+     * TODO: Reuse {@link DocumentPicker} inside this PO instead of duplicating this method.
      *
      * @param expectedPathString the path string to wait for
      * @since 7.2RC1

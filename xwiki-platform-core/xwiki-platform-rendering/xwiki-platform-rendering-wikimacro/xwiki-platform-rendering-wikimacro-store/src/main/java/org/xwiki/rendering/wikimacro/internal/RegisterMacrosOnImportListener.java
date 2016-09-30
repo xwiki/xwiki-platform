@@ -40,7 +40,7 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
 /**
  * Import action event listener to handle registering of the wiki macros after import. The problem is with the wiki
  * macros imported in the empty wiki, which cannot be registered at the save of the document on import time due to lack
- * of rights (initial import is done with XWikiGuest). <br />
+ * of rights (initial import is done with XWikiGuest). <br>
  * FIXME: remove this when the initial import will be done with the appropriate user
  * 
  * @version $Id$

@@ -169,7 +169,9 @@ public class Package
     /**
      * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
      *         <code>false</code> otherwise.
-     * @since 6.4.5, 7.0.1, 7.1M1
+     * @since 6.4.5
+     * @since 7.0.1
+     * @since 7.1M1
      */
     public boolean isInstallExtension()
     {
@@ -188,9 +190,11 @@ public class Package
     }
 
     /**
-     * @param installExension <code>true</code> if the extension packaged in the XAR should be registered as such
+     * @param installExtension <code>true</code> if the extension packaged in the XAR should be registered as such
      *            automatically, <code>false</code> otherwise.
-     * @since 6.4.5, 7.0.1, 7.1M1
+     * @since 6.4.5
+     * @since 7.0.1
+     * @since 7.1M1
      */
     public void setInstallExtension(boolean installExtension)
     {

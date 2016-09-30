@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc reference="XWiki.XWikiSyntaxOtherSyntaxes" locale="sv">
   <web>XWiki</web>
   <name>XWikiSyntaxOtherSyntaxes</name>
   <language>sv</language>
@@ -36,7 +36,6 @@
   <contentUpdateDate>1301497886000</contentUpdateDate>
   <version>1.1</version>
   <title>Other Wiki Syntaxes</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

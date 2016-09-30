@@ -39,7 +39,7 @@ import net.java.truevfs.access.TPath;
 /**
  * Converts {@link String} into {@link Path} objects constructed using TrueVFS. Permissions are also checked to verify
  * that the current users has the right to access the specified FileSystem Provider.
- * <p/>
+ * <p>
  * See {@link VfsResourceReferenceConverter} for example input and how the String input is first converted to a
  * {@link VfsResourceReference} and then into a TrueVFS-compatible URI suitable for TrueVFS.
  *

@@ -116,7 +116,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
     }
 
     /**
-     * Registers the wiki macros for all the wikis or a specific wiki, according to the passed parameter. <br />
+     * Registers the wiki macros for all the wikis or a specific wiki, according to the passed parameter. <br>
      * FIXME: I don't like this way of passing params, but it's kinda the best I can do for the moment without
      * duplicating at least the logic inside this function, if not some code as well.
      * 

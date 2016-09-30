@@ -170,7 +170,7 @@ public class ConfluenceInputFilterStream
             }
 
             // > Group
-            proxyFilter.beginGroup(groupName, groupParameters);
+            proxyFilter.beginGroupContainer(groupName, groupParameters);
 
             // Members users
             if (groupProperties.containsKey(ConfluenceXMLPackage.KEY_GROUP_MEMBERUSERS)) {
@@ -221,7 +221,7 @@ public class ConfluenceInputFilterStream
             }
 
             // < Group
-            proxyFilter.endGroup(groupName, groupParameters);
+            proxyFilter.endGroupContainer(groupName, groupParameters);
         }
 
         // Generate documents events

@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
  * Resolves references serialized as string that gets its type from the string serialization, in the form {@code
- * type://} and, if no such type specification is found, it uses the default passed type. <br />
+ * type://} and, if no such type specification is found, it uses the default passed type. <br>
  * For example, something like: {@code DOCUMENT://XWiki.TagClass[0]#tags} will result in parsing {@code
  * XWiki.TagClass[0]#tags} as a document reference, while {OBJECT_PROPERTY://XWiki.TagClass[0]#tags} will result in
  * parsing {@code XWiki.TagClass[0]#tags} as an object property reference.

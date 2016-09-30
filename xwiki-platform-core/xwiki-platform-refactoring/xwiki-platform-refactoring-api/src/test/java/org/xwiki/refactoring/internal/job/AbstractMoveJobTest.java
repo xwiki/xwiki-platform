@@ -45,8 +45,7 @@ public abstract class AbstractMoveJobTest extends AbstractEntityJobTest
 
     protected void verifyNoMove() throws Exception
     {
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class), any(DocumentReference.class));
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class),
-            any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
     }
 }

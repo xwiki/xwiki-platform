@@ -36,7 +36,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -44,7 +46,6 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
-import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -52,6 +53,7 @@ import org.xwiki.mail.internal.DefaultSessionFactory;
 import org.xwiki.mail.internal.FileSystemMailContentStore;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
+import org.xwiki.mail.internal.thread.MailSenderInitializerListener;
 import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
@@ -63,6 +65,7 @@ import org.xwiki.mail.script.ScriptMimeMessage;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -88,6 +91,7 @@ import static org.mockito.Mockito.when;
  */
 // @formatter:off
 @ComponentList({
+    MailSenderInitializerListener.class,
     MailSenderScriptService.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
@@ -160,6 +164,11 @@ public class ScriptingIntegrationTest
             this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
         when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
+
+        // Simulate receiving the Application Ready Event to start the mail threads
+        MailSenderInitializerListener listener =
+            this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
+        listener.onEvent(new ApplicationReadyEvent(), null, null);
     }
 
     @After
@@ -167,7 +176,9 @@ public class ScriptingIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.componentManager.getInstance(MailSender.class)).stopMailThreads();
+        Disposable listener =
+            this.componentManager.getInstance(EventListener.class, MailSenderInitializerListener.LISTENER_NAME);
+        listener.dispose();
     }
 
     @Test

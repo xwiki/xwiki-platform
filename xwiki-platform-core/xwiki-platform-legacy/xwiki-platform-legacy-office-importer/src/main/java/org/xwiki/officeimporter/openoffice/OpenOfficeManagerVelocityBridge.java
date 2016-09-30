@@ -47,8 +47,8 @@ public class OpenOfficeManagerVelocityBridge
     /**
      * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager} component.
      * 
-     * @param oomanager office manager component
-     * @param docBridge document access bridge component
+     * @param officeManager office manager component
+     * @param documentAccessBridge document access bridge component
      * @param execution current execution
      */
     public OpenOfficeManagerVelocityBridge(OpenOfficeManager officeManager, DocumentAccessBridge documentAccessBridge,

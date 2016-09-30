@@ -32,6 +32,11 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -58,10 +63,13 @@ import com.xpn.xwiki.XWikiContext;
  * Maven 2 plugin to import aset of XWiki documents into an existing database.
  *
  * @version $Id$
- * @goal import
- * @requiresDependencyResolution compile
- * @requiresProject
  */
+@Mojo(
+    name = "import",
+    defaultPhase = LifecyclePhase.PACKAGE,
+    requiresDependencyResolution = ResolutionScope.COMPILE,
+    requiresProject = true
+)
 public class ImportMojo extends AbstractMojo
 {
     public static final String MPKEYPREFIX = "xwiki.extension.";
@@ -75,62 +83,52 @@ public class ImportMojo extends AbstractMojo
     public static final String MPNAME_FEATURES = "features";
 
     /**
-     * @parameter default-value = "xwiki"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="xwiki")
     private String databaseName;
 
     /**
-     * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="${basedir}/src/main/packager/hibernate.cfg.xml")
     private File hibernateConfig;
 
     /**
-     * @parameter
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter
     private File sourceDirectory;
 
     /**
-     * @parameter default-value = "${project.build.directory}/data/"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
      */
+    @Parameter(defaultValue="${project.build.directory}/data/")
     private File xwikiDataDir;
 
     /**
      * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
     /**
-     * Project builder -- builds a model from a pom.xml.
-     *
-     * @component role="org.apache.maven.project.ProjectBuilder"
-     * @required
-     * @readonly
+     * The current Maven session being executed.
      */
+    @Parameter(defaultValue="${session}", readonly = true)
+    private MavenSession session;
+
+    /**
+     * Project builder -- builds a model from a pom.xml.
+     */
+    @Component
     protected ProjectBuilder projectBuilder;
 
     /**
      * Used to look up Artifacts in the remote repository.
-     *
-     * @component
-     * @required
      */
+    @Component
     protected RepositorySystem repositorySystem;
-
-    /**
-     * The current Maven session being executed.
-     *
-     * @parameter default-value="${session}"
-     * @readonly
-     */
-    private MavenSession session;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException

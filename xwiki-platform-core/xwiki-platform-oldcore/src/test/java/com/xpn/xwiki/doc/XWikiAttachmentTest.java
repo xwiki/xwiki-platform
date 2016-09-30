@@ -83,7 +83,7 @@ public class XWikiAttachmentTest
     /**
      * Unit test for <a href="http://jira.xwiki.org/browse/XWIKI-9075">XWIKI-9075</a> to prove that calling
      * {@code fromXML} doesn't set the metadata dirty flag.
-     * <p/>
+     * <p>
      * Note: I think there's a bug in that fromXML should return a new instance of XWikiAttachment and not modify the
      * current one as this would mean changing its identity...
      */

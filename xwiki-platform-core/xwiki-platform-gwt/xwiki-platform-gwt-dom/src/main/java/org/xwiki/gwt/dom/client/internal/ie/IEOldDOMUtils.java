@@ -159,9 +159,10 @@ public class IEOldDOMUtils extends IEDOMUtils
      * <p>
      * We also think that element properties of non-primitive types shouldn't be counted as attributes.
      * </p>
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=4690.
      * 
      * @see IEDOMUtils#hasAttribute(Element, String)
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=4690
      */
     @Override
     public boolean hasAttribute(Element element, String attributeName)
@@ -207,10 +208,11 @@ public class IEOldDOMUtils extends IEDOMUtils
     }
 
     /**
+     * See http://msdn.microsoft.com/en-us/library/ms533747.aspx.
+     * 
      * @param element a DOM element
      * @param attributeName the name of an attribute
      * @return {@code true} if the specified attribute is custom, set through JavaScript, {@code false} otherwise
-     * @see http://msdn.microsoft.com/en-us/library/ms533747.aspx
      */
     private native boolean isExpando(Element element, String attributeName)
     /*-{

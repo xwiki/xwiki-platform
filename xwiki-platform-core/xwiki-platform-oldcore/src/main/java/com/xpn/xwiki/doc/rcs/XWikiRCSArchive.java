@@ -48,7 +48,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Class for String [de]serialization for {@link XWikiDocumentArchive}.
+ * Class for String [de]serialization for {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
  *
  * @version $Id$
  * @since 1.2M1
@@ -59,7 +59,7 @@ public class XWikiRCSArchive extends Archive
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRCSArchive.class);
 
     /**
-     * Used to serialize {@link XWikiDocumentArchive}.
+     * Used to serialize {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
      *
      * @param nodeInfos - collection of {@link XWikiRCSNodeInfo} in any order
      * @param context - for loading nodes content
@@ -98,7 +98,7 @@ public class XWikiRCSArchive extends Archive
     }
 
     /**
-     * Used to deserialize {@link XWikiDocumentArchive}.
+     * Used to deserialize {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
      *
      * @param archiveText - archive text in JRCS format
      * @throws ParseException if syntax errors

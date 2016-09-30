@@ -35,10 +35,14 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class SkinEnvironmentResource extends AbstractEnvironmentResource
 {
+    protected Provider<XWikiContext> xcontextProvider;
+
     public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
         Environment environment, Provider<XWikiContext> xcontextProvider)
     {
-        super(path, resourceName, repository, environment, xcontextProvider);
+        super(path, resourceName, repository, environment);
+
+        this.xcontextProvider = xcontextProvider;
     }
 
     @Override

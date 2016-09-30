@@ -93,8 +93,9 @@ public class NativeRange extends JavaScriptObject
      * result = textRange instanceof ControlRange // result is also true, which is wrong.
      * </pre>
      * 
+     * See http://code.google.com/p/google-web-toolkit/wiki/OverlayTypes.
+     * 
      * @return true if this is a text range, and false if it is a control range.
-     * @see http://code.google.com/p/google-web-toolkit/wiki/OverlayTypes
      */
     public final native boolean isTextRange()
     /*-{

@@ -36,13 +36,13 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -90,7 +90,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private AuthorizationManager authorization;
 
     @Inject
-    private SUExecutor suExecutor;
+    private AuthorExecutor authorExecutor;
 
     /**
      * Checks if the last author of the document holding the extension(s) has the rights required to register extensions
@@ -167,7 +167,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
             WikiUIExtension extension =
                 new WikiUIExtension(roleHint, id, extensionPointId, extensionDefinition.getReference(),
-                    doc.getAuthorReference(), this.suExecutor);
+                    doc.getAuthorReference(), this.authorExecutor);
 
             // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
             // safer to use a POJO and pass the Component Manager to it.

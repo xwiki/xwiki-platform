@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -55,18 +56,14 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
 {
     /**
      * The document to perform the update on
-     * 
-     * @parameter expression="${basedir}/src/main/resources/XWiki/XWikiPreferences"
-     * @required
      */
+    @Parameter(defaultValue = "${basedir}/src/main/resources/XWiki/XWikiPreferences")
     protected File sourceDocument;
 
     /**
      * The target directory to write the document back to
-     * 
-     * @parameter expression="${project.build.outputDirectory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.outputDirectory}")
     protected File outputDirectory;
 
     /**

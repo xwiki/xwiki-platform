@@ -5,6 +5,7 @@ org.xwiki.mail.internal.AddressesConverter
 org.xwiki.mail.internal.AddressConverter
 org.xwiki.mail.internal.MemoryMailListener
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
+org.xwiki.mail.internal.thread.MailSenderInitializerListener
 org.xwiki.mail.internal.thread.PrepareMailQueueManager
 org.xwiki.mail.internal.thread.SendMailQueueManager
 org.xwiki.mail.internal.thread.PrepareMailRunnable

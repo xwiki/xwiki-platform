@@ -34,7 +34,8 @@ public class Command
     public static final Command BACK_COLOR = new Command("backcolor");
 
     /**
-     * If there is no selection, the insertion point will set bold for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set bold for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already bold, the bold will be removed. Otherwise, all
      * selected characters will become bold.
      */
@@ -57,13 +58,15 @@ public class Command
     public static final Command ENABLE = new Command("enable");
 
     /**
-     * This command will set the font face for a selection or at the insertion point if there is no selection.<br/>
+     * This command will set the font face for a selection or at the insertion point if there is no selection.
+     * <p>
      * The given string is such as would be used in the "name" attribute of the font tag.
      */
     public static final Command FONT_NAME = new Command("fontname");
 
     /**
-     * This command will set the font size for a selection or at the insertion point if there is no selection.<br/>
+     * This command will set the font size for a selection or at the insertion point if there is no selection.
+     * <p>
      * The given number is such as would be used in the "size" attribute of the font tag.
      */
     public static final Command FONT_SIZE = new Command("fontsize");
@@ -93,14 +96,16 @@ public class Command
     public static final Command INSERT_BR_ON_RETURN = new Command("insertbronreturn");
 
     /**
-     * This command will insert a horizontal rule (line) at the insertion point.<br/>
+     * This command will insert a horizontal rule (line) at the insertion point.
+     * <p>
      * Does it delete the selection? Yes!
      */
     public static final Command INSERT_HORIZONTAL_RULE = new Command("inserthorizontalrule");
 
     /**
      * This command will insert the given HTML into the &lt;body&gt; in place of the current selection or at the caret
-     * location.<br/>
+     * location.
+     * <p>
      * The given string is the HTML to insert.
      */
     public static final Command INSERT_HTML = new Command("inserthtml");
@@ -128,7 +133,8 @@ public class Command
     public static final Command INSERT_PARAGRAPH = new Command("insertparagraph");
 
     /**
-     * If there is no selection, the insertion point will set italic for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set italic for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already italic, the italic will be removed. Otherwise, all
      * selected characters will become italic.
      */
@@ -156,7 +162,8 @@ public class Command
 
     /**
      * Outdent the block where the caret is located. If the block is not indented prior to calling outdent, nothing will
-     * happen.<br/>
+     * happen.
+     * <p>
      * If the caret is in a list item, the item will bump up a level in the list or break out of the list entirely.
      */
     public static final Command OUTDENT = new Command("outdent");
@@ -180,7 +187,8 @@ public class Command
     public static final Command RESET = new Command("reset");
 
     /**
-     * If there is no selection, the insertion point will set strikethrough for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set strikethrough for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already striked, the strikethrough will be removed.
      * Otherwise, all selected characters will have a line drawn through them.
      */
@@ -194,28 +202,32 @@ public class Command
     public static final Command STYLE_WITH_CSS = new Command("styleWithCSS");
 
     /**
-     * If there is no selection, the insertion point will set subscript for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set subscript for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already subscripted, the subscript will be removed.
      * Otherwise, all selected characters will be drawn slightly lower than normal text.
      */
     public static final Command SUB_SCRIPT = new Command("subscript");
 
     /**
-     * If there is no selection, the insertion point will set superscript for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set superscript for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already superscripted, the superscript will be removed.
      * Otherwise, all selected characters will be drawn slightly higher than normal text.
      */
     public static final Command SUPER_SCRIPT = new Command("superscript");
 
     /**
-     * If there is no selection, the insertion point will be set to teletype for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will be set to teletype for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters have already teletype style, the teletype will be removed.
      * Otherwise, all selected characters will become teletype.
      */
     public static final Command TELETYPE = new Command("tt");
 
     /**
-     * If there is no selection, the insertion point will set underline for subsequently typed characters.<br/>
+     * If there is no selection, the insertion point will set underline for subsequently typed characters.
+     * <p>
      * If there is a selection and all of the characters are already underlined, the underline will be removed.
      * Otherwise, all selected characters will become underlined.
      */

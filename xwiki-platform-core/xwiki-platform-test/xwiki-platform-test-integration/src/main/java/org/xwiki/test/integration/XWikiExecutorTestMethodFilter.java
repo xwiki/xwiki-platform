@@ -23,7 +23,7 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 
 /**
- * Filter to be applied on {@link XWikiExecutorSuite}'s executed {@link @link org.junit.runner.Runner}s (i.e. test
+ * Filter to be applied on {@link XWikiExecutorSuite}'s executed {@link org.junit.runner.Runner}s (i.e. test
  * classes).
  * <p>
  * Each child runner (i.e. test method) of a test class is compared with a {@link #pattern} to see if it

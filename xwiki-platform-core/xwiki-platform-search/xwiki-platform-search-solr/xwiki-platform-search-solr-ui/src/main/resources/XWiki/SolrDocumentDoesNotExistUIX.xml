@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.SolrDocumentDoesNotExistUIX" locale="">
+  <web>XWiki</web>
+  <name>SolrDocumentDoesNotExistUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1470996853000</creationDate>
+  <parent>XWiki.SearchCode</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1471007175000</date>
+  <contentUpdateDate>1471005398000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>UI Extension, implemented with Solr, used to displays similar pages based on the current document's reference, when the current document does not exist.</content>
+  <object>
+    <name>XWiki.SolrDocumentDoesNotExistUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>ec0be50e-3359-44cc-b48f-cbc98fcfbed2</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.docdoesnotexist-solr-container {
+  margin-top: 1em;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Style</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.SolrDocumentDoesNotExistUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>13e97fcf-124a-45ae-a0b5-aefc8307a0c1</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor/>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <editor/>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content>{{velocity}}
+#set ($docName = $doc.name)
+#if ($doc.name == 'WebHome')
+  ## Use the last space name as doc name for non-terminal documents.
+  #set ($docName = ${doc.documentReference.lastSpaceReference.name})
+#end
+##
+## Handle the case when there are spaces in the doc name
+#set ($docNameWords = $stringtool.split($docName, ' '))
+#set ($docNameSplit = "${stringtool.join($docNameWords, ',')}")
+#set ($docNameSplitFuzzy = "$!{stringtool.join($docNameWords, '~,')}~")
+#set ($docNameSplitWildcard = "*$!{stringtool.join($docNameWords, '*,*')}*")
+##
+## Extract the space reference elements
+#set ($spaceReferenceStrings = "")
+#set ($spaceReferenceFuzzyStrings = "")
+#set ($spaceReferenceWildcardStrings = "")
+#set ($spaceReferences = $doc.documentReference.spaceReferences)
+#foreach ($spaceReference in $spaceReferences)
+  #if ($foreach.count &gt; 1)
+    #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}, ")
+    #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}, ")
+    #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}, ")
+  #end
+  ## Note: Also handling possible space characters in the space name.
+  #set ($spaceNameWords = $stringtool.split(${spaceReference.name}, ' '))
+  #set ($spaceReferenceStrings = "$!{spaceReferenceStrings}${stringtool.join($spaceNameWords, ',')}")
+  #set ($spaceReferenceFuzzyStrings = "$!{spaceReferenceFuzzyStrings}${stringtool.join($spaceNameWords, '~,')}~")
+  #set ($spaceReferenceWildcardStrings = "$!{spaceReferenceWildcardStrings}*${stringtool.join($spaceNameWords, '*,*')}*")
+#end
+##
+## Build the query string, with various usecases supported.
+## TODO: Add better scoring boosts to properly favor one usecase over another or multiple usecases happening at the same time.
+##
+## Non-terminal doc with the same name as the current doc
+#set ($suggestionsQueryString = "(spaces:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard) AND name_exact:WebHome)")
+## Terminal doc with the same name as the current doc
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR name:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
+## Document in a space named like the current terminal doc, if it is the case.
+#if ($doc.name != 'WebHome')
+  #set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($docNameSplit, $docNameSplitFuzzy, $docNameSplitWildcard)")
+#end
+## Document in a space named like on of the spaces of the current doc.
+#set ($suggestionsQueryString = "${suggestionsQueryString} OR spaces:($spaceReferenceStrings, $spaceReferenceFuzzyStrings, $spaceReferenceWildcardStrings)")
+##
+## Build and run the Solr query.
+#set ($suggestionsQuery = $services.query.createQuery($suggestionsQueryString, "solr"))
+#set ($filterQuery = ['type:"DOCUMENT"', "locale:(""$xcontext.locale"" OR """")"])
+#if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+  #set ($discard = $filterQuery.add('hidden:false'))
+#end
+#set ($discard = $suggestionsQuery.bindValue('fq', $filterQuery))
+#set ($discard = $suggestionsQuery.setLimit(10))
+##
+#set ($suggestionsResponse = $suggestionsQuery.execute()[0])
+#set ($suggestionResults = $suggestionsResponse.results)
+##
+## Display the suggestions, if any.
+#if ($suggestionResults.size() &gt; 0)
+  #set ($discard = $xwiki.ssx.use('XWiki.SolrDocumentDoesNotExistUIX'))
+
+  {{html clean='false'}}
+  &lt;div class='docdoesnotexist-solr-container'&gt;
+    &lt;p&gt;&lt;b&gt;$services.localization.render('solr.uix.docdoesnotexist.title')&lt;/b&gt;&lt;/p&gt;
+    &lt;ul&gt;
+    #template('hierarchy_macros.vm')
+    #foreach ($suggestionResult in $suggestionResults)
+      #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))
+      #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
+      &lt;li&gt;&lt;a href="$escapetool.xml($suggestionDocument.getURL())"&gt;#hierarchy($suggestionResultsDocReference, {'plain' : true, 'local' : true})&lt;/a&gt;&lt;/li&gt;
+    #end
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  {{/html}}
+
+#end
+{{/velocity}}
+</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.search.ui.docdoesnotexist</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.search.solr.ui.docdoesnotexist</name>
+    </property>
+    <property>
+      <parameters>order=10000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

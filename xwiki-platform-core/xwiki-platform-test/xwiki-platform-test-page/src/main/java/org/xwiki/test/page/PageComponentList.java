@@ -43,34 +43,25 @@ import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.rendering.internal.macro.DefaultMacroContentParser;
 import org.xwiki.rendering.internal.macro.DefaultMacroIdFactory;
 import org.xwiki.rendering.internal.macro.DefaultMacroManager;
+import org.xwiki.rendering.internal.macro.html.HTMLMacro;
+import org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRendererFactory;
+import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.macro.velocity.DefaultVelocityMacroConfiguration;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFilter;
 import org.xwiki.rendering.internal.parser.DefaultContentParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
-import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
-import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
-import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
-import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
 import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLBlockRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLRendererFactory;
-import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
-import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.transformation.DefaultTransformationManager;
 import org.xwiki.rendering.internal.transformation.XWikiRenderingContext;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroDocumentReferenceResolver;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
@@ -86,6 +77,13 @@ import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityFactory;
+import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
+import org.xwiki.xml.internal.html.filter.AttributeFilter;
+import org.xwiki.xml.internal.html.filter.BodyFilter;
+import org.xwiki.xml.internal.html.filter.FontFilter;
+import org.xwiki.xml.internal.html.filter.LinkFilter;
+import org.xwiki.xml.internal.html.filter.ListFilter;
+import org.xwiki.xml.internal.html.filter.ListItemFilter;
 
 import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
 import com.xpn.xwiki.internal.localization.XWikiLocalizationContext;
@@ -96,6 +94,11 @@ import com.xpn.xwiki.internal.skin.DefaultSkinManager;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
+import com.xpn.xwiki.objects.meta.BooleanMetaClass;
+import com.xpn.xwiki.objects.meta.NumberMetaClass;
+import com.xpn.xwiki.objects.meta.StaticListMetaClass;
+import com.xpn.xwiki.objects.meta.StringMetaClass;
+import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
 import com.xpn.xwiki.render.XWikiScriptContextInitializer;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -145,24 +148,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     EnumConverter.class,
     ConvertUtilsConverter.class,
 
-    // XWiki 2.0
-    XWiki20Parser.class,
-    XWiki20LinkReferenceParser.class,
-    XWiki20ImageReferenceParser.class,
-    DefaultUntypedLinkReferenceParser.class,
-    DocumentResourceReferenceTypeParser.class,
-    SpaceResourceReferenceTypeParser.class,
-    AttachmentResourceReferenceTypeParser.class,
-
-    // XHTML 1.0
-    XHTMLBlockRenderer.class,
-    XHTMLRendererFactory.class,
-    XHTMLRenderer.class,
-    DefaultXHTMLLinkRenderer.class,
-    DefaultXHTMLLinkTypeRenderer.class,
-    DefaultXHTMLImageRenderer.class,
-    DefaultXHTMLImageTypeRenderer.class,
-
     // Display
     ConfiguredDocumentDisplayer.class,
     DefaultDisplayConfiguration.class,
@@ -200,6 +185,22 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultVelocityMacroConfiguration.class,
     IndentVelocityMacroFilter.class,
 
+    // HTML Cleaner
+    DefaultHTMLCleaner.class,
+    ListFilter.class,
+    ListItemFilter.class,
+    FontFilter.class,
+    BodyFilter.class,
+    AttributeFilter.class,
+    LinkFilter.class,
+
+    // HTML Macro
+    HTMLMacro.class,
+    HTMLMacroXHTMLRendererFactory.class,
+
+    // Include Macro
+    IncludeMacro.class,
+
     // Execution
     DefaultExecutionContextManager.class,
     DefaultExecution.class,
@@ -218,6 +219,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultLocalizationManager.class,
     DefaultTranslationBundleContext.class,
     XWikiLocalizationContext.class,
+
+    // Property Class Providers (needed when the page has xobjects)
+    StaticListMetaClass.class,
+    TextAreaMetaClass.class,
+    StringMetaClass.class,
+    BooleanMetaClass.class,
+    NumberMetaClass.class,
+
+    // Macro Resolver/Serializer
+    CurrentMacroDocumentReferenceResolver.class,
+    CurrentMacroEntityReferenceResolver.class,
 })
 @Inherited
 public @interface PageComponentList

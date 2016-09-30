@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <!--                                              -->
+  <!-- Named queries for the Nested Spaces hierarchy -->
+  <!--                                              -->
+
+  <!-- These queries are used to retrieve the Nested Spaces hierarchy, which we don't use in practice (we normally use
+    the Nested Pages hierarchy instead) but the Document Tree has an option to display it so we keep these queries for
+    backward compatibility. Even though the page and the space entities are distinct in this hierarchy, a space can have
+    both page and space children so we still need to query them together in order to support sort and pagination. We're
+    forced to use native SQL queries because HQL doesn't support unions and neither outer joins between unrelated
+    entities (HHH-1050 and HHH-16).
+    
+    Moreover, in order to sort the pages by their translated raw title (XWIKI-12832) we need to perform an outer join
+    (because we want to fall-back on the default title and then on the page name). The Hibernate version we use doesn't
+    support this because the translations are not mapped as aggregated entities (HHH-16) so we are again forced to use
+    native SQL queries.
+
+    Another solution that we tried was to define two new entities XWikiPageOrSpace and XWikiPageOrSpaceTranslation that
+    were mapped to a SQL query (e.g. the union between the documents and spaces tables) rather than to an existing
+    table. This had the advantage that the new entities could be queried using HQL and we could perform an outer join
+    between the XWikiPageOrSpace and the aggregated translations. The problem was that the sort by page title was very
+    slow on MySql, because there were many constraints applied to the union instead of the inner selects and so MySql
+    could not use the indexes. -->
+
+  <resultset name = "XWikiPageOrSpaceReference">
+    <return-scalar column="reference" type="string" />
+    <!-- This type information is very important because we want Hibernate to convert 0 and 1 into false and true. -->
+    <return-scalar column="terminal" type="boolean" />
+  </resultset>
+
+  <!-- Note that we use 0 and 1 instead of false and true because Oracle doesn't support the boolean constants. The
+    returned value is boolean though because we specify the type in the result set meta-data. -->
+  <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
+    implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
+  <sql-query name="nestedSpacesOrderedByTitle" resultset-ref="XWikiPageOrSpaceReference" read-only="true">
+    <synchronize table="xwikidoc" />
+    <synchronize table="xwikispace" />
+    select xwikiPageOrSpace.reference reference, xwikiPageOrSpace.terminal terminal
+
+    from (
+
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWS_NAME title
+            from xwikispace)
+
+        union all
+
+        (select doc.XWD_FULLNAME reference,
+                1 terminal,
+                coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), doc.XWD_NAME) title
+            from xwikidoc doc
+            left outer join xwikidoc tdoc on (
+                tdoc.XWD_FULLNAME = doc.XWD_FULLNAME and
+                tdoc.XWD_LANGUAGE = :locale)
+            where doc.XWD_TRANSLATION = 0)
+
+    ) xwikiPageOrSpace
+
+    order by xwikiPageOrSpace.terminal, lower(xwikiPageOrSpace.title), xwikiPageOrSpace.title
+  </sql-query>
+
+  <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
+    implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
+  <sql-query name="nestedSpacesOrderedByName" resultset-ref="XWikiPageOrSpaceReference" read-only="true">
+    <synchronize table="xwikidoc" />
+    <synchronize table="xwikispace" />
+    select xwikiPageOrSpace.reference reference, xwikiPageOrSpace.terminal terminal
+
+    from (
+
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWS_NAME pageOrSpaceName
+            from xwikispace)
+
+        union all
+
+        (select XWD_FULLNAME reference,
+                1 terminal,
+                XWD_NAME pageOrSpaceName
+            from xwikidoc doc
+            where XWD_TRANSLATION = 0)
+
+    ) xwikiPageOrSpace
+
+    order by xwikiPageOrSpace.terminal, lower(xwikiPageOrSpace.pageOrSpaceName), xwikiPageOrSpace.pageOrSpaceName
+  </sql-query>
+</hibernate-mapping>

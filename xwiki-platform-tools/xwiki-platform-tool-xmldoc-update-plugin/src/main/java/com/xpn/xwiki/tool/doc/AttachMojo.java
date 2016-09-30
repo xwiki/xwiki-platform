@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,29 +35,26 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Attach a file to a XWiki document
  * 
  * @version $Id$
- * @goal attach
  */
+@Mojo(name = "attach")
 public class AttachMojo extends AbstractDocumentMojo
 {
     /**
      * The attachment author
-     * 
-     * @parameter expression="XWiki.Admin"
      */
+    @Parameter(defaultValue="XWiki.Admin")
     private String author;
 
     /**
      * The file to attach
-     * 
-     * @parameter
      */
+    @Parameter
     private File file;
 
     /**
      * The files to attach.
-     * 
-     * @parameter
      */
+    @Parameter
     private File[] files;
 
     public AttachMojo() throws MojoExecutionException

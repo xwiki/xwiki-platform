@@ -31,8 +31,8 @@
   <parent>ExtensionCode.ExtensionClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1444202919000</date>
-  <contentUpdateDate>1444202521000</contentUpdateDate>
+  <date>1473780917000</date>
+  <contentUpdateDate>1473780917000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
   <comment/>
@@ -56,6 +56,7 @@
   #set($id = $extension.getProperty('id').value)
   #set($type = $extension.getProperty('type').value)
   #set($category = $extension.getProperty('category').value)
+  #set($recommended = $extension.getProperty('recommended').value)
 
   #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())
   #if ($extensionTypeDocumentNames.size() &gt; 0)
@@ -108,6 +109,10 @@
         #end
       #end
 
+      ##------- Recommended -----------------
+      #if ("$!recommended" == "1")
+        {{html wiki='true' clean='false'}}(% class="pull-right"%){{success}}**Recommended**{{/success}}{{/html}}
+      #end
       (% class="extensionInfo" %)
       ##------- Type --------------
       #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
@@ -130,6 +135,10 @@
         #else
           $doc.authors
         #end
+      ##------- Active Installs --------
+      #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)
+        |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
+      #end
       ##------- Rating --------
       |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference "")
       ##------- Website --------------
@@ -238,6 +247,7 @@
     |Source|$doc.display('source')
     |Display Icon Location
 (Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
+    |Show Active Installs|$doc.display('showInstalledCount')
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)
@@ -392,11 +402,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>5</number>
+        <number>6</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -404,8 +414,9 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>2</number>
+        <number>3</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -418,11 +429,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>6</number>
+        <number>1</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -431,7 +442,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -442,7 +453,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -453,11 +464,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>3</number>
+        <number>4</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -509,6 +520,16 @@
 
 .toc ul {
   margin-top: 0;
+}
+
+/*Rating*/
+.extensionInfo .rating-wrapper {
+  float: left;
+}
+
+.extensionInfo .rating-container &gt; div {
+  float: left;
+  margin-right: 10px
 }</code>
     </property>
     <property>
@@ -541,11 +562,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>5</number>
+        <number>6</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -553,8 +574,9 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>2</number>
+        <number>3</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -567,11 +589,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>6</number>
+        <number>1</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -580,7 +602,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -591,7 +613,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -602,11 +624,11 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>3</number>
+        <number>4</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>

@@ -55,7 +55,7 @@
 
   &lt;div class="hidden"&gt;
     &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
-    &lt;input type='hidden' name='xredirect' value="$xwiki.relativeRequestURL" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$escapetool.xml($xwiki.relativeRequestURL)" /&gt;
   &lt;/div&gt;
 
   &lt;h2&gt;$escapetool.xml($services.localization.render('annotations.config.activate.title'))&lt;/h2&gt;
@@ -138,34 +138,6 @@
 &lt;/div&gt;
 {{/html}}
 {{/velocity}}</content>
-  <object>
-    <name>AnnotationCode.AnnotationConfigSheet</name>
-    <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>7d030ed4-622c-4843-981e-5b82a077fd53</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
   <object>
     <name>AnnotationCode.AnnotationConfigSheet</name>
     <number>0</number>

@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +33,10 @@ import javax.inject.Provider;
 import javax.script.ScriptContext;
 
 import org.apache.velocity.VelocityContext;
+import org.hamcrest.Description;
 import org.jmock.Expectations;
+import org.jmock.api.Action;
+import org.jmock.api.Invocation;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +116,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Execution execution = getComponentManager().getInstance(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.xcontext);
         ScriptContextManager scm = getComponentManager().getInstance(ScriptContextManager.class);
-        scm.getScriptContext().setAttribute("xcontext", this.xcontext, ScriptContext.ENGINE_SCOPE);
+        scm.getCurrentScriptContext().setAttribute("xcontext", this.xcontext, ScriptContext.ENGINE_SCOPE);
 
         getMockery().checking(new Expectations()
         {
@@ -163,15 +168,13 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
         List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
     {
-        WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
-                WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description",
+            "Test", WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
         Parser parser = getComponentManager().getInstance(Parser.class, syntax.toIdString());
 
-        DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(wikiMacroDocumentReference, null, true, descriptor, parser.parse(new StringReader(
-                macroContent)), syntax, getComponentManager());
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocumentReference, null, true, descriptor,
+            parser.parse(new StringReader(macroContent)), syntax, getComponentManager());
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }
@@ -244,10 +247,10 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        Assert
-            .assertEquals("<h1 id=\"Hheading\"><span>heading</span></h1>"
+        Assert.assertEquals(
+            "<h1 id=\"Hheading\"><span>heading</span></h1>"
                 + "<ul><li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li></ul>",
-                printer.toString());
+            printer.toString());
     }
 
     /**
@@ -276,11 +279,11 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     @Test
     public void testExecuteWhenWikiMacroDirectlyProvideTheResult() throws Exception
     {
-        registerWikiMacro(
-            "wikimacrowithresult",
+        registerWikiMacro("wikimacrowithresult",
             "{{groovy}}"
                 + "xcontext.macro.result = java.util.Collections.singletonList(new org.xwiki.rendering.block.WordBlock(xcontext.macro.params.param1));"
-                + "{{/groovy}}", Syntax.XWIKI_2_0);
+                + "{{/groovy}}",
+            Syntax.XWIKI_2_0);
 
         Converter converter = getComponentManager().getInstance(Converter.class);
 
@@ -320,10 +323,24 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockVelocityManager).getVelocityContext();
+                oneOf(mockVelocityManager).getCurrentVelocityContext();
                 will(returnValue(vContext));
-                oneOf(mockVelocityManager).getVelocityEngine();
-                will(returnValue(vEngine));
+                oneOf(mockVelocityManager).evaluate(with(any(Writer.class)), with(any(String.class)),
+                    with(any(Reader.class)));
+                will(new Action()
+                {
+                    @Override
+                    public Object invoke(Invocation invocation) throws Throwable
+                    {
+                        return vEngine.evaluate(vContext, (Writer) invocation.getParameter(0),
+                            (String) invocation.getParameter(1), (Reader) invocation.getParameter(2));
+                    }
+
+                    @Override
+                    public void describeTo(Description description)
+                    {
+                    }
+                });
             }
         });
 
@@ -346,27 +363,20 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     public void testGetCurrentMacroBlock() throws Exception
     {
         registerWikiMacro("wikimacro",
-            "{{groovy}}"
-            + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
-            + "{{/groovy}}",
+            "{{groovy}}" + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
+                + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
+                + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
+                + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
+                + "{{/groovy}}",
             Syntax.XWIKI_2_0, Collections.<WikiMacroParameterDescriptor>emptyList());
 
         Converter converter = getComponentManager().getInstance(Converter.class);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
-        converter.convert(new StringReader("before\n\n{{wikimacro/}}\n\nafter"), Syntax.XWIKI_2_0,
-            Syntax.PLAIN_1_0, printer);
+        converter.convert(new StringReader("before\n\n{{wikimacro/}}\n\nafter"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0,
+            printer);
 
-        Assert.assertEquals("before"
-            + "\n\n"
-            + "wikimacro\n"
-            + "class org.xwiki.rendering.block.XDOM\n"
-            + "after\n"
-            + "before"
-            + "\n\n"
-            + "after", printer.toString());
+        Assert.assertEquals("before" + "\n\n" + "wikimacro\n" + "class org.xwiki.rendering.block.XDOM\n" + "after\n"
+            + "before" + "\n\n" + "after", printer.toString());
     }
 }

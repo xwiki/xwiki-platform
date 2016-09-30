@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.velocity;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.inject.Inject;
@@ -37,6 +38,7 @@ import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
 import org.xwiki.rendering.macro.velocity.VelocityMacroParameters;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
@@ -74,6 +76,9 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     @Inject
     private VelocityMacroConfiguration configuration;
 
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
     /**
      * The logger to log.
      */
@@ -102,12 +107,13 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         String result = "";
 
         try {
-            VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+            VelocityContext velocityContext = this.velocityManager.getCurrentVelocityContext();
 
             VelocityMacroFilter filter = getFilter(parameters);
 
             String cleanedContent = content;
 
+            // Execute pre filter
             if (filter != null) {
                 cleanedContent = filter.before(cleanedContent, velocityContext);
             }
@@ -121,9 +127,11 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
                 key = "unknown namespace";
             }
 
-            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, key, cleanedContent);
+            // Execute Velocity context
+            this.velocityManager.evaluate(writer, key, new StringReader(cleanedContent));
             result = writer.toString();
 
+            // Execute post filter
             if (filter != null) {
                 result = filter.after(result, velocityContext);
             }

@@ -35,6 +35,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
+import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.repository.CoreExtensionRepository;
@@ -259,9 +260,10 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
                         // Replace with managed dependency if any
                         ExtensionDependency resolvedDependency =
-                            getDependency(extensionDependency, managedDependencies, localExtension);
+                            ExtensionUtils.getDependency(extensionDependency, managedDependencies, localExtension);
 
-                        repairDependency(resolvedDependency, namespace, append(managedDependencies, localExtension));
+                        repairDependency(resolvedDependency, namespace,
+                            ExtensionUtils.append(managedDependencies, localExtension));
                     }
                 } finally {
                     this.progressManager.popLevelProgress(this);

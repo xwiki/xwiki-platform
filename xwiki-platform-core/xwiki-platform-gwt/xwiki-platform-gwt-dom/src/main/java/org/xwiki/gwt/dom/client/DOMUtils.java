@@ -79,11 +79,12 @@ public class DOMUtils
 
     /**
      * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
-     * code.<br/>
+     * code.
+     * <p>
      * NOTE: We had to move this array from Element because there is a problem with static field initialization for
      * classes extending JavaScriptObject.
-     * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3192
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3192.
      */
     protected static final String[] HTML_EMPTY_TAGS =
         new String[] {"area", "base", "basefont", BR, "col", "frame", HR, "img", "input", "isindex", "link", "meta",
@@ -142,7 +143,8 @@ public class DOMUtils
     /**
      * Returns the value of the specified CSS property for the given element as it is computed by the browser before it
      * displays that element. The CSS property doesn't have to be applied explicitly or directly on the given element.
-     * It can be inherited or assumed by default on that element.<br/>
+     * It can be inherited or assumed by default on that element.
+     * <p>
      * NOTE: You have to pass the JavaScript name of the property and not its CSS name. The JavaScript name has camel
      * case style ({@code fontWeight}) and it is used like this {@code object.style.propertyJSName = value}. The CSS
      * name has dash style ({@code font-weight}) and it is used like this {@code propertyCSSName: value;}.
@@ -673,10 +675,11 @@ public class DOMUtils
     /**
      * Helps setting the inner HTML for an element, in a cross-browser manner, because IE seems to trim leading comments
      * in the inner HTML. This method is overwritten in IE's specific implementation.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3146.
      * 
      * @param element element to set the inner HTML for
      * @param html the HTML string to set
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3146
      */
     public void setInnerHTML(Element element, String html)
     {
@@ -1276,10 +1279,11 @@ public class DOMUtils
 
     /**
      * We need our own implementation because the one provided by GWT includes commented text in the output.
+     * <p>
+     * See http://code.google.com/p/google-web-toolkit/issues/detail?id=3275.
      * 
      * @param element the element whose inner text to return
      * @return the text between the start and end tags of the given element
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3275
      */
     public String getInnerText(Element element)
     {
@@ -1626,8 +1630,10 @@ public class DOMUtils
     /**
      * Isolates a node from its siblings. Previous siblings are moved in a clone of their parent placed before their
      * parent. Next siblings are moved in a clone of their parent placed after their parent. As an example, isolating
-     * the {@code em} from<br/>{@code <ins>a<em>b</em>c</ins>}<br/>
-     * results in<br/>{@code <ins>a</ins><ins><em>b</em></ins><ins>c</ins>}.
+     * the {@code em} from
+     * <br>{@code <ins>a<em>b</em>c</ins>}
+     * <br>results in
+     * <br>{@code <ins>a</ins><ins><em>b</em></ins><ins>c</ins>}.
      * 
      * @param node the node to isolate
      */

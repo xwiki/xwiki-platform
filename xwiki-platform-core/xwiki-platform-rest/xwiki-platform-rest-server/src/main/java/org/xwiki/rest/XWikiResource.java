@@ -22,8 +22,6 @@ package org.xwiki.rest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
@@ -74,14 +73,16 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @deprecated since 7.3M1, use {@link #slf4Jlogger} instead
      */
     @Deprecated
-    protected Logger logger;
+    protected java.util.logging.Logger logger;
 
     /**
      * The logger to be used to output log messages.
      * 
-     * @since 7.3M1
+     * @since 7.4.5
+     * @since 8.3C1
      */
-    protected org.slf4j.Logger slf4Jlogger;
+    @Inject
+    protected Logger slf4Jlogger;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -143,14 +144,12 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        logger = Logger.getLogger(this.getClass().getName());
+        logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 
         objectFactory = new ObjectFactory();
 
-        logger.log(
-                Level.FINE,
-                String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
-                        Utils.getXWikiUser(componentManager)));
+        this.slf4Jlogger.trace("Resource {} initialized. Serving user: '{}'\n", getClass().getName(),
+            Utils.getXWikiUser(componentManager));
     }
 
     /**

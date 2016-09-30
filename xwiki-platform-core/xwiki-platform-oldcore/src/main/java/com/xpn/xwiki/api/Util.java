@@ -53,12 +53,11 @@ public class Util extends Api
     }
 
     /**
-     * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}.
+     * Decodes a <code>application/x-www-form-urlencoded</code> string.
      *
      * @param text the encoded text
      * @return decoded text
      * @since 1.3 Milestone 2
-     * @see #encodeURI(String)
      */
     public String decodeURI(String text)
     {

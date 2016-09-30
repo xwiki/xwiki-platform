@@ -1,3 +1,5 @@
+##! Priviledged template in order to be able to execute SOLR queries which require PR.
+##!privileged=true
 ###
 ### Document does not exist message
 ###
@@ -16,10 +18,14 @@
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
   #else
     #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('thispagedoesnotexist'))
+    ## Create link
     #if($hasEdit)
       #set($url = $doc.getURL("create", $editparams))
       $services.localization.render('core.viewers.content.doesnotexists.edittocreate', [$url])
     #end
+    ## UI Extensions, if any.
+    #showExtensions()
+    ## Recycle bin
     #template("recyclebinlist.vm")
     #xwikimessageboxend()
   #end
@@ -27,4 +33,12 @@
   </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
+#end
+##
+## Display any existing UI Extensions, sorted by order.
+##
+#macro (showExtensions)
+  #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.docdoesnotexist', {'sortByParameter' : 'order'}))
+    $services.rendering.render($extension.execute(), 'html/5.0')
+  #end
 #end

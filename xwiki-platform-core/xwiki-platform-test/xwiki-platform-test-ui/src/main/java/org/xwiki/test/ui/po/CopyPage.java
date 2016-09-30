@@ -24,7 +24,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the common actions possible on the Copy Page page.
- * <p/>
+ * <p>
  * TODO: Refactor using the {@link DocumentPicker} and drop the org.xwiki.index.test.po.CopyPage workaround.
  *
  * @version $Id$

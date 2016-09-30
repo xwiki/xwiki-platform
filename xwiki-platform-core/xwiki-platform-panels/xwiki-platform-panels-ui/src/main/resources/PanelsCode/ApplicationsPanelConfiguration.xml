@@ -154,6 +154,34 @@
   </object>
   <object>
     <name>PanelsCode.ApplicationsPanelConfiguration</name>
+    <number>4</number>
+    <className>PanelsCode.ApplicationsPanelBlackListClass</className>
+    <guid>75151565-2fe0-4d15-8667-b6bcd1cbc793</guid>
+    <class>
+      <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <applicationId>
+        <disabled>0</disabled>
+        <name>applicationId</name>
+        <number>1</number>
+        <prettyName>applicationId</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </applicationId>
+    </class>
+    <property>
+      <applicationId>platform.panels.TourApplication</applicationId>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelConfiguration</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>45461230-f358-4b62-81e1-35e3d67ea690</guid>

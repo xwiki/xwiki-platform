@@ -153,7 +153,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <div class="btn-group commenttools">
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>#glyphicon('comment')</a></span>
-        #if($comment.author == $xcontext.user && $hasEdit)
+        #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">#glyphicon('pencil')</a>
         #end
       #end
@@ -242,8 +242,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayEditCommentForm $comment)
-  #if (${comment.author} == ${xcontext.user})
-  <form action="$doc.getURL('save')" method="post" class="edit-xcomment reply">
+  #if($services.model.resolveDocument($comment.author, 'current') == $xcontext.userReference || $hasAdmin)
+  <form action="$doc.getURL('commentsave')" method="post" class="edit-xcomment reply">
     <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#mediumUserAvatar($comment.author)#{else}#smallUserAvatar($comment.author)#end</div>
     <div class="commentheader">
@@ -263,7 +263,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <input type="hidden" name="xredirect" value="$xredirect">
     </div>
     <div>
-      <input type="submit" name="action_save" class="button" value="$services.localization.render('core.viewers.comments.edit.save')"/>
+      <input type="submit" name="action_commentsave" class="button" value="$services.localization.render('core.viewers.comments.edit.save')"/>
       <a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$services.localization.render('core.viewers.comments.edit.cancel')</a>
     </div>
 

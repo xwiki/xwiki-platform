@@ -41,21 +41,86 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ################################
+## Globals
+################################
+#set ($isSubWiki = $services.wiki.currentWikiId != $services.wiki.mainWikiId)
+#set ($flamingoThemesFromThisWiki = [])
+#set ($flamingoThemesFromMainWiki = [])
+#set ($colibriThemesFromThisWiki  = [])
+#set ($colibriThemesFromMainWiki  = [])
+#getFlamingoThemes($services.wiki.currentWikiId, $flamingoThemesFromThisWiki)
+#getColibriThemes ($services.wiki.currentWikiId, $colibriThemesFromThisWiki )
+#if ($isSubWiki)
+  #getFlamingoThemes($services.wiki.mainWikiId,    $flamingoThemesFromMainWiki)
+  #getColibriThemes ($services.wiki.mainWikiId,    $colibriThemesFromMainWiki )
+  ## Enable the JavaScript for subwiki only
+  #set ($discard = $xwiki.jsx.use('XWiki.ColorThemePropertyDisplayer'))
+#end
+#set ($currentScope = 'local')
+#if ("$!value" != '' &amp;&amp; $services.model.resolveDocument($value).wikiReference.name == $services.wiki.mainWikiId)
+  #set ($currentScope = 'global')
+#end
+################################
+## Get Flamingo themes
+################################
+#macro(getFlamingoThemes $wiki $return)
+  #set ($results = [])
+  #set ($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")
+  #getThemesFromQuery ($xwql, $wiki, $results)
+  #set ($return = $NULL)
+  #setVariable ("$return", $results)
+#end
+################################
+## Get Colibri themes
+################################
+#macro(getColibriThemes $wiki $return)
+  #set ($results = [])
+  #set ($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate' ORDER BY doc.name")
+  #getThemesFromQuery ($xwql, $wiki, $results)
+  #set ($return = $NULL)
+  #setVariable ("$return" $results)
+#end
+################################
+## Get themes from a query
+################################
+#macro(getThemesFromQuery $xwql $wiki $return)
+  #set ($wikiReference = $services.model.createWikiReference($wiki))
+  #set ($themes = $services.query.xwql($xwql).setWiki($wiki).execute())
+  #set ($themesRef = [])
+  #foreach ($theme in $themes)
+    #set ($themeRef = $services.model.resolveDocument($theme, 'default', $wikiReference))
+    #if ($services.security.authorization.hasAccess('view', $xcontext.userReference, $themeRef))
+      #set ($discard = $themesRef.add($themeRef))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $themesRef)
+#end
+################################
 ## Display an &lt;option&gt; line
 ################################
-#macro(displayLine $theme)
-  #set($themeDoc = $xwiki.getDocument($theme))
-  #set($fullName = $themeDoc.fullName)
-  &lt;option value="$fullName"#if ($fullName.equals($value)) selected="selected"#end&gt;$themeDoc.plainTitle&lt;/option&gt;
+#macro(displayLine $themeRef $scope)
+  #set($themeDoc = $xwiki.getDocument($themeRef))
+  #if ($scope == 'local')
+    #set($fullName = $services.model.serialize($themeRef, 'local'))
+  #else
+    #set($fullName = $services.model.serialize($themeRef, 'default'))
+  #end
+  &lt;option value="$fullName"#if ($fullName.equals($value)) selected="selected"#end&gt;
+    $themeDoc.plainTitle
+    #if ($isSubWiki &amp;&amp; $scope == 'local')
+      ($themeRef.wikiReference.name)
+    #end
+  &lt;/option&gt;
 #end
 ################################
 ## Display lines for a skin
 ################################
-#macro(displaySkinLines $themes $name)
-  #if(!$themes.isEmpty())
-    &lt;optgroup label="$name"&gt;
-    #foreach($theme in $themes)
-      #displayLine($theme)
+#macro(displaySkinLines $themesRef $name $scope)
+  #if (!$themesRef.isEmpty())
+    &lt;optgroup label="$name" data-scope="$scope"&gt;
+    #foreach ($themeRef in $themesRef)
+      #displayLine($themeRef, $scope)
     #end
     &lt;/optgroup&gt;
   #end
@@ -64,23 +129,184 @@
 ## Displayer
 ################################
 {{html}}
-  #set ($colorThemeExists = $xwiki.exists($services.model.resolveDocument($value)))
-  #if ($value &amp;&amp; !$colorThemeExists)
-    &lt;p class="errormessage"&gt;$services.localization.render('admin.colorthemes.invalidtheme', $escapetool.xml($value))&lt;/p&gt;
-  #end
-  &lt;select name="${prefix}${name}" id="${prefix}${name}"&gt;
-    #if (!$value || !$colorThemeExists)
-      &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
+  &lt;div class="XWikiColorThemeDisplayer"&gt;
+    #set ($colorThemeExists = $xwiki.exists($services.model.resolveDocument($value)))
+    #if ($value &amp;&amp; !$colorThemeExists)
+      &lt;p class="errormessage"&gt;$services.localization.render('admin.colorthemes.invalidtheme', $escapetool.xml($value))&lt;/p&gt;
     #end
-    ## Display the Flamingo themes
-    #set($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")
-    #set($themes = $services.query.xwql($xwql).execute())
-    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.flamingothemes'))
-    ## Display the Colibri themes
-    #set($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate' ORDER BY doc.name")
-    #set($themes = $services.query.xwql($xwql).execute())
-    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.colibrithemes'))
-  &lt;/select&gt;
+
+    #if ($isSubWiki &amp;&amp; (!$flamingoThemesFromMainWiki.isEmpty() || !$colibriThemesFromMainWiki.isEmpty()))
+      &lt;ul class="nav nav-tabs" role="tablist"&gt;
+        &lt;li role="presentation" #if ($currentScope=='local')class="active"#end&gt;&lt;a href="#local" role="tab" data-toggle="tab" data-scope="local"&gt;$escapetool.xml($services.localization.render('admin.colorthemes.local'))&lt;/a&gt;&lt;/li&gt;
+        &lt;li role="presentation" #if ($currentScope=='global')class="active"#end&gt;&lt;a href="#global" role="tab" data-toggle="tab" data-scope="global"&gt;$escapetool.xml($services.localization.render('admin.colorthemes.global'))&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    #end
+    
+    &lt;select name="${prefix}${name}" id="${prefix}${name}" data-current-scope="$currentScope"&gt;
+      #if (!$value || !$colorThemeExists)
+        &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
+      #end
+      #displaySkinLines($flamingoThemesFromThisWiki, $services.localization.render('admin.colorthemes.flamingothemes'), 'local')
+      #displaySkinLines($colibriThemesFromThisWiki,  $services.localization.render('admin.colorthemes.colibrithemes'), 'local')
+      #if ($isSubWiki)
+        #displaySkinLines($flamingoThemesFromMainWiki, $services.localization.render('admin.colorthemes.flamingothemes'), 'global')
+        #displaySkinLines($colibriThemesFromMainWiki,  $services.localization.render('admin.colorthemes.colibrithemes'), 'global')
+      #end
+    &lt;/select&gt;
+  &lt;/div&gt;
 {{/html}}
-{{/velocity}}</content>
+{{/velocity}}
+</content>
+  <object>
+    <name>XWiki.ColorThemePropertyDisplayer</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f79a90ef-7aa0-4460-98e0-ea0c012bd381</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function ($) {
+  'use strict';
+  
+  $(document).ready(function() {
+    
+    /**
+     * Show only options of the current scope (local/global)
+     */
+    var refreshDisplayer = function (displayer) {
+      var select       = displayer.find('select');
+      var currentScope = select.data('current-scope');
+      var optgroups    = select.find('optgroup');
+      for (var i = 0; i &lt; optgroups.length; ++i) {
+        var optgroup = $(optgroups[i]);
+        if (optgroup.data('scope') != currentScope) {
+          optgroup.hide();
+        } else {
+          optgroup.show();
+        }
+      }
+    }
+    
+    /**
+     * Initialization
+     */
+    var init = function () {
+      $('.XWikiColorThemeDisplayer').each(function() {
+        var displayer = $(this);
+        
+        // Refresh the displayer to hide unecessary elements
+        refreshDisplayer(displayer);
+        
+        /**
+         * Event called when the user click on a tab and so change the current scope
+         */
+        displayer.find('li &gt; a[role="tab"]').click(function () {
+          var tabLink      = $(this);
+          var displayer    = tabLink.parents('.XWikiColorThemeDisplayer');
+          var select       = displayer.find('select');
+          var newScope     = tabLink.data('scope');
+          var currentScope = newScope == 'local' ? 'global' : 'local';
+          // Record the current value
+          select.data('value-' + currentScope, select.val());
+          // Update the current scope
+          select.data('current-scope', newScope);
+          // Refresh the displayer according to the new scope
+          refreshDisplayer(displayer);
+          // Set the previous value for that scope
+          var oldValue = select.data('value-' + newScope);
+          select.val(oldValue ? oldValue : '');
+        });
+      });
+    }
+    
+    
+    init();
+    
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>JS (useful to switch form local to global themes)</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

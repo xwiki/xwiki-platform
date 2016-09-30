@@ -19,16 +19,21 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.apache.ecs.xhtml.textarea;
-import org.apache.velocity.VelocityContext;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.edit.EditException;
+import org.xwiki.edit.Editor;
+import org.xwiki.edit.EditorManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxContent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
@@ -37,6 +42,80 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    /**
+     * Possible values for the editor meta property.
+     * <p>
+     * Indicates which editor should be used to manipulate the content of the property.
+     */
+    public enum EditorType
+    {
+        /**
+         * Plain text without any known syntax.
+         */
+        PURE_TEXT("PureText"),
+
+        /**
+         * Edit wiki syntax using a plain text editor.
+         */
+        TEXT("Text"),
+
+        /**
+         * Edit wiki syntax using a visual editor.
+         */
+        WYSIWYG("Wysiwyg");
+
+        private final String value;
+
+        private EditorType(String value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.value;
+        }
+    }
+
+    /**
+     * Possible values for the contenttype meta property.
+     * <p>
+     * Indicates what kind of content this field contains (wiki, plain text, etc.).
+     * 
+     * @since 8.3
+     */
+    public enum ContentType
+    {
+        /**
+         * Plain text without any known syntax.
+         */
+        PURE_TEXT("PureText"),
+
+        /**
+         * Wiki content.
+         */
+        WIKI_TEXT("FullyRenderedText"),
+
+        /**
+         * Velocity content.
+         */
+        VELOCITY_CODE("VelocityCode");
+
+        private final String value;
+
+        private ContentType(String value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.value;
+        }
+    }
+
     private static final String XCLASSNAME = "textarea";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
@@ -52,6 +131,32 @@ public class TextAreaClass extends StringClass
     public TextAreaClass()
     {
         this(null);
+    }
+
+    /**
+     * @param contentType the content type
+     * @return the editor type compatible with the passed content type, null if several are compatible
+     */
+    public static EditorType getEditorType(ContentType contentType, EditorType def)
+    {
+        if (contentType != null && contentType != ContentType.WIKI_TEXT) {
+            return EditorType.PURE_TEXT;
+        }
+
+        return def;
+    }
+
+    /**
+     * @param editorType the editor type
+     * @return the content type compatible with the passed editor type, null if several are compatible
+     */
+    public static ContentType getContentType(EditorType editorType, ContentType def)
+    {
+        if (editorType != EditorType.PURE_TEXT) {
+            return ContentType.WIKI_TEXT;
+        }
+
+        return def;
     }
 
     @Override
@@ -78,10 +183,38 @@ public class TextAreaClass extends StringClass
         return getStringValue("editor").toLowerCase();
     }
 
+    /**
+     * Sets the editor meta property.
+     * 
+     * @param editor the editor type
+     * @since 8.2RC1
+     */
+    public void setEditor(String editor)
+    {
+        setStringValue("editor", editor);
+    }
+
+    /**
+     * Sets the editor meta property.
+     * 
+     * @param editorType the editor type
+     * @since 8.3
+     */
+    public void setEditor(EditorType editorType)
+    {
+        setEditor(editorType.toString());
+
+        // Make sure the content type is compatible
+        ContentType compatible = getContentType(editorType, null);
+        if (compatible != null) {
+            setContentType(compatible);
+        }
+    }
+
     public String getContentType()
     {
         String result = getStringValue("contenttype").toLowerCase();
-        if (result.equals("")) {
+        if (result.isEmpty()) {
             result = "fullyrenderedtext";
         }
 
@@ -93,56 +226,45 @@ public class TextAreaClass extends StringClass
         setStringValue("contenttype", contentType);
     }
 
+    /**
+     * @param contentType the content type
+     * @since 8.3
+     */
+    public void setContentType(ContentType contentType)
+    {
+        setContentType(contentType.toString());
+
+        // Make sure the editor type is compatible
+        EditorType compatible = getEditorType(contentType, null);
+        if (compatible != null) {
+            setEditor(compatible);
+        }
+    }
+
     public boolean isWysiwyg(XWikiContext context)
     {
-        String editor = null;
-        if ((context != null) && (context.getRequest() != null)) {
-            editor = context.getRequest().get("xeditmode");
+        return "wysiwyg".equals(getEditorType(context));
+    }
+
+    private String getEditorType(XWikiContext context)
+    {
+        String editorType = null;
+        if (context != null && context.getRequest() != null) {
+            editorType = context.getRequest().get("xeditmode");
         }
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
-            }
-        }
-
-        editor = getEditor();
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
+        if (isEmptyValue(editorType)) {
+            editorType = getEditor();
+            if (isEmptyValue(editorType) && context != null && context.getWiki() != null) {
+                editorType = context.getWiki().getEditorPreference(context);
             }
         }
+        return isEmptyValue(editorType) ? null : editorType.toLowerCase();
+    }
 
-        if ((context != null) && (context.getWiki() != null)) {
-            editor = context.getWiki().getEditorPreference(context);
-        }
-
-        if (editor != null) {
-            if (editor.equals("text")) {
-                return false;
-            }
-            if (editor.equals("puretext")) {
-                return false;
-            }
-            if (editor.equals("wysiwyg")) {
-                return true;
-            }
-        }
-
-        return false;
+    private boolean isEmptyValue(String value)
+    {
+        // See XWIKI-10853: Some static lists in XWiki.XWikiPreferences have the "---" value
+        return StringUtils.isEmpty(value) || "---".equals(value);
     }
 
     /**
@@ -160,46 +282,32 @@ public class TextAreaClass extends StringClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
-        boolean isWysiwyg = isWysiwyg(context);
-        textarea textarea = new textarea();
-        textarea.setAttributeFilter(new XMLAttributeValueFilter());
-        String tname = prefix + name;
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop != null) {
-            textarea.addElement(prop.toFormString());
+        String editorType = getEditorType(context);
+        EditorManager editorManager = Utils.getComponent(EditorManager.class);
+        Editor<SyntaxContent> editor = editorManager.getDefaultEditor(SyntaxContent.class, editorType);
+        Map<String, Object> parameters = new HashMap<>();
+        String fieldName = prefix + name;
+        parameters.put("id", fieldName);
+        parameters.put("name", fieldName);
+        parameters.put("cols", getSize());
+        parameters.put("rows", getRows());
+        parameters.put("disabled", isDisabled());
+        parameters.put("sourceDocumentReference", object.getDocumentReference());
+        Syntax syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
+        try {
+            buffer.append(editor.render(syntaxContent, parameters));
+        } catch (EditException e) {
+            LOGGER.error("Failed to display the text area property.", e);
         }
-
-        textarea.setName(tname);
-        textarea.setID(tname);
-        textarea.setCols(getSize());
-        textarea.setRows(getRows() + (isWysiwyg ? 2 : 0));
-        textarea.setDisabled(isDisabled());
-
-        // Let's add the Wysiwyg JS
-        if (isWysiwyg) {
-            String wysiwyg = (String) context.get("editor_wysiwyg");
-            if (wysiwyg == null) {
-                wysiwyg = tname;
-            } else {
-                wysiwyg += "," + tname;
-            }
-            context.put("editor_wysiwyg", wysiwyg);
-        } else {
-            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext != null) {
-                vcontext.put("textareaName", tname);
-                vcontext.put("textarea", textarea);
-                String addscript = context.getWiki().parseTemplate("textarea_text.vm", context);
-                buffer.append(addscript);
-            }
-        }
-        buffer.append(textarea.toString());
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();

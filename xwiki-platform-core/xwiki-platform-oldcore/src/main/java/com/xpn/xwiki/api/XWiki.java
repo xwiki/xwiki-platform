@@ -76,24 +76,20 @@ public class XWiki extends Api
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * @see org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver = Utils
-        .getComponent(DocumentReferenceResolver.TYPE_STRING);
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
 
     /**
      * The object used to serialize entity references into strings. We need it because we have script APIs that work
      * with entity references but have to call older, often internal, methods that still use string references.
      */
-    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer = Utils
-        .getComponent(EntityReferenceSerializer.TYPE_STRING);
+    private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
+    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
     /**
      * XWiki API Constructor
@@ -108,6 +104,44 @@ public class XWiki extends Api
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
         this.criteriaService = new CriteriaService(context);
+    }
+
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentMixedDocumentReferenceResolver == null) {
+            this.currentMixedDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentMixedDocumentReferenceResolver;
+    }
+
+    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
+    {
+        if (this.currentgetdocumentResolver == null) {
+            this.currentgetdocumentResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
+        }
+
+        return this.currentgetdocumentResolver;
+    }
+
+    private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()
+    {
+        if (this.defaultDocumentReferenceResolver == null) {
+            this.defaultDocumentReferenceResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+        }
+
+        return this.defaultDocumentReferenceResolver;
+    }
+
+    private EntityReferenceSerializer<String> getDefaultStringEntityReferenceSerializer()
+    {
+        if (this.defaultStringEntityReferenceSerializer == null) {
+            this.defaultStringEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        }
+
+        return this.defaultStringEntityReferenceSerializer;
     }
 
     /**
@@ -182,9 +216,9 @@ public class XWiki extends Api
         if (fullName != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
         } else {
-            reference = this.defaultDocumentReferenceResolver.resolve("");
+            reference = getDefaultDocumentReferenceResolver().resolve("");
         }
 
         return getDocument(reference);
@@ -231,7 +265,7 @@ public class XWiki extends Api
      */
     public Document getDocument(EntityReference reference) throws XWikiException
     {
-        return getDocument(this.currentgetdocumentResolver.resolve(reference));
+        return getDocument(getCurrentgetdocumentResolver().resolve(reference));
     }
 
     /**
@@ -252,9 +286,9 @@ public class XWiki extends Api
         if (fullName != null) {
             // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
             // specified in the passed string, rather than use the current document's page name.
-            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
         } else {
-            reference = this.defaultDocumentReferenceResolver.resolve("");
+            reference = getDefaultDocumentReferenceResolver().resolve("");
         }
 
         return getDocumentAsAuthor(reference);
@@ -274,7 +308,8 @@ public class XWiki extends Api
     {
         String author = this.getEffectiveScriptAuthorName();
         XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(), getXWikiContext()) == false) {
+        if (this.xwiki.getRightService().hasAccessLevel("view", author, doc.getFullName(),
+            getXWikiContext()) == false) {
             return null;
         }
 
@@ -312,7 +347,8 @@ public class XWiki extends Api
         if (!NumberUtils.isDigits(index)) {
             return null;
         }
-        XWikiDeletedDocument dd = this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
+        XWikiDeletedDocument dd =
+            this.xwiki.getDeletedDocument(fullname, locale, Integer.parseInt(index), this.context);
         if (dd == null) {
             return null;
         }
@@ -434,7 +470,7 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+            DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(docname);
             XWikiDocument doc = getXWikiContext().getWiki().getDocument(docReference, this.context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
@@ -627,8 +663,7 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale, int nb, int start)
         throws XWikiException
     {
-        return convert(this.xwiki.getStore()
-            .searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
+        return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
     }
 
     /**
@@ -648,8 +683,8 @@ public class XWiki extends Api
      * &lt;/code&gt;
      * </pre>
      *
-     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parameterizedWhereClause the HQL where clause. For example
+     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -682,8 +717,8 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
      *
      * @param wikiName the name of the wiki where to search.
-     * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parameterizedWhereClause the HQL where clause. For example
+     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -711,8 +746,8 @@ public class XWiki extends Api
      * Search spaces by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
-     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
+     * @param parametrizedSqlClause the HQL where clause. For example
+     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -722,9 +757,8 @@ public class XWiki extends Api
     public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return this.xwiki.getStore().search(
-            "select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause, nb, start, parameterValues,
-            this.context);
+        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause,
+            nb, start, parameterValues, this.context);
     }
 
     /**
@@ -732,8 +766,8 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
-     * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
+     * @param parametrizedSqlClause The HQL where clause. For example
+     *            {@code where doc.fullName <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
@@ -744,8 +778,8 @@ public class XWiki extends Api
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues,
-            this.context));
+        return convertAttachments(
+            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**
@@ -914,8 +948,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale
@@ -926,8 +960,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an XWiki Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale
+     * API to access an XWiki Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
@@ -939,9 +973,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale If no preference is found it will look in the
-     * XWiki Preferences
+     * API to access an Space Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale If no preference is found it will look in the XWiki
+     * Preferences
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale
@@ -952,9 +986,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access an Space Preference There can be one preference object per locale This function will find the
-     * right preference object associated to the current active locale If no preference is found it will look in the
-     * XWiki Preferences
+     * API to access an Space Preference There can be one preference object per locale This function will find the right
+     * preference object associated to the current active locale If no preference is found it will look in the XWiki
+     * Preferences
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
@@ -1022,10 +1056,8 @@ public class XWiki extends Api
      * <p>
      * If the property is not set on any level then empty String is returned.
      * 
-     * @param preferenceKey the name of the preference key
+     * @param preference the name of the preference key
      * @param spaceReference the reference of the space
-     * @param defaultValue the value to return if the preference can't be found
-     * @param context the XWiki context
      * @return the value of the preference or empty String if it could not be found
      * @since 7.4M1
      */
@@ -1039,10 +1071,9 @@ public class XWiki extends Api
      * <p>
      * If the property is not set on any level then <code>defaultValue</code> is returned.
      * 
-     * @param preferenceKey the name of the preference key
+     * @param preference the name of the preference key
      * @param spaceReference the reference of the space
      * @param defaultValue the value to return if the preference can't be found
-     * @param context the XWiki context
      * @return the value of the preference or <code>defaultValue</code> if it could not be found
      * @since 7.4M1
      */
@@ -1129,9 +1160,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a space Preference as a int number There can be one preference object per locale This function
-     * will find the right preference object associated to the current active locale If no preference is found it will
-     * look for the XWiki Preference
+     * API to access a space Preference as a int number There can be one preference object per locale This function will
+     * find the right preference object associated to the current active locale If no preference is found it will look
+     * for the XWiki Preference
      *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
@@ -1143,9 +1174,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access a Space Preference as a int number There can be one preference object per locale This function
-     * will find the right preference object associated to the current active locale If no preference is found it will
-     * look for the XWiki Preference
+     * API to access a Space Preference as a int number There can be one preference object per locale This function will
+     * find the right preference object associated to the current active locale If no preference is found it will look
+     * for the XWiki Preference
      *
      * @param preference Preference name
      * @return The preference for this wiki and the current locale in int format
@@ -1192,17 +1223,17 @@ public class XWiki extends Api
 
     /**
      * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get
-     * the locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists
-     * then use the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP
-     * request. If none is defined use the default locale.
+     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
+     * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
+     * the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP request. If none
+     * is defined use the default locale.
      *
      * @return the locale to use
      * @since 8.0M1
      */
     public Locale getLocalePreference()
     {
-        return this.xwiki.getLocalePreference(getXWikiContext());        
+        return this.xwiki.getLocalePreference(getXWikiContext());
     }
 
     /**
@@ -1219,8 +1250,8 @@ public class XWiki extends Api
 
     /**
      * API to access the interface locale preference for the request Order of evaluation is: locale of the wiki in
-     * mono-lingual mode locale request parameter locale in context locale user preference locale in cookie
-     * locale accepted by the navigator
+     * mono-lingual mode locale request parameter locale in context locale user preference locale in cookie locale
+     * accepted by the navigator
      *
      * @return the document locale preference for the request
      */
@@ -1320,9 +1351,9 @@ public class XWiki extends Api
 
     /**
      * Privileged API to create a new user from the request.
-     * <p/>
+     * <p>
      * This API is used by the RegisterNewUser wiki page.
-     * <p/>
+     * <p>
      * This version sends a validation email to the user. Configuration of validation email is in the XWiki Preferences.
      *
      * @param withValidation true to send the validation email
@@ -1346,9 +1377,8 @@ public class XWiki extends Api
             if (hasProgrammingRights()) {
                 registerRight = true;
             } else {
-                registerRight =
-                    this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
-                        "XWiki.XWikiPreferences", getXWikiContext());
+                registerRight = this.xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                    "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight) {
@@ -1369,7 +1399,7 @@ public class XWiki extends Api
      * validation information are taken from the request object
      *
      * @param withConfirmEmail true to send a account confirmation email/false to not send it
-     * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
+     * @return Success of Failure code (0 for success, -1 for missing programming rights, &gt; 0 for other errors
      * @throws XWikiException
      */
     public int validateUser(boolean withConfirmEmail) throws XWikiException
@@ -1503,18 +1533,16 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
         String wikilocale, boolean reset, boolean force) throws XWikiException
     {
-        DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+        DocumentReference sourceDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(docname);
         if (!StringUtils.isEmpty(sourceWiki)) {
-            sourceDocumentReference =
-                sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(), new WikiReference(
-                    sourceWiki));
+            sourceDocumentReference = sourceDocumentReference.replaceParent(sourceDocumentReference.getWikiReference(),
+                new WikiReference(sourceWiki));
         }
 
-        DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
+        DocumentReference targetDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(targetdocname);
         if (!StringUtils.isEmpty(targetWiki)) {
-            targetDocumentReference =
-                targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(), new WikiReference(
-                    targetWiki));
+            targetDocumentReference = targetDocumentReference.replaceParent(targetDocumentReference.getWikiReference(),
+                new WikiReference(targetWiki));
         }
 
         return this.copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force);
@@ -1537,8 +1565,8 @@ public class XWiki extends Api
         String wikilocale, boolean resetHistory, boolean overwrite) throws XWikiException
     {
         // In order to copy the source document the user must have at least the right to view it.
-        if (hasAccessLevel("view", this.defaultStringEntityReferenceSerializer.serialize(sourceDocumentReference))) {
-            String targetDocStringRef = this.defaultStringEntityReferenceSerializer.serialize(targetDocumentReference);
+        if (hasAccessLevel("view", getDefaultStringEntityReferenceSerializer().serialize(sourceDocumentReference))) {
+            String targetDocStringRef = getDefaultStringEntityReferenceSerializer().serialize(targetDocumentReference);
             // To create the target document the user must have edit rights. If the target document exists and the user
             // wants to overwrite it then he needs delete right.
             // Note: We have to check if the target document exists before checking the delete right because delete
@@ -1779,7 +1807,8 @@ public class XWiki extends Api
      *
      * @param reference the reference to the entity for which to return the URL for
      * @param action the mode in which to access the entity (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({@code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the entity
      * @throws XWikiException if the URL could not be generated properly
      * @since 7.2M1
@@ -1830,7 +1859,8 @@ public class XWiki extends Api
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({@code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      */
@@ -1848,7 +1878,8 @@ public class XWiki extends Api
      *
      * @param reference the reference to the document for which to return the URL for
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({@code name1=value1&name2=value=2}) including
+     *            encoding
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
      * @since 3.0M3
@@ -1867,7 +1898,8 @@ public class XWiki extends Api
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
-     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @param querystring the Query String to provide in the usual mode ({@code name1=value1&name2=value=2}) including
+     *            encoding
      * @param anchor the anchor that points at a location within the passed document name
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
@@ -1916,7 +1948,6 @@ public class XWiki extends Api
      * Generate and return an unescaped user display name.
      *
      * @param userReference the user reference
-     * @param context the XWiki context
      * @return the unescaped display user name
      * @since 6.4RC1
      */
@@ -2396,9 +2427,8 @@ public class XWiki extends Api
     public boolean renamePage(Document doc, String newFullName)
     {
         try {
-            if (this.xwiki.exists(newFullName, getXWikiContext())
-                && !this.xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName,
-                    getXWikiContext())) {
+            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
+                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
                 return false;
             }
             if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
@@ -2628,7 +2658,7 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentName);
+        DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(documentName);
         return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 

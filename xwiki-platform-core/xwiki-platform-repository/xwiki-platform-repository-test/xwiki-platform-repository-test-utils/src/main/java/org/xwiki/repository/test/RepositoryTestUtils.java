@@ -31,6 +31,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -55,7 +56,7 @@ public class RepositoryTestUtils
     /**
      * @since 7.3M1
      */
-    public static org.xwiki.rest.model.jaxb.Object extensionObject(Extension extension)
+    public static org.xwiki.rest.model.jaxb.Object extensionObject(RemoteExtension extension)
     {
         org.xwiki.rest.model.jaxb.Object extensionObject = object(XWikiRepositoryModel.EXTENSION_CLASSNAME);
 
@@ -65,6 +66,8 @@ public class RepositoryTestUtils
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName()));
         extensionObject.getProperties()
             .add(property(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary()));
+        extensionObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_EXTENSION_RECOMMENDED, extension.isRecommended() ? 1 : 0));
         if (!extension.getLicenses().isEmpty()) {
             extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME,
                 extension.getLicenses().iterator().next().getName()));
@@ -224,7 +227,7 @@ public class RepositoryTestUtils
         this.testUtils.rest().delete(getExtensionPageReference(extensionName));
     }
 
-    public void addExtension(Extension extension) throws Exception
+    public void addExtension(RemoteExtension extension) throws Exception
     {
         // Delete any pre existing extension
         this.testUtils.rest().delete(getExtensionPageReference(extension));

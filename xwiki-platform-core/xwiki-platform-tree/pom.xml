@@ -25,13 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree</artifactId>
   <name>XWiki Platform - Tree - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Tree - Parent POM</description>
   <modules>
+    <module>xwiki-platform-tree-api</module>
     <module>xwiki-platform-tree-macro</module>
     <module>xwiki-platform-tree-test-pageobjects</module>
     <module>xwiki-platform-tree-war</module>

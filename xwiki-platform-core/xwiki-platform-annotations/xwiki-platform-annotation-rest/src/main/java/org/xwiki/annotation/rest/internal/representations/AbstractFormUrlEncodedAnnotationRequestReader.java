@@ -52,13 +52,13 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
     MessageBodyReader<T>, XWikiRestComponent
 {
     /**
-     * The parameter name for a field requested to appear in the annotations stub. <br />
+     * The parameter name for a field requested to appear in the annotations stub. <br>
      * Note: This can get problematic if a custom field of the annotation is called the same
      */
     protected static final String REQUESTED_FIELD = "request_field";
 
     /**
-     * The prefix of the parameters of the annotations filters. <br />
+     * The prefix of the parameters of the annotations filters. <br>
      * Note: This can get problematic if custom fields of the annotation are called the same
      */
     protected static final String FILTER_FIELD_PREFIX = "filter_";

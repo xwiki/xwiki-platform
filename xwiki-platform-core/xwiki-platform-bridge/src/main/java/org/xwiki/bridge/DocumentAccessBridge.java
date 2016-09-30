@@ -363,7 +363,7 @@ public interface DocumentAccessBridge
      * @param propertyName name of the property to set.
      * @param propertyValue value of the property to set.
      * @throws Exception if the document cannot be accessed.
-     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)
+     * @deprecated use {@link DocumentAccessBridge#setProperty(DocumentReference, DocumentReference, String, Object)}
      */
     @Deprecated
     void setProperty(String documentReference, String className, String propertyName, Object propertyValue)
@@ -471,11 +471,11 @@ public interface DocumentAccessBridge
      *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
      * @since 2.5M1
      */
-    String getDocumentURL(final DocumentReference documentReference,
-                          final String action,
-                          final String queryString,
-                          final String anchor,
-                          final boolean isFullURL);
+    String getDocumentURL(DocumentReference documentReference,
+                          String action,
+                          String queryString,
+                          String anchor,
+                          boolean isFullURL);
 
     /**
      * Retrieves the internal (without the hostname) URL that can be used to access a document, using a specific action.

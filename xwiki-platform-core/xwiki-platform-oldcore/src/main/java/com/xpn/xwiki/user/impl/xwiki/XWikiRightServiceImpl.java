@@ -55,7 +55,9 @@ import com.xpn.xwiki.web.Utils;
  * Default implementation of {@link XWikiRightService}.
  *
  * @version $Id$
+ * @deprecated since 4.0, use XWikiCachingRightService instead
  */
+@Deprecated
 public class XWikiRightServiceImpl implements XWikiRightService
 {
     public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,
@@ -136,6 +138,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("undelete", "undelete");
             actionMap.put("reset", "delete");
             actionMap.put("commentadd", "comment");
+            actionMap.put("commentsave", "comment");
             actionMap.put("register", "register");
             actionMap.put("redirect", "view");
             actionMap.put("admin", "admin");

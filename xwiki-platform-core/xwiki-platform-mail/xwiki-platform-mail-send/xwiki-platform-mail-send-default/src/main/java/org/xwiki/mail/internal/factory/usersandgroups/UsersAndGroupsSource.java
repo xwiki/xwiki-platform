@@ -37,7 +37,8 @@ import org.xwiki.text.XWikiToStringBuilder;
  * + a list of email addresses, and optional exclusion lists.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public class UsersAndGroupsSource
 {

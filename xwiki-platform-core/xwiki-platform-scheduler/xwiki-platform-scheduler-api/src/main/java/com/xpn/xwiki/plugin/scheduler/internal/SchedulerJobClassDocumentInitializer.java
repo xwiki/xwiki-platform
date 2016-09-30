@@ -104,14 +104,12 @@ public class SchedulerJobClassDocumentInitializer extends AbstractMandatoryDocum
         needsUpdate |= baseClass.addTextField(FIELD_JOBCLASS, "Job Class", 60);
         needsUpdate |= baseClass.addTextField(FIELD_STATUS, "Status", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CRON, "Cron Expression", 30);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10);
-        // make sure that the script field is of type pure text so that wysiwyg editor is never used for it
-        TextAreaClass scriptField = (TextAreaClass) baseClass.getField(FIELD_SCRIPT);
-        // Note: getEditor() returns lowercase but the values are actually camelcase...
-        if (!scriptField.getEditor().equals("puretext")) {
-            scriptField.setStringValue("editor", "PureText");
-            needsUpdate = true;
-        }
+
+        // This field contains groovy script and is thus of tpye PureText.
+        // TODO: In the future, add the ability to provide wiki markup so that all script languages can be supported
+        // and not only Groovy. When this is done, convert this field to "Text".
+        needsUpdate |= baseClass.addTextAreaField(FIELD_SCRIPT, "Job Script", 60, 10,
+            TextAreaClass.ContentType.PURE_TEXT);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTUSER, "Job execution context user", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTLANG, "Job execution context lang", 30);
         needsUpdate |= baseClass.addTextField(FIELD_CONTEXTDATABASE, "Job execution context database", 30);

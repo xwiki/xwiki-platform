@@ -33,7 +33,8 @@ import org.xwiki.component.annotation.Component;
  * Customize chart colors.
  *
  * @version $Id$
- * @since 7.4.3, 8.0RC1
+ * @since 7.4.3
+ * @since 8.0RC1
  */
 @Component
 @Named("color")

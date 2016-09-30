@@ -354,7 +354,15 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             // compute the job unique Id
             String xjob = getObjectUniqueId(object, context);
 
-            JobBuilder jobBuilder = JobBuilder.newJob((Class<Job>) Class.forName(object.getStringValue("jobClass")));
+            // Load the job class.
+            // Note: Remember to always use the current thread's class loader and not the container's
+            // (Class.forName(...)) since otherwise we will not be able to load classes installed with EM.
+            ClassLoader currentThreadClassLoader = Thread.currentThread().getContextClassLoader();
+            String jobClassName = object.getStringValue("jobClass");
+            Class<Job> jobClass = (Class<Job>) Class.forName(jobClassName, true, currentThreadClassLoader);
+
+            // Build the new job.
+            JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
 
             jobBuilder.withIdentity(xjob);
             jobBuilder.storeDurably();
@@ -631,7 +639,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     /**
      * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating its name (it's
      * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document.
-     * <p/>
+     * <p>
      * The scheduler uses this unique object id to assure the unicity of jobs
      * 
      * @return a unique String that can identify the object

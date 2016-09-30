@@ -95,8 +95,8 @@ public class SendMailRunnableTest
         listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
-        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId);
-        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId);
+        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
+        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId, "xwiki");
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
@@ -162,9 +162,9 @@ public class SendMailRunnableTest
         ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
         listener.onPrepareMessageSuccess(message1, Collections.<String, Object>emptyMap());
-        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId);
+        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId, "xwiki");
         listener.onPrepareMessageSuccess(message2, Collections.<String, Object>emptyMap());
-        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId);
+        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId, "xwiki");
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));

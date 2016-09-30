@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ratings</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ratings-api</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Ratings - API</name>
   <description>API to rate wiki pages</description>
   <properties>
-    <platform.version>${commons.version}</platform.version>
+    <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -60,6 +60,19 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Required in order to mock XWikiContext -->
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

@@ -394,6 +394,7 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 2.5]
 #-# Repositories to use when searching and downloading extensions.
+#-# Repositories will be checked in the same order they have in this configuration file.
 #-# 
 #-# The format is <id>:<type>:<url> where
 #-# * id can be anything as long as there is only one
@@ -414,14 +415,14 @@ rendering.transformations = $xwikiRenderingTransformations
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
 ## Apache Commons Configuration syntax for specifying the user.home system property!
 #set ($userHome = '${sys:user.home}')
-# extension.repositories=local:maven:file://${userHome}/.m2/repository
+# extension.repositories=maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
-#-# When not set the following is taken:
-# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+#-# When not set the following is taken (in this order):
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 #-# 
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=
@@ -454,6 +455,12 @@ extension.oldflavors=$oldFlavor.trim()
 #else
 # extension.oldflavors=
 #end
+
+#-# [Since 8.3]
+#-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
+#-# 
+#-# The default is:
+# extension.core.resolve=true
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
@@ -749,6 +756,33 @@ extension.oldflavors=$oldFlavor.trim()
 #-#
 #-# The default is:
 # lesscss.generateInlineSourceMaps = false
+
+#-------------------------------------------------------------------------------------
+# Edit
+#-------------------------------------------------------------------------------------
+
+#-# [Since 8.2RC1]
+#-# Indicate the default editor to use for a specific data type.
+#-# The editors are components so they are specified using their role hints.
+#-# Some data types can be edited in multiple ways, by different types of editors.
+#-# Thus you can also indicate the default editor to use from a specific category (editor type).
+#-#
+#-# The format is this:
+#-# edit.defaultEditor.<dataType>=<roleHintOrCategory>
+#-# edit.defaultEditor.<dataType>#<category>=<roleHintOrSubCategory>
+#-#
+#-# The default bindings are:
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent=text
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#text=text
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM=text
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM#text=text
+#if ($xwikiPropertiesDefaultWysiwygEditor)
+edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
+edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
+#else
+# edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=gwt
+# edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=gwt
+#end
 
 
 $!xwikiPropertiesAdditionalProperties

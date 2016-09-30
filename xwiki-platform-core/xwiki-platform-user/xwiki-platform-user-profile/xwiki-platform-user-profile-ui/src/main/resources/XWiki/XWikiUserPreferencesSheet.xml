@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="XWiki.XWikiUserPreferencesSheet" locale="">
   <web>XWiki</web>
   <name>XWikiUserPreferencesSheet</name>
   <language/>
@@ -54,21 +54,51 @@ $xwiki.ssx.use('XWiki.XWikiUserSheet')##
       #end
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;
+          &lt;label&gt;$services.localization.render('platform.core.profile.displayHiddenDocuments')&lt;/label&gt;
+          #set ($hintKey = 'XWiki.XWikiUsers_displayHiddenDocuments.hint')
+          #if ($services.localization.get($hintKey))
+          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
+          #end
+        &lt;/dt&gt;
         &lt;dd&gt;$doc.display('displayHiddenDocuments')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.enableAccessibility')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;
+          &lt;label&gt;$services.localization.render('platform.core.profile.enableAccessibility')&lt;/label&gt;
+          #set ($hintKey = 'XWiki.XWikiUsers_accessibility.hint')
+          #if ($services.localization.get($hintKey))
+          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
+          #end
+        &lt;/dt&gt;
         &lt;dd&gt;$doc.display('accessibility')&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.timezone')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;
+          &lt;label&gt;$services.localization.render('platform.core.profile.timezone')&lt;/label&gt;
+          #set ($hintKey = 'XWiki.XWikiUsers_timezone.hint')
+          #if ($services.localization.get($hintKey))
+          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
+          #end
+        &lt;/dt&gt;
         &lt;dd&gt;$doc.display('timezone')&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;
+          &lt;label&gt;$services.localization.render('platform.core.profile.editor')&lt;/label&gt;
+          #set ($hintKey = 'XWiki.XWikiUsers_editor.hint')
+          #if ($services.localization.get($hintKey))
+          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
+          #end
+        &lt;/dt&gt;
         &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.userType')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;
+          &lt;label&gt;$services.localization.render('platform.core.profile.userType')&lt;/label&gt;
+          #set ($hintKey = 'XWiki.XWikiUsers_usertype.hint')
+          #if ($services.localization.get($hintKey))
+          &lt;span class="xHint"&gt;{{translation key='$hintKey'/}}&lt;/span&gt;
+          #end
+        &lt;/dt&gt;
         &lt;dd&gt;$doc.display('usertype')&lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/div&gt;

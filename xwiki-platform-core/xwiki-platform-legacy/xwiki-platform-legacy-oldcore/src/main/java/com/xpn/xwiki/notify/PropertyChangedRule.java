@@ -28,7 +28,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * XWikiNotificationRule to check weather an object property has changed.
- * <br />
+ * <br>
  * The rules are as follows:
  * <ul>
  * <li>if an object of the specified class is added or deleted a notification is sent</li>

@@ -85,15 +85,15 @@ public class Range
 
     /**
      * Copy the given list and return a (smart) subList corresponding to this range. If the absolute size of this range
-     * is 0 (ALL) it returns an unmodified copy. <br/>
-     * <br/>
+     * is 0 (ALL) it returns an unmodified copy.
+     * <p>
      * Considering this 9 elements list : [0, 1, 2, 3, 4, 5, 6, 7, 8]
      * <ul>
-     * <li>Range 0 / 4 -> will return [0, 1, 2, 3]</li>
-     * <li>Range -2 / 4 -> will return [7, 8] (not enough elements for the given size)</li>
-     * <li>Range -2 / -4 -> will return [3, 4, 5, 6]</li>
-     * <li>Range 2 / -4 -> will return [0, 1] (not enough elements for the given size)</li>
-     * <li>Range 0 / -4 -> will return [5, 6, 7, 8]</li>
+     * <li>Range 0 / 4 : will return [0, 1, 2, 3]</li>
+     * <li>Range -2 / 4 : will return [7, 8] (not enough elements for the given size)</li>
+     * <li>Range -2 / -4 : will return [3, 4, 5, 6]</li>
+     * <li>Range 2 / -4 : will return [0, 1] (not enough elements for the given size)</li>
+     * <li>Range 0 / -4 : will return [5, 6, 7, 8]</li>
      * </ul>
      *
      * @param list the list from which the sublist will be extracted

@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,38 +41,34 @@ public interface ModelBridge
      * Create a new document with the specified reference.
      * 
      * @param documentReference the reference of the new document
-     * @param userReference the reference of the document creator
      * @return {@code true} if the document was create successfully, {@code false} if the creation failed
      */
-    boolean create(DocumentReference documentReference, DocumentReference userReference);
+    boolean create(DocumentReference documentReference);
 
     /**
      * Copy a document with the specified reference.
      * 
      * @param source the document to copy
      * @param destination the reference of the document copy that is going to be created
-     * @param userReference the reference of the user that performs the copy
      * @return {@code true} if the document was copied successfully, {@code false} if the copy failed
      */
-    boolean copy(DocumentReference source, DocumentReference destination, DocumentReference userReference);
+    boolean copy(DocumentReference source, DocumentReference destination);
 
     /**
      * Delete the specified document.
      * 
      * @param documentReference the reference of the document to delete
-     * @param userReference the reference of the user that performs the delete
      * @return {@code true} if the document was deleted successfully, {@code false} if the delete failed
      */
-    boolean delete(DocumentReference documentReference, DocumentReference userReference);
+    boolean delete(DocumentReference documentReference);
 
     /**
      * Remove the edit lock from the specified document.
      * 
      * @param documentReference the document to unlock
-     * @param userReference the reference of the user that removes the edit lock
      * @return {@code true} if the lock was removed successfully, {@code false} if the remove failed
      */
-    boolean removeLock(DocumentReference documentReference, DocumentReference userReference);
+    boolean removeLock(DocumentReference documentReference);
 
     /**
      * Create a redirect from the old document reference to the new document reference.
@@ -103,7 +100,24 @@ public interface ModelBridge
      * @param oldParentReference the old document reference for which to update its children's parent fields
      * @param newParentReference the new value to set in the chidlren's parent field
      * @return {@code true} if the parent fields were successfully updated, {@code false} if the update failed
-     * @since 8.0M2, 7.4.2
+     * @since 8.0M2
+     * @since 7.4.2
      */
     boolean updateParentField(DocumentReference oldParentReference, DocumentReference newParentReference);
+
+    /**
+     * Sets the current user reference on the execution context.
+     * 
+     * @param userReference the user reference to put on the execution context
+     * @return the previous user reference that was on the execution context
+     */
+    DocumentReference setContextUserReference(DocumentReference userReference);
+
+    /**
+     * Modify the specified document based on the given parameters (usually the fields to update).
+     * 
+     * @param documentReference specifies the document to update
+     * @param parameters specifies the updates to perform (e.g. which fields to update)
+     */
+    void update(DocumentReference documentReference, Map<String, String> parameters);
 }

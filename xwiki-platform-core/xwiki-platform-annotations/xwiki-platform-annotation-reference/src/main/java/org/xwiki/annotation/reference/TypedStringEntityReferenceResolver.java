@@ -26,13 +26,13 @@ import org.xwiki.model.reference.EntityReference;
 /**
  * Typed version of the entity reference resolver from string representations which gets its type from the string
  * serialization, in the form {@code type://} and, if no such type specification is found, it uses the default passed
- * type. <br />
+ * type. <br>
  * For example, something like: {@code DOCUMENT://XWiki.TagClass[0]#tags} will result in parsing {@code
  * XWiki.TagClass[0]#tags} as a document reference, while {OBJECT_PROPERTY://XWiki.TagClass[0]#tags} will result in
- * parsing {@code XWiki.TagClass[0]#tags} as an object property reference.<br />
+ * parsing {@code XWiki.TagClass[0]#tags} as an object property reference.<br>
  * Note that, although it roughly does the same thing, this is a different hierarchy than EntityReferenceResolver
- * because it's a different strategy, different interpretation of the type parameter and resolvers & serializers of this
- * type should be used together.
+ * because it's a different strategy, different interpretation of the type parameter and resolvers and serializers of
+ * this type should be used together.
  * 
  * @version $Id$
  * @since 2.3M1

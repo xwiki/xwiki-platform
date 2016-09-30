@@ -94,7 +94,8 @@ public abstract class AbstractSelectorWizardStep<T> extends AbstractInteractiveW
     }
 
     /**
-     * Notifies this wizard step that it has been activated, when part of an aggregator for example. <br />
+     * Notifies this wizard step that it has been activated, when part of an aggregator for example.
+     * <p>
      * FIXME: this function should not be here but in it's own decorating interface for aggregated wizard steps or,
      * cleaner, all wizard steps who need to be notified when they're activated should implement Focusable interface and
      * all wizard step handlers (the dialog, the aggregator) should call setFocus(). This is a quick solution to handle

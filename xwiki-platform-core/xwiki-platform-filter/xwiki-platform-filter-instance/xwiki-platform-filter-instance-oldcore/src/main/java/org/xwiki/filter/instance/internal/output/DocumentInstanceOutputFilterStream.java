@@ -56,14 +56,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilterStream<DocumentInstanceOutputProperties>
     implements WikiDocumentFilter
 {
-    private static final TranslationMarker LOG_DOCUMENT_CREATED = new TranslationMarker(
-        "filter.instance.log.document.created", WikiDocumentFilter.LOG_DOCUMENT_CREATED);
+    private static final TranslationMarker LOG_DOCUMENT_CREATED =
+        new TranslationMarker("filter.instance.log.document.created", WikiDocumentFilter.LOG_DOCUMENT_CREATED);
 
-    private static final TranslationMarker LOG_DOCUMENT_UPDATED = new TranslationMarker(
-        "filter.instance.log.document.updated", WikiDocumentFilter.LOG_DOCUMENT_UPDATED);
+    private static final TranslationMarker LOG_DOCUMENT_UPDATED =
+        new TranslationMarker("filter.instance.log.document.updated", WikiDocumentFilter.LOG_DOCUMENT_UPDATED);
 
-    private static final TranslationMarker LOG_DOCUMENT_FAILSAVE = new TranslationMarker(
-        "filter.instance.log.document.failsave", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
+    private static final TranslationMarker LOG_DOCUMENT_FAILSAVE =
+        new TranslationMarker("filter.instance.log.document.failsave", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
 
     @Inject
     private FilterDescriptorManager filterManager;
@@ -93,6 +93,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
     private FilterEventParameters currentLocaleParameters;
 
+    private FilterEventParameters currentRevisionParameters;
+
     @Override
     protected Object createFilter() throws FilterException
     {
@@ -119,36 +121,60 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
         this.documentDeleted = false;
+
+        this.currentLocaleParameters = parameters;
+        this.currentRevisionParameters = parameters;
     }
 
     @Override
     public void endWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
-        // Nothing to do
+        maybeSaveDocument();
+
+        // Reset
+        this.currentRevisionParameters = null;
+        this.currentLocaleParameters = null;
     }
 
     @Override
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
     {
         this.currentLocaleParameters = parameters;
+        this.currentRevisionParameters = parameters;
     }
 
     @Override
     public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
     {
+        maybeSaveDocument();
+
+        // Reset
+        this.currentRevisionParameters = null;
         this.currentLocaleParameters = null;
     }
 
     @Override
     public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
     {
-        // Nothing to do
+        this.currentRevisionParameters = parameters;
     }
 
     @Override
     public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws FilterException
     {
+        maybeSaveDocument();
+
+        // Reset
+        this.currentRevisionParameters = null;
+    }
+
+    private void maybeSaveDocument() throws FilterException
+    {
         XWikiDocument inputDocument = this.documentListener.getDocument();
+
+        if (this.currentRevisionParameters == null) {
+            return;
+        }
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -164,8 +190,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
                     // Put previous version in recycle bin
                     if (xcontext.getWiki().hasRecycleBin(xcontext)) {
-                        xcontext.getWiki().getRecycleBinStore()
-                            .saveToRecycleBin(document, xcontext.getUser(), new Date(), xcontext, true);
+                        xcontext.getWiki().getRecycleBinStore().saveToRecycleBin(document, xcontext.getUser(),
+                            new Date(), xcontext, true);
                     }
 
                     // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
@@ -187,8 +213,10 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             // Author
 
             if (this.properties.isAuthorPreserved()
-                && parameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
+                && this.currentRevisionParameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
                 document.setAuthorReference(inputDocument.getAuthorReference());
+            } else if (this.properties.isAuthorSet()) {
+                document.setAuthorReference(this.properties.getAuthor());
             } else {
                 document.setAuthorReference(xcontext.getUserReference());
             }
@@ -196,7 +224,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             // Content author
 
             if (this.properties.isAuthorPreserved()
-                && parameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
+                && this.currentRevisionParameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
                 document.setContentAuthorReference(inputDocument.getContentAuthorReference());
             } else {
                 document.setContentAuthorReference(document.getAuthorReference());
@@ -213,8 +241,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             if (document.isNew() && document.getDocumentArchive() != null) {
                 // we need to force the saving the document archive
                 if (document.getDocumentArchive() != null) {
-                    xcontext.getWiki().getVersioningStore()
-                        .saveXWikiDocArchive(document.getDocumentArchive(xcontext), true, xcontext);
+                    xcontext.getWiki().getVersioningStore().saveXWikiDocArchive(document.getDocumentArchive(xcontext),
+                        true, xcontext);
                 }
             }
 

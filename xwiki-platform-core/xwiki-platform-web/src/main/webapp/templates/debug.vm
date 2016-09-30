@@ -1,4 +1,5 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/debug/debug.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/debug/debug.css', true))
 #set ($discard = $xwiki.linkx.use($services.webjars.url('jstree', 'themes/default/style.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 #template('progress_macros.vm')
 <div id="debug_performance_tree" class="debug">

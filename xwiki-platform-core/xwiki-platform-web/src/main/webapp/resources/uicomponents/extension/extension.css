@@ -102,6 +102,11 @@
   word-wrap: break-word;
 }
 
+.extension-recommended {
+  margin-top: .5em;
+  color: $theme.notificationSuccessColor
+}
+
 .extension-body {
   border: 1px dotted $theme.borderColor;;
   padding: 0 .8em .8em 1.8em !important;

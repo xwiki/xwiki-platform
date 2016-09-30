@@ -167,7 +167,6 @@
   ##
   ## Hidden inputs
   ##
-  &lt;input type="hidden" name="groovyFilter" value="" /&gt;
   &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
   ## Normalize the parent reference of the new document so that even in a subwiki it points to the current wiki
   #set ($normalizedParentReference = $services.model.resolveDocument("$!request.parent", 'current'))

@@ -56,6 +56,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferen
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
@@ -111,6 +112,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultReferenceDocumentReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
     DefaultSymbolScheme.class,
+    CurrentReferenceObjectReferenceResolver.class,
 
     DefaultModelConfiguration.class
 })

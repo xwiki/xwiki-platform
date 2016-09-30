@@ -19,12 +19,7 @@
  */
 var XWiki = (function(XWiki) {
 // Start XWiki augmentation.
-// Make sure the XWiki 'namespace' and the AjaxSaveAndContinue class exist.
-if (!XWiki.actionButtons || !XWiki.actionButtons.AjaxSaveAndContinue) {
-  if (console && console.warn) {
-    console.warn("[Autosave feature] Required class missing: XWiki.actionButtons.AjaxSaveAndContinue");
-  }
-} else {
+
 var editors = XWiki.editors = XWiki.editors || {};
 /**
  * Autosave feature.
@@ -54,7 +49,7 @@ editors.AutoSave = Class.create({
   initialize : function(options) {
     this.options = Object.extend(Object.clone(this.options), options || { });
     this.form = $(this.options.form) || ($("xwikieditcontent") && $("xwikieditcontent").up('form'));
-    if (!this.form) {
+    if (!this.form || this.form.down('#autosaveControl')) {
       return;
     }
     this.initVersionMetadataElements();
@@ -265,14 +260,20 @@ editors.AutoSave = Class.create({
 });
 
 function init() {
-  return new editors.AutoSave();
+  // Make sure the AjaxSaveAndContinue class exist.
+  if (!XWiki.actionButtons || !XWiki.actionButtons.AjaxSaveAndContinue) {
+    if (console && console.warn) {
+      console.warn("[Autosave feature] Required class missing: XWiki.actionButtons.AjaxSaveAndContinue");
+    }
+  } else {
+    return new editors.AutoSave();
+  }
 }
 
 // When the document is loaded, create the Autosave control
 (XWiki.domIsLoaded && init())
 || document.observe("xwiki:dom:loaded", init);
 
-}//XWiki.actionButtons.AjaxSaveAndContinue exists
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));

@@ -22,7 +22,6 @@ package org.xwiki.filter.event.model;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Class property related events.
@@ -38,9 +37,8 @@ public interface WikiClassPropertyFilter
      * @param parameters the parameters of the property
      * @throws FilterException when failing to send event
      */
-    void beginWikiClassProperty(@Name("name") String name, @Name("type") String type,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void beginWikiClassProperty(String name, String type,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param name the name of the property
@@ -48,9 +46,8 @@ public interface WikiClassPropertyFilter
      * @param parameters the parameters of the property
      * @throws FilterException when failing to send event
      */
-    void endWikiClassProperty(@Name("name") String name, @Name("type") String type,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void endWikiClassProperty(String name, String type,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 
     /**
      * @param name the name of the field
@@ -58,7 +55,6 @@ public interface WikiClassPropertyFilter
      * @param parameters the properties of the field
      * @throws FilterException when failing to send event
      */
-    void onWikiClassPropertyField(@Name("name") String name, @Name("value") String value,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
-        throws FilterException;
+    void onWikiClassPropertyField(String name, String value,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 }

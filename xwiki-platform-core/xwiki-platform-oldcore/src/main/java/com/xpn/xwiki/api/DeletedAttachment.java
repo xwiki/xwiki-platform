@@ -36,7 +36,6 @@ import com.xpn.xwiki.util.Programming;
  * date. The attachment can be accessed using {@link #getAttachment()}.
  * <p>
  * This object is immutable, since entries in the trash can not be modified.
- * </p>
  *
  * @version $Id$
  * @since 2.2M1
@@ -161,10 +160,10 @@ public class DeletedAttachment extends Api
      * Check if the current user has the right to permanently delete the attachment from the trash.
      *
      * @return {@code true} if the current user can purge this document, {@code false} otherwise
-     * @xwikicfg xwiki.store.recyclebin.adminWaitDays How many days should an administrator wait before being able to
-     *           permanently delete this document from the recycle bin. 0 by default.
-     * @xwikicfg xwiki.store.recyclebin.waitDays How many days should a normal user with "delete" right wait before
-     *           being able to permanently delete this document from the recycle bin. 7 by default.
+     * @xwiki.xwikicfg xwiki.store.recyclebin.adminWaitDays How many days should an administrator wait before being able
+     *                 to permanently delete this document from the recycle bin. 0 by default.
+     * @xwiki.xwikicfg xwiki.store.recyclebin.waitDays How many days should a normal user with "delete" right wait
+     *                 before being able to permanently delete this document from the recycle bin. 7 by default.
      */
     public boolean canDelete()
     {

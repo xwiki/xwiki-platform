@@ -90,7 +90,8 @@ public class ListBehaviorAdjuster extends KeyboardAdaptor implements CommandList
      * <li>finding all the {@code ul} or {@code ol} tags which are at the beginning (first child) of a list item and
      * making the parent list items editable</li>
      * </ul>
-     * (but these operations are executed in a single pass). <br />
+     * (but these operations are executed in a single pass).
+     * <p>
      * Note that while these operations are not enough from a strict xhtml cleaning point of view, they address all the
      * practical cases that appear so we chose to limit the operations executed to only these for performance reasons.
      * 

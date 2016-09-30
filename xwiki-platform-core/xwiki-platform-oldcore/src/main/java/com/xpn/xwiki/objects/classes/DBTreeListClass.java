@@ -24,12 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.script.ScriptContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -37,6 +39,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -175,7 +178,8 @@ public class DBTreeListClass extends DBListClass
     }
 
     @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -196,7 +200,8 @@ public class DBTreeListClass extends DBListClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         List<String> selectlist = toList(prop);
@@ -291,15 +296,19 @@ public class DBTreeListClass extends DBListClass
 
     private String displayTree(String name, String prefix, List<String> selectlist, String mode, XWikiContext context)
     {
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        ScriptContextManager scriptManager = Utils.getComponent(ScriptContextManager.class);
+        ScriptContext scontext = scriptManager.getCurrentScriptContext();
+
         Map<String, ListItem> map = getMap(context);
         Map<String, List<ListItem>> treemap = getTreeMap(context);
-        vcontext.put("selectlist", selectlist);
-        vcontext.put("fieldname", prefix + name);
-        vcontext.put("tree", map);
-        vcontext.put("treelist", getTreeList(treemap, map, context));
-        vcontext.put("treemap", treemap);
-        vcontext.put("mode", mode);
+
+        scontext.setAttribute("selectlist", selectlist, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("fieldname", prefix + name, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("tree", map, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("treelist", getTreeList(treemap, map, context), ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("treemap", treemap, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("mode", mode, ScriptContext.ENGINE_SCOPE);
+
         return context.getWiki().parseTemplate("treeview.vm", context);
     }
 
@@ -404,11 +413,10 @@ public class DBTreeListClass extends DBListClass
                     // defined by the document "parent" property (unless a parent property is
                     // specified).
                     if (hasClassname) {
-                        sql =
-                            "select distinct doc.fullName, doc.fullName, "
-                                + (hasParentField ? parentField : "doc.parent")
-                                + " from XWikiDocument as doc, BaseObject as obj"
-                                + " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                        sql = "select distinct doc.fullName, doc.fullName, "
+                            + (hasParentField ? parentField : "doc.parent")
+                            + " from XWikiDocument as doc, BaseObject as obj"
+                            + " where doc.fullName=obj.name and obj.className='" + classname + "'";
                     } else {
                         // If none of the first 3 properties is specified, return a query that
                         // always returns no rows (only with the parent field no query can be made)
@@ -432,9 +440,8 @@ public class DBTreeListClass extends DBListClass
                 // Check if the document and object are needed or not.
                 // The object is needed if there is a classname, or if at least one of the selected
                 // columns is an object property.
-                boolean usesObj =
-                    hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.")
-                        || parentField.startsWith("obj.");
+                boolean usesObj = hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.")
+                    || parentField.startsWith("obj.");
                 // The document is needed if one of the selected columns is a document property, or
                 // if there is no classname specified and at least one of the selected columns is
                 // not an object property.

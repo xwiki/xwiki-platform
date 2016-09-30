@@ -112,7 +112,8 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * @return the application location picker
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     public DocumentPicker getLocationPicker()
     {
@@ -132,7 +133,7 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * Simply clicks on the Next Stept button, nothing more.
-     * <p/>
+     * <p>
      * You should generally use {@link #clickNextStep()} instead if you are not expecting an error or something outside
      * the normal flow.
      */

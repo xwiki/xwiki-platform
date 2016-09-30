@@ -49,7 +49,12 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
      */
     public static final String ID = "wiki";
 
-    private static final String KEY_PREFIX = ID + ':';
+    /**
+     * The prefix of wiki namespace.
+     * 
+     * @since 8.4RC1
+     */
+    public static final String NAMESPACE_PREFIX = ID + ':';
 
     @Inject
     private WikiDescriptorManager wikis;
@@ -86,7 +91,7 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
     {
         String wiki = getCurrentWiki();
 
-        return wiki != null ? KEY_PREFIX + wiki : null;
+        return wiki != null ? NAMESPACE_PREFIX + wiki : null;
     }
 
     @Override

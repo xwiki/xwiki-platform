@@ -41,7 +41,7 @@ import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
 
 /**
  * Expose Mail Sending API to scripts.
- * <p/>
+ * <p>
  * Example for sending an HTML message with attachments and a text
  * alternative:
  * <pre><code>

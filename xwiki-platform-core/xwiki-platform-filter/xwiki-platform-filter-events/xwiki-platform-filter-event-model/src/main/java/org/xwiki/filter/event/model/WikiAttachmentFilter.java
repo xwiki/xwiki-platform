@@ -24,7 +24,6 @@ import java.io.InputStream;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
-import org.xwiki.filter.annotation.Name;
 
 /**
  * Attachment related events.
@@ -87,7 +86,7 @@ public interface WikiAttachmentFilter
      * @param parameters the properties of the attachment
      * @throws FilterException when failing to send event
      */
-    void onWikiAttachment(@Name("name") String name, @Name("content") InputStream content, @Name("size") Long size,
-        @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
+    void onWikiAttachment(String name, InputStream content, Long size,
+        @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

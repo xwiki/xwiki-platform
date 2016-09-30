@@ -37,7 +37,8 @@ import com.xpn.xwiki.plugin.PluginApi;
  * API for managing rights, users and groups.
  *
  * @version $Id$
- * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+ * @since 1.1.2
+ * @since 1.2M2
  */
 public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 {

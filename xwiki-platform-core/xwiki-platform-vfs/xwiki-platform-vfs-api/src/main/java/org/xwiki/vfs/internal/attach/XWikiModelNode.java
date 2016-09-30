@@ -125,7 +125,8 @@ public class XWikiModelNode
 
     /**
      * @return true if the attachment exists or false otherwise
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     public boolean hasAttachment()
     {

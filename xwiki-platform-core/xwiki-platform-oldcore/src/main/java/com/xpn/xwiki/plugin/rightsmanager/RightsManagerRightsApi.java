@@ -35,7 +35,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * API for managing rights and inheritance.
  *
  * @version $Id$
- * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+ * @since 1.1.2
+ * @since 1.2M2
  */
 public class RightsManagerRightsApi extends Api
 {

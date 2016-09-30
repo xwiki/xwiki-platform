@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-default</artifactId>
   <name>XWiki Platform - Refactoring - Default Implementation</name>
   <description>XWiki Platform - Refactoring - Default Implementation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

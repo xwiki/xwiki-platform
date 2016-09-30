@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Default implementation of the typed entity resolver, which gets missing values from the default configuration. <br />
+ * Default implementation of the typed entity resolver, which gets missing values from the default configuration. <br>
  * NOTE: this is not yet used, the IOService and IOTargetService currently use a default resolver, since the current
  * document at the moment when the io service is called can be anything. Also, rest service receives document paths, it
  * doesn't need to resolve targets wrt to current document.

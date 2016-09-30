@@ -35,7 +35,7 @@ import org.xwiki.model.reference.WikiReference;
  * correspondence between a SecurityReference and a Wiki-, Space-, or DocumentReference. Moreover, a security reference
  * built with a null EntityReference is equivalent to the main wiki reference (but with a null original reference).
  *
- * @see {@link SecurityReferenceFactory}
+ * @see SecurityReferenceFactory
  * @version $Id$
  * @since 4.0M2
  */
@@ -105,7 +105,7 @@ public class SecurityReference extends EntityReference
     }
 
     /**
-     * @return the entity reference type, but for the main wiki, return {@link SecurityReference.FARM}.
+     * @return the entity reference type, but for the main wiki, return {@link #FARM}.
      */
     public EntityType getSecurityType()
     {

@@ -134,7 +134,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener, Clic
     }
 
     /**
-     * Method invoked by {@link ImportMenuExtension} when "Import -> Office File" menu item is clicked.
+     * Method invoked by {@link ImportMenuExtension} when "Import -&amp; Office File" menu item is clicked.
      */
     public void onImportOfficeFile()
     {

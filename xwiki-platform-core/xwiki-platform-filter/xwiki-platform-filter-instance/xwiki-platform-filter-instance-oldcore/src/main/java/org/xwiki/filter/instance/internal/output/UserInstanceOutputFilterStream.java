@@ -254,8 +254,8 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
                 }
                 if (parameters.containsKey(UserFilter.PARAMETER_REVISION_DATE)) {
                     userDocument.setDate(getDate(UserFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
-                    userDocument.setContentUpdateDate(getDate(UserFilter.PARAMETER_REVISION_DATE, parameters,
-                        new Date()));
+                    userDocument
+                        .setContentUpdateDate(getDate(UserFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
                 }
             }
 
@@ -286,7 +286,14 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     }
 
     @Override
+    @Deprecated
     public void beginGroup(String name, FilterEventParameters parameters) throws FilterException
+    {
+        beginGroupContainer(name, parameters);
+    }
+
+    @Override
+    public void beginGroupContainer(String name, FilterEventParameters parameters) throws FilterException
     {
         // Init members
         this.members = new ArrayList<String>();
@@ -306,7 +313,14 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     }
 
     @Override
+    @Deprecated
     public void endGroup(String name, FilterEventParameters parameters) throws FilterException
+    {
+        endGroupContainer(name, parameters);
+    }
+
+    @Override
+    public void endGroupContainer(String name, FilterEventParameters parameters) throws FilterException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 

@@ -33,11 +33,8 @@ import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
- * The <code>Context</code> class represents a secure proxy for the XWiki context, which in turn represents the
- * execution environment for all the wiki pages. An instance of the <code>Context</code> class is available as a
- * predefined variable for scripting inside any wiki page. You can access it using <code>$xcontext</code> in Velocity
- * scripts or simply <code>xcontext</code> in Groovy ones. The <code>Context</code> class provides a means of getting
- * contextual information about the current request or configuring XWiki on the fly.
+ * Provides a secure proxy for the internal {@code XWikiContext} class, that can be used safely in scripts. All
+ * dangerous methods are protected by requiring Programming Rights.
  *
  * @version $Id$
  */
@@ -78,7 +75,7 @@ public class Context extends Api
     /**
      * Specifies the container or environment in which XWiki is currently running. See the following table for possible
      * values it can return:
-     * <table>
+     * <table summary="Return values">
      * <thead>
      * <tr>
      * <th>Return</th>
@@ -413,12 +410,14 @@ public class Context extends Api
     }
 
     /**
-     * Returns the list of textarea fields that use the WYSIWYG editor. This list is automatically built when displaying
-     * textarea properties.
+     * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
+     * TextArea properties.
      *
-     * @return A string containing a comma-separated list of textarea field names for which the WYSIWYG editor should be
-     *         enabled.
+     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
+     *         enabled
      */
+    @Deprecated
     public String getEditorWysiwyg()
     {
         return getXWikiContext().getEditorWysiwyg();

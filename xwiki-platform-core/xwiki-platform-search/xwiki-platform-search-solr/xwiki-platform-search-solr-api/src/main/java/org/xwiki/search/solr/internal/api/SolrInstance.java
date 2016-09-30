@@ -33,7 +33,7 @@ import org.xwiki.component.phase.Initializable;
 /**
  * Component in charge of communicating with the actual Solr server. This is direct access and consistency is not
  * enforced at this level.
- * <p/>
+ * <p>
  * Note: This is also useful for testing since it can be replaced with a mock, this way allowing us to test just our
  * code.
  * 
@@ -45,7 +45,7 @@ public interface SolrInstance extends Initializable
 {
     /**
      * Add a {@link SolrInputDocument} to the Solr index.
-     * <p/>
+     * <p>
      * Note: Does not apply until you call {@link #commit()}.
      * 
      * @param solrDocument the document.
@@ -56,7 +56,7 @@ public interface SolrInstance extends Initializable
 
     /**
      * Add a list of {@link SolrInputDocument} to the Solr index. This is a batch operation.
-     * <p/>
+     * <p>
      * Note: Does not apply until you call {@link #commit()}.
      * 
      * @param solrDocuments the documents.
@@ -67,7 +67,7 @@ public interface SolrInstance extends Initializable
 
     /**
      * Delete a single entry from the Solr index.
-     * <p/>
+     * <p>
      * Note: Does not apply until you call {@link #commit()}.
      * 
      * @param id the ID of the entry.
@@ -78,7 +78,7 @@ public interface SolrInstance extends Initializable
 
     /**
      * Delete a list of entries from the Solr index. This is a batch operation.
-     * <p/>
+     * <p>
      * Note: Does not apply until you call {@link #commit()}.
      * 
      * @param ids the list of entry IDs
@@ -89,7 +89,7 @@ public interface SolrInstance extends Initializable
 
     /**
      * Delete entries from the index based on the result of the given query.
-     * <p/>
+     * <p>
      * Note: Does not apply until you call {@link #commit()}.
      * 
      * @param query the Solr query.

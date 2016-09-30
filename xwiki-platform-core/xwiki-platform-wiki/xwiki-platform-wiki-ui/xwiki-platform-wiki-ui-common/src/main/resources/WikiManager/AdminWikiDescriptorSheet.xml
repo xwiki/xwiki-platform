@@ -49,12 +49,17 @@
     ##
     ## Handle AJAX requests.
     ##
-    #set ($prettyName = "$!request.prettyName")
+    #set ($prettyName  = "$!request.prettyName")
     #set ($description = "$!request.description")
-    #set ($owner = "$!request.owner")
-    #set ($homepage = "$!request.homepage")
-    #if ("$!owner" != '' &amp;&amp; "$!homepage" != '' &amp;&amp; $services.csrf.isTokenValid("$!{request.form_token}"))
-      #set ($discard = $descriptor.setOwnerId($owner))
+    #set ($owner       = "$!request.owner")
+    #set ($homepage    = "$!request.homepage")
+    #if ("$!homepage" != '' &amp;&amp; $services.csrf.isTokenValid("$!{request.form_token}"))
+      #if ("$!owner" != '')
+        ## There is a security check in $services.wiki.saveDescriptor() to avoid an admin who is not the current owner
+        ## to take the ownership of the wiki.
+        ## So we can fill the descriptor safely.
+        #set ($discard = $descriptor.setOwnerId($owner))
+      #end
       #set ($discard = $descriptor.setPrettyName($prettyName))
       #set ($discard = $descriptor.setDescription($description))
       #set ($homepageReference = $services.model.resolveDocument($homepage))
@@ -124,34 +129,34 @@
             &lt;/dd&gt;
 
             ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).
-            #set ($currentUserString = $services.model.serialize($xcontext.userReference))
-            #set ($descriptorReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', "XWikiServer${stringtool.capitalize($descriptor.id)}"))
-            #set ($descriptorFullName = $services.model.serialize($descriptorReference))
+            #set ($currentUserString   = $services.model.serialize($xcontext.userReference, 'default'))
+            #set ($descriptorReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', "XWikiServer${stringtool.capitalize($descriptor.id)}"))
+            #set ($descriptorFullName  = $services.model.serialize($descriptorReference))
             #set ($hasEditOnDescriptor = $xwiki.hasAccessLevel('edit', $currentUserString, $descriptorFullName))
             #if ($currentUserString == "$!{services.wiki.currentWikiDescriptor.ownerId}" || $hasEditOnDescriptor)
-            &lt;dt&gt;
-              &lt;label for='owner'&gt;
-                $services.localization.render('platform.wiki.sheet.prop.owner') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
-              &lt;/label&gt;
-              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.owner')&lt;/span&gt;
-            &lt;/dt&gt;
-            &lt;dd&gt;
-              #userPicker_import()
-              #set ($class = 'suggestUsers')
-              #set ($userScope = "$!services.wiki.user.userScope")
-              #if ($userScope == 'LOCAL_AND_GLOBAL')
-                #set ($class = "$class withScope")
-              #elseif ($userScope == 'GLOBAL_ONLY')
-                #set ($class = "$class global")
-              #end
-              &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
-            &lt;/dd&gt;
+              &lt;dt&gt;
+                &lt;label for='owner'&gt;
+                  $services.localization.render('platform.wiki.sheet.prop.owner') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
+                &lt;/label&gt;
+                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.owner')&lt;/span&gt;
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                #userPicker_import()
+                #set ($class = 'suggestUsers')
+                #set ($userScope = "$!services.wiki.user.userScope")
+                #if ($userScope == 'LOCAL_AND_GLOBAL')
+                  #set ($class = "$class withScope")
+                #elseif ($userScope == 'GLOBAL_ONLY')
+                  #set ($class = "$class global")
+                #end
+                &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
+              &lt;/dd&gt;
 
-            &lt;dd class='warning'&gt;
-              &lt;label for='owner'&gt;
-                &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
-              &lt;/label&gt;
-            &lt;/dd&gt;
+              &lt;dd class='warning'&gt;
+                &lt;label for='owner'&gt;
+                  &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
+                &lt;/label&gt;
+              &lt;/dd&gt;
             #end
 
           &lt;/dl&gt;

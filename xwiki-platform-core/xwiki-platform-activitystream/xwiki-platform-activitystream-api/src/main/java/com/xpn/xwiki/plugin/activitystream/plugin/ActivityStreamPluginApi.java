@@ -734,11 +734,10 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
      *
-     * @param hql HQL where query statement
-     * @param nb number of events to retrieve
-     * @param start query offset
+     * @param optionalWhereClause HQL where query statement
+     * @param maxItems number of events to retrieve
+     * @param startAt query offset
      * @return matching pages with events
-     * @throws ActivityStreamException if the search query fails
      */
     public List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt)
     {
@@ -754,11 +753,11 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Get unique pages with events sorted by date. A document is returned at most once, regardless of the number of
      * events.
      *
-     * @param hql HQL where query statement
-     * @param nb number of events to retrieve
-     * @param start query offset
+     * @param optionalWhereClause HQL where query statement
+     * @param parametersValues values for the query parameters
+     * @param maxItems number of events to retrieve
+     * @param startAt query offset
      * @return matching pages with events
-     * @throws ActivityStreamException if the search query fails
      */
     public List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
         int startAt)
@@ -776,11 +775,10 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
      *
-     * @param hql HQL where query statement
-     * @param nb number of events to retrieve
-     * @param start query offset
+     * @param optionalWhereClause HQL where query statement
+     * @param maxItems number of events to retrieve
+     * @param startAt query offset
      * @return matching pages with events
-     * @throws ActivityStreamException if the search query fails
      */
     public List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt)
     {
@@ -796,11 +794,11 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Get unique pages with events sorted by date, grouped by days. A document is returned at most once per day, but
      * might appear more than once if it has associated events in different days.
      *
-     * @param hql HQL where query statement
-     * @param nb number of events to retrieve
-     * @param start query offset
+     * @param optionalWhereClause HQL where query statement
+     * @param parametersValues values for the query parameters
+     * @param maxItems number of events to retrieve
+     * @param startAt query offset
      * @return matching pages with events
-     * @throws ActivityStreamException if the search query fails
      */
     public List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
         int startAt)

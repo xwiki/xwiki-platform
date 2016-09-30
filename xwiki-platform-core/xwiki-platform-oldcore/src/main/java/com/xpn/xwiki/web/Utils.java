@@ -415,11 +415,10 @@ public class Utils
     /**
      * Parse the request parameters from the specified String using the specified encoding. <strong>IMPLEMENTATION
      * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
-     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
-     * or "&" character that would otherwise be interpreted as a delimiter.
+     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded
+     * {@code =} or {@code &} character that would otherwise be interpreted as a delimiter.
      * <p>
      * Code borrowed from Apache Tomcat 5.0
-     * </p>
      *
      * @param data input string containing request parameters
      * @param encoding the encoding to use for transforming bytes into characters
@@ -451,14 +450,12 @@ public class Utils
     /**
      * Parse the request parameters from the specified byte array using the specified encoding. <strong>IMPLEMENTATION
      * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
-     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
-     * or "&" character that would otherwise be interpreted as a delimiter.
+     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded
+     * {@code =} or {@code &} character that would otherwise be interpreted as a delimiter.
      * <p>
      * NOTE: byte array data is modified by this method. Caller beware.
-     * </p>
      * <p>
      * Code borrowed from Apache Tomcat 5.0
-     * </p>
      *
      * @param data input byte array containing request parameters
      * @param encoding Encoding to use for converting hex

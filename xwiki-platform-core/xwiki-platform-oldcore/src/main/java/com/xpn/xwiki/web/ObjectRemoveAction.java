@@ -21,10 +21,10 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -42,18 +42,20 @@ public class ObjectRemoveAction extends XWikiAction
         String className = form.getClassName();
         int classId = form.getClassId();
         if (StringUtils.isBlank(className)) {
-            ((VelocityContext) context.get("vcontext")).put("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"));
+            getCurrentScriptContext().setAttribute("message",
+                localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"),
+                ScriptContext.ENGINE_SCOPE);
         } else if (classId < 0) {
-            ((VelocityContext) context.get("vcontext")).put("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"));
+            getCurrentScriptContext().setAttribute("message",
+                localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"), ScriptContext.ENGINE_SCOPE);
         } else {
             obj = doc.getObject(className, classId);
             if (obj == null) {
-                ((VelocityContext) context.get("vcontext")).put("message",
-                    localizePlainOrKey("platform.core.action.objectRemove.invalidObject"));
+                getCurrentScriptContext().setAttribute("message",
+                    localizePlainOrKey("platform.core.action.objectRemove.invalidObject"), ScriptContext.ENGINE_SCOPE);
             }
         }
+
         return obj;
     }
 

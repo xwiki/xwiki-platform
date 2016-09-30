@@ -28,7 +28,7 @@ import org.xwiki.url.internal.standard.WikiReferenceExtractor;
  * when the Resource Type is Entity (usually {@code bin} but it's controlled through XWiki configuration, see
  * {@link org.xwiki.url.internal.standard.DefaultStandardURLConfiguration#getEntityPathPrefix()}). For example:
  * {@code http://server/(ignorePrefix)/bin/action/space/page/attachment}.
- * <p/>
+ * <p>
  * Use cases:
  * <ul>
  *   <li>URLs for the main wiki in path-based multiwiki configs</li>

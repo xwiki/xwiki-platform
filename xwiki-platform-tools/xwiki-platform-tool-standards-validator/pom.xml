@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>8.2-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>
   <description>XWiki Platform - Tools - Web Standard Validator</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>16.3.3</version>
+      <version>16.6.29</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>

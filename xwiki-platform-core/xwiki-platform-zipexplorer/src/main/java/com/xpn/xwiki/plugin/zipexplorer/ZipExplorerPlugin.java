@@ -202,15 +202,18 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     /**
      * Finds the ZIP attachment with passed name from the passed document matching and parse the ZIP to generate a list
      * of {@link com.xpn.xwiki.objects.classes.ListItem} elements representing a tree view of all directories and files
-     * in the ZIP. For example the following zip: <code><pre>
+     * in the ZIP. For example the following zip:
+     * <pre><code>
      * zipfile.zip:
      *   Directory/File.txt
      *   File2.txt
-     * </pre></code> generates the following ListItem list: <code><pre>
+     * </code></pre>
+     * generates the following ListItem list:
+     * <pre><code>
      *   { id = "Directory/", value = "Directory", parent = ""}
      *   { id = "Directory/File.txt", value = "File.txt", parent = "Directory/"}
      *   { id = "File2.txt", value = "File2.txt", parent = ""}
-     * </pre></code>
+     * </code></pre>
      * 
      * @param document the document containing the ZIP file as an attachment
      * @param attachmentName the name under which the ZIP file is attached in the document
@@ -264,11 +267,11 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      * @param action the XWiki requested action (for example "download", "edit", "view", etc).
      * @return the relative file location of a file in the ZIP file pointed to by the passed URL. The ZIP URL must be of
      *         the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example above this
-     *         method would return <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL
-     *         passed doesn't point inside a zip file.
-     * @todo There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL manipulation. Once
-     *       this exists remove this code. See http://jira.xwiki.org/jira/browse/XWIKI-437
+     *         method would return <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL passed
+     *         doesn't point inside a zip file.
      */
+    // TODO: There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL manipulation. Once
+    // this exists remove this code. See http://jira.xwiki.org/jira/browse/XWIKI-437
     protected String getFileLocationFromZipURL(String url, String action)
     {
         String path = url.substring(url.indexOf(URL_SEPARATOR + action));

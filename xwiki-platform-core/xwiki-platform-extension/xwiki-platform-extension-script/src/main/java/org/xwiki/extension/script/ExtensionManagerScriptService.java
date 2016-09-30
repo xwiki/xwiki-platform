@@ -19,9 +19,7 @@
  */
 package org.xwiki.extension.script;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -39,6 +37,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
@@ -91,17 +90,26 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     /**
      * The prefix put behind all job ids.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PREFIX} instead
      */
+    @Deprecated
     public static final String EXTENSION_JOBID_PREFIX = ROLEHINT;
 
     /**
      * The prefix put behind all job ids which are actual actions.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_ACTION_PREFIX} instead
      */
+    @Deprecated
     public static final String EXTENSIONACTION_JOBID_PREFIX = "action";
 
     /**
      * The prefix put behind all job ids which are information gathering.
+     * 
+     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PLAN_PREFIX} instead
      */
+    @Deprecated
     public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
 
     /**
@@ -168,12 +176,23 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param offset the offset from where to start returning search results, 0-based
      * @param nb the maximum number of search results to return. -1 indicate no limit. 0 indicate that no result will be
      *            returned but it can be used to get the total hits.
-     * @return the found extensions descriptors, empty list if nothing could be found
+     * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
+     *         been catched
      * @see org.xwiki.extension.repository.search.Searchable
      */
     public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
-        return this.repositoryManager.search(pattern, offset, nb);
+        setError(null);
+
+        IterableResult<Extension> result = null;
+
+        try {
+            return this.repositoryManager.search(pattern, offset, nb);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return result;
     }
 
     /**
@@ -182,13 +201,24 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * query.
      * 
      * @param query the search query
-     * @return the found extensions descriptors, empty list if nothing could be found
+     * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
+     *         been catched
      * @see org.xwiki.extension.repository.search.Searchable
      * @since 7.1RC1
      */
     public IterableResult<Extension> search(ExtensionQuery query)
     {
-        return this.repositoryManager.search(query);
+        setError(null);
+
+        IterableResult<Extension> result = null;
+
+        try {
+            result = this.repositoryManager.search(query);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return result;
     }
 
     /**
@@ -312,19 +342,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     // Actions
 
-    private List<String> getJobId(String prefix, String extensionId, String namespace)
-    {
-        List<String> jobId;
-
-        if (namespace != null) {
-            jobId = Arrays.asList(EXTENSION_JOBID_PREFIX, prefix, extensionId, namespace);
-        } else {
-            jobId = Arrays.asList(EXTENSION_JOBID_PREFIX, prefix, extensionId);
-        }
-
-        return jobId;
-    }
-
     /**
      * Create an {@link InstallRequest} instance based on passed parameters.
      * 
@@ -338,7 +355,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         InstallRequest installRequest = createInstallPlanRequest(id, version, namespace);
 
-        installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, id, namespace));
         installRequest.setInteractive(true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
         DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
@@ -405,7 +422,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     public InstallRequest createInstallPlanRequest(String id, String version, String namespace)
     {
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, id, namespace));
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, id, namespace));
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -543,7 +560,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         UninstallRequest uninstallRequest = createUninstallPlanRequest(extensionId, namespace);
 
-        uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), namespace));
+        uninstallRequest
+            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.setInteractive(true);
         uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
 
@@ -561,7 +579,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     private UninstallRequest createUninstallPlanRequest(ExtensionId extensionId, String namespace)
     {
         UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), namespace));
+        uninstallRequest
+            .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.addExtension(extensionId);
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -650,7 +669,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     public InstallRequest createUpgradePlanRequest(String namespace)
     {
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, null, namespace));
         installRequest.addNamespace(namespace);
 
         // Provide informations on what started the job
@@ -663,7 +682,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     private InstallRequest createUpgradePlanRequest()
     {
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
+        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, null, null));
 
         // Provide informations on what started the job
         installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
@@ -773,7 +792,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public JobStatus getExtensionJobStatus(String extensionId, String namespace)
     {
-        return getJobStatus(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId, namespace));
+        return getJobStatus(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
     }
 
     /**
@@ -785,7 +804,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public JobStatus getExtensionPlanJobStatus(String extensionId, String namespace)
     {
-        return getJobStatus(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId, namespace));
+        return getJobStatus(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId, namespace));
     }
 
     /**

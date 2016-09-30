@@ -44,6 +44,8 @@ public class TextAreaClass extends StringClass
 {
     /**
      * Possible values for the editor meta property.
+     * <p>
+     * Indicates which editor should be used to manipulate the content of the property.
      */
     public enum EditorType
     {
@@ -77,7 +79,9 @@ public class TextAreaClass extends StringClass
     }
 
     /**
-     * Possible values for the editor meta property.
+     * Possible values for the contenttype meta property.
+     * <p>
+     * Indicates what kind of content this field contains (wiki, plain text, etc.).
      * 
      * @since 8.3
      */

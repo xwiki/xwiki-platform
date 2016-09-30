@@ -55,7 +55,9 @@ import com.xpn.xwiki.web.Utils;
  * Default implementation of {@link XWikiRightService}.
  *
  * @version $Id$
+ * @deprecated since 4.0, use XWikiCachingRightService instead
  */
+@Deprecated
 public class XWikiRightServiceImpl implements XWikiRightService
 {
     public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,

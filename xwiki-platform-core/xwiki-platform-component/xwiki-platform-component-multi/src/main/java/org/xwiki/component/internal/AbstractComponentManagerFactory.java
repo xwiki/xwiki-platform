@@ -19,27 +19,28 @@
  */
 package org.xwiki.component.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.inject.Inject;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerFactory;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.manager.ComponentManager;
 
 /**
- * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
+ * Base class helper to implement {@link ComponentManagerFactory}.
  * 
  * @version $Id$
- * @since 5.0M2
+ * @since 8.4M1
  */
-@Component
-@Named(DocumentComponentManager.ID)
-@Singleton
-public class DocumentComponentManagerFactory extends AbstractEnityComponentManagerFactory
+public abstract class AbstractComponentManagerFactory implements ComponentManagerFactory
 {
+    /**
+     * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
+     */
+    @Inject
+    protected ComponentManagerFactory defaultFactory;
+
     @Override
-    protected EntityType getEntityType()
+    public ComponentManager createComponentManager(ComponentManager parentComponentManager)
     {
-        return EntityType.DOCUMENT;
+        return this.defaultFactory.createComponentManager(parentComponentManager);
     }
 }

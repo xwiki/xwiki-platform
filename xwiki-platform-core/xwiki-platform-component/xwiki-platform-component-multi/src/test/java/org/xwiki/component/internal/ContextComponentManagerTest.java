@@ -29,14 +29,19 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit tests for {@link ContextComponentManager} which indirectly test
@@ -86,8 +91,8 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Enabled component registration events
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
-        eventManager.setObservationManager(getComponentManager().<ObservationManager>getInstance(
-            ObservationManager.class));
+        eventManager
+            .setObservationManager(getComponentManager().<ObservationManager>getInstance(ObservationManager.class));
         eventManager.shouldStack(false);
         getComponentManager().setComponentEventManager(eventManager);
     }
@@ -438,6 +443,23 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.getInstance(Role.class));
     }
+
+    @Test
+    public void testCreateDocumentComponentManager() throws Exception
+    {
+        ComponentManagerManager manager = getComponentManager().getInstance(ComponentManagerManager.class);
+
+        NamespacedComponentManager componentManager =
+            (NamespacedComponentManager) manager.getComponentManager("document:wiki1:space1.space2.document1", true);
+
+        assertNotNull(componentManager);
+        assertEquals("document:wiki1:space1.space2.document1", componentManager.getNamespace());
+        assertEquals("space:wiki1:space1.space2", ((NamespacedComponentManager)componentManager.getParent()).getNamespace());
+        assertEquals("space:wiki1:space1", ((NamespacedComponentManager)componentManager.getParent().getParent()).getNamespace());
+        assertEquals("wiki:wiki1", ((NamespacedComponentManager)componentManager.getParent().getParent().getParent()).getNamespace());
+    }
+
+    // Failures
 
     @Test
     public void testRegisterComponentInContextComponentManagerThrowsException() throws Exception

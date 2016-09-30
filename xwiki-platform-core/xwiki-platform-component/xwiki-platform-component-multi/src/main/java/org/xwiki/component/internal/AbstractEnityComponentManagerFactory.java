@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * Base class helper to create entity related {@link ComponentManager}.
  * 
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 public abstract class AbstractEnityComponentManagerFactory extends AbstractComponentManagerFactory
 {

@@ -52,7 +52,7 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
     /**
      * The prefix of space namespace.
      * 
-     * @since 8.4M1
+     * @since 8.4RC1
      */
     public static final String NAMESPACE_PREFIX = ID + ':';
 

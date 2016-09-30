@@ -28,7 +28,7 @@ import org.xwiki.component.manager.ComponentManager;
  * Base class helper to implement {@link ComponentManagerFactory}.
  * 
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 public abstract class AbstractComponentManagerFactory implements ComponentManagerFactory
 {

@@ -52,7 +52,7 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
     /**
      * The prefix of document namespace.
      * 
-     * @since 8.4M1
+     * @since 8.4RC1
      */
     public static final String NAMESPACE_PREFIX = ID + ':';
 

@@ -52,7 +52,7 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
     /**
      * The prefix of wiki namespace.
      * 
-     * @since 8.4M1
+     * @since 8.4RC1
      */
     public static final String NAMESPACE_PREFIX = ID + ':';
 

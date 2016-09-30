@@ -52,7 +52,7 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
     /**
      * The prefix of user namespace.
      * 
-     * @since 8.4M1
+     * @since 8.4RC1
      */
     public static final String NAMESPACE_PREFIX = ID + ':';
 

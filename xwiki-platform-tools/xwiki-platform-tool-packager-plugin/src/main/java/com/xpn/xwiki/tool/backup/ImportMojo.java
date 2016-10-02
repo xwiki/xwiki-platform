@@ -60,7 +60,7 @@ import org.xwiki.tool.utils.LogUtils;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Maven 2 plugin to import aset of XWiki documents into an existing database.
+ * Maven 2 plugin to import a set of XWiki documents into an existing database.
  *
  * @version $Id$
  */

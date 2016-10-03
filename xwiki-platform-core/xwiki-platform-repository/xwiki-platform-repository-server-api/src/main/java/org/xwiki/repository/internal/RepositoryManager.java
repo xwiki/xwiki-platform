@@ -920,6 +920,9 @@ public class RepositoryManager implements Initializable, Disposable
         if (xobjects != null) {
             boolean deleteExistingObjects = false;
 
+            // Clone since we are going to modify and parse it at the same time
+            xobjects = new ArrayList(document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE));
+
             for (int i = 0; i < xobjects.size(); ++i) {
                 BaseObject dependencyObject = xobjects.get(i);
 
@@ -946,16 +949,20 @@ public class RepositoryManager implements Initializable, Disposable
                             xobjectDependency.setRepositories(XWikiRepositoryModel
                                 .toRepositoryDescriptors(xobjectRepositories));
 
-                            ExtensionDependency dependency = dependencies.get(dependencyIndex);
+                            if (dependencies.size() > dependencyIndex) {
+                                ExtensionDependency dependency = dependencies.get(dependencyIndex);
 
-                            if (!dependency.equals(xobjectDependency)) {
-                                deleteExistingObjects = true;
+                                if (dependency.equals(xobjectDependency)) {
+                                    ++dependencyIndex;
 
-                                document.removeXObject(dependencyObject);
-                                needSave = true;
-                            } else {
-                                ++dependencyIndex;
+                                    continue;
+                                }
                             }
+
+                            deleteExistingObjects = true;
+
+                            document.removeXObject(dependencyObject);
+                            needSave = true;
                         }
                     }
                 }

@@ -881,11 +881,8 @@ public class RepositoryManager implements Initializable, Disposable
     {
         Query query;
         try {
-            query =
-                this.queryManager.createQuery(
-                    "from doc.object(XWiki.XWikiUsers) as user"
-                        + " where user.first_name like :userfirstname OR user.last_name like :userlastname",
-                    Query.XWQL);
+            query = this.queryManager.createQuery("from doc.object(XWiki.XWikiUsers) as user"
+                + " where user.first_name like :userfirstname OR user.last_name like :userlastname", Query.XWQL);
 
             query.bindValue("userfirstname", '%' + authorElements[0] + '%');
             query.bindValue("userlastname", '%' + authorElements[authorElements.length - 1] + '%');

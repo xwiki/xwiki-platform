@@ -1072,6 +1072,13 @@ public class RepositoryManager implements Initializable, Disposable
 
     protected boolean update(BaseObject object, String fieldName, Object value)
     {
+        // Make sure collection are lists
+        if (value instanceof Collection) {
+            if (!(value instanceof List)) {
+                value = new ArrayList<>((Collection) value);
+            }
+        }
+
         if (ObjectUtils.notEqual(value, getValue(object, fieldName))) {
             object.set(fieldName, value, this.xcontextProvider.get());
 

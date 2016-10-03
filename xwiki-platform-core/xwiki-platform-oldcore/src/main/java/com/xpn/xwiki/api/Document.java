@@ -751,9 +751,20 @@ public class Document extends Api
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId) throws XWikiException
     {
         // Make sure we keep using current author as passed content author
-        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, null, getXWikiContext());
+        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false, getCallerDocument(getXWikiContext()),
+            getXWikiContext());
     }
 
+    private XWikiDocument getCallerDocument(XWikiContext xcontext)
+    {
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc == null) {
+            sdoc = xcontext.getDoc();
+        }
+
+        return sdoc;
+    }
+    
     /**
      * @param targetSyntax the syntax in which to render the document content
      * @return the rendered content

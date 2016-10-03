@@ -1268,7 +1268,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
         boolean restrictedTransformationContext, XWikiContext context)
     {
-        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, restrictedTransformationContext, this, context);
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, restrictedTransformationContext, null, context);
     }
 
     /**
@@ -1288,11 +1288,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         XWikiDocument currentSDocument = (XWikiDocument) context.get(CKEY_SDOC);
         try {
-            // Remember what is the current caller document because #setAsContextDoc reset it
-            if (sDocument == null) {
-                sDocument = getCallerDocument(context);
-            }
-
             // We have to render the given text in the context of this document. Check if this document is already
             // on the context (same Java object reference). We don't check if the document references are equal
             // because this document can have temporary changes that are not present on the context document even if
@@ -1303,7 +1298,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 setAsContextDoc(context);
             }
 
-            // Make sure to execute the document with the right of the calling author
+            // Make sure to execute the document with the right of the provided sdocument's author
             if (sDocument != null) {
                 context.put(CKEY_SDOC, sDocument);
             }
@@ -1329,16 +1324,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return "";
-    }
-
-    private XWikiDocument getCallerDocument(XWikiContext xcontext)
-    {
-        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
-        if (sdoc == null) {
-            sdoc = xcontext.getDoc();
-        }
-
-        return sdoc;
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException

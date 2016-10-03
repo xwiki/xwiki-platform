@@ -31,8 +31,8 @@
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1473764546000</date>
-  <contentUpdateDate>1473756898000</contentUpdateDate>
+  <date>1475504230000</date>
+  <contentUpdateDate>1427461793000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -49,6 +49,27 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
+    <allowednamespaces>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <multiSelect>1</multiSelect>
+      <name>allowednamespaces</name>
+      <number>26</number>
+      <picker>0</picker>
+      <prettyName>Allowed namespaces</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators>|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </allowednamespaces>
     <authors>
       <cache>0</cache>
       <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>

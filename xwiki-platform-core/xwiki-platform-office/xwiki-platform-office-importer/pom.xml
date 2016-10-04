@@ -33,7 +33,7 @@
   <properties>
     <!-- Skipping CLIRR since xwiki-platform-legacy-office-importer wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

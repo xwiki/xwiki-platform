@@ -62,7 +62,7 @@ public class ExpandedMacroBlockTest
     public void getContentWrapsChildNodesInXDOM()
     {
         ExpandedMacroBlock expandedMacroBlock =
-            new ExpandedMacroBlock("gallery", Collections.emptyMap(), this.contentRenderer, false);
+            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
 
         expandedMacroBlock.getContent();
 
@@ -75,9 +75,9 @@ public class ExpandedMacroBlockTest
     @Test
     public void getContentUsesChildXDOM()
     {
-        XDOM content = new XDOM(Collections.emptyList());
+        XDOM content = new XDOM(Collections.<Block>emptyList());
         ExpandedMacroBlock expandedMacroBlock =
-            new ExpandedMacroBlock("gallery", Collections.emptyMap(), this.contentRenderer, false);
+            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
         expandedMacroBlock.addChild(content);
 
         expandedMacroBlock.getContent();
@@ -88,8 +88,8 @@ public class ExpandedMacroBlockTest
     @Test
     public void getContentUsesAnotherBlockRenderer() throws Exception
     {
-        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock("gallery", Collections.emptyMap(),
-            this.contentRenderer, false, this.componentManager);
+        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock("gallery",
+            Collections.<String, String>emptyMap(), this.contentRenderer, false, this.componentManager);
         XDOM parent = new XDOM(Collections.singletonList(expandedMacroBlock));
         parent.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.MARKDOWN_1_1);
 

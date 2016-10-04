@@ -42,6 +42,7 @@ import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.logging.LogLevel;
@@ -67,6 +68,7 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -78,13 +80,15 @@ import static org.mockito.Mockito.when;
 @AllComponents
 public class XarExtensionHandlerTest
 {
-    private MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    private MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
-    private MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.componentManager);
+    private MockitoComponentManagerRule componentManager = this.oldcore.getMocker();
 
     @Rule
     public MockitoRepositoryUtilsRule repositoryUtil =
         new MockitoRepositoryUtilsRule(this.componentManager, this.oldcore);
+
+    private XarInstalledExtensionRepository installedExtensionRepository;
 
     private ExtensionId localXarExtensiontId1;
 
@@ -143,6 +147,9 @@ public class XarExtensionHandlerTest
         // Get rid of wiki macro listener
         this.componentManager.<ObservationManager>getInstance(ObservationManager.class)
             .removeListener("RegisterMacrosOnImportListener");
+
+        this.installedExtensionRepository =
+            this.componentManager.getInstance(InstalledExtensionRepository.class, "xar");
     }
 
     private void mockHasAdminRight(boolean right) throws XWikiException
@@ -241,7 +248,7 @@ public class XarExtensionHandlerTest
 
         // install
 
-        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+        XarInstalledExtension xarInstalledExtension = install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
         verifyHasAdminRight(2);
 
@@ -295,6 +302,15 @@ public class XarExtensionHandlerTest
 
         Assert.assertFalse("Document wiki:space1.page1 has not been saved in the database", page1.isNew());
 
+        assertEquals(Arrays.asList(xarInstalledExtension),
+            this.installedExtensionRepository.getXarInstalledExtensions(page1.getDocumentReference()));
+        assertEquals(Arrays.asList(xarInstalledExtension),
+            this.installedExtensionRepository.getXarInstalledExtensions(page1.getDocumentReferenceWithLocale()));
+        assertEquals(0, this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("wiki", "space1", "page1", Locale.ENGLISH)).size());
+        assertEquals(0, this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("otherwiki", "space1", "page1")).size());
+
         // translated.translated
         DocumentReference translatedReference = new DocumentReference("wiki", "translated", "translated");
         XWikiDocument defaultTranslated =
@@ -311,6 +327,9 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong content author", this.contextUser, defaultTranslated.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
+        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+            .getXarInstalledExtensions(defaultTranslated.getDocumentReferenceWithLocale()));
+
         // translated.translated.tr
         XWikiDocument translated =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
@@ -326,6 +345,9 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong content author", this.contextUser, translated.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
+        assertEquals(Arrays.asList(xarInstalledExtension),
+            this.installedExtensionRepository.getXarInstalledExtensions(translated.getDocumentReferenceWithLocale()));
+
         // translated.translated.fr
         XWikiDocument translated2 =
             this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
@@ -340,6 +362,9 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong author", this.contextUser, translated2.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, translated2.getContentAuthorReference());
         Assert.assertEquals("Wrong version", "1.1", translated2.getVersion());
+
+        assertEquals(Arrays.asList(xarInstalledExtension),
+            this.installedExtensionRepository.getXarInstalledExtensions(translated2.getDocumentReferenceWithLocale()));
 
         // space.hiddenpage
 
@@ -796,11 +821,13 @@ public class XarExtensionHandlerTest
 
         // validate
 
+        // space.page belong to several extensions
         XWikiDocument page =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
 
-        Assert.assertTrue("Document wiki.space.page has not been removed from the database", page.isNew());
+        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
 
+        // space1.page1 only belong to the uninstalled extension
         XWikiDocument page1 =
             this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,6 +107,12 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     {
         XarInstalledExtension installedExtension = (XarInstalledExtension) getInstalledExtension(extensionId);
 
+        pagesUpdated(installedExtension, namespace, add);
+    }
+
+    private void pagesUpdated(XarInstalledExtension installedExtension, String namespace, boolean add)
+        throws UnsupportedNamespaceException
+    {
         if (installedExtension != null) {
             for (XarEntry xarEntry : installedExtension.getXarPackage().getEntries()) {
                 if (namespace != null) {
@@ -165,11 +172,14 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         }
     }
 
-    private void addCacheXarExtension(InstalledExtension installedExtension) throws IOException, XarException
+    private XarInstalledExtension addCacheXarExtension(InstalledExtension installedExtension)
+        throws IOException, XarException
     {
         XarInstalledExtension xarExtension = new XarInstalledExtension(installedExtension, this);
 
         addCachedExtension(xarExtension);
+
+        return xarExtension;
     }
 
     protected void removeCachedXarExtension(ExtensionId extensionId)
@@ -186,9 +196,21 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
         for (InstalledExtension localExtension : this.installedRepository.getInstalledExtensions()) {
             if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
                 try {
-                    addCacheXarExtension(localExtension);
+                    // Add XAR extension to the cache
+                    XarInstalledExtension xarInstalledExtension = addCacheXarExtension(localExtension);
+
+                    // Add extension pages to the index
+                    if (xarInstalledExtension.getNamespaces() == null) {
+                        pagesUpdated(xarInstalledExtension, null, true);
+                    } else {
+                        for (String namespace : localExtension.getNamespaces()) {
+                            pagesUpdated(xarInstalledExtension, namespace, true);
+                        }
+                    }
                 } catch (Exception e) {
                     this.logger.error("Failed to parse extension [{}]", localExtension.getId(), e);
+
+                    continue;
                 }
             }
         }
@@ -201,8 +223,12 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
      */
     public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
     {
-        Collection<XarInstalledExtension> wikiExtensions = this.documents.get(reference);
-        Collection<XarInstalledExtension> rootExtensions = this.rootDocuments.get(reference);
+        Collection<XarInstalledExtension> wikiExtensions = this.documents
+            .get(reference.getLocale() == null ? new DocumentReference(reference, Locale.ROOT) : reference);
+        Collection<XarInstalledExtension> rootExtensions =
+            this.rootDocuments.get(reference.getLocaleDocumentReference().getLocale() == null
+                ? new LocalDocumentReference(reference.getLocaleDocumentReference(), Locale.ROOT)
+                : reference.getLocaleDocumentReference());
 
         List<XarInstalledExtension> allExtensions = new ArrayList<>();
 

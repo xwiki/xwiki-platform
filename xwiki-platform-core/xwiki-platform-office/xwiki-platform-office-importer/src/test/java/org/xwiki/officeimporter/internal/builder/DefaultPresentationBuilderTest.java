@@ -151,7 +151,7 @@ public class DefaultPresentationBuilderTest
         Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));
     }
 
-    private Answer<Document> returnMatchingDocument(String content, Document document)
+    private Answer<Document> returnMatchingDocument(final String content, final Document document)
     {
         return new Answer<Document>()
         {

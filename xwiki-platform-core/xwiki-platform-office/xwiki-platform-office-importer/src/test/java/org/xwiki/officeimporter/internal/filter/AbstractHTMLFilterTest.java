@@ -58,7 +58,7 @@ public abstract class AbstractHTMLFilterTest
 
     protected Document filter(String content)
     {
-        return filter(content, Collections.emptyMap());
+        return filter(content, Collections.<String, String>emptyMap());
     }
 
     protected Document filter(String content, Map<String, String> cleaningParameters)
@@ -73,7 +73,7 @@ public abstract class AbstractHTMLFilterTest
 
     protected Document filterAndAssertOutput(String input, String expectedOuput)
     {
-        return filterAndAssertOutput(input, Collections.emptyMap(), expectedOuput);
+        return filterAndAssertOutput(input, Collections.<String, String>emptyMap(), expectedOuput);
     }
 
     protected Document filterAndAssertOutput(String input, Map<String, String> cleaningParameters, String expectedOuput)

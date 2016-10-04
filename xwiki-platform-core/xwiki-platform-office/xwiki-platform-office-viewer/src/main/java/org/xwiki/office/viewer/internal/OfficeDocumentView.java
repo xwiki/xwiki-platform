@@ -29,7 +29,8 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * Holds all the information belonging to an office attachment view. Instances of this class are mainly used for caching
  * office attachment views.
  * 
- * @since 5.4.6/6.2.2
+ * @since 5.4.6
+ * @since 6.2.2
  * @version $Id$
  */
 public class OfficeDocumentView

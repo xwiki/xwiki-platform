@@ -103,7 +103,7 @@ public class DefaultQuery implements SecureQuery
     /**
      * field for {@link #getExecuter()}.
      */
-    private QueryExecutor executer;
+    private transient QueryExecutor executer;
 
     /**
      * Create a Query.
@@ -293,5 +293,11 @@ public class DefaultQuery implements SecureQuery
     protected QueryExecutor getExecuter()
     {
         return this.executer;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getStatement();
     }
 }

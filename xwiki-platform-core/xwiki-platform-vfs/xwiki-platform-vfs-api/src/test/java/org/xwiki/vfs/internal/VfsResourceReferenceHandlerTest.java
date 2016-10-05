@@ -44,8 +44,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
@@ -143,35 +141,9 @@ public class VfsResourceReferenceHandlerTest
     }
 
     @Test
-    public void handleWhenNotPermitted() throws Exception
-    {
-        setUp("attach", "wiki2", "space2", "page2", "test.zip", Arrays.asList("test.txt"));
-
-        // Disallow access to the document
-        ContextualAuthorizationManager authorizationManager =
-            this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.VIEW, this.documentReference)).thenReturn(false);
-
-        try {
-            this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
-            fail("Should have raised an exception here");
-        } catch (ResourceReferenceHandlerException expected) {
-            assertEquals("Failed to extract resource [uri = [attach:wiki2:space2.page2@test.zip], path = [test.txt], "
-                + "parameters = []]", expected.getMessage());
-            assertEquals("IOException: No View permission for document [wiki2:space2.page2]",
-                ExceptionUtils.getRootCauseMessage(expected));
-        }
-    }
-
-    @Test
     public void handleOk() throws Exception
     {
         setUp("attach", "wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
-
-        // Allow access to the document
-        ContextualAuthorizationManager authorizationManager =
-            this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
-        when(authorizationManager.hasAccess(Right.VIEW, this.documentReference)).thenReturn(true);
 
         assertEquals(Arrays.asList(VfsResourceReference.TYPE),
             this.mocker.getComponentUnderTest().getSupportedResourceReferences());

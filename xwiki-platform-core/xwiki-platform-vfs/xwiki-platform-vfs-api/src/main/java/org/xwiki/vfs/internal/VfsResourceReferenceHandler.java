@@ -84,7 +84,7 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
         VfsResourceReference vfsResourceReference = (VfsResourceReference) resourceReference;
 
         try {
-            // Verify that the user has the permission for the specified VFS scheme
+            // Verify that the user has the permission for the specified VFS scheme and for the VFS URI
             this.permissionChecker.checkPermission(vfsResourceReference);
 
             // Extract the asked resource from inside the zip and return its content for display.

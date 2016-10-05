@@ -56,7 +56,7 @@
 ############################
 #set($variables = {
   "logos": {
-    "logo": "logo"
+    "logo": "image"
   },
   "base-colors": {
     "text-color": "color",
@@ -72,12 +72,23 @@
     "component-active-color" : "color",
     "component-active-bg" : "color"
   },
+  "header": {
+    "xwiki-display-page-header": "boolean",
+    "xwiki-page-header-bg-color": "color",
+    "xwiki-page-header-bg-image": "image"
+  },
   "typography" : {
     "font-family-base": "font",
     "font-family-sans-serif": "font",
     "font-family-serif": "font",
     "font-family-monospace": "font",
     "font-size-base" : "size"
+  },
+  "tables" : {
+    "table-cell-padding": "size",
+    "table-bg": "color",
+    "table-bg-hover": "color",
+    "table-border-color": "color"
   },
   "buttons": {
     "btn-font-weight" : "text",
@@ -161,6 +172,77 @@
   &lt;/ul&gt;
 #end
 ############################
+## FIELD TEXTAREA
+############################
+#macro(fieldTextarea $varName $obj)
+  #if($varName == 'lessCode')
+    &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
+  #end
+  &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
+    $!escapetool.xml($!doc.getValue($varName, $obj))
+  &lt;/textarea&gt;
+#end
+############################
+## FIELD IMAGE
+############################
+#macro(fieldImage $varName $obj)
+  #set($currentLogo = $obj.getValue($varName))
+  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-image"&gt;
+    &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
+    #foreach($attachment in $doc.getAttachmentList())
+      #if($attachment.isImage())
+        &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+      #end
+    #end
+  &lt;/select&gt;
+#end
+############################
+## FIELD TEXT
+############################
+#macro(fieldText $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control type-text" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD SIZE
+############################
+#macro(fieldSize $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control type-size" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD COLOR
+############################
+#macro(fieldColor $varName $obj)
+  &lt;div class="input-group"&gt;
+    &lt;input type="text" class="form-control color-picker type-color" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+  &lt;/div&gt;
+#end
+############################
+## FIELD BOOLEAN
+############################
+#macro(fieldBoolean $varName $obj)
+  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-boolean"&gt;
+    #set ($value = $doc.getValue($varName, $obj))
+    &lt;option value="0"&gt;$services.localization.render("no")&lt;/option&gt;
+    &lt;option value="1" #if("$!value" == '1') selected="selected"#end&gt;$services.localization.render("yes")&lt;/option&gt;
+  &lt;/select&gt;
+#end
+############################
+## FIELD POSITION
+############################
+#macro(fieldPosition $varName $obj)
+  &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName" class="type-position"&gt;
+    &lt;option&gt;top&lt;/option&gt;
+    &lt;option&gt;bottom&lt;/option&gt;
+    &lt;option&gt;left&lt;/option&gt;
+    &lt;option&gt;right&lt;/option&gt;
+    &lt;option&gt;center&lt;/option&gt;
+  &lt;/select&gt;
+#end
+############################
 ## DISPLAY VARIABLES PANES
 ############################
 #macro(displayVariablesPanes)
@@ -175,27 +257,20 @@
         &lt;div class="form-group"&gt;
           &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
           &lt;div class="col-xs-12"&gt;
-            #if($varType == 'logo')
-              #set($currentLogo = $obj.getValue('logo'))
-              &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
-                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
-                #foreach($attachment in $doc.getAttachmentList())
-                  #if($attachment.isImage())
-                    &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
-                  #end
-                #end
-              &lt;/select&gt;
+            #if($varType == 'image')
+              #fieldImage($varName, $obj)
             #elseif($varType == 'textarea')
-              #if($varName == 'lessCode')
-                &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
-              #end
-              &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $!escapetool.xml($!doc.getValue($varName, $obj))
-              &lt;/textarea&gt;
+              #fieldTextarea($varName, $obj)
+            #elseif($varType == 'size')
+              #fieldSize($varName, $obj)
+            #elseif($varType == 'color')
+              #fieldColor($varName, $obj)
+            #elseif($varType == 'boolean')
+              #fieldBoolean($varName, $obj)
+            #elseif($varType == 'position')
+              #fieldPosition($varName, $obj)
             #else
-              &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end type-${varType}" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
-              &lt;/div&gt;
+              #fieldText($varName, $obj)
             #end
           &lt;/div&gt;
         &lt;/div&gt;
@@ -345,21 +420,32 @@
 require(['jquery', 'xwiki-meta'], function($, xm) {
   'use strict';
 
+  /**
+   * @return if the 'xwiki-display-page-header' variable is set to 'yes'
+   */
+  var getDisplayPageHeaderValue = function () {
+    return $('#var-xwiki-display-page-header').val() == '1' ? true : false;
+  }
+
+  // To handle the variable 'xwiki-display-page-header', we need to refresh the whole iframe and not only the less code.
+  // This is because it's not a LESS variable but an XWiki one, used in some templates with Velocity.
+  var displayPageHeader = getDisplayPageHeaderValue();
+
   // Waiting jQuery to be ready
   $(document).ready(function() {
-  
+
     // Usefull variables
     var iframe = $("#iframe");
     var autoSync = $("#autosync");
-    var variableInputs = $("#bt-variables input");
-    
+    var variableInputs = $("#bt-variables input,#bt-variables select");
+
     // Need IE9+ or any other recent browser
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
     if (match &amp;&amp; parseInt(match[1]) &lt; 9) {
       iframe.parent().replaceWith("&lt;div class=\"panel-body\"&gt;&lt;div class=\"alert alert-danger\"&gt;$services.localization.render('platform.flamingo.themes.incompatiblebrowser')&lt;/div&gt;&lt;/div&gt;");
       return;
     }
-    
+
     // Put a gray curtain in front of the iframe
     var addCurtain = function() {
       var previewCurtain = $("#preview-curtain");
@@ -375,12 +461,12 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       previewCurtain.css("left", iframePosition.left);
       previewCurtain.css("right", iframePosition.right);
     }
-    
+
     // Remove the curtain
     var removeCurtain = function() {
       $("#preview-curtain").remove();
     }
-    
+
     // Function that waits the iframe to be fully loaded
     var waitUntilIFrameIsLoaded = function(callback) {
       var iframeHead = $(iframe).contents().find("head")[0];
@@ -390,7 +476,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         setTimeout(function(){ waitUntilIFrameIsLoaded(callback); }, 100);
       }
     };
-    
+
     // Function that waits the iframe has loaded LESS
     var waitUntilLessIsLoadedInIFrame = function(callback) {
       if (iframe[0].contentWindow.lessJs !== undefined) {
@@ -399,10 +485,20 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         setTimeout(function(){ waitUntilLessIsLoadedInIFrame(callback); }, 100 );
       }
     }
-    
+
     // Refresh the preview
     var refreshPreview = function () {
       addCurtain();
+      // To handle the $displayPageHeader variable, we need to refresh the whole iframe because it's not a LESS variable, but a
+      // velocity one.
+      if (displayPageHeader != getDisplayPageHeaderValue()) {
+        displayPageHeader = getDisplayPageHeaderValue();
+        // Reload the iframe
+        iframe[0].src = new XWiki.Document(XWiki.Model.resolve('Main.WebHome', XWiki.EntityType.DOCUMENT)).getURL('view', 'colortheme=no&amp;displayPageHeader='+displayPageHeader);
+        // Because the iframe will be reloaded, the initIframe() method will be called thanks to the DOM event so we
+        // don't need to do more than that.
+        return;
+      }
       // Get the variables' values
       var varMap = {};
       for (var i=0; i&lt;variableInputs.length; ++i) {
@@ -412,18 +508,26 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
           var value = variableInput.value
+          var input = $(variableInput);
           // Some values need to be placed inside a string
-          if ($(variableInput).hasClass('type-escapedText')) {
+          if (input.hasClass('type-image')) {
+            var url = $("#attachmentsURL").attr('data-value');
+            value = 'url('+ url.replace("__tochange__", value) + ')';
+          }
+          if (input.hasClass('type-escapedText')) {
             value = '"' + value.replace('"', '\\"') + '"';
+          }
+          if (input.hasClass('type-boolean') || input.hasClass('type-position')) {
+            continue;
           }
           varMap[name] = value;
         }
       }
-      
+
       // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file.
       // It is handled by our LessCodePlugin.
       iframe[0].contentWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
-      
+
       // We run LESS in a thread in order to not block the main thread
       setTimeout(function(){
         // Run LESS (which use promises)
@@ -435,10 +539,11 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);
       }, 10);
     };
-    
+
     // Function called when an input is changed by the user
     var onChange = function (variableInput) {
-      if (autoSync.prop("checked")) {
+      var input = $(variableInput);
+      if (autoSync.prop("checked") &amp;&amp; !input.hasClass('type-boolean')) {
         var oldValue = variableInput.value;
         setTimeout(function(){
           if (variableInput.value == oldValue) {
@@ -447,7 +552,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         }, 1000);
       }
     }
-    
+
     // Function that change the logo in the iframe
     var setLogo = function(event) {
       var value = $("#var-logo").val();
@@ -460,25 +565,25 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         iFrameLogo.attr("src", url.replace("__tochange__", value));
       }
     }
-    
+
     // Function that adds LESS scripts to the iframe document
     var initIframe = function() {
       addCurtain();
       var iframeHead = iframe.contents().find("head")[0];
-      
+
       // 1: Add a link to the LESS source code of the skin
       var link = document.createElement("link");
       link.rel = "stylesheet/less";
       link.type = "text/css";
       link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
       iframeHead.appendChild(link);
-      
+
       // 2: Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable
       // to the LESS code of the skin.
-      
+
       // The plugin is an AMD module defined in an other page (we add a query string so require.js does not append the '.js' suffix).
       var pluginURL = new XWiki.Document(new XWiki.DocumentReference(xm.wiki, ['FlamingoThemesCode'], 'LessCodePluginJs')).getURL('jsx', 'r=1');
-      
+
       // We add a script tag to the iframe that will load our plugin and the LESS preprocessor
       var script = document.createElement("script");
       script.innerHTML  = "\
@@ -503,7 +608,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }); \n\
         });";
       iframeHead.appendChild(script);
-      
+
       // 3: Refresh the live preview
       waitUntilLessIsLoadedInIFrame(function(){
         // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
@@ -512,14 +617,14 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         setTimeout(refreshPreview, 1);
       });
     };
-    
+
     // Add the curtain which will be removed when the iframe will be loaded and the LESS code compiled
     addCurtain()
     // The user can navigate to an other page inside the iframe, so when the page changes (onload),
     // we re-init the iframe to use LESS
     iframe.load(initIframe);
     // Initialize the event handlers
-    $("#refresh").click( function() { 
+    $("#refresh").click( function() {
       // We refresh it in a thread to avoid blocking the browser.
       setTimeout(refreshPreview, 1);
     });
@@ -531,10 +636,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     $("#var-logo").on("change", setLogo);
     // Set the good logo at the start
     setLogo();
-    
-    
+
+
   });
-  
+
 });
 </code>
     </property>
@@ -642,18 +747,18 @@ require(['jquery', 'colpick'], function($, Colpick) {
 
   // Get the inputs that need to be enhanced
   var inputs = $('.color-picker');
-  
+
   // For each input
   for (var i=0; i&lt;inputs.length; ++i) {
     var input = $(inputs[i]);
     var parent = input.parent();
-    
+
     // Create the color preview box
     parent.append('&lt;span class="input-group-addon"&gt;&lt;span class="color-preview"&gt;&lt;/span&gt;&lt;/span&gt;');
-    
+
     // Update the color preview box
     parent.find('.color-preview').css('background-color', input.val());
-    
+
     // Enable the color picker
     input.colpick({
       layout: 'hex',
@@ -671,7 +776,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
         element.trigger('change');
       }
     });
-    
+
     // If the user write a value manually
     input.keyup(function(event){
       var element = $(event.target);
@@ -681,7 +786,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
       element.colpickSetColor(element.val(), false);
     });
   }
-  
+
   // Hide the color picker if the user scrolls
   $('.tab-content').scroll(function(){
     // For each input

@@ -497,6 +497,19 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </font-size-base>
+    <xwiki-page-header-bg-image>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>xwiki-page-header-bg-image</name>
+      <number>60</number>
+      <picker>0</picker>
+      <prettyName>xwiki-page-header-bg-image</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </xwiki-page-header-bg-image>
     <headings-color>
       <disabled>0</disabled>
       <name>headings-color</name>
@@ -768,6 +781,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </text-color>
+    <xwiki-display-page-header>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <name>xwiki-display-page-header</name>
+      <number>61</number>
+      <prettyName>xwiki-display-page-header</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </xwiki-display-page-header>
     <xwiki-page-content-bg>
       <customDisplay/>
       <disabled>0</disabled>

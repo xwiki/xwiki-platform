@@ -171,15 +171,20 @@
       "panel-default-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
-      "breadcrumb-separator": "escapedText"
+      "breadcrumb-separator": "escapedText",
+      "xwiki-page-header-bg-color": "color",
+      "xwiki-page-header-bg-image": "image",
+      "xwiki-page-header-bg-position": "text"
       })
     #set($themeClass = $xwiki.getClass('FlamingoThemesCode.ThemeClass'))
     #foreach($property in $variables.keySet())
       #set($value = $themeDoc.getValue($property, $themeObj))
       #if("$!value" != '')
         #set($propertyType = $variables.get($property))
-        #if($propertyType == 'escapedText')
-          @$property: "$escapetool.javascript($value)";
+        #if($propertyType == 'image')
+          @$property: url("$themeDoc.getAttachmentURL($value)");
+        #elseif($propertyType == 'escapedText')
+          @$property: "$escapetool.javascript($value)";  
         #else
           @$property: $value;
         #end

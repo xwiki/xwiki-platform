@@ -133,5 +133,26 @@
   #set($showRightPanels = '0')
 #end
 
+##
+## Handle 'displayPageHeader' parameter (since 8.4RC1)
+##
+#if ("$request.displayPageHeader" == 'true')
+  #set($displayPageHeader = true)
+#elseif ("$request.displayPageHeader" != 'false')
+  ## If the parameter is not given in the URL, we fallback to the value of the Famingo Theme, which handle this
+  ## parameter since 8.4RC1
+  #set ($themeDocFullName = "$!{request.colorTheme}")
+  #if ($themeDocFullName == '')
+     #set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
+  #end
+  #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
+  #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+  #if ("$!$themeObj" != '')
+    #if ("$themeObj.getValue('xwiki-display-page-header')" == '1')
+      #set($displayPageHeader = true)
+    #end
+  #end
+#end
+
 ## To let custom skins easily override layout variables, we evaluate a template that is empty by default.
 #template("layoutExtraVars.vm")

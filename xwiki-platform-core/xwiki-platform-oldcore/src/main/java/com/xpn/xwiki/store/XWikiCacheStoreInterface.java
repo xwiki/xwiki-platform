@@ -30,5 +30,10 @@ public interface XWikiCacheStoreInterface extends XWikiStoreInterface
 
     void flushCache();
 
+    /**
+     * @deprecated since 8.3. It does not make much sense to make this method public and it was not really doing
+     *             anything for a very long time in practice (since Infinispan is the default cache inmplementation)
+     */
+    @Deprecated
     void initCache(int capacity, int pageExistCapacity, XWikiContext context) throws XWikiException;
 }

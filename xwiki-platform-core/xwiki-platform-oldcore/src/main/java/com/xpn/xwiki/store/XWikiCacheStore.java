@@ -103,29 +103,28 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     public void initCache(XWikiContext context) throws XWikiException
     {
-        int cacheCapacity = (int) context.getWiki().ParamAsLong("xwiki.store.cache.capacity", 500);
-        int pageExistCacheCapacity = (int) context.getWiki().ParamAsLong("xwiki.store.cache.pageexistcapacity", 10000);
-
-        initCache(cacheCapacity, pageExistCacheCapacity, context);
-    }
-
-    @Override
-    public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
-    {
         CacheManager cacheManager = Utils.getComponent(CacheManager.class);
 
         try {
-            Cache<XWikiDocument> pageCache =
-                cacheManager.createNewCache(new LRUCacheConfiguration("xwiki.store.pagecache", capacity));
-            setCache(pageCache);
+            int pageCacheCapacity = (int) context.getWiki().ParamAsLong("xwiki.store.cache.capacity", 500);
+            this.cache =
+                cacheManager.createNewCache(new LRUCacheConfiguration("xwiki.store.pagecache", pageCacheCapacity));
 
-            Cache<Boolean> pageExistcache = cacheManager
+            int pageExistCacheCapacity =
+                (int) context.getWiki().ParamAsLong("xwiki.store.cache.pageexistcapacity", 10000);
+            this.pageExistCache = cacheManager
                 .createNewCache(new LRUCacheConfiguration("xwiki.store.pageexistcache", pageExistCacheCapacity));
-            setPageExistCache(pageExistcache);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to initialize cache", e);
         }
+    }
+
+    @Deprecated
+    @Override
+    public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
+    {
+        // Do nothing
     }
 
     @Override
@@ -170,15 +169,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public void flushCache()
     {
-        if (this.cache != null) {
-            this.cache.dispose();
-            this.cache = null;
-        }
-
-        if (this.pageExistCache != null) {
-            this.pageExistCache.dispose();
-            this.pageExistCache = null;
-        }
+        getCache().removeAll();
+        getPageExistCache().removeAll();
     }
 
     @Override

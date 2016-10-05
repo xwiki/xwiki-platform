@@ -69,6 +69,19 @@ public class PathConverter extends AbstractConverter<Path>
 
         try {
             VfsResourceReference reference = new VfsResourceReference(new URI(value.toString()));
+
+            // Verify that the user has the permission for the specified VFS scheme. We need to do this at this level
+            // since it's possible to do the check in the driver itself since TrueVFS controls whether the driver is
+            // called or not and does caching,
+            // see https://java.net/projects/truezip/lists/users/archive/2015-12/message/8
+            // Since this convert has to be called to use the VFS API from Velocity, we're safe that this will prevent
+            // any Velocity script to execute a VFS call if the user is not allowed.
+            //
+            // Note: Even though the user needs View access to the attachment, we cannot check this right now because
+            // of the caching issue. However we consider that if the user has Programming Rights, he can do anything he
+            // wants and thus it's safe that he can access the attachment.
+            this.permissionChecker.checkPermission(reference);
+
             URI trueVfsURI = this.trueVfsResourceReferenceSerializer.serialize(reference);
             path = new TPath(trueVfsURI);
         } catch (Exception e) {

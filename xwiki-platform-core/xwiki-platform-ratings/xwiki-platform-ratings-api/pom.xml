@@ -34,6 +34,7 @@
   <name>XWiki Platform - Ratings - API</name>
   <description>API to rate wiki pages</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
     <platform.version>${commons.version}</platform.version>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>

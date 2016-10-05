@@ -3,4 +3,3 @@ org.xwiki.display.internal.DefaultDisplayConfiguration
 org.xwiki.display.internal.DefaultDocumentDisplayer
 org.xwiki.display.internal.DocumentContentDisplayer
 org.xwiki.display.internal.DocumentTitleDisplayer
-org.xwiki.display.internal.XWiki10DocumentTitleDisplayer

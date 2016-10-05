@@ -422,7 +422,12 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // We run LESS in a thread in order to not block the main thread
       setTimeout(function(){
         // Run LESS (which use promises)
-        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain).catch(removeCurtain);
+        // Note: because of yuicompressor which does not support Promise.prototype.catch() properly, we cannot
+        // call p.catch() directly (it generates an error in the logs).
+        // See http://jira.xwiki.org/browse/XWIKI-13772
+        // Instead, we use the following trick: p['catch']()
+        // TODO: remove this trick when we replace yuicompressor by something else.
+        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);
       }, 10);
     };
     

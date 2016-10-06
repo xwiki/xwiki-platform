@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Filter.ApplicationsPanelEntry" locale="">
   <web>Filter</web>
   <name>ApplicationsPanelEntry</name>
   <language/>
@@ -30,18 +30,15 @@
   <creationDate>1384439645000</creationDate>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384439741000</date>
-  <contentUpdateDate>1384439693000</contentUpdateDate>
+  <date>1475757366000</date>
+  <contentUpdateDate>1475757366000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden/>
+  <hidden>false</hidden>
   <content/>
   <object>
     <name>Filter.ApplicationsPanelEntry</name>
@@ -90,7 +87,9 @@
       <nameField/>
       <validationScript/>
       <content>
+        <contenttype/>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>content</name>
         <number>3</number>
         <prettyName>Extension Content</prettyName>
@@ -118,7 +117,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parameters>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>parameters</name>
         <number>4</number>
         <prettyName>Extension Parameters</prettyName>
@@ -137,7 +138,7 @@
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>wiki=Current Wiki|user=Current User|global=Global</values>

@@ -362,9 +362,14 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     // Put a gray curtain in front of the iframe
     var addCurtain = function() {
-      var iframePosition = iframe.position();
-      $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;").insertAfter(iframe);
       var previewCurtain = $("#preview-curtain");
+      if (previewCurtain.length &gt; 0) {
+        // The curtain already exist, do nothing.
+        return;
+      }
+      var iframePosition = iframe.position();
+      previewCurtain = $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;");
+      previewCurtain.insertAfter(iframe);
       previewCurtain.width(iframe.outerWidth(true));
       previewCurtain.height(iframe.outerHeight(true));
       previewCurtain.css("left", iframePosition.left);
@@ -501,7 +506,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       
       // 3: Refresh the live preview
       waitUntilLessIsLoadedInIFrame(function(){
-        removeCurtain();
         // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
         // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
         // We refresh it in a thread to avoid blocking the browser.
@@ -509,8 +513,8 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       });
     };
     
-    // Initialize the iframe
-    waitUntilIFrameIsLoaded(initIframe);
+    // Add the curtain which will be removed when the iframe will be loaded and the LESS code compiled
+    addCurtain()
     // The user can navigate to an other page inside the iframe, so when the page changes (onload),
     // we re-init the iframe to use LESS
     iframe.load(initIframe);

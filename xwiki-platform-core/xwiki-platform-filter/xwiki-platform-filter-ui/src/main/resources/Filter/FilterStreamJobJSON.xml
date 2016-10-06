@@ -46,11 +46,11 @@
   #if ($finished)
     #if ($jobStatus.log.getLogs('ERROR').isEmpty())
       &lt;div class="box successmessage"&gt;
-        Done toto.
+        Done.
       &lt;/div&gt;
     #else
       &lt;div class="box errormessage"&gt;
-        Error has been found during the conversion toto !
+        Error has been found during the conversion !
       &lt;/div&gt;
     #end
   #end

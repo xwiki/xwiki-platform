@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;

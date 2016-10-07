@@ -105,7 +105,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.defaultEntityReferenceSerializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.document.setSyntax(Syntax.XWIKI_1_0);
+        this.document.setSyntax(Syntax.XWIKI_2_0);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
@@ -231,9 +231,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
-        this.document.setContent("Some content\n1 Title");
-        this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
-            .will(velocityEngineEvaluateStub);
+        this.document.setContent("Some content\n= Title");
 
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
@@ -291,18 +289,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("value", this.document.extractTitle());
 
         this.document.setContent("content not in section\n=== header 3===");
-
-        assertEquals("", this.document.extractTitle());
-    }
-
-    public void testExtractTitle10()
-    {
-        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
-
-        assertEquals("header 1", this.document.extractTitle());
-
-        this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
     }

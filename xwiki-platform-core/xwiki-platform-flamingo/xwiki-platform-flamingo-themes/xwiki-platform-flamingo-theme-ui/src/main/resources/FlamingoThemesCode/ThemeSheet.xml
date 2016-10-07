@@ -264,34 +264,6 @@
   <object>
     <name>FlamingoThemesCode.ThemeSheet</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>27bbf39f-be74-4cb2-99fc-b62027a9f33c</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>inline</defaultEditMode>
-    </property>
-  </object>
-  <object>
-    <name>FlamingoThemesCode.ThemeSheet</name>
-    <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>55955fbc-78ed-4062-94b3-19da854f013a</guid>
     <class>
@@ -390,9 +362,14 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     // Put a gray curtain in front of the iframe
     var addCurtain = function() {
-      var iframePosition = iframe.position();
-      $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;").insertAfter(iframe);
       var previewCurtain = $("#preview-curtain");
+      if (previewCurtain.length &gt; 0) {
+        // The curtain already exist, do nothing.
+        return;
+      }
+      var iframePosition = iframe.position();
+      previewCurtain = $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;");
+      previewCurtain.insertAfter(iframe);
       previewCurtain.width(iframe.outerWidth(true));
       previewCurtain.height(iframe.outerHeight(true));
       previewCurtain.css("left", iframePosition.left);
@@ -450,7 +427,12 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       // We run LESS in a thread in order to not block the main thread
       setTimeout(function(){
         // Run LESS (which use promises)
-        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain).catch(removeCurtain);
+        // Note: because of yuicompressor which does not support Promise.prototype.catch() properly, we cannot
+        // call p.catch() directly (it generates an error in the logs).
+        // See http://jira.xwiki.org/browse/XWIKI-13772
+        // Instead, we use the following trick: p['catch']()
+        // TODO: remove this trick when we replace yuicompressor by something else.
+        iframe[0].contentWindow.lessJs.modifyVars(varMap).then(removeCurtain)['catch'](removeCurtain);
       }, 10);
     };
     
@@ -524,7 +506,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       
       // 3: Refresh the live preview
       waitUntilLessIsLoadedInIFrame(function(){
-        removeCurtain();
         // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
         // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
         // We refresh it in a thread to avoid blocking the browser.
@@ -532,8 +513,8 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       });
     };
     
-    // Initialize the iframe
-    waitUntilIFrameIsLoaded(initIframe);
+    // Add the curtain which will be removed when the iframe will be loaded and the LESS code compiled
+    addCurtain()
     // The user can navigate to an other page inside the iframe, so when the page changes (onload),
     // we re-init the iframe to use LESS
     iframe.load(initIframe);

@@ -56,9 +56,13 @@ public class AllTests
         LOGGER.info("Adding maven repository to xwiki.properties");
 
         PropertiesConfiguration properties = executor.loadXWikiPropertiesConfiguration();
+
         // Put self as extensions repository
-        properties.setProperty("extension.repositories", "maven-test:maven:"
-            + repositoryUtil.getMavenRepository().toURI());
+        properties.setProperty("extension.repositories",
+            "maven-test:maven:" + repositoryUtil.getMavenRepository().toURI());
+        // Disable core extension resolve because Jetty is not ready when it starts
+        properties.setProperty("extension.core.resolve", false);
+
         executor.saveXWikiProperties(properties);
     }
 

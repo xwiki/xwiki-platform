@@ -19,22 +19,17 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import javax.inject.Provider;
-
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
+ * @param <I> the type of the {@link InputSource}
  * @version $Id$
  * @since 6.4M1
  */
 public abstract class AbstractResource<I extends InputSource> implements Resource<I>
 {
-    protected final Provider<XWikiContext> xcontextProvider;
-
     protected ResourceRepository repository;
 
     protected String id;
@@ -43,15 +38,12 @@ public abstract class AbstractResource<I extends InputSource> implements Resourc
 
     protected String resourceName;
 
-    public AbstractResource(String id, String path, String resourceName, ResourceRepository repository,
-        Provider<XWikiContext> xcontextProvider)
+    public AbstractResource(String id, String path, String resourceName, ResourceRepository repository)
     {
         this.id = id;
         this.path = path;
         this.resourceName = resourceName;
         this.repository = repository;
-
-        this.xcontextProvider = xcontextProvider;
     }
 
     @Override
@@ -70,5 +62,17 @@ public abstract class AbstractResource<I extends InputSource> implements Resourc
     public String getPath()
     {
         return this.path;
+    }
+
+    @Override
+    public String getResourceName()
+    {
+        return this.resourceName;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId();
     }
 }

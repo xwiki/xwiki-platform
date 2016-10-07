@@ -98,7 +98,8 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     /**
-     * @since 7.1RC1, 6.4.5
+     * @since 7.1RC1
+     * @since 6.4.5
      */
     public void setrequestURL(StringBuffer requestURL)
     {
@@ -114,7 +115,8 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     /**
-     * @since 7.1RC1, 6.4.5
+     * @since 7.1RC1
+     * @since 6.4.5
      */
     public void setServerName(String serverName)
     {

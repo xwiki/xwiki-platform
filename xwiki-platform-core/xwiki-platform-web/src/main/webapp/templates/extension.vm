@@ -37,10 +37,14 @@
           value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$services.localization.render('extensions.search.tip')#{end}" />
         <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
         <select id="extensionSearchRepositoryList" name="repo">
-          <option value="">$services.localization.render('extensions.search.repository.all.label')</option>
+          ## Recommended extensions repository (default)
+          <option value="recommended">$services.localization.render("extensions.search.repository.recommended.label")</option>
           #if ($request.repo)
             #set ($selectedRepositoryId = $request.repo)
           #end
+          ## Remote extensions repository
+          <option value=""#if ($selectedRepositoryId == '') selected="selected"#end>$services.localization.render('extensions.search.repository.remote.label')</option>
+          ## Local repositories
           #foreach ($repositoryId in ['core', 'installed', 'local'])
             <option value="$repositoryId"#if ($selectedRepositoryId == $repositoryId) selected="selected"#end>
               $services.localization.render("extensions.search.repository.${repositoryId}.label")</option>
@@ -912,6 +916,9 @@ $namespace##
       #end
       #if ("$!extension.summary" != '')
         <div class="extension-summary">$escapetool.xml($extension.summary)</div>
+      #end
+      #if ($extension.isRecommended())
+        <div class="extension-recommended">$services.localization.render('extensions.info.recommended')</div>
       #end
       #displayProgressBar($extension)
       <div class="clearfloats"></div>

@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AnnotationConfigSheet" /}}</content>
+  <content/>
   <attachment>
     <filename>AnnotationsSectionIcon.png</filename>
     <author>xwiki:XWiki.Admin</author>
@@ -270,6 +270,38 @@
     </property>
     <property>
       <exceptionSpaces/>
+    </property>
+  </object>
+  <object>
+    <name>AnnotationCode.AnnotationConfig</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>74e36f78-d460-4f99-ae45-d6f0e984235f</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>AnnotationConfigSheet</sheet>
     </property>
   </object>
   <object>

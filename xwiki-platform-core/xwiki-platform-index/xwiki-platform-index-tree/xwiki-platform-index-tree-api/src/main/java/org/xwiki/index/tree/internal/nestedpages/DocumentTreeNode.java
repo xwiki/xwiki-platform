@@ -20,9 +20,7 @@
 package org.xwiki.index.tree.internal.nestedpages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +53,18 @@ import org.xwiki.tree.TreeNode;
  * The document tree node.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("document")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initializable
 {
+    private static final String FIELD_TITLE = "title";
+
+    private static final String PARAMETER_LOCALE = "locale";
+
     @Inject
     @Named("count")
     protected QueryFilter countQueryFilter;
@@ -79,6 +82,18 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
     @Inject
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
+
+    @Inject
+    @Named("childPage/nestedPages")
+    private QueryFilter childPageFilter;
+
+    @Inject
+    @Named("hiddenPage/nestedPages")
+    private QueryFilter hiddenPageFilter;
+
+    @Inject
+    @Named("documentReferenceResolver/nestedPages")
+    private QueryFilter documentReferenceResolverFilter;
 
     /**
      * We use a {@link LinkedHashMap} because the order of the key is important.
@@ -100,8 +115,8 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
         ComponentManager contextComponentManager = this.contextComponentManagerProvider.get();
         try {
             for (String nonLeafChildNodeType : nonLeafChildNodeTypes) {
-                this.nonLeafChildNodes.put(nonLeafChildNodeType,
-                    contextComponentManager.getInstance(TreeNode.class, nonLeafChildNodeType));
+                TreeNode treeNode = contextComponentManager.getInstance(TreeNode.class, nonLeafChildNodeType);
+                this.nonLeafChildNodes.put(nonLeafChildNodeType, treeNode);
             }
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to lookup the child components.", e);
@@ -138,56 +153,38 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode implements Initia
             return Collections.emptyList();
         }
 
-        List<String> constraints = new ArrayList<String>();
-        constraints.add("page.parent = :parent");
-
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("parent", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
-
-        if (!areHiddenEntitiesShown()) {
-            constraints.add("page.hidden <> true");
-        }
-        if (!areTerminalDocumentsShown()) {
-            constraints.add("page.terminal = false");
-        }
-
-        String whereClause = whereClause(constraints);
         String orderBy = getOrderBy();
-        String statement;
-        if ("title".equals(orderBy)) {
-            statement = StringUtils.join(Arrays.asList("select page.name, page.terminal from XWikiPage page",
-                "left join page.translations defaultTranslation with defaultTranslation.locale = ''",
-                "left join page.translations translation with translation.locale = :locale", whereClause,
-                "order by lower(coalesce(translation.title, defaultTranslation.title, page.name)), "
-                    + "coalesce(translation.title, defaultTranslation.title, page.name)"),
-                ' ');
-            parameters.put("locale", this.localizationContext.getCurrentLocale().toString());
-        } else {
-            statement = StringUtils.join(
-                Arrays.asList("select name, terminal from XWikiPage page", whereClause, "order by lower(name), name"),
-                ' ');
-        }
-        Query query = this.queryManager.createQuery(statement, Query.HQL);
-        query.setWiki(documentReference.getWikiReference().getName());
-        query.setOffset(offset);
-        query.setLimit(limit);
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            query.bindValue(entry.getKey(), entry.getValue());
-        }
-
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-        for (Object result : query.execute()) {
-            String name = (String) ((Object[]) result)[0];
-            Boolean terminal = (Boolean) ((Object[]) result)[1];
-            if (terminal) {
-                documentReferences.add(new DocumentReference(name, documentReference.getLastSpaceReference()));
+        Query query;
+        if (areTerminalDocumentsShown()) {
+            if (FIELD_TITLE.equals(orderBy)) {
+                query = this.queryManager.getNamedQuery("nestedPagesOrderedByTitle");
+                query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
             } else {
-                SpaceReference spaceReference = new SpaceReference(name, documentReference.getLastSpaceReference());
-                documentReferences.add(new DocumentReference(getDefaultDocumentName(), spaceReference));
+                query = this.queryManager.getNamedQuery("nestedPagesOrderedByName");
+            }
+        } else {
+            if (FIELD_TITLE.equals(orderBy)) {
+                query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle");
+                query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
+            } else {
+                // Query only the spaces table.
+                query = this.queryManager.createQuery(
+                    "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
             }
         }
 
-        return documentReferences;
+        query.setWiki(documentReference.getWikiReference().getName());
+        query.setOffset(offset);
+        query.setLimit(limit);
+
+        query.addFilter(this.childPageFilter);
+        query.bindValue("parent", this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
+
+        if (!areHiddenEntitiesShown()) {
+            query.addFilter(this.hiddenPageFilter);
+        }
+
+        return query.addFilter(this.documentReferenceResolverFilter).execute();
     }
 
     @Override

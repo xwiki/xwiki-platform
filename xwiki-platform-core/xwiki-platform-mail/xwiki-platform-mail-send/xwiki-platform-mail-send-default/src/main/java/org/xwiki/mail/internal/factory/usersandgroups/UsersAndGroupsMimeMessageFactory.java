@@ -40,7 +40,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
  * for each user. Also handles an optional list of users to exclude.
  *
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 @Component
 @Named("usersandgroups")

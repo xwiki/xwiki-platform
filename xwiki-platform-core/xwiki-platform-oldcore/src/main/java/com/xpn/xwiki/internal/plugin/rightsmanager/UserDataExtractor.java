@@ -29,7 +29,8 @@ import com.xpn.xwiki.objects.BaseObject;
  *
  * @param <T> the type of data extracted from the user profile
  * @version $Id$
- * @since 6.4.2, 7.0M2
+ * @since 6.4.2
+ * @since 7.0M2
  */
 public interface UserDataExtractor<T>
 {

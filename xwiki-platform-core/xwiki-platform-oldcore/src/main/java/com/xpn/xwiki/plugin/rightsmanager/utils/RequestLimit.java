@@ -23,7 +23,8 @@ package com.xpn.xwiki.plugin.rightsmanager.utils;
  * Contains maximum number of result to return and index of the first element.
  *
  * @version $Id$
- * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+ * @since 1.1.2
+ * @since 1.2M2
  */
 public class RequestLimit
 {

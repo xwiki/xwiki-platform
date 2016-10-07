@@ -42,7 +42,12 @@
   <content>administration.templateProvider.description=Description
 administration.templateProvider.description.hint=The information to be displayed for template provider when a new page is created.
 administration.templateProvider.icon=Icon
-administration.templateProvider.icon.hint=The icon to be displayed for template provider when a new page is created. Select one from the {0}full list of icons{1}.</content>
+administration.templateProvider.icon.hint=The icon to be displayed for template provider when a new page is created. Select one from the {0}full list of icons{1}.
+administration.templateProvider.creationRestrictions=Creation Restrictions
+administration.templateProvider.creationRestrictions.hint=The list of locations (including their children) where this template is allowed to create pages
+administration.templateProvider.creationRestrictions.none=This template can create pages everywhere
+administration.templateProvider.creationRestrictionsAreSuggestions=Creation Restrictions as Suggestions
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Allows the user to select any location to create the page with this template, using one of the existing restrictions just as the prefilled default location when the template is selected form the list.</content>
   <object>
     <name>XWiki.TemplateProviderTranslations</name>
     <number>0</number>

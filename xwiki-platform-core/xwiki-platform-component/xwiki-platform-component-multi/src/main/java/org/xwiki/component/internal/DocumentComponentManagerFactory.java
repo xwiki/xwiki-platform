@@ -19,13 +19,12 @@
  */
 package org.xwiki.component.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerFactory;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 
 /**
  * Implementation of {@link ComponentManagerFactory} which force parent to be {@link SpaceComponentManager}.
@@ -36,30 +35,11 @@ import org.xwiki.component.manager.ComponentManager;
 @Component
 @Named(DocumentComponentManager.ID)
 @Singleton
-public class DocumentComponentManagerFactory implements ComponentManagerFactory
+public class DocumentComponentManagerFactory extends AbstractEnityComponentManagerFactory
 {
-    /**
-     * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
-     */
-    @Inject
-    private ComponentManagerFactory factory;
-
-    /**
-     * The Component Manager to be used as parent when a component is not found in the current Component Manager.
-     */
-    @Inject
-    @Named(SpaceComponentManager.ID)
-    private ComponentManager spaceComponentManager;
-
     @Override
-    public ComponentManager createComponentManager(ComponentManager parentComponentManager)
+    protected EntityType getEntityType()
     {
-        return this.factory.createComponentManager(this.spaceComponentManager);
-    }
-
-    @Override
-    public ComponentManager createComponentManager(String namespace, ComponentManager parentComponentManager)
-    {
-        return this.factory.createComponentManager(namespace, this.spaceComponentManager);
+        return EntityType.DOCUMENT;
     }
 }

@@ -33,7 +33,9 @@ import static org.junit.Assert.assertTrue;
  * Tests related to the ApplicationsPanel Administration
  *  
  * @version $Id$
- * @since 7.1M1, 7.0.1, 6.4.4  
+ * @since 7.1M1
+ * @since 7.0.1
+ * @since 6.4.4
  */
 public class ApplicationsPanelAdministrationTest extends AbstractTest
 {

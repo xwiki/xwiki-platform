@@ -716,7 +716,7 @@ public class CreateActionTest
             templateProviderDocument);
         // Mock the provider object (template + spaces properties)
         BaseObject templateProviderObject = mock(BaseObject.class);
-        when(templateProviderObject.getListValue("spaces")).thenReturn(allowedSpaces);
+        when(templateProviderObject.getListValue("creationRestrictions")).thenReturn(allowedSpaces);
         String templateDocumentFullName = fullName.substring(0, fullName.indexOf("Provider"));
         when(templateProviderObject.getStringValue("template")).thenReturn(templateDocumentFullName);
         if (terminal != null) {

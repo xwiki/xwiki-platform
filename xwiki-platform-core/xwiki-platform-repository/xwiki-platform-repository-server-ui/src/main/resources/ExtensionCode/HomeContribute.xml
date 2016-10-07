@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="ExtensionCode.HomeContribute" locale="">
+  <web>ExtensionCode</web>
+  <name>HomeContribute</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1473755136000</creationDate>
+  <parent>Extension.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1473755136000</date>
+  <contentUpdateDate>1473755136000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Contribute box for the Home page</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>(% class="extension-link add-extension box" %)(((
+(((
+{{velocity}}
+=== #if($services.icon)$services.icon.render('add')#end Contribute Extension... ===
+{{html}}
+#if ($isGuest)
+  You need first to &lt;a href="${escapetool.xml($xwiki.getURL('Main.WebHome', 'login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
+#else
+&lt;form action="$doc.getURL()" id="createextension"&gt;
+  &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
+  &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
+  &lt;input type="hidden" name="createExtension" value="true" /&gt;
+  &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
+  &lt;span class="buttonwrapper"&gt;
+    &lt;input class="btn btn-success" type="submit" value="Add" id="contributeSubmit"/&gt;
+  &lt;/span&gt;
+&lt;/form&gt;
+{{/html}}
+
+[[Import&gt;&gt;ExtensionCode.ImportExtension]]
+#end
+{{/velocity}}
+)))
+)))
+
+(% class="clearfloats" %)((()))(%%)
+</content>
+</xwikidoc>

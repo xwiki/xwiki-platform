@@ -21,22 +21,30 @@ package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jmock.Expectations;
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.w3c.dom.Document;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -44,6 +52,14 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
@@ -51,156 +67,100 @@ import org.xwiki.rendering.syntax.Syntax;
  * @version $Id$
  * @since 2.1M1
  */
-public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
+public class DefaultPresentationBuilderTest
 {
-    /**
-     * The name of an input file to be used in tests.
-     */
-    private static final String INPUT_FILE_NAME = "office.ppt";
-
-    /**
-     * The name of the output file.
-     */
-    private static final String OUTPUT_FILE_NAME = "img0.html";
-
-    /**
-     * The {@link PresentationBuilder} component being tested.
-     */
-    private DefaultPresentationBuilder presentationBuilder;
+    @Rule
+    public MockitoComponentMockingRule<PresentationBuilder> mocker =
+        new MockitoComponentMockingRule<PresentationBuilder>(DefaultPresentationBuilder.class);
 
     /**
      * The component used to parse the presentation HTML.
      */
-    private Parser mockXHTMLParser;
+    private Parser xhtmlParser;
 
-    @Override
+    private OfficeConverter officeConverter;
+
+    private HTMLCleaner officeHTMLCleaner;
+
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Before
-    public void setUp() throws Exception
+    public void configure() throws Exception
     {
-        super.setUp();
+        this.xhtmlParser = this.mocker.getInstance(Parser.class, "xhtml/1.0");
+        this.officeHTMLCleaner = this.mocker.getInstance(HTMLCleaner.class, "openoffice");
+        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
 
-        presentationBuilder = (DefaultPresentationBuilder) getComponentManager().getInstance(PresentationBuilder.class);
+        this.officeConverter = mock(OfficeConverter.class);
+        OfficeServer officeServer = this.mocker.getInstance(OfficeServer.class);
+        when(officeServer.getConverter()).thenReturn(this.officeConverter);
     }
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        mockXHTMLParser = registerMockComponent(Parser.class, "xhtml/1.0");
-    }
-
-    /**
-     * Tests {@link DefaultPresentationBuilder#importPresentation(InputStream, String)}.
-     */
     @Test
-    public void testImportPresentation() throws Exception
+    public void build() throws Exception
     {
-        InputStream officeFileStream = new ByteArrayInputStream(new byte[1024]);
-        final Map<String, InputStream> input = Collections.singletonMap(INPUT_FILE_NAME, officeFileStream);
-        final Map<String, byte[]> output = Collections.singletonMap(OUTPUT_FILE_NAME, new byte[0]);
-        final OfficeConverter mockDocumentConverter = getMockery().mock(OfficeConverter.class);
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockOfficeServer).getConverter();
-                will(returnValue(mockDocumentConverter));
+        DocumentModelBridge document = mock(DocumentModelBridge.class);
+        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        when(dab.getDocument(documentReference)).thenReturn(document);
+        when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
-                oneOf(mockDocumentConverter).convert(input, INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-                will(returnValue(output));
-            }
-        });
-
-        Assert.assertEquals(output, presentationBuilder.importPresentation(officeFileStream, INPUT_FILE_NAME));
-    }
-
-    /**
-     * Tests {@link DefaultPresentationBuilder#buildPresentationHTML(Map, String)}.
-     */
-    @Test
-    public void testBuildPresentationHTML()
-    {
-        final Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
-        artifacts.put("img0.jpg", new byte[0]);
-        artifacts.put(OUTPUT_FILE_NAME, new byte[0]);
+        InputStream officeFileStream = new ByteArrayInputStream("Presentation content".getBytes());
+        Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
+        byte[] firstSlide = "first slide".getBytes();
+        byte[] secondSlide = "second slide".getBytes();
+        artifacts.put("img0.jpg", firstSlide);
+        artifacts.put("img0.html", new byte[0]);
         artifacts.put("text0.html", new byte[0]);
-        artifacts.put("img1.jpg", new byte[0]);
+        artifacts.put("img1.jpg", secondSlide);
         artifacts.put("img1.html", new byte[0]);
         artifacts.put("text1.html", new byte[0]);
+        when(this.officeConverter.convert(Collections.singletonMap("file.odp", officeFileStream), "file.odp",
+            "img0.html")).thenReturn(artifacts);
 
-        Assert.assertEquals("<p><img src=\"test-slide0.jpg\"/></p><p><img src=\"test-slide1.jpg\"/></p>",
-            presentationBuilder.buildPresentationHTML(artifacts, "test"));
-        Assert.assertEquals(2, artifacts.size());
-        Assert.assertTrue(artifacts.containsKey("test-slide0.jpg"));
-        Assert.assertTrue(artifacts.containsKey("test-slide1.jpg"));
-    }
+        HTMLCleanerConfiguration config = mock(HTMLCleanerConfiguration.class);
+        when(this.officeHTMLCleaner.getDefaultConfiguration()).thenReturn(config);
 
-    /**
-     * Tests {@link DefaultPresentationBuilder#cleanPresentationHTML(String, DocumentReference)}.
-     */
-    @Test
-    public void testCleanPresentationHTML()
-    {
-        final DocumentReference reference = new DocumentReference("xwiki", "Main", "Test");
-        final String stringReference = "xwiki:Main.Test";
-        final AttachmentReference imageReference = new AttachmentReference("office-slide0.jpg", reference);
+        Document xhtmlDoc = XMLUtils.createDOMDocument();
+        xhtmlDoc.appendChild(xhtmlDoc.createElement("html"));
+        String presentationHTML = "<p><img src=\"file-slide0.jpg\"/></p><p><img src=\"file-slide1.jpg\"/></p>";
+        when(this.officeHTMLCleaner.clean(any(Reader.class), eq(config)))
+            .then(returnMatchingDocument(presentationHTML, xhtmlDoc));
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockDefaultStringEntityReferenceSerializer).serialize(reference);
-                will(returnValue(stringReference));
+        XDOM galleryContent = new XDOM(Collections.<Block>emptyList());
+        when(this.xhtmlParser.parse(any(Reader.class))).thenReturn(galleryContent);
 
-                oneOf(mockDocumentReferenceResolver).resolve(stringReference);
-                will(returnValue(reference));
+        XDOMOfficeDocument result =
+            this.mocker.getComponentUnderTest().build(officeFileStream, "file.odp", documentReference);
 
-                oneOf(mockDocumentAccessBridge).getAttachmentURL(imageReference, false);
-                will(returnValue("/xwiki/bin/download/Main/Test/office-slide0.jpg"));
-            }
-        });
+        verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
 
-        Assert.assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-            + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-            + "<html><p><!--startimage:false|-|attach|-|office-slide0.jpg-->"
-            + "<img src=\"/xwiki/bin/download/Main/Test/office-slide0.jpg\" /><!--stopimage--></p></html>\n",
-            presentationBuilder.cleanPresentationHTML("<p><img src=\"office-slide0.jpg\"/></p>", reference));
-    }
+        Map<String, byte[]> expectedArtifacts = new HashMap<String, byte[]>();
+        expectedArtifacts.put("file-slide0.jpg", firstSlide);
+        expectedArtifacts.put("file-slide1.jpg", secondSlide);
+        assertEquals(expectedArtifacts, result.getArtifacts());
 
-    /**
-     * Tests {@link DefaultPresentationBuilder#buildPresentationXDOM(String, DocumentReference)}.
-     */
-    @Test
-    public void testBuildPresentationXDOM() throws Exception
-    {
-        final DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
-        final DocumentModelBridge mockDocumentModelBridge = getMockery().mock(DocumentModelBridge.class);
-        final XDOM galleryContent = new XDOM(Collections.<Block> emptyList());
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockDocumentAccessBridge).getDocument(reference);
-                will(returnValue(mockDocumentModelBridge));
-
-                oneOf(mockDocumentModelBridge).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-
-                oneOf(mockXHTMLParser).parse(with(aNonNull(StringReader.class)));
-                will(returnValue(galleryContent));
-
-                oneOf(mockDefaultStringEntityReferenceSerializer).serialize(reference);
-                will(returnValue("foo"));
-            }
-        });
-
-        XDOM xdom = presentationBuilder.buildPresentationXDOM("some HTML", reference);
-        Assert.assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
+        assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 
         List<ExpandedMacroBlock> macros =
-            xdom.getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);
+            result.getContentDocument().getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);
         Assert.assertEquals(1, macros.size());
         Assert.assertEquals("gallery", macros.get(0).getId());
         Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));
+    }
+
+    private Answer<Document> returnMatchingDocument(final String content, final Document document)
+    {
+        return new Answer<Document>()
+        {
+            @Override
+            public Document answer(InvocationOnMock invocation) throws Throwable
+            {
+                Reader reader = invocation.getArgumentAt(0, Reader.class);
+                return StringUtils.equals(content, IOUtils.toString(reader)) ? document : null;
+            }
+        };
     }
 }

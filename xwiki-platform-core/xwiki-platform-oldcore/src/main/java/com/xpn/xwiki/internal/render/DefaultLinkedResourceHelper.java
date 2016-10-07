@@ -39,7 +39,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * Default implementation for {@link LinkedResourceHelper}.
  *
  * @version $Id$
- * @since 7.4.1, 8.0M1
+ * @since 7.4.1
+ * @since 8.0M1
  */
 @Component
 @Singleton

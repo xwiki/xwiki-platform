@@ -61,8 +61,8 @@ public class MailMandatoryDocumentInitializer extends AbstractMandatoryDocumentI
 
         needsUpdate |= bclass.addTextField("subject", "Subject", 40);
         needsUpdate |= bclass.addTextField("language", "Language", 5);
-        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
-        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.EditorType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
+        needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15, TextAreaClass.ContentType.PURE_TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "Mail Class");
 

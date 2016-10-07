@@ -36,9 +36,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
-
-import com.xpn.xwiki.internal.template.SUExecutor;
-import com.xpn.xwiki.internal.template.SUExecutor.SUExecutorContext;
+import org.xwiki.security.authorization.AuthorExecutor;
 
 /**
  * Make sure to execute wiki macro with a properly configured context and especially which user programming right is
@@ -73,7 +71,7 @@ public class WikiMacroExecutionEventListener implements EventListener
     private Execution execution;
 
     @Inject
-    private SUExecutor suExecutor;
+    private AuthorExecutor suExecutor;
 
     /**
      * The logger to log.
@@ -111,14 +109,14 @@ public class WikiMacroExecutionEventListener implements EventListener
     public void onWikiMacroExecutionStartsEvent(WikiMacro wikiMacro)
     {
         // Modify the context for that following code is executed with the right of wiki macro author
-        SUExecutorContext sucontext = this.suExecutor.before(wikiMacro.getAuthorReference());
+        AutoCloseable sucontext = this.suExecutor.before(wikiMacro.getAuthorReference());
 
         // Put it in an hidden context property to restore it later
         ExecutionContext econtext = this.execution.getContext();
         // Use a stack in case a wiki macro calls another wiki macro
-        Stack<SUExecutorContext> backup = (Stack<SUExecutorContext>) econtext.getProperty(SUCONTEXT_KEY);
+        Stack<AutoCloseable> backup = (Stack<AutoCloseable>) econtext.getProperty(SUCONTEXT_KEY);
         if (backup == null) {
-            backup = new Stack<SUExecutorContext>();
+            backup = new Stack<AutoCloseable>();
             econtext.setProperty(SUCONTEXT_KEY, backup);
         }
         backup.push(sucontext);
@@ -132,7 +130,7 @@ public class WikiMacroExecutionEventListener implements EventListener
         // Get the su context to restore
         ExecutionContext econtext = this.execution.getContext();
         // Use a stack in case a wiki macro calls another wiki macro
-        Stack<SUExecutorContext> backup = (Stack<SUExecutorContext>) econtext.getProperty(SUCONTEXT_KEY);
+        Stack<AutoCloseable> backup = (Stack<AutoCloseable>) econtext.getProperty(SUCONTEXT_KEY);
         if (backup != null && !backup.isEmpty()) {
             // Restore the context execution rights
             this.suExecutor.after(backup.pop());

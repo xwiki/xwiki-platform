@@ -3686,13 +3686,6 @@ public class XWiki implements EventListener
         memberObject.setStringValue("member", userName);
 
         this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
-
-        try {
-            XWikiGroupService gservice = getGroupService(context);
-            gservice.addUserToGroup(userName, context.getWikiId(), groupName, context);
-        } catch (Exception e) {
-            LOGGER.error("Failed to update group service cache", e);
-        }
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
@@ -5302,7 +5295,8 @@ public class XWiki implements EventListener
             }
             return text;
         } catch (Exception e) {
-            LOGGER.error("Failed to get user profile page", e);
+            LOGGER.warn("Failed to display the user name of [{}]. Root cause is [{}]. Falling back on the user id.",
+                userReference, ExceptionUtils.getRootCauseMessage(e));
 
             return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
         }

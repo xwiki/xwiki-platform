@@ -32,7 +32,7 @@ public interface DataMigrationManager
 {
     /**
      * @return current DB version or null for a new database
-     * @xwikicfg xwiki.store.migration.version - override data version
+     * @xwiki.xwikicfg xwiki.store.migration.version - override data version
      * @throws DataMigrationException if any error
      */
     XWikiDBVersion getDBVersion() throws DataMigrationException;
@@ -45,13 +45,14 @@ public interface DataMigrationManager
     DataMigrationStatus getDataMigrationStatus() throws DataMigrationException;
 
     /**
-     * Check current database version and proceed to migrations.
-     * Migration is processed only once, and depends on the following configuration:
-     * @xwikicfg xwiki.store.migration  - 1 to enable migration, default to 0
-     * @xwikicfg xwiki.store.migration.databases - list of database to migrate, default to all
-     * @xwikicfg xwiki.store.migration.forced  - force run selected migrations
-     * @xwikicfg xwiki.store.migration.ignored - ignore selected migrations
-     * @xwikicfg xwiki.store.migration.exitAfterEnd  - 1 to exit at the end of migrations, default to 0
+     * Check current database version and proceed to migrations. Migration is processed only once, and depends on the
+     * following configuration:
+     *
+     * @xwiki.xwikicfg xwiki.store.migration - 1 to enable migration, default to 0
+     * @xwiki.xwikicfg xwiki.store.migration.databases - list of database to migrate, default to all
+     * @xwiki.xwikicfg xwiki.store.migration.forced - force run selected migrations
+     * @xwiki.xwikicfg xwiki.store.migration.ignored - ignore selected migrations
+     * @xwiki.xwikicfg xwiki.store.migration.exitAfterEnd - 1 to exit at the end of migrations, default to 0
      * @throws MigrationRequiredException when version is incompatible with current version
      * @throws DataMigrationException when an error occurs during check.
      */

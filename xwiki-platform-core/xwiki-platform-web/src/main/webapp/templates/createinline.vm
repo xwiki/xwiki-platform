@@ -117,18 +117,31 @@
         ## Extract and save in data-* attributes list of allowed spaces to be used in the JavaScript validation of the spaceReference input.
         ##
         #set($jsAllowedSpacesArray = '[]')## Reset any previous value
-        #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
+        #set($allowedSpaces = $tpobj.getValue('creationRestrictions'))
+        #if($allowedSpaces.size() == 0)
+          ## Backwards compatibility for Template Providers created before 8.3M2.
+          #set($allowedSpaces = $tpobj.getValue('spaces'))
+        #end
+        ## Reset to an empty list when no restrictions are set.
+        #if ("$!allowedSpaces" == '')
+          #set ($allowedSpaces = [])
+        #end
         #if($allowedSpaces.size() > 0)
           #set($jsAllowedSpacesArray = $jsontool.serialize($allowedSpaces))
         #end
         ## Compute the error message.
+        #set ($templateProviderName = $services.localization.render($tpobj.getValue('name')))
         #if($allowedSpaces.isEmpty())
           #set($message = '')
         #elseif($allowedSpaces.size() == 1)
-          #set($message = $services.localization.render('core.create.template.allowedspace.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+          #set($message = $services.localization.render('core.create.template.allowedspace.inline', [$templateProviderName, $jsAllowedSpacesArray]))
         #else
-          #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
+          #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$templateProviderName, $jsAllowedSpacesArray]))
         #end
+        ##
+        ## Determine if the creation restrictions are just suggestions
+        ##
+        #set ($restrictionsAreSuggestions = ($tpobj.getValue('creationRestrictionsAreSuggestions') == 1))
         ##
         ## Determine if it's a terminal page template
         ##
@@ -164,6 +177,7 @@
           'data': {
             'allowed-spaces': $jsAllowedSpacesArray,
             'allowed-spaces-message': $message,
+            'restrictions-are-suggestions': $restrictionsAreSuggestions,
             'type': 'template',
             'terminal' : $isTerminalProvider
           }

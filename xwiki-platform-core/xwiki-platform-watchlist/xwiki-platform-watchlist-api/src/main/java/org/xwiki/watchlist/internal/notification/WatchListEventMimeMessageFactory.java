@@ -31,7 +31,7 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.internal.SessionFactory;
+import org.xwiki.mail.SessionFactory;
 import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;

@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -43,19 +44,21 @@ public interface FlavorManager
      * 
      * @param query query to execute
      * @return flavors matching the query
+     * @throws SearchException error when trying to search provided query
      * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
      */
     @Deprecated
-    IterableResult<Extension> getFlavors(FlavorQuery query);
+    IterableResult<Extension> getFlavors(FlavorQuery query) throws SearchException;
 
     /**
      * Get all flavors matching a query.
      * 
      * @param query query to execute
      * @return flavors matching the query
+     * @throws SearchException error when trying to search provided query
      * @since 8.0RC1
      */
-    IterableResult<Extension> searchFlavors(FlavorQuery query);
+    IterableResult<Extension> searchFlavors(FlavorQuery query) throws SearchException;
 
     /**
      * Get the flavor installed on a given wiki.

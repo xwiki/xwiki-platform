@@ -58,6 +58,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -171,10 +172,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (reference != null) {
                 EntityReference relativeReference =
                     getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-                reference =
-                    new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
-                        new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
-                            .getParent().getParent()));
+                reference = new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
+                    new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(),
+                        reference.getParent().getParent()));
             } else {
                 reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
             }
@@ -760,7 +760,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addUsersField(String fieldName, String fieldPrettyName, boolean multiSelect)
     {
@@ -773,7 +774,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
     {
@@ -848,11 +850,40 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, EditorType editorType)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, cols, rows,
-            editorType != null ? editorType.toString() : (String) null);
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editorType,
+            TextAreaClass.getContentType(editorType, null));
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, null);
+    }
+
+    /**
+     * @since 8.3
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows,
+        ContentType contentType)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, TextAreaClass.getEditorType(contentType, null),
+            contentType);
+    }
+
+    /**
+     * @since 8.3
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, EditorType editorType,
+        ContentType contentType)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows,
+            editorType != null ? editorType.toString() : null, contentType != null ? contentType.toString() : null);
+    }
+
+    /**
+     * @since 8.3
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor,
+        String contenttype)
     {
         boolean result = false;
 
@@ -875,9 +906,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         // Note: TextAreaClass.getEditor() transforms the editor string into lowercase so we need to do the same when
         // comparing here. In addition when the editor is not, an empty string is returned from getEditor()...
         if ((editor == null && !textAreaClass.getEditor().isEmpty())
-            || (editor != null && !textAreaClass.getEditor().equals(editor.toLowerCase())))
-        {
+            || (editor != null && !textAreaClass.getEditor().equals(editor.toLowerCase()))) {
             textAreaClass.setEditor(editor);
+            result = true;
+        }
+
+        if (!textAreaClass.getContentType().equalsIgnoreCase(contenttype)) {
+            textAreaClass.setContentType(contenttype);
             result = true;
         }
 
@@ -912,12 +947,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         String values, String displayType, String separators)
     {
-        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, false, values, displayType, separators);
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, false, values, displayType,
+            separators);
     }
 
     /**
@@ -1151,8 +1188,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         } catch (Exception e) {
             Object[] args = { customClass };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}",
-                e, args);
+                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                args);
         }
     }
 
@@ -1358,8 +1395,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
             getDefaultEditSheet(), mergeResult));
 
-        setNameField(MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
-            mergeResult));
+        setNameField(
+            MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(), mergeResult));
 
         // Properties
 

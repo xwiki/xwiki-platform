@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation-test</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-test-tests</artifactId>
   <name>XWiki Platform - Observation - Tests - Functional Tests</name>
@@ -162,8 +162,7 @@
           <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <!-- FIXME: maven-hsqldb-plugin seems to an issue with 2.3.4 -->
-            <version>2.3.3</version>
+            <version>${hsqldb.version}</version>
           </dependency>
         </dependencies>
       </plugin>

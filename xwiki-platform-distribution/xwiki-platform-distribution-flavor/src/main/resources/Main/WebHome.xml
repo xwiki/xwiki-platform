@@ -77,34 +77,6 @@ AWM will take care of making it easy for you and your users to create and manage
   <object>
     <name>Main.WebHome</name>
     <number>0</number>
-    <className>XWiki.EditModeClass</className>
-    <guid>c170a0a8-cc17-41cd-aa1e-6f6faf1d9f28</guid>
-    <class>
-      <name>XWiki.EditModeClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultEditMode>
-        <disabled>0</disabled>
-        <name>defaultEditMode</name>
-        <number>1</number>
-        <prettyName>Default Edit Mode</prettyName>
-        <size>15</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultEditMode>
-    </class>
-    <property>
-      <defaultEditMode>edit</defaultEditMode>
-    </property>
-  </object>
-  <object>
-    <name>Main.WebHome</name>
-    <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>15760afa-b3b1-4e26-aee1-3168d8e4a621</guid>
     <class>

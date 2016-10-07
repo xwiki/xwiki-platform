@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-webjars</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webjars-api</artifactId>
   <name>XWiki Platform - WebJars - API</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -80,6 +80,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-servlet</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -87,18 +92,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <!-- Required at runtime! -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-container</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <!-- Used to determine the Content Type of the requested resource. -->
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

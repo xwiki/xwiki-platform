@@ -49,12 +49,15 @@
   #set ($discard = $xwiki.jsx.use('XWiki.TemplateProviderSheet'))
 #end
 #set ($discard = $xwiki.ssx.use('XWiki.TemplateProviderSheet'))
+## Hierarchy macros needed to display the restrictions. Evaluate the template in a string to discard the junk empty
+## lines it would produce since the template is written for html rendering.
+#set ($discard = "#template('hierarchy_macros.vm')")
 
 ##
 ## Display the sheet.
 ##
 {{html clean='false'}}
-&lt;div class="xform row"&gt;
+&lt;div class="xform row templateProviderSheet"&gt;
   ##
   ## Left side
   ##
@@ -192,8 +195,60 @@
   ##
   ## Right side: enabled spaces
   ##
-  &lt;div class="col-xs-12 col-md-6" id="enabled-spaces"&gt;
+  &lt;div class="col-xs-12 col-md-6"&gt;
     &lt;dl&gt;
+      ##
+      ## Creation Restrictions
+      ##
+      &lt;dt&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_creationRestrictions"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictions'))&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        #if($isEditing)
+          {{/html}}
+
+          {{html wiki=true clean='false'}}
+            &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.creationRestrictions.hint')&lt;/span&gt;
+            $!providerObj.get('creationRestrictions')
+          {{/html}}
+
+          {{html clean='false'}}
+        #else
+          #set ($creationRestrictions = $providerObj.getValue('creationRestrictions'))
+          #if (!$creationRestrictions.isEmpty())
+            &lt;ul&gt;
+              ## Note: Sorting the list, in case they are not already sorted.
+              #foreach ($creationRestriction in $sorttool.sort($creationRestrictions))
+                #set ($spaceReference = $services.model.resolveSpace($creationRestriction))
+                &lt;li&gt;#hierarchy($spaceReference, { 'local' : true })&lt;/li&gt;
+              #end
+            &lt;/ul&gt;
+          #else
+            &lt;span&gt;$services.localization.render('administration.templateProvider.creationRestrictions.none')&lt;/span&gt;
+          #end
+        #end
+      &lt;/dd&gt;
+      ##
+      ## Creation Restrictions As Suggestions
+      ##
+      &lt;dt&gt;
+        &lt;label #if($isEditing)for="XWiki.TemplateProviderClass_0_creationSuggestion"#end&gt;$escapetool.xml($services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions'))&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+          {{/html}}
+
+          {{html wiki=true clean='false'}}
+            #if($isEditing)
+              &lt;span class="xHint"&gt;$services.localization.render('administration.templateProvider.creationRestrictionsAreSuggestions.hint')&lt;/span&gt;
+            #end
+            $!providerObj.creationRestrictionsAreSuggestions
+          {{/html}}
+
+          {{html clean='false'}}
+      &lt;/dd&gt;
+      ##
+      ## Visibility Restrictions
+      ##
       &lt;dt&gt;
         &lt;label&gt;$escapetool.xml($services.localization.render('xe.templateprovider.spaces'))&lt;/label&gt;
         #if ($isEditing)
@@ -204,11 +259,11 @@
         #if ($isEditing)
           ## We can`t just join the list values in the hidden DOM element without escaping the separator from each value first.
           #set ($spacesEscapedValues = [])
-          #foreach ($spacesValue in $providerObj.getValue('spaces'))
+          #foreach ($spacesValue in $providerObj.getValue('visibilityRestrictions'))
             #set ($discard = $spacesEscapedValues.add($spacesValue.replace(',', '\,')))
           #end
 
-          &lt;input id="XWiki.TemplateProviderClass_0_spaces" name="XWiki.TemplateProviderClass_0_spaces"
+          &lt;input id="XWiki.TemplateProviderClass_0_visibilityRestrictions" name="XWiki.TemplateProviderClass_0_visibilityRestrictions"
             value="$!escapetool.xml($stringtool.join($spacesEscapedValues, ','))" type="hidden"&gt;
 
           {{/html}}
@@ -219,9 +274,8 @@
 
           {{html clean='false'}}
         #else
-          #set ($spacesValues = $providerObj.getValue('spaces'))
+          #set ($spacesValues = $providerObj.getValue('visibilityRestrictions'))
           #if ($spacesValues &amp;&amp; !$spacesValues.isEmpty())
-            #template("hierarchy_macros.vm")
             &lt;ul&gt;
               ## Note: Sorting the list, in case they are not already sorted.
               #foreach ($spacesValue in $sorttool.sort($spacesValues))
@@ -246,7 +300,8 @@
   (% class="buttonwrapper" %)
   [[{{translation key="xe.templateprovider.backtoadmin"/}}&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=Templates')]]
 #end
-{{/velocity}}</content>
+{{/velocity}}
+</content>
   <object>
     <name>XWiki.TemplateProviderSheet</name>
     <number>0</number>
@@ -279,6 +334,7 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -358,8 +414,8 @@
      * for checking and unchecking tree nodes (documents).
      */
     function addEnabledSpacesTreeExtraConfiguration() {
-      var treeElement = $('#enabled-spaces .xtree');
-      var dataElement = $('#XWiki\\.TemplateProviderClass_0_spaces');
+      var treeElement = $('.templateProviderSheet .xtree');
+      var dataElement = $('#XWiki\\.TemplateProviderClass_0_visibilityRestrictions');
 
       // Extract the list of initially checked elements.
       var savedIds = readSavedValues(dataElement.val());
@@ -504,6 +560,7 @@
       </cache>
       <code>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>3</number>
         <prettyName>Code</prettyName>
@@ -568,11 +625,11 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#enabled-spaces .breadcrumb &gt; .active:last-of-type a {
+      <code>.templateProviderSheet .breadcrumb &gt; .active:last-of-type a {
   color: @link-color;
 }
 
-#enabled-spaces .breadcrumb {
+.templateProviderSheet .breadcrumb {
   margin-bottom: 0;
   background-color: transparent;
   border-radius: 0;

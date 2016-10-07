@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
@@ -44,6 +45,7 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.test.mockito.StringReaderMatcher;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -93,28 +95,33 @@ public class TemplateManagerTest
         when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
     }
 
-    // Tests
-
-    @Test
-    public void testRenderVelocity() throws Exception
+    private void mockVelocity(String source, String result) throws XWikiVelocityException
     {
         when(this.velocityManagerMock.evaluate(Matchers.<Writer>any(), anyString(),
-            argThat(new StringReaderMatcher("<html>$toto</html>")))).then(new Answer<Boolean>()
+            argThat(new StringReaderMatcher(source)))).then(new Answer<Boolean>()
             {
                 @Override
                 public Boolean answer(InvocationOnMock invocation) throws Throwable
                 {
                     Writer writer = (Writer) invocation.getArguments()[0];
 
-                    writer.write("<html>value</html>");
+                    writer.write(result);
 
                     return Boolean.TRUE;
                 }
             });
+    }
 
-        setTemplateContent("<html>$toto</html>");
+    // Tests
 
-        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
+    @Test
+    public void testRenderVelocity() throws Exception
+    {
+        mockVelocity("source", "OK");
+
+        setTemplateContent("source");
+
+        assertEquals("OK", mocker.getComponentUnderTest().render("template"));
     }
 
     @Test
@@ -123,5 +130,13 @@ public class TemplateManagerTest
         setTemplateContent("##!source.syntax=xwiki/2.1\nfirst line\\\\second line");
 
         assertEquals("<p>first line<br/>second line</p>", mocker.getComponentUnderTest().render("template"));
+    }
+
+    @Test
+    public void testRenderClassloaderTemplate() throws ComponentLookupException, Exception
+    {
+        mockVelocity("classloader template content", "OK");
+
+        assertEquals("OK", this.mocker.getComponentUnderTest().render("classloader_template.vm"));
     }
 }

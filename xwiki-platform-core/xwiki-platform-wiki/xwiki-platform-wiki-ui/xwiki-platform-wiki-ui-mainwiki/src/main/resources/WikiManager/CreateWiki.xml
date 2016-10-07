@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="WikiManager.CreateWiki" locale="">
   <web>WikiManager</web>
   <name>CreateWiki</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>WikiManager.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1308816032000</date>
-  <contentUpdateDate>1308816032000</contentUpdateDate>
+  <date>1475675577000</date>
+  <contentUpdateDate>1475675577000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.wiki.create.title')</title>
   <comment/>
@@ -561,8 +561,6 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
   #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
-  #set ($errors = $status.log.getLogs('ERROR'))
-  #set ($hasError = ($errors.size() &gt; 0))
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
@@ -583,10 +581,10 @@
         &lt;/div&gt;
       &lt;/div&gt;
       #end
-      &lt;p class="successmessage box #if($hasError || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
+      &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$hasError || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
+      &lt;p class="errormessage box #if(!$$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;
@@ -602,8 +600,13 @@
     &lt;/div&gt;
     #set($doc = $olddoc)
     #if($status.state == 'FINISHED')
-      #set($finalizeHidden = $hasError)
-      #set($cleanUpHidden = !$hasError)
+      #if ($status.error)
+        #set($finalizeHidden = true)
+        #set($cleanUpHidden = false)
+      #else
+        #set($finalizeHidden = false)
+        #set($cleanUpHidden = true)
+      #end
     #else
       #set($finalizeHidden = true)
       #set($cleanUpHidden = true)
@@ -733,7 +736,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -778,10 +781,10 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -1028,7 +1031,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1073,10 +1076,10 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -1186,7 +1189,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1231,10 +1234,10 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -1330,7 +1333,7 @@ require(['jquery'], function($) {
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1356,7 +1359,7 @@ require(['jquery'], function($) {
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -1391,10 +1394,10 @@ require(['jquery'], function($) {
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -1487,7 +1490,7 @@ require(['jquery'], function($) {
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1513,7 +1516,7 @@ require(['jquery'], function($) {
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -1548,10 +1551,10 @@ require(['jquery'], function($) {
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>

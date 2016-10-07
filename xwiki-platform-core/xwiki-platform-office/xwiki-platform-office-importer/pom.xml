@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-office</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-office-importer</artifactId>
   <name>XWiki Platform - Office - Importer</name>
@@ -33,7 +33,7 @@
   <properties>
     <!-- Skipping revapi since xwiki-platform-legacy-office-importer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -101,6 +101,12 @@
       <!-- Used to detect the encoding of the HTML byte array produced by the office server. -->
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
+    </dependency>
+    <!-- Used to parse the images embedded through the Data URI scheme. -->
+    <dependency>
+      <groupId>com.github.ooxi</groupId>
+      <artifactId>jdatauri</artifactId>
+      <version>1.0</version>
     </dependency>
     <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
     <dependency>

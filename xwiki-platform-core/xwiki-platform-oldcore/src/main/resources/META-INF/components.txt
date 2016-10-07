@@ -17,6 +17,7 @@ com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.script.display.DisplayScriptService
+com.xpn.xwiki.internal.job.JobRequestContextInitializer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
@@ -61,13 +62,13 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
+com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager
 com.xpn.xwiki.internal.skin.InternalSkinConfiguration
 com.xpn.xwiki.internal.skin.InternalSkinManager
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.script.DebugScriptService
 com.xpn.xwiki.internal.script.DocumentScriptSafeProvider
-com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager
 com.xpn.xwiki.internal.template.TemplateListener

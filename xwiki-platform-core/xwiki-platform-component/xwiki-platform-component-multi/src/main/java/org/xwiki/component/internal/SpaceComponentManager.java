@@ -49,6 +49,13 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
      */
     public static final String ID = "space";
 
+    /**
+     * The prefix of space namespace.
+     * 
+     * @since 8.4RC1
+     */
+    public static final String NAMESPACE_PREFIX = ID + ':';
+
     @Inject
     @Named("current")
     private Provider<SpaceReference> referenceProvider;

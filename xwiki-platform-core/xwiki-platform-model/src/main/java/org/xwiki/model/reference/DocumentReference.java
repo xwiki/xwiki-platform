@@ -53,6 +53,11 @@ public class DocumentReference extends EntityReference
     static final String LOCALE = "LOCALE";
 
     /**
+     * Cache the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}.
+     */
+    private LocalDocumentReference localDocumentReference;
+
+    /**
      * Special constructor that transforms a generic entity reference into a {@link DocumentReference}. It checks the
      * validity of the passed reference (ie correct type and correct parent).
      *
@@ -126,8 +131,8 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
-        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)), (language == null) ? null
-            : new Locale(language));
+        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
+            (language == null) ? null : new Locale(language));
     }
 
     /**
@@ -318,6 +323,19 @@ public class DocumentReference extends EntityReference
     public DocumentReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
         return new DocumentReference(this, oldParent, newParent);
+    }
+
+    /**
+     * @return the {@link LocalDocumentReference} corresponding to this {@link DocumentReference}
+     * @since 8.3
+     */
+    public LocalDocumentReference getLocaleDocumentReference()
+    {
+        if (this.localDocumentReference == null) {
+            this.localDocumentReference = new LocalDocumentReference(this);
+        }
+
+        return this.localDocumentReference;
     }
 
     @Override

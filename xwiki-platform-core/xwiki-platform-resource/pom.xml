@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource</artifactId>
   <name>XWiki Platform - Resource - Parent POM</name>
@@ -36,6 +36,7 @@
     <module>xwiki-platform-resource-api</module>
     <module>xwiki-platform-resource-default</module>
     <module>xwiki-platform-resource-servlet</module>
+    <module>xwiki-platform-resource-temporary</module>
   </modules>
   <profiles>
     <profile>

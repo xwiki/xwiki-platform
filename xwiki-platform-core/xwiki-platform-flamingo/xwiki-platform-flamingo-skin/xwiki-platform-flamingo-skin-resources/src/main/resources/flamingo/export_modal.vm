@@ -75,7 +75,7 @@
           </div>
         #end
         <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.html')</a>
-        #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
+        #if($hasAdmin && $services.xar.isXARExportAvailable())
           #set($exportURL = "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.documentReference,'default'))")
           #if ($doc.name == 'WebHome')
             ## When nested page also export WebPreferences which contain among other things the right of this entity

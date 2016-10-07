@@ -1,0 +1,4 @@
+org.xwiki.xar.internal.XarObjectPropertySerializerManager
+org.xwiki.xar.internal.property.DateXarObjectPropertySerializer
+org.xwiki.xar.internal.property.DefaultXarObjectPropertySerializer
+org.xwiki.xar.internal.property.ListXarObjectPropertySerializer

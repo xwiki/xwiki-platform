@@ -35,6 +35,13 @@ public class ContextMacroParameters
     private String documentReference;
 
     /**
+     * @see #getTransformationContext()
+     * @since 8.3
+     * @since 8.4RC1
+     */
+    private TransformationContextMode transformationContextMode = TransformationContextMode.CURRENT;
+
+    /**
      * @return the reference to the document that will be set as the current document to evaluate the macro's content
      */
     public String getDocument()
@@ -51,4 +58,26 @@ public class ContextMacroParameters
         this.documentReference = documentReference;
     }
 
+    /**
+     * @return the mode to use for setting the Transformation Context in which the Context Macro will execute, see
+     *         {@link TransformationContextMode} for details
+     * @since 8.3
+     * @since 8.4RC1
+     */
+    public TransformationContextMode getTransformationContext()
+    {
+        return this.transformationContextMode;
+    }
+
+    /**
+     * @param mode refer to {@link #getTransformationContext()}
+     * @since 8.3
+     * @since 8.4RC1
+     */
+    @PropertyDescription("The Transformation Context mode to use. "
+        + "Valid values are \"current\", \"document\" and \"transformations\"")
+    public void setTransformationContext(TransformationContextMode mode)
+    {
+        this.transformationContextMode = mode;
+    }
 }

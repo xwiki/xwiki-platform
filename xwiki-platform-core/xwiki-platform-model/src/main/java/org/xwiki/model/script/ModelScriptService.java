@@ -484,7 +484,8 @@ public class ModelScriptService implements ScriptService
      *            property reference relative to another entity reference
      * @return the corresponding typed {@link ClassPropertyReference} object (resolved using the
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
-     * @since 5.4.2, 6.0M1
+     * @since 5.4.2
+     * @since 6.0M1
      */
     public ClassPropertyReference resolveClassProperty(String stringRepresentation, Object... parameters)
     {
@@ -499,7 +500,8 @@ public class ModelScriptService implements ScriptService
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a class
      *            property reference relative to another entity reference
      * @return the corresponding typed {@link ClassPropertyReference} object
-     * @since 5.4.2, 6.0M1
+     * @since 5.4.2
+     * @since 6.0M1
      */
     public ClassPropertyReference resolveClassProperty(String stringRepresentation, String hint, Object... parameters)
     {

@@ -455,12 +455,18 @@ require(['jquery'], function($) {
     addTerminalPageValidation(spaceValidator, form.find('#terminal'));
 
     var updateSpaceValidatorFromTemplateProviderInput = function(input) {
-      var allowedSpacesData = input.attr('data-allowed-spaces');
+      var restrictionsAreSuggestions = (input.attr('data-restrictions-are-suggestions') == "true");
+
       var allowedSpaces = [];
-      if (allowedSpacesData) {
+      var allowedSpacesData = input.attr('data-allowed-spaces');
+      // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
+      // should be ignored by validation.
+      if (!restrictionsAreSuggestions && allowedSpacesData) {
         allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
       }
+
       var message = input.attr('data-allowed-spaces-message');
+
       setAllowedValues(spaceValidator, allowedSpaces, message);
     };
 

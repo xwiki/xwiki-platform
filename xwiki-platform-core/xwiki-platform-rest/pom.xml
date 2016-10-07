@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest</artifactId>
   <packaging>pom</packaging>
@@ -36,4 +36,12 @@
     <module>xwiki-platform-rest-server</module>
     <module>xwiki-platform-rest-api</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-rest-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

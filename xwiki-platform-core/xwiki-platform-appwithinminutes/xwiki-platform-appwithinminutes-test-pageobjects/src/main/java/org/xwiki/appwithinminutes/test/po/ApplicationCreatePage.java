@@ -112,7 +112,8 @@ public class ApplicationCreatePage extends ViewPage
 
     /**
      * @return the application location picker
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     public DocumentPicker getLocationPicker()
     {

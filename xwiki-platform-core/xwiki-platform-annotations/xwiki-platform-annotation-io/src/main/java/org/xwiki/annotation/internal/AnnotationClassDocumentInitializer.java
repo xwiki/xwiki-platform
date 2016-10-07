@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
+import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 
 /**
  * When the wiki is initialized, make sure that the configured annotation class contains the minimum required properties
@@ -84,13 +84,13 @@ public class AnnotationClassDocumentInitializer extends AbstractMandatoryDocumen
         needsUpdate |= annotationClass.addDateField(Annotation.DATE_FIELD, "Date");
 
         needsUpdate |=
-            annotationClass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, EditorType.PURE_TEXT);
+            annotationClass.addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5, ContentType.PURE_TEXT);
         needsUpdate |= annotationClass.addTextAreaField(Annotation.SELECTION_LEFT_CONTEXT_FIELD,
-            "Selection Left Context", 40, 5, EditorType.PURE_TEXT);
+            "Selection Left Context", 40, 5, ContentType.PURE_TEXT);
         needsUpdate |= annotationClass.addTextAreaField(Annotation.SELECTION_RIGHT_CONTEXT_FIELD,
-            "Selection Right Context", 40, 5, EditorType.PURE_TEXT);
+            "Selection Right Context", 40, 5, ContentType.PURE_TEXT);
         needsUpdate |= annotationClass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40,
-            5, EditorType.PURE_TEXT);
+            5, ContentType.PURE_TEXT);
         needsUpdate |= annotationClass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
         needsUpdate |= annotationClass.addTextField(Annotation.STATE_FIELD, "State", 30);
 

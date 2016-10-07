@@ -35,6 +35,7 @@ import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -43,7 +44,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -339,7 +339,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     protected String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
         final XWikiContext context) throws Exception
     {
-        return Utils.getComponent(SUExecutor.class)
+        return Utils.getComponent(AuthorExecutor.class)
             .call(() -> context.getDoc().getRenderedContent(content, syntax, context), authorReference);
     }
 

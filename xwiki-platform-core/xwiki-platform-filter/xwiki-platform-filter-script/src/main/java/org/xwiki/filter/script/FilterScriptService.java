@@ -51,6 +51,9 @@ import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.job.JobRequestContext;
+
 /**
  * Expose various FilterStream related APIs to scripts.
  * 
@@ -76,6 +79,9 @@ public class FilterScriptService extends AbstractFilterScriptService
 
     @Inject
     private JobExecutor jobExecutor;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     @Named(FilterStreamConverterJob.JOBTYPE)
@@ -138,6 +144,9 @@ public class FilterScriptService extends AbstractFilterScriptService
                 new FilterStreamConverterJobRequest(inputType, inputProperties, outputType, folded, outputProperties);
 
             if (async) {
+                // Give a few context related values to the job
+                request.setProperty(JobRequestContext.KEY, new JobRequestContext(this.xcontextProvider.get()));
+
                 this.lastJob = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
             } else {
                 // Not using the job executor to make sure to be executed in the current thread

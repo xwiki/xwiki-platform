@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
@@ -31,7 +32,6 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.template.event.TemplateDeletedEvent;
 import org.xwiki.template.event.TemplateUpdatedEvent;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AbstractAttachmentEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
@@ -75,8 +75,9 @@ public class TemplateListener extends AbstractEventListener
         // Is this a skin document
         if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
             if (event instanceof AbstractAttachmentEvent) {
-                XWikiAttachment attachment = document.getAttachment(((AbstractAttachmentEvent) event).getName());
-                String id = this.referenceSerializer.serialize(attachment.getReference());
+                AttachmentReference attachment = new AttachmentReference(((AbstractAttachmentEvent) event).getName(),
+                    document.getDocumentReference());
+                String id = this.referenceSerializer.serialize(attachment);
                 if (event instanceof AttachmentDeletedEvent) {
                     this.observation.notify(new TemplateDeletedEvent(id), this);
                 } else if (event instanceof AttachmentUpdatedEvent) {

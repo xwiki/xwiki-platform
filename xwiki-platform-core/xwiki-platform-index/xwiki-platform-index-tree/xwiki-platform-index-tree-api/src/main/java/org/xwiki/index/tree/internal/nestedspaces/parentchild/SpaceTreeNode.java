@@ -34,13 +34,16 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 
 /**
  * The space node in the parent-child over nested spaces hierarchy.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("space/parentChildOnNestedSpaces")
@@ -55,27 +58,29 @@ public class SpaceTreeNode extends org.xwiki.index.tree.internal.nestedspaces.Sp
     @Named("explicit")
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
+    @Inject
+    @Named("topLevelPage/parentChildOnNestedSpaces")
+    private QueryFilter topLevelPageFilter;
+
     @Override
     protected List<? extends EntityReference> getChildren(SpaceReference spaceReference, int offset, int limit)
         throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Query query = getChildrenQuery(spaceReference, offset, limit);
 
-        // Include only the documents that either don't have a parent document or that have a parent document in a
-        // different space. Note that in Oracle the empty string is stored as null.
-        String hasNoParent = "(page.parentDoc = '' or page.parentDoc is null)";
-        String hasParentOutsideSpace = "(page.parentDoc like '%.%' and page.parentDoc not like :absoluteRef "
-            + "and page.parentDoc not like :localRef)";
-        constraints.add(String.format("(%s or %s)", hasNoParent, hasParentOutsideSpace));
+        if (areTerminalDocumentsShown()) {
+            // Include only the documents that either don't have a parent document or that have a parent document in a
+            // different space.
+            query.addFilter(this.topLevelPageFilter);
+            DocumentReference absoluteReference =
+                this.explicitDocumentReferenceResolver.resolve(String.valueOf('%'), spaceReference);
+            query.bindValue(PARAMETER_ABSOLUTE_REFERENCE,
+                this.defaultEntityReferenceSerializer.serialize(absoluteReference));
+            query.bindValue(PARAMETER_LOCAL_REFERENCE,
+                this.localEntityReferenceSerializer.serialize(absoluteReference));
+        }
 
-        DocumentReference absoluteReference =
-            this.explicitDocumentReferenceResolver.resolve(String.valueOf('%'), spaceReference);
-        parameters.put(PARAMETER_ABSOLUTE_REFERENCE,
-            this.defaultEntityReferenceSerializer.serialize(absoluteReference));
-        parameters.put(PARAMETER_LOCAL_REFERENCE, this.localEntityReferenceSerializer.serialize(absoluteReference));
-
-        return getChildren(spaceReference, offset, limit, constraints, parameters);
+        return query.execute();
     }
 
     @Override

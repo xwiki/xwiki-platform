@@ -39,6 +39,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -73,7 +74,6 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.stats.impl.RefererStats;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -259,7 +259,8 @@ public class Document extends Api
      * Get the name wiki where the document is stored.
      *
      * @return The name of the wiki where this document is stored.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public String getWiki()
     {
@@ -283,7 +284,8 @@ public class Document extends Api
      * complete full name is "xwiki:MySpace.MyDoc".
      *
      * @return The complete fullName of the document.
-     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     * @since 1.1.2
+     * @since 1.2M2
      */
     public String getPrefixedFullName()
     {
@@ -608,8 +610,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the Locale of the default version of the document (usually {@link Locale#ROOT} or
-     *  {@link Locale#ENGLISH})
+     * @return the Locale of the default version of the document (usually {@link Locale#ROOT} or {@link Locale#ENGLISH})
      * @since 8.0M1
      */
     public Locale getDefaultLocale()
@@ -701,7 +702,7 @@ public class Document extends Api
     @Deprecated
     public String getRenderedContent(String text) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, Syntax.XWIKI_1_0.toIdString(), getXWikiContext());
+        return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString());
     }
 
     /**
@@ -712,7 +713,7 @@ public class Document extends Api
      */
     public String getRenderedContent(String text, String syntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, syntaxId, getXWikiContext());
+        return getRenderedContent(text, syntaxId, false);
     }
 
     /**
@@ -725,7 +726,22 @@ public class Document extends Api
      */
     public String getRenderedContentRestricted(String text, String syntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, syntaxId, true, getXWikiContext());
+        return getRenderedContent(text, syntaxId, true);
+    }
+
+    /**
+     * Render a text in a restricted mode, where script macros are completely disabled.
+     *
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return the given text rendered in the context of this document using the passed Syntax
+     */
+    private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException
+    {
+        // Make sure we keep using current author as passed content author
+        return this.doc.getRenderedContent(text, syntaxId, restricted, getCallerDocument(getXWikiContext()),
+            getXWikiContext());
     }
 
     /**
@@ -737,7 +753,19 @@ public class Document extends Api
      */
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, getXWikiContext());
+        // Make sure we keep using current author as passed content author
+        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, false,
+            getCallerDocument(getXWikiContext()), getXWikiContext());
+    }
+
+    private XWikiDocument getCallerDocument(XWikiContext xcontext)
+    {
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc == null) {
+            sdoc = xcontext.getDoc();
+        }
+
+        return sdoc;
     }
 
     /**
@@ -2442,12 +2470,7 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        // The existing convention is that when the current user reference is null, it's the guest user.
         DocumentReference currentUserReference = this.context.getUserReference();
-        if (currentUserReference == null) {
-            currentUserReference =
-                getCurrentMixedDocumentReferenceResolver().resolve(XWikiRightService.GUEST_USER_FULLNAME);
-        }
 
         doc.setAuthorReference(currentUserReference);
 

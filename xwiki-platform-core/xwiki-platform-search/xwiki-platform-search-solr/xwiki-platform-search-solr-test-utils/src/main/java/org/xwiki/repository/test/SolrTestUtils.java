@@ -31,14 +31,14 @@ import org.xwiki.test.ui.TestUtils;
  */
 public class SolrTestUtils
 {
-    public final static String PROPERTY_KEY = "solrutils";
+    public static final String PROPERTY_KEY = "solrutils";
 
-    private final static String SOLRSERVICE_SPACE = "TestService";
+    private static final String SOLRSERVICE_SPACE = "TestService";
 
-    private final static String SOLRSERVICE_PAGE = "Solr";
+    private static final String SOLRSERVICE_PAGE = "Solr";
 
-    private final static LocalDocumentReference SOLRSERVICE_REFERENCE = new LocalDocumentReference(SOLRSERVICE_SPACE,
-        SOLRSERVICE_PAGE);
+    private static final LocalDocumentReference SOLRSERVICE_REFERENCE =
+        new LocalDocumentReference(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE);
 
     private final TestUtils testUtils;
 
@@ -52,12 +52,9 @@ public class SolrTestUtils
     private void initService() throws Exception
     {
         if (!this.testUtils.pageExists(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE)) {
-            // Make sure we create this page with SuperAdmin rights so that it has SR and PR when executed by tests.
-            testUtils.loginAsSuperAdmin();
-
             // Create the utility page.
             this.testUtils.rest().savePage(SOLRSERVICE_REFERENCE, "{{velocity}}$services.solr.queueSize{{/velocity}}",
-                null, null, null);
+                null);
         }
     }
 
@@ -76,7 +73,7 @@ public class SolrTestUtils
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("outputSyntax", "plain");
 
-        return Long.valueOf(this.testUtils.getString("/bin/get/" + SOLRSERVICE_SPACE + '/' + SOLRSERVICE_PAGE,
-            parameters));
+        return Long
+            .valueOf(this.testUtils.getString("/bin/get/" + SOLRSERVICE_SPACE + '/' + SOLRSERVICE_PAGE, parameters));
     }
 }

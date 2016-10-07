@@ -33,7 +33,8 @@ import org.xwiki.model.reference.EntityReference;
  * Base class for document tree nodes.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 public abstract class AbstractDocumentTreeNode extends AbstractEntityTreeNode
 {

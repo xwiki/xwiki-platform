@@ -176,12 +176,23 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param offset the offset from where to start returning search results, 0-based
      * @param nb the maximum number of search results to return. -1 indicate no limit. 0 indicate that no result will be
      *            returned but it can be used to get the total hits.
-     * @return the found extensions descriptors, empty list if nothing could be found
+     * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
+     *         been catched
      * @see org.xwiki.extension.repository.search.Searchable
      */
     public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
-        return this.repositoryManager.search(pattern, offset, nb);
+        setError(null);
+
+        IterableResult<Extension> result = null;
+
+        try {
+            return this.repositoryManager.search(pattern, offset, nb);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return result;
     }
 
     /**
@@ -190,13 +201,24 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * query.
      * 
      * @param query the search query
-     * @return the found extensions descriptors, empty list if nothing could be found
+     * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
+     *         been catched
      * @see org.xwiki.extension.repository.search.Searchable
      * @since 7.1RC1
      */
     public IterableResult<Extension> search(ExtensionQuery query)
     {
-        return this.repositoryManager.search(query);
+        setError(null);
+
+        IterableResult<Extension> result = null;
+
+        try {
+            result = this.repositoryManager.search(query);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return result;
     }
 
     /**

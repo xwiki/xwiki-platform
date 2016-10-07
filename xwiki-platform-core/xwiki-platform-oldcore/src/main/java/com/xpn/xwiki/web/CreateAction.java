@@ -123,7 +123,7 @@ public class CreateAction extends XWikiAction
         }
 
         // Check if the creation in the spaceReference is allowed.
-        if (!handler.isTemplateProviderAllowedInSpace()) {
+        if (!handler.isTemplateProviderAllowedToCreateInCurrentSpace()) {
             // The selected template provider is not usable in the selected location. Go back to the template and pick
             // something else.
             return CREATE_TEMPLATE;

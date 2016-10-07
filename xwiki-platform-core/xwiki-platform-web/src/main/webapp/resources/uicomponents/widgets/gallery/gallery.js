@@ -23,7 +23,14 @@ XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
 
-    this.container = container.update('<input type="text" tabindex="-1" class="focusCatcher"/><div class="currentImageWrapper"><img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/><span class="currentImagePinPoint"></span></div><div class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</div><div class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</div><div class="index">0 / 0</div><div class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></div>');
+    this.container = container.update(
+      '<input type="text" tabindex="-1" class="focusCatcher"/>' +
+      '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
+      '<div class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</div>' +
+      '<div class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</div>' +
+      '<div class="index">0 / 0</div>' +
+      '<div class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></div>'
+    );
     this.container.addClassName('xGallery');
 
     this.focusCatcher = this.container.down('.focusCatcher');
@@ -64,27 +71,8 @@ XWiki.Gallery = Class.create({
     this.show(this.index < this.images.length - 1 ? this.index + 1 : 0);
   },
   _onLoadImage : function() {
-    this._maybeLimitImageSize();
     Element.removeClassName(this.currentImage.parentNode, 'loading');
     this.currentImage.style.visibility = 'visible';
-  },
-  _maybeLimitImageSize : function() {
-    // Limit image size if the browser doesn't support the max-width and max-height CSS properties.
-    this.currentImage.style.height = this.currentImage.style.width = '';
-    var imageHeight = this.currentImage.offsetHeight;
-    var imageWidth = this.currentImage.offsetWidth;
-    var availableHeight = this.currentImage.parentNode.offsetHeight;
-    // Remove width reserved for the navigation arrows.
-    var availableWidth = this.currentImage.parentNode.offsetWidth - 128;
-    if (imageHeight > availableHeight || imageWidth > availableWidth) {
-      var aspectRatio = imageWidth / imageHeight;
-      var height = availableWidth / aspectRatio;
-      if (height > availableHeight) {
-        this.currentImage.style.height = availableHeight + 'px';
-      } else {
-        this.currentImage.style.width = availableWidth + 'px';
-      }
-    }
   },
   _onErrorImage: function() {
   },
@@ -124,66 +112,11 @@ XWiki.Gallery = Class.create({
   _onToggleMaximize : function() {
     this.maximizeToggle.toggleClassName('maximize');
     this.maximizeToggle.toggleClassName('minimize');
-    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ? "${escapetool.javascript($services.localization.render('core.widgets.gallery.maximize'))}" : "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
+    this.maximizeToggle.title = this.maximizeToggle.hasClassName('maximize') ?
+      "${escapetool.javascript($services.localization.render('core.widgets.gallery.maximize'))}" :
+      "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
-    if (this.container.hasClassName('maximized')) {
-      this._maybeUpdatePosition();
-      this._updateSize();
-    } else {
-      this._resetSize();
-      this._maybeResetPosition();
-    }
-  },
-  _isIE6 : function() {
-    return Prototype.Browser.IE && navigator.appVersion.indexOf('MSIE 6') > -1;
-  },
-  /* Hack required to overcome the broken support for position:fixed in IE6. */
-  _maybeUpdatePosition : function() {
-    if (this._isIE6()) {
-      this.placeHolder = this.placeHolder || new Element('div', {'class': 'xGalleryPlaceHolder'});
-      this.container.parentNode.replaceChild(this.placeHolder, this.container);
-      document.body.appendChild(this.container);
-      // The focus was lost when the focus catcher was detached.
-      setTimeout(function() {
-        this.focusCatcher.focus();
-      }.bind(this), 0);
-    }
-  },
-  /* Hack required to overcome the broken support for position:fixed in IE6. */
-  _maybeResetPosition : function() {
-    if (this._isIE6()) {
-      this.placeHolder.parentNode.replaceChild(this.container, this.placeHolder);
-      // The focus was lost when the focus catcher was detached.
-      setTimeout(function() {
-        this.focusCatcher.focus();
-      }.bind(this), 0);
-    }
-  },
-  _updateSize : function() {
-    var dimensions = document.viewport.getDimensions();
-    // Adjust dimensions for IE6 Quirks mode, which isn't supported by Prototype.js
-    if (dimensions.width <= 0) dimensions.width = document.body.clientWidth;
-    if (dimensions.height <= 0) dimensions.height = document.body.clientHeight;
-    // Remove container padding;
-    var width = dimensions.width - 20;
-    var height = dimensions.height - 20;
-    if (!this._isIE6()) {
-      this.container.setStyle({width: width + 'px', height: height + 'px'});
-    }
-    this.currentImage.up().setStyle({height: height + 'px', lineHeight: height + 'px'});
-    // Remove width reserved for the navigation arrows.
-    this.currentImage.setStyle({maxHeight: height + 'px', maxWidth: (width - 128) + 'px'});
-    this._maybeLimitImageSize();
-  },
-  _resetSize : function() {
-    this.container.style.cssText = '';
-    this.container.removeAttribute('style');
-    this.currentImage.parentNode.style.cssText = '';
-    this.currentImage.parentNode.removeAttribute('style');
-    this.currentImage.style.cssText = '';
-    this.currentImage.removeAttribute('style');
-    this._maybeLimitImageSize();
   },
   show : function(index) {
     if (index < 0 || index >= this.images.length || index == this.index) {
@@ -215,4 +148,3 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
-

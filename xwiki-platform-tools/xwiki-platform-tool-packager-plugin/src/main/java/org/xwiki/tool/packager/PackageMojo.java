@@ -164,6 +164,12 @@ public class PackageMojo extends AbstractMojo
     private String platformVersion;
 
     /**
+     * The commons version to be used by the packager plugin.
+     */
+    @Parameter(defaultValue = "${commons.version}")
+    private String commonsVersion;
+
+    /**
      * List of skin artifacts to include in the packaging.
      */
     @Parameter
@@ -348,36 +354,27 @@ public class PackageMojo extends AbstractMojo
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
-        Artifact configurationResourcesArtifact =
-            this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-                getXWikiPlatformVersion(), "", "jar");
+        Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-tool-configuration-resources", getXWikiPlatformVersion(), "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
         configurationFileTargetDirectory.mkdirs();
 
-        try {
-            JarInputStream jarInputStream =
-                new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()));
-
-            try {
-                JarEntry entry;
-                while ((entry = jarInputStream.getNextJarEntry()) != null) {
-                    if (entry.getName().endsWith(".vm")) {
-
-                        String fileName = entry.getName().replace(".vm", "");
-                        File outputFile = new File(configurationFileTargetDirectory, fileName);
-                        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                        getLog().info("Writing config file: " + outputFile);
-                        // Note: Init is done once even if this method is called several times...
-                        Velocity.init();
-                        Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
-                        writer.close();
-                        jarInputStream.closeEntry();
-                    }
+        try (JarInputStream jarInputStream =
+            new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
+            JarEntry entry;
+            while ((entry = jarInputStream.getNextJarEntry()) != null) {
+                if (entry.getName().endsWith(".vm")) {
+                    String fileName = entry.getName().replace(".vm", "");
+                    File outputFile = new File(configurationFileTargetDirectory, fileName);
+                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
+                    getLog().info("Writing config file: " + outputFile);
+                    // Note: Init is done once even if this method is called several times...
+                    Velocity.init();
+                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream));
+                    writer.close();
+                    jarInputStream.closeEntry();
                 }
-            } finally {
-                // Flush and close all the streams
-                jarInputStream.close();
             }
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to extract configuration files", e);
@@ -465,6 +462,7 @@ public class PackageMojo extends AbstractMojo
     {
         Artifact hsqldbArtifact = null;
 
+        // Try to find an HSQLDB dependency in the project using the packager plugin
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
@@ -476,9 +474,17 @@ public class PackageMojo extends AbstractMojo
             }
         }
 
-        // If the HSQLDB artifact wasn't defined, try to resolve the default HSQLDB JAR artifact
+        // If the HSQLDB artifact wasn't defined in the project, resolve it using ${hsqldb.version} as its version to
+        // make sure we use the version defined in the top level POM. And if that property doesn't exist throw an
+        // error.
         if (hsqldbArtifact == null) {
-            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", "2.3.3", "", "jar");
+            String hsqldbVersion = this.project.getProperties().getProperty("hsqldb.version");
+            if (hsqldbVersion == null) {
+                throw new MojoExecutionException("The HSQLDB version couldn't be computed. Either define a dependency "
+                    + "on it in your project or set the \"hsqldb.version\" Maven property in the project POM or in "
+                    + "some of its parents.");
+            }
+            hsqldbArtifact = this.repositorySystem.createArtifact("org.hsqldb", "hsqldb", hsqldbVersion, "", "jar");
         }
 
         if (hsqldbArtifact != null) {
@@ -487,6 +493,8 @@ public class PackageMojo extends AbstractMojo
             throw new MojoExecutionException("Failed to locate the HSQLDB artifact in either the project "
                 + "dependency list or using the specific [hsqldb:hsqldb] artifact name");
         }
+
+        getLog().info("  ... Using artifact: " + hsqldbArtifact.getFile());
 
         return hsqldbArtifact;
     }
@@ -636,7 +644,7 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-gwt-api", getXWikiPlatformVersion(), null, "jar"));
 
         // Needed by platform-web but since we don't have any dep in platform-web's pom.xml at the moment (duplication
-        // issue with XE/XEM and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
+        // issue with XE and platform-web) we need to include it here FTM... Solution: get a better maven WAR plugin
         // with proper merge feature and then remove this...
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-uiextension-api", getXWikiPlatformVersion(), null, "jar"));
@@ -662,6 +670,8 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-resource-servlet", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-xar-script", getXWikiPlatformVersion(), null, "jar"));
 
         // Velocity Scripting for Model Modules is also core (it's used a bit everywhere in VMs, pages, etc).
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -717,6 +727,10 @@ public class PackageMojo extends AbstractMojo
         // developer's life easy, we also include the filter module (used for XAR exports).
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-filter-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
+        // XAR module is triggered by org.xwiki.platform:xwiki-platform-oldcore but we still trigger it explicitly to
+        // not have bad surprises if that changes later
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-filter-stream-xar", getXWikiPlatformVersion(), null, "jar"));
 
         // Also add the skins artifacts, that may have JAR dependencies
         mandatoryTopLevelArtifacts.addAll(getSkinArtifacts());
@@ -802,21 +816,26 @@ public class PackageMojo extends AbstractMojo
      */
     private String getXWikiCommonsVersion()
     {
-        return this.project.getProperties().getProperty("commons.version", this.project.getVersion());
+        return normalizeVersion(this.commonsVersion);
     }
 
     /**
-     * @return the version of the XWiki Platform project, either configured in the project using this plugin or taken
-     *         from the {@code platform.version} property if defined, defaulting to the current project version if not
-     *         defined
+     * @return the version of the XWiki Platform project, either configured in the project's pom using this plugin or
+     *         taken from the {@code platform.version} property if defined, defaulting to the current project version
+     *         if not defined
      */
     private String getXWikiPlatformVersion()
     {
-        String version = this.platformVersion;
-        if (version == null) {
-            version = this.project.getVersion();
+        return normalizeVersion(this.platformVersion);
+    }
+
+    private String normalizeVersion(String version)
+    {
+        String normalizedVersion = version;
+        if (normalizedVersion == null) {
+            normalizedVersion = this.project.getVersion();
         }
-        return version;
+        return normalizedVersion;
     }
 
     private String getDependencyManagementVersion(MavenProject project, String groupId, String artifactId)

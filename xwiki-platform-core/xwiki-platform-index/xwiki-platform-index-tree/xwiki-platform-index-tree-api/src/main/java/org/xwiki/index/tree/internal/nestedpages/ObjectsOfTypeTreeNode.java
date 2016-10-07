@@ -46,7 +46,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * The "objects of type" tree node.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("objectsOfType")

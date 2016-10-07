@@ -20,7 +20,6 @@
 package org.xwiki.index.tree.internal.nestedspaces;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -37,7 +35,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
@@ -48,7 +45,8 @@ import org.xwiki.query.QueryFilter;
  * The space node in the nested spaces hierarchy.
  * 
  * @version $Id$
- * @since 8.3M2, 7.4.5
+ * @since 8.3M2
+ * @since 7.4.5
  */
 @Component
 @Named("space")
@@ -65,6 +63,24 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
     @Inject
     @Named("count")
     private QueryFilter countQueryFilter;
+
+    /**
+     * Reuse the child page filter from the nested pages hierarchy.
+     */
+    @Inject
+    @Named("childPage/nestedPages")
+    private QueryFilter childPageFilter;
+
+    /**
+     * Reuse the hidden page filter from the nested pages hierarchy.
+     */
+    @Inject
+    @Named("hiddenPage/nestedPages")
+    private QueryFilter hiddenPageFilter;
+
+    @Inject
+    @Named("documentOrSpaceReferenceResolver/nestedSpaces")
+    private QueryFilter documentOrSpaceReferenceResolverFilter;
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -84,58 +100,40 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
     protected List<? extends EntityReference> getChildren(SpaceReference spaceReference, int offset, int limit)
         throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        return getChildren(spaceReference, offset, limit, constraints, parameters);
+        return getChildrenQuery(spaceReference, offset, limit).execute();
     }
 
-    protected List<? extends EntityReference> getChildren(SpaceReference spaceReference, int offset, int limit,
-        List<String> constraints, Map<String, Object> parameters) throws QueryException
+    protected Query getChildrenQuery(SpaceReference spaceReference, int offset, int limit) throws QueryException
     {
-        constraints.add("page.parent = :parent");
-        parameters.put("parent", this.localEntityReferenceSerializer.serialize(spaceReference));
-
-        if (!areHiddenEntitiesShown()) {
-            constraints.add("page.hidden <> true");
-        }
-        if (!areTerminalDocumentsShown()) {
-            constraints.add("page.terminal = false");
-        }
-
-        String whereClause = whereClause(constraints);
         String orderBy = getOrderBy();
-        String statement;
-        if ("title".equals(orderBy)) {
-            statement = StringUtils.join(Arrays.asList("select page.name, page.terminal from XWikiPageOrSpace page",
-                "left join page.translations defaultTranslation with defaultTranslation.locale = ''",
-                "left join page.translations translation with translation.locale = :locale", whereClause,
-                "order by page.terminal,", "lower(coalesce(translation.title, defaultTranslation.title, page.name)),",
-                "coalesce(translation.title, defaultTranslation.title, page.name)"), ' ');
-            parameters.put("locale", this.localizationContext.getCurrentLocale().toString());
+        Query query;
+        if (areTerminalDocumentsShown()) {
+            if ("title".equals(orderBy)) {
+                query = this.queryManager.getNamedQuery("nestedSpacesOrderedByTitle");
+                query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
+            } else {
+                query = this.queryManager.getNamedQuery("nestedSpacesOrderedByName");
+            }
         } else {
-            statement = StringUtils.join(Arrays.asList("select name, terminal from XWikiPageOrSpace page", whereClause,
-                "order by page.terminal, lower(name), name"), ' ');
+            // Query only the spaces table.
+            query = this.queryManager.createQuery(
+                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
         }
-        Query query = this.queryManager.createQuery(statement, Query.HQL);
+
         query.setWiki(spaceReference.getWikiReference().getName());
         query.setOffset(offset);
         query.setLimit(limit);
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            query.bindValue(entry.getKey(), entry.getValue());
+
+        query.addFilter(this.childPageFilter);
+        query.bindValue("parent", this.localEntityReferenceSerializer.serialize(spaceReference));
+
+        if (!areHiddenEntitiesShown()) {
+            query.addFilter(this.hiddenPageFilter);
         }
 
-        List<EntityReference> entityReferences = new ArrayList<EntityReference>();
-        for (Object result : query.execute()) {
-            String name = (String) ((Object[]) result)[0];
-            Boolean terminal = (Boolean) ((Object[]) result)[1];
-            if (terminal) {
-                entityReferences.add(new DocumentReference(name, spaceReference));
-            } else {
-                entityReferences.add(new SpaceReference(name, spaceReference));
-            }
-        }
+        query.addFilter(this.documentOrSpaceReferenceResolverFilter);
 
-        return entityReferences;
+        return query;
     }
 
     @Override

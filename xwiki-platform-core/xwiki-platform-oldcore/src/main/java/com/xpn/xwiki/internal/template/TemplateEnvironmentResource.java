@@ -32,13 +32,13 @@ public class TemplateEnvironmentResource extends AbstractEnvironmentResource
 {
     public TemplateEnvironmentResource(String path, String resourceName, Environment environment)
     {
-        super(path, resourceName, null, environment, null);
+        super(path, resourceName, null, environment);
     }
 
     @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
-        // Does not make any sense for a template
+        // Does not make any sense in this case
         throw new NotImplementedException();
     }
 }

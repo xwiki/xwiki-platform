@@ -24,13 +24,9 @@ import java.net.URI;
 
 import javax.inject.Provider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -47,8 +43,6 @@ import net.java.truevfs.kernel.spec.FsNodeName;
  */
 public class XWikiModelNode
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiModelNode.class);
-
     private ComponentManager componentManager;
 
     private DocumentReference reference;
@@ -60,8 +54,6 @@ public class XWikiModelNode
     private URI uri;
 
     private String name;
-
-    private ContextualAuthorizationManager authorizationManager;
 
     XWikiModelNode(AttachController controller, FsNodeName name)
     {
@@ -114,24 +106,15 @@ public class XWikiModelNode
     }
 
     /**
-     * @return the archive attachment itself
-     * @throws IOException when an error accessing the Attachment occurs or if the current user doesn't have VIEW
-     *         permission on the Document to which it's attached to
-     */
-    public XWikiAttachment getAttachment() throws IOException
-    {
-        return getAttachment(true);
-    }
-
-    /**
      * @return true if the attachment exists or false otherwise
-     * @since 7.4.1, 8.0M1
+     * @since 7.4.1
+     * @since 8.0M1
      */
     public boolean hasAttachment()
     {
         boolean result;
         try {
-            getAttachment(false);
+            getAttachment();
             result = true;
         } catch (Exception e) {
             result = false;
@@ -139,15 +122,13 @@ public class XWikiModelNode
         return result;
     }
 
-    private XWikiAttachment getAttachment(boolean shouldCheckPermission) throws IOException
+    /**
+     * @return the archive attachment itself
+     * @throws IOException when an error accessing the Attachment occurs
+     */
+    public XWikiAttachment getAttachment() throws IOException
     {
         if (this.attachment == null) {
-            // Note that we check permission only once per Node for performance reason. As a consequence it's possible
-            // that a user who had permission at point A, and who's been denied it may still access the Node for some
-            // time.
-            if (shouldCheckPermission) {
-                checkViewPermission();
-            }
             try {
                 XWikiDocument document = getXWikiContext().getWiki().getDocument(
                     getDocumentReference(), getXWikiContext());
@@ -157,19 +138,5 @@ public class XWikiModelNode
             }
         }
         return this.attachment;
-    }
-
-    private void checkViewPermission() throws IOException
-    {
-        try {
-            if (this.authorizationManager == null) {
-                this.authorizationManager = getComponentManager().getInstance(ContextualAuthorizationManager.class);
-            }
-        } catch (Exception e) {
-            throw new IOException(String.format("Failed to check permission for [%s]", this.uri), e);
-        }
-        if (!this.authorizationManager.hasAccess(Right.VIEW, getDocumentReference())) {
-            throw new IOException(String.format("No View permission for document [%s]", getDocumentReference()));
-        }
     }
 }

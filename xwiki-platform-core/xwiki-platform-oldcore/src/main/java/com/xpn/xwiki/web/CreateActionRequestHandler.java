@@ -136,7 +136,11 @@ public class CreateActionRequestHandler
 
     /**
      * The property name for the spaces in the template provider object.
+     *
+     * @deprecated since 8.3M2. Use {@link #TP_CREATION_RESTRICTIONS_PROPERTY} or
+     *             {@value #TP_VISIBILITY_RESTRICTIONS_PROPERTY} instead for the explicit restriction you need to add.
      */
+    @Deprecated
     private static final String SPACES_PROPERTY = "spaces";
 
     /**
@@ -164,6 +168,13 @@ public class CreateActionRequestHandler
     private static final String TP_TYPE_PROPERTY = TYPE;
 
     private static final String TP_TYPE_PROPERTY_SPACE_VALUE = SPACE;
+
+    private static final String TP_CREATION_RESTRICTIONS_PROPERTY = "creationRestrictions";
+
+    private static final String TP_VISIBILITY_RESTRICTIONS_PROPERTY = "visibilityRestrictions";
+
+    private static final String TP_CREATION_RESTRICTIONS_ARE_SUGGESTIONS_PROPERTY =
+        "creationRestrictionsAreSuggestions";
 
     /**
      * Space homepage document name.
@@ -215,8 +226,9 @@ public class CreateActionRequestHandler
 
         // Get the available templates, in the current space, to check if all conditions to create a new document are
         // met
-        availableTemplateProviders = loadAvailableTemplateProviders(
-            document.getDocumentReference().getLastSpaceReference(), templateProviderClassReference, context);
+        availableTemplateProviders =
+            loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
+                templateProviderClassReference, context);
 
         // Get the type of document to create
         type = request.get(TYPE);
@@ -414,10 +426,10 @@ public class CreateActionRequestHandler
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
 
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
-            Query query = queryManager.createQuery(
-                "from doc.object(XWiki.TemplateProviderClass) as template "
+            Query query =
+                queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
                     + "where doc.fullName not like 'XWiki.TemplateProviderTemplate' " + "order by template.name",
-                Query.XWQL);
+                    Query.XWQL);
 
             // TODO: Extend the above query to include a filter on the type and allowed spaces properties so we can
             // remove the java code below, thus improving performance by not loading all the documents, but only the
@@ -430,7 +442,9 @@ public class CreateActionRequestHandler
                 XWikiDocument templateDoc = wiki.getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
 
-                if (isTemplateProviderAllowedInSpace(templateObject, spaceReference)) {
+                // Check the template provider's visibility restrictions.
+                if (isTemplateProviderAllowedInSpace(templateObject, spaceReference,
+                    TP_VISIBILITY_RESTRICTIONS_PROPERTY)) {
                     // create a Document and put it in the list
                     templates.add(new Document(templateDoc, context));
                 }
@@ -442,16 +456,23 @@ public class CreateActionRequestHandler
         return templates;
     }
 
-    private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference)
+    private boolean isTemplateProviderAllowedInSpace(BaseObject templateObject, SpaceReference spaceReference,
+        String restrictionsProperty)
     {
+        // Handle the special case for creation restrictions when they are only suggestions and can be ignored.
+        if (TP_CREATION_RESTRICTIONS_PROPERTY.equals(restrictionsProperty)
+            && templateObject.getIntValue(TP_CREATION_RESTRICTIONS_ARE_SUGGESTIONS_PROPERTY, 0) == 1) {
+            return true;
+        }
+
         // Check the allowed spaces list.
-        List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
-        if (allowedSpaces.size() > 0) {
+        List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
+        if (restrictions.size() > 0) {
             EntityReferenceSerializer<String> localSerializer =
                 Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
-            for (String allowedSpace : allowedSpaces) {
+            for (String allowedSpace : restrictions) {
                 // Exact match or parent space (i.e. prefix) match.
                 if (allowedSpace.equals(spaceStringReference)
                     || StringUtils.startsWith(spaceStringReference, String.format("%s.", allowedSpace))) {
@@ -463,8 +484,19 @@ public class CreateActionRequestHandler
             return false;
         }
 
-        // No explicit spaces to check, allowed by default.
+        // No creation restrictions exist, allowed by default.
         return true;
+    }
+
+    private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
+    {
+        List<String> creationRestrictions = templateObject.getListValue(restrictionsProperty);
+        if (creationRestrictions.size() == 0) {
+            // Backwards compatibility for template providers created before 8.3M2, where the "spaces" property handled
+            // both visibility and creation.
+            creationRestrictions = templateObject.getListValue(SPACES_PROPERTY);
+        }
+        return creationRestrictions;
     }
 
     /**
@@ -533,22 +565,26 @@ public class CreateActionRequestHandler
      *
      * @return {@code true} if the creation is allowed, {@code false} otherwise
      */
-    public boolean isTemplateProviderAllowedInSpace()
+    public boolean isTemplateProviderAllowedToCreateInCurrentSpace()
     {
         // Check that the chosen space is allowed with the given template, if not:
         // - Cancel the redirect
         // - Set an error on the context, to be read by the create.vm
         if (templateProvider != null) {
-            if (!isTemplateProviderAllowedInSpace(templateProvider, spaceReference)) {
+            // Check using the template provider's creation restrictions.
+            if (!isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
+                TP_CREATION_RESTRICTIONS_PROPERTY)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, name };
-                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                    "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
+                XWikiException exception =
+                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
 
                 ScriptContext scontext = getCurrentScriptContext();
                 scontext.setAttribute(EXCEPTION, exception, ScriptContext.ENGINE_SCOPE);
-                scontext.setAttribute("createAllowedSpaces", templateProvider.getListValue(SPACES_PROPERTY),
+                scontext.setAttribute("createAllowedSpaces",
+                    getTemplateProviderRestrictions(templateProvider, TP_CREATION_RESTRICTIONS_PROPERTY),
                     ScriptContext.ENGINE_SCOPE);
 
                 return false;
@@ -577,9 +613,10 @@ public class CreateActionRequestHandler
                 ScriptContext.ENGINE_SCOPE);
 
             // Throw an exception.
-            Object[] args = { newDocument.getDocumentReference() };
+            Object[] args = {newDocument.getDocumentReference()};
             XWikiException documentAlreadyExists =
-                new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot create document {0} because it already has content", null, args);
             scontext.setAttribute(EXCEPTION, documentAlreadyExists, ScriptContext.ENGINE_SCOPE);
 

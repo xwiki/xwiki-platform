@@ -50,7 +50,9 @@ public interface GroupFilter
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
-     * @since 8.3M1, 8.2.2, 7.4.5
+     * @since 8.3M1
+     * @since 8.2.2
+     * @since 7.4.5
      */
     default void beginGroupContainer(String name,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException
@@ -62,7 +64,9 @@ public interface GroupFilter
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
-     * @since 8.3M1, 8.2.2, 7.4.5
+     * @since 8.3M1
+     * @since 8.2.2
+     * @since 7.4.5
      */
     default void endGroupContainer(String name,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException

@@ -36,14 +36,8 @@ import org.xwiki.component.manager.ComponentManager;
 @Component
 @Named(UserComponentManager.ID)
 @Singleton
-public class UserComponentManagerFactory implements ComponentManagerFactory
+public class UserComponentManagerFactory extends AbstractComponentManagerFactory
 {
-    /**
-     * The default {@link ComponentManagerFactory} used to actually create the {@link ComponentManager} instance.
-     */
-    @Inject
-    private ComponentManagerFactory factory;
-
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
@@ -52,14 +46,8 @@ public class UserComponentManagerFactory implements ComponentManagerFactory
     private ComponentManager documentComponentManager;
 
     @Override
-    public ComponentManager createComponentManager(ComponentManager parentComponentManager)
-    {
-        return this.factory.createComponentManager(this.documentComponentManager);
-    }
-
-    @Override
     public ComponentManager createComponentManager(String namespace, ComponentManager parentComponentManager)
     {
-        return this.factory.createComponentManager(namespace, this.documentComponentManager);
+        return this.defaultFactory.createComponentManager(namespace, this.documentComponentManager);
     }
 }

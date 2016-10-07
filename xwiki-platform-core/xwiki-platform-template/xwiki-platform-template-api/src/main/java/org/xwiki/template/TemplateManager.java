@@ -41,10 +41,31 @@ public interface TemplateManager
      * <p>
      * Any failure is "printed" in the returned {@link XDOM}.
      * 
+     * @param template the template
+     * @return the XDOM source of the template
+     * @since 8.3RC1
+     */
+    XDOM getXDOMNoException(Template template);
+
+    /**
+     * Parse the template with the provided name and return it as {@link XDOM}.
+     * <p>
+     * Any failure is "printed" in the returned {@link XDOM}.
+     * 
      * @param templateName the name of the template
      * @return the XDOM source of the template
      */
     XDOM getXDOMNoException(String templateName);
+
+    /**
+     * Parse the template with the provided name and return it as {@link XDOM}.
+     * 
+     * @param template the template
+     * @return the XDOM source of the template
+     * @throws Exception when failing to parse the template
+     * @since 8.3RC1
+     */
+    XDOM getXDOM(Template template) throws Exception;
 
     /**
      * Parse the template with the provided name and return it as {@link XDOM}.
@@ -60,10 +81,31 @@ public interface TemplateManager
      * <p>
      * Any failure is "printed" in the returned {@link XDOM}.
      * 
-     * @param template the name of the template
+     * @param template the template
+     * @return the {@link XDOM} result of the template execution
+     * @since 8.3RC1
+     */
+    XDOM executeNoException(Template template);
+
+    /**
+     * Execute and return the template as {@link XDOM}.
+     * <p>
+     * Any failure is "printed" in the returned {@link XDOM}.
+     * 
+     * @param templateName the name of the template
      * @return the {@link XDOM} result of the template execution
      */
-    XDOM executeNoException(String template);
+    XDOM executeNoException(String templateName);
+
+    /**
+     * Execute and return the template as {@link XDOM}.
+     * 
+     * @param template the template
+     * @return the {@link XDOM} result of the template execution
+     * @throws Exception when failing to parse the template
+     * @since 8.3RC1
+     */
+    XDOM execute(Template template) throws Exception;
 
     /**
      * Execute and return the template as {@link XDOM}.
@@ -79,27 +121,36 @@ public interface TemplateManager
      * <p>
      * Any failure is "printed" in the returned result.
      * 
-     * @param template the name of the template
+     * @param templateName the name of the template
      * @return the result of the execution of the template in the current target syntax
      */
-    String renderNoException(String template);
+    String renderNoException(String templateName);
 
     /**
      * Execute and render the template in current target syntax.
      * 
-     * @param template the name of the template
+     * @param templateName the name of the template
      * @return the result of the execution of the template in the current target syntax
      * @throws Exception when failing to render the template
      */
-    String render(String template) throws Exception;
+    String render(String templateName) throws Exception;
 
     /**
      * Execute and render the template in current target syntax.
      * 
-     * @param template the name of the template
+     * @param template the template
+     * @param writer the writer containing the result of the execution and rendering
+     * @since 8.3RC1
+     */
+    void renderNoException(Template template, Writer writer);
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
+     * @param templateName the name of the template
      * @param writer the writer containing the result of the execution and rendering
      */
-    void renderNoException(String template, Writer writer);
+    void renderNoException(String templateName, Writer writer);
 
     /**
      * Execute and render the template in current target syntax.
@@ -113,33 +164,33 @@ public interface TemplateManager
     /**
      * Execute and render the template in current target syntax.
      * 
-     * @param template the name of the template
+     * @param templateName the name of the template
      * @param writer the writer containing the result of the execution and rendering
      * @throws Exception when failing to render the template
      */
-    void render(String template, Writer writer) throws Exception;
+    void render(String templateName, Writer writer) throws Exception;
 
     /**
-     * Execute and render the template in current target syntax from the passed skin. When the template is not
-     * found in the passed skin it fallback on skin parent etc.
+     * Execute and render the template in current target syntax from the passed skin. When the template is not found in
+     * the passed skin it fallback on skin parent etc.
      * 
-     * @param template the name of the template
+     * @param templateName the name of the template
      * @param skin the skin
      * @return the result of the execution of the template in the current target syntax
      * @throws Exception when failing to render the template
      */
-    String renderFromSkin(String template, Skin skin) throws Exception;
+    String renderFromSkin(String templateName, Skin skin) throws Exception;
 
     /**
-     * Execute and render the template in current target syntax from the passed skin. When the template is not
-     * found in the passed skin it fallback on skin parent etc.
+     * Execute and render the template in current target syntax from the passed skin. When the template is not found in
+     * the passed skin it fallback on skin parent etc.
      * 
      * @param templateName the name of the template
      * @param skin the skin
      * @param writer the writer containing the result of the execution and rendering
      * @throws Exception when failing to render the template
      */
-    void renderFromSkin(final String templateName, Skin skin, final Writer writer) throws Exception;
+    void renderFromSkin(String templateName, Skin skin, Writer writer) throws Exception;
 
     /**
      * Search the template with passed name in the passed skin.

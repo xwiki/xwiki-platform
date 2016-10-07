@@ -28,7 +28,8 @@ import org.openqa.selenium.support.FindBy;
  * on the Copy button (i.e. after the copy parameters have been submitted).
  * 
  * @version $Id$
- * @since 7.4.1, 8.0M1
+ * @since 7.4.1
+ * @since 8.0M1
  */
 public class CopyOrRenameStatusPage extends BasePage
 {

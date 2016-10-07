@@ -415,16 +415,16 @@ rendering.transformations = $xwikiRenderingTransformations
 ## Note: Since this file is parsed by Velocity in the Maven Remote Resource plugin we need to escape the
 ## Apache Commons Configuration syntax for specifying the user.home system property!
 #set ($userHome = '${sys:user.home}')
-# extension.repositories=local:maven:file://${userHome}/.m2/repository
+# extension.repositories=maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
 #-# When not set the following is taken (in this order):
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
-# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
 # extension.repositories=maven-xwikicom:maven:https://nexus.xwiki.com/nexus/content/repositories/public-store-releases
 # extension.repositories=store.xwiki.com:maven:https://store.xwiki.com/xwiki/rest/
+# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
 #-# 
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=
@@ -457,6 +457,12 @@ extension.oldflavors=$oldFlavor.trim()
 #else
 # extension.oldflavors=
 #end
+
+#-# [Since 8.3]
+#-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
+#-# 
+#-# The default is:
+# extension.core.resolve=true
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard

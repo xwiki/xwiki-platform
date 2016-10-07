@@ -21,20 +21,22 @@ package org.xwiki.repository.test;
 
 import java.io.File;
 
-import org.xwiki.extension.AbstractExtension;
+import org.xwiki.extension.AbstractRemoteExtension;
 import org.xwiki.extension.ExtensionId;
 
 /**
  * @version $Id$
  * @since 4.2M1
  */
-public class TestExtension extends AbstractExtension
+public class TestExtension extends AbstractRemoteExtension
 {
     public final static String FOLDERNAME_EXETENSIONS = "target/extensions/";
 
     protected TestExtension(ExtensionId id, String type, File file)
     {
         super(null, id, type);
+
+        setName(id.getId());
 
         setFile(new TestExtensionFile(file));
     }

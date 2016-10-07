@@ -49,7 +49,12 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
      */
     public static final String ID = "user";
 
-    private static final String KEY_PREFIX = ID + ':';
+    /**
+     * The prefix of user namespace.
+     * 
+     * @since 8.4RC1
+     */
+    public static final String NAMESPACE_PREFIX = ID + ':';
 
     /**
      * Used to access the current user in the Execution Context.
@@ -92,7 +97,7 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
     {
         DocumentReference userReference = getCurrentReference();
 
-        return userReference != null ? KEY_PREFIX + this.referenceSerializer.serialize(userReference) : null;
+        return userReference != null ? NAMESPACE_PREFIX + this.referenceSerializer.serialize(userReference) : null;
     }
 
     @Override

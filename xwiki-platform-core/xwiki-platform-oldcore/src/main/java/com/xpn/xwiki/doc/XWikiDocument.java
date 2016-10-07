@@ -795,29 +795,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Temporary helper to produce a local/uid serialization of this document reference, including the language. Only
-     * translated document will have language appended. FIXME: when reference contains locale, this is no more needed.
+     * Helper to produce and cache a local uid serialization of this document reference, including the language. Only
+     * translated document will have language appended.
      *
      * @return a unique name (in a wiki) (5:space4:name2:lg)
      */
     private String getLocalKey()
     {
         if (this.localKeyCache == null) {
-            final String localUid = LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getDocumentReference());
-
-            if (StringUtils.isEmpty(getLanguage())) {
-                this.localKeyCache = localUid;
-            } else {
-                this.localKeyCache = appendLocale(new StringBuilder(64).append(localUid)).toString();
-            }
+            this.localKeyCache =
+                LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getDocumentReferenceWithLocale());
         }
 
         return this.localKeyCache;
     }
 
     /**
-     * Temporary helper to produce a uid serialization of this document reference, including the locale. Only translated
-     * document will have locale appended. FIXME: when reference contains locale, this is no more needed.
+     * Helper to produce and cache a uid serialization of this document reference, including the language. Only
+     * translated document will have language appended.
      *
      * @return a unique name (8:wikiname5:space4:name2:lg or 8:wikiname5:space4:name)
      * @since 4.0M1
@@ -825,35 +820,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getKey()
     {
         if (this.keyCache == null) {
-            final String uid = getUidStringEntityReferenceSerializer().serialize(getDocumentReference());
-
-            if (StringUtils.isEmpty(getLanguage())) {
-                this.keyCache = uid;
-            } else {
-                this.keyCache = appendLocale(new StringBuilder(64).append(uid)).toString();
-            }
+            this.keyCache = getUidStringEntityReferenceSerializer().serialize(getDocumentReferenceWithLocale());
         }
 
         return this.keyCache;
-    }
-
-    /**
-     * Temporary helper that append the language of this document to the provide string buffer. FIXME: when reference
-     * contains locale, this is no more needed.
-     *
-     * @param sb a StringBuilder where to append the locale key
-     * @return the StringBuilder appended with the locale of this document formatted like 2:lg
-     * @see #getLocalKey()
-     */
-    private StringBuilder appendLocale(StringBuilder sb)
-    {
-        String localeString = getLanguage();
-
-        if (StringUtils.isEmpty(localeString)) {
-            return sb;
-        }
-
-        return sb.append(localeString.length()).append(':').append(localeString);
     }
 
     @Override
@@ -879,7 +849,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // that all things saved in a given wiki's database are always stored relative to that wiki so that
         // changing that wiki's name is simpler.
 
-        return (this.id = Util.getHash(getLocalKey()));
+        this.id = Util.getHash(getLocalKey());
+
+        return this.id;
     }
 
     /**
@@ -1257,6 +1229,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param context the XWiki Context object
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 8.3
+     */
+    public String getRenderedContent(String text, String syntaxId, boolean restrictedTransformationContext,
+        XWikiDocument sDocument, XWikiContext context)
+    {
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(), restrictedTransformationContext,
+            sDocument, context);
+    }
+
+    /**
+     * @param text the text to render
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param targetSyntaxId the id of the syntax in which to render the document content
      * @param context the XWiki context
@@ -1280,25 +1268,39 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
         boolean restrictedTransformationContext, XWikiContext context)
     {
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, restrictedTransformationContext, null, context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
+     * @param context the XWiki context
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 8.3
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
+        boolean restrictedTransformationContext, XWikiDocument sDocument, XWikiContext context)
+    {
         Map<String, Object> backup = null;
 
+        XWikiDocument currentSDocument = (XWikiDocument) context.get(CKEY_SDOC);
         try {
             // We have to render the given text in the context of this document. Check if this document is already
             // on the context (same Java object reference). We don't check if the document references are equal
             // because this document can have temporary changes that are not present on the context document even if
             // it has the same document reference.
             if (context.getDoc() != this) {
-                // Remember what is the current caller document because #setAsContextDoc reset it
-                XWikiDocument callerDocument = getCallerDocument(context);
-
                 backup = new HashMap<>();
                 backupContext(backup, context);
                 setAsContextDoc(context);
+            }
 
-                // Make sure to execute the document with the right of the calling author
-                if (callerDocument != null) {
-                    context.put("sdoc", callerDocument);
-                }
+            // Make sure to execute the document with the right of the provided sdocument's author
+            if (sDocument != null) {
+                context.put(CKEY_SDOC, sDocument);
             }
 
             // Reuse this document's reference so that the Velocity macro name-space is computed based on it.
@@ -1318,19 +1320,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (backup != null) {
                 restoreContext(backup, context);
             }
+            context.put(CKEY_SDOC, currentSDocument);
         }
 
         return "";
-    }
-
-    private XWikiDocument getCallerDocument(XWikiContext xcontext)
-    {
-        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
-        if (sdoc == null) {
-            sdoc = xcontext.getDoc();
-        }
-
-        return sdoc;
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
@@ -2391,7 +2384,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     * @since 7.3M1
+     * @since 7.2.1
+     * @since 7.1.3
+     * @since 6.4.6
      */
     public int getXObjectSize(EntityReference classReference)
     {
@@ -2584,7 +2580,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param xcontext the XWiki context
      * @return a {@link BaseObject} stored at passed location
      * @throws XWikiException when failing to create new xobject instance
-     * @since 7.3M1, 7.2.1, 7.1.3, 6.4.6
+     * @since 7.3M1
+     * @since 7.2.1
+     * @since 7.1.3
+     * @since 6.4.6
      */
     public BaseObject getXObject(EntityReference classReference, int number, boolean create, XWikiContext xcontext)
         throws XWikiException
@@ -6490,7 +6489,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     }
                 } catch (XWikiException e) {
                     LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach.getReference(),
-                        newAttach.getReference());
+                        newAttach.getReference(), e);
                 }
             }
         }

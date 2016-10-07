@@ -96,7 +96,8 @@ public class ComponentScriptService implements ScriptService
 
     /**
      * @return the contextual Component Manager if the document has Programming Rights or null otherwise
-     * @since 6.4.1, 6.2.6
+     * @since 6.4.1
+     * @since 6.2.6
      */
     public ComponentManager getContextComponentManager()
     {
@@ -105,7 +106,8 @@ public class ComponentScriptService implements ScriptService
 
     /**
      * @return the root Component Manager if the document has Programming Rights or null otherwise
-     * @since 6.4.1, 6.2.6
+     * @since 6.4.1
+     * @since 6.2.6
      */
     public ComponentManager getRootComponentManager()
     {

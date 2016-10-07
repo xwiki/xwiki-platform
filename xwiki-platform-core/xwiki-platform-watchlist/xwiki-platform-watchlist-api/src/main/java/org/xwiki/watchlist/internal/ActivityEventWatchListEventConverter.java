@@ -65,8 +65,6 @@ public class ActivityEventWatchListEventConverter implements WatchListEventConve
                 new WikiReference(from.getWiki())));
         }
 
-        WatchListEvent event =
-            new WatchListEvent(documentReference, type, userReference, from.getVersion(), from.getDate());
-        return event;
+        return new WatchListEvent(documentReference, type, userReference, from.getVersion(), from.getDate());
     }
 }

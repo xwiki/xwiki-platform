@@ -168,7 +168,10 @@ public abstract class AbstractCachedCompiler<T>
      * @param exception exception to store in the cache
      * @return an object that can be stored in the cache and returned to the user next time
      *  
-     * @since 7.3M1, 6.4.6, 7.1.2, 7.2.1
+     * @since 7.3M1
+     * @since 6.4.6
+     * @since 7.1.2
+     * @since 7.2.1
      */
     protected abstract T exceptionAsResult(LESSCompilerException exception);
 }

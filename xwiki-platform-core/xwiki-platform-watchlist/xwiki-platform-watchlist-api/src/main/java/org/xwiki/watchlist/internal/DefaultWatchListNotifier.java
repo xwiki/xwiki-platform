@@ -42,7 +42,7 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.internal.SessionFactory;
+import org.xwiki.mail.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -121,6 +121,7 @@ public class DefaultWatchListNotifier implements WatchListNotifier
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
     @Override
+    @Deprecated
     public void sendNotification(String subscriber, List<WatchListEvent> events, String templateDocument,
         Date previousFireTime) throws XWikiException
     {

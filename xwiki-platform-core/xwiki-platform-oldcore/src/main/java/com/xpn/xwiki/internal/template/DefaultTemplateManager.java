@@ -42,9 +42,21 @@ public class DefaultTemplateManager implements TemplateManager
     private InternalTemplateManager templateManager;
 
     @Override
+    public XDOM getXDOMNoException(Template template)
+    {
+        return this.templateManager.getXDOMNoException(template);
+    }
+
+    @Override
     public XDOM getXDOMNoException(String templateName)
     {
         return this.templateManager.getXDOMNoException(templateName);
+    }
+
+    @Override
+    public XDOM getXDOM(Template template) throws Exception
+    {
+        return this.templateManager.getXDOM(template);
     }
 
     @Override
@@ -54,27 +66,33 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
-    public String renderNoException(String template)
+    public String renderNoException(String templateName)
     {
-        return this.templateManager.renderNoException(template);
+        return this.templateManager.renderNoException(templateName);
     }
 
     @Override
-    public String render(String template) throws Exception
+    public String render(String templateName) throws Exception
     {
-        return this.templateManager.render(template);
+        return this.templateManager.render(templateName);
     }
 
     @Override
-    public String renderFromSkin(String template, Skin skin) throws Exception
+    public String renderFromSkin(String templateName, Skin skin) throws Exception
     {
-        return this.templateManager.renderFromSkin(template, skin);
+        return this.templateManager.renderFromSkin(templateName, skin);
     }
 
     @Override
-    public void renderNoException(String template, Writer writer)
+    public void renderNoException(Template template, Writer writer)
     {
         this.templateManager.renderNoException(template, writer);
+    }
+
+    @Override
+    public void renderNoException(String templateName, Writer writer)
+    {
+        this.templateManager.renderNoException(templateName, writer);
     }
 
     @Override
@@ -96,9 +114,21 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
-    public XDOM executeNoException(String template)
+    public XDOM executeNoException(Template template)
     {
         return this.templateManager.executeNoException(template);
+    }
+
+    @Override
+    public XDOM executeNoException(String templateName)
+    {
+        return this.templateManager.executeNoException(templateName);
+    }
+
+    @Override
+    public XDOM execute(Template template) throws Exception
+    {
+        return this.templateManager.execute(template);
     }
 
     @Override

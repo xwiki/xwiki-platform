@@ -31,90 +31,62 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1468938266000</date>
-  <contentUpdateDate>1468938266000</contentUpdateDate>
+  <date>1473764884000</date>
+  <contentUpdateDate>1473764884000</contentUpdateDate>
   <version>1.1</version>
   <title>Extensions</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
+  <content>{{include reference='ExtensionCode.HomeBrowse'/}}
 
-{{include reference="ExtensionCode.CreateExtension"/}}
+{{include reference='ExtensionCode.HomeSearch'/}}
 
-(% class="extension-link search-extension box" %)(((
-(((
+{{include reference='ExtensionCode.HomeContribute'/}}
+
 {{velocity}}
-=== #if($services.icon)$services.icon.render('find')#end Search Extension... ===
-{{html}}
-&lt;form action="$xwiki.getURL("ExtensionCode.ExtensionSearch")"&gt;
-  &lt;input type="hidden" name="f_space" value="Extension" /&gt;
-  &lt;input type="text" name="text" value="extension name..." size="25" class="withTip" id="searchTextInput" /&gt;
-  &lt;span class="buttonwrapper"&gt;
-    &lt;input class="btn btn-primary" type="submit" value="Search"  id="searchSubmit"/&gt;
-  &lt;/span&gt;
-&lt;/form&gt;
-{{/html}}
-
-[[Advanced&gt;&gt;ExtensionCode.ExtensionSearch||queryString="space=Extension"]]
-{{/velocity}}
-)))
-)))
-
-(% class="extension-link add-extension box" %)(((
-(((
-{{velocity}}
-=== #if($services.icon)$services.icon.render('add')#end Contribute Extension... ===
-{{html}}
-#if ($isGuest)
-  You need first to &lt;a href="${escapetool.xml($xwiki.getURL('Main.WebHome', 'login', "xredirect=$doc.externalURL"))}"&gt;log in&lt;/a&gt; or &lt;a href="${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))}"&gt;register&lt;/a&gt;.
-#else
-&lt;form action="$doc.getURL()" id="createextension"&gt;
-  &lt;input type="hidden" name="parent" value="Extension.WebHome" /&gt;
-  &lt;input type="hidden" name="template" value="ExtensionCode.ExtensionTemplate" /&gt;
-  &lt;input type="hidden" name="createExtension" value="true" /&gt;
-  &lt;input class="withTip" type="text" name="name" value="extension name..."  size="25" id="contributeNameInput"/&gt;
-  &lt;span class="buttonwrapper"&gt;
-    &lt;input class="btn btn-success" type="submit" value="Add" id="contributeSubmit"/&gt;
-  &lt;/span&gt;
-&lt;/form&gt;
-{{/html}}
-
-[[Import&gt;&gt;ExtensionCode.ImportExtension]]
+#if ($useRecommendations)
+  #if ($isRecommendedView)
+    = Recommended Extensions =
+  #else
+    = All Extensions =
+  #end
 #end
 {{/velocity}}
-)))
-)))
 
-(% class="clearfloats" %)((()))(%%)
-
-{{velocity}}
-#set($columns = ["name", "summary", "category", "authors", "doc.creationDate", "doc.date", "installedCount", "rating"])
-#set($columnsProperties = {
-  "name" : { "type" : "text", "link" : "view" },
-  "summary" : { "type" : "text" },
-  "category" : { "type" : "list" },
-  "authors" : {'html': true},
-  "doc.creationDate" : { "type" : "date" },
-  "doc.date" : { "type" : "date" },
-  "rating" : { 'html' : true, 'filterable' : false, 'sortable' : false}
-})
-#set($options = { 
-   "tagCloud":true,
-   "className":"ExtensionCode.ExtensionClass",
-   "selectedColumn":"doc.creationDate",
-   "defaultOrder":"desc",
-   "translationPrefix" : "extension.repository.",
-   "rowCount": 30
-})
-#livetable("extensions" $columns $columnsProperties $options)
-
-(% class="hidden" %) (((
-Temporary provide a link for robots to index all extension.
-In the future, this link will be provided via a sitemap.
-[[ExtensionCode.AllExtensionsList]]
-)))
-#set($docextras=[])
-{{/velocity}}</content>
+{{include reference='ExtensionCode.HomeLivetable'/}}
+</content>
+  <object>
+    <name>Extension.WebHome</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>0d58b94c-de7f-4961-bfd9-5a1de6b79911</guid>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>ExtensionCode.HomeSheet</sheet>
+    </property>
+  </object>
 </xwikidoc>

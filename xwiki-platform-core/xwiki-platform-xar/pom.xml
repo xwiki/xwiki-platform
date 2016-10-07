@@ -25,68 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>8.3-SNAPSHOT</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xar</artifactId>
-  <name>XWiki Platform - XAR</name>
-  <packaging>jar</packaging>
-  <description>Various utilities to manipulate XAR packages</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.2</xwiki.jacoco.instructionRatio>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-xml</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.stax-utils</groupId>
-      <artifactId>stax-utils</artifactId>
-    </dependency>
-
-    <!-- Test Dependencies -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-              org/xwiki/xar/XarPackage.java,
-              org/xwiki/xar/internal/XarUtils.java,
-              org/xwiki/xar/internal/model/XarAttachmentModel.java,
-              org/xwiki/xar/internal/model/XarClassModel.java,
-              org/xwiki/xar/internal/model/XarClassPropertyModel.java,
-              org/xwiki/xar/internal/model/XarDocumentModel.java,
-              org/xwiki/xar/internal/model/XarModel.java,
-              org/xwiki/xar/internal/model/XarObjectModel.java,
-              org/xwiki/xar/internal/model/XarObjectPropertyModel.java
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <name>XWiki Platform - XAR - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>API and UI to import and export XAR packages</description>
+  <modules>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-xar-model</module>
+    <module>xwiki-platform-xar-script</module>
+  </modules>
 </project>

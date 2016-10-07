@@ -19,13 +19,12 @@
  */
 package org.xwiki.office.viewer.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.artofsolving.jodconverter.document.DocumentFamily;
@@ -49,7 +47,6 @@ import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,12 +59,20 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ExpandedMacroBlock;
 import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.url.ExtendedURL;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeResourceViewer}.
@@ -80,11 +85,6 @@ import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initializable
 {
     /**
-     * Default encoding used for encoding wiki, space, page and attachment names.
-     */
-    private static final String DEFAULT_ENCODING = "UTF-8";
-
-    /**
      * The module name used when creating temporary files. This is the module used by the temporary resource action to
      * retrieve the temporary file.
      */
@@ -96,11 +96,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * Used to access the temporary directory.
-     */
     @Inject
-    private Environment environment;
+    private TemporaryResourceStore temporaryResourceStore;
+
+    @Inject
+    @Named("standard/tmp")
+    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL> urlTemporaryResourceReferenceSerializer;
 
     /**
      * Used for serializing {@link AttachmentReference}s.
@@ -158,20 +159,6 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     private Logger logger;
 
-    String getFilePath(String resourceName, String fileName, Map<String, ?> parameters)
-    {
-        // We use Base64 encoding for the resource name because it may contain special characters like / (slash) or \
-        // (back-slash) that are prohibited in URLs by some servlet containers (e.g. Tomcat) even if they are
-        // URL-encoded. This can happen for instance if the resource is specified by an URL (e.g. external resource).
-        // Even for internal resources the back-slash character may be used to escape some characters in the resource
-        // reference. The down-side of the Base64 encoding is that the length of the output is greater than the length
-        // of the input by 30%. This means the file path can become quite large which may cause problems on environments
-        // that limit the path length (e.g. Windows). To be safe, the resource name should not exceed one third of the
-        // maximum accepted path length on the environment where XWiki is running.
-        String safeResourceName = Base64.encodeBase64URLSafeString(resourceName.getBytes());
-        return safeResourceName + '/' + parameters.hashCode() + '/' + getSafeFileName(fileName);
-    }
-
     /**
      * Processes all the image blocks in the given XDOM and changes image URL to point to a temporary file for those
      * images that are view artifacts.
@@ -198,21 +185,28 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             // Check whether there is a corresponding artifact.
             if (artifacts.containsKey(imageReference)) {
                 try {
-                    String filePath = getFilePath(resourceReference, imageReference, parameters);
+                    List<String> resourcePath = Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
+                    TemporaryResourceReference temporaryResourceReference =
+                        new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
 
                     // Write the image into a temporary file.
-                    File tempFile = getTemporaryFile(ownerDocumentReference, filePath);
-                    createTemporaryFile(tempFile, artifacts.get(imageReference));
+                    File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
+                        new ByteArrayInputStream(artifacts.get(imageReference)));
 
                     // Create a URL image reference which links to above temporary image file.
+                    String temporaryResourceURL =
+                        this.urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference).serialize();
                     ResourceReference urlImageReference =
-                        new ResourceReference(buildURL(ownerDocumentReference, filePath), ResourceType.URL);
-                    // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
-                    urlImageReference.setTyped(false);
+                        new ResourceReference(temporaryResourceURL, ResourceType.PATH);
+                    urlImageReference.setTyped(true);
 
                     // Replace the old image block with a new one that uses the above URL image reference.
                     Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
                     imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
+
+                    // Make sure the new image block is not inside an ExpandedMacroBlock whose's content syntax doesn't
+                    // support relative path resource references (we use relative paths to refer the temporary files).
+                    maybeFixExpandedMacroAncestor(newImgBlock);
 
                     // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                     temporaryFiles.add(tempFile);
@@ -224,6 +218,24 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         }
 
         return temporaryFiles;
+    }
+
+    private void maybeFixExpandedMacroAncestor(Block block)
+    {
+        ExpandedMacroBlock expandedMacro =
+            block.getFirstBlock(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.ANCESTOR_OR_SELF);
+        if (expandedMacro != null) {
+            Block parent = expandedMacro.getParent();
+            if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
+                MetaDataBlock metaData = new MetaDataBlock(Collections.<Block>emptyList());
+                // Use a syntax that supports relative path resource references (we use relative paths to include the
+                // temporary files).
+                metaData.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.XWIKI_2_1);
+                metaData.getMetaData().addMetaData(MODULE_NAME, true);
+                parent.replaceChild(metaData, expandedMacro);
+                metaData.addChild(expandedMacro);
+            }
+        }
     }
 
     /**
@@ -345,12 +357,10 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             // the owner document reference. This way we ensure the path to the temporary files doesn't contain
             // redundant information and so it remains as small as possible (considering that the path length is limited
             // on some environments).
-            Set<File> temporaryFiles =
-                processImages(xdom, xdomOfficeDocument.getArtifacts(), attachmentReference.getDocumentReference(),
-                    attachmentReference.getName(), parameters);
-            view =
-                new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
-                    temporaryFiles);
+            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(),
+                attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);
+            view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
+                temporaryFiles);
 
             this.attachmentCache.set(cacheKey, view);
         }
@@ -373,9 +383,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         if (view == null) {
             XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters);
             XDOM xdom = xdomOfficeDocument.getContentDocument();
-            Set<File> temporaryFiles =
-                processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument, serializedResourceReference,
-                    parameters);
+            Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument,
+                serializedResourceReference, parameters);
             view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
             this.externalCache.set(cacheKey, view);
@@ -405,82 +414,6 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private String getCacheKey(DocumentReference ownerDocument, String resource, Map<String, ?> parameters)
     {
         return this.serializer.serialize(ownerDocument) + '/' + resource + '/' + parameters.hashCode();
-    }
-
-    /**
-     * Creates a temporary file that stores the given data.
-     * 
-     * @param file the temporary file to be created
-     * @param fileData file data to be written
-     * @throws Exception if an error occurs while creating the temporary file
-     */
-    private void createTemporaryFile(File file, byte[] fileData) throws Exception
-    {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            file.deleteOnExit();
-
-            IOUtils.write(fileData, fos);
-        } finally {
-            IOUtils.closeQuietly(fos);
-        }
-    }
-
-    File getTemporaryFile(DocumentReference documentReference, String filepath) throws Exception
-    {
-        String wiki = documentReference.getWikiReference().getName();
-        String space = documentReference.getParent().getName();
-        String page = documentReference.getName();
-
-        // Encode to avoid illegal characters in file paths.
-        wiki = getSafeFileName(wiki);
-        space = getSafeFileName(space);
-        page = getSafeFileName(page);
-
-        // Create temporary directory.
-        String path = String.format("temp/%s/%s/%s/%s/", MODULE_NAME, wiki, space, page);
-        File rootDir = this.environment.getTemporaryDirectory();
-        File tempDir = new File(rootDir, path);
-        File tempFile = new File(tempDir, filepath);
-
-        // Make sure the folder exist
-        File parentFolder = tempFile.getParentFile();
-
-        boolean success =
-            (parentFolder.exists() || parentFolder.mkdirs()) && parentFolder.isDirectory() && parentFolder.canWrite();
-        if (!success) {
-            String message = "Error while creating temporary directory [%s].";
-            throw new Exception(String.format(message, tempDir));
-        }
-
-        return tempFile;
-    }
-
-    private String buildURL(DocumentReference ownerDocument, String filePath)
-    {
-        // We need the absolute URL because the gallery macro, which is used when viewing an office presentation, uses
-        // the syntax of the target document to parse its content and XWiki 2.0 syntax (unlike XWiki 2.1) doesn't
-        // support path image references (e.g. image:path:/one/two/three.png).
-        String prefix = this.documentAccessBridge.getDocumentURL(ownerDocument, "temp", null, null, true);
-
-        return String.format("%s/%s/%s", prefix, MODULE_NAME, filePath);
-    }
-
-    /**
-     * Make sure to find a name that works on pretty much any system.
-     * 
-     * @param name the file or directory/file name to encode
-     * @return the encoding name
-     */
-    private String getSafeFileName(String name)
-    {
-        try {
-            return URLEncoder.encode(name, DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen.
-            return name;
-        }
     }
 
     private DocumentReference getOwnerDocument(Map<String, ?> parameters)

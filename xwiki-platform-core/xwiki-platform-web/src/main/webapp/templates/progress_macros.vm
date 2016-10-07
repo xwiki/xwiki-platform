@@ -19,7 +19,16 @@
     #set($elapsedTimePercent = 100)
   #end
 
-  <li>$progressStep.message <em>#printElapsedTime($elapsedTime)</em> ($mathtool.toInteger($elapsedTimePercent)%)
+  #set($elapsedTimePercentInt = $mathtool.toInteger($elapsedTimePercent))
+  <li#if($progressStep.children.size() > 0)#if ($elapsedTimePercentInt == 0) class="jstree-closed"#else class="jstree-open"#end#end>
+  #if($elapsedTimePercent > 50)<strong>#end
+    $progressStep.message
+  #if($elapsedTimePercent > 50)</strong>#end 
+    <em class="debug-time">#printElapsedTime($elapsedTime)</em>
+    <span class="debug-percent-container">
+      <span class="debug-percent">$elapsedTimePercentInt%</span>
+      <span class="debug-percent-bar" style="width:$elapsedTimePercentInt%;"></span>
+    </span>
   #if ($progressStep.children.size() > 0)
     <ul>
       #foreach($child in $progressStep.children)

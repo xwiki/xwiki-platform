@@ -19,19 +19,20 @@
  */
 package org.xwiki.rendering.block;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Assert;
-
 import org.junit.Test;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
+import org.mockito.ArgumentCaptor;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.rendering.syntax.Syntax;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link ExpandedMacroBlock}.
@@ -39,73 +40,68 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @since 3.1
  * @version $Id$
  */
-public class ExpandedMacroBlockTest extends AbstractComponentTestCase
+public class ExpandedMacroBlockTest
 {
-    /**
-     * Tests that the child blocks of an {@link ExpandedMacroBlock} are rendered.
-     */
+    private BlockRenderer contentRenderer = mock(BlockRenderer.class);
+
+    private ComponentManager componentManager = mock(ComponentManager.class);
+
     @Test
-    public void testRenderExpandedMacroBlock() throws Exception
+    public void constructorCallsSuper()
     {
-        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
-
-        Map<String, String> parameters = Collections.emptyMap();
-        ExpandedMacroBlock gallery = new ExpandedMacroBlock("gallery", parameters, renderer, false);
-        ResourceReference alice = new ResourceReference("alice.png", ResourceType.ATTACHMENT);
-        alice.setTyped(false);
-        gallery.addChild(new ParagraphBlock(Collections.<Block> singletonList(new ImageBlock(alice, true))));
-        ResourceReference bob = new ResourceReference("bob.png", ResourceType.ATTACHMENT);
-        bob.setTyped(false);
-        gallery.addChild(new ParagraphBlock(Collections.<Block> singletonList(new ImageBlock(bob, true))));
-
-        ParagraphBlock before = new ParagraphBlock(Collections.<Block> singletonList(new WordBlock("before")));
-        ParagraphBlock after = new ParagraphBlock(Collections.<Block> singletonList(new WordBlock("after")));
-
-        XDOM xdom = new XDOM(Arrays.<Block> asList(before, gallery, after));
-        WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(xdom, printer);
-        Assert.assertEquals("before\n\n{{gallery}}\nimage:alice.png\n\nimage:bob.png\n{{/gallery}}\n\nafter",
-            printer.toString());
-
-        // Modify and render again.
-        ((ImageBlock) gallery.getChildren().get(1).getChildren().get(0)).setParameter("width", "300");
-        printer = new DefaultWikiPrinter();
-        renderer.render(xdom, printer);
-        Assert.assertEquals(
-            "before\n\n{{gallery}}\nimage:alice.png\n\n[[image:bob.png||width=\"300\"]]\n{{/gallery}}\n\nafter",
-            printer.toString());
+        String id = "gallery";
+        Map<String, String> parameters = Collections.singletonMap("width", "300px");
+        boolean inline = true;
+        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock(id, parameters, contentRenderer, inline);
+        assertEquals(id, expandedMacroBlock.getId());
+        assertEquals(parameters, expandedMacroBlock.getParameters());
+        assertEquals(inline, expandedMacroBlock.isInline());
     }
 
-    /**
-     * Renders an {@link ExpandedMacroBlock} that has a XDOM block as single child.
-     */
     @Test
-    public void testRenderExpandedMacroBlockWithXDOM() throws Exception
+    public void getContentWrapsChildNodesInXDOM()
     {
-        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
+        ExpandedMacroBlock expandedMacroBlock =
+            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
 
-        XDOM content = new XDOM(Arrays.<Block> asList(new WordBlock("1"), new SpaceBlock(), new WordBlock("2")));
+        expandedMacroBlock.getContent();
 
-        Map<String, String> parameters = Collections.emptyMap();
-        ExpandedMacroBlock macro = new ExpandedMacroBlock("macro", parameters, renderer, false);
-        macro.addChild(content);
-
-        WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(new XDOM(Collections.<Block> singletonList(macro)), printer);
-        Assert.assertEquals("{{macro}}\n1 2\n{{/macro}}", printer.toString());
+        ArgumentCaptor<Block> block = ArgumentCaptor.forClass(Block.class);
+        verify(this.contentRenderer).render(block.capture(), any(WikiPrinter.class));
+        assertTrue(block.getValue() instanceof XDOM);
+        assertEquals(0, block.getValue().getChildren().size());
     }
 
-    /**
-     * Tries to render an empty {@link ExpandedMacroBlock}.
-     */
     @Test
-    public void testRenderEmptyExpandedMacroBlock() throws Exception
+    public void getContentUsesChildXDOM()
     {
-        BlockRenderer renderer = getComponentManager().getInstance(BlockRenderer.class, "xwiki/2.0");
-        Map<String, String> parameters = Collections.emptyMap();
-        ExpandedMacroBlock macro = new ExpandedMacroBlock("empty", parameters, renderer, false);
-        WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(new XDOM(Collections.<Block> singletonList(macro)), printer);
-        Assert.assertEquals("{{empty}}{{/empty}}", printer.toString());
+        XDOM content = new XDOM(Collections.<Block>emptyList());
+        ExpandedMacroBlock expandedMacroBlock =
+            new ExpandedMacroBlock("gallery", Collections.<String, String>emptyMap(), this.contentRenderer, false);
+        expandedMacroBlock.addChild(content);
+
+        expandedMacroBlock.getContent();
+
+        verify(this.contentRenderer).render(same(content), any(WikiPrinter.class));
+    }
+
+    @Test
+    public void getContentUsesAnotherBlockRenderer() throws Exception
+    {
+        ExpandedMacroBlock expandedMacroBlock = new ExpandedMacroBlock("gallery",
+            Collections.<String, String>emptyMap(), this.contentRenderer, false, this.componentManager);
+        XDOM parent = new XDOM(Collections.singletonList(expandedMacroBlock));
+        parent.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.MARKDOWN_1_1);
+
+        BlockRenderer markdownRenderer = mock(BlockRenderer.class);
+        when(this.componentManager.hasComponent(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
+            .thenReturn(true);
+        when(this.componentManager.getInstance(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
+            .thenReturn(markdownRenderer);
+
+        expandedMacroBlock.getContent();
+
+        verify(markdownRenderer).render(any(XDOM.class), any(WikiPrinter.class));
+        verify(this.contentRenderer, never()).render(any(XDOM.class), any(WikiPrinter.class));
     }
 }

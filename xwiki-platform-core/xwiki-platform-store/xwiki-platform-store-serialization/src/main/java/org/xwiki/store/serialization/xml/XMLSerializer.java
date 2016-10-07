@@ -46,7 +46,7 @@ public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
      * @return a new object made by deserializing the XML Element.
      * @throws IOException if something goes wrong.
      */
-    P parse(final Element xmlElement) throws IOException;
+    P parse(Element xmlElement) throws IOException;
 
     /**
      * Serialize to an XMLWriter.
@@ -55,5 +55,5 @@ public interface XMLSerializer<R, P extends R> extends Serializer<R, P>
      * @param writeTo write output to this.
      * @throws IOException if something goes wrong.
      */
-    void serialize(final R object, final XMLWriter writeTo) throws IOException;
+    void serialize(R object, XMLWriter writeTo) throws IOException;
 }

@@ -40,9 +40,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.uiextension.UIExtension;
-
-import com.xpn.xwiki.internal.template.SUExecutor;
 
 /**
  * Provides a bridge between Panels defined in XObjects and {@link UIExtension}.
@@ -100,7 +99,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
      */
     private final Transformation macroTransformation;
 
-    private final SUExecutor suExecutor;
+    private final AuthorExecutor authorExecutor;
 
     private final JobProgressManager progress;
 
@@ -124,7 +123,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.renderingContext = componentManager.getInstance(RenderingContext.class);
-        this.suExecutor = componentManager.getInstance(SUExecutor.class);
+        this.authorExecutor = componentManager.getInstance(AuthorExecutor.class);
         this.progress = componentManager.getInstance(JobProgressManager.class);
     }
 
@@ -164,7 +163,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
         // Perform panel transformations with the right of the panel author
         try {
-            this.suExecutor.call(() -> {
+            this.authorExecutor.call(() -> {
                 TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
                 transformationContext.setId(getRoleHint());
                 ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,

@@ -49,7 +49,7 @@ public class RepositoryRESTResource extends AbstractExtensionRESTResource
 
         result.setFilterable(true);
         result.setSortable(true);
-        result.setVersion(Resources.VERSION11);
+        result.setVersion(Resources.VERSION12);
 
         return result;
     }

@@ -27,6 +27,7 @@ import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
@@ -68,6 +69,8 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
             safe = new SafeLocalExtension<LocalExtension>((LocalExtension) unsafe, this.defaultSafeProvider);
         } else if (unsafe instanceof RatingExtension) {
             safe = new SafeRatingExtension<RatingExtension>((RatingExtension) unsafe, this.defaultSafeProvider);
+        } else if (unsafe instanceof RemoteExtension) {
+            safe = new SafeRemoteExtension<RemoteExtension>((RemoteExtension) unsafe, this.defaultSafeProvider);
         } else {
             safe = new SafeExtension<Extension>(unsafe, this.defaultSafeProvider);
         }

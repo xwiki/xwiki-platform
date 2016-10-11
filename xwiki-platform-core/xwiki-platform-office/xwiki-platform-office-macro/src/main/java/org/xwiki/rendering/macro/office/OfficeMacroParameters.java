@@ -78,7 +78,8 @@ public class OfficeMacroParameters
      * IMPORTANT: this method should not be used from Java, its signature is temporary and will change in 6.2.1.
      * 
      * @return a string reference to the office file to be viewed
-     * @since 5.4.6/6.2.2
+     * @since 5.4.6
+     * @since 6.2.2
      */
     public ResourceReference getReference()
     {
@@ -87,7 +88,8 @@ public class OfficeMacroParameters
 
     /**
      * @param reference the reference to the file to be viewed
-     * @since 5.4.6/6.2.2
+     * @since 5.4.6
+     * @since 6.2.2
      */
     @PropertyDescription("The office file to be viewed. Use an resource string reference to specify which"
         + " office file should be viewed:"

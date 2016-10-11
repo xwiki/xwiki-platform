@@ -77,7 +77,8 @@ import org.xwiki.url.ExtendedURL;
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeResourceViewer}.
  * 
- * @since 5.4.6/6.2.2
+ * @since 5.4.6
+ * @since 6.2.2
  * @version $Id$
  */
 @Component

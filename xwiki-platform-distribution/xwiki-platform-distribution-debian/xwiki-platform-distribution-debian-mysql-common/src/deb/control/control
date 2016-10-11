@@ -3,7 +3,7 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-common (= [[version]]), mysql-server, libmysql-java (>= 5.1.4)
+Depends: xwiki-common (= [[version]]), mysql-server, libmysql-java (>= 5.1.4), dbconfig-mysql
 Provides: xwiki-database
 Suggests: xwiki-tomcat7-mysql | xwiki-tomcat8-mysql
 Replaces: xwiki-database

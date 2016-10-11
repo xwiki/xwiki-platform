@@ -53,8 +53,14 @@ MSCheckbox = Class.create({
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
       "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
     ];
+    // TODO: set the labels
     this.labels = ['','',''];
-
+    // Alts are the messages describing the checkbox images
+    this.alts = [
+      '--',
+      '$escapetool.javascript($services.localization.render("allow_1"))',
+      '$escapetool.javascript($services.localization.render("allow_0"))'
+    ];
     this.draw(this.state);
     this.attachEvents();
   },
@@ -71,6 +77,7 @@ MSCheckbox = Class.create({
     //add new image
     var img = document.createElement('img');
     img.src = this.images[state];
+    img.alt = this.alts[state];
     this.domNode.appendChild(img);
     //add label
     if (this.labels[state] != '') {

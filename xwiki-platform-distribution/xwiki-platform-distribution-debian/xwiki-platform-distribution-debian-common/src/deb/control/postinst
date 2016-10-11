@@ -15,6 +15,6 @@ if [ ! -d /var/lib/xwiki/data ]; then
 fi
 
 # Update configuration files
-ucf --three-way --debconf-ok /usr/share/xwiki/default/xwiki.cfg /etc/xwiki/xwiki.conf
+ucf --three-way --debconf-ok /usr/share/xwiki/default/xwiki.cfg /etc/xwiki/xwiki.cfg
 ucf --three-way --debconf-ok /usr/share/xwiki/default/xwiki.properties /etc/xwiki/xwiki.properties
 ucf --three-way --debconf-ok /usr/share/xwiki/default/web.xml /etc/xwiki/web.xml

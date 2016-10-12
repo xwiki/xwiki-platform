@@ -470,7 +470,7 @@
                     "packages": {
                       "regex": true,
                       "include": ["org\\.xwiki\\..*"],
-                      "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?"]
+                      "exclude": ["org\\.xwiki\\..*\\.internal(\\..*)?", "org\\.xwiki\\..*\\.test(\\..*)?", "org\\.xwiki\\..*\\.po(\\..*)?"]
                     }
                   }
                 },

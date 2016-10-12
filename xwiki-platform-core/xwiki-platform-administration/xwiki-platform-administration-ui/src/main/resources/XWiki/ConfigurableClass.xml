@@ -60,11 +60,11 @@
  *                                            it will not be able to include applications (possibly injecting
  *                                            arbitrary code.) if none specified then $doc.getFullName() is used.
  *
- * $globaladmin - boolean - If set true then we will assume we are administrationg the entire wiki.
- *                          If not set then we look for a request parameter called "editor" if that exists and equals
- *                          "globaladmin" then $globaladmin is true, if it doesn't exist then we check to see if
- *                          $currentDoc.getFullName() equals "XWiki.XWikiPreferences".
- *###
+ * $visibility - String - The scope of the configuration document. If is wiki, the configuration is possible only at
+ *                        wiki level. If it's space, the configuration is possible only at space level. If it's
+ *                        global, the configuration it's possiblye at both wiki and space level.
+ *#
+##
 ##
 ## Form submission depends on this.
 $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
@@ -75,15 +75,13 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #if(!$currentDoc)
   #set($currentDoc = $doc.getFullName())
 #end
-## Get value of $globaladmin if not specified.
-#if("$!globaladmin" == '')
+#if("$!visibilityAdmin" == '')
   #if($editor != 'globaladmin'
       &amp;&amp; $request.getParameter('editor') != 'globaladmin'
       &amp;&amp; $currentDoc != 'XWiki.XWikiPreferences')
-  ##
-    #set($globaladmin = false)
+    #set($visibilityAdmin = 'space')
   #else
-    #set($globaladmin = true)
+    #set($visibilityAdmin = 'wiki')
   #end
 #end
 #set($currentSpace = $xwiki.getDocument($currentDoc).getSpace())
@@ -106,7 +104,7 @@ $doc.dropPermissions()##
   ##
   ## Searches the database for names of apps to be configured
   #set($outputList = [])
-  #findNamesOfAppsToConfigure($section, $globaladmin, $xwiki.getDocument($currentDoc).getSpace(), $outputList)
+  #findNamesOfAppsToConfigure($section, [], $xwiki.getDocument($currentDoc).getSpace(), $outputList)
   ##
   #foreach($appName in $outputList)
     ##
@@ -181,8 +179,9 @@ $doc.dropPermissions()##
       #set($configurableObjs = [])
       #foreach($configurableObj in $allConfigurableObjs)
         #if($app.getValue('displayInSection', $configurableObj) == $section)
-          ## If this is space admin, then don't display global, if global don't display space.
-          #if($globaladmin == ($app.getValue('configureGlobally', $configurableObj) == 1))
+          ## If this is space admin, then don't display wiki, if wiki don't display space.
+          #if ($app.getValue('visibility', $configurableObj) == 'global'
+            || $app.getValue('visibility', $configurableObj) == $visibilityAdmin)
             #set($discard = $configurableObjs.add($configurableObj))
           #end
         #end
@@ -622,6 +621,27 @@ $doc.dropPermissions()##
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </sectionOrder>
+    <visibility>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>visibility</name>
+      <number>13</number>
+      <picker>0</picker>
+      <prettyName>visibility</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>global|space|wiki</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </visibility>
   </class>
   <object>
     <name>XWiki.ConfigurableClass</name>

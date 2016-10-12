@@ -189,7 +189,7 @@ public class Importer extends AbstractPackager
             XWikiHibernateStore hibernateStore = (XWikiHibernateStore) store;
 
             // check that is HSQLDB
-            Dialect dialect = Dialect.getDialect(hibernateStore.getConfiguration().getProperties());
+            Dialect dialect = hibernateStore.getDialect();
             if (!(dialect instanceof HSQLDialect)) {
                 return;
             }

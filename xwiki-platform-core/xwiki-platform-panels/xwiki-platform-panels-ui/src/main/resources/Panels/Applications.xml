@@ -122,38 +122,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{velocity output="false"}}
-#macro (displayAppPanelEntry $params)
-  #if ($params.icon.startsWith('icon:'))
-    #set ($icon = $services.icon.renderHTML($params.icon.substring(5)))
-  #else
-    #set ($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'),
-      'xhtml/1.0'))
-  #end
-  &lt;li&gt;
-    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")" title="$escapetool.xml($params.label)"&gt;
-      &lt;span class="application-img"&gt;$icon&lt;/span&gt;
-      &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
-    &lt;/a&gt;
-  &lt;/li&gt;
-#end
-
-#macro (maybeDisplayAppPanelEntry $uix $configDoc)
-  #set ($params = $uix.getParameters())
-  #set ($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id))
-  #set ($targetReference = $services.model.resolveDocument($params.target))
-  #if (!$blackListObj &amp;&amp; "$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != ''
-      &amp;&amp; $services.security.authorization.hasAccess('view', $targetReference))
-    #displayAppPanelEntry($params)
-  #end
-#end
-
-#macro (displayAppPanelEntries $extensionPointId $configDoc)
-  #foreach ($uix in $services.uix.getExtensions($extensionPointId, {'sortByParameter': 'label'}))
-    #maybeDisplayAppPanelEntry($uix $configDoc)
-  #end
-#end
-{{/velocity}}
+      <content>{{include reference="Applications.Macros"/}}
 
 {{velocity}}
 #set ($discard = $xwiki.ssx.use('Panels.Applications'))

@@ -27,7 +27,7 @@
 #macro (displayExtensionSearchBar)
   <div class="extension-search-bar">
     ## Simple search form.
-    <form action="$xwiki.relativeRequestURL" id="extension-search-simple">
+    <form action="$xwiki.relativeRequestURL" id="extension-search-simple" class="form-inline">
       <div>
         #if ($request.section)
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
@@ -50,6 +50,11 @@
               $services.localization.render("extensions.search.repository.${repositoryId}.label")</option>
           #end
         </select>
+        ## We don't use #em_submitButton because we want to use <button> instead of <input type="submit">, in order to 
+        ## be able to use HTML content inside the text of the button (the search icon and the hidden span for screen readers).
+        <span class="buttonwrapper">
+          <button class="primary" type="submit">$services.icon.renderHTML('search') <span class="hidden">$escapetool.xml($services.localization.render('extensions.advancedSearch.actions.submit'))</span></button>
+        </span>
       </div>
     </form>
     ## Advanced search form.

@@ -1516,6 +1516,6 @@ public class XWikiHibernateBaseStore implements Initializable
             this.dialect = Dialect.getDialect(getConfiguration().getProperties());
         }
 
-        return this.getDialect();
+        return this.dialect;
     }
 }

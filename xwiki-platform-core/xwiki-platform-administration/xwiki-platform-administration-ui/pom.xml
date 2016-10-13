@@ -85,5 +85,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to display nicer input for the languages -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-select</artifactId>
+      <version>1.9.4</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

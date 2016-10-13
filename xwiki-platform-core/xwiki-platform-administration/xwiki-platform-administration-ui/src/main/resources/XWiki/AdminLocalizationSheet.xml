@@ -46,7 +46,274 @@
   'date': ['dateformat', 'timezone'],
   'translations': ['documentBundles']
 })
+## Used to display nicer inputs for the languages
+#set ($discard = $xwiki.jsx.use('XWiki.AdminLocalizationSheet'))
 {{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
+  <object>
+    <name>XWiki.AdminLocalizationSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>178f9271-bc41-45c1-8c00-88d7d5b7a944</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/**
+ * Add a dependency to the "bootstrap-select" plugin, used to display a nice select field that handle
+ * multiple selection.
+ */
+require.config({
+  paths: {
+    'bootstrap-select': '$services.webjars.url("bootstrap-select", "js/bootstrap-select.min")'
+  },
+  shim: {
+    'bootstrap-select' : ['jquery', 'bootstrap']
+  }
+});
+/**
+ * Replace the simple text input field for supported languages by a nicer select widget with all available languages 
+ * ready to be selected.
+ *
+ * Instead of dynamically replace the text input field on the client-side, we could have done on the server-side,
+ * by using a custom displayer.
+ * However, it's a pain to upgrade the XWiki.XWikiPreferences class to add a displayer.
+ * The class is not even packaged by the administration application.
+ */
+require(['jquery','bootstrap','bootstrap-select'], function($) {
+  'use strict';
+  
+##########################################
+## Display the pretty name of a language
+##########################################
+#macro(displayLanguagePrettyName $language)
+#if ($language != '')
+#set($languageLocale = $services.localization.toLocale($language))$escapetool.xml($stringtool.capitalize($languageLocale.getDisplayName($languageLocale)))##
+#else
+$services.localization.render('defaultlanguage')##
+#end
+#end
+  
+  // List taken from http://l10n.xwiki.org/xwiki/bin/view/L10N/LocaleTranslations
+  // TODO: get it form a script service instead
+  var languages = [
+    { code: 'bg', name: '#displayLanguagePrettyName('bg')'},
+    { code: 'ca', name: '#displayLanguagePrettyName('ca')'},
+    { code: 'cs', name: '#displayLanguagePrettyName('cs')'},
+    { code: 'da', name: '#displayLanguagePrettyName('da')'},
+    { code: 'de', name: '#displayLanguagePrettyName('de')'},
+    { code: 'el', name: '#displayLanguagePrettyName('el')'},
+    { code: 'en', name: '#displayLanguagePrettyName('en')'},
+    { code: 'es', name: '#displayLanguagePrettyName('es')'},
+    { code: 'fr', name: '#displayLanguagePrettyName('fr')'},
+    { code: 'fa', name: '#displayLanguagePrettyName('fa')'},
+    { code: 'gl', name: '#displayLanguagePrettyName('gl')'},
+    { code: 'hi', name: '#displayLanguagePrettyName('hi')'},
+    { code: 'hu', name: '#displayLanguagePrettyName('hu')'},
+    { code: 'hr', name: '#displayLanguagePrettyName('hr')'},
+    { code: 'id', name: '#displayLanguagePrettyName('id')'},
+    { code: 'it', name: '#displayLanguagePrettyName('it')'},
+    { code: 'kn', name: '#displayLanguagePrettyName('kn')'},
+    { code: 'km', name: '#displayLanguagePrettyName('km')'},
+    { code: 'ko', name: '#displayLanguagePrettyName('ko')'},
+    { code: 'lt', name: '#displayLanguagePrettyName('ly')'},
+    { code: 'lv', name: '#displayLanguagePrettyName('lv')'},
+    { code: 'mr', name: '#displayLanguagePrettyName('mr')'},
+    { code: 'nl', name: '#displayLanguagePrettyName('nl')'},
+    { code: 'no', name: '#displayLanguagePrettyName('no')'},
+    { code: 'pl', name: '#displayLanguagePrettyName('pl')'},
+    { code: 'pt', name: '#displayLanguagePrettyName('pt')'},
+    { code: 'pt_BR', name: '#displayLanguagePrettyName('pt_BR')'},
+    { code: 'ro', name: '#displayLanguagePrettyName('ro')'},
+    { code: 'ru', name: '#displayLanguagePrettyName('ru')'},
+    { code: 'si', name: '#displayLanguagePrettyName('si')'},
+    { code: 'sk', name: '#displayLanguagePrettyName('sk')'},
+    { code: 'sl', name: '#displayLanguagePrettyName('sl')'},
+    { code: 'sv', name: '#displayLanguagePrettyName('sv')'},
+    { code: 'tr', name: '#displayLanguagePrettyName('tr')'},
+    { code: 'uk', name: '#displayLanguagePrettyName('uk')'},
+    { code: 'vi', name: '#displayLanguagePrettyName('vi')'},
+    { code: 'zh', name: '#displayLanguagePrettyName('zh')'},
+    { code: 'zh_TW', name: '#displayLanguagePrettyName('zh_TW')'}
+  ];
+
+  /**
+   * Get the initial values of the input
+   * @return an array of language codes
+   */
+  var getLanguagesFromInput = function (input) {
+    var languages = input.val().split(',');
+    var results = [];
+    for (var i = 0; i &lt; languages.length; ++i) {
+      if (languages[i].trim() != '') {
+        results[results.length] = languages[i].trim();
+      }
+    }
+    return results;
+  }
+  
+  /**
+   * Serialize an array of languages to a string that the XWiki server can handle
+   */
+  var serializeArray = function (array) {
+    var result = '';
+    var separator = '';
+    for (var i = 0; i &lt; array.length; ++i) {
+      if (array[i] != '') {
+        result += separator;
+        result += array[i];
+        separator = ',';
+      }
+    }
+    return result;
+  }
+  
+  /**
+   * Initialization
+   */
+  $(document).ready(function() {
+  
+    //
+    // Adding the CSS of the boostrap-select plugin
+    //
+    var css = $('&lt;link rel="stylesheet" href="$services.webjars.url("bootstrap-select", "css/bootstrap-select.min.css")"&gt;');
+    $('head').append(css);
+  
+    // Getting the original input
+    var languagesInput = $('input[name="XWiki.XWikiPreferences_0_languages"');
+    
+    // Creating the select box
+    var select = $('&lt;select multiple&gt;');
+    
+    // Add all available options
+    var currentLanguages = getLanguagesFromInput(languagesInput);
+    for (var i = 0; i &lt; languages.length; ++i) {
+      var option = $('&lt;option&gt;');
+      option.prop('value', languages[i].code);
+      option.text(languages[i].name);
+      if ($.inArray(languages[i].code, currentLanguages) &gt; -1) {
+        option.prop('selected', 'selected');
+      }
+      select.append(option);
+    }
+    
+    // Problem: when we save the document, XWiki expects 'XWiki.XWikiPreferences_0_languages' to be a simple text,
+    // not a "select" field with different values.
+    // So we keep the old input field as an hidden input which will hold the serialized representation of the 
+    // selected languages.
+    languagesInput.prop('type', 'hidden');
+    
+    // Adds the new select widget in the DOM
+    select.insertAfter(languagesInput);
+    
+    // Enable the bootstrap-select plugin to have a nicer UI
+    select.selectpicker({width: '100%'});
+    
+    // Synchronize the value of the hidden input text with the selected item in the select widget.
+    select.on('changed.bs.select', function (event) {
+      languagesInput.prop('value', serializeArray(select.val()));
+    });
+    
+    // We can also do it for the "default language" field.
+    var defaultLanguageInput = $('input[name="XWiki.XWikiPreferences_0_default_language"');
+    var select2 = $('&lt;select&gt;');
+    select2.prop('name', defaultLanguageInput.prop('name'));
+    for (var i = 0; i &lt; languages.length; ++i) {
+      var option = $('&lt;option&gt;');
+      option.prop('value', languages[i].code);
+      option.text(languages[i].name);
+      if (defaultLanguageInput.val() == languages[i].code) {
+        option.prop('selected', 'selected');
+      }
+      select2.append(option);
+    }
+    defaultLanguageInput.replaceWith(select2);
+  });
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
 </xwikidoc>

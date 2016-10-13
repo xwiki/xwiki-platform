@@ -30,7 +30,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -73,6 +75,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -1074,6 +1077,12 @@ public class XWikiDocumentMockitoTest
         template.setTitle("Enter title here");
         template.setSyntax(Syntax.XWIKI_2_0);
         template.setContent("Enter content here");
+
+        XWikiAttachment templateAttachment = new XWikiAttachment(template, "test.txt");
+        String testContent = "test content";
+        templateAttachment.setContent(IOUtils.toInputStream(testContent));
+        template.addAttachment(templateAttachment);
+
         this.oldcore.getSpyXWiki().saveDocument(template, this.oldcore.getXWikiContext());
 
         XWikiDocument target = new XWikiDocument(new DocumentReference("Page", spaceReference));
@@ -1084,6 +1093,7 @@ public class XWikiDocumentMockitoTest
         Assert.assertEquals(template.getTitle(), target.getTitle());
         Assert.assertEquals(template.getSyntax(), target.getSyntax());
         Assert.assertEquals(template.getContent(), target.getContent());
+        assertThat(target.getAttachmentList(), Matchers.containsInAnyOrder(target.getAttachmentList().toArray()));
     }
 
     @Test

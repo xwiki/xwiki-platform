@@ -3851,6 +3851,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     // Currently the choice is not to merge the base class and object because it is not the prefered way
                     // of using external classes and objects.
                     mergeXObjects(templatedoc);
+
+                    // Copy the attachments from the template document.
+                    copyAttachments(templatedoc);
                 }
             }
         }

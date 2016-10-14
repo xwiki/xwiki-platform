@@ -65,6 +65,8 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DocumentLocaleReader extends AbstractReader
 {
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+
     @Inject
     @Named("relative")
     private EntityReferenceResolver<String> relativeResolver;
@@ -224,11 +226,10 @@ public class DocumentLocaleReader extends AbstractReader
 
     private boolean canSendBeginWikiDocument(boolean force)
     {
-        return this.sentSpaceReference != null
-            && !this.sentBeginWikiDocument
+        return this.sentSpaceReference != null && !this.sentBeginWikiDocument
             && (force || (this.currentDocumentReference != null
-                && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS.size() && this.properties
-                .getEntities() == null));
+                && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS.size()
+                && this.properties.getEntities() == null));
     }
 
     private void sendBeginWikiDocument(XARInputFilter proxyFilter, boolean force) throws FilterException
@@ -254,10 +255,9 @@ public class DocumentLocaleReader extends AbstractReader
 
     private boolean canSendBeginWikiDocumentLocale(boolean force)
     {
-        return this.sentBeginWikiDocument
-            && !this.sentBeginWikiDocumentLocale
-            && (force || (this.currentDocumentLocale != null && this.currentDocumentLocaleParameters.size() == XARDocumentModel.DOCUMENTLOCALE_PARAMETERS
-                .size()));
+        return this.sentBeginWikiDocument && !this.sentBeginWikiDocumentLocale
+            && (force || (this.currentDocumentLocale != null
+                && this.currentDocumentLocaleParameters.size() == XARDocumentModel.DOCUMENTLOCALE_PARAMETERS.size()));
     }
 
     private void sendBeginWikiDocumentLocale(XARInputFilter proxyFilter, boolean force) throws FilterException
@@ -294,10 +294,9 @@ public class DocumentLocaleReader extends AbstractReader
 
     private boolean canSendBeginWikiDocumentRevision(boolean force)
     {
-        return this.sentBeginWikiDocumentLocale
-            && !this.sentBeginWikiDocumentRevision
-            && (force || (this.currentDocumentRevision != null && this.currentDocumentRevisionParameters.size() == XARDocumentModel.DOCUMENTREVISION_PARAMETERS
-                .size()));
+        return this.sentBeginWikiDocumentLocale && !this.sentBeginWikiDocumentRevision
+            && (force || (this.currentDocumentRevision != null && this.currentDocumentRevisionParameters
+                .size() == XARDocumentModel.DOCUMENTREVISION_PARAMETERS.size()));
     }
 
     private void sendBeginWikiDocumentRevision(XARInputFilter proxyFilter, boolean force) throws FilterException
@@ -329,18 +328,18 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        FilterException
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
     {
-        XMLStreamReader xmlReader =
-            this.properties.getEncoding() != null ? XMLInputFactory.newInstance().createXMLStreamReader(stream,
-                this.properties.getEncoding()) : XMLInputFactory.newInstance().createXMLStreamReader(stream);
+        XMLStreamReader xmlReader = this.properties.getEncoding() != null
+            ? XML_INPUT_FACTORY.createXMLStreamReader(stream, this.properties.getEncoding())
+            : XML_INPUT_FACTORY.createXMLStreamReader(stream);
 
         read(xmlReader, filter, proxyFilter);
     }
 
-    public void read(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        FilterException
+    public void read(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
     {
         resetDocument();
 

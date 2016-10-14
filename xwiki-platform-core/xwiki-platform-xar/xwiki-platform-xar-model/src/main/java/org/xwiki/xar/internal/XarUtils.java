@@ -45,6 +45,8 @@ public final class XarUtils
     public static final RelativeStringEntityReferenceResolver RESOLVER =
         new RelativeStringEntityReferenceResolver(new DefaultSymbolScheme());
 
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+
     private XarUtils()
     {
         // Utility class
@@ -62,7 +64,7 @@ public final class XarUtils
     {
         XMLStreamReader xmlReader;
         try {
-            xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(documentStream);
+            xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(documentStream);
         } catch (XMLStreamException e) {
             throw new XarException("Failed to create a XML read", e);
         }

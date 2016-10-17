@@ -145,7 +145,7 @@ public class FilterScriptService extends AbstractFilterScriptService
 
             if (async) {
                 // Give a few context related values to the job
-                request.setProperty(JobRequestContext.KEY, new JobRequestContext(this.xcontextProvider.get()));
+                JobRequestContext.set(request, this.xcontextProvider.get());
 
                 this.lastJob = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
             } else {

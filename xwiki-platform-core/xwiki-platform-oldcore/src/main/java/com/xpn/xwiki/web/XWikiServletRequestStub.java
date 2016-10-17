@@ -22,13 +22,12 @@ package com.xpn.xwiki.web;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -45,6 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
@@ -72,14 +73,44 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private String serverName;
 
-    /**
-     * @since 7.3M1
-     */
-    private Map<String, List<String>> parameters;
+    private Map<String, String[]> parameters;
 
     public XWikiServletRequestStub()
     {
-        this.host = "";
+        setHost("");
+    }
+
+    /**
+     * @since 8.4RC1
+     */
+    public XWikiServletRequestStub(URL requestURL, Map<String, String[]> requestParameters)
+    {
+        if (requestURL != null) {
+            setScheme(requestURL.getProtocol());
+            setHost(requestURL.getHost());
+
+            setRequestURI(requestURL.toString());
+            setrequestURL(new StringBuffer(requestURL.toString()));
+        } else {
+            setHost("");
+        }
+
+        this.parameters = clone(requestParameters);
+    }
+
+    private Map<String, String[]> clone(Map<String, String[]> map)
+    {
+        Map<String, String[]> clone;
+        if (this.parameters != null) {
+            clone = new LinkedHashMap<>(map.size());
+            for (Map.Entry<String, String[]> entry : map.entrySet()) {
+                clone.put(entry.getKey(), entry.getValue().clone());
+            }
+        } else {
+            clone = null;
+        }
+
+        return clone;
     }
 
     public void setContextPath(String contextPath)
@@ -135,17 +166,19 @@ public class XWikiServletRequestStub implements XWikiRequest
     /**
      * @since 7.3M1
      */
-    public void put(String name, String value)
+    public void put(String key, String value)
     {
         if (this.parameters == null) {
-            this.parameters = new HashMap<>();
+            this.parameters = new LinkedHashMap<>();
         }
-        List<String> values = this.parameters.get(name);
+
+        String[] values = this.parameters.get(key);
         if (values == null) {
-            values = new ArrayList<>();
-            this.parameters.put(name, values);
+            values = new String[] { value };
+        } else {
+            values = ArrayUtils.add(values, value);
         }
-        values.add(value);
+        this.parameters.put(key, values);
     }
 
     @Override
@@ -185,13 +218,13 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     @Override
-    public Enumeration getHeaders(String s)
+    public Enumeration<String> getHeaders(String s)
     {
         return null;
     }
 
     @Override
-    public Enumeration getHeaderNames()
+    public Enumeration<String> getHeaderNames()
     {
         return null;
     }
@@ -321,7 +354,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     @Override
-    public Enumeration getAttributeNames()
+    public Enumeration<String> getAttributeNames()
     {
         return null;
     }
@@ -360,14 +393,15 @@ public class XWikiServletRequestStub implements XWikiRequest
     public String getParameter(String s)
     {
         if (this.parameters != null) {
-            List<String> values = this.parameters.get(s);
-            return values != null && values.size() > 0 ? values.get(0) : null;
+            String[] values = this.parameters.get(s);
+            return values != null && values.length > 0 ? values[0] : null;
         }
+
         return null;
     }
 
     @Override
-    public Enumeration getParameterNames()
+    public Enumeration<String> getParameterNames()
     {
         return this.parameters != null ? Collections.enumeration(this.parameters.keySet()) : null;
     }
@@ -376,16 +410,18 @@ public class XWikiServletRequestStub implements XWikiRequest
     public String[] getParameterValues(String s)
     {
         if (this.parameters != null) {
-            List<String> values = this.parameters.get(s);
-            return values != null ? values.toArray(new String[] {}) : null;
+            String[] values = this.parameters.get(s);
+
+            return values != null ? values.clone() : null;
         }
+
         return null;
     }
 
     @Override
-    public Map getParameterMap()
+    public Map<String, String[]> getParameterMap()
     {
-        return this.parameters != null ? Collections.unmodifiableMap(this.parameters) : null;
+        return clone(this.parameters);
     }
 
     @Override
@@ -449,7 +485,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     @Override
-    public Enumeration getLocales()
+    public Enumeration<Locale> getLocales()
     {
         return null;
     }

@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
@@ -95,7 +96,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
-import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
@@ -107,8 +107,11 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -175,23 +178,22 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.internal.WikiInitializerJob;
+import com.xpn.xwiki.internal.WikiInitializerRequest;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
+import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -329,12 +331,7 @@ public class XWiki implements EventListener
     /**
      * The list of initialized wikis.
      */
-    private List<String> virtualWikiList = new ArrayList<String>();
-
-    /**
-     * The cache containing the names of the wikis already initialized.
-     */
-    private Cache<DocumentReference> virtualWikiMap;
+    private Map<String, WikiInitializerJob> initializedWikis = new ConcurrentHashMap<>();
 
     private boolean isReadOnly = false;
 
@@ -381,6 +378,8 @@ public class XWiki implements EventListener
     private SyntaxFactory syntaxFactory;
 
     private ResourceReferenceManager resourceReferenceManager;
+
+    private JobExecutor jobExecutor;
 
     private InternalSkinManager internalSkinManager;
 
@@ -668,6 +667,15 @@ public class XWiki implements EventListener
         return this.resourceReferenceManager;
     }
 
+    private JobExecutor getJobExecutor()
+    {
+        if (this.jobExecutor == null) {
+            this.jobExecutor = Utils.getComponent(JobExecutor.class);
+        }
+
+        return this.jobExecutor;
+    }
+
     private DocumentReference getDefaultDocumentReference()
     {
         return getDefaultDocumentReferenceProvider().get();
@@ -740,7 +748,7 @@ public class XWiki implements EventListener
             return xwiki;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
-                "Could not initialize main XWiki context", e);
+                "Could not initialize main XWiki instance", e);
         }
     }
 
@@ -768,25 +776,25 @@ public class XWiki implements EventListener
      * Unless <code>wait</code> is false the method return right away null if XWiki is not yet initialized.
      *
      * @param wait wait until XWiki is initialized
-     * @param context see {@link XWikiContext}
+     * @param xcontext see {@link XWikiContext}
      * @return an XWiki object configured for the wiki corresponding to the current request
      * @throws XWikiException if the requested URL does not correspond to a real wiki, or if there's an error in the
      *             storage
      */
-    public static XWiki getXWiki(boolean wait, XWikiContext context) throws XWikiException
+    public static XWiki getXWiki(boolean wait, XWikiContext xcontext) throws XWikiException
     {
-        XWiki xwiki = getMainXWiki(wait, context);
+        XWiki xwiki = getMainXWiki(wait, xcontext);
 
         if (xwiki == null) {
             return null;
         }
 
         // Extract Entity Resource from URL and put it in the Execution Context
-        EntityResourceReference entityResourceReference = initializeResourceFromURL(context);
+        EntityResourceReference entityResourceReference = initializeResourceFromURL(xcontext);
 
         // Get the wiki id
         String wikiId = entityResourceReference.getEntityReference().extractReference(EntityType.WIKI).getName();
-        if (wikiId.equals(context.getMainXWiki())) {
+        if (wikiId.equals(xcontext.getMainXWiki())) {
             // The main wiki was requested.
             return xwiki;
         }
@@ -805,18 +813,94 @@ public class XWiki implements EventListener
                 String.format("The wiki [%s] does not exist", wikiId));
         }
 
-        context.setWikiId(wikiId);
-        context.setOriginalWikiId(wikiId);
+        // Initialize wiki
 
-        try {
-            // Let's make sure the virtual wikis are upgraded to the latest database version
-            xwiki.updateDatabase(wikiId, false, context);
-        } catch (HibernateException e) {
-            // Just report it, hopefully the database is in a good enough state
-            LOGGER.error("Failed to upgrade database [{}]", wikiId, e);
+        xcontext.setWikiId(wikiId);
+        xcontext.setOriginalWikiId(wikiId);
+
+        if (!xwiki.initializeWiki(wikiId, wait, xcontext)) {
+            // The wiki is still initializing
+            return null;
         }
 
         return xwiki;
+    }
+
+    /**
+     * @param wikiId the identifier of the wiki
+     * @return the current {@link WikiInitializerJob} associated to the passed wiki or null if there is none
+     */
+    public Job getWikiInitializerJob(String wikiId)
+    {
+        return this.initializedWikis.get(wikiId);
+    }
+
+    /**
+     * Make sure the wiki is initializing or wait for it.
+     * 
+     * @param wikiId the identifier of the wiki to initialize
+     * @param wait true if the method should return only when the wiki is fully initialized
+     * @return true if the wiki is fully initialized
+     * @param xcontext the XWiki context
+     * @throws XWikiException when the initialization failed
+     * @since 8.4RC1
+     */
+    public boolean initializeWiki(String wikiId, boolean wait, XWikiContext xcontext) throws XWikiException
+    {
+        Job wikiJob = this.initializedWikis.get(wikiId);
+
+        // Create and start the job if it does not exist
+        if (wikiJob == null) {
+            try {
+                wikiJob = initializeWiki(wikiId, xcontext);
+            } catch (JobException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
+                    "Could not start [" + wikiId + "] wiki initialization", e);
+            }
+        }
+
+        // Check if the job is done
+        if (wikiJob.getStatus().getState() == State.FINISHED) {
+            return true;
+        }
+
+        // Wait until the job is finished if asked to
+        if (wait) {
+            try {
+                wikiJob.join();
+            } catch (InterruptedException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
+                    "Wiki [" + wikiId + "] initialization was interrupted unexpectedly", e);
+            }
+
+            if (wikiJob.getStatus().getError() != null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
+                    "Wiki [" + wikiId + "] initialization failed", wikiJob.getStatus().getError());
+            }
+
+            return true;
+        }
+
+        // Still initializing
+        return false;
+    }
+
+    private Job initializeWiki(String wikiId, XWikiContext xcontext) throws JobException
+    {
+        synchronized (this.initializedWikis) {
+            WikiInitializerJob wikiJob = this.initializedWikis.get(wikiId);
+
+            if (wikiJob == null) {
+                WikiInitializerRequest request = new WikiInitializerRequest(wikiId);
+
+                JobRequestContext.set(request, xcontext);
+
+                wikiJob = (WikiInitializerJob) getJobExecutor().execute(WikiInitializerJob.JOBTYPE, request);
+                this.initializedWikis.put(wikiId, wikiJob);
+            }
+
+            return wikiJob;
+        }
     }
 
     private static EntityResourceReference initializeResourceFromURL(XWikiContext context) throws XWikiException
@@ -1129,7 +1213,7 @@ public class XWiki implements EventListener
      *
      * @param context see {@link XWikiContext}
      */
-    private void initializeMandatoryDocuments(XWikiContext context)
+    public void initializeMandatoryDocuments(XWikiContext context)
     {
         if (context.get("initdone") == null) {
             @SuppressWarnings("deprecation")
@@ -1223,7 +1307,9 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
      */
+    @Deprecated
     public void updateDatabase(String wikiId, XWikiContext context) throws HibernateException, XWikiException
     {
         updateDatabase(wikiId, false, context);
@@ -1232,7 +1318,9 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
      */
+    @Deprecated
     public void updateDatabase(String wikiId, boolean force, XWikiContext context)
         throws HibernateException, XWikiException
     {
@@ -1244,52 +1332,23 @@ public class XWiki implements EventListener
      * @param force if the update of the databse should be forced
      * @param initDocuments if mandatory document and plugin should be initialized for passed wiki
      * @param context see {@link XWikiContext}
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
      */
+    @Deprecated
     public void updateDatabase(String wikiId, boolean force, boolean initDocuments, XWikiContext context)
         throws HibernateException, XWikiException
     {
-        String database = context.getWikiId();
-        try {
-            List<String> wikiList = getVirtualWikiList();
-
-            // Make sure the wiki is updated
-            if (force) {
-                wikiList.remove(wikiId);
-                context.remove("initdone");
-            }
-
-            context.setWikiId(wikiId);
-            synchronized (wikiId) {
-                if (!wikiList.contains(wikiId)) {
-                    wikiList.add(wikiId);
-
-                    // Make sure these classes exists
-                    if (initDocuments) {
-                        initializeMandatoryDocuments(context);
-                        getPluginManager().virtualInit(context);
-                    }
-
-                    // Add initdone which will allow to
-                    // bypass some initializations
-                    context.put("initdone", "1");
-
-                    // Send event to notify listeners that the subwiki is ready
-                    getObservationManager().notify(new WikiReadyEvent(wikiId), wikiId, context);
-                }
-            }
-        } finally {
-            context.setWikiId(database);
-        }
+        initializeWiki(wikiId, true, context);
     }
 
     /**
      * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
-     *         list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
+     *         list of all virtual wikis database names use {@link WikiDescriptorManager#getAllIds()}.
      */
     @Deprecated
     public List<String> getVirtualWikiList()
     {
-        return this.virtualWikiList;
+        return new ArrayList<>(this.initializedWikis.keySet());
     }
 
     /**
@@ -1322,9 +1381,10 @@ public class XWiki implements EventListener
      * @return the cache containing the names of the wikis already initialized.
      * @since 1.5M2.
      */
+    @Deprecated
     public Cache<DocumentReference> getVirtualWikiCache()
     {
-        return this.virtualWikiMap;
+        return null;
     }
 
     /**
@@ -2335,8 +2395,8 @@ public class XWiki implements EventListener
      *
      * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
      *            document of the wiki.
-     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
-     *            no result
+     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave no
+     *            result
      * @param defaultValue the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
      *            xwiki.cfg parameter gave no result
      */
@@ -2359,8 +2419,8 @@ public class XWiki implements EventListener
      * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
      *            document of the wiki.
      * @param wiki the wiki to get preference from
-     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
-     *            no result
+     * @param fallbackParam the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave no
+     *            result
      * @param defaultValue the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
      *            xwiki.cfg parameter gave no result
      * @since 7.4M1
@@ -3012,12 +3072,7 @@ public class XWiki implements EventListener
     public void flushCache(XWikiContext context)
     {
         // We need to flush the virtual wiki list
-        this.virtualWikiList = new ArrayList<String>();
-        // We need to flush the server Cache
-        if (this.virtualWikiMap != null) {
-            this.virtualWikiMap.dispose();
-            this.virtualWikiMap = null;
-        }
+        this.initializedWikis = new ConcurrentHashMap<>();
 
         // We need to flush the group service cache
         if (this.groupService != null) {
@@ -3101,25 +3156,6 @@ public class XWiki implements EventListener
     public void setVersion(String version)
     {
         this.version = version;
-    }
-
-    private void flushVirtualWikis(XWikiDocument doc)
-    {
-        List<BaseObject> bobjects = doc.getXObjects(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE);
-        if (bobjects != null) {
-            for (BaseObject bobj : bobjects) {
-                if (bobj != null) {
-                    String host = bobj.getStringValue("server");
-                    if (StringUtils.isNotEmpty(host)) {
-                        if (this.virtualWikiMap != null) {
-                            if (this.virtualWikiMap.get(host) != null) {
-                                this.virtualWikiMap.remove(host);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -4871,7 +4907,7 @@ public class XWiki implements EventListener
         XWikiDocument doc = new XWikiDocument(reference);
         doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
         doc.setStore(getStore());
-        context.put("doc", doc);        
+        context.put("doc", doc);
     }
 
     /**
@@ -6774,15 +6810,13 @@ public class XWiki implements EventListener
                     this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
                         getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
                 }
-            } else if (event instanceof XObjectEvent) {
-                onServerObjectEvent(event, doc, context);
             }
         }
     }
 
     private void onWikiDeletedEvent(WikiDeletedEvent event)
     {
-        getVirtualWikiList().remove(event.getWikiId());
+        this.initializedWikis.remove(event.getWikiId());
     }
 
     private void onMandatoryDocumentInitializerAdded(ComponentDescriptorAddedEvent event,
@@ -6802,7 +6836,7 @@ public class XWiki implements EventListener
             XWikiContext context = getXWikiContext();
             if (namespace == null) {
                 // Initialize in already initialized wikis (will be initialized in others when they are initialized)
-                for (String wiki : this.virtualWikiList) {
+                for (String wiki : this.initializedWikis.keySet()) {
                     initializeMandatoryDocument(wiki, initializer, context);
                 }
             } else if (namespace.startsWith("wiki:")) {
@@ -6814,18 +6848,6 @@ public class XWiki implements EventListener
         }
     }
 
-    private void onServerObjectEvent(Event event, XWikiDocument doc, XWikiContext context)
-    {
-        flushVirtualWikis(doc.getOriginalDocument());
-        flushVirtualWikis(doc);
-    }
-
-    /**
-     * The reference to match class XWiki.XWikiServerClass on whatever wiki.
-     */
-    private static final RegexEntityReference SERVERCLASS_REFERENCE =
-        new RegexEntityReference(Pattern.compile(".*:XWiki.XWikiServerClass\\[\\d*\\]"), EntityType.OBJECT);
-
     /**
      * The reference to match properties "plugins" and "backlinks" of class XWiki.XWikiPreference on whatever wiki.
      */
@@ -6834,9 +6856,7 @@ public class XWiki implements EventListener
             new RegexEntityReference(Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS =
-        Arrays.<Event>asList(new XObjectAddedEvent(SERVERCLASS_REFERENCE),
-            new XObjectDeletedEvent(SERVERCLASS_REFERENCE), new XObjectUpdatedEvent(SERVERCLASS_REFERENCE),
-            new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        Arrays.<Event>asList(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
             new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
             new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE), new WikiDeletedEvent(),
             new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));

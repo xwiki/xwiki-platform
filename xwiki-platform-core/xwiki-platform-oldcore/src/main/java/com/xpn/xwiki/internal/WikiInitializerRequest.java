@@ -19,31 +19,55 @@
  */
 package com.xpn.xwiki.internal;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 
 /**
- * Request to use with {@link XWikiInitializerJob}.
+ * Request to use with {@link WikiInitializerJob}.
  *
  * @version $Id$
- * @since 6.1M1
+ * @since 8.4RC1
  */
-public class XWikiInitializerRequest extends AbstractRequest
+public class WikiInitializerRequest extends AbstractRequest
 {
+    private String wikiId;
+
     /**
-     * Default constructor.
+     * @param wikiId the identifier of the wiki to initialize
      */
-    public XWikiInitializerRequest()
+    public WikiInitializerRequest(String wikiId)
     {
-        setId("initialization", "xwiki");
+        setId(toJobId(wikiId));
         setInteractive(false);
+
+        this.wikiId = wikiId;
     }
 
     /**
      * @param request the request to copy
      */
-    public XWikiInitializerRequest(Request request)
+    public WikiInitializerRequest(Request request)
     {
         super(request);
+    }
+
+    /**
+     * @param wikiId the identifier of the wiki
+     * @return the Job id corresponding to the passed wiki identifier
+     */
+    public static List<String> toJobId(String wikiId)
+    {
+        return Arrays.asList("initialization", "wiki", wikiId);
+    }
+
+    /**
+     * @return The identifier of the wiki to initialize
+     */
+    public String getWikiId()
+    {
+        return this.wikiId;
     }
 }

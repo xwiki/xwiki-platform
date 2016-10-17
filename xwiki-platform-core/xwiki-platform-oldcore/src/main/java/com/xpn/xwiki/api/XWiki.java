@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.Job;
+import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -159,11 +161,39 @@ public class XWiki extends Api
         return null;
     }
 
+    /**
+     * @return the status of the job initializing {@link com.xpn.xwiki.XWiki} instance
+     * @since 6.1M1
+     */
     public XWikiInitializerJobStatus getJobStatus()
     {
         XWikiInitializerJob job = Utils.getComponent((Type) Job.class, XWikiInitializerJob.JOBTYPE);
 
         return job != null ? job.getStatus() : null;
+    }
+
+    /**
+     * @return the status of the job initializing the instance or the current wiki
+     * @since 8.4RC1
+     */
+    public JobStatus getCurrentInitializerJobStatus()
+    {
+        // Get XWiki intiializer job
+        XWikiInitializerJobStatus xwikiStatus = getJobStatus();
+
+        if (xwikiStatus == null) {
+            return null;
+        }
+
+        // The XWiki initialization is not done yet
+        if (xwikiStatus.getState() != State.FINISHED) {
+            return xwikiStatus;
+        }
+
+        // Get current wiki initializer job
+        Job wikiJob = this.xwiki.getWikiInitializerJob(this.context.getWikiId());
+
+        return wikiJob != null ? wikiJob.getStatus() : null;
     }
 
     /**

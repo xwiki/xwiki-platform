@@ -19,31 +19,28 @@
  */
 package com.xpn.xwiki.internal;
 
-import org.xwiki.job.AbstractRequest;
-import org.xwiki.job.Request;
+import org.xwiki.job.AbstractJobStatus;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
 /**
- * Request to use with {@link XWikiInitializerJob}.
+ * Used to expose {@link WikiInitializerJob} status.
  *
  * @version $Id$
- * @since 6.1M1
+ * @since 8.4RC1
  */
-public class XWikiInitializerRequest extends AbstractRequest
+public class WikiInitializerJobStatus extends AbstractJobStatus<WikiInitializerRequest>
 {
     /**
-     * Default constructor.
+     * @param request the request provided when started the job
+     * @param observationManager the observation manager component
+     * @param loggerManager the logger manager component
      */
-    public XWikiInitializerRequest()
+    public WikiInitializerJobStatus(WikiInitializerRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
-        setId("initialization", "xwiki");
-        setInteractive(false);
-    }
+        super(request, null, observationManager, loggerManager);
 
-    /**
-     * @param request the request to copy
-     */
-    public XWikiInitializerRequest(Request request)
-    {
-        super(request);
+        setIsolated(false);
     }
 }

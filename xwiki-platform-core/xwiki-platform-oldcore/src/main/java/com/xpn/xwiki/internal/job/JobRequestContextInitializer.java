@@ -32,6 +32,7 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.job.JobRequestContext;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Automatically set various context values before the actual job start.
@@ -84,6 +85,12 @@ public class JobRequestContextInitializer extends AbstractEventListener
                 // Secure document
                 if (jobRequestContext.isSDocumentSet()) {
                     xcontext.put(XWikiDocument.CKEY_SDOC, jobRequestContext.getSDocument());
+                }
+
+                // Request
+                if (jobRequestContext.isRequestSet()) {
+                    xcontext.setRequest(new XWikiServletRequestStub(jobRequestContext.getRequestURL(),
+                        jobRequestContext.getRequestParameters()));
                 }
             }
         }

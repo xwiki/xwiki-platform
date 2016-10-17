@@ -93,7 +93,7 @@ public class DefaultWikiCreatorTest
         // Verify that the wiki has been created
         verify(store).createWiki(eq("wikiid1"), any(XWikiContext.class));
         // Verify that the wiki has been updated
-        verify(xwiki).updateDatabase(eq("wikiid1"), eq(true), eq(true), any(XWikiContext.class));
+        verify(xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
         verify(wikiDescriptorBuilder).save(eq(descriptor));
         // Verify that the descriptor has been reloaded after being saved

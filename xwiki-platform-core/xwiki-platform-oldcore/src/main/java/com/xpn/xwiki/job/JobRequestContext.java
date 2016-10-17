@@ -19,11 +19,18 @@
  */
 package com.xpn.xwiki.job;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Contains various information about the context which asked for a job execution.
@@ -54,6 +61,12 @@ public class JobRequestContext
 
     private DocumentReference userReference;
 
+    private boolean requestSet;
+
+    private URL requestURL;
+
+    private Map<String, String[]> requestParameters;
+
     /**
      * Default constructor.
      */
@@ -71,6 +84,31 @@ public class JobRequestContext
             setUserReference(xcontext.getUserReference());
             setDocument(xcontext.getDoc());
             setSDocument((XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC));
+
+            XWikiRequest request = xcontext.getRequest();
+            if (request != null) {
+                try {
+                    setRequestUrl(new URL(request.getRequestURL().toString()));
+                } catch (MalformedURLException e) {
+                    // Log something ? I guess I should never happen (it returns a StringBuffer so that it can be
+                    // modified).
+                }
+                setRequestParameters(request.getParameterMap());
+            }
+        }
+    }
+
+    /**
+     * Register part of the {@link XWikiContext} in the job request.
+     * 
+     * @param request the job request
+     * @param xcontext the XWiki context
+     * @since 8.4RC1
+     */
+    public static void set(AbstractRequest request, XWikiContext xcontext)
+    {
+        if (xcontext != null) {
+            request.setProperty(JobRequestContext.KEY, new JobRequestContext(xcontext));
         }
     }
 
@@ -172,5 +210,51 @@ public class JobRequestContext
     public XWikiDocument getSDocument()
     {
         return this.sDocument;
+    }
+
+    /**
+     * @return true if the request informations have been set
+     * @since 8.4RC1
+     */
+    public boolean isRequestSet()
+    {
+        return this.requestSet;
+    }
+
+    /**
+     * @param requestURL the request {@link URL}
+     * @since 8.4RC1
+     */
+    public void setRequestUrl(URL requestURL)
+    {
+        this.requestURL = requestURL;
+        this.requestSet = true;
+    }
+
+    /**
+     * @return the request URL
+     * @since 8.4RC1
+     */
+    public URL getRequestURL()
+    {
+        return this.requestURL;
+    }
+
+    /**
+     * @param requestParameters the parameters of the request
+     * @since 8.4RC1
+     */
+    public void setRequestParameters(Map<String, String[]> requestParameters)
+    {
+        this.requestParameters = new HashMap<>(requestParameters);
+    }
+
+    /**
+     * @return the parameters of the request
+     * @since 8.4RC1
+     */
+    public Map<String, String[]> getRequestParameters()
+    {
+        return this.requestParameters;
     }
 }

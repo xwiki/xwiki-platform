@@ -87,13 +87,17 @@ public class JobRequestContext
 
             XWikiRequest request = xcontext.getRequest();
             if (request != null) {
-                try {
-                    setRequestUrl(new URL(request.getRequestURL().toString()));
-                } catch (MalformedURLException e) {
-                    // Log something ? I guess I should never happen (it returns a StringBuffer so that it can be
-                    // modified).
+                if (request.getRequestURL() != null) {
+                    try {
+                        setRequestUrl(new URL(request.getRequestURL().toString()));
+                    } catch (MalformedURLException e) {
+                        // Log something ? I guess I should never happen (it returns a StringBuffer so that it can be
+                        // modified).
+                    }
                 }
-                setRequestParameters(request.getParameterMap());
+                if (request.getParameterMap() != null) {
+                    setRequestParameters(request.getParameterMap());
+                }
             }
         }
     }

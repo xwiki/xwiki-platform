@@ -175,7 +175,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
    * @return an array of locales codes
    */
   var getLocalesFromInput = function (input) {
-    var locales = input.val().split(',');
+    var locales = input.val().split(/,| /);
     var results = [];
     for (var i = 0; i &lt; locales.length; ++i) {
       if (locales[i].trim() != '') {

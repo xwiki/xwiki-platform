@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1385638578000</date>
-  <contentUpdateDate>1385551024000</contentUpdateDate>
+  <date>1476801617000</date>
+  <contentUpdateDate>1476522551000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.activity')</title>
   <comment/>
@@ -89,7 +89,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -333,7 +335,7 @@ document.observe('xwiki:dom:loaded', function() {
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>5</number>
+        <number>6</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -344,9 +346,11 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
-        <number>2</number>
+        <number>3</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -359,7 +363,7 @@ document.observe('xwiki:dom:loaded', function() {
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>6</number>
+        <number>1</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -372,7 +376,7 @@ document.observe('xwiki:dom:loaded', function() {
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
+        <number>2</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -383,7 +387,7 @@ document.observe('xwiki:dom:loaded', function() {
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -394,7 +398,7 @@ document.observe('xwiki:dom:loaded', function() {
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>3</number>
+        <number>4</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -727,6 +731,7 @@ h1:hover .toolFilter .toolExpand {
       <validationScript/>
       <code>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>code</name>
         <number>9</number>
         <prettyName>Macro code</prettyName>
@@ -736,7 +741,9 @@ h1:hover .toolFilter .toolExpand {
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>contentDescription</name>
         <number>8</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
@@ -771,7 +778,9 @@ h1:hover .toolFilter .toolExpand {
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultCategory>
       <description>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
@@ -877,10 +886,7 @@ $xwiki.ssx.use('Main.Activity')##
 ##
 ## User status configuration
 ## -------------------------------------------------------------
-#set ($config = 'XWiki.MessageStreamConfig')
-#set ($configClass = $xwiki.getDocument($config).getxWikiClass())
-#set ($configObj = $xwiki.getDocument($config).getObject($config))
-#set ($isMessageStreamActive = ("$configObj.getProperty('active').value" == '1'))
+#set ($isMessageStreamActive = $services.messageStream.isActive())
 ## TODO: filter out user statuses from the activity stream if inactive
 ##
 ##
@@ -1875,6 +1881,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -1941,6 +1948,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2007,6 +2015,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2073,6 +2082,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2139,6 +2149,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2205,6 +2216,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2271,6 +2283,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>
@@ -2337,6 +2350,7 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultValue>
       <description>
+        <contenttype/>
         <disabled>0</disabled>
         <name>description</name>
         <number>2</number>

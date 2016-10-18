@@ -38,6 +38,7 @@ import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -55,12 +56,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
-import org.apache.velocity.VelocityContext;
+import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
+import com.xpn.xwiki.cache.api.internal.XWikiInitializedWikiCacheStub;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
@@ -168,7 +172,7 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public XWikiCache XWiki.getVirtualWikiMap()
     {
-        return new XWikiCacheStub(this.virtualWikiMap);
+        return new XWikiInitializedWikiCacheStub(this.initializedWikis);
     }
 
     /**
@@ -540,9 +544,6 @@ public privileged aspect XWikiCompatibilityAspect
             // Verify is server page already exist
             XWikiDocument serverdoc = getDocument(SYSTEM_SPACE, wikiServerPage, context);
             if (serverdoc.isNew()) {
-                // clear entry in virtual wiki cache
-                this.virtualWikiMap.remove(wikiUrl);
-
                 // Create Wiki Server page
                 serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "server", wikiUrl);
                 serverdoc.setStringValue(VIRTUAL_WIKI_DEFINITION_CLASS_REFERENCE, "owner", wikiAdmin);
@@ -909,60 +910,18 @@ public privileged aspect XWikiCompatibilityAspect
      */
     private DocumentReference XWiki.findWikiServer(String host, XWikiContext context) throws XWikiException
     {
-        ensureVirtualWikiMapExists();
-        DocumentReference wikiName = this.virtualWikiMap.get(host);
+        try {
+          WikiDescriptor descriptor = Utils.getComponent(WikiDescriptorManager.class).getByAlias(host);
 
-        if (wikiName == null) {
-            // Not loaded yet, search for it in the main wiki
-            String hql =
-                ", BaseObject as obj, StringProperty as prop WHERE obj.name=doc.fullName"
-                    + " AND doc.space='XWiki' AND doc.name LIKE 'XWikiServer%'"
-                    + " AND obj.className='XWiki.XWikiServerClass' AND prop.id.id = obj.id"
-                    + " AND prop.id.name = 'server' AND prop.value=?";
-            List<String> parameters = new ArrayList<String>(1);
-            parameters.add(host);
-            try {
-                List<DocumentReference> list =
-                    context.getWiki().getStore().searchDocumentReferences(hql, parameters, context);
-                if ((list != null) && (list.size() > 0)) {
-                    wikiName = list.get(0);
-                }
-
-                this.virtualWikiMap.set(host, wikiName);
-            } catch (XWikiException e) {
-                LOGGER.warn("Error when searching for wiki name from URL host [" + host + "]", e);
-            }
+          if (descriptor != null) {
+              return new DocumentReference(context.getMainXWiki(), "XWiki",
+                  "XWikiServer" + StringUtils.capitalize(descriptor.getId()));
+          }
+        } catch (WikiManagerException e) {
+            LOGGER.warn("Error when searching for wiki name from URL host [" + host + "]", e);
         }
 
-        return wikiName;
-    }
-
-    private void XWiki.ensureVirtualWikiMapExists() throws XWikiException
-    {
-        synchronized (this) {
-            if (this.virtualWikiMap == null) {
-                int iCapacity = 1000;
-                try {
-                    String capacity = Param("xwiki.virtual.cache.capacity");
-                    if (capacity != null) {
-                        iCapacity = Integer.parseInt(capacity);
-                    }
-                } catch (Exception e) {
-                }
-                try {
-                    CacheConfiguration configuration = new CacheConfiguration();
-                    configuration.setConfigurationId("xwiki.virtualwikimap");
-                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-                    lru.setMaxEntries(iCapacity);
-                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
-                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
-                } catch (CacheException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
-                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
-                }
-            }
-        }
+        return null;
     }
 
     /**

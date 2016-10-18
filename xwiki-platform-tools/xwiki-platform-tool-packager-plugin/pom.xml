@@ -379,6 +379,7 @@
                 <goal>clean</goal>
                 <goal>package</goal>
               </goals>
+              <showErrors>true</showErrors>
               <!-- Don't display debug logs by default because it takes more time and one test asserts that there's no
                    extra debug log displayed since we don't want that when we execute this plugin on projects -->
               <debug>false</debug>

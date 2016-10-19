@@ -36,6 +36,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.COMPARISON;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionQuery;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
@@ -134,7 +135,8 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Ordering
         // /////////////////
 
-        List<String> sortClauses = new ArrayList<String>(query.getSortClauses().size() + 1);
+        // Convert extension ordering into solr ordering
+        List<String> sortClauses = new ArrayList<>(query.getSortClauses().size() + 1);
         for (SortClause sortClause : query.getSortClauses()) {
             String solrField = XWikiRepositoryModel.toSolrField(sortClause.getField());
             if (solrField != null) {
@@ -142,8 +144,15 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
             }
         }
 
-        // Sort by score by default
-        sortClauses.add("score desc");
+        // Set default ordering
+        if (StringUtils.isEmpty(query.getQuery())) {
+            // Sort by rating by default when search query is empty
+            sortClauses.add(XWikiRepositoryModel.toSolrOrderField(RatingExtension.FIELD_AVERAGE_VOTE) + " desc");
+            sortClauses.add(XWikiRepositoryModel.toSolrOrderField(RatingExtension.FIELD_TOTAL_VOTES) + " desc");
+        } else {
+            // Sort by score by default when search query is not empty
+            sortClauses.add("score desc");
+        }
 
         solrQuery.bindValue("sort", sortClauses);
 
@@ -151,7 +160,7 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Filtering
         // /////////////////
 
-        List<String> fq = new ArrayList<String>(query.getFilters().size() + 1);
+        List<String> fq = new ArrayList<>(query.getFilters().size() + 1);
 
         // TODO: should be filter only on current wiki ?
 

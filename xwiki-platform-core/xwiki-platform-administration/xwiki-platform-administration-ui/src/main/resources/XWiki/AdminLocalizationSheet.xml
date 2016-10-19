@@ -254,6 +254,7 @@ require(['jquery','bootstrap','bootstrap-select'], function($) {
     var defaultLocaleInput = $('input[name="XWiki.XWikiPreferences_0_default_language"]');
     var select2 = $('&lt;select&gt;');
     select2.prop('name', defaultLocaleInput.prop('name'));
+    select2.prop('id', defaultLocaleInput.prop('id'));
     for (var i = 0; i &lt; locales.length; ++i) {
       var option = $('&lt;option&gt;');
       option.prop('value', locales[i].code);

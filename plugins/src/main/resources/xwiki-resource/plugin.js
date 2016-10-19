@@ -90,6 +90,8 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
                 '<label class="cke_dialog_ui_labeled_label"></label>' +
                 '<input type="text" />' +
               '</div>',
+        // Focus the resource picker when the dialog is loaded.
+        tabIndex: 0,
         onLoad: function() {
           // Register the event listeners and create the resource picker. We register the changeResourceType listener
           // before creating the resource picker because we need to catch the first changeResourceType event in order to
@@ -105,10 +107,16 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');
           var resourceReferenceInput = this.getElement().findOne('input.resourceReference');
+          var tabIndex = this.tabIndex;
           [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
-            dialog.addFocusable(field, 0);
-            field._focusable = dialog._.focusList[0];
+            if (tabIndex >= 0 && tabIndex < dialog._.focusList.length) {
+              dialog.addFocusable(field, tabIndex);
+              field._focusable = dialog._.focusList[tabIndex];
+            } else {
+              dialog.addFocusable(field);
+              field._focusable = dialog._.focusList[dialog._.focusList.length - 1];
+            }
             field.on('focus', function() {
               dialog._.currentFocusIndex = this._focusable.focusIndex;
             });

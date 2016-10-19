@@ -201,10 +201,8 @@
     // picker) to be focused when the dialog is opened.
     delete dialogDefinition.onFocus;
 
-    // The link dialog doesn't have a field to input or edit the link label (because the link label can be edited
-    // in-line) and it uses the link URL as the default label when there is no text or element (e.g. image) selected
-    // in the edited content. This is fine for the external (URL) links but for internal links it's nicer to use the
-    // resource label (e.g. the wiki page title or the attachment file name).
+    // Use the resource label (e.g. the wiki page title or the attachment file name) as the default link label when the
+    // link label text input is left empty.
     overwriteDefaultLinkLabel(dialogDefinition);
 
     resourcePlugin.updateResourcePickerOnFileBrowserSelect(dialogDefinition,
@@ -226,6 +224,8 @@
 
   var createResourcePicker = function(editor) {
     return CKEDITOR.plugins.xwikiResource.createResourcePicker({
+      // The resource picker is displayed after the link label input.
+      tabIndex: 1,
       resourceTypes: (editor.config['xwiki-link'] || {}).resourceTypes || ['doc', 'attach', 'url', 'mailto'],
       getValue: function() {
         var data = {resourceReference: this.base.getValue.apply(this, arguments)};
@@ -287,6 +287,17 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
+      },
+      onSelectResource: function(event, resource) {
+        this.base.onSelectResource.apply(this, arguments);
+        this.maybeUpdateLinkLabel();
+      },
+      maybeUpdateLinkLabel: function() {
+        var linkLabelField = this.getDialog().getContentElement('info', 'linkDisplayText');
+        if (linkLabelField.getValue() === '') {
+          // Use the resource label (e.g. the wiki page title or the attachment file name) as link label.
+          linkLabelField.setValue(this.getResourceLabel());
+        }
       }
     });
   };
@@ -391,27 +402,19 @@
   };
 
   /**
-   * Use the resource label as the default link label when creating a new link and there is no text or element (e.g.
-   * image) selected in the edited content.
+   * Use the resource label (e.g. the wiki page title or the attachment file name) as the default link label when the
+   * link label text input is left empty.
    */
   var overwriteDefaultLinkLabel = function(dialogDefinition) {
-    var oldOnOk = dialogDefinition.onOk;
-    dialogDefinition.onOk = function() {
-      if (!this._.selectedElement) {
-        // When creating a new link..
-        var editor = this.getParentEditor();
-        var range = editor.getSelection().getRanges()[0];
-        if (range.collapsed) {
-          // And there's no text or element (e.g. image) selected in the edited content..
-          var resourceLabel = this.getContentElement('info', 'resourceReference').getResourceLabel();
-          var textNode = new CKEDITOR.dom.text(resourceLabel, editor.document);
-          range.insertNode(textNode);
-          range.selectNodeContents(textNode);
-          range.select();
-        }
+    var linkLabelField = dialogDefinition.getContents('info').get('linkDisplayText');
+    var oldCommit = linkLabelField.commit;
+    linkLabelField.commit = function(data) {
+      if (this.getValue() === '') {
+        // Use the resource label (e.g. the wiki page title or the attachment file name) as link label.
+        this.setValue(this.getDialog().getContentElement('info', 'resourceReference').getResourceLabel());
       }
-      if (oldOnOk) {
-        oldOnOk.apply(this, arguments);
+      if (typeof oldCommit === 'function') {
+        oldCommit.apply(this, arguments);
       }
     };
   };

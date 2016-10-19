@@ -37,6 +37,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -71,6 +72,13 @@ public abstract class AbstractX509WikiStore
     @Inject
     @Named("current")
     private EntityReferenceResolver<String> stringReferenceResolver;
+
+    /**
+     * Used to convert document references to query parameters.
+     */
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Used to encode/decode certificates, private keys and subject keys.
@@ -122,6 +130,14 @@ public abstract class AbstractX509WikiStore
     protected QueryManager getQueryManager()
     {
         return this.queryManager;
+    }
+
+    /**
+     * @return the query manager.
+     */
+    protected EntityReferenceSerializer<String> getSerializer()
+    {
+        return this.entityReferenceSerializer;
     }
 
     /**
@@ -191,11 +207,13 @@ public abstract class AbstractX509WikiStore
         CertificateObjectReference certRef;
         if (keyId != null) {
             certRef =
-                new X509CertificateReferenceKeyIdentifierQuery(resolveStore(store), this.base64, this.queryManager)
+                new X509CertificateReferenceKeyIdentifierQuery(resolveStore(store), this.base64, this.queryManager,
+                    this.entityReferenceSerializer)
                     .getReference(keyId);
         } else {
             certRef =
-                new X509CertificateReferenceIssuerAndSerialQuery(resolveStore(store), this.base64, this.queryManager)
+                new X509CertificateReferenceIssuerAndSerialQuery(resolveStore(store), this.base64, this.queryManager,
+                    this.entityReferenceSerializer)
                     .getReference(publicKey.getIssuer(), publicKey.getSerialNumber());
         }
 

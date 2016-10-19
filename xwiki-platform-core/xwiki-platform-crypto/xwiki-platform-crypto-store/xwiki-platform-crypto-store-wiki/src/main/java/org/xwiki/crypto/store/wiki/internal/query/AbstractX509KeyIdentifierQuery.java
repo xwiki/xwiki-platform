@@ -26,6 +26,7 @@ import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.CertificateStoreException;
 import org.xwiki.crypto.store.wiki.internal.X509CertificateWikiStore;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
@@ -51,12 +52,14 @@ public abstract class AbstractX509KeyIdentifierQuery extends AbstractX509StoreQu
      * @param where the additional where statement specific to the query.
      * @param encoder a string encoder/decoder used to convert byte arrays to/from String.
      * @param queryManager the query manager used to build queries.
+     * @param serializer the entity reference serializer to serialize the store reference for query
      * @throws CertificateStoreException on error creating required queries.
      */
     public AbstractX509KeyIdentifierQuery(EntityReference store, String select, String from, String where,
-        BinaryStringEncoder encoder, QueryManager queryManager) throws CertificateStoreException
+        BinaryStringEncoder encoder, QueryManager queryManager, EntityReferenceSerializer<String>serializer)
+        throws CertificateStoreException
     {
-        super(store, select, from, WHERE_STATEMENT + where, encoder, queryManager);
+        super(store, select, from, WHERE_STATEMENT + where, encoder, queryManager, serializer);
     }
 
     /**

@@ -44,6 +44,8 @@ import org.xwiki.crypto.store.wiki.internal.query.AbstractX509KeyIdentifierQuery
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509StoreQuery;
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509SubjectQuery;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -79,8 +81,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
-@ComponentList({CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
-                CurrentStringEntityReferenceResolver.class})
+@ComponentList({
+    CurrentReferenceDocumentReferenceResolver.class,
+    CurrentReferenceEntityReferenceResolver.class,
+    CurrentStringEntityReferenceResolver.class,
+    LocalStringEntityReferenceSerializer.class,
+    DefaultSymbolScheme.class
+})
 public class X509CertificateWikiStoreTest
 {
     private static final byte[] CERTIFICATE = "certificate".getBytes();
@@ -94,6 +101,7 @@ public class X509CertificateWikiStoreTest
     private static final String WIKI = "wiki";
     private static final String SPACE = "space";
     private static final String DOCUMENT = "document";
+    private static final String FULLNAME = SPACE + '.' + DOCUMENT;
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference(WIKI);
     private static final EntityReference SPACE_REFERENCE = new EntityReference(SPACE, EntityType.WIKI);
@@ -110,8 +118,7 @@ public class X509CertificateWikiStoreTest
     protected static final String BIND_SERIAL = getFieldValue(AbstractX509IssuerAndSerialQuery.class, "SERIAL");
     protected static final String BIND_SUBJECT = getFieldValue(AbstractX509SubjectQuery.class, "SUBJECT");
 
-    private static final String BIND_SPACE = getFieldValue(AbstractX509StoreQuery.class, "SPACE");
-    private static final String BIND_DOCNAME = getFieldValue(AbstractX509StoreQuery.class, "DOCNAME");
+    private static final String BIND_STORE = getFieldValue(AbstractX509StoreQuery.class, "STORE");
 
     @Rule
     public MockitoComponentMockingRule<CertificateStore> mocker =
@@ -285,8 +292,7 @@ public class X509CertificateWikiStoreTest
         store.store(DOC_STORE_REF, getMockedCertificate(true));
 
         verify(query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(query).bindValue(BIND_SPACE, SPACE);
-        verify(query).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(query).bindValue(BIND_STORE, FULLNAME);
 
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID), any(String.class));
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER), any(String.class));
@@ -311,7 +317,7 @@ public class X509CertificateWikiStoreTest
         store.store(SPACE_STORE_REF, getMockedCertificate(true));
 
         verify(query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(query).bindValue(BIND_SPACE, SPACE);
+        verify(query).bindValue(BIND_STORE, SPACE);
 
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID), any(String.class));
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER), any(String.class));
@@ -337,8 +343,7 @@ public class X509CertificateWikiStoreTest
 
         verify(query).bindValue(BIND_ISSUER, ISSUER);
         verify(query).bindValue(BIND_SERIAL, SERIAL.toString());
-        verify(query).bindValue(BIND_SPACE, SPACE);
-        verify(query).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(query).bindValue(BIND_STORE, FULLNAME);
 
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID), any(String.class));
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER), any(String.class));
@@ -365,7 +370,7 @@ public class X509CertificateWikiStoreTest
 
         verify(query).bindValue(BIND_ISSUER, ISSUER);
         verify(query).bindValue(BIND_SERIAL, SERIAL.toString());
-        verify(query).bindValue(BIND_SPACE, SPACE);
+        verify(query).bindValue(BIND_STORE, SPACE);
 
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID), any(String.class));
         verify(certObj, never()).setStringValue(eq(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER), any(String.class));
@@ -395,8 +400,7 @@ public class X509CertificateWikiStoreTest
             equalTo(certificate));
 
         verify(this.query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
-        verify(this.query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query, times(3)).bindValue(BIND_STORE, FULLNAME);
     }
 
     @Test
@@ -408,7 +412,7 @@ public class X509CertificateWikiStoreTest
             equalTo(certificate));
 
         verify(this.query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query, times(3)).bindValue(BIND_STORE, SPACE);
     }
 
     @Test
@@ -421,8 +425,7 @@ public class X509CertificateWikiStoreTest
 
         verify(query).bindValue(BIND_ISSUER, ISSUER);
         verify(query).bindValue(BIND_SERIAL, SERIAL.toString());
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
-        verify(query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(query, times(3)).bindValue(BIND_STORE, FULLNAME);
     }
 
     @Test
@@ -435,7 +438,7 @@ public class X509CertificateWikiStoreTest
 
         verify(query).bindValue(BIND_ISSUER, ISSUER);
         verify(query).bindValue(BIND_SERIAL, SERIAL.toString());
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(query, times(3)).bindValue(BIND_STORE, SPACE);
     }
 
     private CertifiedPublicKey[] mockMultiCertsQuery() throws Exception
@@ -467,8 +470,7 @@ public class X509CertificateWikiStoreTest
             contains(certs));
 
         verify(this.query).bindValue(BIND_SUBJECT, SUBJECT);
-        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
-        verify(this.query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query, times(3)).bindValue(BIND_STORE, FULLNAME);
     }
 
     @Test
@@ -480,7 +482,7 @@ public class X509CertificateWikiStoreTest
             contains(certs));
 
         verify(this.query).bindValue(BIND_SUBJECT, SUBJECT);
-        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query, times(3)).bindValue(BIND_STORE, SPACE);
     }
 
     @Test
@@ -490,8 +492,7 @@ public class X509CertificateWikiStoreTest
 
         assertThat(this.store.getAllCertificates(DOC_STORE_REF), contains(certs));
 
-        verify(this.query).bindValue(BIND_SPACE, SPACE);
-        verify(this.query).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query).bindValue(BIND_STORE, FULLNAME);
     }
 
     @Test
@@ -501,7 +502,7 @@ public class X509CertificateWikiStoreTest
 
         assertThat(this.store.getAllCertificates(SPACE_STORE_REF), contains(certs));
 
-        verify(this.query).bindValue(BIND_SPACE, SPACE);
+        verify(this.query).bindValue(BIND_STORE, SPACE);
     }
 
 }

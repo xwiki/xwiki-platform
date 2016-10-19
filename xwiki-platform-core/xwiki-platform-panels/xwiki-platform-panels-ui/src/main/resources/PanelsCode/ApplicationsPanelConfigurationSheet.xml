@@ -57,11 +57,21 @@
 #end
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
   #if("$!configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id)" != '')
-    #set($discard = $blacklistedApps.add($uix))
+    #set($discard = $blacklistedApps.add({'uix': $uix}))
   #else
-    #set($discard = $displayedApps.add($uix))
+    #set ($app = {'uix': $uix})
+    #set ($orderObj = $configDoc.getObject('PanelsCode.ApplicationsPanelOrderClass', 'applicationId', $uix.id))
+    #if ($orderObj)
+      #set ($discard = $app.put('order', $orderObj.getValue('order')))
+    #else
+      ## if order is not set, set MAX_INTEGER
+      #set ($discard = $app.put('order', 2147483647))
+    #end
+    #set ($discard = $displayedApps.add($app))
   #end
 #end
+## Sort the displayedApp
+#set ($displayedApps = $sorttool.sort($displayedApps, 'order'))
 ##########################
 ## Macro to display an application panel
 ##########################
@@ -75,15 +85,15 @@
         &lt;/div&gt;
         &lt;div class="panel-body"&gt;
           &lt;ul class="nav nav-pills applicationsPanel"&gt;
-            #foreach($uix in $apps)
-              #set($params = $uix.getParameters())
+            #foreach($app in $apps)
+              #set($params = $app.uix.getParameters())
               #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
                 #if ($params.icon.startsWith('icon:'))
                   #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
                 #else
                   #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
                 #end
-                &lt;li class="draggableApp" id="$uix.id"&gt;
+                &lt;li class="draggableApp" id="$app.uix.id"&gt;
                   &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
                 &lt;/li&gt;
               #end
@@ -255,7 +265,7 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
       data: {
         'form_token': xm['form_token'],
         'blacklist': JSON.stringify(blacklist),
-        'displaylistOrder': JSON.stringify(displaylistOrder),
+        'orderlist': JSON.stringify(displaylistOrder)
       },
       success: function(data, status) {
         if (data == 'SUCCESS') {

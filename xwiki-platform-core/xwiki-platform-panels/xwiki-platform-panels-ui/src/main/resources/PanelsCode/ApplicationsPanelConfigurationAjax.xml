@@ -63,6 +63,23 @@
         #set($discard = $configDoc.removeObject($obj))
       #end
     #end
+    ## Get the orderlist configuration
+    #set ($list = $jsontool.parse($request.orderlist))
+    #foreach ($app in $list)
+      #set ($orderObj = $configDoc.getObject('PanelsCode.ApplicationsPanelOrderClass', 'applicationId', $app))
+      #if (!$orderObj)
+        #set ($orderObj = $configDoc.newObject('PanelsCode.ApplicationsPanelOrderClass'))
+        #set ($discard = $orderObj.set('applicationId', $app))
+      #end
+      #set ($discard = $orderObj.set('order', $velocityCount))
+    #end
+    ## Remove the order objects that are not set
+    #foreach($obj in $configDoc.getObjects('PanelsCode.ApplicationsPanelOrderClass').clone())
+      #set($app = $obj.getValue('applicationId'))
+      #if(!$list.contains($app))
+        #set($discard = $configDoc.removeObject($obj))
+      #end
+    #end
     #set($discard = $configDoc.setHidden(true))
     #set($discard = $configDoc.save("Save the new configuration"))
     SUCCESS

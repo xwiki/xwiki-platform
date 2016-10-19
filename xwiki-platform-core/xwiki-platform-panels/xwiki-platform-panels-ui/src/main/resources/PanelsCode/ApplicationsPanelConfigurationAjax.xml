@@ -63,6 +63,7 @@
         #set($discard = $configDoc.removeObject($obj))
       #end
     #end
+    #set($discard = $configDoc.setHidden(true))
     #set($discard = $configDoc.save("Save the new configuration"))
     SUCCESS
   #end

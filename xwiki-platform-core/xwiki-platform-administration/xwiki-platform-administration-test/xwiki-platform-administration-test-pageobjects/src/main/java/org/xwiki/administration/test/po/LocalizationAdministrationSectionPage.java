@@ -22,6 +22,7 @@ package org.xwiki.administration.test.po;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -46,6 +47,10 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
+        // Wait for asynchronous widgets to be loaded
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".bootstrap-select"));
+        getDriver().waitUntilElementIsVisible(
+                By.cssSelector("select[name=\"XWiki.XWikiPreferences_0_default_language\"]"));
     }
 
     public void setMultiLingual(boolean isMultiLingual)

@@ -23,6 +23,7 @@ import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.CertificateStoreException;
 import org.xwiki.crypto.store.wiki.internal.X509CertificateWikiStore;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryManager;
 
 /**
@@ -44,12 +45,13 @@ public class X509CertificateReferenceKeyIdentifierQuery extends AbstractX509KeyI
      * @param store the reference of a document or a space where the certificate should be stored.
      * @param encoder a string encoder/decoder used to convert byte arrays to/from String.
      * @param queryManager the query manager used to build queries.
+     * @param serializer the entity reference serializer to serialize the store reference for query
      * @throws CertificateStoreException on error creating required queries.
      */
     public X509CertificateReferenceKeyIdentifierQuery(EntityReference store, BinaryStringEncoder encoder,
-        QueryManager queryManager) throws CertificateStoreException
+        QueryManager queryManager, EntityReferenceSerializer<String> serializer) throws CertificateStoreException
     {
-        super(store, SELECT_STATEMENT, FROM_STATEMENT, "", encoder, queryManager);
+        super(store, SELECT_STATEMENT, FROM_STATEMENT, "", encoder, queryManager, serializer);
     }
 
     /**

@@ -32,6 +32,7 @@ import org.xwiki.crypto.store.wiki.internal.query.X509CertificateIssuerAndSerial
 import org.xwiki.crypto.store.wiki.internal.query.X509CertificateKeyIdentifierQuery;
 import org.xwiki.crypto.store.wiki.internal.query.X509CertificateSubjectQuery;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryManager;
 
 /**
@@ -55,14 +56,17 @@ public class X509CertificateProvider implements CertificateProvider
      * @param factory a certificate factory used to convert byte arrays to certificate.
      * @param encoder a string encoder/decoder used to convert byte arrays to/from String.
      * @param queryManager the query manager used to build queries.
+     * @param serializer the entity reference serializer to serialize the store reference for query
      * @throws CertificateStoreException on error creating required queries.
      */
     protected X509CertificateProvider(EntityReference store, CertificateFactory factory, BinaryStringEncoder encoder,
-        QueryManager queryManager) throws CertificateStoreException
+        QueryManager queryManager, EntityReferenceSerializer<String> serializer) throws CertificateStoreException
     {
-        this.keyIdentifierQuery = new X509CertificateKeyIdentifierQuery(store, factory, encoder, queryManager);
-        this.issuerAndSerialQuery = new X509CertificateIssuerAndSerialQuery(store, factory, encoder, queryManager);
-        this.subjectQuery = new X509CertificateSubjectQuery(store, factory, encoder, queryManager);
+        this.keyIdentifierQuery =
+            new X509CertificateKeyIdentifierQuery(store, factory, encoder, queryManager, serializer);
+        this.issuerAndSerialQuery =
+            new X509CertificateIssuerAndSerialQuery(store, factory, encoder, queryManager, serializer);
+        this.subjectQuery = new X509CertificateSubjectQuery(store, factory, encoder, queryManager, serializer);
     }
 
     @Override

@@ -119,7 +119,7 @@ public class X509CertificateWikiStore extends AbstractX509WikiStore implements C
     public CertificateProvider getCertificateProvider(StoreReference store) throws CertificateStoreException
     {
         return new X509CertificateProvider(resolveStore(store), getCertificateFactory(), getEncoder(),
-            getQueryManager());
+            getQueryManager(), getSerializer());
     }
 
     /**
@@ -130,7 +130,7 @@ public class X509CertificateWikiStore extends AbstractX509WikiStore implements C
     @Override
     public Collection<CertifiedPublicKey> getAllCertificates(StoreReference store) throws CertificateStoreException
     {
-        return new X509CertificateQuery(resolveStore(store), getCertificateFactory(), getEncoder(), getQueryManager())
-            .getCertificates();
+        return new X509CertificateQuery(resolveStore(store), getCertificateFactory(), getEncoder(), getQueryManager(),
+            getSerializer()).getCertificates();
     }
 }

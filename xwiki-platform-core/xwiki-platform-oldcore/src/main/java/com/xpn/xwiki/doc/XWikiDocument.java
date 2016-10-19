@@ -1123,7 +1123,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        getProgress().startStep(getDocumentReference(), "document.progress.render",
+        getProgress().startStep(this, "document.progress.render",
             "Render document [{}] in syntax [{}]", getDocumentReference(), targetSyntax);
 
         try {
@@ -1168,7 +1168,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return renderedContent;
         } finally {
             getProgress().popLevelProgress(getDocumentReference());
-            getProgress().endStep(getDocumentReference());
+            getProgress().endStep(this);
         }
     }
 
@@ -1286,6 +1286,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         Map<String, Object> backup = null;
 
+        getProgress().startStep(this, "document.progress.renderText",
+            "Execute content [{}] in the context of document [{}]",
+            StringUtils.substring(text, 0, 100) + (text.length() >= 100 ? "..." : ""), getDocumentReference());
+
         XWikiDocument currentSDocument = (XWikiDocument) context.get(CKEY_SDOC);
         try {
             // We have to render the given text in the context of this document. Check if this document is already
@@ -1321,6 +1325,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 restoreContext(backup, context);
             }
             context.put(CKEY_SDOC, currentSDocument);
+
+            getProgress().endStep(this);
         }
 
         return "";

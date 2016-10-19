@@ -125,11 +125,6 @@ require(['jquery', 'resource', 'resourcePicker'], function ($, $resource) {
           var id = CKEDITOR.tools.getNextId();
           resourceReferenceInput.setAttribute('id', id);
           this.getElement().findOne('label').setAttribute('for', id);
-          // Register the event listeners. Note that we register the event listeners after the resource picker was
-          // created because we don't care about the first changeResourceType and selectResource events since we're
-          // going to trigger them anyway when the dialog is shown by setting the value of the resource input.
-          $(this.getElement().$).on('changeResourceType', $.proxy(this, 'onResourceTypeChange'))
-            .on('selectResource', $.proxy(this, 'onSelectResource'));
         },
         validate: function() {
           var resourceReference = this.getValue();

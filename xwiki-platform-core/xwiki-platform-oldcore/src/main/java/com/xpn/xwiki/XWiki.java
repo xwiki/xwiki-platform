@@ -1307,7 +1307,7 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
     @Deprecated
     public void updateDatabase(String wikiId, XWikiContext context) throws HibernateException, XWikiException
@@ -1318,7 +1318,7 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
     @Deprecated
     public void updateDatabase(String wikiId, boolean force, XWikiContext context)
@@ -1332,7 +1332,7 @@ public class XWiki implements EventListener
      * @param force if the update of the databse should be forced
      * @param initDocuments if mandatory document and plugin should be initialized for passed wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean)} instead
+     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
     @Deprecated
     public void updateDatabase(String wikiId, boolean force, boolean initDocuments, XWikiContext context)

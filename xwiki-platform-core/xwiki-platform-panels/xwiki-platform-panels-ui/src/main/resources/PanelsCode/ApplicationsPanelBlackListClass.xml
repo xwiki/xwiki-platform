@@ -62,6 +62,38 @@
   <object>
     <name>PanelsCode.ApplicationsPanelBlackListClass</name>
     <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>ac6dcc09-80dc-48d2-8b17-7f7d46b8e972</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>PanelsCode.ApplicationsPanelConfigurationSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+    <number>0</number>
     <className>XWiki.DocumentSheetBinding</className>
     <guid>d42506ea-9cac-45e0-96bb-3c7ef2d9ec5a</guid>
     <class>

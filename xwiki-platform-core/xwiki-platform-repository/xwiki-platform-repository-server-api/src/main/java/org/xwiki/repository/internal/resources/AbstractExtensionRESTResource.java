@@ -91,7 +91,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 {
     public static final String[] EPROPERTIES_SUMMARY =
         new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
-        XWikiRepositoryModel.PROP_EXTENSION_NAME, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES };
+        XWikiRepositoryModel.PROP_EXTENSION_NAME };
 
     protected static final String DEFAULT_BOOST;
 

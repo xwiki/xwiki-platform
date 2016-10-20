@@ -19,7 +19,11 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -55,5 +59,18 @@ public class ApplicationsPanel extends ViewPage
         getDriver().findElementWithoutWaiting(By.xpath(
             "//a/span[@class=\"application-label\" and contains(text(), '" + applicationName + "')]")).click();
         return new ViewPage();
+    }
+
+    public List<String> getApplications()
+    {
+        List<String> applications = new ArrayList<>();
+
+        for (WebElement elem : getDriver().findElementsWithoutWaiting(By.cssSelector(".application-label"))) {
+            if (elem.isDisplayed()) {
+                applications.add(elem.getText());
+            }
+        }
+
+        return applications;
     }
 }

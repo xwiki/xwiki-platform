@@ -147,5 +147,6 @@ Paragraphs are text elements separated by 2 or more new lines.
 |Simple paragraph|This is a paragraph|This is a paragraph
 |Paragraph on multiple lines|Paragraph on\\multiple lines|Paragraph on\\multiple lines
 |Two paragraphs|Paragraph one\\\\Paragraph two|Paragraph one\\\\Paragraph two
-|Parametrized paragraph|{{{(% style="text-align:center;color:blue" %)}}}\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph</content>
+|Parametrized paragraph|{{{(% style="text-align:center;color:blue" %)}}}\\Centered and blue paragraph|(% style="text-align:center;color:blue" %)\\Centered and blue paragraph
+|span on some portion of the paragraph content|paragraph with {{{(% style="color:red" %)}}}red{{{(%%)}}} span inside|paragraph with (% style="color:red" %)red(%%) span inside</content>
 </xwikidoc>

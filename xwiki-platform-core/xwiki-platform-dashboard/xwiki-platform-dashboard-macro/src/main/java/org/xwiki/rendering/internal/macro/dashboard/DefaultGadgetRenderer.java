@@ -22,13 +22,14 @@ package org.xwiki.rendering.internal.macro.dashboard;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
@@ -54,6 +55,10 @@ public class DefaultGadgetRenderer implements GadgetRenderer
      */
     protected static final String ID = "id";
 
+    @Inject
+    @Named("empty")
+    private XDOMChecker emptyXDOMChecker;
+
     @Override
     public List<Block> decorateGadget(Gadget gadget)
     {
@@ -61,7 +66,7 @@ public class DefaultGadgetRenderer implements GadgetRenderer
 
         // We only decorate the gadget if it has some content. This allows to dynamically decide whether to display
         // a gadget or not.
-        if (!isContentEmpty(gadget.getContent())) {
+        if (!this.emptyXDOMChecker.check(gadget.getContent())) {
             // prepare the title of the gadget, in a heading 2
             HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL1);
             titleBlock.setParameter(CLASS, "gadget-title");
@@ -86,30 +91,5 @@ public class DefaultGadgetRenderer implements GadgetRenderer
         }
 
         return result;
-    }
-
-    /**
-     * @param contentBlocks the blocks resulting from the execution of the gadget content
-     * @return true on the following conditions:
-     *         <ul>
-     *           <li>There are no blocks</li>
-     *           <li>There's only 1 block, it's a {@link org.xwiki.rendering.block.MacroMarkerBlock} and it doesn't
-     *               have children</li>
-     *         </ul>
-     */
-    private boolean isContentEmpty(List<Block> contentBlocks)
-    {
-        boolean result = false;
-        if (contentBlocks.isEmpty()
-            || (contentBlocks.size() == 1 && isMacroMarkerBlockAndEmpty(contentBlocks.get(0))))
-        {
-            result = true;
-        }
-        return result;
-    }
-
-    private boolean isMacroMarkerBlockAndEmpty(Block block)
-    {
-        return block instanceof MacroMarkerBlock && block.getChildren().isEmpty();
     }
 }

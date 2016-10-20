@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetRenderer;
@@ -56,24 +57,59 @@ public class DefaultGadgetRenderer implements GadgetRenderer
     @Override
     public List<Block> decorateGadget(Gadget gadget)
     {
-        // prepare the title of the gadget, in a heading 2
-        HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL1);
-        titleBlock.setParameter(CLASS, "gadget-title");
+        List<Block> result;
 
-        // And then the content wrapped in a group block with class, to style it
-        GroupBlock contentGroup = new GroupBlock();
-        contentGroup.setParameter(CLASS, "gadget-content");
-        contentGroup.addChildren(gadget.getContent());
+        // We only decorate the gadget if it has some content. This allows to dynamically decide whether to display
+        // a gadget or not.
+        if (!isContentEmpty(gadget.getContent())) {
+            // prepare the title of the gadget, in a heading 2
+            HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL1);
+            titleBlock.setParameter(CLASS, "gadget-title");
 
-        // and wrap everything in a container, to give it a class
-        GroupBlock gadgetBlock = new GroupBlock();
-        String idPrefix = "gadget";
-        gadgetBlock.setParameter(CLASS, idPrefix);
-        // put an underscore here because it doesn't hurt at this level and it helps scriptaculous on the frontend
-        gadgetBlock.setParameter(ID, idPrefix + "_" + gadget.getId());
-        gadgetBlock.addChild(titleBlock);
-        gadgetBlock.addChild(contentGroup);
+            // And then the content wrapped in a group block with class, to style it
+            GroupBlock contentGroup = new GroupBlock();
+            contentGroup.setParameter(CLASS, "gadget-content");
+            contentGroup.addChildren(gadget.getContent());
 
-        return Collections.<Block> singletonList(gadgetBlock);
+            // and wrap everything in a container, to give it a class
+            GroupBlock gadgetBlock = new GroupBlock();
+            String idPrefix = "gadget";
+            gadgetBlock.setParameter(CLASS, idPrefix);
+            // put an underscore here because it doesn't hurt at this level and it helps scriptaculous on the frontend
+            gadgetBlock.setParameter(ID, idPrefix + "_" + gadget.getId());
+            gadgetBlock.addChild(titleBlock);
+            gadgetBlock.addChild(contentGroup);
+
+            result = Collections.singletonList(gadgetBlock);
+        } else {
+            result = Collections.emptyList();
+        }
+
+        return result;
+    }
+
+    /**
+     * @param contentBlocks the blocks resulting from the execution of the gadget content
+     * @return true on the following conditions:
+     *         <ul>
+     *           <li>There are no blocks</li>
+     *           <li>There's only 1 block, it's a {@link org.xwiki.rendering.block.MacroMarkerBlock} and it doesn't
+     *               have children</li>
+     *         </ul>
+     */
+    private boolean isContentEmpty(List<Block> contentBlocks)
+    {
+        boolean result = false;
+        if (contentBlocks.isEmpty()
+            || (contentBlocks.size() == 1 && isMacroMarkerBlockAndEmpty(contentBlocks.get(0))))
+        {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean isMacroMarkerBlockAndEmpty(Block block)
+    {
+        return block instanceof MacroMarkerBlock && block.getChildren().isEmpty();
     }
 }

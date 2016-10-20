@@ -93,6 +93,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-image': 1,
     'xwiki-link': 1,
     'xwiki-macro': 1,
+    'xwiki-maximize': 1,
     'xwiki-save': 1,
     'xwiki-source': 1,
     'xwiki-table': 1

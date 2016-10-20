@@ -676,7 +676,9 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>/*
+      <code>#template('colorThemeInit.vm')
+
+/*
 #set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono'))
 #if ("$!ckeditorSkinPath" == '')
   ## Before 6.3RC1
@@ -728,11 +730,6 @@ a.cke_button_disabled &gt; span.cke_button_icon.loading {
   background-position: 0 0 !important;
 }
 
-.fullScreenEditLinkContainer {
-  /* See XWIKI-5864 (Possibility to not add the maximize button for some certain textareas). */
-  display: none;
-}
-
 .ckeditor-textarea.loading {
   border: 0 none;
   box-shadow: none;
@@ -749,6 +746,31 @@ body &gt; .modal-backdrop {
 /* The modal can be nested inside the body while the backdrop is always a direct child of body. */
 body .modal {
   z-index: 10050;
+}
+
+/**
+ * Full-screen styles.
+ */
+
+.fullScreenEditLinkContainer {
+  /* See XWIKI-5864 (Possibility to not add the maximize button for some certain textareas). */
+  display: none;
+}
+
+.cke_maximized .buttons {
+  background-color: $theme.backgroundSecondaryColor;
+  padding: .5em;
+}
+
+/* The 'skin-flamingo' class name is removed from the body element in full-screen mode so we need to fix the auto-save 
+  styles. */
+.cke_maximized #autosaveControl input.autosave-frequency {
+  width: 3em;
+}
+
+/* Make sure the notifications are visible in full-screen mode (e.g. for Save &amp; Continue action) */
+body[data-maximized] .xnotification-container {
+  z-index: 9996;
 }
 
 /**

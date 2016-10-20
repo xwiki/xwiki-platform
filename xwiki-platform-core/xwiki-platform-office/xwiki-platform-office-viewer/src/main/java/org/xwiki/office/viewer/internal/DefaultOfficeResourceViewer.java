@@ -77,7 +77,8 @@ import org.xwiki.url.ExtendedURL;
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeResourceViewer}.
  * 
- * @since 5.4.6/6.2.2
+ * @since 5.4.6
+ * @since 6.2.2
  * @version $Id$
  */
 @Component
@@ -227,7 +228,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         if (expandedMacro != null) {
             Block parent = expandedMacro.getParent();
             if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
-                MetaDataBlock metaData = new MetaDataBlock(Collections.emptyList());
+                MetaDataBlock metaData = new MetaDataBlock(Collections.<Block>emptyList());
                 // Use a syntax that supports relative path resource references (we use relative paths to include the
                 // temporary files).
                 metaData.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.XWIKI_2_1);

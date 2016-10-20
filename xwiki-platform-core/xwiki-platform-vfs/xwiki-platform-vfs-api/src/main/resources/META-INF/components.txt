@@ -7,6 +7,7 @@ org.xwiki.vfs.internal.CascadingVfsPermissionChecker
 org.xwiki.vfs.internal.DefaultVfsPermissionChecker
 org.xwiki.vfs.internal.DefaultVfsManager
 org.xwiki.vfs.internal.URIVfsResourceReferenceSerializer
+org.xwiki.vfs.internal.DefaultVfsPathFactory
 org.xwiki.vfs.internal.attach.AttachURIVfsResourceReferenceSerializer
 org.xwiki.vfs.internal.attach.AttachVfsPermissionChecker
 org.xwiki.vfs.internal.attach.AttachVfsResourceReferenceSerializer

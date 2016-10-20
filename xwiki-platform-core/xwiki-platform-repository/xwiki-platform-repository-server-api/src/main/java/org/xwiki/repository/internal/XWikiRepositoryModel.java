@@ -195,7 +195,7 @@ public class XWikiRepositoryModel
 
         public ExtensionSolrField(String name, String type, Float boostValue)
         {
-            super(toExtensionClassSolrPropertyName(name, type),
+            super(toExtensionClassSolrPropertyName(name, type), toExtensionClassSolrOrderPropertyName(name, type),
                 type != null ? toExtensionClassSolrPropertyName(name) : null, boostValue);
         }
     }
@@ -210,6 +210,7 @@ public class XWikiRepositoryModel
         public RatingSolrField(String name, String type, Float boostValue)
         {
             super(toAverageRatingClassSolrPropertyName(name, type),
+                toAverageRatingClassSolrOrderPropertyName(name, type),
                 type != null ? toAverageRatingClassSolrPropertyName(name) : null, boostValue);
         }
     }
@@ -218,13 +219,16 @@ public class XWikiRepositoryModel
     {
         public final String name;
 
+        public final String orderName;
+
         public final String boostName;
 
         public final Float boostValue;
 
-        public SolrField(String name, String boostName, Float boostValue)
+        public SolrField(String name, String orderName, String boostName, Float boostValue)
         {
             this.name = name;
+            this.orderName = orderName;
             this.boostName = boostName;
             this.boostValue = boostValue;
         }
@@ -240,7 +244,7 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new ExtensionSolrField(PROP_EXTENSION_SUMMARY, 6.0f));
 
         // We only search in the description but we don't retrieve it (because it's not stored in a stable field)
-        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(PROP_EXTENSION_DESCRIPTION, null, 5.0f));
+        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(PROP_EXTENSION_DESCRIPTION, null, null, 5.0f));
 
         // Not very interesting for fulltext search
         SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new ExtensionSolrField(PROP_EXTENSION_AUTHORS, null));
@@ -289,6 +293,11 @@ public class XWikiRepositoryModel
         return toExtensionClassSolrPropertyName(propertyName) + '_' + type;
     }
 
+    public static String toExtensionClassSolrOrderPropertyName(String propertyName, String type)
+    {
+        return toExtensionClassSolrPropertyName(propertyName) + "_sort" + StringUtils.capitalize(type);
+    }
+
     public static String toAverageRatingClassSolrPropertyName(String propertyName)
     {
         return "property." + AVERAGERATING_CLASSNAME + '.' + propertyName;
@@ -297,6 +306,11 @@ public class XWikiRepositoryModel
     public static String toAverageRatingClassSolrPropertyName(String propertyName, String type)
     {
         return toAverageRatingClassSolrPropertyName(propertyName) + '_' + type;
+    }
+
+    public static String toAverageRatingClassSolrOrderPropertyName(String propertyName, String type)
+    {
+        return toAverageRatingClassSolrPropertyName(propertyName) + "_sort" + StringUtils.capitalize(type);
     }
 
     public static String toSolrField(String restField)
@@ -308,6 +322,17 @@ public class XWikiRepositoryModel
         }
 
         return field.name;
+    }
+
+    public static String toSolrOrderField(String restField)
+    {
+        SolrField field = SOLR_FIELDS.get(restField);
+
+        if (field == null) {
+            return null;
+        }
+
+        return field.orderName;
     }
 
     /**

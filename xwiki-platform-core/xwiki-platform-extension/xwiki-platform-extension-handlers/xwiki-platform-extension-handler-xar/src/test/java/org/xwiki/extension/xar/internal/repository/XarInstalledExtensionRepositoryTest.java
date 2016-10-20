@@ -19,7 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.repository;
 
-import org.junit.Assert;
+import java.util.Arrays;
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,9 +30,13 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
-import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @AllComponents
 public class XarInstalledExtensionRepositoryTest
@@ -53,22 +59,33 @@ public class XarInstalledExtensionRepositoryTest
     @Test
     public void testInit() throws ResolveException, SearchException
     {
-        Assert.assertTrue(this.installedExtensionRepository.countExtensions() == 1);
+        assertEquals(1, this.installedExtensionRepository.countExtensions());
 
-        Assert
-        .assertNotNull(this.installedExtensionRepository.resolve(new ExtensionId("xarinstalledextension", "1.0")));
-        
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension(new ExtensionId(
-            "xarinstalledextension", "1.0")));
-        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("xarinstalledextension", null));
-        Assert.assertNull(this.installedExtensionRepository.getInstalledExtension("notexisting", null));
+        XarInstalledExtension xarInstalledExtension =
+            this.installedExtensionRepository.resolve(new ExtensionId("xarinstalledextension", "1.0"));
+        assertNotNull(xarInstalledExtension);
 
-        Assert.assertEquals(1, this.installedExtensionRepository.getInstalledExtensions().size());
-        Assert.assertEquals(1, this.installedExtensionRepository.getInstalledExtensions(null).size());
+        assertNotNull(
+            this.installedExtensionRepository.getInstalledExtension(new ExtensionId("xarinstalledextension", "1.0")));
+        assertNotNull(this.installedExtensionRepository.getInstalledExtension("xarinstalledextension", null));
+        assertNull(this.installedExtensionRepository.getInstalledExtension("notexisting", null));
 
-        Assert.assertEquals(1, this.installedExtensionRepository.search("xarinstalledextension", 0, -1).getSize());
-        Assert.assertEquals(1, this.installedExtensionRepository.search(null, 0, -1).getSize());
-        Assert.assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions("xarinstalledextension", null, 0, -1).getSize());
-        Assert.assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions(null, null, 0, -1).getSize());
+        assertEquals(1, this.installedExtensionRepository.getInstalledExtensions().size());
+        assertEquals(1, this.installedExtensionRepository.getInstalledExtensions(null).size());
+
+        assertEquals(1, this.installedExtensionRepository.search("xarinstalledextension", 0, -1).getSize());
+        assertEquals(1, this.installedExtensionRepository.search(null, 0, -1).getSize());
+        assertEquals(1, this.installedExtensionRepository
+            .searchInstalledExtensions("xarinstalledextension", null, 0, -1).getSize());
+        assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions(null, null, 0, -1).getSize());
+
+        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page")));
+        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("wiki2", "space", "page")));
+        assertEquals(Arrays.asList(xarInstalledExtension), this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ROOT)));
+        assertEquals(0, this.installedExtensionRepository
+            .getXarInstalledExtensions(new DocumentReference("xwiki", "space", "page", Locale.ENGLISH)).size());
     }
 }

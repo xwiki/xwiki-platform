@@ -475,59 +475,6 @@
                   }
                 },
                 "ignore": [
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method java.lang.String org.xwiki.skin.Resource<I extends org.xwiki.filter.input.InputSource>::getResourceName()",
-                    "justification": "Young API. Remember the external name of the resource"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::execute(org.xwiki.template.Template) throws java.lang.Exception",
-                    "justification": "Young API. Add helpers"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::executeNoException(org.xwiki.template.Template)",
-                    "justification": "Young API. Add helpers"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::getXDOM(org.xwiki.template.Template) throws java.lang.Exception",
-                    "justification": "Young API. Add helpers"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method org.xwiki.rendering.block.XDOM org.xwiki.template.TemplateManager::getXDOMNoException(org.xwiki.template.Template)",
-                    "justification": "Young API. Add helpers"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.template.TemplateManager::renderNoException(org.xwiki.template.Template, java.io.Writer)",
-                    "justification": "Young API. Add helpers"
-                 },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery)",
-                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::getFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
-                    "justification": "Align with ExtensionRepository API"
-                  },
-                  {
-                    "code": "java.method.exception.checkedAdded",
-                    "old": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery)",
-                    "new": "method org.xwiki.extension.repository.result.IterableResult<org.xwiki.extension.Extension> org.xwiki.platform.flavor.FlavorManager::searchFlavors(org.xwiki.platform.flavor.FlavorQuery) throws org.xwiki.extension.repository.search.SearchException",
-                    "justification": "Align with ExtensionRepository API"
-                  },
-                  {
-                    "code": "java.field.typeChanged",
-                    "old": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
-                    "new": "field org.xwiki.mail.script.AbstractMailScriptService.sessionFactory",
-                    "justification": "Was publicly exposing internal class"
-                  },
-                  {
-                    "code": "java.class.removed",
-                    "old": "class org.xwiki.resource.temporary.TemporaryResourceReference",
-                    "justification": "Not an actual breakage. The class has been moved from xwiki-platform-resource-default to xwiki-platform-resource-temporary module, under the same package."
-                  }
                 ]
               }
             }

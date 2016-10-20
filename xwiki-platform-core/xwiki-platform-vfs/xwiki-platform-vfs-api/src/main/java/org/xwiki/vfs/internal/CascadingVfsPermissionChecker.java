@@ -64,7 +64,7 @@ public class CascadingVfsPermissionChecker implements VfsPermissionChecker
             resolvedChecker =
                 componentManager.getInstance(VfsPermissionChecker.class, scheme);
         } catch (ComponentLookupException e) {
-            // Use the Generic permissio checker
+            // Use the Generic permission checker
             try {
                 resolvedChecker = componentManager.getInstance(VfsPermissionChecker.class);
             } catch (ComponentLookupException ee) {

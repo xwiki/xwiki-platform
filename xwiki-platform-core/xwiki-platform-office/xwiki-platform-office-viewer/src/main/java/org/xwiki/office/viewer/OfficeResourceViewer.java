@@ -29,7 +29,8 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * The component responsible for creating XDOM views from office resource.
  * 
  * @version $Id$
- * @since 5.4.6/6.2.2
+ * @since 5.4.6
+ * @since 6.2.2
  */
 @Role
 public interface OfficeResourceViewer

@@ -26,7 +26,13 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -38,15 +44,17 @@ import static org.junit.Assert.*;
  */
 public class MessageStreamScriptServiceTest
 {
+    private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
+
+    private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
+
     @Rule
     public MockitoComponentMockingRule<MessageStreamScriptService> mocker =
         new MockitoComponentMockingRule<>(MessageStreamScriptService.class);
 
     private MessageStreamScriptService streamService;
 
-    private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
-
-    private final DocumentReference targetGroup = new DocumentReference("wiki", "XWiki", "MyFriends");
+    private ExecutionContext executionContext;
 
     @Before
     public void configure() throws Exception
@@ -54,8 +62,8 @@ public class MessageStreamScriptServiceTest
         this.streamService = this.mocker.getComponentUnderTest();
 
         Execution execution = this.mocker.getInstance(Execution.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+        this.executionContext = new ExecutionContext();
+        when(execution.getContext()).thenReturn(this.executionContext);
     }
 
     @Test
@@ -150,5 +158,25 @@ public class MessageStreamScriptServiceTest
 
         assertFalse(this.streamService.deleteMessage("abc123"));
         assertEquals("error", this.streamService.getLastError().getMessage());
+    }
+
+    @Test
+    public void isActive() throws Exception
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        this.executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+
+        XWiki xwiki = mock(XWiki.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xwiki.getDocument(any(EntityReference.class), any(XWikiContext.class))).thenReturn(document);
+
+        BaseObject object = mock(BaseObject.class);
+        when(document.getXObject(any(EntityReference.class))).thenReturn(object);
+
+        when(object.getIntValue("active")).thenReturn(1);
+
+        assertTrue(this.streamService.isActive());
     }
 }

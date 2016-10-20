@@ -57,11 +57,21 @@
 #end
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
   #if("$!configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id)" != '')
-    #set($discard = $blacklistedApps.add($uix))
+    #set($discard = $blacklistedApps.add({'uix': $uix}))
   #else
-    #set($discard = $displayedApps.add($uix))
+    #set ($app = {'uix': $uix})
+    #set ($orderObj = $configDoc.getObject('PanelsCode.ApplicationsPanelOrderClass', 'applicationId', $uix.id))
+    #if ($orderObj)
+      #set ($discard = $app.put('order', $orderObj.getValue('order')))
+    #else
+      ## if order is not set, set MAX_INTEGER
+      #set ($discard = $app.put('order', 2147483647))
+    #end
+    #set ($discard = $displayedApps.add($app))
   #end
 #end
+## Sort the displayedApp
+#set ($displayedApps = $sorttool.sort($displayedApps, 'order'))
 ##########################
 ## Macro to display an application panel
 ##########################
@@ -75,15 +85,15 @@
         &lt;/div&gt;
         &lt;div class="panel-body"&gt;
           &lt;ul class="nav nav-pills applicationsPanel"&gt;
-            #foreach($uix in $apps)
-              #set($params = $uix.getParameters())
+            #foreach($app in $apps)
+              #set($params = $app.uix.getParameters())
               #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
                 #if ($params.icon.startsWith('icon:'))
                   #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
                 #else
                   #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
                 #end
-                &lt;li class="draggableApp" id="$uix.id"&gt;
+                &lt;li class="draggableApp" id="$app.uix.id"&gt;
                   &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
                 &lt;/li&gt;
               #end
@@ -216,9 +226,10 @@ require.config({
  ************************************/
 require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function($, xm) {
   /**
-   * Panel ID that contains the last selected application
+   * Selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort inner elements
+   * with drag &amp; drop.
    */
-  var lastDraggedObjectParent = false;
+  var sortableSelector = '.appsPanel &gt; div &gt; ul';
   
   /**
    * Helper to know if a dragged element is inside a container or not
@@ -232,34 +243,29 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
     return (currentAppOffset.left &gt;= containerOffset.left &amp;&amp; currentAppOffset.left &lt;= containerOffset.left + containerWidth
           &amp;&amp; currentAppOffset.top &gt;= containerOffset.top &amp;&amp; currentAppOffset.top &lt;= containerOffset.top + containerHeight);
   }
-  
-  /**
-   * Move an application from a list to the other
-   */
-  var moveToContainer = function(element, selector) {
-    initDragAndDrop($(element).clone().css('left', 0).css('top', 0).appendTo($(selector)));
-    $(element).remove();
-  }
 
   /**
-   * Save the black list configuration
+   * Save the black list and the order configuration
    */
   var save = function() {
+    // Generate the array that contains all the applications to have in the blacklist
     var blacklistElems = $('#blacklistedPanels li.draggableApp');
-    // Generate the JSON string that contains all the applications to have in the blacklist
-    var blacklist = '[';
+    var blacklist = [];
     for (var i = 0; i &lt; blacklistElems.length; ++i) {
-      if (i &gt; 0) {
-        blacklist += ',';
-      }
-      blacklist += "'" + blacklistElems[i].id + "'";
+      blacklist.push(blacklistElems[i].id);
     }
-    blacklist += ']';
+    // Generate the JSON array that contains the order of the displayed applications
+    var displaylistElems = $('#displayedPanels li.draggableApp');
+    var displaylistOrder = [];
+    for (var i = 0; i &lt;displaylistElems.length; ++i) {
+      displaylistOrder.push(displaylistElems[i].id);
+    }
     $.ajax({
       url: '$xwiki.getURL('PanelsCode.ApplicationsPanelConfigurationAjax', 'get', 'outputSyntax=plain')',
       data: {
         'form_token': xm['form_token'],
-        'blacklist': blacklist
+        'blacklist': JSON.stringify(blacklist),
+        'orderlist': JSON.stringify(displaylistOrder)
       },
       success: function(data, status) {
         if (data == 'SUCCESS') {
@@ -285,57 +291,42 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
     $(element).draggable({
       // Restrict the drag and drop to the '.appLists' container
       containment: '.appLists',
-      // Revert the drag and drop if the dragged element has not be moved to the other list
+      // Allow to drop the element in the sortable containers
+      connectToSortable: $(sortableSelector),
+      // Revert the drag and drop if the dragged element has not be moved to one of the valid containers
       revert: function(event) {
-        return !((isInContainer(this, 'displayedPanels') &amp;&amp; lastDraggedObjectParent == 'blacklistedPanels')
-            || (isInContainer(this, 'blacklistedPanels') &amp;&amp; lastDraggedObjectParent == 'displayedPanels'));
+        return !(isInContainer(this, 'displayedPanels') || isInContainer(this, 'blacklistedPanels'));
       },
       // On start
       start: function(event, ui) {
         // Set the z-index of the element to be on top of all the others
         $(this).css('z-index', 100);
-        // Save the parent of the element
-        lastDraggedObjectParent = $(this).parents()[2].id;
       },
-      // On stop: move the element to the other list
+      // On stop
       stop: function(event, ui) {
         // Reset the z-index
         $(this).css('z-index', 1);
-        if (lastDraggedObjectParent == 'displayedPanels' &amp;&amp; isInContainer(this, 'blacklistedPanels')) {
-          moveToContainer(this, '#blacklistedPanels &gt; div &gt; ul')
-        } else if (lastDraggedObjectParent == 'blacklistedPanels' &amp;&amp; isInContainer(this, 'displayedPanels')){
-          moveToContainer(this, '#displayedPanels &gt; div &gt; ul');
-        }
       }
     });
-  }
-  
-  /**
-   * Wait until all the DOM elements we want to initialize are ready.
-   * We cannot rely on $(window).load() or $(window).ready() because of the asynchronous nature of requirejs
-   * (see: http://requirejs.org/docs/api.html#pageload).
-   */
-  var waitDOMReady = function(callback) {
-    // if the dom elements that we want to initialize are not loaded
-    if ($('.draggableApp').length == 0) {
-      // then retry in 100ms
-      setTimeout(function(){waitDOMReady(callback);}, 100);
-    } else {
-       callback();
-    }
   }
 
   /**
    * First: init all applications marked with the 'draggableApp' class.
    */
-  waitDOMReady(function() {
+  $(document).ready(function() {
+    // Allow to sort, with a drag &amp; drop, elements inside their container
+    $(sortableSelector).sortable();
+    
+    // Allow drag &amp; drop between containers
     initDragAndDrop('.draggableApp');
     
+    // Allow reverting the changes
     $('#bt-revert').click(function(){
       // Refresh the page
       window.location.reload();
     });
     
+    // Redefine the save action
     $('#bt-save').click(save);
   });
 });

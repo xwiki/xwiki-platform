@@ -881,11 +881,8 @@ public class RepositoryManager implements Initializable, Disposable
     {
         Query query;
         try {
-            query =
-                this.queryManager.createQuery(
-                    "from doc.object(XWiki.XWikiUsers) as user"
-                        + " where user.first_name like :userfirstname OR user.last_name like :userlastname",
-                    Query.XWQL);
+            query = this.queryManager.createQuery("from doc.object(XWiki.XWikiUsers) as user"
+                + " where user.first_name like :userfirstname OR user.last_name like :userlastname", Query.XWQL);
 
             query.bindValue("userfirstname", '%' + authorElements[0] + '%');
             query.bindValue("userlastname", '%' + authorElements[authorElements.length - 1] + '%');
@@ -927,6 +924,9 @@ public class RepositoryManager implements Initializable, Disposable
         if (xobjects != null) {
             boolean deleteExistingObjects = false;
 
+            // Clone since we are going to modify and parse it at the same time
+            xobjects = new ArrayList(document.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE));
+
             for (int i = 0; i < xobjects.size(); ++i) {
                 BaseObject dependencyObject = xobjects.get(i);
 
@@ -951,16 +951,20 @@ public class RepositoryManager implements Initializable, Disposable
                             xobjectDependency
                                 .setRepositories(XWikiRepositoryModel.toRepositoryDescriptors(xobjectRepositories));
 
-                            ExtensionDependency dependency = dependencies.get(dependencyIndex);
+                            if (dependencies.size() > dependencyIndex) {
+                                ExtensionDependency dependency = dependencies.get(dependencyIndex);
 
-                            if (!dependency.equals(xobjectDependency)) {
-                                deleteExistingObjects = true;
+                                if (dependency.equals(xobjectDependency)) {
+                                    ++dependencyIndex;
 
-                                document.removeXObject(dependencyObject);
-                                needSave = true;
-                            } else {
-                                ++dependencyIndex;
+                                    continue;
+                                }
                             }
+
+                            deleteExistingObjects = true;
+
+                            document.removeXObject(dependencyObject);
+                            needSave = true;
                         }
                     }
                 }
@@ -1068,6 +1072,13 @@ public class RepositoryManager implements Initializable, Disposable
 
     protected boolean update(BaseObject object, String fieldName, Object value)
     {
+        // Make sure collection are lists
+        if (value instanceof Collection) {
+            if (!(value instanceof List)) {
+                value = new ArrayList<>((Collection) value);
+            }
+        }
+
         if (ObjectUtils.notEqual(value, getValue(object, fieldName))) {
             object.set(fieldName, value, this.xcontextProvider.get());
 

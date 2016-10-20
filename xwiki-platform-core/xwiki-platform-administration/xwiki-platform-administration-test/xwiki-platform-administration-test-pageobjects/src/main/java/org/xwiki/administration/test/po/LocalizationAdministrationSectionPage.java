@@ -19,6 +19,10 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -35,14 +39,18 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     private WebElement multiLingualSelect;
 
     @FindBy(id = "XWiki.XWikiPreferences_0_default_language")
-    private WebElement defaultLanguageInput;
+    private WebElement defaultLanguageSelect;
 
-    @FindBy(id = "XWiki.XWikiPreferences_0_languages")
-    private WebElement supportedLanguagesInput;
+    @FindBy(css = ".bootstrap-select")
+    private WebElement supportedLanguagesSelect;
 
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
+        // Wait for asynchronous widgets to be loaded
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".bootstrap-select"));
+        getDriver().waitUntilElementIsVisible(
+                By.cssSelector("select[name=\"XWiki.XWikiPreferences_0_default_language\"]"));
     }
 
     public void setMultiLingual(boolean isMultiLingual)
@@ -57,13 +65,18 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
 
     public void setDefaultLanguage(String defaultLanguage)
     {
-        this.defaultLanguageInput.clear();
-        this.defaultLanguageInput.sendKeys(defaultLanguage);
+        Select select = new Select(this.defaultLanguageSelect);
+        select.selectByValue(defaultLanguage);
     }
 
     public void setSupportedLanguages(String supportedLanguages)
     {
-        this.supportedLanguagesInput.clear();
-        this.supportedLanguagesInput.sendKeys(supportedLanguages);
+        setSupportedLanguages(Arrays.asList(supportedLanguages.split(",")));
+    }
+
+    public void setSupportedLanguages(List<String> supportedLanguages)
+    {
+        BootstrapSelect select = new BootstrapSelect(this.supportedLanguagesSelect, getDriver());
+        select.selectByValues(supportedLanguages);
     }
 }

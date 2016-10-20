@@ -41,6 +41,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
@@ -88,6 +89,9 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private ContextualAuthorizationManager authorization;
 
+    @Inject
+    private JobProgressManager progress;
+
     private volatile Set<String> allowedNamedQueries;
 
     @Override
@@ -117,7 +121,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 }
             }
         }
-        
+
         return this.allowedNamedQueries;
     }
 
@@ -153,6 +157,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
         String oldDatabase = getContext().getWikiId();
         try {
+            this.progress.startStep(query, "query.hql.progress.execute", "Execute HQL query [{}]", query);
+
             if (query.getWiki() != null) {
                 getContext().setWikiId(query.getWiki());
             }
@@ -178,6 +184,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             throw new QueryException("Exception while executing query", query, e);
         } finally {
             getContext().setWikiId(oldDatabase);
+
+            this.progress.endStep(query);
         }
     }
 

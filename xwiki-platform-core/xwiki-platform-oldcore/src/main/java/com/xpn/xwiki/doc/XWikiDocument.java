@@ -1123,7 +1123,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        getProgress().startStep(getDocumentReference(), "document.progress.render",
+        getProgress().startStep(this, "document.progress.render",
             "Render document [{}] in syntax [{}]", getDocumentReference(), targetSyntax);
 
         try {
@@ -1168,7 +1168,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return renderedContent;
         } finally {
             getProgress().popLevelProgress(getDocumentReference());
-            getProgress().endStep(getDocumentReference());
+            getProgress().endStep(this);
         }
     }
 
@@ -1268,7 +1268,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId,
         boolean restrictedTransformationContext, XWikiContext context)
     {
-        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, restrictedTransformationContext, this, context);
+        return getRenderedContent(text, sourceSyntaxId, targetSyntaxId, restrictedTransformationContext, null, context);
     }
 
     /**
@@ -1286,13 +1286,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         Map<String, Object> backup = null;
 
+        getProgress().startStep(this, "document.progress.renderText",
+            "Execute content [{}] in the context of document [{}]",
+            StringUtils.substring(text, 0, 100) + (text.length() >= 100 ? "..." : ""), getDocumentReference());
+
         XWikiDocument currentSDocument = (XWikiDocument) context.get(CKEY_SDOC);
         try {
-            // Remember what is the current caller document because #setAsContextDoc reset it
-            if (sDocument == null) {
-                sDocument = getCallerDocument(context);
-            }
-
             // We have to render the given text in the context of this document. Check if this document is already
             // on the context (same Java object reference). We don't check if the document references are equal
             // because this document can have temporary changes that are not present on the context document even if
@@ -1303,7 +1302,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 setAsContextDoc(context);
             }
 
-            // Make sure to execute the document with the right of the calling author
+            // Make sure to execute the document with the right of the provided sdocument's author
             if (sDocument != null) {
                 context.put(CKEY_SDOC, sDocument);
             }
@@ -1326,19 +1325,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 restoreContext(backup, context);
             }
             context.put(CKEY_SDOC, currentSDocument);
+
+            getProgress().endStep(this);
         }
 
         return "";
-    }
-
-    private XWikiDocument getCallerDocument(XWikiContext xcontext)
-    {
-        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
-        if (sdoc == null) {
-            sdoc = xcontext.getDoc();
-        }
-
-        return sdoc;
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
@@ -3866,6 +3857,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     // Currently the choice is not to merge the base class and object because it is not the prefered way
                     // of using external classes and objects.
                     mergeXObjects(templatedoc);
+
+                    // Copy the attachments from the template document.
+                    copyAttachments(templatedoc);
                 }
             }
         }

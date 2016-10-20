@@ -136,21 +136,20 @@ public class EditorWikiComponent<D> extends AbstractEditor<D> implements WikiCom
     @Override
     protected String render() throws EditException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiDocument previousSecurityDocument = (XWikiDocument) xcontext.get(SECURITY_DOCUMENT);
         try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+
             XWikiDocument editorDocument = xcontext.getWiki().getDocument(this.getDocumentReference(), xcontext);
             BaseObject editorObject = editorDocument.getXObject(EDITOR_CLASS_REFERENCE);
             String editorCode = editorObject.getStringValue("code");
             // Make sure the editor code is executed with the rights of the editor document author.
-            xcontext.put(SECURITY_DOCUMENT, editorDocument);
+            XWikiDocument sdoc = editorDocument;
             // Execute the editor code in the context of the current document (because the editor code needs to access
             // the data that has been put on the script context).
-            return xcontext.getDoc().getRenderedContent(editorCode, editorDocument.getSyntax().toIdString(), xcontext);
+            return xcontext.getDoc().getRenderedContent(editorCode, editorDocument.getSyntax().toIdString(), false,
+                sdoc, xcontext);
         } catch (Exception e) {
             throw new EditException("Failed to render the editor code.", e);
-        } finally {
-            xcontext.put(SECURITY_DOCUMENT, previousSecurityDocument);
         }
     }
 

@@ -121,7 +121,7 @@ public abstract class AbstractPackager
         }
 
         // Trigger extensions that need to initialize the database (create classes, etc.)
-        xwiki.updateDatabase(xcontext.getMainXWiki(), xcontext);
+        xwiki.initializeWiki(xcontext.getMainXWiki(), true, xcontext);
 
         return xcontext;
     }

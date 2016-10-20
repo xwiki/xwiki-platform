@@ -76,7 +76,7 @@ public class DefaultWikiCreator implements WikiCreator
 
         // Init database/schema
         try {
-            xwiki.updateDatabase(wikiId, true, true, context);
+            xwiki.initializeWiki(wikiId, true, context);
         } catch (Exception e) {
             throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate", wikiId), e);
         }

@@ -406,8 +406,14 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
             this.document.getRenderedContent("**bold**", "xwiki/2.0", getContext()));
     }
 
-    public void testGetRenderedContentTextRights()
+    public void testGetRenderedContentTextRights() throws XWikiException
     {
+        XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
+        otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));
+        XWikiDocument sdoc = new XWikiDocument(new DocumentReference("callerwiki", "callerspace", "callerpage"));
+        sdoc.setContentAuthorReference(new DocumentReference("callerwiki", "XWiki", "calleruser"));
+        Document apiDocument = this.document.newDocument(getContext());
+
         getContext().setDoc(null);
 
         String content =
@@ -416,41 +422,52 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         this.document.setContentAuthorReference(new DocumentReference("authorwiki", "XWiki", "contentauthor"));
 
-        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+        assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
 
         assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
 
-        XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
-        otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));
-
-        getContext().setDoc(otherDocument);
-
-        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+        assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
 
         assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
-
-        XWikiDocument sdoc = new XWikiDocument(new DocumentReference("callerwiki", "callerspace", "callerpage"));
-        sdoc.setContentAuthorReference(new DocumentReference("callerwiki", "XWiki", "calleruser"));
-        getContext().put("sdoc", sdoc);
-
-        getContext().setDoc(this.document);
-
-        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
-
-        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, otherDocument,
+                getContext()));
 
         getContext().setDoc(otherDocument);
 
-        assertEquals("<p>authorwiki:XWiki.contentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, getContext()));
+        assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+
+        assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
+
+        assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
+
+        getContext().put("sdoc", sdoc);
+        getContext().setDoc(this.document);
 
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, null, getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
+
+        getContext().setDoc(otherDocument);
+
+        assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
+
+        assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
+            apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
+
     }
 }

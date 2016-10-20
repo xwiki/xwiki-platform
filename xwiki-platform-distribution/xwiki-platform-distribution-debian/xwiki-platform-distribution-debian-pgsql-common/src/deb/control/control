@@ -3,7 +3,7 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-common (= [[version]]), postgresql, libpg-java
+Depends: xwiki-common (= [[version]]), postgresql, libpg-java, dbconfig-pgsql
 Provides: xwiki-database
 Suggests: xwiki-tomcat7-pgsql | xwiki-tomcat8-pgsql
 Replaces: xwiki-database

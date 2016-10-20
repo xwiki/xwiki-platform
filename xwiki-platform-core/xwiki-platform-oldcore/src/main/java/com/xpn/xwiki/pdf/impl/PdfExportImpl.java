@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -443,6 +444,9 @@ public class PdfExportImpl implements PdfExport
             SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
+
+            // Set the base URL so that CSS4J can resolve URLs in CSS. Use the current document in the XWiki Context
+            document.setBaseURL(new URL(context.getDoc().getExternalURL("view", context)));
 
             // Apply the style sheet
             document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));

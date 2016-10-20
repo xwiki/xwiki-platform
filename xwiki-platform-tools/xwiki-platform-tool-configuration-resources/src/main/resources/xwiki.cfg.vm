@@ -454,34 +454,6 @@ xwiki.plugins=$!xwikiCfgPlugins
 xwiki.plugin.image.cache.capacity=30
 
 #---------------------------------------
-# Calendar Plugin
-#
-
-#-# Calendar Prev/Next Month bounds.
-#-# The calendar generates links to the previous/next months for a limited range, by default 6 months back and 12 months
-#-# after. A value of 0 means that there is no limit in that direction.
-# xwiki.calendar.bound.prev=6
-# xwiki.calendar.bound.next=12
-
-#---------------------------------------
-# Lucene Plugin
-#
-
-#-# Lucene search engine
-#-# Location where to place the lucene index files. The default is the "lucene" subdirectory in XWiki's permanent data
-#-# directory. Change it if you want to store indexes in another place.
-# xwiki.plugins.lucene.indexdir=/usr/local/xwiki/lucene
-#-# The text analyzer to use for indexing.
-# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
-#-# The number of seconds to wait between reindexes. A smaller value ensures that new documents will be indexed faster,
-#-# but with a minor performance reduction. Adjust according to your wiki load.
-# xwiki.plugins.lucene.indexinterval=20
-#-# The maximum size of the indexing queue. After this limit is reached, the reindex thread will have to wait until the
-#-# queue is consumed. Note that this does not affect documents submitted through the notification mechanism, only the
-#-# full reindex option.
-# xwiki.plugins.lucene.maxQueueSize=1000
-
-#---------------------------------------
 # Activity Stream Plugin
 #
 

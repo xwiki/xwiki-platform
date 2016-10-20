@@ -22,6 +22,7 @@ package org.xwiki.vfs.internal.script;
 import java.net.URI;
 import java.nio.file.Path;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -29,11 +30,14 @@ import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.vfs.VfsException;
+import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
 
 import net.java.truevfs.access.TPath;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -49,7 +53,7 @@ public class PathConverterTest
         new MockitoComponentMockingRule<>(PathConverter.class);
 
     @Test
-    public void convertOk() throws Exception
+    public void convertWhenOk() throws Exception
     {
         ResourceReferenceSerializer<VfsResourceReference, URI> serializer = this.mocker.getInstance(
             new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
@@ -64,7 +68,7 @@ public class PathConverterTest
     }
 
     @Test
-    public void convertError() throws Exception
+    public void convertWhenError() throws Exception
     {
         ResourceReferenceSerializer<VfsResourceReference, URI> serializer = this.mocker.getInstance(
             new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
@@ -79,6 +83,29 @@ public class PathConverterTest
         } catch (ConversionException expected) {
             assertEquals("Failed to convert [attach:Sandbox.WebHome@my.zip/a/b/c] to a Path object",
                 expected.getMessage());
+        }
+    }
+
+    @Test
+    public void convertWhenNoPermission() throws Exception
+    {
+        ResourceReferenceSerializer<VfsResourceReference, URI> serializer = this.mocker.getInstance(
+            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, VfsResourceReference.class,
+                URI.class), "truevfs");
+        VfsResourceReference reference = new VfsResourceReference(URI.create("attach:Sandbox.WebHome@my.zip"), "a/b/c");
+        when(serializer.serialize(reference)).thenReturn(URI.create("attach://xwiki:Sandbox.WebHome/my.zip/a/b/c"));
+
+        VfsPermissionChecker permissionChecker = this.mocker.getInstance(VfsPermissionChecker.class, "cascading");
+        doThrow(new VfsException("unauthorized")).when(permissionChecker).checkPermission(reference);
+
+        try {
+            this.mocker.getComponentUnderTest().convert(new DefaultParameterizedType(null, Path.class),
+                "attach:Sandbox.WebHome@my.zip/a/b/c");
+            fail("Should have thrown an exception here");
+        } catch (ConversionException expected) {
+            assertEquals("Failed to convert [attach:Sandbox.WebHome@my.zip/a/b/c] to a Path object",
+                expected.getMessage());
+            assertEquals("VfsException: unauthorized", ExceptionUtils.getRootCauseMessage(expected));
         }
     }
 }

@@ -25,7 +25,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Some unit tests for {@link org.xwiki.tool.packager.PackageMojo}.
+ * Unit tests for {@link org.xwiki.tool.packager.PackageMojo}.
  *
  * @version $Id$
  * @since 6.2
@@ -39,7 +39,7 @@ public class PackageMojoTest
         context.put("xwikiDataDir", "/some/path");
         PackageMojo mojo = new PackageMojo();
 
-        // We test 2 several things here:
+        // We test several things here:
         // - that ${xwikiDataDir} is going to be replaced
         // - that $XWIKI_OPTS, $XWIKI_DATA_DIR and $XWIKI_PID are not going to be modified
         // - that $! is not going to be modified either

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Filter.FilterStreamJob" locale="">
   <web>Filter</web>
   <name>FilterStreamJob</name>
   <language/>
@@ -30,150 +30,49 @@
   <creationDate>1383901486000</creationDate>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384437477000</date>
-  <contentUpdateDate>1384436951000</contentUpdateDate>
+  <date>1475764483000</date>
+  <contentUpdateDate>1475764483000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if ($xcontext.action == 'view')
-  ## Include
-  #set ($discard = $xwiki.jsx.use('Filter.FilterStreamJob'))
-  (%id="filter_job_status"%)((()))
-#end
+  <content>{{template name="job_macros.vm"/}}
+
+{{velocity output="false"}}
+#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
 {{/velocity}}
 
-{{velocity wiki="false"}}
-#if ($xcontext.action == 'get')
-  ## Ajax
-
+{{velocity}}
+{{html}}
   &lt;div id="filter_job_status"&gt;
     #set($job = $services.filter.currentJob)
     #if ($job)
-      ## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
-      ## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
-      ## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
-      ## but unfortunately this doesn't allow the template to be overridden from the skin.
-      #evaluate("#include('extension.vm')")
-
-      &lt;div class="extension-body"&gt;
-      Progress
-      &lt;div&gt;
+      #set ($jobStatusURL = $xwiki.getURL('FilterStreamJobJSON', 'get', $escapetool.url({
+        'outputSyntax': 'plain'
+      })))
+      &lt;div class="xcontent job-status" data-url="$jobStatusURL"&gt;
         #set($jobStatus = $job.status)
-        #if ($jobStatus.state.name() == 'RUNNING')
+        #set($finished = $jobStatus.state.name() == 'FINISHED')
+        #if (!$finished)
           #displayJobProgressBar($jobStatus)
+        #else
+          #if ($jobStatus.log.getLogs('ERROR').isEmpty())
+            &lt;div class="box successmessage"&gt;
+              Done.
+            &lt;/div&gt;
+          #else
+            &lt;div class="box errormessage"&gt;
+              Error has been found during the conversion !
+            &lt;/div&gt;
+          #end
         #end
-        #printStatusLog($jobStatus)
-      &lt;/div&gt;
+        #displayJobStatusLog($jobStatus true)
       &lt;/div&gt;
     #end
   &lt;/div&gt;
-#end
+{{/html}}
 {{/velocity}}</content>
-  <object>
-    <name>Filter.FilterStreamJob</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>0133c9ad-7236-47a8-8a98-d2db76645ac5</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>new Ajax.PeriodicalUpdater('filter_job_status', '${xwiki.getURL('FilterStreamJob', 'get')}', {
-    parameters:
-      {
-        type: this.value,
-        outputSyntax: 'plain',
-        input: 'true'
-      }
-  });</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
 </xwikidoc>

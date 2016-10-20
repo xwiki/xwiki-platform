@@ -149,8 +149,22 @@
 #end
 
 #macro (displayAppPanelEntries $extensionPointId $configDoc)
+  ## Get all UIX and sort them
+  #set ($apps = [])
   #foreach ($uix in $services.uix.getExtensions($extensionPointId, {'sortByParameter': 'label'}))
-    #maybeDisplayAppPanelEntry($uix $configDoc)
+    #set ($app = {'uix': $uix})
+    #set ($orderObj = $configDoc.getObject('PanelsCode.ApplicationsPanelOrderClass', 'applicationId', $uix.id))
+    #if ($orderObj)
+      #set ($discard = $app.put('order', $orderObj.getValue('order')))
+    #else
+      ## if order is not set, set MAX_INTEGER
+      #set ($discard = $app.put('order', 2147483647))
+    #end
+    #set ($discard = $apps.add($app))
+  #end
+  ## Sort the apps
+  #foreach ($app in $sorttool.sort($apps, 'order'))
+    #maybeDisplayAppPanelEntry($app.uix, $configDoc)
   #end
 #end
 {{/velocity}}

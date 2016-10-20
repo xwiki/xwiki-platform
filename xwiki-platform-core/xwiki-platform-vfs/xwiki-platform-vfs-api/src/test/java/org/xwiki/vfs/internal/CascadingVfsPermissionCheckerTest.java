@@ -23,6 +23,9 @@ import java.net.URI;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
@@ -67,6 +70,15 @@ public class CascadingVfsPermissionCheckerTest
     public void checkPermissionWithAttachSchemeChecker() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(URI.create("attach:whatever"), "whatever");
+
+        AttachmentReferenceResolver<String> resolver =
+            this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING);
+        DocumentReference attachmentDocumentReference = new DocumentReference("wiki", "space", "page");
+        when(resolver.resolve("whatever")).thenReturn(new AttachmentReference("file", attachmentDocumentReference));
+
+        ContextualAuthorizationManager authorizationManager =
+            this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.VIEW, attachmentDocumentReference)).thenReturn(true);
 
         this.mocker.getComponentUnderTest().checkPermission(reference);
     }

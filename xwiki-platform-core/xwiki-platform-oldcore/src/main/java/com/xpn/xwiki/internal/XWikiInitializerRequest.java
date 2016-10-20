@@ -35,7 +35,7 @@ public class XWikiInitializerRequest extends AbstractRequest
      */
     public XWikiInitializerRequest()
     {
-        setId("xwiki");
+        setId("initialization", "xwiki");
         setInteractive(false);
     }
 

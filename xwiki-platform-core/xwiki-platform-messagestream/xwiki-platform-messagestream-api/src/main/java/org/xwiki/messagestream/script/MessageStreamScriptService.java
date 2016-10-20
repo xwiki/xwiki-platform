@@ -25,9 +25,18 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.messagestream.MessageStream;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Service exposing the {@link MessageStream} functionality, allowing to post messages from the current user.
@@ -43,6 +52,10 @@ public class MessageStreamScriptService implements ScriptService
      * The key under which the last encountered error is stored in the current execution context.
      */
     static final String ERROR_KEY = "scriptservice.messageStream.error";
+
+    private static final EntityReference CONFIG_DOCUMENT_REFERENCE =
+        new EntityReference("MessageStreamConfig", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE));
 
     /**
      * Provides access to the current context.
@@ -140,6 +153,36 @@ public class MessageStreamScriptService implements ScriptService
             setError(e);
             return false;
         }
+    }
+
+    /**
+     * @return true if the Message Stream feature is active or false otherwise
+     * @since 8.4RC1
+     */
+    @Unstable
+    public boolean isActive()
+    {
+        boolean result = false;
+
+        // TODO: Introduce a MessageStreamConfiguration class
+        try {
+            ExecutionContext ec = this.execution.getContext();
+            if (ec != null) {
+                XWikiContext xcontext = (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+                if (xcontext != null) {
+                    XWiki xwiki = xcontext.getWiki();
+                    XWikiDocument configDocument = xwiki.getDocument(CONFIG_DOCUMENT_REFERENCE, xcontext);
+                    BaseObject configObject = configDocument.getXObject(CONFIG_DOCUMENT_REFERENCE);
+                    int active = configObject.getIntValue("active");
+                    result = (active == 1);
+                }
+            }
+        } catch (Exception e) {
+            setError(e);
+            return false;
+        }
+
+        return result;
     }
 
     /**

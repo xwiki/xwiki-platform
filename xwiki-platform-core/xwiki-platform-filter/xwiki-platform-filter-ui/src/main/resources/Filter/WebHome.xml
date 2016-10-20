@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="Filter.WebHome" locale="">
   <web>Filter</web>
   <name>WebHome</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1417442821000</date>
-  <contentUpdateDate>1417442821000</contentUpdateDate>
+  <date>1475761760000</date>
+  <contentUpdateDate>1475761760000</contentUpdateDate>
   <version>1.1</version>
   <title>Filter streams</title>
   <comment/>
@@ -40,13 +40,6 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{warning}}Filter module is still young and experimental and while exporting should be safe enough, importing can be more risky for the current instance.{{/warning}}
-
-{{template name="extension.vm" output="false"/}}
-
-{{velocity output="false"}}
-#set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
-{{/velocity}}
 
 {{include reference="FilterStreamDescriptorForm"/}}
 
@@ -99,7 +92,9 @@
       #set($job = $services.filter.startConvert($input, $inputProperties, $output, $outputProperties))
     #end
     #if ($job)
-      {{success}}Conversion started.{{/success}}
+      #if (!$sourceStandardInput)
+        {{success}}Conversion started.{{/success}}
+      #end
     #else
       #set ($lastError = $services.filter.lastError)
       #if ($lastError)
@@ -118,49 +113,61 @@
 #end
 {{/velocity}}
 
+== Current conversion
+
 {{include reference="FilterStreamJob"/}}
+
+== Configuration ==
 
 {{velocity}}
 {{html}}
 &lt;form class="xform" method="post"&gt;
 &lt;div id="filter_form"&gt;
-  &lt;dl&gt;
-    &lt;dt&gt;&lt;label for="filter_input_select"&gt;Input type&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;select name="input" id="filter_input_type"&gt;
-        #foreach($type in $services.filter.availableInputStreams)
-          &lt;option value="$escapetool.xml($type.serialize())"#if($type.serialize() == $input)selected="selected"#end&gt;$services.filter.getInputFilterStreamDescriptor($type).name ($type)&lt;/option&gt;
-          #if (!$input)
-            #set($input = $type.serialize())
+  &lt;fieldset&gt;
+    &lt;legend&gt;Input&lt;/legend&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="filter_input_select"&gt;Input type&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select name="input" id="filter_input_type"&gt;
+          #foreach($type in $services.filter.availableInputStreams)
+            &lt;option value="$escapetool.xml($type.serialize())"#if($type.serialize() == $input)selected="selected"#end&gt;$services.filter.getInputFilterStreamDescriptor($type).name ($type)&lt;/option&gt;
+            #if (!$input)
+              #set($input = $type.serialize())
+            #end
           #end
-        #end
-      &lt;/select&gt;
-    &lt;/dd&gt;
-    #if ($input)
-    &lt;dt&gt;&lt;label&gt;Input configuration&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-      #filterDescriptorForm($services.filter.getInputFilterStreamDescriptor($input), 'filter_input_properties')
-    &lt;/dd&gt;
-    #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+      #if ($input)
+      &lt;dt&gt;&lt;label&gt;Input configuration&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        #filterDescriptorForm($services.filter.getInputFilterStreamDescriptor($input), 'filter_input_properties')
+      &lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  &lt;/fieldset&gt;
 
-    &lt;dt&gt;&lt;label for="filter_output_select"&gt;Output type&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-      &lt;select name="output" id="filter_output_type"&gt;
-        #foreach($type in $services.filter.availableOutputStreams)
-          &lt;option value="$escapetool.xml($type.serialize())"#if($type.serialize() == $output)selected="selected"#end&gt;$services.filter.getOutputFilterStreamDescriptor($type).name ($type)&lt;/option&gt;
-          #if (!$output)
-            #set($output = $type.serialize())
+  &lt;fieldset&gt;
+    &lt;legend&gt;Output&lt;/legend&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="filter_output_select"&gt;Output type&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select name="output" id="filter_output_type"&gt;
+          #foreach($type in $services.filter.availableOutputStreams)
+            &lt;option value="$escapetool.xml($type.serialize())"#if($type.serialize() == $output)selected="selected"#end&gt;$services.filter.getOutputFilterStreamDescriptor($type).name ($type)&lt;/option&gt;
+            #if (!$output)
+              #set($output = $type.serialize())
+            #end
           #end
-        #end
-      &lt;/select&gt;
-    &lt;/dd&gt;
-    #if ($output)
-    &lt;dt&gt;&lt;label&gt;Output configuration&lt;/label&gt;&lt;/dt&gt;
-    &lt;dd&gt;
-      #filterDescriptorForm($services.filter.getOutputFilterStreamDescriptor($output), 'filter_output_properties')
-    &lt;/dd&gt;
-    #end
-  &lt;/dl&gt;
+        &lt;/select&gt;
+      &lt;/dd&gt;
+      #if ($output)
+      &lt;dt&gt;&lt;label&gt;Output configuration&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        #filterDescriptorForm($services.filter.getOutputFilterStreamDescriptor($output), 'filter_output_properties')
+      &lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  &lt;/fieldset&gt;
 
   &lt;p&gt;
   &lt;input class="button" type="submit" name="convert" value="Convert"/&gt;
@@ -193,14 +200,16 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -238,7 +247,7 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>

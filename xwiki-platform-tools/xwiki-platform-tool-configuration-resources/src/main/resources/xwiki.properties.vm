@@ -421,8 +421,10 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
 #-# When not set the following is taken (in this order):
-# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+# extension.repositories=maven-xwikicom:maven:https://nexus.xwiki.com/nexus/content/repositories/public-store-releases
+# extension.repositories=store.xwiki.com:maven:https://store.xwiki.com/xwiki/rest/
+# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
 #-# 
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=

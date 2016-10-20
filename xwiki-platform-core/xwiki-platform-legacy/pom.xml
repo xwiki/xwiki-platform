@@ -50,32 +50,6 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Skip aspectj when in M2Eclipse, it's useless, slow and a bad practice anyway to develop with deprecated methods. Plus it make the build failed when AJDT is not installed. -->
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <versionRange>[1.6,)</versionRange>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
         <!-- Apply Backward compatibility Aspects using the strategy described at
           http://blogs.sonatype.com/john/2007/11/09/1194630418546.html -->
         <plugin>

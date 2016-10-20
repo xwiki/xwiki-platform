@@ -221,7 +221,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
         try {
             // The following method call also clones the execution context.
-            documentAccessBridge.pushDocumentInContext(backupObjects, document.getDocumentReference());
+            documentAccessBridge.pushDocumentInContext(backupObjects, document);
             // Make sure to synchronize the context wiki with the context document's wiki.
             modelContext.setCurrentEntityReference(document.getDocumentReference().getWikiReference());
             return display(document, nameSpace, parameters);

@@ -1,4 +1,4 @@
-#set($jobstatus = $xwiki.jobStatus)
+#set($jobstatus = $xwiki.currentInitializerJobStatus)
 #set($errors = $jobstatus.log.getLogsFrom('ERROR'))
 #set($hasErrors = !$errors.isEmpty())
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -11,13 +11,25 @@
         #set($percent = $jobstatus.progress.offset * 100)
         #set($percent = $percent.intValue())
       #end
-      <title>$services.localization.render('platform.web.init.message.intializing', $percent)</title>
+      #if ($jobstatus.request.wikiId)
+        <title>$services.localization.render('platform.web.init.message.wiki.initializing', [$jobstatus.request.wikiId, $percent])</title>
+      #else
+        <title>$services.localization.render('platform.web.init.message.initializing', [$percent])</title>
+      #end
       <meta http-equiv="refresh" content="1"/>
     #else
       #if ($hasErrors)
-        <title>$services.localization.render('platform.web.init.message.intializationFailure')</title>
+        #if ($jobstatus.request.wikiId)
+          <title>$services.localization.render('platform.web.init.message.wiki.initializationFailure', [$jobstatus.request.wikiId])</title>
+        #else
+          <title>$services.localization.render('platform.web.init.message.initializationFailure')</title>
+        #end
       #else
-        <title>$services.localization.render('platform.web.init.message.intializationSuccess')</title>
+        #if ($jobstatus.request.wikiId)
+          <title>$services.localization.render('platform.web.init.message.wiki.initializationSuccess', [$jobstatus.request.wikiId])</title>
+        #else
+          <title>$services.localization.render('platform.web.init.message.initializationSuccess')</title>
+        #end
         <meta http-equiv="refresh" content="1"/>
       #end
 
@@ -108,12 +120,24 @@
   <body>
     <div id="content">
       #if ($jobstatus.state.name() != 'FINISHED')
-        <p>$services.localization.render('platform.web.init.message.intializing', $percent)</p>
+        #if ($jobstatus.request.wikiId)
+          <p>$services.localization.render('platform.web.init.message.wiki.initializing', [$jobstatus.request.wikiId, $percent])</p>
+        #else
+          <p>$services.localization.render('platform.web.init.message.initializing', [$percent])</p>
+        #end
       #else
         #if ($hasErrors)
-          <p>$services.localization.render('platform.web.init.message.intializationFailure')<p>
+          #if ($jobstatus.request.wikiId)
+            <p>$services.localization.render('platform.web.init.message.wiki.initializationFailure', [$jobstatus.request.wikiId])<p>
+          #else
+            <p>$services.localization.render('platform.web.init.message.initializationFailure')<p>
+          #end
         #else
-          <p>$services.localization.render('platform.web.init.message.intializationSuccess')</p>
+          #if ($jobstatus.request.wikiId)
+            <p>$services.localization.render('platform.web.init.message.wiki.initializationSuccess', [$jobstatus.request.wikiId])<p>
+          #else
+            <p>$services.localization.render('platform.web.init.message.initializationSuccess')</p>
+          #end
         #end
         $services.template.execute('logging_macros.vm')
         #printLogs($jobstatus.log)

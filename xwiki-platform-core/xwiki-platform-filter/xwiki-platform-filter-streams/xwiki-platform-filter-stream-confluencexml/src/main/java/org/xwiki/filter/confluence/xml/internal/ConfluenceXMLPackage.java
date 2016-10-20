@@ -221,6 +221,8 @@ public class ConfluenceXMLPackage
      */
     private static final String REPAIRED_CDATA_END = "]]";
 
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+
     private File directory;
 
     private File entities;
@@ -398,7 +400,7 @@ public class ConfluenceXMLPackage
         this.tree.mkdir();
 
         try (InputStream stream = new FileInputStream(getEntities())) {
-            XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
+            XMLStreamReader xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(stream);
 
             xmlReader.nextTag();
 

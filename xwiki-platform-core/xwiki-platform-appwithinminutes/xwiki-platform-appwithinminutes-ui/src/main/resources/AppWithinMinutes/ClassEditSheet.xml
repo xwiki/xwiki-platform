@@ -126,7 +126,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
               ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through
               ## the query string even if it doesn't match the action (e.g. the 'get' action).
               ## The sheet parameter is required when editing a new class because the request will be made to a document that doesn't exist.
-              &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;sheet=AppWithinMinutes.ClassEditSheet&amp;field=$escapetool.url($formFieldDoc.fullName)")" class="data"/&gt;
+              ## FIXME2: In the future don't force the text editor type and instead use the default editor. This means
+              ## that if the WYSIWYG editor is used, we'll need to convert the HTML into the target syntax so that the
+              ## Template in #updateAndSaveTemplate is saved with target syntax and not HTML.
+              ## See http://jira.xwiki.org/browse/XWIKI-13789
+              &lt;input type="hidden" value="$doc.getURL('edit', "xpage=plain&amp;sheet=AppWithinMinutes.ClassEditSheet&amp;field=$escapetool.url($formFieldDoc.fullName)&amp;xeditmode=text")" class="data"/&gt;
             {{/html}}
         #end
     #end

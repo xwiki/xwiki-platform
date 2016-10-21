@@ -46,7 +46,7 @@
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 
 #macro (displaySearchForm)
-  {{html}}
+  {{html clean="false"}}
   &lt;form class="search-form row" action="$doc.getURL()" role="search"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
@@ -89,7 +89,7 @@
     #set ($debugMap = $searchResponse.debugMap)
     #if ($debugMap)
 
-      {{html}}
+      {{html clean="false"}}
       &lt;dl&gt;
         &lt;dt&gt;Query Parser&lt;/dt&gt;
         &lt;dd&gt;$!escapetool.xml($debugMap.get('QParser'))&lt;/dd&gt;
@@ -147,7 +147,7 @@
       #extendQueryString($url $resetParameters)
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url
         ||class="search-facets-action-reset"]]## Continue in the same paragraph.
-      {{html}}
+      {{html clean="false"}}
       &lt;a href="#" class="search-facets-action-collapseAll hidden"&gt;
         $escapetool.xml($services.localization.render('solr.facets.collapseAll'))
       &lt;/a&gt;
@@ -182,7 +182,7 @@
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end"
         data-name="$facetField.name" %)(((
-      {{html}}
+      {{html clean="false"}}
       #displaySearchFacetHeader($facetField)
       #displaySearchFacetBody($facetField)
       {{/html}}
@@ -374,20 +374,20 @@
     'defaultItemsPerPage': $rows,
     'position': 'top'
   })
-  {{html}}#pagination($paginationParameters){{/html}}
+  {{html clean="false"}}#pagination($paginationParameters){{/html}}
   (% class="search-results" %)(((
     #foreach ($searchResult in $results)
       #displaySearchResult($searchResult)
     #end
   )))
   #set ($discard = $paginationParameters.put('position', 'bottom'))
-  {{html}}#pagination($paginationParameters){{/html}}
+  {{html clean="false"}}#pagination($paginationParameters){{/html}}
 
   #displayRSSLink()
 #end
 
 #macro (displayRSSLink)
-  {{html}}
+  {{html clean="false"}}
   #set ($parameters = {})
   ## We keep most of the current request parameters so that the RSS feed matches the current search query and filters.
   #set ($discard = $parameters.putAll($request.getParameterMap()))
@@ -409,7 +409,7 @@
   #set ($searchResultReference = $services.solr.resolve($searchResult))
   (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
     ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
-    {{html}}
+    {{html clean="false"}}
     #evaluate("${escapetool.h}displaySearchResult_$searchResult.type.toLowerCase()(${escapetool.d}searchResult)")
     #displaySearchResultHighlighting($searchResult)
     {{/html}}
@@ -810,7 +810,7 @@ $value##
   #processRequestParameters()
   (% class="search-ui" %)(((
     #if ($xcontext.action == 'get')
-      {{html}}
+      {{html clean="false"}}
       ## The search UI is updated dynamically through AJAX and we need to pull the skin extensions.
       ## We put the skin extension imports inside a &lt;noscript&gt; element to prevent jQuery from fetching the JavaScript
       ## files automatically (we want to fetch only the new JavaScript files).

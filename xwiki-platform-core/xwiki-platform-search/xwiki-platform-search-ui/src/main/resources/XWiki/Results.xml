@@ -42,7 +42,7 @@
   <content>{{template name="hierarchy_macros.vm" /}}
 
 {{velocity}}
-{{html}}
+{{html clean="false"}}
 #set ($showdata = 0)
 &lt;div id="searchResults"&gt;
   #foreach ($item in $list)

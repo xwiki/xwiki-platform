@@ -42,11 +42,14 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.executor.ContentExecutor;
+import org.xwiki.rendering.executor.ContentExecutorException;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetSource;
-import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.parser.MissingParserException;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
@@ -106,11 +109,13 @@ public class DefaultGadgetSource implements GadgetSource
     @Inject
     private VelocityManager velocityManager;
 
-    /**
-     * The parser, to parse the content of the gadget and the title.
-     */
     @Inject
-    private ContentParser contentParser;
+    private ContentExecutor<MacroTransformationContext> contentExecutor;
+
+    /**
+     * Prepare the parser to parse the title and content of the gadget into blocks.
+     */
+    private ParserUtils parserUtils = new ParserUtils();
 
     @Override
     public List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception
@@ -158,8 +163,6 @@ public class DefaultGadgetSource implements GadgetSource
             key = "unknown namespace";
         }
         VelocityEngine velocityEngine = velocityManager.getVelocityEngine();
-        // prepare the parser to parse the title and content of the gadget into blocks
-        ParserUtils parserUtils = new ParserUtils();
 
         for (BaseObject xObject : objects) {
             if (xObject == null) {
@@ -179,12 +182,10 @@ public class DefaultGadgetSource implements GadgetSource
             String gadgetTitle = writer.toString();
 
             // parse both the title and content in the syntax of the transformation context
-            XDOM titleXDom = contentParser.parse(gadgetTitle, sourceSyntax, xObject.getDocumentReference());
-            List<Block> titleBlocks = titleXDom.getChildren();
-            parserUtils.removeTopLevelParagraph(titleBlocks);
-            XDOM contentXDom = contentParser.parse(content, sourceSyntax, xObject.getDocumentReference());
-            List<Block> contentBlocks = contentXDom.getChildren();
-            parserUtils.removeTopLevelParagraph(contentBlocks);
+            List<Block> titleBlocks =
+                renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(), context);
+            List<Block> contentBlocks =
+                renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(), context);
 
             // create a gadget will all these and add the gadget to the container of gadgets
             Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
@@ -192,6 +193,15 @@ public class DefaultGadgetSource implements GadgetSource
             gadgets.add(gadget);
         }
         return gadgets;
+    }
+
+    private List<Block> renderGadgetProperty(String content, Syntax sourceSyntax, EntityReference sourceReference,
+        MacroTransformationContext context) throws MissingParserException, ParseException, ContentExecutorException
+    {
+        XDOM xdom = this.contentExecutor.execute(content, sourceSyntax, sourceReference, context);
+        List<Block> xdomBlocks = xdom.getChildren();
+        this.parserUtils.removeTopLevelParagraph(xdomBlocks);
+        return xdomBlocks;
     }
 
     /**

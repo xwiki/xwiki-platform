@@ -366,7 +366,7 @@
       <position>2, 1</position>
     </property>
     <property>
-      <title>#if ($xcontext.action == 'edit' || $services.messageStream.isActive())$services.localization.render('platform.dashboard.wiki.messageSender')#end</title>
+      <title>$services.localization.render('platform.dashboard.wiki.messageSender')</title>
     </property>
   </object>
   <object>

@@ -20,13 +20,19 @@
 package org.xwiki.panels.test.po;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Represents the applications panel administration page (PanelsCode.ApplicationsPanelConfiguration).
@@ -49,20 +55,28 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
 
     @FindBy(id = "bt-save")
     private WebElement saveButton;
+
+    public static ApplicationsPanelAdministrationPage gotoPage()
+    {
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasSection("panels.applications"));
+        administrationPage.clickSection("Applications", "Applications Panel");
+        return new ApplicationsPanelAdministrationPage();
+    }
     
-    public Collection<String> getApplicationsInBar()
+    public List<String> getApplicationsInBar()
     {
         return getApplicationsInPanel(displayedPanels);
     }
 
-    public Collection<String> getApplicationsNotInBar()
+    public List<String> getApplicationsNotInBar()
     {
         return getApplicationsInPanel(blacklistedPanels);
     }
     
-    private Collection<String> getApplicationsInPanel(WebElement panel)
+    private List<String> getApplicationsInPanel(WebElement panel)
     {
-        Collection<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         for (WebElement elem : getDriver().findElementsWithoutWaiting(panel,
                 By.xpath("div[contains(@class, 'panel-body')]/ul"
                         + "/li[contains(@class, 'draggableApp')]//span[contains(@class, 'application-label')]"))) {
@@ -87,7 +101,50 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
         WebElement app = fromPanel.findElement(By.linkText(appName));
         new Actions(getDriver()).dragAndDrop(app, panel).perform();
     }
-    
+
+    public void moveAppBefore(String appName, String appBeforeName)
+    {
+        if (appName.equals(appBeforeName)) {
+            // do nothing
+            return;
+        }
+
+        WebElement app = displayedPanels.findElement(By.linkText(appName));
+        WebElement appBefore = displayedPanels.findElement(By.linkText(appBeforeName));
+        Point target = appBefore.getLocation();
+        Point source = app.getLocation();
+
+        // The drag & drop of the "sortable" plugin of "jquery-ui" is very sensitive so we need to script the
+        // moves of the mouse precisely if we don't want to have flickers.
+        Actions actions = new Actions(getDriver());
+        // First we hold the app
+        actions.clickAndHold(app);
+        // Then we move into the position of the targeted app so jquery-ui can register we want to take its place.
+        actions.moveByOffset(target.getX() - source.getX(), target.getY() - source.getY());
+        // Now we do a little move on top left so jquery-ui understand we want to be *before* the other app and
+        // put a blank place instead of the other app.
+        actions.moveByOffset(-5, -5);
+        // Do it
+        actions.perform();
+
+        // Before releasing the click, check that jquery-ui has moved the other app to let the place free.
+        getDriver().waitUntilCondition(new ExpectedCondition<Object>()
+        {
+            @Override
+            public Object apply(WebDriver webDriver)
+            {
+                Point newTarget = appBefore.getLocation();
+                Point newSource = app.getLocation();
+                return newTarget.getX() > newSource.getX() + 5 || newTarget.getY() > newSource.getY() + 5;
+            }
+        });
+
+        // Now we can release the selection
+        actions = new Actions(getDriver());
+        actions.release();
+        actions.perform();
+    }
+
     public void revert()
     {
         revertButton.click();   

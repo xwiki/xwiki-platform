@@ -57,6 +57,6 @@
   #end
   &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
 #end
-{{html}}#displaySearchFacetValues($facetValues {} 'displaySearchFacetValue_class'){{/html}}
+{{html clean="false"}}#displaySearchFacetValues($facetValues {} 'displaySearchFacetValue_class'){{/html}}
 {{/velocity}}</content>
 </xwikidoc>

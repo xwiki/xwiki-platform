@@ -62,7 +62,7 @@
 #if ($facetValues)
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
   #set ($discard = $xwiki.ssx.use('Main.SolrUserFacet'))
-  {{html}}
+  {{html clean="false"}}
   &lt;ul class="users"&gt;
     #displaySearchFacetValuesLimited($facetValues {} 'displaySearchFacetValue_user')
   &lt;/ul&gt;

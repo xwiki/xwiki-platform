@@ -53,7 +53,7 @@
 
 #set($discard = $doc.use($doc.fullName))
 (% class="xform" %)(((
-; {{html}}
+; {{html clean="false"}}
   &lt;label#if ($editing) for="${doc.fullName}_0_activated"#end&gt;
     $doc.displayPrettyName('activated', false, false)
   &lt;/label&gt;
@@ -80,7 +80,7 @@
 ## Display the list of search engines.
 ## We use HTML here just because we can't set the class name of a list item using wiki syntax.
 #if ($sources.size() &gt; 0)
-  {{html}}
+  {{html clean="false"}}
   &lt;ul class="xwikitabbar searchEngines"&gt;
   #foreach ($engine in $sorttool.sort($sources.keySet()))
     &lt;li#if ($engine == $searchEngine) class="active"#end&gt;
@@ -131,7 +131,7 @@
         )))
         (% class="source-body hidden" %)(((
           #set ($object = $source)
-          {{html}}$sourceSheet.getRenderedContent().replace('{{', '&amp;#123;&amp;#123;'){{/html}}
+          {{html clean="false"}}$sourceSheet.getRenderedContent().replace('{{', '&amp;#123;&amp;#123;'){{/html}}
         )))
       )))
   #end

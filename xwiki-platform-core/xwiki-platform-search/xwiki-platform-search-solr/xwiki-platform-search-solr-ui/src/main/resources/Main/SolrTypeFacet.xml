@@ -44,6 +44,6 @@
   $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
 #end
 ## We have to reset the sort when the result type selection changes because the sort fields depend on the selected result type.
-{{html}}#displaySearchFacetValues($facetValues {'sort': [], 'sortOrder': []} 'displaySearchFacetValue_type'){{/html}}
+{{html clean="false"}}#displaySearchFacetValues($facetValues {'sort': [], 'sortOrder': []} 'displaySearchFacetValue_type'){{/html}}
 {{/velocity}}</content>
 </xwikidoc>

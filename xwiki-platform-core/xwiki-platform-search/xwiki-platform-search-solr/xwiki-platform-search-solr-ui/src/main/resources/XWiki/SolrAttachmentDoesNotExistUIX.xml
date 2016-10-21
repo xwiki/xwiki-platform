@@ -290,7 +290,7 @@
 #if ($suggestionResults.size() &gt; 0)
   #set ($discard = $xwiki.ssx.use('XWiki.SolrAttachmentDoesNotExistUIX'))
 
-  {{html}}
+  {{html clean="false"}}
   &lt;div class='attachmentdoesnotexist-solr-container'&gt;
     &lt;p&gt;&lt;b&gt;$services.localization.render('solr.uix.attachmentdoesnotexist.title')&lt;/b&gt;&lt;/p&gt;
     &lt;ul&gt;

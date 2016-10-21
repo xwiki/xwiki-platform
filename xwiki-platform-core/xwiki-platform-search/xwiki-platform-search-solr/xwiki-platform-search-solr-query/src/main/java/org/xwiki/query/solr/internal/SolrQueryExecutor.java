@@ -38,6 +38,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
@@ -103,6 +104,9 @@ public class SolrQueryExecutor implements QueryExecutor
     @Inject
     private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
 
+    @Inject
+    private JobProgressManager progress;
+
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
@@ -112,10 +116,20 @@ public class SolrQueryExecutor implements QueryExecutor
             throw new QueryException("Solr query require programming right", query, null);
         }
 
+        this.progress.startStep(query, "query.solr.progress.execute", "Execute Solr query [{}]", query);
+        this.progress.pushLevelProgress(3, query);
+
         try {
+            this.progress.startStep(query, "query.solr.progress.execute.prepare", "Prepare");
+
             SolrInstance solrInstance = solrInstanceProvider.get();
             SolrQuery solrQuery = createSolrQuery(query);
+
+            this.progress.startStep(query, "query.solr.progress.execute.execute", "Execute");
+
             QueryResponse response = solrInstance.query(solrQuery);
+
+            this.progress.startStep(query, "query.solr.progress.execute.filter", "Filter");
 
             // Check access rights need to be checked before returning the response.
             // FIXME: this is not really the best way, mostly because at this point all grouping operations
@@ -131,6 +145,9 @@ public class SolrQueryExecutor implements QueryExecutor
             return (List<T>) Arrays.asList(response);
         } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
+        } finally {
+            this.progress.popLevelProgress(query);
+            this.progress.endStep(query);
         }
     }
 

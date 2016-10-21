@@ -695,6 +695,21 @@ public class Document extends Api
     }
 
     /**
+     * Execute and render the document in the current context.
+     * <p>
+     * The code is executed with right of this document content author.
+     * 
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @return the result
+     * @throws XWikiException when failing to display the document
+     * @since 8.4RC1
+     */
+    public String getRenderedContent(boolean transformationContextIsolated) throws XWikiException
+    {
+        return this.doc.getRenderedContent(transformationContextIsolated, getXWikiContext());
+    }
+
+    /**
      * @param text the text to render
      * @return the given text rendered in the context of this document
      * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String)}

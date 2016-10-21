@@ -265,42 +265,44 @@ require.config({
     });
   };
 
-  var loadTreeCode = function(callback) {
-    if (!require.specified('tree')) {
-      // Before 6.4
-      require.config({
-        paths: {
-          jsTree: "$!services.webjars.url('jstree', 'jstree.min.js')",
-          JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
-          tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
-        }
-      });
-    }
-    require(['tree'], function() {
+  var requireConfigTreeModule = function(callback) {
+    require([
+      // Configures the path to the tree widget module and its dependencies.
+      "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+    ], function() {
+      if (!require.specified('tree')) {
+        // Before 6.4
+        require.config({
+          paths: {
+            jsTree: "$!services.webjars.url('jstree', 'jstree.min.js')",
+            JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
+            tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
+          }
+        });
+      }
       callback();
     });
   };
 
-  require([
-    'jquery',
-    'ckeditor',
-    // Used to access the form token.
-    'xwiki-meta',
-    // Used to catch form action events fired from Prototype.js code (actionButtons.js).
-    'xwiki-events-bridge',
-    // Activate the auto-save feature.
-    'autosave',
-    // Configures the path to the tree widget module and its dependencies.
-    "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})",
-    // Used on the link, image and macro dialogs to select pages and attachments.
-    'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer'
-  ], function($, ckeditor, xwikiMeta) {
-    // xwiki-meta module is available only since 6.3M2
-    xwikiMeta = xwikiMeta || {
-      form_token: $('meta[name="form_token"]').attr('content')
-    };
-    // Load the tree used by the page and attachment pickers.
-    loadTreeCode(function() {
+  // Before loading the editor we have to configure the path to the tree widget module and its dependencies, which are
+  // used by the page and attachment pickers.
+  requireConfigTreeModule(function() {
+    require([
+      'jquery',
+      'ckeditor',
+      // Used to access the form token.
+      'xwiki-meta',
+      // Used to catch form action events fired from Prototype.js code (actionButtons.js).
+      'xwiki-events-bridge',
+      // Activate the auto-save feature.
+      'autosave',
+      // Used on the link, image and macro dialogs to select pages and attachments.
+      'entityResourcePicker', 'entityResourceSuggester', 'entityResourceDisplayer'
+    ], function($, ckeditor, xwikiMeta) {
+      // xwiki-meta module is available only since 6.3M2
+      xwikiMeta = xwikiMeta || {
+        form_token: $('meta[name="form_token"]').attr('content')
+      };
       init($, ckeditor, xwikiMeta);
     });
   });

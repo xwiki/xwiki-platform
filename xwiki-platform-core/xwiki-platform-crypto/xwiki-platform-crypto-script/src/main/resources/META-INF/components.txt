@@ -1,1 +1,4 @@
 org.xwiki.crypto.script.CryptoScriptService
+org.xwiki.crypto.script.RSACryptoScriptService
+org.xwiki.crypto.script.StoreScriptService
+org.xwiki.crypto.script.X509NameScriptService

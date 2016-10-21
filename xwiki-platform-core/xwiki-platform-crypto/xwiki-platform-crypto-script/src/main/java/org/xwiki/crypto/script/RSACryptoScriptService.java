@@ -71,7 +71,7 @@ import org.xwiki.stability.Unstable;
  * Script service allowing a user to create keys pairs and issue certificates.
  *
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 @Component
 @Named(CryptoScriptService.ROLEHINT + '.' + RSACryptoScriptService.ROLEHINT)

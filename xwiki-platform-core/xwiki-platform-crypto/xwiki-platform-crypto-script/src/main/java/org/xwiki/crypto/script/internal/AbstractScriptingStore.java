@@ -31,7 +31,7 @@ import org.xwiki.security.authorization.Right;
  * Common base class for scripting stores.
  *
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 public abstract class AbstractScriptingStore
 {

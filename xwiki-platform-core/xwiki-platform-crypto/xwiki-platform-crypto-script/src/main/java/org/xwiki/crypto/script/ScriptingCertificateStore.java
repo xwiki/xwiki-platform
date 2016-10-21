@@ -36,7 +36,7 @@ import org.xwiki.stability.Unstable;
  * Wrapper over {@link CertificateStore} for scripting.
  *
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 @Unstable
 public class ScriptingCertificateStore extends AbstractScriptingStore

@@ -35,7 +35,7 @@ import org.xwiki.stability.Unstable;
  * Helper script service to create X509 names.
  *
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 @Component
 @Named(CryptoScriptService.ROLEHINT + '.' + X509NameScriptService.ROLEHINT)

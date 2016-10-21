@@ -31,7 +31,7 @@ import org.xwiki.script.service.ScriptServiceManager;
  * Script service manager for cryptographic services.
  *
  * @version $Id$
- * @since 8.4M1
+ * @since 8.4RC1
  */
 @Component
 @Named(CryptoScriptService.ROLEHINT)

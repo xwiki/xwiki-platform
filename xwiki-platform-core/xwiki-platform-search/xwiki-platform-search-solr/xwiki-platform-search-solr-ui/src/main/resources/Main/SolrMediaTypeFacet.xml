@@ -205,7 +205,7 @@
 
 {{velocity}}
 #if ($facetValues)
-  {{html}}#displaySearchFacetValues_mediaType($facetValues){{/html}}
+  {{html clean="false"}}#displaySearchFacetValues_mediaType($facetValues){{/html}}
 #end
 {{/velocity}}</content>
   <object>

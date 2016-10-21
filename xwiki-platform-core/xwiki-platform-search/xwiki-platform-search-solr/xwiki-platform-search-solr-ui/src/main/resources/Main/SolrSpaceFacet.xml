@@ -77,7 +77,7 @@
   #set ($return = $NULL)
   #setVariable("$return" $macro.data)
 #end
-{{html}}
+{{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('Main.SolrSpaceFacet'))
 #if ($facetRequestValues &amp;&amp; $facetRequestValues.size() &gt; 0)
   #set ($localSpaceReference = $stringtool.removeEnd($stringtool.substringAfter($facetRequestValues.get(0), '/'), '.'))

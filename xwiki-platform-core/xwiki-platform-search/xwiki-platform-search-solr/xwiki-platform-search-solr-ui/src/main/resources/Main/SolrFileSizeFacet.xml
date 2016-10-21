@@ -142,7 +142,7 @@
 
 {{velocity}}
 #if ($facetValues)
-  {{html}}#displaySearchFacetValues_fileSize($facetValues){{/html}}
+  {{html clean="false"}}#displaySearchFacetValues_fileSize($facetValues){{/html}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

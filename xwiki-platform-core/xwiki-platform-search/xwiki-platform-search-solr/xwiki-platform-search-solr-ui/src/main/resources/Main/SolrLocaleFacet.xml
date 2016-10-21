@@ -52,6 +52,6 @@
 #end
 #set ($currentLocale = $services.localization.currentLocale)
 #retainMatchedRequestValues()
-{{html}}#displaySearchFacetValues($facetValues {} 'displaySearchFacetValue_locale'){{/html}}
+{{html clean="false"}}#displaySearchFacetValues($facetValues {} 'displaySearchFacetValue_locale'){{/html}}
 {{/velocity}}</content>
 </xwikidoc>

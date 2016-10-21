@@ -57,6 +57,6 @@
     #end
   #end
 #end
-{{html}}#displaySearchFacetValues($actualFacetValues {} 'displaySearchFacetValue_wiki'){{/html}}
+{{html clean="false"}}#displaySearchFacetValues($actualFacetValues {} 'displaySearchFacetValue_wiki'){{/html}}
 {{/velocity}}</content>
 </xwikidoc>

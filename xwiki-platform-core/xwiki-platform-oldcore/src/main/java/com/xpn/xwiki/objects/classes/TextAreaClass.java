@@ -55,7 +55,7 @@ public class TextAreaClass extends StringClass
         PURE_TEXT("PureText"),
 
         /**
-         * Edit wiki syntax using a plain text editor.
+         * Edit wiki syntax using a text editor.
          */
         TEXT("Text"),
 

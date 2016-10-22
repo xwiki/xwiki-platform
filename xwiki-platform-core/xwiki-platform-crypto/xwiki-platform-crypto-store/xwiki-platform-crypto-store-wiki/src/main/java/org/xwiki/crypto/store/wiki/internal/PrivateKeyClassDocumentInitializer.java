@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Create or update the Crypto.PrivateKeyClass document.
@@ -52,7 +53,8 @@ public class PrivateKeyClassDocumentInitializer extends AbstractMandatoryDocumen
     {
         BaseClass bclass = document.getXClass();
 
-        boolean needsUpdate = bclass.addTextAreaField(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, "Private Key", 64, 10);
+        boolean needsUpdate = bclass.addTextAreaField(X509KeyWikiStore.PRIVATEKEYCLASS_PROP_KEY, "Private Key", 64, 10,
+            TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "Private Key Class");
 

@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Create or update the Crypto.SignatureClass document.
@@ -54,8 +55,8 @@ public class SignatureClassDocumentInitializer extends AbstractMandatoryDocument
 
         boolean needsUpdate = bclass.addTextField(DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE, "Reference", 64);
 
-        needsUpdate |=
-            bclass.addTextAreaField(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE, "Signature", 64, 10);
+        needsUpdate |= bclass.addTextAreaField(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE, "Signature",
+            64, 10, TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "Signature Class");
 

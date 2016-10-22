@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -57,8 +58,12 @@ public class DistributionPingDataProvider implements PingDataProvider
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
+    /**
+     * Note that we use a Provider to make sure that the Instance Manager is initialized as late as possible (it
+     * requires the database to be ready for its initialization).
+     */
     @Inject
-    private InstanceIdManager instanceIdManager;
+    private Provider<InstanceIdManager> instanceIdManagerProvider;
 
     @Override
     public Map<String, Object> provideMapping()
@@ -80,7 +85,7 @@ public class DistributionPingDataProvider implements PingDataProvider
     {
         Map<String, Object> jsonMap = new HashMap<>();
 
-        String instanceId = this.instanceIdManager.getInstanceId().toString();
+        String instanceId = this.instanceIdManagerProvider.get().getInstanceId().toString();
         jsonMap.put(PROPERTY_INSTANCE_ID, instanceId);
 
         CoreExtension distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();

@@ -19,19 +19,12 @@
  */
 package org.xwiki.instance;
 
-import org.xwiki.component.annotation.Role;
-
-/**
- * Initialize and retrieve the Instance Id.
- *
- * @version $Id$
- * @since 5.2M2
- */
-@Role
-public interface InstanceIdManager
+public interface CompatibilityInstanceIdManager
 {
     /**
-     * @return the Instance id or null if it isn't set
+     * Generate and save a unique instance id in the database if one isn't already there.
+     * @deprecated replaced by implementation of Initializable since 8.4RC1
      */
-    InstanceId getInstanceId();
+    @Deprecated
+    void initializeInstanceId();
 }

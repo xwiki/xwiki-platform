@@ -43,6 +43,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Initializes the XClasses required by {@link DefaultWikiComponentBuilder}.
@@ -190,7 +191,11 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
 
         needsUpdate |= this.initializeXClassDocumentMetadata(doc, "Wiki Component Method XWiki Class");
         needsUpdate |= bclass.addTextField(METHOD_NAME_FIELD, "Method name", 30);
-        needsUpdate |= bclass.addTextAreaField(METHOD_CODE_FIELD, "Method body code", 40, 20);
+
+        // This field contains wiki syntax (usually some scripting macr) but it's technical content that should be
+        // edited with a Text editor.
+        needsUpdate |= bclass.addTextAreaField(METHOD_CODE_FIELD, "Method body code", 40, 20,
+            TextAreaClass.EditorType.TEXT, TextAreaClass.ContentType.WIKI_TEXT);
 
         if (needsUpdate) {
             this.update(doc);

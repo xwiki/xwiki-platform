@@ -215,7 +215,7 @@ public class TextAreaClass extends StringClass
     {
         String result = getStringValue("contenttype").toLowerCase();
         if (result.isEmpty()) {
-            result = "fullyrenderedtext";
+            result = ContentType.WIKI_TEXT.toString().toLowerCase();
         }
 
         return result;

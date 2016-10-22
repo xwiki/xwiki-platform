@@ -911,7 +911,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        if (!textAreaClass.getContentType().equalsIgnoreCase(contenttype)) {
+        // Note: TextAreaClass.getContentType() will return a lowercase ContentType.WIKI_TEXT if the stored content
+        // editor is not set (i.e. using a default content type). Thus we need to take that into account when comparing.
+        // If the passed content type is null and the set content type is ContentType.WIKI_TEXT we don't consider that
+        // the content type is different (and vice versa).
+        if ((contenttype == null && !textAreaClass.getContentType().equalsIgnoreCase(ContentType.WIKI_TEXT.toString()))
+            || (contenttype != null && !textAreaClass.getContentType().equalsIgnoreCase(contenttype)))
+        {
             textAreaClass.setContentType(contenttype);
             result = true;
         }

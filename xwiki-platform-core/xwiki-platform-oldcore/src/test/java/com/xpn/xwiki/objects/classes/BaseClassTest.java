@@ -105,4 +105,19 @@ public class BaseClassTest
         assertEquals("otherspace", baseClass.getDocumentReference().getLastSpaceReference().getName());
         assertEquals("otherpage", baseClass.getDocumentReference().getName());
     }
+
+    @Test
+    public void addTextAreaFieldWhenNullContentType() throws Exception
+    {
+        BaseClass baseClass = new BaseClass();
+
+        TextAreaClass textAreaClass = new TextAreaClass();
+        textAreaClass.setName("field");
+        textAreaClass.setPrettyName("pretty name");
+        textAreaClass.setSize(55);
+        textAreaClass.setRows(33);
+        baseClass.put("field", textAreaClass);
+
+        assertFalse(baseClass.addTextAreaField("field", "pretty name", 55, 33));
+    }
 }

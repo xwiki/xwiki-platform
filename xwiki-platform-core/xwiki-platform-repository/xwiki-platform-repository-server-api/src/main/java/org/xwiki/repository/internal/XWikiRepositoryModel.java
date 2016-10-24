@@ -106,6 +106,8 @@ public class XWikiRepositoryModel
 
     public static final String PROP_EXTENSION_ALLOWEDNAMESPACES = "allowednamespaces";
 
+    public static final String PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY = "allowednamespaces_empty";
+
     public static final String PROP_EXTENSION_SCMURL = "source";
 
     public static final String PROP_EXTENSION_SCMCONNECTION = "scmconnection";
@@ -172,6 +174,13 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
 
     public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
+
+    // Tools
+
+    /**
+     * @since 8.4RC1
+     */
+    public static final String PROPSUFFIX_EMPTYCOLLECTION = "_empty";
 
     // Solr
 
@@ -261,6 +270,7 @@ public class XWikiRepositoryModel
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_URL, null));
         SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
         SOLR_FIELDS.put(Extension.FIELD_NAMESPACES, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, new ExtensionSolrField(PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY, null));
         SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACE, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_ALLOWEDNAMESPACES, SOLR_FIELDS.get(Extension.FIELD_NAMESPACES));
         SOLR_FIELDS.put(Extension.FIELD_REPOSITORIES, new ExtensionSolrField(PROP_VERSION_REPOSITORIES, null));

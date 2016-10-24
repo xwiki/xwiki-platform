@@ -89,9 +89,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY =
-        new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID, XWikiRepositoryModel.PROP_EXTENSION_TYPE,
-        XWikiRepositoryModel.PROP_EXTENSION_NAME };
+    public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
+    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
 
     protected static final String DEFAULT_BOOST;
 
@@ -392,7 +391,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Allowed namespaces
         List<String> namespaces =
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
-        if (namespaces != null && !namespaces.isEmpty()) {
+        Integer namespacesEmpty =
+            (Integer) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY);
+        if (namespaces != null && (!namespaces.isEmpty() || namespacesEmpty == 1)) {
             Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
             restNamespaces.withNamespaces(namespaces);
             extension.setAllowedNamespaces(restNamespaces);
@@ -629,7 +630,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Allowed namespaces
         String namespacesString =
             this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES);
-        if (!StringUtils.isEmpty(namespacesString)) {
+        Integer namespacesEmpty =
+            (Integer) getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY);
+        if (namespacesString != null && (!namespacesString.isEmpty() || namespacesEmpty == 1)) {
             List<String> namespaces = ListClass.getListFromString(namespacesString, "|", false);
             Namespaces restNamespaces = this.extensionObjectFactory.createNamespaces();
             restNamespaces.withNamespaces(namespaces);

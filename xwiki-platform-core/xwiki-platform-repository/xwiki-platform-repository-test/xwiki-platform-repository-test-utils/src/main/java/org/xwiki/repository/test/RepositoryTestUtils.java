@@ -84,6 +84,8 @@ public class RepositoryTestUtils
         if (extension.getAllowedNamespaces() != null) {
             extensionObject.getProperties()
                 .add(property(XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES, extension.getAllowedNamespaces()));
+            extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES_EMPTY,
+                extension.getAllowedNamespaces() != null && extension.getAllowedNamespaces().isEmpty() ? 1 : 0));
         }
         if (extension.getScm() != null) {
             extensionObject.getProperties()

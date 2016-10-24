@@ -31,8 +31,8 @@
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1475504230000</date>
-  <contentUpdateDate>1427461793000</contentUpdateDate>
+  <date>1477305139000</date>
+  <contentUpdateDate>1474040621000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -70,6 +70,20 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </allowednamespaces>
+    <allowednamespaces_empty>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <name>allowednamespaces_empty</name>
+      <number>27</number>
+      <prettyName>Is allowed namespaces empty</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </allowednamespaces_empty>
     <authors>
       <cache>0</cache>
       <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
@@ -130,6 +144,7 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </customInstallationOnly>
     <description>
+      <contenttype>---</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>---</editor>
@@ -192,6 +207,7 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </id>
     <installation>
+      <contenttype>---</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
       <editor>---</editor>

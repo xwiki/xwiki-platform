@@ -22,6 +22,7 @@ package org.xwiki.repository.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -295,14 +296,12 @@ public class RepositoryManager implements Initializable, Disposable
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        BaseObject extensionObjectToSave = null;
-
         // Update last version field
         String lastVersion = findLastVersion(document);
 
         if (lastVersion != null && !StringUtils.equals(lastVersion,
             getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
-            extensionObjectToSave = document.getXObject(extensionObject.getReference());
+            BaseObject extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
 
             needSave = true;
@@ -321,7 +320,7 @@ public class RepositoryManager implements Initializable, Disposable
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
 
         if ((currentValue == 1) != valid) {
-            extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+            BaseObject extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? "1" : "0", xcontext);
 
             needSave = true;
@@ -786,8 +785,8 @@ public class RepositoryManager implements Initializable, Disposable
             extension.getExtensionFeatures());
 
         // Allowed namespaces
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES,
-            extension.getAllowedNamespaces());
+        needSave |= updateCollection(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ALLOWEDNAMESPACES,
+            extension.getAllowedNamespaces(), xcontext);
 
         // Properties
         needSave |= updateProperties(extensionObject, extension.getProperties());
@@ -1086,5 +1085,19 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         return false;
+    }
+
+    private boolean updateCollection(BaseObject extensionObject, String fieldName, Collection<String> allowedNamespaces,
+        XWikiContext xcontext)
+    {
+        boolean needSave =
+            update(extensionObject, fieldName, allowedNamespaces != null ? allowedNamespaces : Collections.emptyList());
+
+        String fieldNameEmpty = fieldName + XWikiRepositoryModel.PROPSUFFIX_EMPTYCOLLECTION;
+        if (extensionObject.getXClass(xcontext).get(fieldNameEmpty) != null) {
+            update(extensionObject, fieldNameEmpty, allowedNamespaces != null && allowedNamespaces.isEmpty() ? 1 : 0);
+        }
+
+        return needSave;
     }
 }

@@ -16,8 +16,8 @@
  limitations under the License.
 -->
 
-<schema name="xwiki" version="1.5">
-  <field name="_version_" type="long" indexed="true" stored="true"/>
+<schema name="xwiki" version="1.6">
+  <field name="_version_" type="long" indexed="true" stored="true" />
   <field name="id" type="string" indexed="true" stored="true" required="true" />
 
   <dynamicField name="*" type="ignored" multiValued="true" />

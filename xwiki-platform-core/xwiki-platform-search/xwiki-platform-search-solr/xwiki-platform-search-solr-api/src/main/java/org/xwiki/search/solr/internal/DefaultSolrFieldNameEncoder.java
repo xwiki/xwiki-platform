@@ -51,7 +51,7 @@ public class DefaultSolrFieldNameEncoder implements SolrFieldNameEncoder
     /**
      * The code point difference between upper case and lower case.
      */
-    private static final int CASE_DIFF = ('a' - 'A');
+    private static final int CASE_DIFF = 'a' - 'A';
 
     /**
      * The UTF-8 character set.
@@ -93,6 +93,7 @@ public class DefaultSolrFieldNameEncoder implements SolrFieldNameEncoder
         } catch (UnsupportedEncodingException e) {
             // Should never happen.
         }
+
         return null;
     }
 

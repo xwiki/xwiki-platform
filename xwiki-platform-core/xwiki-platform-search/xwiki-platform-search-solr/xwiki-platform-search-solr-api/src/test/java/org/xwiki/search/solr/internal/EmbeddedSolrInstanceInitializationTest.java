@@ -125,7 +125,7 @@ public class EmbeddedSolrInstanceInitializationTest
             expected = implementation.getDefaultHomeDirectory();
         }
 
-        Assert.assertEquals(expected + File.separator, container.getSolrHome());
+        Assert.assertEquals(expected, container.getSolrHome());
         Assert.assertEquals(1, container.getCores().size());
         SolrCore core = container.getCores().iterator().next();
         File coreBaseDirectory = new File(container.getSolrHome(), core.getName());

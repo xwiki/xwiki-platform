@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="xwiki" version="1.5">
+<schema name="xwiki" version="1.6">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -61,12 +61,14 @@
             to off for version >= 1.4
        1.5: omitNorms defaults to true for primitive field types 
             (int, float, boolean, string...)
+       1.6: useDocValuesAsStored defaults to true.
      -->
+
 
    <!-- Valid attributes for fields:
      name: mandatory - the name for the field
      type: mandatory - the name of a field type from the 
-       <types> fieldType section
+       fieldTypes
      indexed: true if this field should be indexed (searchable or sortable)
      stored: true if this field should be retrievable
      docValues: true if this field should have doc values. Doc values are
@@ -92,6 +94,8 @@
        This will increase storage costs.
      termOffsets: Store offset information with the term vector. This 
        will increase storage costs.
+     termPayloads: Store payload information with the term vector. This
+       will increase storage costs.
      required: The field is required.  It will throw an error if the
        value does not exist
      default: a value that should be used if no value is specified
@@ -108,12 +112,12 @@
    <!-- If you remove this field, you must _also_ disable the update log in solrconfig.xml
       or Solr won't start. _version_ and update log are required for SolrCloud
    --> 
-   <field name="_version_" type="long" indexed="true" stored="true"/>
+   <field name="_version_" type="long" indexed="true" stored="true" />
    
    <!-- points to the root document of a block of nested documents. Required for nested
       document support, may be removed otherwise
    -->
-   <field name="_root_" type="string" indexed="true" stored="false"/>
+   <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
 
    <!-- Fields that are common to all entity types (document, attachment, object and object property) -->
 
@@ -393,8 +397,8 @@
     <!-- sortMissingLast and sortMissingFirst attributes are optional attributes are
          currently supported on types that are sorted internally as strings
          and on numeric types.
-	     This includes "string","boolean", and, as of 3.5 (and 4.x),
-	     int, float, long, date, double, including the "Trie" variants.
+       This includes "string","boolean", and, as of 3.5 (and 4.x),
+       int, float, long, date, double, including the "Trie" variants.
        - If sortMissingLast="true", then a sort on this field will cause documents
          without the field to come after documents with the field,
          regardless of the requested sort order (asc or desc).
@@ -412,10 +416,10 @@
       These fields support doc values, but they require the field to be
       single-valued and either be required or have a default value.
     -->
-    <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
-    <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
-    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
-    <fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="int" class="solr.TrieIntField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="float" class="solr.TrieFloatField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.TrieLongField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="double" class="solr.TrieDoubleField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
 
     <!--
      Numeric field types that index each value at various levels of precision
@@ -427,10 +431,10 @@
      indexed per value, slightly larger index size, and faster range queries.
      A precisionStep of 0 disables indexing at different precision levels.
     -->
-    <fieldType name="tint" class="solr.TrieIntField" precisionStep="8" positionIncrementGap="0"/>
-    <fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" positionIncrementGap="0"/>
-    <fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" positionIncrementGap="0"/>
-    <fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tint" class="solr.TrieIntField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tfloat" class="solr.TrieFloatField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tlong" class="solr.TrieLongField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tdouble" class="solr.TrieDoubleField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
 
     <!-- The format for this date field is of the form 1995-12-31T23:59:59Z, and
          is a more restricted form of the canonical representation of dateTime
@@ -454,10 +458,10 @@
 
          Note: For faster range queries, consider the tdate type
       -->
-    <fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="date" class="solr.TrieDateField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
 
     <!-- A Trie based date field for faster date range queries and date faceting. -->
-    <fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
+    <fieldType name="tdate" class="solr.TrieDateField" docValues="true" precisionStep="6" positionIncrementGap="0"/>
 
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
@@ -505,9 +509,9 @@
 
     <!-- A general text field that has reasonable, generic
          cross-language defaults: it tokenizes with StandardTokenizer,
-	 removes stop words from case-insensitive "stopwords.txt"
-	 (empty by default), and down cases.  At query time only, it
-	 also applies synonyms. -->
+   removes stop words from case-insensitive "stopwords.txt"
+   (empty by default), and down cases.  At query time only, it
+   also applies synonyms. -->
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -543,11 +547,11 @@
                 words="lang/stopwords_en.txt"
                 />
         <filter class="solr.LowerCaseFilterFactory"/>
-	<filter class="solr.EnglishPossessiveFilterFactory"/>
+  <filter class="solr.EnglishPossessiveFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
-	<!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
+  <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
         <filter class="solr.EnglishMinimalStemFilterFactory"/>
-	-->
+  -->
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
       <analyzer type="query">
@@ -558,23 +562,23 @@
                 words="lang/stopwords_en.txt"
                 />
         <filter class="solr.LowerCaseFilterFactory"/>
-	<filter class="solr.EnglishPossessiveFilterFactory"/>
+  <filter class="solr.EnglishPossessiveFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
-	<!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
+  <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
         <filter class="solr.EnglishMinimalStemFilterFactory"/>
-	-->
+  -->
         <filter class="solr.PorterStemFilterFactory"/>
       </analyzer>
     </fieldType>
 
     <!-- A text field with defaults appropriate for English, plus
-	 aggressive word-splitting and autophrase features enabled.
-	 This field is just like text_en, except it adds
-	 WordDelimiterFilter to enable splitting and matching of
-	 words on case-change, alpha numeric boundaries, and
-	 non-alphanumeric chars.  This means certain compound word
-	 cases will work, for example query "wi fi" will match
-	 document "WiFi" or "wi-fi".
+   aggressive word-splitting and autophrase features enabled.
+   This field is just like text_en, except it adds
+   WordDelimiterFilter to enable splitting and matching of
+   words on case-change, alpha numeric boundaries, and
+   non-alphanumeric chars.  This means certain compound word
+   cases will work, for example query "wi fi" will match
+   document "WiFi" or "wi-fi".
         -->
     <fieldType name="text_en_splitting" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
       <analyzer type="index">
@@ -625,7 +629,7 @@
     </fieldType>
 
     <!-- Just like text_general except it reverses the characters of
-	 each token, to enable more efficient leading wildcard queries. -->
+   each token, to enable more efficient leading wildcard queries. -->
     <fieldType name="text_general_rev" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -677,7 +681,7 @@
              See the Java Regular Expression documentation for more
              information on pattern and replacement string syntax.
              
-             http://docs.oracle.com/javase/7/docs/api/java/util/regex/package-summary.html
+             http://docs.oracle.com/javase/8/docs/api/java/util/regex/package-summary.html
           -->
         <filter class="solr.PatternReplaceFilterFactory"
                 pattern="([^a-z])" replacement="" replace="all"
@@ -700,10 +704,10 @@
         a token of "foo|1.4"  would be indexed as "foo" with a payload of 1.4f
         Attributes of the DelimitedPayloadTokenFilterFactory : 
          "delimiter" - a one character delimiter. Default is | (pipe)
-	 "encoder" - how to encode the following value into a playload
-	    float -> org.apache.lucene.analysis.payloads.FloatEncoder,
-	    integer -> o.a.l.a.p.IntegerEncoder
-	    identity -> o.a.l.a.p.IdentityEncoder
+   "encoder" - how to encode the following value into a playload
+      float -> org.apache.lucene.analysis.payloads.FloatEncoder,
+      integer -> o.a.l.a.p.IntegerEncoder
+      identity -> o.a.l.a.p.IdentityEncoder
             Fully Qualified class name implementing PayloadEncoder, Encoder must have a no arg constructor.
          -->
         <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float"/>
@@ -726,10 +730,10 @@
     -->
     <fieldType name="descendent_path" class="solr.TextField">
       <analyzer type="index">
-	<tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
+  <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
       </analyzer>
       <analyzer type="query">
-	<tokenizer class="solr.KeywordTokenizerFactory" />
+  <tokenizer class="solr.KeywordTokenizerFactory" />
       </analyzer>
     </fieldType>
     <!-- 
@@ -738,10 +742,10 @@
     -->
     <fieldType name="ancestor_path" class="solr.TextField">
       <analyzer type="index">
-	<tokenizer class="solr.KeywordTokenizerFactory" />
+  <tokenizer class="solr.KeywordTokenizerFactory" />
       </analyzer>
       <analyzer type="query">
-	<tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
+  <tokenizer class="solr.PathHierarchyTokenizerFactory" delimiter="/" />
       </analyzer>
     </fieldType>
 
@@ -771,6 +775,13 @@
     -->
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
         geo="true" distErrPct="0.025" maxDistErr="0.001" distanceUnits="kilometers" />
+
+    <!-- Spatial rectangle (bounding box) field. It supports most spatial predicates, and has
+     special relevancy modes: score=overlapRatio|area|area2D (local-param to the query).  DocValues is recommended for
+     relevancy. -->
+    <fieldType name="bbox" class="solr.BBoxField"
+               geo="true" distanceUnits="kilometers" numberType="_bbox_coord" />
+    <fieldType name="_bbox_coord" class="solr.TrieDoubleField" precisionStep="8" docValues="true" useDocValuesAsStored="false" stored="false" />
 
    <!-- Money/currency field type. See http://wiki.apache.org/solr/MoneyFieldType
         Parameters:
@@ -1184,7 +1195,7 @@
         <filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
-
+    
     <!-- Swedish -->
     <fieldType name="text_sv" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
@@ -1216,6 +1227,14 @@
       </analyzer>
     </fieldType>
 
+    <!-- Pre-analyzed field type, allows inserting arbitrary token streams and stored values. -->
+    <fieldType name="preanalyzed" class="solr.PreAnalyzedField">
+      <!-- PreAnalyzedField's builtin index analyzer just decodes the pre-analyzed token stream. -->
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      </analyzer>
+    </fieldType>
+
     <!-- A text field used to index XWiki attachment file names. -->
     <fieldType name="text_filename" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
@@ -1243,7 +1262,7 @@
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
+    
   <!-- Similarity is the scoring routine for each document vs. a query.
        A custom Similarity or SimilarityFactory may be specified here, but 
        the default is fine for most applications.  

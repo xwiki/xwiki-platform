@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>5.2.0</luceneMatchVersion>
+  <luceneMatchVersion>6.2.1</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -72,10 +72,8 @@
        The examples below can be used to load some solr-contribs along 
        with their external dependencies.
     -->
-
+    
   <!-- Commented out for XWiki.
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-.*\.jar" />
-
   <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar" />
 
@@ -122,23 +120,7 @@
        persistent, and doesn't work with replication.
     -->
   <directoryFactory name="DirectoryFactory" 
-                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}">
-    
-         
-    <!-- These will be used if you are using the solr.HdfsDirectoryFactory,
-         otherwise they will be ignored. If you don't plan on using hdfs,
-         you can safely remove this section. -->      
-    <!-- The root directory that collection data should be written to. -->     
-    <str name="solr.hdfs.home">${solr.hdfs.home:}</str>
-    <!-- The hadoop configuration files to use for the hdfs client. -->    
-    <str name="solr.hdfs.confdir">${solr.hdfs.confdir:}</str>
-    <!-- Enable/Disable the hdfs cache. -->    
-    <str name="solr.hdfs.blockcache.enabled">${solr.hdfs.blockcache.enabled:true}</str>
-    <!-- Enable/Disable using one global cache for all SolrCores. 
-         The settings used will be from the first HdfsDirectoryFactory created. -->    
-    <str name="solr.hdfs.blockcache.global">${solr.hdfs.blockcache.global:true}</str>
-    
-  </directoryFactory> 
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
 
   <!-- The CodecFactory for defining the format of the inverted index.
        The default implementation is SchemaCodecFactory, which is the official Lucene
@@ -148,30 +130,11 @@
        are experimental, so if you choose to customize the index format, it's a good
        idea to convert back to the official format e.g. via IndexWriter.addIndexes(IndexReader)
        before upgrading to a newer version to avoid unnecessary reindexing.
+       A "compressionMode" string element can be added to <codecFactory> to choose 
+       between the existing compression modes in the default codec: "BEST_SPEED" (default)
+       or "BEST_COMPRESSION".
   -->
   <codecFactory class="solr.SchemaCodecFactory"/>
-
-  <!-- To enable dynamic schema REST APIs, use the following for <schemaFactory>:
-  
-       <schemaFactory class="ManagedIndexSchemaFactory">
-         <bool name="mutable">true</bool>
-         <str name="managedSchemaResourceName">managed-schema</str>
-       </schemaFactory>
-       
-       When ManagedIndexSchemaFactory is specified, Solr will load the schema from
-       the resource named in 'managedSchemaResourceName', rather than from schema.xml.
-       Note that the managed schema resource CANNOT be named schema.xml.  If the managed
-       schema does not exist, Solr will create it after reading schema.xml, then rename
-       'schema.xml' to 'schema.xml.bak'. 
-       
-       Do NOT hand edit the managed schema - external modifications will be ignored and
-       overwritten as a result of schema modification REST API calls.
-
-       When ManagedIndexSchemaFactory is specified with mutable = true, schema
-       modification REST API calls will be allowed; otherwise, error responses will be
-       sent back for these requests. 
-  -->
-  <schemaFactory class="ClassicIndexSchemaFactory"/>
 
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
        Index Config - These settings control low-level behavior of indexing
@@ -211,22 +174,11 @@
          Even older versions of Lucene used LogDocMergePolicy.
       -->
     <!--
-        <mergePolicy class="org.apache.lucene.index.TieredMergePolicy">
+        <mergePolicyFactory class="org.apache.solr.index.TieredMergePolicyFactory">
           <int name="maxMergeAtOnce">10</int>
           <int name="segmentsPerTier">10</int>
-        </mergePolicy>
-      -->
-       
-    <!-- Merge Factor
-         The merge factor controls how many segments will get merged at a time.
-         For TieredMergePolicy, mergeFactor is a convenience parameter which
-         will set both MaxMergeAtOnce and SegmentsPerTier at once.
-         For LogByteSizeMergePolicy, mergeFactor decides how many new segments
-         will be allowed before they are merged into one.
-         Default is 10 for both merge policies.
-      -->
-    <!-- 
-    <mergeFactor>10</mergeFactor>
+          <double name="noCFSRatio">0.1</double>
+        </mergePolicyFactory>
       -->
 
     <!-- Expert: Merge Scheduler
@@ -329,9 +281,17 @@
          uncommitted changes to the index, so use of a hard autoCommit
          is recommended (see below).
          "dir" - the target directory for transaction logs, defaults to the
-                solr data directory.  --> 
+                solr data directory.
+         "numVersionBuckets" - sets the number of buckets used to keep
+                track of max version values when checking for re-ordered
+                updates; increase this value to reduce the cost of
+                synchronizing access to version buckets during high-volume
+                indexing, this requires 8 bytes (long) * numVersionBuckets
+                of heap space per Solr core.
+    -->
     <updateLog>
       <str name="dir">${solr.ulog.dir:}</str>
+      <int name="numVersionBuckets">${solr.ulog.numVersionBuckets:65536}</int>
     </updateLog>
  
     <!-- AutoCommit
@@ -355,8 +315,7 @@
          If the updateLog is enabled, then it's highly recommended to
          have some sort of hard autoCommit to limit the log size.
       -->
-
-     <!-- Commented out for XWiki.
+      <!-- Commented out for XWiki.
      <autoCommit> 
        <maxTime>${solr.autoCommit.maxTime:15000}</maxTime> 
        <openSearcher>false</openSearcher> 
@@ -455,6 +414,17 @@
     <!-- The value was doubled for XWiki's requirements. -->
     <maxBooleanClauses>2048</maxBooleanClauses>
 
+ 
+    <!-- Slow Query Threshold (in millis)
+    
+         At high request rates, logging all requests can become a bottleneck 
+         and therefore INFO logging is often turned off. However, it is still
+         useful to be able to set a latency threshold above which a request
+         is considered "slow" and log that request at WARN level so we can
+         easily identify slow queries.
+    --> 
+    <slowQueryThresholdMillis>-1</slowQueryThresholdMillis>
+
 
     <!-- Solr Internal Query Caches
 
@@ -493,10 +463,13 @@
                  autowarmCount="0"/>
 
     <!-- Query Result Cache
-         
-         Caches results of searches - ordered lists of document ids
-         (DocList) based on a query, a sort, and the range of documents requested.  
-      -->
+
+        Caches results of searches - ordered lists of document ids
+        (DocList) based on a query, a sort, and the range of documents requested.
+        Additional supported parameter by LRUCache:
+           maxRamMB - the maximum amount of RAM (in MB) that this cache is allowed
+                      to occupy
+     -->
     <queryResultCache class="solr.LRUCache"
                      size="512"
                      initialSize="512"
@@ -784,7 +757,6 @@
        not be initialized until the first request that uses it.
 
     -->
-
   <!-- SearchHandler
 
        http://wiki.apache.org/solr/SearchHandler
@@ -950,7 +922,7 @@
   </requestHandler>
 
   <!-- A Robust Example
-
+       
        This example SearchHandler declaration shows off usage of the
        SearchHandler with many defaults declared
 
@@ -959,24 +931,92 @@
        names (and different init parameters)
     -->
   <requestHandler name="/browse" class="solr.SearchHandler">
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
+     <lst name="defaults">
+       <str name="echoParams">explicit</str>
 
-      <!-- VelocityResponseWriter settings -->
-      <str name="wt">velocity</str>
-      <str name="v.template">browse</str>
-      <str name="v.layout">layout</str>
+       <!-- VelocityResponseWriter settings -->
+       <str name="wt">velocity</str>
+       <str name="v.template">browse</str>
+       <str name="v.layout">layout</str>
+       <str name="title">Solritas</str>
 
-      <!-- Query settings -->
-      <str name="defType">edismax</str>
-      <str name="q.alt">*:*</str>
-      <str name="rows">10</str>
-      <str name="fl">*,score</str>
+       <!-- Query settings -->
+       <str name="defType">edismax</str>
+       <str name="qf">
+          text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
+          title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
+       </str>
+       <str name="mm">100%</str>
+       <str name="q.alt">*:*</str>
+       <str name="rows">10</str>
+       <str name="fl">*,score</str>
 
-      <!-- Faceting defaults -->
-      <str name="facet">on</str>
-      <str name="facet.mincount">1</str>
-    </lst>
+       <str name="mlt.qf">
+         text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
+         title^10.0 description^5.0 keywords^5.0 author^2.0 resourcename^1.0
+       </str>
+       <str name="mlt.fl">text,features,name,sku,id,manu,cat,title,description,keywords,author,resourcename</str>
+       <int name="mlt.count">3</int>
+
+       <!-- Faceting defaults -->
+       <str name="facet">on</str>
+       <str name="facet.missing">true</str>
+       <str name="facet.field">cat</str>
+       <str name="facet.field">manu_exact</str>
+       <str name="facet.field">content_type</str>
+       <str name="facet.field">author_s</str>
+       <str name="facet.query">ipod</str>
+       <str name="facet.query">GB</str>
+       <str name="facet.mincount">1</str>
+       <str name="facet.pivot">cat,inStock</str>
+       <str name="facet.range.other">after</str>
+       <str name="facet.range">price</str>
+       <int name="f.price.facet.range.start">0</int>
+       <int name="f.price.facet.range.end">600</int>
+       <int name="f.price.facet.range.gap">50</int>
+       <str name="facet.range">popularity</str>
+       <int name="f.popularity.facet.range.start">0</int>
+       <int name="f.popularity.facet.range.end">10</int>
+       <int name="f.popularity.facet.range.gap">3</int>
+       <str name="facet.range">manufacturedate_dt</str>
+       <str name="f.manufacturedate_dt.facet.range.start">NOW/YEAR-10YEARS</str>
+       <str name="f.manufacturedate_dt.facet.range.end">NOW</str>
+       <str name="f.manufacturedate_dt.facet.range.gap">+1YEAR</str>
+       <str name="f.manufacturedate_dt.facet.range.other">before</str>
+       <str name="f.manufacturedate_dt.facet.range.other">after</str>
+
+       <!-- Highlighting defaults -->
+       <str name="hl">on</str>
+       <str name="hl.fl">content features title name</str>
+       <str name="hl.preserveMulti">true</str>
+       <str name="hl.encoder">html</str>
+       <str name="hl.simple.pre">&lt;b&gt;</str>
+       <str name="hl.simple.post">&lt;/b&gt;</str>
+       <str name="f.title.hl.fragsize">0</str>
+       <str name="f.title.hl.alternateField">title</str>
+       <str name="f.name.hl.fragsize">0</str>
+       <str name="f.name.hl.alternateField">name</str>
+       <str name="f.content.hl.snippets">3</str>
+       <str name="f.content.hl.fragsize">200</str>
+       <str name="f.content.hl.alternateField">content</str>
+       <str name="f.content.hl.maxAlternateFieldLength">750</str>
+
+       <!-- Spell checking defaults -->
+       <str name="spellcheck">on</str>
+       <str name="spellcheck.extendedResults">false</str>       
+       <str name="spellcheck.count">5</str>
+       <str name="spellcheck.alternativeTermCount">2</str>
+       <str name="spellcheck.maxResultsForSuggest">5</str>       
+       <str name="spellcheck.collate">true</str>
+       <str name="spellcheck.collateExtendedResults">true</str>  
+       <str name="spellcheck.maxCollationTries">5</str>
+       <str name="spellcheck.maxCollations">3</str>           
+     </lst>
+
+     <!-- append spellchecking to our list of components -->
+     <arr name="last-components">
+       <str>spellcheck</str>
+     </arr>
   </requestHandler>
 
 
@@ -985,6 +1025,31 @@
       <str name="df">text</str>
     </lst>
   </initParams>
+
+  <initParams path="/update/json/docs">
+    <lst name="defaults">
+      <!--this ensures that the entire json doc will be stored verbatim into one field-->
+      <str name="srcField">_src_</str>
+      <!--This means a the uniqueKeyField will be extracted from the fields and
+       all fields go into the 'df' field. In this config df is already configured to be 'text'
+        -->
+      <str name="mapUniqueKeyOnly">true</str>
+    </lst>
+
+  </initParams>
+
+  <!-- The following are implicitly added
+  <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
+        <lst name="defaults">
+         <str name="stream.contentType">application/json</str>
+       </lst>
+  </requestHandler>
+  <requestHandler name="/update/csv" class="solr.UpdateRequestHandler">
+        <lst name="defaults">
+         <str name="stream.contentType">application/csv</str>
+       </lst>
+  </requestHandler>
+  -->
 
   <!-- Solr Cell Update Request Handler
 
@@ -1149,7 +1214,7 @@
       <!-- maximum threshold of documents a query term can appear to be considered for correction -->
       <float name="maxQueryFrequency">0.01</float>
       <!-- uncomment this to require suggestions to occur in 1% of the documents
-              <float name="thresholdTokenFrequency">.01</float>
+        <float name="thresholdTokenFrequency">.01</float>
       -->
     </lst>
     
@@ -1217,7 +1282,6 @@
     -->
   <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
-      <str name="df">text</str>
       <!-- Solr will use suggestions from both the 'default' spellchecker
            and from the 'wordbreak' spellchecker and combine them.
            collations (re-written queries) can include a combination of
@@ -1239,19 +1303,29 @@
     </arr>
   </requestHandler>
 
-  <!-- This causes long startup times on big indexes, even when never used.  See SOLR-6679
+  <!-- The SuggestComponent in Solr provides users with automatic suggestions for query terms. 
+       You can use this to implement a powerful auto-suggest feature in your search application.
+       As with the rest of this solrconfig.xml file, the configuration of this component is purely
+       an example that applies specifically to this configset and example documents. 
+       
+       More information about this component and other configuration options are described in the
+       "Suggester" section of the reference guide available at 
+       http://archive.apache.org/dist/lucene/solr/ref-guide
+    -->
   <searchComponent name="suggest" class="solr.SuggestComponent">
-      <lst name="suggester">
+    <lst name="suggester">
       <str name="name">mySuggester</str>
-      <str name="lookupImpl">FuzzyLookupFactory</str>
+      <str name="lookupImpl">FuzzyLookupFactory</str>      
       <str name="dictionaryImpl">DocumentDictionaryFactory</str>
       <str name="field">cat</str>
       <str name="weightField">price</str>
       <str name="suggestAnalyzerFieldType">string</str>
+      <str name="buildOnStartup">false</str>
     </lst>
   </searchComponent>
 
-  <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
+  <requestHandler name="/suggest" class="solr.SearchHandler" 
+                  startup="lazy" >
     <lst name="defaults">
       <str name="suggest">true</str>
       <str name="suggest.count">10</str>
@@ -1260,7 +1334,7 @@
       <str>suggest</str>
     </arr>
   </requestHandler>
-  -->
+
 
   <!-- Term Vector Component
 
@@ -1277,7 +1351,6 @@
     -->
   <requestHandler name="/tvrh" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
-      <str name="df">text</str>
       <bool name="tv">true</bool>
     </lst>
     <arr name="last-components">
@@ -1289,64 +1362,54 @@
 
        You'll need to set the solr.clustering.enabled system property
        when running solr to run with clustering enabled:
+       -Dsolr.clustering.enabled=true
 
-            java -Dsolr.clustering.enabled=true -jar start.jar
-
-       http://wiki.apache.org/solr/ClusteringComponent
-       http://carrot2.github.io/solr-integration-strategies/
+       https://cwiki.apache.org/confluence/display/solr/Result+Clustering
     -->
   <searchComponent name="clustering"
                    enable="${solr.clustering.enabled:false}"
                    class="solr.clustering.ClusteringComponent" >
+    <!--
+    Declaration of "engines" (clustering algorithms).
+
+    The open source algorithms from Carrot2.org project:
+      * org.carrot2.clustering.lingo.LingoClusteringAlgorithm
+      * org.carrot2.clustering.stc.STCClusteringAlgorithm
+      * org.carrot2.clustering.kmeans.BisectingKMeansClusteringAlgorithm
+    See http://project.carrot2.org/algorithms.html for more information.
+
+    Commercial algorithm Lingo3G (needs to be installed separately):
+      * com.carrotsearch.lingo3g.Lingo3GClusteringAlgorithm
+    -->
+
     <lst name="engine">
-      <str name="name">lingo</str>
-
-      <!-- Class name of a clustering algorithm compatible with the Carrot2 framework.
-
-           Currently available open source algorithms are:
-           * org.carrot2.clustering.lingo.LingoClusteringAlgorithm
-           * org.carrot2.clustering.stc.STCClusteringAlgorithm
-           * org.carrot2.clustering.kmeans.BisectingKMeansClusteringAlgorithm
-
-           See http://project.carrot2.org/algorithms.html for more information.
-
-           A commercial algorithm Lingo3G (needs to be installed separately) is defined as:
-           * com.carrotsearch.lingo3g.Lingo3GClusteringAlgorithm
-        -->
-      <str name="carrot.algorithm">org.carrot2.clustering.lingo.LingoClusteringAlgorithm</str>
-
-      <!-- Override location of the clustering algorithm's resources 
-           (attribute definitions and lexical resources).
-
-           A directory from which to load algorithm-specific stop words,
-           stop labels and attribute definition XMLs. 
-
-           For an overview of Carrot2 lexical resources, see:
-           http://download.carrot2.org/head/manual/#chapter.lexical-resources
-
-           For an overview of Lingo3G lexical resources, see:
-           http://download.carrotsearch.com/lingo3g/manual/#chapter.lexical-resources
-       -->
+      <str name="name">lingo3g</str>
+      <bool name="optional">true</bool>
+      <str name="carrot.algorithm">com.carrotsearch.lingo3g.Lingo3GClusteringAlgorithm</str>
       <str name="carrot.resourcesDir">clustering/carrot2</str>
     </lst>
 
-    <!-- An example definition for the STC clustering algorithm. -->
+    <lst name="engine">
+      <str name="name">lingo</str>
+      <str name="carrot.algorithm">org.carrot2.clustering.lingo.LingoClusteringAlgorithm</str>
+      <str name="carrot.resourcesDir">clustering/carrot2</str>
+    </lst>
+
     <lst name="engine">
       <str name="name">stc</str>
       <str name="carrot.algorithm">org.carrot2.clustering.stc.STCClusteringAlgorithm</str>
+      <str name="carrot.resourcesDir">clustering/carrot2</str>
     </lst>
 
-    <!-- An example definition for the bisecting kmeans clustering algorithm. -->
     <lst name="engine">
       <str name="name">kmeans</str>
       <str name="carrot.algorithm">org.carrot2.clustering.kmeans.BisectingKMeansClusteringAlgorithm</str>
+      <str name="carrot.resourcesDir">clustering/carrot2</str>
     </lst>
   </searchComponent>
 
-  <!-- A request handler for demonstrating the clustering component
-
-       This is purely as an example.
-
+  <!-- A request handler for demonstrating the clustering component.
+       This is meant as an example.
        In reality you will likely want to add the component to your 
        already specified request handlers. 
     -->
@@ -1376,14 +1439,14 @@
         text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
       </str>
       <str name="q.alt">*:*</str>
-      <str name="rows">10</str>
+      <str name="rows">100</str>
       <str name="fl">*,score</str>
     </lst>
     <arr name="last-components">
       <str>clustering</str>
     </arr>
   </requestHandler>
-  
+
   <!-- Terms Component
 
        http://wiki.apache.org/solr/TermsComponent
@@ -1423,7 +1486,6 @@
   <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
-      <str name="df">text</str>
     </lst>
     <arr name="last-components">
       <str>elevator</str>
@@ -1646,9 +1708,10 @@
   <!--
      Custom response writers can be declared as needed...
     -->
-  <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy">
-    <str name="template.base.dir">${velocity.template.base.dir:}</str>
-  </queryResponseWriter>
+    <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" startup="lazy">
+      <str name="template.base.dir">${velocity.template.base.dir:}</str>
+    </queryResponseWriter>
+  
 
   <!-- XSLT response writer transforms the XML output by any xslt file found
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
@@ -1660,7 +1723,7 @@
 
   <!-- Query Parsers
 
-       http://wiki.apache.org/solr/SolrQuerySyntax
+       https://cwiki.apache.org/confluence/display/solr/Query+Syntax+and+Parsing
 
        Multiple QParserPlugins can be registered by name, and then
        used in either the "defType" param for the QueryComponent (used
@@ -1670,9 +1733,10 @@
   <!--
      <queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/>
     -->
-
+    
   <!-- A custom Query Parser Plugin that adds dynamic aliases for multilingual fields -->
   <queryParser name="xdismax" class="org.xwiki.search.solr.internal.XWikiDismaxQParserPlugin" />
+
 
   <!-- Function Parsers
 
@@ -1712,10 +1776,4 @@
      <transformer name="qecBooster" class="org.apache.solr.response.transform.EditorialMarkerFactory" />
     -->
     
-
-  <!-- Legacy config for the admin interface -->
-  <admin>
-    <defaultQuery>*:*</defaultQuery>
-  </admin>
-
 </config>

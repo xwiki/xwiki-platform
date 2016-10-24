@@ -79,7 +79,7 @@ public class ObjectSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference objectReference) throws SolrIndexerException
     {
-        List<EntityReference> result = new ArrayList<EntityReference>();
+        List<EntityReference> result = new ArrayList<>();
 
         // Object itself
         result.add(objectReference);

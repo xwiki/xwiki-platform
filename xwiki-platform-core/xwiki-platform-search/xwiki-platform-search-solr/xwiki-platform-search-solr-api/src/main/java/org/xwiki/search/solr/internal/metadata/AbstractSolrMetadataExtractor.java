@@ -35,6 +35,7 @@ import javax.inject.Provider;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaMetadataKeys;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -114,8 +115,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected ComponentManager componentManager;
 
     @Override
-    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference) throws SolrIndexerException,
-        IllegalArgumentException
+    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference)
+        throws SolrIndexerException, IllegalArgumentException
     {
         try {
             LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
@@ -157,11 +158,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected SolrReferenceResolver getResolver(EntityReference entityReference) throws SolrIndexerException
     {
         try {
-            return this.componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType()
-                .getLowerCase());
+            return this.componentManager.getInstance(SolrReferenceResolver.class,
+                entityReference.getType().getLowerCase());
         } catch (ComponentLookupException e) {
-            throw new SolrIndexerException("Faile to find solr reference resolver for type reference ["
-                + entityReference + "]");
+            throw new SolrIndexerException(
+                "Faile to find solr reference resolver for type reference [" + entityReference + "]");
         }
     }
 
@@ -205,8 +206,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 return translatedDocument;
             }
         } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Failed to get translated document for '%s'",
-                documentReference), e);
+            throw new SolrIndexerException(
+                String.format("Failed to get translated document for '%s'", documentReference), e);
         }
 
         return null;
@@ -245,16 +246,16 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         return true;
     }
 
-    protected Set<Locale> getLocales(DocumentReference documentReference, Locale entityLocale) throws XWikiException,
-        SolrIndexerException
+    protected Set<Locale> getLocales(DocumentReference documentReference, Locale entityLocale)
+        throws XWikiException, SolrIndexerException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         return getLocales(xcontext.getWiki().getDocument(documentReference, xcontext), entityLocale);
     }
 
-    protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale) throws XWikiException,
-        SolrIndexerException
+    protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale)
+        throws XWikiException, SolrIndexerException
     {
         Set<Locale> locales = new HashSet<Locale>();
 
@@ -324,8 +325,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 locale = xcontext.getWiki().getDocument(documentReference, xcontext).getRealLocale();
             }
         } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",
-                documentReference), e);
+            throw new SolrIndexerException(
+                String.format("Exception while fetching the locale of the document '%s'", documentReference), e);
         }
 
         return locale;
@@ -384,12 +385,13 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // removed from an XClass but there are still objects that have a (large) value set for it (the property
             // class is null in this case). The 255 limit is defined in xwiki.hbm.xml for string properties.
 
-            // It's important here to make sure we give strings to Solr, as it can mutate the value we give it, 
-            // so we need to make sure we don't endanger the state of the document 
+            // It's important here to make sure we give strings to Solr, as it can mutate the value we give it,
+            // so we need to make sure we don't endanger the state of the document
             setPropertyValue(solrDocument, property, new TypedValue(String.valueOf(propertyValue), TypedValue.TEXT),
                 locale);
 
-            if (!(propertyClass instanceof TextAreaClass) && String.valueOf(propertyValue).length() <= SHORT_TEXT_LIMIT) {
+            if (!(propertyClass instanceof TextAreaClass)
+                && String.valueOf(propertyValue).length() <= SHORT_TEXT_LIMIT) {
                 // Also index the raw value that is saved in the database. This provide a stable field name and also
                 // allows exact matching
                 setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
@@ -398,7 +400,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // We iterate the collection instead of giving it to Solr because, although it supports passing collections,
             // it reuses the collection in some cases, when the value of a field is set for the first time for instance,
             // which can lead to side effects on our side.
-            for (Object value : (Collection< ? >) propertyValue) {
+            for (Object value : (Collection<?>) propertyValue) {
                 if (value != null) {
                     // Avoid indexing null values.
                     setPropertyValue(solrDocument, property, new TypedValue(value), locale);
@@ -431,7 +433,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         Map<String, ListItem> knownValues = propertyClass.getMap(this.xcontextProvider.get());
         Object propertyValue = property.getValue();
         // When multiple selection is on the value is a list. Otherwise, for single selection, the value is a string.
-        List< ? > rawValues = propertyValue instanceof List ? (List< ? >) propertyValue : Arrays.asList(propertyValue);
+        List<?> rawValues = propertyValue instanceof List ? (List<?>) propertyValue : Arrays.asList(propertyValue);
         for (Object rawValue : rawValues) {
             // Avoid indexing null values.
             if (rawValue != null) {
@@ -499,7 +501,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             Tika tika = new Tika();
 
             Metadata metadata = new Metadata();
-            metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getFilename());
+            metadata.set(TikaMetadataKeys.RESOURCE_NAME_KEY, attachment.getFilename());
 
             InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
 

@@ -21,15 +21,12 @@ package org.xwiki.search.solr.internal;
 
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -44,7 +41,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.job.Job;
+import org.xwiki.job.JobException;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -239,14 +237,14 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     /**
      * Stop resolver thread.
      */
-    private static final ResolveQueueEntry RESOLVE_QUEUE_ENTRY_STOP = new ResolveQueueEntry(null, false,
-        IndexOperation.STOP);
+    private static final ResolveQueueEntry RESOLVE_QUEUE_ENTRY_STOP =
+        new ResolveQueueEntry(null, false, IndexOperation.STOP);
 
     /**
      * Stop indexer thread.
      */
-    private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP = new IndexQueueEntry((String) null,
-        IndexOperation.STOP);
+    private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP =
+        new IndexQueueEntry((String) null, IndexOperation.STOP);
 
     /**
      * Logging framework.
@@ -284,6 +282,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private ExecutionContextManager ecim;
 
+    @Inject
+    private JobExecutor jobs;
+
     /**
      * The queue of index operation to perform.
      */
@@ -293,12 +294,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * The queue of resolve references and add them to the index queue.
      */
     private BlockingQueue<ResolveQueueEntry> resolveQueue;
-
-    /**
-     * Indexer jobs.
-     */
-    // TODO: use JobManager instead when it support several threads
-    private ExecutorService indexerJobs;
 
     /**
      * Thread in which the indexUpdater will be executed.
@@ -324,8 +319,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     public void initialize() throws InitializationException
     {
         // Initialize the queues before starting the threads.
-        this.resolveQueue = new LinkedBlockingQueue<ResolveQueueEntry>();
-        this.indexQueue = new LinkedBlockingQueue<IndexQueueEntry>(this.configuration.getIndexerQueueCapacity());
+        this.resolveQueue = new LinkedBlockingQueue<>();
+        this.indexQueue = new LinkedBlockingQueue<>(this.configuration.getIndexerQueueCapacity());
 
         // Launch the resolve thread
         this.resolveThread = new Thread(new Resolver());
@@ -340,12 +335,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         this.indexThread.setDaemon(true);
         this.indexThread.start();
         this.indexThread.setPriority(Thread.NORM_PRIORITY - 1);
-
-        // Setup indexer job thread
-        BasicThreadFactory factory =
-            new BasicThreadFactory.Builder().namingPattern("XWiki Solr index job thread").daemon(true)
-                .priority(Thread.MIN_PRIORITY).build();
-        this.indexerJobs = Executors.newSingleThreadExecutor(factory);
     }
 
     @Override
@@ -353,9 +342,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     {
         // Mark the component as disposed
         this.disposed = true;
-
-        // Shutdown indexer jobs queue
-        this.indexerJobs.shutdownNow();
 
         // Stop the resolve thread. Clear the queue and send the stop signal without blocking. We know that the resolve
         // queue will remain empty after the clear call because we set the disposed flag above.
@@ -508,8 +494,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
      * @throws ExecutionContextException
      */
-    private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexerException,
-        IllegalArgumentException, ExecutionContextException
+    private LengthSolrInputDocument getSolrDocument(EntityReference reference)
+        throws SolrIndexerException, IllegalArgumentException, ExecutionContextException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
 
@@ -560,7 +546,11 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     {
         if (!this.disposed) {
             // Don't block because the capacity of the resolver queue is not limited.
-            this.resolveQueue.offer(new ResolveQueueEntry(reference, recurse, operation));
+            try {
+                this.resolveQueue.put(new ResolveQueueEntry(reference, recurse, operation));
+            } catch (InterruptedException e) {
+                this.logger.error("Failed to add reference [{}] to Solr indexing queue", reference, e);
+            }
         }
     }
 
@@ -573,17 +563,10 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public IndexerJob startIndex(IndexerRequest request) throws SolrIndexerException
     {
-        IndexerJob job;
         try {
-            job = this.componentManager.getInstance(Job.class, IndexerJob.JOBTYPE);
-        } catch (ComponentLookupException e) {
-            throw new SolrIndexerException("Failed to lookup indexer job component", e);
+            return (IndexerJob) this.jobs.execute(IndexerJob.JOBTYPE, request);
+        } catch (JobException e) {
+            throw new SolrIndexerException("Failed to start index job", e);
         }
-
-        job.initialize(request);
-
-        this.indexerJobs.execute(job);
-
-        return job;
     }
 }

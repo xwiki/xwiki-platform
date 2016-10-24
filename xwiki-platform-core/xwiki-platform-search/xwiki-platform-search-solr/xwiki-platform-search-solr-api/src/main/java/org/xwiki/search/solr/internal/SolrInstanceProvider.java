@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -42,12 +41,6 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
 @Singleton
 public class SolrInstanceProvider implements Provider<SolrInstance>, Initializable
 {
-    /**
-     * Logging framework.
-     */
-    @Inject
-    private Logger logger;
-
     /**
      * Solr configuration.
      */
@@ -70,8 +63,8 @@ public class SolrInstanceProvider implements Provider<SolrInstance>, Initializab
         try {
             this.configuredInstance = this.componentManager.getInstance(SolrInstance.class, type);
         } catch (ComponentLookupException e) {
-            throw new InitializationException(String.format("Failed to lookup configured Solr instance type [%s]",
-                type), e);
+            throw new InitializationException(
+                String.format("Failed to lookup configured Solr instance type [%s]", type), e);
         }
     }
 

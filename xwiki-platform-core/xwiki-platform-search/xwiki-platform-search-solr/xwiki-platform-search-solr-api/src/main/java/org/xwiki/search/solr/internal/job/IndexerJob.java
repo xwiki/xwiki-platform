@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -28,6 +30,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -43,12 +47,18 @@ import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(IndexerJob.JOBTYPE)
-public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<IndexerRequest>>
+public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<IndexerRequest>> implements GroupedJob
 {
     /**
      * The id of the job.
      */
     public static final String JOBTYPE = "solr.indexer";
+
+    /**
+     * All indexers run in the same thread.
+     */
+    // TODO: group indexers based on the IndexerRequest root entity
+    private static final JobGroupPath GROUP = new JobGroupPath(Arrays.asList("solr", "indexer"));
 
     /**
      * Used to send documents to index or delete to/from Solr index.
@@ -68,6 +78,12 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     public String getType()
     {
         return JOBTYPE;
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return GROUP;
     }
 
     @Override
@@ -100,7 +116,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
      */
     private void updateSolrIndex()
     {
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(solrIterator, databaseIterator);
+        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<>(this.solrIterator, this.databaseIterator);
         iterator.setRootReference(getRequest().getRootReference());
 
         this.progressManager.pushLevelProgress((int) iterator.size(), this);
@@ -123,7 +139,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                 counter[entry.getValue().ordinal()]++;
             }
 
-            logger.info("{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
+            this.logger.info(
+                "{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
         } finally {
             this.progressManager.popLevelProgress(this);

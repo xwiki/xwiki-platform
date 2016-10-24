@@ -114,8 +114,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Execute Solr query [{}]", solrParams);
 
-        QueryResponse result = this.server.query(solrParams);
-        return result;
+        return this.server.query(solrParams);
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Create or update the Crypto.CertificateClass document.
@@ -58,8 +59,8 @@ public class CertificateClassDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER, "Issuer", 64);
         needsUpdate |= bclass.addTextField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_SERIAL, "Serial", 64);
 
-        needsUpdate |=
-            bclass.addTextAreaField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE, "Certificate", 64, 10);
+        needsUpdate |= bclass.addTextAreaField(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
+            "Certificate", 64, 10, TextAreaClass.EditorType.PURE_TEXT, TextAreaClass.ContentType.PURE_TEXT);
 
         needsUpdate |= setClassDocumentFields(document, "Certificate Class");
 

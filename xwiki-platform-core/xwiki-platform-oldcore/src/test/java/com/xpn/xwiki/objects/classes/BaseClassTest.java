@@ -19,13 +19,14 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the {@link BaseClass} class.
@@ -39,31 +40,31 @@ public class BaseClassTest
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     @Test
-    public void testSetDocumentReference() throws Exception
+    public void setDocumentReference() throws Exception
     {
         BaseClass baseClass = new BaseClass();
 
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         baseClass.setDocumentReference(reference);
 
-        Assert.assertEquals(reference, baseClass.getDocumentReference());
+        assertEquals(reference, baseClass.getDocumentReference());
     }
 
     @Test
-    public void testSetNameSetWiki() throws Exception
+    public void setNameSetWiki() throws Exception
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
 
         baseClass.setName("space.page");
 
-        Assert.assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("page", baseClass.getDocumentReference().getName());
+        assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
+        assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("page", baseClass.getDocumentReference().getName());
     }
 
     @Test
-    public void testSetNameAloneWithChangingContext() throws Exception
+    public void setNameAloneWithChangingContext() throws Exception
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
@@ -73,18 +74,18 @@ public class BaseClassTest
         try {
             this.oldcore.getXWikiContext().setWikiId("otherwiki");
 
-            Assert.assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
-            Assert.assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
-            Assert.assertEquals("page", baseClass.getDocumentReference().getName());
+            assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
+            assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
+            assertEquals("page", baseClass.getDocumentReference().getName());
 
             baseClass.setName("otherspace.otherpage");
         } finally {
             this.oldcore.getXWikiContext().setWikiId(database);
         }
 
-        Assert.assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("otherspace", baseClass.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("otherpage", baseClass.getDocumentReference().getName());
+        assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
+        assertEquals("otherspace", baseClass.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("otherpage", baseClass.getDocumentReference().getName());
 
         baseClass = new BaseClass();
         try {
@@ -94,14 +95,29 @@ public class BaseClassTest
             this.oldcore.getXWikiContext().setWikiId(database);
         }
 
-        Assert.assertEquals("otherwiki", baseClass.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("page", baseClass.getDocumentReference().getName());
+        assertEquals("otherwiki", baseClass.getDocumentReference().getWikiReference().getName());
+        assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("page", baseClass.getDocumentReference().getName());
 
         baseClass.setName("otherspace.otherpage");
 
-        Assert.assertEquals("otherwiki", baseClass.getDocumentReference().getWikiReference().getName());
-        Assert.assertEquals("otherspace", baseClass.getDocumentReference().getLastSpaceReference().getName());
-        Assert.assertEquals("otherpage", baseClass.getDocumentReference().getName());
+        assertEquals("otherwiki", baseClass.getDocumentReference().getWikiReference().getName());
+        assertEquals("otherspace", baseClass.getDocumentReference().getLastSpaceReference().getName());
+        assertEquals("otherpage", baseClass.getDocumentReference().getName());
+    }
+
+    @Test
+    public void addTextAreaFieldWhenNullContentType() throws Exception
+    {
+        BaseClass baseClass = new BaseClass();
+
+        TextAreaClass textAreaClass = new TextAreaClass();
+        textAreaClass.setName("field");
+        textAreaClass.setPrettyName("pretty name");
+        textAreaClass.setSize(55);
+        textAreaClass.setRows(33);
+        baseClass.put("field", textAreaClass);
+
+        assertFalse(baseClass.addTextAreaField("field", "pretty name", 55, 33));
     }
 }

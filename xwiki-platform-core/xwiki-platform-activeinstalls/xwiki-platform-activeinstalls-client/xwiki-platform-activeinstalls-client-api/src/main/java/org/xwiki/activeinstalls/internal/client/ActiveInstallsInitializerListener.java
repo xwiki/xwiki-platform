@@ -52,18 +52,6 @@ public class ActiveInstallsInitializerListener implements EventListener
     private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent()));
 
     /**
-     * Used to initialize the unique XWiki instance id (to be removed in the future, see the source documentation
-     * below).
-     * <p>
-     * Note that we use a Provider since the Observation Manager will register listeners very early in the
-     * initialization process and some of the components injected transitively by the {@link InstanceIdManager}
-     * implementation have initialization code that require an Execution Context to be available, which is not the case
-     * early one in XWiki's initialization since no HTTP request has been made yet...
-     */
-    @Inject
-    private Provider<InstanceIdManager> instanceIdManagerProvider;
-
-    /**
      * Used to send the ping to the remote instance.
      * <p>
      * Note that we use a Provider since the Observation Manager will register listeners very early in the
@@ -95,10 +83,6 @@ public class ActiveInstallsInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Ensure that the instance id is initialized and available.
-        // TODO: In the future introduce an EventListener in the instance module and have this listener execute *after*
-        this.instanceIdManagerProvider.get().initializeInstanceId();
-
         // Start a thread to regularly send pings to the active installs server.
         Thread pingThread = new Thread(new ActiveInstallsPingThread(this.configuration, this.pingSenderProvider.get()));
         pingThread.setName("Active Installs Ping Thread");

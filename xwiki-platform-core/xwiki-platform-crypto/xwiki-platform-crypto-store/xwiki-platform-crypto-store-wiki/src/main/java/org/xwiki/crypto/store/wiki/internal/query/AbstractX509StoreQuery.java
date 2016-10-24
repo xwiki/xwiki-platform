@@ -26,6 +26,7 @@ import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.CertificateStoreException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -42,13 +43,11 @@ public abstract class AbstractX509StoreQuery
 
     private static final String WHERE_STATEMENT = " where 1=1";
 
-    private static final String SPACE = "space";
+    private static final String STORE = "store";
 
-    private static final String WHERE_SPACE_STATEMENT = " where doc.space=:" + SPACE;
+    private static final String WHERE_SPACE_STATEMENT = " where doc.space=:" + STORE;
 
-    private static final String DOCNAME = "name";
-
-    private static final String WHERE_DOC_STATEMENT = " and doc.name=:" + DOCNAME;
+    private static final String WHERE_DOC_STATEMENT = " where doc.fullName=:" + STORE;
 
     /**
      * Encoder used to encode/decode data to/from String.
@@ -69,10 +68,12 @@ public abstract class AbstractX509StoreQuery
      * @param where the additional where statement specific to the query.
      * @param encoder a string encoder/decoder used to convert byte arrays to/from String.
      * @param queryManager the query manager used to build queries.
+     * @param serializer the entity reference serializer to serialize the store reference for query
      * @throws CertificateStoreException on error creating required queries.
      */
     public AbstractX509StoreQuery(EntityReference store, String select, String from, String where,
-        BinaryStringEncoder encoder, QueryManager queryManager) throws CertificateStoreException
+        BinaryStringEncoder encoder, QueryManager queryManager, EntityReferenceSerializer<String> serializer)
+        throws CertificateStoreException
     {
         EntityReference wiki = null;
         EntityType storeType = null;
@@ -91,9 +92,10 @@ public abstract class AbstractX509StoreQuery
         String statement = select + FROM_STATEMENT + from;
 
         if (storeType != EntityType.WIKI) {
-            statement += WHERE_SPACE_STATEMENT;
             if (storeType == EntityType.DOCUMENT) {
                 statement += WHERE_DOC_STATEMENT;
+            } else {
+                statement += WHERE_SPACE_STATEMENT;
             }
         } else {
             statement += WHERE_STATEMENT;
@@ -110,12 +112,7 @@ public abstract class AbstractX509StoreQuery
         this.query.setWiki(wiki.getName());
 
         if (storeType != EntityType.WIKI) {
-            if (storeType == EntityType.DOCUMENT) {
-                this.query.bindValue(DOCNAME, store.getName())
-                          .bindValue(SPACE, store.getParent().getName());
-            } else if (storeType == EntityType.SPACE) {
-                this.query.bindValue(SPACE, store.getName());
-            }
+            this.query.bindValue(STORE, serializer.serialize(store));
         }
     }
 

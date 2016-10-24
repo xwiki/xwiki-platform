@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -30,6 +31,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.instance.InstanceId;
@@ -48,14 +50,17 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
  */
 @Component
 @Singleton
-public class DefaultInstanceIdManager implements InstanceIdManager
+public class DefaultInstanceIdManager implements InstanceIdManager, Initializable
 {
     /**
      * Used to store the new instance id if none exists already.
+     *
+     * Note that we use a Provider so that this component can be injected into a Listener (Listeners are initialized
+     * very early and before the store is ready).
      */
     @Inject
     @Named("hibernate")
-    private XWikiStoreInterface hibernateStore;
+    private Provider<XWikiStoreInterface> hibernateStoreProvider;
 
     /**
      * Used to get the XWiki Context.
@@ -82,60 +87,58 @@ public class DefaultInstanceIdManager implements InstanceIdManager
     }
 
     @Override
-    public void initializeInstanceId()
+    public void initialize()
     {
-        if (this.instanceId == null) {
-            // Load it from the database
-            XWikiContext context = getXWikiContext();
-            XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        // Load it from the database
+        XWikiContext context = getXWikiContext();
+        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStoreProvider.get();
 
-            // Try retrieving the UUID from the database
+        // Try retrieving the UUID from the database
 
-            // First ensure that we're on the main wiki since we store the unique id only on the main wiki
-            String originalDatabase = context.getWikiId();
-            context.setWikiId(context.getMainXWiki());
+        // First ensure that we're on the main wiki since we store the unique id only on the main wiki
+        String originalDatabase = context.getWikiId();
+        context.setWikiId(context.getMainXWiki());
 
-            try {
-                InstanceId id = store.failSafeExecuteRead(context,
-                    new XWikiHibernateBaseStore.HibernateCallback<InstanceId>()
+        try {
+            InstanceId id = store.failSafeExecuteRead(context,
+                new XWikiHibernateBaseStore.HibernateCallback<InstanceId>()
+                {
+                    @Override
+                    public InstanceId doInHibernate(Session session) throws HibernateException
+                    {
+                        // Retrieve the version from the database
+                        return (InstanceId) session.createCriteria(InstanceId.class).uniqueResult();
+                    }
+                });
+
+            // If the database doesn't hold the UUID then compute one and save it
+            if (id == null) {
+                // Compute UUID
+                final InstanceId newId = new InstanceId(UUID.randomUUID().toString());
+                // Store it. Note that this can fail in which case no UUID is saved in the DB and the operation
+                // will be retried again next time the wiki is restarted.
+                try {
+                    store.executeWrite(context, new XWikiHibernateBaseStore.HibernateCallback<Object>()
                     {
                         @Override
-                        public InstanceId doInHibernate(Session session) throws HibernateException
+                        public Object doInHibernate(Session session) throws HibernateException
                         {
-                            // Retrieve the version from the database
-                            return (InstanceId) session.createCriteria(InstanceId.class).uniqueResult();
+                            session.createQuery("delete from " + InstanceId.class.getName()).executeUpdate();
+                            session.save(newId);
+                            return null;
                         }
                     });
-
-                // If the database doesn't hold the UUID then compute one and save it
-                if (id == null) {
-                    // Compute UUID
-                    final InstanceId newId = new InstanceId(UUID.randomUUID().toString());
-                    // Store it. Note that this can fail in which case no UUID is saved in the DB and the operation
-                    // will be retried again next time the wiki is restarted.
-                    try {
-                        store.executeWrite(context, new XWikiHibernateBaseStore.HibernateCallback<Object>()
-                        {
-                            @Override
-                            public Object doInHibernate(Session session) throws HibernateException
-                            {
-                                session.createQuery("delete from " + InstanceId.class.getName()).executeUpdate();
-                                session.save(newId);
-                                return null;
-                            }
-                        });
-                    } catch (XWikiException e) {
-                        this.logger.warn("Failed to save Instance id to database. Reason: [{}]",
-                            ExceptionUtils.getRootCauseMessage(e));
-                    }
-                    id = newId;
+                } catch (XWikiException e) {
+                    this.logger.warn("Failed to save Instance id to database. Reason: [{}]",
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
-
-                this.instanceId = id;
-            } finally {
-                // Restore original database
-                context.setWikiId(originalDatabase);
+                id = newId;
             }
+
+            this.instanceId = id;
+        } finally {
+            // Restore original database
+            context.setWikiId(originalDatabase);
         }
     }
 

@@ -19,23 +19,41 @@
  */
 package org.xwiki.crypto.script;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 
 /**
- * Script service allowing a user to sign text, determine the validity and signer of already signed text, create keys,
- * and register new certificates.
+ * Script service manager for cryptographic services.
  *
  * @version $Id$
- * @since 2.5M1
+ * @since 8.4RC1
  */
 @Component
-@Named("crypto")
+@Named(CryptoScriptService.ROLEHINT)
 @Singleton
 public class CryptoScriptService implements ScriptService
 {
-    // Holding place for upcoming new API.
+    /**
+     * The role hint of this component.
+     */
+    public static final String ROLEHINT = "crypto";
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
+
+    /**
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     */
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(CryptoScriptService.ROLEHINT + '.' + serviceName);
+    }
 }

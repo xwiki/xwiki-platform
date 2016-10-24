@@ -19,19 +19,13 @@
  */
 package org.xwiki.instance;
 
-import org.xwiki.component.annotation.Role;
-
 /**
- * Initialize and retrieve the Instance Id.
+ * Add a backward compatibility layer to the {@link org.xwiki.instance.InstanceIdManager} class.
  *
  * @version $Id$
- * @since 5.2M2
+ * @since 8.4RC1
  */
-@Role
-public interface InstanceIdManager
+public privileged aspect InstanceIdManagerAspect
 {
-    /**
-     * @return the Instance id or null if it isn't set
-     */
-    InstanceId getInstanceId();
+    declare parents : InstanceIdManager implements CompatibilityInstanceIdManager;
 }

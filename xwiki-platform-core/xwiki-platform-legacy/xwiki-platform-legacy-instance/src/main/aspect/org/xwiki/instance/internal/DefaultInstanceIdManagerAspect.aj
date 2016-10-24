@@ -17,21 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.instance;
-
-import org.xwiki.component.annotation.Role;
+package org.xwiki.instance.internal;
 
 /**
- * Initialize and retrieve the Instance Id.
+ * Add a backward compatibility layer to the {@link org.xwiki.instance.internal.DefaultInstanceIdManager} class.
  *
  * @version $Id$
- * @since 5.2M2
  */
-@Role
-public interface InstanceIdManager
+public privileged aspect DefaultInstanceIdManagerAspect
 {
     /**
-     * @return the Instance id or null if it isn't set
+     * @deprecated replaced by implementation of Initializable since 8.4RC1
      */
-    InstanceId getInstanceId();
+    @Deprecated
+    public void DefaultInstanceIdManager.initializeInstanceId()
+    {
+        // Kept for backward-compatibility
+        if (this.instanceId == null) {
+            initialize();
+        }
+    }
 }

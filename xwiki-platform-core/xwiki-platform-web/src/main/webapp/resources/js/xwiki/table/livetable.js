@@ -228,7 +228,7 @@ XWiki.widgets.LiveTable = Class.create({
 
           // Let code know new entries arrived
           // 1. Named event (for code interested by that table only)
-          document.fire("xwiki:livetable:" + this.domNodeName + ":receivedEntries", {
+          document.fire("xwiki:livetable:" + self.domNodeName + ":receivedEntries", {
             "data" : res
           });
           // 2. Generic event (for code potentially interested in any livetable)

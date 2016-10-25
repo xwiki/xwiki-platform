@@ -98,19 +98,25 @@
 ## Initialize variables from an old color theme
 ## (FlamingoThemesCode.ThemeClass)
 ##
+## This macro is designed to be called twice (see style.less.vm).
+## The first time, it creates a bunch of variables from default values & the flamingo theme object.
+## The second time, it is called after the @lessCode variable is injected into the LESS code.
+## We do that because it's the way it works on the FlamingoThemeEditor live preview: updating the LESS variables 
+## *after* the custom @lessCode is injected, and there is no way to make it different.
+## So, by calling the macro the second time, we overwrite the values that could be defined in @lessCode, and
+## we are consistent with the live preview (no bad surprise !)
+##
 ##############################################
 #macro(initFromFlamingoTheme)
   // Colors from the new flamingo theme class
-  ## Set the XWiki variables
-  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
-  @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
-  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
-  ## Now set the variables with the values of the object
+  ## Init the XWiki variables
+  #if (!$xwikiLessVarsInitialized)
+    ## These are the variables that can only be overwritten by the @lessCode variable.
+    ## For them, we should not overwrite what @lessCode did
+    #set ($xwikiLessVarsInitialized = true)
+    #initDefaultXWikiVariables()
+  #end
+  ## Now set the variables with the values of the Flamingo object
   #if ("$!themeObj" != '')
     ## variables of the class
     #set($variables = {
@@ -194,7 +200,7 @@
 ##
 ##############################################
 #macro(initDefaultXWikiVariables)
-  ## currently, it comes from the old color theme object
+  ## currently, it comes from the old color theme object (see colorThemeInit.vm)
   // Default
   @xwiki-border-color:                  $theme.borderColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;

@@ -541,6 +541,11 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Generate extension descriptor for each artifact of the WAR -->
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>

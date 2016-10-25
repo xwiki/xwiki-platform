@@ -44,7 +44,6 @@ import org.xwiki.crypto.store.wiki.internal.query.AbstractX509KeyIdentifierQuery
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509StoreQuery;
 import org.xwiki.crypto.store.wiki.internal.query.AbstractX509SubjectQuery;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -86,7 +85,6 @@ import static org.mockito.Mockito.when;
     CurrentReferenceEntityReferenceResolver.class,
     CurrentStringEntityReferenceResolver.class,
     LocalStringEntityReferenceSerializer.class,
-    DefaultSymbolScheme.class
 })
 public class X509CertificateWikiStoreTest
 {

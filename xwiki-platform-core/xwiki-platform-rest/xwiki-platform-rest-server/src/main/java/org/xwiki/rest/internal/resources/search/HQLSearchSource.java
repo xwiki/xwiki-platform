@@ -51,7 +51,12 @@ public class HQLSearchSource extends AbstractDatabaseSearchSource
 
         builder.append("doc.fullName, doc.space, doc.name, doc.language from XWikiDocument as doc ");
 
-        builder.append(query);
+        if (query.toLowerCase().startsWith("from")) {
+            builder.append(',');
+            builder.append(query.substring(4));
+        } else {
+            builder.append(query);
+        }
 
         return builder.toString();
     }

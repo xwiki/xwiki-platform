@@ -50,10 +50,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -61,12 +58,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -76,6 +68,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
+import org.xwiki.tool.extension.util.AbstractExtensionMojo;
 import org.xwiki.tool.utils.LogUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -94,7 +87,7 @@ import com.xpn.xwiki.tool.backup.Importer;
     requiresProject = true,
     threadSafe = true
 )
-public class PackageMojo extends AbstractMojo
+public class PackageMojo extends AbstractExtensionMojo
 {
     /**
      * The directory where to create the packaging.
@@ -121,22 +114,10 @@ public class PackageMojo extends AbstractMojo
     protected MavenProject project;
 
     /**
-     * Project builder -- builds a model from a pom.xml.
-     */
-    @Component
-    protected ProjectBuilder projectBuilder;
-
-    /**
      * Used to look up Artifacts in the remote repository.
      */
     @Component
     protected RepositorySystem repositorySystem;
-
-    /**
-     * The current Maven session being executed.
-     */
-    @Parameter(property = "session", defaultValue = "${session}", readonly = true)
-    private MavenSession session;
 
     /**
      * Local repository to be used by the plugin to resolve dependencies.
@@ -204,6 +185,8 @@ public class PackageMojo extends AbstractMojo
         }
         LogUtils.configureXWikiLogs();
 
+        initializeComponents();
+
         getLog().info("Using platform version: " + getXWikiPlatformVersion());
 
         // Step 1: Expand Jetty resources into the package output directory.
@@ -225,8 +208,7 @@ public class PackageMojo extends AbstractMojo
         File libDirectory = new File(webInfDirectory, "lib");
         createDirectory(libDirectory);
         for (Artifact artifact : resolveJarArtifacts()) {
-            getLog().info("  ... Copying JAR: " + artifact.getFile());
-            copyFile(artifact.getFile(), libDirectory);
+            installJAR(artifact, libDirectory);
         }
 
         // Step 4: Copy compiled classes in the WEB-INF/Classes directory. This allows the tests to provide custom
@@ -246,7 +228,7 @@ public class PackageMojo extends AbstractMojo
         // Step 6: Copy HSQLDB JDBC Driver
         getLog().info("Copying HSQLDB JDBC Driver JAR ...");
         Artifact hsqldbArtifact = resolveHSQLDBArtifact();
-        copyFile(hsqldbArtifact.getFile(), libDirectory);
+        installJAR(hsqldbArtifact, libDirectory);
 
         // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Flamingo skin only.
         getLog().info("Copying Skins ...");
@@ -260,6 +242,16 @@ public class PackageMojo extends AbstractMojo
             String.format("Import XAR dependencies %s...", this.importUser == null ? "as a backup pack"
                 : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
+    }
+
+    protected void installJAR(Artifact artifact, File libDirectory) throws MojoExecutionException
+    {
+        // Copy JAR file
+        getLog().info("  ... Copying JAR: " + artifact.getFile());
+        copyFile(artifact.getFile(), libDirectory);
+
+        // Generate XED file
+        saveExtension(artifact, libDirectory);
     }
 
     protected boolean isSkipExecution()
@@ -789,25 +781,6 @@ public class PackageMojo extends AbstractMojo
     {
         return getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.platform", "xwiki-platform-core",
             getXWikiPlatformVersion()));
-    }
-
-    private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
-    {
-        try {
-            ProjectBuildingRequest request =
-                new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest())
-                    // We don't want to execute any plugin here
-                    .setProcessPlugins(false)
-                    // It's not this plugin job to validate this pom.xml
-                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                    // Use the repositories configured for the built project instead of the default Maven ones
-                    .setRemoteRepositories(this.session.getCurrentProject().getRemoteArtifactRepositories());
-            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
-            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
-            return result.getProject();
-        } catch (ProjectBuildingException e) {
-            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
-        }
     }
 
     /**

@@ -98,8 +98,14 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
 
     private void moveAppToPanel(String appName, WebElement panel, WebElement fromPanel)
     {
-        WebElement app = fromPanel.findElement(By.linkText(appName));
+        By appSelector = By.linkText(appName);
+        WebElement app = fromPanel.findElement(appSelector);
         new Actions(getDriver()).dragAndDrop(app, panel).perform();
+
+        getDriver().waitUntilCondition(webDriver -> {
+            return getDriver().hasElementWithoutWaiting(panel, appSelector)
+                    && !getDriver().hasElementWithoutWaiting(fromPanel, appSelector);
+        });
     }
 
     public void moveAppBefore(String appName, String appBeforeName)

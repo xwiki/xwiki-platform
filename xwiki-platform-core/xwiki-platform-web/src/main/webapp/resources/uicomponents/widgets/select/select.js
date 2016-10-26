@@ -57,10 +57,81 @@ require(['jquery'], function($) {
     };
     
     /**
+     * When the user types some text to filter the options, we hide/show each options according to their matching with
+     * the filter.
+     */
+    self.onFilterChange = function () {
+      // The filter is the DOM input.
+      var filter = $(this);
+      // The value is an array of words to match
+      var filterValues = filter.val().split(' ');
+      // We are going to count how many categories have matching options.
+      var matchingCategoriesCount = 0;
+      // For each category.
+      var categories = self.selectWidget.find('.xwiki-select-category');
+      for (var i = 0; i < categories.length; ++i) {
+        var category = $(categories[i]);
+        // For each option of that category.
+        var options = category.find('.xwiki-select-option');
+        var matchingOptionsCount = 0;
+        for (var j = 0; j < options.length; ++j) {
+          var option = $(options[j]);
+          // We look both in the label and in the hint of the option
+          var label = option.find('label').text().toLowerCase();
+          var hint  = option.find('.xHint').text().toLowerCase();
+          var optionText = label + ' ' + hint;
+          // We look if the label match all the values of the filer.
+          var optionShouldBeVisible = true;
+          for (var k = 0; k < filterValues.length; ++k) {
+            var filterValue = filterValues[k].toLowerCase();
+            // If one of the filter values is missing from the label of this option, we must hide it.
+            if (optionText.indexOf(filterValue) == -1) {
+              optionShouldBeVisible = false;
+              break;
+            }
+          }
+          // Hide/show the option according to the result of the previous loop.
+          if (optionShouldBeVisible) {
+            // We must call show() because the option could have been hidden by a previous filter.
+            // It has no effect if the option is already visible.
+            option.show();
+            matchingOptionsCount++;
+          } else {
+            option.hide();
+          }
+        }
+      
+        // Now, we update the count of matching items in the heading of the category.
+        category.find('.xwiki-select-category-count').text(matchingOptionsCount);
+        
+        // We hide the category if it has no matching options.
+        if (matchingOptionsCount == 0) {
+          category.hide();
+        } else {
+          category.show();
+          matchingCategoriesCount++;
+        }
+      }
+
+      // If there is no matching categories at all, we display a nice "No result" message instead of having a blank
+      // panel.
+      if (matchingCategoriesCount == 0) {
+        // Append the "no result" message only if it is not already displayed
+        if (self.selectWidget.find('.xwiki-select-no-results').length == 0) {
+          self.selectWidget.find('.xwiki-select-options').append('<p class="xwiki-select-no-results">$escapetool.javascript($escapetool.xml($services.localization.render("web.widgets.select.filter.noResults")))</p>');
+        }
+      } else {
+        // We remove the "no results" message, just in case it has been displayed by a previous filter.
+        self.selectWidget.find('.xwiki-select-no-results').remove();
+      }
+    };
+    
+    /**
     /* Initialization
      */
     self.init = function () {
       self.selectWidget.find('.xwiki-select-option').click(self.onOptionClicked);
+      self.selectWidget.find('input.xwiki-select-filter').change(self.onFilterChange).keyup(self.onFilterChange);
     };
     
     /**

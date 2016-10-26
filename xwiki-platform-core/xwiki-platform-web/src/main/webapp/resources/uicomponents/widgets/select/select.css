@@ -30,9 +30,11 @@
 }
 
 .xwiki-select-option {
-  float: left;
+  /* inline-block is better than "float: left" because when the option is hidden (because of the filtering feature), it 
+     does not keep it place in the layout (which looks better) */
+  display: inline-block;
   padding: 5px;
-  width: 50%;
+  width: 49%;
   border: 1px dotted transparent;
   list-style-type: none;
 }

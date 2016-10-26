@@ -2666,6 +2666,7 @@ Recursive title display detected!##
 ### @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first option
 ### @param $cssClass class to add to the div (could be 'xwiki-select-small', 'xwiki-select-medium', 'xwiki-select-tall' or any other class)
 ### @param $id (optional) id to give to the widget
+### @param $enableFilter (optional) enable the filtering of the options
 ###
 ### Example of use:
 ###
@@ -2684,19 +2685,20 @@ Recursive title display detected!##
 ###                     ]
 ###                   }
 ###                 ])
-### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small')
+### #xwikiSelect('nameOfTheField', $options, 'option1', false, 'xwiki-select-small', '', true)
 #########################################################
-#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id)
+#macro(xwikiSelect $fieldName $options $defaultValue $firstIsDefaultIfDefaultNull $cssClass $id $enableFilter $filterPlaceHolder)
   ## TODO: put this in a webjar instead
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/select/select.css', {'forceSkinAction': true}))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/select/select.js' , {'forceSkinAction': true}))
   <div class="xwiki-select $!cssClass" #if("$!id" != '')id="$id"#end>
     ## Here we let a place to add a filter in the future, that is why the options are inside the following div block.
+    <p><input type="text" class="xwiki-select-filter" placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))"/></p>
     <div class="xwiki-select-options">
       <ul>
         #set ($count = 0)
         #foreach ($category in $options)
-          <li>$category.name ($category.options.size())
+          <li class="xwiki-select-category">$category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
             <ul>
               #foreach ($option in $category.options)
                 #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))

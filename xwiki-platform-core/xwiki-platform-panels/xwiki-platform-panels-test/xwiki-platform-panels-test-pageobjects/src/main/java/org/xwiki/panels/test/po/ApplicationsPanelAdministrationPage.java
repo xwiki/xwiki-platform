@@ -100,7 +100,8 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
     {
         By appSelector = By.linkText(appName);
         WebElement app = fromPanel.findElement(appSelector);
-        new Actions(getDriver()).dragAndDrop(app, panel).perform();
+        WebElement destination = panel.findElement(By.tagName("ul"));
+        new Actions(getDriver()).dragAndDrop(app, destination).perform();
 
         getDriver().waitUntilCondition(webDriver ->
             getDriver().hasElementWithoutWaiting(panel, appSelector)

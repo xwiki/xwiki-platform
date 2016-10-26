@@ -37,6 +37,7 @@
   width: 49%;
   border: 1px dotted transparent;
   list-style-type: none;
+  vertical-align: top;
 }
 
 .xwiki-select-options > ul > li {

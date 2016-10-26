@@ -184,12 +184,15 @@
         }))
       #end
     #end
-    <dt><label>$services.localization.render('core.create.type')</label></dt>
+    <dt>
+      <label>$services.localization.render('core.create.type')</label>
+      <span class="xHint">$escapetool.xml($services.localization.render('core.create.type.hint'))</span>
+    </dt>
     #set ($defaultValue = $request.type)
     #if ("$!defaultValue" == '')
       #set ($defaultValue = 'blank')
     #end
-    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-small')</dd>
+    <dd>#xwikiSelect('type', $options, $defaultValue, false, 'xwiki-select-small', '', true)</dd>
   #else
     <input type="hidden" name="template" value="$escapetool.xml($template)" />
   #end

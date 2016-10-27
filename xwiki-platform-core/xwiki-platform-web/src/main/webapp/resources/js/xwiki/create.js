@@ -69,16 +69,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     };
 
     /**
-     * Add an hidden input that indicates which template to use
+     * Set the value of the hidden input that indicates which template to use
      */
     var setTemplateProvider = function (value) {
-      // Note: the input might already exists if the user press the "back" button after having submitted the form once.
-      var templateProvider = $('#templateprovider');
-      if (templateProvider.length == 0) {
-        // So we create it only if it does not already exist
-        templateProvider = $('<input type="hidden" name="templateprovider" id="templateprovider"/>').appendTo(form);
-      }
-      templateProvider.attr('value', value);
+      $('#templateprovider').attr('value', value);
     };
 
     /**

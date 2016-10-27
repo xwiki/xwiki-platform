@@ -225,24 +225,6 @@ require.config({
  * Script that enable the drag &amp; drop of applications
  ************************************/
 require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function($, xm) {
-  /**
-   * Selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort inner elements
-   * with drag &amp; drop.
-   */
-  var sortableSelector = '.appsPanel &gt; div &gt; ul';
-  
-  /**
-   * Helper to know if a dragged element is inside a container or not
-   */
-  var isInContainer = function(element, containerId) {
-    var container        = $('#'+containerId);
-    var containerOffset  = container.offset();
-    var containerWidth   = container.width();
-    var containerHeight  = container.height();
-    var currentAppOffset = $(element).offset();
-    return (currentAppOffset.left &gt;= containerOffset.left &amp;&amp; currentAppOffset.left &lt;= containerOffset.left + containerWidth
-          &amp;&amp; currentAppOffset.top &gt;= containerOffset.top &amp;&amp; currentAppOffset.top &lt;= containerOffset.top + containerHeight);
-  }
 
   /**
    * Save the black list and the order configuration
@@ -282,43 +264,21 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('platform.panels.applications.ajax.error'))', 'error');
       }
     });
-  }
-  
-  /**
-   * Add the drag-and-drop mechanism to the specified elements
-   */
-  var initDragAndDrop = function(element) {
-    $(element).draggable({
-      // Restrict the drag and drop to the '.appLists' container
-      containment: '.appLists',
-      // Allow to drop the element in the sortable containers
-      connectToSortable: $(sortableSelector),
-      // Revert the drag and drop if the dragged element has not be moved to one of the valid containers
-      revert: function(event) {
-        return !(isInContainer(this, 'displayedPanels') || isInContainer(this, 'blacklistedPanels'));
-      },
-      // On start
-      start: function(event, ui) {
-        // Set the z-index of the element to be on top of all the others
-        $(this).css('z-index', 100);
-      },
-      // On stop
-      stop: function(event, ui) {
-        // Reset the z-index
-        $(this).css('z-index', 1);
-      }
-    });
-  }
+  };
 
   /**
-   * First: init all applications marked with the 'draggableApp' class.
+   * Initialization
    */
   $(document).ready(function() {
-    // Allow to sort, with a drag &amp; drop, elements inside their container
-    $(sortableSelector).sortable();
+    // Define the selector for the elements on which we will use the jquery-ui sortable plugin, which allows to sort 
+    // inner elements with drag &amp;amp; drop.
+    var sortableSelector = '.appsPanel &gt; div &gt; ul';
     
-    // Allow drag &amp; drop between containers
-    initDragAndDrop('.draggableApp');
+    // Enable the sortable plugin.
+    // The 'connectWith' option allows the drag &amp; drop from a sortable list (e.g. the displayed panels) to an other
+    // sortable list (e.g. the blacklisted panels).
+    // Here we create 2 sortable lists, because the selector match those 2.
+    $(sortableSelector).sortable({connectWith: sortableSelector});
     
     // Allow reverting the changes
     $('#bt-revert').click(function(){

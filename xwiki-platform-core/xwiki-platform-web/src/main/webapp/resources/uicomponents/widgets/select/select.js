@@ -81,12 +81,6 @@ require(['jquery'], function($) {
     
     self.init();
   };
-  
-  /**
-   * A map storing all select widgets that have been created. 
-   * Storing the objects here is cleaner than polluting the DOM.
-   */
-  var widgets = new Map();
     
   /**
    * Define a jQuery plugin about the select widget.
@@ -101,19 +95,21 @@ require(['jquery'], function($) {
       for (var i = 0; i < this.length; ++i) {
         var domElement = this[i];
         // This widget might have already been created
-        if (widgets.get(domElement)) {
+        if ($(domElement).data('xwikiSelectWidget')) {
           continue;
         }
-        widgets.set(domElement, new XWikiSelectWidget(domElement));
+        // Previously, we stored all the XWikiSelectWidgets in a Map where the DOM elements were the keys, but IE10 does
+        // not support the Map object so we had to find a workaround.
+        $(domElement).data('xwikiSelectWidget', new XWikiSelectWidget(domElement));
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately
       for (var i = 0; i < this.length; ++i) {
-        widgets.get(this[i]).clearSelection();
+        $(this[i]).data('xwikiSelectWidget').clearSelection();
       }
     } else if (action == 'getValue') {
       // In such a case, there is no possible chaining
-      return widgets.get(this[0]).getValue();
+      return $(this[0]).data('xwikiSelectWidget').getValue();
     }
     
     // Enable chaining

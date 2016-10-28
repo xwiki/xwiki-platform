@@ -35,6 +35,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.filter.FilterException;
@@ -77,6 +78,9 @@ public class ExtensionInstanceOutputFilterStreamTest
         this.extensionRepositoryMock =
             this.repositoryUtil.getComponentManager().registerMockComponent(ExtensionRepositoryManager.class);
         doThrow(ResolveException.class).when(this.extensionRepositoryMock).resolve((ExtensionId) any());
+
+        // Skip core extension scanner
+        this.repositoryUtil.getComponentManager().registerMockComponent(CoreExtensionScanner.class);
     }
 
     // Tests
